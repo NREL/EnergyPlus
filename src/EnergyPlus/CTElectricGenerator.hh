@@ -144,37 +144,8 @@ namespace CTElectricGenerator {
         }
     };
 
-    struct ReportVars
-    {
-        // Members
-//        Real64 PowerGen;            // reporting: power (W)
-//        Real64 EnergyGen;           // reporting: power (W)
-        Real64 QTotalHeatRecovered; // reporting: total Heat Recovered (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: Heat Recovered from exhaust (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total Heat Recovered (W)
-        Real64 LubeOilEnergyRec;    // reporting: Heat Recovered from Lubricant (W)
-        Real64 ExhaustEnergyRec;    // reporting: Heat Recovered from exhaust (W)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy use rate (W)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelMdot;            // reporting: Fuel Amount used (kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-
-        // Default Constructor
-        ReportVars()
-            : QTotalHeatRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), TotalHeatEnergyRec(0.0),
-              LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0),
-              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
-        {
-        }
-    };
-
     // Object Data
     extern Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
-    extern Array1D<ReportVars> CTGeneratorReport;
 
     // Static functions
     void SimCTGenerator(int GeneratorType,          // type of Generator

@@ -99,7 +99,6 @@ namespace CTElectricGenerator {
     bool GetCTInput(true);  // then TRUE, calls subroutine to read input file.
 
     Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
-    Array1D<ReportVars> CTGeneratorReport;
 
     void SimCTGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                         std::string const &GeneratorName,   // user specified name of Generator
@@ -226,8 +225,6 @@ namespace CTElectricGenerator {
 
         // ALLOCATE ARRAYS
         CTGenerator.allocate(NumCTGenerators);
-
-        CTGeneratorReport.allocate(NumCTGenerators);
 
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
         for (genNum = 1; genNum <= NumCTGenerators; ++genNum) {
@@ -427,13 +424,13 @@ namespace CTElectricGenerator {
 
             SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
-                                CTGeneratorReport(genNum).FuelEnergyUseRate,
+                                CTGenerator(genNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
                                 CTGenerator(genNum).Name);
             SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                CTGeneratorReport(genNum).FuelEnergy,
+                                CTGenerator(genNum).FuelEnergy,
                                 "System",
                                 "Sum",
                                 CTGenerator(genNum).Name,
@@ -446,27 +443,27 @@ namespace CTElectricGenerator {
             //    general fuel use report (to match other generators)
             SetupOutputVariable("Generator Fuel HHV Basis Rate",
                                 OutputProcessor::Unit::W,
-                                CTGeneratorReport(genNum).FuelEnergyUseRate,
+                                CTGenerator(genNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
                                 CTGenerator(genNum).Name);
             SetupOutputVariable("Generator Fuel HHV Basis Energy",
                                 OutputProcessor::Unit::J,
-                                CTGeneratorReport(genNum).FuelEnergy,
+                                CTGenerator(genNum).FuelEnergy,
                                 "System",
                                 "Sum",
                                 CTGenerator(genNum).Name);
 
             SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                CTGeneratorReport(genNum).FuelMdot,
+                                CTGenerator(genNum).FuelMdot,
                                 "System",
                                 "Average",
                                 CTGenerator(genNum).Name);
 
             SetupOutputVariable("Generator Exhaust Air Temperature",
                                 OutputProcessor::Unit::C,
-                                CTGeneratorReport(genNum).ExhaustStackTemp,
+                                CTGenerator(genNum).ExhaustStackTemp,
                                 "System",
                                 "Average",
                                 CTGenerator(genNum).Name);
@@ -474,13 +471,13 @@ namespace CTElectricGenerator {
             if (CTGenerator(genNum).HeatRecActive) {
                 SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(genNum).QExhaustRecovered,
+                                    CTGenerator(genNum).QExhaustRecovered,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(genNum).ExhaustEnergyRec,
+                                    CTGenerator(genNum).ExhaustEnergyRec,
                                     "System",
                                     "Sum",
                                     CTGenerator(genNum).Name,
@@ -492,13 +489,13 @@ namespace CTElectricGenerator {
 
                 SetupOutputVariable("Generator Lube Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(genNum).QLubeOilRecovered,
+                                    CTGenerator(genNum).QLubeOilRecovered,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Lube Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(genNum).LubeOilEnergyRec,
+                                    CTGenerator(genNum).LubeOilEnergyRec,
                                     "System",
                                     "Sum",
                                     CTGenerator(genNum).Name,
@@ -510,32 +507,32 @@ namespace CTElectricGenerator {
 
                 SetupOutputVariable("Generator Produced Thermal Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(genNum).QTotalHeatRecovered,
+                                    CTGenerator(genNum).QTotalHeatRecovered,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(genNum).TotalHeatEnergyRec,
+                                    CTGenerator(genNum).TotalHeatEnergyRec,
                                     "System",
                                     "Sum",
                                     CTGenerator(genNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    CTGeneratorReport(genNum).HeatRecInletTemp,
+                                    CTGenerator(genNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    CTGeneratorReport(genNum).HeatRecOutletTemp,
+                                    CTGenerator(genNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    CTGeneratorReport(genNum).HeatRecMdot,
+                                    CTGenerator(genNum).HeatRecMdot,
                                     "System",
                                     "Average",
                                     CTGenerator(genNum).Name);
@@ -704,7 +701,6 @@ namespace CTElectricGenerator {
         }
 
         // Now verify the maximum temperature was not exceeded
-        HRecRatio = 1.0;
         MinHeatRecMdot = 0.0;
         if (HeatRecOutTemp > CTGenerator(genNum).HeatRecMaxTemp) {
             if (CTGenerator(genNum).HeatRecMaxTemp != HeatRecInTemp) {
@@ -892,19 +888,6 @@ namespace CTElectricGenerator {
             HeatRecOutletNode = CTGenerator(genNUm).HeatRecOutletNodeNum;
             DataLoopNode::Node(HeatRecOutletNode).Temp = CTGenerator(genNUm).HeatRecOutletTemp;
         }
-        CTGeneratorReport(genNUm).QExhaustRecovered = CTGenerator(genNUm).QExhaustRecovered;
-        CTGeneratorReport(genNUm).QLubeOilRecovered = CTGenerator(genNUm).QLubeOilRecovered;
-        CTGeneratorReport(genNUm).ExhaustEnergyRec = CTGenerator(genNUm).ExhaustEnergyRec;
-        CTGeneratorReport(genNUm).LubeOilEnergyRec = CTGenerator(genNUm).LubeOilEnergyRec;
-        CTGeneratorReport(genNUm).QTotalHeatRecovered = CTGenerator(genNUm).QTotalHeatRecovered;
-        CTGeneratorReport(genNUm).TotalHeatEnergyRec = CTGenerator(genNUm).TotalHeatEnergyRec;
-        CTGeneratorReport(genNUm).FuelEnergyUseRate = CTGenerator(genNUm).FuelEnergyUseRate;
-        CTGeneratorReport(genNUm).FuelEnergy = CTGenerator(genNUm).FuelEnergy;
-        CTGeneratorReport(genNUm).FuelMdot = CTGenerator(genNUm).FuelMdot;
-        CTGeneratorReport(genNUm).ExhaustStackTemp = CTGenerator(genNUm).ExhaustStackTemp;
-        CTGeneratorReport(genNUm).HeatRecInletTemp = CTGenerator(genNUm).HeatRecInletTemp;
-        CTGeneratorReport(genNUm).HeatRecOutletTemp = CTGenerator(genNUm).HeatRecOutletTemp;
-        CTGeneratorReport(genNUm).HeatRecMdot = CTGenerator(genNUm).HeatRecMdot;
     }
 
     void GetCTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
@@ -926,8 +909,8 @@ namespace CTElectricGenerator {
 
         GeneratorPower = CTGenerator(genNum).ElecPowerGenerated;
         GeneratorEnergy = CTGenerator(genNum).ElecEnergyGenerated;
-        ThermalPower = CTGeneratorReport(genNum).QTotalHeatRecovered;
-        ThermalEnergy = CTGeneratorReport(genNum).TotalHeatEnergyRec;
+        ThermalPower = CTGenerator(genNum).QTotalHeatRecovered;
+        ThermalEnergy = CTGenerator(genNum).TotalHeatEnergyRec;
     }
 
 } // namespace CTElectricGenerator
