@@ -288,6 +288,10 @@ namespace IceThermalStorage {
         void InitDetailedIceStorage();
 
         void SimDetailedIceStorage();
+
+        void UpdateDetailedIceStorage();
+
+        void ReportDetailedIceStorage();
     };
 
     // Object Data
@@ -320,16 +324,12 @@ namespace IceThermalStorage {
                      Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
                      Real64 MassFlowstar  // normalized mass flow rate through the ice storage unit
     );
-    
+
     Real64 TempSItoIP(Real64 Temp);
 
     Real64 TempIPtoSI(Real64 Temp);
 
     void UpdateIceFractions();
-
-    void UpdateDetailedIceStorage(int iceNum);
-
-    void ReportDetailedIceStorage(int iceNum);
 
 } // namespace IceThermalStorage
 

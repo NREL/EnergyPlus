@@ -325,9 +325,9 @@ namespace IceThermalStorage {
 
                 thisITS.SimDetailedIceStorage(); // Simulate detailed ice storage
 
-                UpdateDetailedIceStorage(iceNum); // Update detailed ice storage
+                thisITS.UpdateDetailedIceStorage(); // Update detailed ice storage
 
-                ReportDetailedIceStorage(iceNum); // Report detailed ice storage
+                thisITS.ReportDetailedIceStorage(); // Report detailed ice storage
 
             } else {
                 ShowFatalError("Specified IceStorage not found in SimIceStorage" + IceStorageType);
@@ -1913,37 +1913,37 @@ namespace IceThermalStorage {
         // This is called from HVACManager once we have actually stepped forward
         // a system time step.
 
-        for (int IceNum2 = 1; IceNum2 <= modNumIceStorages; ++IceNum2) {
-            IceStorage(IceNum2).IceFracRemain += IceStorage(IceNum2).Urate * DataHVACGlobals::TimeStepSys;
-            if (IceStorage(IceNum2).IceFracRemain <= 0.001) IceStorage(IceNum2).IceFracRemain = 0.0;
-            if (IceStorage(IceNum2).IceFracRemain > 1.0) IceStorage(IceNum2).IceFracRemain = 1.0;
+        for (auto &thisITS: IceStorage) {
+            thisITS.IceFracRemain += thisITS.Urate * DataHVACGlobals::TimeStepSys;
+            if (thisITS.IceFracRemain <= 0.001) thisITS.IceFracRemain = 0.0;
+            if (thisITS.IceFracRemain > 1.0) thisITS.IceFracRemain = 1.0;
         }
 
-        for (int IceNum2 = 1; IceNum2 <= modNumDetIceStorages; ++IceNum2) {
-            DetIceStor(IceNum2).IceFracRemaining += DetIceStor(IceNum2).IceFracChange - (DetIceStor(IceNum2).TankLossCoeff * DataHVACGlobals::TimeStepSys);
-            if (DetIceStor(IceNum2).IceFracRemaining < 0.001) DetIceStor(IceNum2).IceFracRemaining = 0.0;
-            if (DetIceStor(IceNum2).IceFracRemaining > 1.000) DetIceStor(IceNum2).IceFracRemaining = 1.0;
+        for (auto &thisITS: DetIceStor) {
+            thisITS.IceFracRemaining += thisITS.IceFracChange - (thisITS.TankLossCoeff * DataHVACGlobals::TimeStepSys);
+            if (thisITS.IceFracRemaining < 0.001) thisITS.IceFracRemaining = 0.0;
+            if (thisITS.IceFracRemaining > 1.000) thisITS.IceFracRemaining = 1.0;
             // Reset the ice on the coil to zero for inside melt whenever discharging takes place.
             // This assumes that any remaining ice floats away from the coil and resettles perfectly.
             // While this is not exactly what happens and it is possible theoretically to have multiple
             // freeze thaw cycles that are not complete, this is the best we can do.
-            if (DetIceStor(IceNum2).ThawProcessIndex == DetIce::InsideMelt) {
-                if (DetIceStor(IceNum2).IceFracChange < 0.0) {
-                    DetIceStor(IceNum2).IceFracOnCoil = 0.0;
+            if (thisITS.ThawProcessIndex == DetIce::InsideMelt) {
+                if (thisITS.IceFracChange < 0.0) {
+                    thisITS.IceFracOnCoil = 0.0;
                 } else {
                     // Assume loss term does not impact ice on the coil but what is remaining
-                    DetIceStor(IceNum2).IceFracOnCoil += DetIceStor(IceNum2).IceFracChange;
+                    thisITS.IceFracOnCoil += thisITS.IceFracChange;
                     // If the ice remaining has run out because of tank losses, reset ice fraction on coil so that it keeps track of losses
-                    if (DetIceStor(IceNum2).IceFracOnCoil > DetIceStor(IceNum2).IceFracRemaining)
-                        DetIceStor(IceNum2).IceFracOnCoil = DetIceStor(IceNum2).IceFracRemaining;
+                    if (thisITS.IceFracOnCoil > thisITS.IceFracRemaining)
+                        thisITS.IceFracOnCoil = thisITS.IceFracRemaining;
                 }
             } else { // Outside melt system so IceFracOnCoil is always the same as IceFracRemaining (needs to be done for reporting only)
-                DetIceStor(IceNum2).IceFracOnCoil = DetIceStor(IceNum2).IceFracRemaining;
+                thisITS.IceFracOnCoil = thisITS.IceFracRemaining;
             }
         }
     }
 
-    void UpdateDetailedIceStorage(int const iceNum)
+    void DetailedIceStorageData::UpdateDetailedIceStorage()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1961,15 +1961,15 @@ namespace IceThermalStorage {
         // for the detailed ice storage system in question.
 
         // Set the temperature and flow rate for the component outlet node
-        int InNodeNum = DetIceStor(iceNum).PlantInNodeNum;
-        int OutNodeNum = DetIceStor(iceNum).PlantOutNodeNum;
+        int InNodeNum = this->PlantInNodeNum;
+        int OutNodeNum = this->PlantOutNodeNum;
 
         PlantUtilities::SafeCopyPlantNode(InNodeNum, OutNodeNum);
 
-        DataLoopNode::Node(OutNodeNum).Temp = DetIceStor(iceNum).OutletTemp;
+        DataLoopNode::Node(OutNodeNum).Temp = this->OutletTemp;
     }
 
-    void ReportDetailedIceStorage(int const iceNum)
+    void DetailedIceStorageData::ReportDetailedIceStorage()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1987,37 +1987,37 @@ namespace IceThermalStorage {
 
         Real64 const LowLoadLimit(0.1); // Load below which device can be assumed off [W]
 
-        if (DetIceStor(iceNum).CompLoad < LowLoadLimit) { // No load condition
+        if (this->CompLoad < LowLoadLimit) { // No load condition
 
-            DetIceStor(iceNum).IceFracChange = 0.0;
-            DetIceStor(iceNum).DischargingRate = 0.0;
-            DetIceStor(iceNum).DischargingEnergy = 0.0;
-            DetIceStor(iceNum).ChargingRate = 0.0;
-            DetIceStor(iceNum).ChargingEnergy = 0.0;
-            DetIceStor(iceNum).ParasiticElecRate = 0.0;
-            DetIceStor(iceNum).ParasiticElecEnergy = 0.0;
+            this->IceFracChange = 0.0;
+            this->DischargingRate = 0.0;
+            this->DischargingEnergy = 0.0;
+            this->ChargingRate = 0.0;
+            this->ChargingEnergy = 0.0;
+            this->ParasiticElecRate = 0.0;
+            this->ParasiticElecEnergy = 0.0;
 
         } else { // There is a load, determine whether we are charging or discharging based on inlet and outlet temperature
 
-            if (DetIceStor(iceNum).InletTemp < DetIceStor(iceNum).OutletTemp) { // Charging Mode
+            if (this->InletTemp < this->OutletTemp) { // Charging Mode
 
-                DetIceStor(iceNum).ChargingRate = DetIceStor(iceNum).CompLoad;
-                DetIceStor(iceNum).ChargingEnergy = DetIceStor(iceNum).CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-                DetIceStor(iceNum).IceFracChange = DetIceStor(iceNum).CompLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
-                DetIceStor(iceNum).DischargingRate = 0.0;
-                DetIceStor(iceNum).DischargingEnergy = 0.0;
-                DetIceStor(iceNum).ParasiticElecRate = DetIceStor(iceNum).ChargeParaElecLoad * DetIceStor(iceNum).CompLoad;
-                DetIceStor(iceNum).ParasiticElecEnergy = DetIceStor(iceNum).ChargeParaElecLoad * DetIceStor(iceNum).ChargingEnergy;
+                this->ChargingRate = this->CompLoad;
+                this->ChargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                this->IceFracChange = this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                this->DischargingRate = 0.0;
+                this->DischargingEnergy = 0.0;
+                this->ParasiticElecRate = this->ChargeParaElecLoad * this->CompLoad;
+                this->ParasiticElecEnergy = this->ChargeParaElecLoad * this->ChargingEnergy;
 
             } else { // (DetIceStor(IceNum)%InletTemp < DetIceStor(IceNum)%OutletTemp) Discharging Mode
 
-                DetIceStor(iceNum).DischargingRate = DetIceStor(iceNum).CompLoad;
-                DetIceStor(iceNum).DischargingEnergy = DetIceStor(iceNum).CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-                DetIceStor(iceNum).IceFracChange = -DetIceStor(iceNum).CompLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
-                DetIceStor(iceNum).ChargingRate = 0.0;
-                DetIceStor(iceNum).ChargingEnergy = 0.0;
-                DetIceStor(iceNum).ParasiticElecRate = DetIceStor(iceNum).DischargeParaElecLoad * DetIceStor(iceNum).CompLoad;
-                DetIceStor(iceNum).ParasiticElecEnergy = DetIceStor(iceNum).DischargeParaElecLoad * DetIceStor(iceNum).ChargingEnergy;
+                this->DischargingRate = this->CompLoad;
+                this->DischargingEnergy = this->CompLoad * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                this->IceFracChange = -this->CompLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                this->ChargingRate = 0.0;
+                this->ChargingEnergy = 0.0;
+                this->ParasiticElecRate = this->DischargeParaElecLoad * this->CompLoad;
+                this->ParasiticElecEnergy = this->DischargeParaElecLoad * this->ChargingEnergy;
             }
         }
     }
