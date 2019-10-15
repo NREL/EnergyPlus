@@ -196,11 +196,15 @@ namespace IceThermalStorage {
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
 
-        void CalcIceStorageDischarge(Real64 myLoad,       // operating load
-                                     bool RunFlag,        // TRUE when ice storage operating
-                                     bool FirstIteration, // TRUE when first iteration of timestep
-                                     Real64 MaxCap        // Max possible discharge rate (positive value)
-        );
+        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, bool FirstIteration, Real64 MaxCap);
+
+        void CalcIceStorageCharge();
+
+        void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
+
+        void CalcQiceChargeMaxByITS(Real64 chillerOutletTemp, Real64 &QiceMaxByITS);
+
+        void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
     };
 
     struct DetailedIceStorageData
@@ -299,19 +303,7 @@ namespace IceThermalStorage {
 
     void InitDetailedIceStorage(int iceNum);
 
-    void CalcIceStorageCharge(int IceStorageType, // BY ZG
-                              int &iceNum);
-
-    void CalcQiceChargeMaxByChiller(int &iceNum, Real64 &QiceMaxByChiller);
-
-    void CalcQiceChargeMaxByITS(int iceNum,
-                                Real64 chillerOutletTemp, // [degC]
-                                Real64 &QiceMaxByITS            // [W]
-    );
-
     void CalcQiceDischageMax(Real64 &QiceMin, int iceNum);
-
-    void CalcUAIce(int iceNum, Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
                                   Real64 Tout, // ice storage unit outlet (setpoint) temperature
