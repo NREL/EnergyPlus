@@ -60,33 +60,14 @@ namespace EnergyPlus {
 
 namespace IceThermalStorage {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS
     extern std::string const cIceStorageSimple;
     extern std::string const cIceStorageDetailed;
 
-    // ITS parameter
-    extern Real64 const modFreezTemp;    // Water freezing Temperature, 0[C]
-    extern Real64 const modFreezTempIP;  // Water freezing Temperature, 32[F]
-    extern Real64 const modTimeInterval; // Time Interval (1 hr) [s]
-
-    // Conversion parameter
-    extern Real64 const modEpsLimitForX;         // 0.02  ! See Dion's code as eps1
-    extern Real64 const modEpsLimitForDisCharge; // 0.20  ! See Dion's code as eps2
-    extern Real64 const modEpsLimitForCharge;    // 0.20  ! See Dion's code as eps3
-
-    // Parameter used by the Detailed Ice Storage Model
-    extern Real64 const modDeltaTofMin; // Minimum allowed outlet side temperature difference [C]
-    // This is (Tout - Tfreezing)
-    extern Real64 const modDeltaTifMin; // Minimum allowed inlet side temperature difference [C]
-    // This is (Tin - Tfreezing)
-
     // ITS numbers and FoundOrNot
-    extern int modNumIceStorages;
-    extern int modNumDetIceStorages;
-    extern int modTotalIceStorages;
+    extern int NumSimpleIceStorage;
+    extern int NumDetailedIceStorage;
+    extern int TotalNumIceStorage;
 
     struct IceStorageType {
         enum {
@@ -118,22 +99,7 @@ namespace IceThermalStorage {
         };
     };
 
-    struct IceStorageMapping
-    {
-        // Members
-        // Input data
-        std::string Name; // User identifier
-        std::string StorageType;
-        int StorageType_Num;
-        int LocalEqNum;
-
-        // Default Constructor
-        IceStorageMapping() : StorageType_Num(0), LocalEqNum(0)
-        {
-        }
-    };
-
-    struct IceStorageSpecs : PlantComponent
+    struct SimpleIceStorageData : PlantComponent
     {
         // Members
         // Input data
@@ -181,7 +147,7 @@ namespace IceThermalStorage {
         bool MyEnvrnFlag2;
 
         // Default Constructor
-        IceStorageSpecs()
+        SimpleIceStorageData()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
@@ -193,7 +159,7 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSimpleIceStorage();
 
@@ -294,7 +260,7 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitDetailedIceStorage();
 
@@ -308,12 +274,10 @@ namespace IceThermalStorage {
     };
 
     // Object Data
-    extern Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
-    extern Array1D<IceStorageMapping> IceStorageTypeMap;
+    extern Array1D<SimpleIceStorageData> SimpleIceStorage;        // dimension to number of machines
+    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
 
-    // Functions
-
+    // Static Functions
     void clear_state();
 
     void GetIceStorageInput();

@@ -81,7 +81,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
     Real64 ExpectedValue = 0.0;
     Real64 Tolerance = 0.001;
         
-    IceThermalStorage::DetIceStor.allocate(TotDetailedIce);
+    IceThermalStorage::DetailedIceStorage.allocate(TotDetailedIce);
     CurveManager::PerfCurve.allocate(TotCurves);
     CurveManager::NumCurves = TotCurves;
     BeginEnvrnFlag = false;

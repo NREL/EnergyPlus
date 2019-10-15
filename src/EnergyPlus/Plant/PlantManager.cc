@@ -1231,7 +1231,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
-                                this_comp.compPtr = IceThermalStorage::IceStorageSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
