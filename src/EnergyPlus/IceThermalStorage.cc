@@ -290,7 +290,7 @@ namespace IceThermalStorage {
                     Real64 MaxCap;
                     Real64 MinCap;
                     Real64 OptCap;
-                    CalcIceStorageCapacity(IceStorageType::Simple, MaxCap, MinCap, OptCap, iceNum);
+                    thisITS.CalcIceStorageCapacity(MaxCap, MinCap, OptCap, iceNum);
                     CalcIceStorageCharge(IceStorageType::Simple, iceNum);
 
                     //***** Discharging Process for ITS *****************************************
@@ -301,8 +301,8 @@ namespace IceThermalStorage {
                     Real64 MaxCap;
                     Real64 MinCap;
                     Real64 OptCap;
-                    CalcIceStorageCapacity(IceStorageType::Simple, MaxCap, MinCap, OptCap, iceNum);
-                    CalcIceStorageDischarge(IceStorageType::Simple, iceNum, MyLoad, RunFlag, FirstIteration, MaxCap);
+                    thisITS.CalcIceStorageCapacity(MaxCap, MinCap, OptCap, iceNum);
+                    thisITS.CalcIceStorageDischarge(MyLoad, RunFlag, FirstIteration, MaxCap);
                 } // Based on input of U value, deciding Dormant/Charge/Discharge process
 
                 // Update Node properties: mdot and Temperature
@@ -1387,58 +1387,50 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcIceStorageCapacity(int const IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum)
+    void IceStorageSpecs::CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum)
     {
-        {
-            auto const SELECT_CASE_var(IceStorageType);
-            if (SELECT_CASE_var == IceStorageType::Simple) {
+        //------------------------------------------------------------------------
+        // FIRST PROCESS (MyLoad = 0.0 as IN)
+        // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
+        //------------------------------------------------------------------------
 
-                //------------------------------------------------------------------------
-                // FIRST PROCESS (MyLoad = 0.0 as IN)
-                // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
-                //------------------------------------------------------------------------
+        // Initialize Capacity
+        MaxCap = 0.0;
+        MinCap = 0.0;
+        OptCap = 0.0;
 
-                // Initialize Capacity
-                MaxCap = 0.0;
-                MinCap = 0.0;
-                OptCap = 0.0;
-
-                // XCurIceFrac is reset to 1.0 when first hour of day.
-                // Starting full is assumed, because most ice systems are fully charged overnight
-                if (IceStorage(iceNum).ResetXForITSFlag) {
-                    IceStorage(iceNum).XCurIceFrac = 1.0;
-                    IceStorage(iceNum).IceFracRemain = 1.0;
-                    IceStorage(iceNum).Urate = 0.0;
-                    IceStorage(iceNum).ResetXForITSFlag = false;
-                }
-
-                // Calculate UAIceDisch[W/C] and UAIceCh[W/F] based on ONLY XCurIceFrac
-                CalcUAIce(iceNum, IceStorage(iceNum).XCurIceFrac, IceStorage(iceNum).UAIceCh, IceStorage(iceNum).UAIceDisCh, IceStorage(iceNum).HLoss);
-
-                // Calculate QiceMin by UAIceDisCh*deltaTlm
-                //   with UAIceDisCh(function of XCurIceFrac), ITSInletTemp and ITSOutletTemp(=Node(OutletNodeNum)%TempSetPoint by E+[C])
-                // QiceMin is REAL(r64) ITS capacity.
-                Real64 QiceMin;
-                CalcQiceDischageMax(QiceMin, iceNum);
-
-                // At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
-                // Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
-                Real64 Umin = min(max((-(1.0 - modEpsLimitForDisCharge) * QiceMin * modTimeInterval / IceStorage(iceNum).ITSNomCap), (-IceStorage(iceNum).XCurIceFrac + modEpsLimitForX)), 0.0);
-
-                // Calculate CoolingRate with Uact to provide E+.
-                Real64 Uact = Umin;
-                Real64 ITSCoolingRateMax = std::abs(Uact * IceStorage(iceNum).ITSNomCap / modTimeInterval);
-                Real64 ITSCoolingRateOpt = ITSCoolingRateMax;
-                Real64 ITSCoolingRateMin = 0.0;
-
-                // Define MaxCap, OptCap, and MinCap
-                MaxCap = ITSCoolingRateMax;
-                OptCap = ITSCoolingRateOpt;
-                MinCap = ITSCoolingRateMin;
-
-            } else {
-            }
+        // XCurIceFrac is reset to 1.0 when first hour of day.
+        // Starting full is assumed, because most ice systems are fully charged overnight
+        if (this->ResetXForITSFlag) {
+            this->XCurIceFrac = 1.0;
+            this->IceFracRemain = 1.0;
+            this->Urate = 0.0;
+            this->ResetXForITSFlag = false;
         }
+
+        // Calculate UAIceDisch[W/C] and UAIceCh[W/F] based on ONLY XCurIceFrac
+        CalcUAIce(iceNum, this->XCurIceFrac, this->UAIceCh, this->UAIceDisCh, this->HLoss);
+
+        // Calculate QiceMin by UAIceDisCh*deltaTlm
+        //   with UAIceDisCh(function of XCurIceFrac), ITSInletTemp and ITSOutletTemp(=Node(OutletNodeNum)%TempSetPoint by E+[C])
+        // QiceMin is REAL(r64) ITS capacity.
+        Real64 QiceMin;
+        CalcQiceDischageMax(QiceMin, iceNum);
+
+        // At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
+        // Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
+        Real64 Umin = min(max((-(1.0 - modEpsLimitForDisCharge) * QiceMin * modTimeInterval / this->ITSNomCap), (-this->XCurIceFrac + modEpsLimitForX)), 0.0);
+
+        // Calculate CoolingRate with Uact to provide E+.
+        Real64 Uact = Umin;
+        Real64 ITSCoolingRateMax = std::abs(Uact * this->ITSNomCap / modTimeInterval);
+        Real64 ITSCoolingRateOpt = ITSCoolingRateMax;
+        Real64 ITSCoolingRateMin = 0.0;
+
+        // Define MaxCap, OptCap, and MinCap
+        MaxCap = ITSCoolingRateMax;
+        OptCap = ITSCoolingRateOpt;
+        MinCap = ITSCoolingRateMin;
     }
 
     //******************************************************************************
@@ -1636,9 +1628,7 @@ namespace IceThermalStorage {
         }
     }
 
-    void CalcIceStorageDischarge(int const IceStorageType,             // by ZG
-                                 int const iceNum,                     // ice storage number
-                                 Real64 const MyLoad,                  // operating load
+    void IceStorageSpecs::CalcIceStorageDischarge(Real64 const myLoad,                  // operating load
                                  bool const RunFlag,                   // TRUE when ice storage operating
                                  bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
                                  Real64 const MaxCap                   // Max possible discharge rate (positive value)
@@ -1646,101 +1636,93 @@ namespace IceThermalStorage {
     {
         std::string const RoutineName("CalcIceStorageDischarge");
 
+        // Initialize processed Rate and Energy
+        this->ITSMassFlowRate = 0.0;
+        this->ITSCoolingRate = 0.0;
+        this->ITSCoolingEnergy = 0.0;
+
         {
-            auto const SELECT_CASE_var(IceStorageType);
-            if (SELECT_CASE_var == IceStorageType::Simple) {
-
-                // Initialize processed Rate and Energy
-                IceStorage(iceNum).ITSMassFlowRate = 0.0;
-                IceStorage(iceNum).ITSCoolingRate = 0.0;
-                IceStorage(iceNum).ITSCoolingEnergy = 0.0;
-
-                {
-                    auto const SELECT_CASE_var1(DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
-                        IceStorage(iceNum).ITSOutletSetPointTemp = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
-                        IceStorage(iceNum).ITSOutletSetPointTemp = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPointHi;
-                    }
-                }
-
-                // Initialize processed U values
-                IceStorage(iceNum).Urate = 0.0;
-
-                // If no component demand or ITS OFF, then RETURN.
-                if (MyLoad == 0 || !RunFlag) {
-                    IceStorage(iceNum).ITSMassFlowRate = 0.0;
-                    IceStorage(iceNum).ITSInletTemp = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp;
-                    IceStorage(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSInletTemp;
-                    IceStorage(iceNum).ITSCoolingRate = 0.0;
-                    IceStorage(iceNum).ITSCoolingEnergy = 0.0;
-                    return;
-                }
-
-                // If FlowLock(provided by PlantSupplyManager) is False(=0), that is, MyLoad is not changed.
-                // then based on MyLoad, new ITSMassFlowRate will be calculated.
-
-                //----------------------------
-                int LoopNum = IceStorage(iceNum).LoopNum;
-
-                Real64 CpFluid = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(LoopNum).FluidName, DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
-
-                // Calculate Umyload based on MyLoad from E+
-                Real64 Umyload = -MyLoad * modTimeInterval / IceStorage(iceNum).ITSNomCap;
-                // Calculate Umax and Umin
-                // Cannot discharge more than the fraction that is left
-                Real64 Umax = -IceStorage(iceNum).IceFracRemain / DataHVACGlobals::TimeStepSys;
-                // Calculate Umin based on returned MyLoad from E+.
-                Real64 Umin = min(Umyload, 0.0);
-                // Based on Umax and Umin, if necessary to run E+, calculate proper Uact
-                // U is negative here.
-                Real64 Uact = max(Umin, Umax);
-
-                // Set ITSInletTemp provided by E+
-                IceStorage(iceNum).ITSInletTemp = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp;
-                // The first thing is to set the ITSMassFlowRate
-                IceStorage(iceNum).ITSMassFlowRate = IceStorage(iceNum).DesignMassFlowRate; //[kg/s]
-
-                PlantUtilities::SetComponentFlowRate(IceStorage(iceNum).ITSMassFlowRate,
-                                                     IceStorage(iceNum).PltInletNodeNum,
-                                                     IceStorage(iceNum).PltOutletNodeNum,
-                                                     IceStorage(iceNum).LoopNum,
-                                                     IceStorage(iceNum).LoopSideNum,
-                                                     IceStorage(iceNum).BranchNum,
-                                                     IceStorage(iceNum).CompNum);
-
-                // Qice is calculate input U which is within boundary between Umin and Umax.
-                Real64 Qice = Uact * IceStorage(iceNum).ITSNomCap / modTimeInterval;
-                // Qice cannot exceed MaxCap calulated by CalcIceStorageCapacity
-                // Note Qice is negative here, MaxCap is positive
-                Qice = max(Qice, -MaxCap);
-
-                // Calculate leaving water temperature
-                if ((Qice >= 0.0) || (IceStorage(iceNum).XCurIceFrac <= 0.0) || (IceStorage(iceNum).ITSMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)) {
-                    IceStorage(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSInletTemp;
-                    Qice = 0.0;
-                    Uact = 0.0;
-                } else {
-                    Real64 DeltaTemp = Qice / CpFluid / IceStorage(iceNum).ITSMassFlowRate;
-                    IceStorage(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSInletTemp + DeltaTemp;
-                    // Limit leaving temp to be no less than setpoint or freezing temp plus 1C
-                    IceStorage(iceNum).ITSOutletTemp = max(IceStorage(iceNum).ITSOutletTemp, IceStorage(iceNum).ITSOutletSetPointTemp, (modFreezTemp + 1));
-                    // Limit leaving temp to be no greater than inlet temp
-                    IceStorage(iceNum).ITSOutletTemp = min(IceStorage(iceNum).ITSOutletTemp, IceStorage(iceNum).ITSInletTemp);
-                    DeltaTemp = IceStorage(iceNum).ITSOutletTemp - IceStorage(iceNum).ITSInletTemp;
-                    Qice = DeltaTemp * CpFluid * IceStorage(iceNum).ITSMassFlowRate;
-                    Uact = Qice / (IceStorage(iceNum).ITSNomCap / modTimeInterval);
-                } // End of leaving temp checks
-
-                // Calculate reported U value
-                IceStorage(iceNum).Urate = Uact;
-                // Calculate ITSCoolingEnergy [J]
-                IceStorage(iceNum).ITSCoolingRate = -Qice;
-                IceStorage(iceNum).ITSCoolingEnergy = IceStorage(iceNum).ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-            } else {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
+
+        // Initialize processed U values
+        this->Urate = 0.0;
+
+        // If no component demand or ITS OFF, then RETURN.
+        if (myLoad == 0 || !RunFlag) {
+            this->ITSMassFlowRate = 0.0;
+            this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+            this->ITSOutletTemp = this->ITSInletTemp;
+            this->ITSCoolingRate = 0.0;
+            this->ITSCoolingEnergy = 0.0;
+            return;
+        }
+
+        // If FlowLock(provided by PlantSupplyManager) is False(=0), that is, MyLoad is not changed.
+        // then based on MyLoad, new ITSMassFlowRate will be calculated.
+
+        //----------------------------
+        int loopNum = this->LoopNum;
+
+        Real64 CpFluid = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, DataLoopNode::Node(this->PltInletNodeNum).Temp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+
+        // Calculate Umyload based on MyLoad from E+
+        Real64 Umyload = -myLoad * modTimeInterval / this->ITSNomCap;
+        // Calculate Umax and Umin
+        // Cannot discharge more than the fraction that is left
+        Real64 Umax = -this->IceFracRemain / DataHVACGlobals::TimeStepSys;
+        // Calculate Umin based on returned MyLoad from E+.
+        Real64 Umin = min(Umyload, 0.0);
+        // Based on Umax and Umin, if necessary to run E+, calculate proper Uact
+        // U is negative here.
+        Real64 Uact = max(Umin, Umax);
+
+        // Set ITSInletTemp provided by E+
+        this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        // The first thing is to set the ITSMassFlowRate
+        this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(this->ITSMassFlowRate,
+                                             this->PltInletNodeNum,
+                                             this->PltOutletNodeNum,
+                                             this->LoopNum,
+                                             this->LoopSideNum,
+                                             this->BranchNum,
+                                             this->CompNum);
+
+        // Qice is calculate input U which is within boundary between Umin and Umax.
+        Real64 Qice = Uact * this->ITSNomCap / modTimeInterval;
+        // Qice cannot exceed MaxCap calulated by CalcIceStorageCapacity
+        // Note Qice is negative here, MaxCap is positive
+        Qice = max(Qice, -MaxCap);
+
+        // Calculate leaving water temperature
+        if ((Qice >= 0.0) || (this->XCurIceFrac <= 0.0) || (this->ITSMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)) {
+            this->ITSOutletTemp = this->ITSInletTemp;
+            Qice = 0.0;
+            Uact = 0.0;
+        } else {
+            Real64 DeltaTemp = Qice / CpFluid / this->ITSMassFlowRate;
+            this->ITSOutletTemp = this->ITSInletTemp + DeltaTemp;
+            // Limit leaving temp to be no less than setpoint or freezing temp plus 1C
+            this->ITSOutletTemp = max(this->ITSOutletTemp, this->ITSOutletSetPointTemp, (modFreezTemp + 1));
+            // Limit leaving temp to be no greater than inlet temp
+            this->ITSOutletTemp = min(this->ITSOutletTemp, this->ITSInletTemp);
+            DeltaTemp = this->ITSOutletTemp - this->ITSInletTemp;
+            Qice = DeltaTemp * CpFluid * this->ITSMassFlowRate;
+            Uact = Qice / (this->ITSNomCap / modTimeInterval);
+        } // End of leaving temp checks
+
+        // Calculate reported U value
+        this->Urate = Uact;
+        // Calculate ITSCoolingEnergy [J]
+        this->ITSCoolingRate = -Qice;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
     void CalcQiceDischageMax(Real64 &QiceMin, int iceNum)

@@ -193,6 +193,14 @@ namespace IceThermalStorage {
         void InitSimpleIceStorage();
 
         void CalcIceStorageDormant();
+
+        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
+
+        void CalcIceStorageDischarge(Real64 myLoad,       // operating load
+                                     bool RunFlag,        // TRUE when ice storage operating
+                                     bool FirstIteration, // TRUE when first iteration of timestep
+                                     Real64 MaxCap        // Max possible discharge rate (positive value)
+        );
     };
 
     struct DetailedIceStorageData
@@ -291,8 +299,6 @@ namespace IceThermalStorage {
 
     void InitDetailedIceStorage(int iceNum);
 
-    void CalcIceStorageCapacity(int IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
-
     void CalcIceStorageCharge(int IceStorageType, // BY ZG
                               int &iceNum);
 
@@ -301,14 +307,6 @@ namespace IceThermalStorage {
     void CalcQiceChargeMaxByITS(int iceNum,
                                 Real64 chillerOutletTemp, // [degC]
                                 Real64 &QiceMaxByITS            // [W]
-    );
-
-    void CalcIceStorageDischarge(int IceStorageType,  // by ZG
-                                 int iceNum,          // ice storage number
-                                 Real64 MyLoad,       // operating load
-                                 bool RunFlag,        // TRUE when ice storage operating
-                                 bool FirstIteration, // TRUE when first iteration of timestep
-                                 Real64 MaxCap        // Max possible discharge rate (positive value)
     );
 
     void CalcQiceDischageMax(Real64 &QiceMin, int iceNum);
