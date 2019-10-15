@@ -75,7 +75,7 @@ namespace EnergyPlus {
 
 namespace CTElectricGenerator {
 
-    //__________________________________________________________________________
+    //__________________________________________________________________________;
     // BLAST inherited generators:
     // CTElectricGenerator (COMBUSTION Turbine)
 
@@ -96,7 +96,6 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataGlobalConstants::iGeneratorCombTurbine;
@@ -104,13 +103,11 @@ namespace CTElectricGenerator {
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::SecInHour;
 
-    // MODULE VARIABLE DECLARATIONS:
     int NumCTGenerators(0); // number of CT Generators specified in input
     bool GetCTInput(true);  // then TRUE, calls subroutine to read input file.
 
     Array1D_bool CheckEquipName;
 
-    // Object Data
     Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
     Array1D<ReportVars> CTGeneratorReport;
 
@@ -131,10 +128,8 @@ namespace CTElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -191,8 +186,6 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill data needed in PlantLoopEquipments
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (GetCTInput) {
             GetCTGeneratorInput();
             GetCTInput = false;
@@ -227,10 +220,6 @@ namespace CTElectricGenerator {
         // This routine will get the input
         // required by the CT Generator models.
 
-        // METHODOLOGY EMPLOYED:
-        // EnergyPlus input processor
-
-        // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -239,7 +228,6 @@ namespace CTElectricGenerator {
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
-        // LOCAL VARIABLES
         int GeneratorNum;               // Generator counter
         int NumAlphas;                  // Number of elements in the alpha array
         int NumNums;                    // Number of elements in the numeric array
@@ -247,8 +235,6 @@ namespace CTElectricGenerator {
         Array1D_string AlphArray(12);   // character string data
         Array1D<Real64> NumArray(12);   // numeric data
         static bool ErrorsFound(false); // error flag
-
-        // FLOW
 
         cCurrentModuleObject = "Generator:CombustionTurbine";
         NumCTGenerators = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -578,12 +564,6 @@ namespace CTElectricGenerator {
         }
     }
 
-    // End of Get Input subroutines for the CT Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
-
     void CalcCTGeneratorModel(int const GeneratorNum, // Generator number
                               bool const RunFlag,     // TRUE when Generator operating
                               Real64 const MyLoad,    // Generator demand
@@ -602,26 +582,22 @@ namespace CTElectricGenerator {
         // curve fit of performance data.  This model was originally
         // developed by Dale Herron for the BLAST program
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
         static std::string const RoutineName("CalcCTGeneratorModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;     // min allowed operating frac full load
         Real64 MaxPartLoadRat;     // max allowed operating frac full load
         Real64 RatedPowerOutput;   // Generator nominal capacity (W)
         Real64 ElecPowerGenerated; // Generator output (W)
         Real64 ElectricEnergyGen;  // Generator output (J)
 
-        // Special variables for CT Generator
         Real64 MaxExhaustperCTPower; // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
         Real64 PLR;                  // Generator operating part load ratio
         Real64 FuelUseRate;          // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
@@ -648,7 +624,6 @@ namespace CTElectricGenerator {
         Real64 HRecRatio;        // When Max Temp is reached the amount of recovered heat has to be reduced.
         // and this assumption uses this ratio to accomplish this task.
 
-        //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         MinPartLoadRat = CTGenerator(GeneratorNum).MinPartLoadRat;
         MaxPartLoadRat = CTGenerator(GeneratorNum).MaxPartLoadRat;
         RatedPowerOutput = CTGenerator(GeneratorNum).RatedPowerOutput;
@@ -805,12 +780,6 @@ namespace CTElectricGenerator {
         CTGenerator(GeneratorNum).ExhaustStackTemp = ExhaustStackTemp;
     }
 
-    // End of CT Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitCTGenerators(int const GeneratorNum,         // Generator number
                           bool const RunFlag,             // TRUE when Generator operating
                           Real64 const EP_UNUSED(MyLoad), // Generator demand
@@ -826,10 +795,6 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the CT generators.
 
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger initializations.
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Generator_CTurbine;
         using FluidProperties::GetDensityGlycol;
@@ -837,10 +802,8 @@ namespace CTElectricGenerator {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitICEngineGenerators");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInletNode;            // inlet node number in heat recovery loop
         int HeatRecOutletNode;           // outlet node number in heat recovery loop
         static bool MyOneTimeFlag(true); // Initialization flag
@@ -852,10 +815,7 @@ namespace CTElectricGenerator {
         Real64 rho;
         bool errFlag;
 
-        // FLOW:
-
         // Do the one time initializations
-
         if (MyOneTimeFlag) {
             MyEnvrnFlag.allocate(NumCTGenerators);
             MyPlantScanFlag.allocate(NumCTGenerators);
@@ -961,12 +921,6 @@ namespace CTElectricGenerator {
         }
     }
 
-    // End CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
-
     void UpdateCTGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
                                   int const Num                  // Generator number
     )
@@ -975,36 +929,13 @@ namespace CTElectricGenerator {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInletNode;
         int HeatRecOutletNode;
 
         if (CTGenerator(Num).HeatRecActive) {
             HeatRecInletNode = CTGenerator(Num).HeatRecInletNodeNum;
             HeatRecOutletNode = CTGenerator(Num).HeatRecOutletNodeNum;
-
-            //    Node(HeatRecOutletNode)%MassFlowRate = CTGenerator(Num)%HeatRecMdot
             Node(HeatRecOutletNode).Temp = CTGenerator(Num).HeatRecOutletTemp;
-            //    Node(HeatRecOutletNode)%MassFlowRateMaxAvail = Node(HeatRecInletNode)%MassFlowRateMaxAvail
-            //    Node(HeatRecOutletNode)%MassFlowRateMinAvail = Node(HeatRecInletNode)%MassFlowRateMinAvail
         }
         CTGeneratorReport(Num).PowerGen = CTGenerator(Num).ElecPowerGenerated;
         CTGeneratorReport(Num).EnergyGen = CTGenerator(Num).ElecEnergyGenerated;
@@ -1040,35 +971,11 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // get some results for load center's aggregation
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         GeneratorPower = CTGeneratorReport(GeneratorIndex).PowerGen;
         GeneratorEnergy = CTGeneratorReport(GeneratorIndex).EnergyGen;
         ThermalPower = CTGeneratorReport(GeneratorIndex).QTotalHeatRecovered;
         ThermalEnergy = CTGeneratorReport(GeneratorIndex).TotalHeatEnergyRec;
     }
-
-    // End of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
 
 } // namespace CTElectricGenerator
 
