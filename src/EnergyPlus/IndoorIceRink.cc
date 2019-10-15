@@ -450,6 +450,14 @@ namespace IceRink {
                 ErrorsFound = true;
             }
 
+            DRink(Item).PeopleSchedName = Alphas(11);
+            DRink(Item).PeopleSchedPtr = GetScheduleIndex(Alphas(11));
+            if ((DRink(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(11))) {
+                ShowSevereError(cAlphaFields(11) + " not found: " + Alphas(11));
+                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ErrorsFound = true;
+            }
+
             DRink(Item).MaxNumOfPeople = Numbers(5);
             if (DRink(Item).MaxNumOfPeople < 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " was entered with negative people.  This is not allowed.");
@@ -633,6 +641,14 @@ namespace IceRink {
                 ErrorsFound = true;
             }
 
+            IRink(Item).PeopleSchedName = Alphas(11);
+            IRink(Item).PeopleSchedPtr = GetScheduleIndex(Alphas(11));
+            if ((IRink(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(11))) {
+                ShowSevereError(cAlphaFields(11) + " not found: " + Alphas(11));
+                ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ErrorsFound = true;
+            }
+
             IRink(Item).MaxNumOfPeople = Numbers(5);
             if (IRink(Item).MaxNumOfPeople < 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " was entered with negative people.  This is not allowed.");
@@ -681,11 +697,11 @@ namespace IceRink {
             }
 
             IRink(Item).RefrigType = Numbers(11);
-            if ((IRink(Item).RefrigType != 1) || (IRink(Item).RefrigType != 2)) {
+            if ((IRink(Item).RefrigType != CaCl2) || (IRink(Item).RefrigType != EG)) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " was entered with invalid refrigerant type. This is not allowed");
                 ShowContinueError("The refrigerant type has been reset to Ethylene Glycol.");
-                IRink(Item).RefrigType = 2;
+                IRink(Item).RefrigType = EG;
             }
 
             IRink(Item).RefrigConc = Numbers(12);
