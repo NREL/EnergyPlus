@@ -194,9 +194,11 @@ namespace IceThermalStorage {
 
         void CalcIceStorageDormant();
 
-        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
+        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
         void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, bool FirstIteration, Real64 MaxCap);
+
+        void CalcQiceDischageMax(Real64 &QiceMin);
 
         void CalcIceStorageCharge();
 
@@ -205,6 +207,10 @@ namespace IceThermalStorage {
         void CalcQiceChargeMaxByITS(Real64 chillerOutletTemp, Real64 &QiceMaxByITS);
 
         void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
+
+        void UpdateNode(Real64 myLoad, bool RunFlag);
+
+        void RecordOutput(Real64 MyLoad, bool RunFlag);
     };
 
     struct DetailedIceStorageData
@@ -278,6 +284,8 @@ namespace IceThermalStorage {
               MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
+
+        void InitDetailedIceStorage();
     };
 
     // Object Data
@@ -301,10 +309,6 @@ namespace IceThermalStorage {
 
     void GetIceStorageInput();
 
-    void InitDetailedIceStorage(int iceNum);
-
-    void CalcQiceDischageMax(Real64 &QiceMin, int iceNum);
-
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
                                   Real64 Tout, // ice storage unit outlet (setpoint) temperature
                                   Real64 Tfr   // freezing temperature
@@ -320,10 +324,6 @@ namespace IceThermalStorage {
     Real64 TempSItoIP(Real64 Temp);
 
     Real64 TempIPtoSI(Real64 Temp);
-
-    void UpdateNode(Real64 MyLoad, bool RunFlag, int iceNum);
-
-    void RecordOutput(int iceNum, Real64 MyLoad, bool RunFlag);
 
     void UpdateIceFractions();
 
