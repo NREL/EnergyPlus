@@ -49,25 +49,25 @@
 #include <vector>
 #include <utility>
 
-#include <BranchNodeConnections.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantComponent.hh>
-#include <PlantUtilities.hh>
-#include <ReportSizingManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
-#include "CurveManager.hh"
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/CurveManager.hh>
 
 namespace EnergyPlus {
     namespace EIRWaterToWaterHeatPumps {

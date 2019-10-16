@@ -1112,7 +1112,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     HeatBalanceManager::GetProjectControlData(ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     GetProjectData();
@@ -2425,7 +2425,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     ManageSimulation();

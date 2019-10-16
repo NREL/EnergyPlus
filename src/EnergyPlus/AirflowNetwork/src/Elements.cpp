@@ -48,10 +48,10 @@
 #include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
 
-#include "DataAirLoop.hh"
-#include "DataHVACGlobals.hh"
-#include "DataLoopNode.hh"
-#include "DataSurfaces.hh"
+#include "../../DataAirLoop.hh"
+#include "../../DataHVACGlobals.hh"
+#include "../../DataLoopNode.hh"
+#include "../../DataSurfaces.hh"
 
 namespace EnergyPlus {
 

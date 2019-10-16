@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_VALIDATOR_HPP
-#define __VALIJSON_VALIDATOR_HPP
 
 #include <valijson/schema.hpp>
 #include <valijson/validation_visitor.hpp>
@@ -74,5 +72,3 @@ private:
 };
 
 }  // namespace valijson
-
-#endif

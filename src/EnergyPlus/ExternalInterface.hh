@@ -54,8 +54,8 @@ extern "C" {
 }
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <ExternalInterface.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExternalInterface.hh>
 
 // C++ Standard Library Headers
 #include <string>

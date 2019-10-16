@@ -48,9 +48,9 @@
 #ifndef PlantTopologyComponent_hh_INCLUDED
 #define PlantTopologyComponent_hh_INCLUDED
 
-#include <Plant/Enums.hh>
-#include <Plant/EquipAndOperations.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/EquipAndOperations.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

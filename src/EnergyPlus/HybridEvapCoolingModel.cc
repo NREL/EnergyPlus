@@ -46,22 +46,21 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <HybridEvapCoolingModel.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include <cmath>
 #include <string>
-//#include <windows.h>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -256,6 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -473,6 +473,7 @@ namespace HybridEvapCoolingModel {
     bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
     {
 
+        // Note: This is abusing the table normalization value
         Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
         if (NormalizationReference == -1) {
             // should never happen, because to get to this function we need a valid curve but check anyway.

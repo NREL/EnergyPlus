@@ -54,24 +54,24 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <HeatBalanceManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SimulationManager.hh>
-#include <SingleDuct.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace SimulationManager;
@@ -1252,7 +1252,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -2451,7 +2451,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ManageSimulation(); // run the design days
 

@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 

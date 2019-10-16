@@ -1,8 +1,3 @@
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
-
-# public API headers go in the src/EnergyPlus/public folder
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
-
 if(WIN32)
   configure_file( energyplus.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
   configure_file( energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
@@ -19,6 +14,8 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
+  AirLoopHVACDOAS.cc
+  AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
@@ -651,7 +648,7 @@ add_subdirectory(AirflowNetwork)
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva Windows-CalcEngine airflownetworklib)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
 if (OPENGL_FOUND)
   target_link_libraries( energypluslib penumbra )
 else()

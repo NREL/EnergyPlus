@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -71,7 +71,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <General.hh>
+#include <EnergyPlus/General.hh>
 #include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -1201,6 +1201,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing(CurSysNum).HeatSupTemp = 16.7;
     UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
     UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
+    DataHVACGlobals::NumPrimaryAirSys = 1;
     SizeWaterCoil(1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 239.835, 0.01);

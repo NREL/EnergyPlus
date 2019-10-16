@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -401,9 +401,9 @@ namespace EvaporativeCoolers {
                               Real64 const FlowRatio   // secondary air flow fraction
     );
 
-    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum);
+    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR = 1.0);
 
-    void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum);
+    void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR = 1.0);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -477,6 +477,14 @@ namespace EvaporativeCoolers {
 
     // Used to clear global data between Unit Tests, should not be normally called
     void clear_state();
+
+    int GetInletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    );
+
+    int GetOutletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    );
 
 } // namespace EvaporativeCoolers
 

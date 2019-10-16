@@ -57,70 +57,70 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <BaseboardElectric.hh>
-#include <BaseboardRadiator.hh>
-#include <ChilledCeilingPanelSimple.hh>
-#include <CoolTower.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataConvergParams.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <EarthTube.hh>
-#include <ElectricBaseboardRadiator.hh>
-#include <EvaporativeCoolers.hh>
-#include <FanCoilUnits.hh>
-#include <Fans.hh>
-#include <General.hh>
-#include <HVACInterfaceManager.hh>
-#include <HVACStandAloneERV.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HWBaseboardRadiator.hh>
-#include <HeatRecovery.hh>
-#include <HighTempRadiantSystem.hh>
-#include <HybridUnitaryAirConditioners.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <OutdoorAirUnit.hh>
-#include <PackagedTerminalHeatPump.hh>
-#include <Psychrometrics.hh>
-#include <PurchasedAirManager.hh>
-#include <RefrigeratedCase.hh>
-#include <ReturnAirPathManager.hh>
-#include <ScheduleManager.hh>
-#include <SizingManager.hh>
-#include <SplitterComponent.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <SwimmingPool.hh>
-#include <SystemAvailabilityManager.hh>
-#include <ThermalChimney.hh>
-#include <UnitHeater.hh>
-#include <UnitVentilator.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <VentilatedSlab.hh>
-#include <WaterThermalTanks.hh>
-#include <WindowAC.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
-#include <ZoneDehumidifier.hh>
-#include <ZoneEquipmentManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EarthTube.hh>
+#include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -216,8 +216,8 @@ namespace ZoneEquipmentManager {
     }
 
     void ManageZoneEquipment(bool const FirstHVACIteration,
-                             bool &SimZone,             // Set to false at the end of the routine
-                             bool &SimAir               // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
+                             bool &SimZone, // Set to false at the end of the routine
+                             bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     )
     {
 
@@ -2494,6 +2494,32 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
                     } else {
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens = StdRhoAir;
+                        // save design heating load when the there is design heating load and the design heating volume flow rate is zero, i.e., when
+                        // design heating volume flow rate is set to zero due to heating supply air temp less than zone thermostat temperature
+                        if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatLoad > CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad) {
+                            CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatLoad;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatLoadSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatOutTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtHeatPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutHumRatAtHeatPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDDNum;
+                            CalcFinalZoneSizing(CtrlZoneNum).cHeatDDDate = DesDayWeath(CurOverallSimDay).DateString;
+                            CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).TimeStepNumAtHeatMax;
+                            CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
+                            CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
+                        }
                     }
                     // from all the design periods, choose the one needing the most Cooling and save all its design variables in CalcFinalZoneSizing
                     if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolVolFlow > CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow) {
@@ -2521,6 +2547,32 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
                     } else {
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens = StdRhoAir;
+                        // save design cooling load when the there is design cooling load and the design cooling volume flow rate is zero, i.e., when
+                        // design cooling volume flow rate is set to zero due to cooling supply air temp greater than zone thermostat temperature
+                        if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolLoad > CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad) {
+                            CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolLoad;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolLoadSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolLoadSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolOutTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolOutHumRatSeq;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtCoolPeak =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtCoolPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtCoolPeak = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).OutHumRatAtCoolPeak;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDDNum;
+                            CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate = DesDayWeath(CurOverallSimDay).DateString;
+                            CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax =
+                                CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax;
+                            CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
+                            CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
+                        }
                     }
                 }
 
@@ -2631,10 +2683,18 @@ namespace ZoneEquipmentManager {
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp > CalcFinalZoneSizing(I).ZoneTempAtCoolPeak) {
                                 ShowSevereError(
                                     "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
+                                ShowContinueError("...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
+                                                  " m3/s");
+                                ShowContinueError("...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
+                                                  " kg/s");
+                                ShowContinueError("...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
+                                                  " C");
                                 ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) +
                                                   " C");
                                 ShowContinueError("...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
                                 ShowContinueError("...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError(
+                                    "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
                             }
                         }
                         // Should this be done only if there is a heating load? Or would this message help determine why there was no load?
@@ -2656,7 +2716,7 @@ namespace ZoneEquipmentManager {
                                 }
                                 ShowContinueError("...check zone thermostat set point and design supply air temperatures");
                                 ShowContinueError("...zone name = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError("...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesCoolLoad, 2) + " W");
+                                ShowContinueError("...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesHeatLoad, 2) + " W");
                                 ShowContinueError("...thermostat set point temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
                                                   " C");
                                 ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
@@ -2673,10 +2733,18 @@ namespace ZoneEquipmentManager {
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp < CalcFinalZoneSizing(I).ZoneTempAtHeatPeak) {
                                 ShowSevereError(
                                     "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
+                                ShowContinueError("...calculated design heating volume flow rate = " +
+                                                  RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) + " m3/s");
+                                ShowContinueError("...calculated design heating mass flow rate   = " +
+                                                  RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) + " kg/s");
+                                ShowContinueError("...thermostat set piont temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
+                                                  " C");
                                 ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
                                                   " C");
                                 ShowContinueError("...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
                                 ShowContinueError("...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
+                                ShowContinueError("...Note: supply air temperature should be greater than zone temperature during heating air "
+                                                  "flow calculations");
                             }
                         }
                     }

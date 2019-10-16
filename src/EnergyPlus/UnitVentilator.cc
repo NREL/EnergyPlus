@@ -53,39 +53,39 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SingleDuct.hh>
-#include <SteamCoils.hh>
-#include <UnitVentilator.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -3433,7 +3433,7 @@ namespace UnitVentilator {
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
 
-                mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+                CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum,PartLoadRatio);
                 SetComponentFlowRate(mdot,
                                      UnitVent(UnitVentNum).ColdControlNode,
                                      UnitVent(UnitVentNum).ColdCoilOutNodeNum,
@@ -4026,7 +4026,33 @@ namespace UnitVentilator {
         return ActualOAMassFlowRate;
     }
 
+    void CalcMdotCCoilCycFan(Real64 &mdot,                 // mass flow rate
+                             Real64 &QCoilReq,             // Remaining load to cooling coil
+                             Real64 const QZnReq,         // Zone load to setpoint
+                             int const UnitVentNum,       // Unit Ventilator index
+                             Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    )
+    {
 
+        if (QZnReq >= 0.0) {    // Heating requested so no cooling coil needed
+            mdot = 0.0;
+        } else {                // Cooling so set first guess at flow rate
+            mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+        }
+        
+            // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
+        int CCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
+        int AirInNode = UnitVent(UnitVentNum).AirInNode;
+        Real64 const SmallLoad = -1.0;  // Watts
+        Real64 CpAirZn = PsyCpAirFnWTdb(Node(AirInNode).HumRat, Node(AirInNode).Temp);
+        QCoilReq = QZnReq - Node(CCoilInAirNode).MassFlowRate * CpAirZn * (Node(CCoilInAirNode).Temp - Node(AirInNode).Temp);
+        if (QCoilReq > SmallLoad) {
+            QCoilReq = 0.0;
+            mdot = 0.0;
+        }
+        
+    }
+    
 } // namespace UnitVentilator
 
 } // namespace EnergyPlus

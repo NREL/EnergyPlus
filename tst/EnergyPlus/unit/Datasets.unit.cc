@@ -55,9 +55,9 @@
 #include <gtest/gtest.h>
 
 // Fixtures, etc.
-#include <ConfiguredFunctions.hh>
-#include <DataGlobals.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 

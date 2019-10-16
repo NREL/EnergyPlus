@@ -57,8 +57,8 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -112,6 +112,9 @@ public:                                  // data
                                  //  2=SupplyAirFlowRate, 3=FlowPerFloorArea, 4=FractionOfAutosizedCoolingAirflow,
                                  //  5=FractionOfAutosizedHeatingAirflow, 6=FlowPerCoolingCapacity, 7=FlowPerHeatingCapacity
     std::string coilSizingMethodAirFlowName;
+
+    bool isCoilSizingForTotalLoad; // Type of peak to size (cooling) coils on: True is TotalCoolingLoad, False is sensible
+    std::string coilPeakLoadTypeToSizeOnName;
 
     // Real64 coilDesCapUser; // coil capacity original input value [W]; -999 means field not applicable to this coil
     bool capIsAutosized;        // true if the coil's capacity was autosized

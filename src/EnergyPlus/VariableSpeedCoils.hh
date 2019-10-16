@@ -53,7 +53,7 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -469,6 +469,10 @@ namespace VariableSpeedCoils {
 
     Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
+    );
+
+    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+                                               bool &ErrorsFound    // set to true if problem
     );
 
     int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type

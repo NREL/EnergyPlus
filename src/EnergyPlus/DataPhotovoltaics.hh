@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -343,6 +343,8 @@ namespace DataPhotovoltaics {
 
     // Object Data
     extern Array1D<PVArrayStruct> PVarray;
+
+    void clear_state();
 
 } // namespace DataPhotovoltaics
 

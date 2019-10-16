@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataContaminantBalance.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
