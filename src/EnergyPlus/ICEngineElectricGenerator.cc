@@ -92,7 +92,6 @@ namespace ICEngineElectricGenerator {
 
     int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
     bool GetICEInput(true);       // When TRUE, calls subroutine to read input file.
-    Array1D_bool CheckEquipName;
 
     // Object Data
     Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
@@ -133,12 +132,12 @@ namespace ICEngineElectricGenerator {
                 ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                ", Number of IC Engine Generators=" + General::TrimSigDigits(NumICEngineGenerators) + ", Generator name=" + GeneratorName);
             }
-            if (CheckEquipName(GenNum)) {
+            if (ICEngineGenerator(GenNum).CheckEquipName) {
                 if (GeneratorName != ICEngineGenerator(GenNum).Name) {
                     ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                    ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator(GenNum).Name);
                 }
-                CheckEquipName(GenNum) = false;
+                ICEngineGenerator(GenNum).CheckEquipName = false;
             }
         }
 
@@ -250,7 +249,6 @@ namespace ICEngineElectricGenerator {
 
         // ALLOCATE ARRAYS
         ICEngineGenerator.allocate(NumICEngineGenerators);
-        CheckEquipName.dimension(NumICEngineGenerators, true);
 
         ICEngineGeneratorReport.allocate(NumICEngineGenerators);
 
