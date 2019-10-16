@@ -59,14 +59,8 @@ namespace EnergyPlus {
 
 namespace SwimmingPool {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
+    // Standard, run-of-the-mill variables
     extern int NumSwimmingPools;                 // Number of swimming pools
     extern Array1D<int> SurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
     extern Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular pool
@@ -77,8 +71,6 @@ namespace SwimmingPool {
     extern Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-
-    // Types
 
     struct SwimmingPoolData
     {
@@ -173,38 +165,38 @@ namespace SwimmingPool {
 
     void clear_state();
 
-    void SimSwimmingPool(bool const FirstHVACIteration);
+    void SimSwimmingPool(bool FirstHVACIteration);
 
     void GetSwimmingPool();
 
-    void InitSwimmingPool(bool const FirstHVACIteration, // true during the first HVAC iteration
-                          int const PoolNum              // Index of the swimming pool under consideration within the derived types
+    void InitSwimmingPool(bool FirstHVACIteration, // true during the first HVAC iteration
+                          int PoolNum              // Index of the swimming pool under consideration within the derived types
     );
 
-    void InitSwimmingPoolPlantLoopIndex(int const PoolNum,        // number of the swimming pool
+    void InitSwimmingPoolPlantLoopIndex(int PoolNum,        // number of the swimming pool
                                         bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     );
 
-    void InitSwimmingPoolPlantNodeFlow(int const PoolNum,             // number of the swimming pool
-                                       bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    void InitSwimmingPoolPlantNodeFlow(int PoolNum,             // number of the swimming pool
+                                       bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     );
     
-    void CalcSwimmingPool(int const PoolNum // Index of the swimming pool under consideration within the derived types
+    void CalcSwimmingPool(int PoolNum // Index of the swimming pool under consideration within the derived types
     );
 
     void CalcSwimmingPoolEvap(Real64 &EvapRate,   // Evaporation rate
-                              int const PoolNum,  // Pool index
-                              int const SurfNum,  // Surface index
-                              Real64 const MAT,   // mean air temperature
-                              Real64 const HumRat // zone air humidity ratio
+                              int PoolNum,  // Pool index
+                              int SurfNum,  // Surface index
+                              Real64 MAT,   // mean air temperature
+                              Real64 HumRat // zone air humidity ratio
     );
 
-    void UpdateSwimmingPool(int const PoolNum // Index of the swimming pool under consideration within the derived types
+    void UpdateSwimmingPool(int PoolNum // Index of the swimming pool under consideration within the derived types
     );
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(int ZoneNum); // Zone number
 
     void ReportSwimmingPool();
 
