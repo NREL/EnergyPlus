@@ -146,15 +146,11 @@ namespace CTElectricGenerator {
 
         void setupOutputVars();
 
-        void InitCTGenerators(bool RunFlag,
-                              bool FirstHVACIteration);
+        void InitCTGenerators(bool RunFlag, bool FirstHVACIteration);
 
-        void CalcCTGeneratorModel(bool RunFlag,
-                                  Real64 MyLoad,
-                                  bool FirstHVACIteration);
+        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         static PlantComponent *factory(std::string const &objectName);
-
     };
 
     // Object Data

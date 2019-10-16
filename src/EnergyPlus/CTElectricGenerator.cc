@@ -67,8 +67,8 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -96,8 +96,8 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    int NumCTGenerators(0); // number of CT Generators specified in input
-    bool getCTInputFlag(true);  // then TRUE, calls subroutine to read input file.
+    int NumCTGenerators(0);    // number of CT Generators specified in input
+    bool getCTInputFlag(true); // then TRUE, calls subroutine to read input file.
 
     Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
 
@@ -123,12 +123,16 @@ namespace CTElectricGenerator {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: " +
+                       objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorData::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void CTGeneratorData::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+                                   bool EP_UNUSED(FirstHVACIteration),
+                                   Real64 &EP_UNUSED(CurLoad),
+                                   bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -198,8 +202,14 @@ namespace CTElectricGenerator {
             }
 
             // Not sure what to do with electric nodes, so do not use optional arguments
-            CTGenerator(genNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Electric, DataLoopNode::NodeConnectionType_Electric, 1, DataLoopNode::ObjectIsNotParent);
+            CTGenerator(genNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                          ErrorsFound,
+                                                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                                                          AlphArray(1),
+                                                                                          DataLoopNode::NodeType_Electric,
+                                                                                          DataLoopNode::NodeConnectionType_Electric,
+                                                                                          1,
+                                                                                          DataLoopNode::ObjectIsNotParent);
 
             CTGenerator(genNum).MinPartLoadRat = NumArray(2);
             CTGenerator(genNum).MaxPartLoadRat = NumArray(3);
@@ -260,26 +270,40 @@ namespace CTElectricGenerator {
 
             if (CTGenerator(genNum).DesignHeatRecVolFlowRate > 0.0) {
                 CTGenerator(genNum).HeatRecActive = true;
-                CTGenerator(genNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                    AlphArray(9), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+                CTGenerator(genNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(9),
+                                                                                              ErrorsFound,
+                                                                                              DataIPShortCuts::cCurrentModuleObject,
+                                                                                              AlphArray(1),
+                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
                 if (CTGenerator(genNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError("Missing Node Name, Heat Recovery Inlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                CTGenerator(genNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                    AlphArray(10), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+                CTGenerator(genNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(10),
+                                                                                               ErrorsFound,
+                                                                                               DataIPShortCuts::cCurrentModuleObject,
+                                                                                               AlphArray(1),
+                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               1,
+                                                                                               DataLoopNode::ObjectIsNotParent);
                 if (CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError("Missing Node Name, Heat Recovery Outlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
+                BranchNodeConnections::TestCompSet(
+                    DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
                 PlantUtilities::RegisterPlantCompDesignFlow(CTGenerator(genNum).HeatRecInletNodeNum, CTGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
                 CTGenerator(genNum).HeatRecActive = false;
                 CTGenerator(genNum).HeatRecInletNodeNum = 0;
                 CTGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!DataIPShortCuts::lAlphaFieldBlanks(9) || !DataIPShortCuts::lAlphaFieldBlanks(10)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
+                                     AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -353,12 +377,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power",
-                            OutputProcessor::Unit::W,
-                            this->ElecPowerGenerated,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator Produced Electric Energy",
                             OutputProcessor::Unit::J,
@@ -372,12 +391,8 @@ namespace CTElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Generator " + this->FuelType + " Rate",
-                            OutputProcessor::Unit::W,
-                            this->FuelEnergyUseRate,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
 
         SetupOutputVariable("Generator " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
@@ -392,41 +407,18 @@ namespace CTElectricGenerator {
                             "Plant");
 
         //    general fuel use report (to match other generators)
-        SetupOutputVariable("Generator Fuel HHV Basis Rate",
-                            OutputProcessor::Unit::W,
-                            this->FuelEnergyUseRate,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Fuel HHV Basis Energy",
-                            OutputProcessor::Unit::J,
-                            this->FuelEnergy,
-                            "System",
-                            "Sum",
-                            this->Name);
+        SetupOutputVariable("Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
 
-        SetupOutputVariable("Generator " + this->FuelType + " Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->FuelMdot,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Exhaust Air Temperature",
-                            OutputProcessor::Unit::C,
-                            this->ExhaustStackTemp,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
 
         if (this->HeatRecActive) {
-            SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
-                                this->QExhaustRecovered,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
 
             SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
@@ -440,12 +432,8 @@ namespace CTElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Generator Lube Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
-                                this->QLubeOilRecovered,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
 
             SetupOutputVariable("Generator Lube Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
@@ -459,46 +447,25 @@ namespace CTElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Generator Produced Thermal Rate",
-                                OutputProcessor::Unit::W,
-                                this->QTotalHeatRecovered,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Produced Thermal Energy",
-                                OutputProcessor::Unit::J,
-                                this->TotalHeatEnergyRec,
-                                "System",
-                                "Sum",
-                                this->Name);
+            SetupOutputVariable("Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
 
-            SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->HeatRecInletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->HeatRecOutletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->HeatRecMdot,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
         }
     }
 
-    void CTGeneratorData::CalcCTGeneratorModel(bool const RunFlag,     // TRUE when Generator operating
-                              Real64 const MyLoad,    // Generator demand
-                              bool const FirstHVACIteration)
+    void CTGeneratorData::CalcCTGeneratorModel(bool const RunFlag,  // TRUE when Generator operating
+                                               Real64 const MyLoad, // Generator demand
+                                               bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -532,20 +499,18 @@ namespace CTElectricGenerator {
         // design turbine inlet temperature (C)
         Real64 designAirInletTemp = this->DesignAirInletTemp;
 
-        int heatRecInNode; // Heat Recovery Fluid Inlet Node Num
+        int heatRecInNode;    // Heat Recovery Fluid Inlet Node Num
         Real64 heatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 
-        Real64 heatRecMdot;      // Heat Recovery Fluid Mass FlowRate (kg/s)
-        Real64 heatRecCp;        // Specific Heat of the Heat Recovery Fluid (J/kg-K)
+        Real64 heatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
+        Real64 heatRecCp;   // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
             heatRecInNode = this->HeatRecInletNodeNum;
             heatRecInTemp = DataLoopNode::Node(heatRecInNode).Temp;
 
-            heatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                               heatRecInTemp,
-                                                               DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
-                                                               RoutineName);
+            heatRecCp = FluidProperties::GetSpecificHeatGlycol(
+                DataPlant::PlantLoop(this->HRLoopNum).FluidName, heatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
             if (FirstHVACIteration && RunFlag) {
                 heatRecMdot = this->DesignHeatRecMassFlowRate;
             } else {
@@ -614,8 +579,8 @@ namespace CTElectricGenerator {
         // multiplying the exhaust temperature (C) for a particular part load as given by PLBasedExhaustTempCurve
         // a correction factor based on the deviation from design temperature, TempBasedExhaustTempCurve
 
-        Real64 QExhaustRec; // recovered exhaust heat (W)
-        Real64 exhaustStackTemp;  // turbine stack temp. (C)
+        Real64 QExhaustRec;      // recovered exhaust heat (W)
+        Real64 exhaustStackTemp; // turbine stack temp. (C)
         if ((PLR > 0.0) && ((exhaustFlow > 0.0) || (maxExhaustperCTPower > 0.0))) {
 
             // (TEX) Exhaust Gas Temperature in C
@@ -629,7 +594,7 @@ namespace CTElectricGenerator {
             Real64 designMinExitGasTemp = this->DesignMinExitGasTemp;
 
             exhaustStackTemp = designMinExitGasTemp + (exhaustTemp - designMinExitGasTemp) /
-                                                      std::exp(UA_loc / (max(exhaustFlow, maxExhaustperCTPower * ratedPowerOutput) * exhaustCp));
+                                                          std::exp(UA_loc / (max(exhaustFlow, maxExhaustperCTPower * ratedPowerOutput) * exhaustCp));
 
             QExhaustRec = max(exhaustFlow * exhaustCp * (exhaustTemp - exhaustStackTemp), 0.0);
         } else {
@@ -644,7 +609,7 @@ namespace CTElectricGenerator {
         Real64 QLubeOilRec = elecPowerGenerated * CurveManager::CurveValue(this->QLubeOilRecoveredCurve, PLR);
 
         // Check for divide by zero
-        Real64 HeatRecOutTemp;   // Heat Recovery Fluid Outlet Temperature (C)
+        Real64 HeatRecOutTemp; // Heat Recovery Fluid Outlet Temperature (C)
         if ((heatRecMdot > 0.0) && (heatRecCp > 0.0)) {
             HeatRecOutTemp = (QExhaustRec + QLubeOilRec) / (heatRecMdot * heatRecCp) + heatRecInTemp;
         } else {
@@ -658,7 +623,7 @@ namespace CTElectricGenerator {
         // Heat Recovery Flow Rate if minimal heat recovery is accomplished
         Real64 MinHeatRecMdot = 0.0;
 
-        Real64 HRecRatio;        // When Max Temp is reached the amount of recovered heat has to be reduced.
+        Real64 HRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 
         if (HeatRecOutTemp > this->HeatRecMaxTemp) {
             if (this->HeatRecMaxTemp != heatRecInTemp) {
@@ -720,8 +685,8 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::InitCTGenerators(bool const RunFlag,             // TRUE when Generator operating
-                          bool const FirstHVACIteration)
+    void CTGeneratorData::InitCTGenerators(bool const RunFlag, // TRUE when Generator operating
+                                           bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -740,17 +705,17 @@ namespace CTElectricGenerator {
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    DataPlant::TypeOf_Generator_CTurbine,
-                                    this->HRLoopNum,
-                                    this->HRLoopSideNum,
-                                    this->HRBranchNum,
-                                    this->HRCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+                                                    DataPlant::TypeOf_Generator_CTurbine,
+                                                    this->HRLoopNum,
+                                                    this->HRLoopSideNum,
+                                                    this->HRBranchNum,
+                                                    this->HRCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
             if (errFlag) {
                 ShowFatalError("InitCTGenerators: Program terminated due to previous condition(s).");
             }
@@ -769,20 +734,20 @@ namespace CTElectricGenerator {
 
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                   DataGlobals::InitConvTemp,
-                                   DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
-                                   RoutineName);
+                                                           DataGlobals::InitConvTemp,
+                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           RoutineName);
 
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
             PlantUtilities::InitComponentNodes(0.0,
-                               this->DesignHeatRecMassFlowRate,
-                               HeatRecInletNode,
-                               HeatRecOutletNode,
-                               this->HRLoopNum,
-                               this->HRLoopSideNum,
-                               this->HRBranchNum,
-                               this->HRCompNum);
+                                               this->DesignHeatRecMassFlowRate,
+                                               HeatRecInletNode,
+                                               HeatRecOutletNode,
+                                               this->HRLoopNum,
+                                               this->HRLoopSideNum,
+                                               this->HRBranchNum,
+                                               this->HRCompNum);
 
             this->MySizeAndNodeInitFlag = false;
         } // end one time inits
@@ -796,13 +761,13 @@ namespace CTElectricGenerator {
             DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
-                               this->DesignHeatRecMassFlowRate,
-                               HeatRecInletNode,
-                               HeatRecOutletNode,
-                               this->HRLoopNum,
-                               this->HRLoopSideNum,
-                               this->HRBranchNum,
-                               this->HRCompNum);
+                                               this->DesignHeatRecMassFlowRate,
+                                               HeatRecInletNode,
+                                               HeatRecOutletNode,
+                                               this->HRLoopNum,
+                                               this->HRLoopSideNum,
+                                               this->HRBranchNum,
+                                               this->HRCompNum);
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -820,21 +785,21 @@ namespace CTElectricGenerator {
                     mdot = 0.0;
                 }
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     this->HeatRecInletNodeNum,
-                                     this->HeatRecOutletNodeNum,
-                                     this->HRLoopNum,
-                                     this->HRLoopSideNum,
-                                     this->HRBranchNum,
-                                     this->HRCompNum);
+                                                     this->HeatRecInletNodeNum,
+                                                     this->HeatRecOutletNodeNum,
+                                                     this->HRLoopNum,
+                                                     this->HRLoopSideNum,
+                                                     this->HRBranchNum,
+                                                     this->HRCompNum);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(this->HeatRecMdot,
-                                     this->HeatRecInletNodeNum,
-                                     this->HeatRecOutletNodeNum,
-                                     this->HRLoopNum,
-                                     this->HRLoopSideNum,
-                                     this->HRBranchNum,
-                                     this->HRCompNum);
+                                                     this->HeatRecInletNodeNum,
+                                                     this->HeatRecOutletNodeNum,
+                                                     this->HRLoopNum,
+                                                     this->HRLoopSideNum,
+                                                     this->HRBranchNum,
+                                                     this->HRCompNum);
             }
         }
     }
