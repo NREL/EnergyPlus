@@ -251,6 +251,8 @@ namespace WaterUse {
         int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
     void GetWaterUseInput();
+    
+    void SetupOutputVars();
 
     void CalcEquipmentFlowRates(int WaterEquipNum);
 
