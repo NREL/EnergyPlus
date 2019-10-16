@@ -23,7 +23,7 @@ set(API_TEST_TARGET_DIR "${CMAKE_BINARY_DIR}/Products")
 configure_file( "${API_TEST_SRC_DIR}/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py" )
 configure_file( "${API_TEST_SRC_DIR}/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
 configure_file( "${API_TEST_SRC_DIR}/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
-configure_file( "${API_TEST_SRC_DIR}/TestDataTransfer2.py" "${API_TEST_TARGET_DIR}/TestDataTransfer2.py" )
+#configure_file( "${API_TEST_SRC_DIR}/TestDataTransfer2.py" "${API_TEST_TARGET_DIR}/TestDataTransfer2.py" )
 add_test(NAME "API.TestFunctionalPy"
         COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
         WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
@@ -33,6 +33,6 @@ add_test(NAME "API.TestRuntimePy"
 add_test(NAME "API.TestDataTransferPy"
         COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py"
         WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-add_test(NAME "API.TestDataTransferPy2"
-        COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer2.py"
-        WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+#add_test(NAME "API.TestDataTransferPy2"
+#        COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer2.py"
+#        WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")

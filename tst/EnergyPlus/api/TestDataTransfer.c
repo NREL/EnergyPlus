@@ -51,7 +51,7 @@
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
 
-void newEnvrnHandler()
+void afterHourHandler()
 {
     printf("STARTING A NEW ENVIRONMENT\n");
     int kindOfSim = simDataGetKindOfSim();
@@ -85,9 +85,6 @@ void newEnvrnHandler()
             printf("Could not set actuator...\n");
         }
     }
-}
-
-void afterTimestepHandler() {
     int outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     int outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
     Real64 oa_temp = getVariableValue(outdoorTempSensor);
@@ -96,9 +93,9 @@ void afterTimestepHandler() {
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
 
+
 int main() {
-    registerRuntimeCallbackFromBeginNewEvironment(newEnvrnHandler);
-    registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(afterTimestepHandler);
+    registerRuntimeCallbackFromEndOfHour(afterHourHandler);
     cRunEnergyPlus("/tmp/epdll");
     return 0;
 }

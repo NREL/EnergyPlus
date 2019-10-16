@@ -9,10 +9,10 @@ api = EnergyPlusAPI()
 runtime = api.runtime()
 
 
-def environment_handler():
-    print("OH HAI NEW ENVIRONMENT")
+def hour_handler():
+    print("OH HAI NEW HOUR")
     sys.stdout.flush()
 
 
-runtime.register_callback_new_environment(environment_handler)
+runtime.register_callback_end_of_hour(hour_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
