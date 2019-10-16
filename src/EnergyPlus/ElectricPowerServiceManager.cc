@@ -2108,17 +2108,17 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
     }
     case GeneratorType::combTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorSpecs::factory(name);
+        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(name);
         // dummy vars
         PlantLocation L(0,0,0,0);
         Real64 tempLoad = myElecLoadRequest;
 
         // simulate
         thisCTE->simulate(L, FirstHVACIteration, tempLoad, runFlag);
-        dynamic_cast<CTElectricGenerator::CTGeneratorSpecs*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
-        dynamic_cast<CTElectricGenerator::CTGeneratorSpecs*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
-        electricPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorSpecs*> (thisCTE)->ElecPowerGenerated;
-        thermalPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorSpecs*> (thisCTE)->QTotalHeatRecovered;
+        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
+        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
+        electricPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
+        thermalPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->QTotalHeatRecovered;
         break;
     }
     case GeneratorType::pV: {

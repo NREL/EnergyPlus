@@ -99,7 +99,7 @@ namespace CTElectricGenerator {
     int NumCTGenerators(0); // number of CT Generators specified in input
     bool getCTInputFlag(true);  // then TRUE, calls subroutine to read input file.
 
-    Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
+    Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
 
     void clear_state()
     {
@@ -108,7 +108,7 @@ namespace CTElectricGenerator {
         CTGenerator.deallocate();
     }
 
-    PlantComponent *CTGeneratorSpecs::factory(std::string const &objectName)
+    PlantComponent *CTGeneratorData::factory(std::string const &objectName)
     {
         // Process the input data for generators if it hasn't been done already
         if (getCTInputFlag) {
@@ -128,7 +128,7 @@ namespace CTElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void CTGeneratorData::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -142,7 +142,7 @@ namespace CTElectricGenerator {
 
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side... do nothing.
-        // calls from the ElectricPowerServiceManger call the init and calculation worker function directly.
+        // calls from the ElectricPowerServiceManger call the init and calculation worker functions directly.
     }
 
     void GetCTGeneratorInput()
@@ -351,7 +351,7 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorSpecs::setupOutputVars()
+    void CTGeneratorData::setupOutputVars()
     {
         SetupOutputVariable("Generator Produced Electric Power",
                             OutputProcessor::Unit::W,
@@ -496,7 +496,7 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorSpecs::CalcCTGeneratorModel(bool const RunFlag,     // TRUE when Generator operating
+    void CTGeneratorData::CalcCTGeneratorModel(bool const RunFlag,     // TRUE when Generator operating
                               Real64 const MyLoad,    // Generator demand
                               bool const FirstHVACIteration)
     {
@@ -513,56 +513,56 @@ namespace CTElectricGenerator {
         // curve fit of performance data.  This model was originally
         // developed by Dale Herron for the BLAST program
 
-        Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
+        Real64 const exhaustCp(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
         static std::string const RoutineName("CalcCTGeneratorModel");
 
         // min allowed operating frac full load
-        Real64 MinPartLoadRat = this->MinPartLoadRat;
+        Real64 minPartLoadRat = this->MinPartLoadRat;
 
         // max allowed operating frac full load
-        Real64 MaxPartLoadRat = this->MaxPartLoadRat;
+        Real64 maxPartLoadRat = this->MaxPartLoadRat;
 
         // Generator nominal capacity (W)
-        Real64 RatedPowerOutput = this->RatedPowerOutput;
+        Real64 ratedPowerOutput = this->RatedPowerOutput;
 
         // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
-        Real64 MaxExhaustperCTPower = this->MaxExhaustperCTPower;
+        Real64 maxExhaustperCTPower = this->MaxExhaustperCTPower;
 
         // design turbine inlet temperature (C)
-        Real64 DesignAirInletTemp = this->DesignAirInletTemp;
+        Real64 designAirInletTemp = this->DesignAirInletTemp;
 
-        int HeatRecInNode; // Heat Recovery Fluid Inlet Node Num
-        Real64 HeatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
+        int heatRecInNode; // Heat Recovery Fluid Inlet Node Num
+        Real64 heatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 
-        Real64 HeatRecMdot;      // Heat Recovery Fluid Mass FlowRate (kg/s)
-        Real64 HeatRecCp;        // Specific Heat of the Heat Recovery Fluid (J/kg-K)
+        Real64 heatRecMdot;      // Heat Recovery Fluid Mass FlowRate (kg/s)
+        Real64 heatRecCp;        // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            HeatRecInNode = this->HeatRecInletNodeNum;
-            HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+            heatRecInNode = this->HeatRecInletNodeNum;
+            heatRecInTemp = DataLoopNode::Node(heatRecInNode).Temp;
 
-            HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                              HeatRecInTemp,
-                                              DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
-                                              RoutineName);
+            heatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                               heatRecInTemp,
+                                                               DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
+                                                               RoutineName);
             if (FirstHVACIteration && RunFlag) {
-                HeatRecMdot = this->DesignHeatRecMassFlowRate;
+                heatRecMdot = this->DesignHeatRecMassFlowRate;
             } else {
-                HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
+                heatRecMdot = DataLoopNode::Node(heatRecInNode).MassFlowRate;
             }
         } else {
-            HeatRecInTemp = 0.0;
-            HeatRecCp = 0.0;
-            HeatRecMdot = 0.0;
+            heatRecInTemp = 0.0;
+            heatRecCp = 0.0;
+            heatRecMdot = 0.0;
         }
 
         // If no loop demand or Generator OFF, return
         if (!RunFlag) {
             this->ElecPowerGenerated = 0.0;
             this->ElecEnergyGenerated = 0.0;
-            this->HeatRecInletTemp = HeatRecInTemp;
-            this->HeatRecOutletTemp = HeatRecInTemp;
+            this->HeatRecInletTemp = heatRecInTemp;
+            this->HeatRecOutletTemp = heatRecInTemp;
             this->HeatRecMdot = 0.0;
             this->QLubeOilRecovered = 0.0;
             this->QExhaustRecovered = 0.0;
@@ -579,21 +579,21 @@ namespace CTElectricGenerator {
 
         // CALCULATE POWER GENERATED AND PLR
         // Generator output (W)
-        Real64 ElecPowerGenerated = min(MyLoad, RatedPowerOutput);
-        ElecPowerGenerated = max(ElecPowerGenerated, 0.0);
+        Real64 elecPowerGenerated = min(MyLoad, ratedPowerOutput);
+        elecPowerGenerated = max(elecPowerGenerated, 0.0);
 
         // Generator operating part load ratio
-        Real64 PLR = min(ElecPowerGenerated / RatedPowerOutput, MaxPartLoadRat);
-        PLR = max(PLR, MinPartLoadRat);
-        ElecPowerGenerated = PLR * RatedPowerOutput;
+        Real64 PLR = min(elecPowerGenerated / ratedPowerOutput, maxPartLoadRat);
+        PLR = max(PLR, minPartLoadRat);
+        elecPowerGenerated = PLR * ratedPowerOutput;
 
         // SET OFF-DESIGN AIR TEMPERATURE DIFFERENCE
         // (ATAIR) Difference between ambient actual and ambient design temperatures
-        Real64 AmbientDeltaT;
+        Real64 ambientDeltaT;
         if (this->OAInletNode == 0) {
-            AmbientDeltaT = DataEnvironment::OutDryBulbTemp - DesignAirInletTemp;
+            ambientDeltaT = DataEnvironment::OutDryBulbTemp - designAirInletTemp;
         } else {
-            AmbientDeltaT = DataLoopNode::Node(this->OAInletNode).Temp - DesignAirInletTemp;
+            ambientDeltaT = DataLoopNode::Node(this->OAInletNode).Temp - designAirInletTemp;
         }
 
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
@@ -601,39 +601,39 @@ namespace CTElectricGenerator {
         // The TempBasedFuelInputCurve is a correction based on deviation from design inlet air temperature conditions.
         // The first coefficient of this fit should be 1.0 to ensure that no correction is made at design conditions.
         // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
-        Real64 FuelUseRate = ElecPowerGenerated * CurveManager::CurveValue(this->PLBasedFuelInputCurve, PLR) *
-                      CurveManager::CurveValue(this->TempBasedFuelInputCurve, AmbientDeltaT);
+        Real64 FuelUseRate = elecPowerGenerated * CurveManager::CurveValue(this->PLBasedFuelInputCurve, PLR) *
+                             CurveManager::CurveValue(this->TempBasedFuelInputCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Flow.  This curve shows the ratio of exhaust gas flow (kg/s) to electric power
         // output (J/s).  The units on ExhaustFlowCurve are (kg/J).  When multiplied by the rated power of the unit,
         // it gives the exhaust flow rate in kg/s
         // (FEX) Exhaust Gas Flow Rate cubic meters per second???
-        Real64 ExhaustFlow = RatedPowerOutput * CurveManager::CurveValue(this->ExhaustFlowCurve, AmbientDeltaT);
+        Real64 exhaustFlow = ratedPowerOutput * CurveManager::CurveValue(this->ExhaustFlowCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Temperature.  This curve calculates the exhaust temperature (C) by
         // multiplying the exhaust temperature (C) for a particular part load as given by PLBasedExhaustTempCurve
         // a correction factor based on the deviation from design temperature, TempBasedExhaustTempCurve
 
         Real64 QExhaustRec; // recovered exhaust heat (W)
-        Real64 ExhaustStackTemp;  // turbine stack temp. (C)
-        if ((PLR > 0.0) && ((ExhaustFlow > 0.0) || (MaxExhaustperCTPower > 0.0))) {
+        Real64 exhaustStackTemp;  // turbine stack temp. (C)
+        if ((PLR > 0.0) && ((exhaustFlow > 0.0) || (maxExhaustperCTPower > 0.0))) {
 
             // (TEX) Exhaust Gas Temperature in C
-            Real64 ExhaustTemp = CurveManager::CurveValue(this->PLBasedExhaustTempCurve, PLR) *
-                          CurveManager::CurveValue(this->TempBasedExhaustTempCurve, AmbientDeltaT);
+            Real64 exhaustTemp = CurveManager::CurveValue(this->PLBasedExhaustTempCurve, PLR) *
+                                 CurveManager::CurveValue(this->TempBasedExhaustTempCurve, ambientDeltaT);
 
             // (UACGC) Heat Exchanger UA to Capacity
-            Real64 UA = this->UACoef(1) * std::pow(RatedPowerOutput, this->UACoef(2));
+            Real64 UA_loc = this->UACoef(1) * std::pow(ratedPowerOutput, this->UACoef(2));
 
             // design engine stack saturated steam temp. (C)
-            Real64 DesignMinExitGasTemp = this->DesignMinExitGasTemp;
+            Real64 designMinExitGasTemp = this->DesignMinExitGasTemp;
 
-            ExhaustStackTemp = DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
-                                                          std::exp(UA / (max(ExhaustFlow, MaxExhaustperCTPower * RatedPowerOutput) * ExhaustCP));
+            exhaustStackTemp = designMinExitGasTemp + (exhaustTemp - designMinExitGasTemp) /
+                                                      std::exp(UA_loc / (max(exhaustFlow, maxExhaustperCTPower * ratedPowerOutput) * exhaustCp));
 
-            QExhaustRec = max(ExhaustFlow * ExhaustCP * (ExhaustTemp - ExhaustStackTemp), 0.0);
+            QExhaustRec = max(exhaustFlow * exhaustCp * (exhaustTemp - exhaustStackTemp), 0.0);
         } else {
-            ExhaustStackTemp = this->DesignMinExitGasTemp;
+            exhaustStackTemp = this->DesignMinExitGasTemp;
             QExhaustRec = 0.0;
         }
 
@@ -641,15 +641,15 @@ namespace CTElectricGenerator {
         // multiplying the total power generated by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // recovered lube oil heat (W)
-        Real64 QLubeOilRec = ElecPowerGenerated * CurveManager::CurveValue(this->QLubeOilRecoveredCurve, PLR);
+        Real64 QLubeOilRec = elecPowerGenerated * CurveManager::CurveValue(this->QLubeOilRecoveredCurve, PLR);
 
         // Check for divide by zero
         Real64 HeatRecOutTemp;   // Heat Recovery Fluid Outlet Temperature (C)
-        if ((HeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
-            HeatRecOutTemp = (QExhaustRec + QLubeOilRec) / (HeatRecMdot * HeatRecCp) + HeatRecInTemp;
+        if ((heatRecMdot > 0.0) && (heatRecCp > 0.0)) {
+            HeatRecOutTemp = (QExhaustRec + QLubeOilRec) / (heatRecMdot * heatRecCp) + heatRecInTemp;
         } else {
-            HeatRecMdot = 0.0;
-            HeatRecOutTemp = HeatRecInTemp;
+            heatRecMdot = 0.0;
+            HeatRecOutTemp = heatRecInTemp;
             QExhaustRec = 0.0;
             QLubeOilRec = 0.0;
         }
@@ -661,17 +661,17 @@ namespace CTElectricGenerator {
         Real64 HRecRatio;        // When Max Temp is reached the amount of recovered heat has to be reduced.
 
         if (HeatRecOutTemp > this->HeatRecMaxTemp) {
-            if (this->HeatRecMaxTemp != HeatRecInTemp) {
-                MinHeatRecMdot = (QExhaustRec + QLubeOilRec) / (HeatRecCp * (this->HeatRecMaxTemp - HeatRecInTemp));
+            if (this->HeatRecMaxTemp != heatRecInTemp) {
+                MinHeatRecMdot = (QExhaustRec + QLubeOilRec) / (heatRecCp * (this->HeatRecMaxTemp - heatRecInTemp));
                 if (MinHeatRecMdot < 0.0) MinHeatRecMdot = 0.0;
             }
 
             // Recalculate Outlet Temperature, with adjusted flowrate
-            if ((MinHeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
-                HeatRecOutTemp = (QExhaustRec + QLubeOilRec) / (MinHeatRecMdot * HeatRecCp) + HeatRecInTemp;
-                HRecRatio = HeatRecMdot / MinHeatRecMdot;
+            if ((MinHeatRecMdot > 0.0) && (heatRecCp > 0.0)) {
+                HeatRecOutTemp = (QExhaustRec + QLubeOilRec) / (MinHeatRecMdot * heatRecCp) + heatRecInTemp;
+                HRecRatio = heatRecMdot / MinHeatRecMdot;
             } else {
-                HeatRecOutTemp = HeatRecInTemp;
+                HeatRecOutTemp = heatRecInTemp;
                 HRecRatio = 0.0;
             }
             QLubeOilRec *= HRecRatio;
@@ -680,39 +680,39 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
         Real64 FuelEnergyUsed = FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // recovered lube oil heat (J)
-        Real64 LubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // recovered exhaust heat (J)
-        Real64 ExhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        this->ElecPowerGenerated = ElecPowerGenerated;
+        this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
 
-        this->HeatRecInletTemp = HeatRecInTemp;
+        this->HeatRecInletTemp = heatRecInTemp;
         this->HeatRecOutletTemp = HeatRecOutTemp;
 
-        this->HeatRecMdot = HeatRecMdot;
+        this->HeatRecMdot = heatRecMdot;
         this->QExhaustRecovered = QExhaustRec;
         this->QLubeOilRecovered = QLubeOilRec;
         this->QTotalHeatRecovered = QExhaustRec + QLubeOilRec;
         this->FuelEnergyUseRate = std::abs(FuelUseRate);
-        this->ExhaustEnergyRec = ExhaustEnergyRec;
-        this->LubeOilEnergyRec = LubeOilEnergyRec;
-        this->TotalHeatEnergyRec = ExhaustEnergyRec + LubeOilEnergyRec;
+        this->ExhaustEnergyRec = exhaustEnergyRec;
+        this->LubeOilEnergyRec = lubeOilEnergyRec;
+        this->TotalHeatEnergyRec = exhaustEnergyRec + lubeOilEnergyRec;
         this->FuelEnergy = std::abs(FuelEnergyUsed);
 
         // Heating Value of Fuel in (kJ/kg)
-        Real64 FuelHeatingValue = this->FuelHeatingValue;
+        Real64 fuelHeatingValue = this->FuelHeatingValue;
 
-        this->FuelMdot = std::abs(FuelUseRate) / (FuelHeatingValue * KJtoJ);
+        this->FuelMdot = std::abs(FuelUseRate) / (fuelHeatingValue * KJtoJ);
 
-        this->ExhaustStackTemp = ExhaustStackTemp;
+        this->ExhaustStackTemp = exhaustStackTemp;
 
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
@@ -720,7 +720,7 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorSpecs::InitCTGenerators(bool const RunFlag,             // TRUE when Generator operating
+    void CTGeneratorData::InitCTGenerators(bool const RunFlag,             // TRUE when Generator operating
                           bool const FirstHVACIteration)
     {
 
@@ -838,31 +838,6 @@ namespace CTElectricGenerator {
             }
         }
     }
-
-//    void GetCTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
-//                               int const genNum,
-//                               Real64 &GeneratorPower,  // electrical power
-//                               Real64 &GeneratorEnergy, // electrical energy
-//                               Real64 &ThermalPower,    // heat power
-//                               Real64 &ThermalEnergy    // heat energy
-//    )
-//    {
-//        // SUBROUTINE INFORMATION:
-//        //       AUTHOR         B Griffith
-//        //       DATE WRITTEN   March 2008
-//        //       MODIFIED       na
-//        //       RE-ENGINEERED  na
-//
-//        // PURPOSE OF THIS SUBROUTINE:
-//        // get some results for load center's aggregation
-//
-//        // called by ElectricPowerServiceManager. this function needs to go away eventually.
-//
-//        GeneratorPower = CTGenerator(genNum).ElecPowerGenerated;
-//        GeneratorEnergy = CTGenerator(genNum).ElecEnergyGenerated;
-//        ThermalPower = CTGenerator(genNum).QTotalHeatRecovered;
-//        ThermalEnergy = CTGenerator(genNum).TotalHeatEnergyRec;
-//    }
 
 } // namespace CTElectricGenerator
 

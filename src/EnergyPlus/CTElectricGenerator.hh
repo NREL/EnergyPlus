@@ -65,7 +65,7 @@ namespace CTElectricGenerator {
 
     extern int NumCTGenerators; // number of CT Generators specified in input
 
-    struct CTGeneratorSpecs : PlantComponent
+    struct CTGeneratorData : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
@@ -128,7 +128,7 @@ namespace CTElectricGenerator {
         bool MyFlag;
 
         // Default Constructor
-        CTGeneratorSpecs()
+        CTGeneratorData()
             : TypeOf("Generator:CombustionTurbine"), CompType_Num(iGeneratorCombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), PLBasedFuelInputCurve(0),
               TempBasedFuelInputCurve(0), ExhaustFlow(0.0), ExhaustFlowCurve(0), ExhaustTemp(0.0), PLBasedExhaustTempCurve(0),
@@ -158,38 +158,9 @@ namespace CTElectricGenerator {
     };
 
     // Object Data
-    extern Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
-
-//    // Static functions
-//    void SimCTGenerator(int GeneratorType,          // type of Generator
-//                        std::string const &GeneratorName, // user specified name of Generator
-//                        int &GeneratorIndex,
-//                        bool RunFlag,  // simulate Generator when TRUE
-//                        Real64 MyLoad, // generator demand
-//                        bool FirstHVACIteration);
-//
-//    void SimCTPlantHeatRecovery(std::string const &CompType, // unused1208
-//                                std::string const &CompName,
-//                                int CompTypeNum, // unused1208
-//                                int &CompNum,
-//                                bool RunFlag,
-//                                bool &InitLoopEquip,
-//                                Real64 &MyLoad,
-//                                Real64 &MaxCap,
-//                                Real64 &MinCap,
-//                                Real64 &OptCap,
-//                                bool FirstHVACIteration // TRUE if First iteration of simulation
-//    );
+    extern Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
 
     void GetCTGeneratorInput();
-
-//    void GetCTGeneratorResults(int GeneratorType, // type of Generator
-//                               int genNum,
-//                               Real64 &GeneratorPower,  // electrical power
-//                               Real64 &GeneratorEnergy, // electrical energy
-//                               Real64 &ThermalPower,    // heat power
-//                               Real64 &ThermalEnergy    // heat energy
-//    );
 
     void clear_state();
 
