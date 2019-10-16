@@ -109,6 +109,7 @@ extern "C" {
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <HeatBalanceAirManager.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -1165,9 +1166,12 @@ namespace SimulationManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
-                        DoCoilDirectSolutions = true;
-                    }
+                    DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
+                }
+                if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
+                    HeatBalanceIntRadExchange::CarrollMethod =
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
                 }
             }
         }

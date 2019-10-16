@@ -98,8 +98,6 @@ namespace HeatBalanceIntRadExchange {
                                bool &ErrorsFound                        // True when errors are found
     );
 
-    void SetRadiantExchangeMethod();
-
     void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
