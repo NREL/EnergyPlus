@@ -72,10 +72,6 @@ namespace EnergyPlus {
 
 namespace ICEngineElectricGenerator {
 
-    //__________________________________________________________________________
-    // BLAST inherited generators:
-    // ICENGINEElectricGenerator (Internal Combustion, curve fit from BLAST)
-
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   Sept. 2000
@@ -90,7 +86,6 @@ namespace ICEngineElectricGenerator {
     // is available to meet an electric load demand, it calls SimICEngineGenerator
     // which in turn calls the ICEngine Generator model.
 
-    // Using/Aliasing
     using namespace DataLoopNode;
     using DataGlobalConstants::iGeneratorICEngine;
     using DataGlobals::BeginEnvrnFlag;
@@ -98,12 +93,10 @@ namespace ICEngineElectricGenerator {
     using DataGlobals::SecInHour;
     using General::RoundSigDigits;
 
-    // MODULE PARAMETER DEFINITIONS
     Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
 
-    // MODULE VARIABLE DECLARATIONS:
     int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
     bool GetICEInput(true);       // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
@@ -128,10 +121,8 @@ namespace ICEngineElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -180,31 +171,6 @@ namespace ICEngineElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         GeneratorPower = ICEngineGeneratorReport(GeneratorIndex).PowerGen;
         GeneratorEnergy = ICEngineGeneratorReport(GeneratorIndex).EnergyGen;
         ThermalPower = ICEngineGeneratorReport(GeneratorIndex).QTotalHeatRecovered;
@@ -234,7 +200,6 @@ namespace ICEngineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill data needed in PlantLoopEquipments
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Generator_ICEngine;
         using PlantUtilities::UpdateComponentHeatRecoverySide;
 
@@ -267,12 +232,6 @@ namespace ICEngineElectricGenerator {
                                         FirstHVACIteration);
     }
 
-    // End IC ENGINE Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of IC ENGINE Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetICEngineGeneratorInput()
     {
         // SUBROUTINE INFORMATION:
@@ -283,10 +242,6 @@ namespace ICEngineElectricGenerator {
         // This routine will get the input
         // required by the IC ENGINE Generator models.
 
-        // METHODOLOGY EMPLOYED:
-        // EnergyPlus input processor
-
-        // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::CurveValue;
@@ -295,7 +250,6 @@ namespace ICEngineElectricGenerator {
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
-        // LOCAL VARIABLES
         int GeneratorNum;               // Generator counter
         int NumAlphas;                  // Number of elements in the alpha array
         int NumNums;                    // Number of elements in the numeric array
@@ -635,12 +589,6 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    // End of Get Input subroutines for the IC ENGINE Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
-
     void CalcICEngineGeneratorModel(int const GeneratorNum, // Generator number
                                     bool const RunFlag,     // TRUE when Generator operating
                                     Real64 const MyLoad,    // Generator demand
@@ -658,24 +606,14 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // curve fit of performance data:
 
-        // REFERENCES:na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
-        // DERIVED TYPE DEFINITIONS
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;     // min allowed operating frac full load
         Real64 MaxPartLoadRat;     // max allowed operating frac full load
         Real64 PLR;                // Generator operating part load ratio
@@ -711,7 +649,6 @@ namespace ICEngineElectricGenerator {
         Real64 HRecRatio;            // When Max Temp is reached the amount of recovered heat has to be reduced.
         // and this assumption uses this ratio to accomplish this task.
 
-        // LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         MinPartLoadRat = ICEngineGenerator(GeneratorNum).MinPartLoadRat;
         MaxPartLoadRat = ICEngineGenerator(GeneratorNum).MaxPartLoadRat;
         RatedPowerOutput = ICEngineGenerator(GeneratorNum).RatedPowerOutput;
@@ -888,22 +825,11 @@ namespace ICEngineElectricGenerator {
         // The chiller sets the flow on the loop first by the input design flowrate and then
         // performs a check to verify that
 
-        // REFERENCES: na
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;
         Real64 MinHeatRecMdot;
         Real64 HeatRecInTemp;
@@ -957,12 +883,6 @@ namespace ICEngineElectricGenerator {
         ICEngineGenerator(Num).HeatRecMdotActual = HeatRecMdot;
     }
 
-    // End IC ENGINE Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitICEngineGenerators(int const GeneratorNum,         // Generator number
                                 bool const RunFlag,             // TRUE when Generator operating
                                 Real64 const EP_UNUSED(MyLoad), // Generator demand
@@ -981,10 +901,6 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Generator_ICEngine;
         using FluidProperties::GetDensityGlycol;
@@ -992,19 +908,8 @@ namespace ICEngineElectricGenerator {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitICEngineGenerators");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInletNode;            // inlet node number in heat recovery loop
         int HeatRecOutletNode;           // outlet node number in heat recovery loop
         static bool MyOneTimeFlag(true); // Initialization flag
@@ -1016,7 +921,6 @@ namespace ICEngineElectricGenerator {
         Real64 rho;
         bool errFlag;
 
-        // FLOW:
         // Do the one time initializations
         if (MyOneTimeFlag) {
             MyEnvrnFlag.allocate(NumICEngineGenerators);
@@ -1125,12 +1029,6 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    // End IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
-
     void UpdateICEngineGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
                                         int const Num                  // Generator number
     )
@@ -1142,30 +1040,11 @@ namespace ICEngineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // reporting
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecOutletNode;
 
         if (ICEngineGenerator(Num).HeatRecActive) {
             HeatRecOutletNode = ICEngineGenerator(Num).HeatRecOutletNodeNum;
-            //      Node(HeatRecOutletNode)%MassFlowRate            = ICEngineGenerator(Num)%HeatRecMdotActual
             Node(HeatRecOutletNode).Temp = ICEngineGenerator(Num).HeatRecOutletTemp;
-            //      Node(HeatRecOutletNode)%MassFlowRateMaxAvail = Node(HeatRecInletNode)%MassFlowRateMaxAvail
-            //      Node(HeatRecOutletNode)%MassFlowRateMinAvail = Node(HeatRecInletNode)%MassFlowRateMinAvail
         }
         ICEngineGeneratorReport(Num).PowerGen = ICEngineGenerator(Num).ElecPowerGenerated;
         ICEngineGeneratorReport(Num).QJacketRecovered = ICEngineGenerator(Num).QJacketRecovered;
@@ -1185,9 +1064,6 @@ namespace ICEngineElectricGenerator {
         ICEngineGeneratorReport(Num).HeatRecOutletTemp = ICEngineGenerator(Num).HeatRecOutletTemp;
         ICEngineGeneratorReport(Num).HeatRecMdot = ICEngineGenerator(Num).HeatRecMdotActual;
     }
-
-    // End of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
 
 } // namespace ICEngineElectricGenerator
 

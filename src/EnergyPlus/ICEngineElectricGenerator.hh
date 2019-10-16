@@ -60,24 +60,15 @@ namespace EnergyPlus {
 
 namespace ICEngineElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorICEngine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
     extern bool GetICEInput;          // When TRUE, calls subroutine to read input file.
     extern Array1D_bool CheckEquipName;
-    // SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
-
-    // Types
 
     struct ICEngineGeneratorSpecs
     {
@@ -219,19 +210,7 @@ namespace ICEngineElectricGenerator {
                                  bool const FirstHVACIteration // TRUE if First iteration of simulation
     );
 
-    // End IC ENGINE Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of IC ENGINE Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetICEngineGeneratorInput();
-
-    // End of Get Input subroutines for the IC ENGINE Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
 
     void CalcICEngineGeneratorModel(int const GeneratorNum, // Generator number
                                     bool const RunFlag,     // TRUE when Generator operating
@@ -244,29 +223,14 @@ namespace ICEngineElectricGenerator {
                                      Real64 &HRecRatio // Max Heat recovery ratio
     );
 
-    // End IC ENGINE Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitICEngineGenerators(int const GeneratorNum, // Generator number
                                 bool const RunFlag,     // TRUE when Generator operating
                                 Real64 const MyLoad,    // Generator demand
                                 bool const FirstHVACIteration);
 
-    // End IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
-
     void UpdateICEngineGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
                                         int const Num       // Generator number
     );
-
-    // End of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
 
 } // namespace ICEngineElectricGenerator
 
