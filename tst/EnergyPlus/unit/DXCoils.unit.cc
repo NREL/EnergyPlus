@@ -1355,7 +1355,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     CalcMultiSpeedDXCoilCooling(1, 1, 1, 2, 1, 1, 0);
 
-    EXPECT_NEAR(1303.4304, MSHPWasteHeat, 0.001);
+    EXPECT_NEAR(1302.7482629848564, MSHPWasteHeat, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)

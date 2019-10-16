@@ -1348,7 +1348,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.1322, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43744.633890623081, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.12352, 0.0001);
 
     // Direct solution
@@ -1358,7 +1358,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.364114, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796613, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43746.0164, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.523723406601, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1234600, 0.0001);
 
     QZnReq = -10000.00;
@@ -1367,13 +1367,13 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.454516, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41685.992, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.850794492711, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.2859843, 0.0001);
     DataGlobals::DoCoilDirectSolutions = true;
     SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.454516, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41685.992, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.850794492711, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.2859843, 0.0001);
 
     // Heating
