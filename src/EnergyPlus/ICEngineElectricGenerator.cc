@@ -86,13 +86,6 @@ namespace ICEngineElectricGenerator {
     // is available to meet an electric load demand, it calls SimICEngineGenerator
     // which in turn calls the ICEngine Generator model.
 
-    using namespace DataLoopNode;
-    using DataGlobalConstants::iGeneratorICEngine;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::SecInHour;
-    using General::RoundSigDigits;
-
     Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
@@ -121,8 +114,6 @@ namespace ICEngineElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        using General::TrimSigDigits;
-
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -139,12 +130,12 @@ namespace ICEngineElectricGenerator {
         } else {
             GenNum = GeneratorIndex;
             if (GenNum > NumICEngineGenerators || GenNum < 1) {
-                ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(GenNum) +
-                               ", Number of IC Engine Generators=" + TrimSigDigits(NumICEngineGenerators) + ", Generator name=" + GeneratorName);
+                ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
+                               ", Number of IC Engine Generators=" + General::TrimSigDigits(NumICEngineGenerators) + ", Generator name=" + GeneratorName);
             }
             if (CheckEquipName(GenNum)) {
                 if (GeneratorName != ICEngineGenerator(GenNum).Name) {
-                    ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(GenNum) +
+                    ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                    ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator(GenNum).Name);
                 }
                 CheckEquipName(GenNum) = false;
@@ -200,9 +191,6 @@ namespace ICEngineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Fill data needed in PlantLoopEquipments
 
-        using DataPlant::TypeOf_Generator_ICEngine;
-        using PlantUtilities::UpdateComponentHeatRecoverySide;
-
         if (GetICEInput) {
             GetICEngineGeneratorInput();
             GetICEInput = false;
@@ -220,9 +208,9 @@ namespace ICEngineElectricGenerator {
             return;
         } // End Of InitLoopEquip
 
-        UpdateComponentHeatRecoverySide(ICEngineGenerator(CompNum).HRLoopNum,
+        PlantUtilities::UpdateComponentHeatRecoverySide(ICEngineGenerator(CompNum).HRLoopNum,
                                         ICEngineGenerator(CompNum).HRLoopSideNum,
-                                        TypeOf_Generator_ICEngine,
+                                        DataPlant::TypeOf_Generator_ICEngine,
                                         ICEngineGenerator(CompNum).HeatRecInletNodeNum,
                                         ICEngineGenerator(CompNum).HeatRecOutletNodeNum,
                                         ICEngineGeneratorReport(CompNum).QTotalHeatRecovered,
@@ -242,14 +230,6 @@ namespace ICEngineElectricGenerator {
         // This routine will get the input
         // required by the IC ENGINE Generator models.
 
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using BranchNodeConnections::TestCompSet;
-        using CurveManager::CurveValue;
-        using CurveManager::GetCurveIndex;
-        using General::RoundSigDigits;
-        using NodeInputManager::GetOnlySingleNode;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
-
         int GeneratorNum;               // Generator counter
         int NumAlphas;                  // Number of elements in the alpha array
         int NumNums;                    // Number of elements in the numeric array
@@ -260,11 +240,11 @@ namespace ICEngineElectricGenerator {
         Real64 xValue;                  // test curve limits
 
         // FLOW
-        cCurrentModuleObject = "Generator:InternalCombustionEngine";
-        NumICEngineGenerators = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        DataIPShortCuts::cCurrentModuleObject = "Generator:InternalCombustionEngine";
+        NumICEngineGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         if (NumICEngineGenerators <= 0) {
-            ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -276,7 +256,7 @@ namespace ICEngineElectricGenerator {
 
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
         for (GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,
                                           NumAlphas,
@@ -284,68 +264,68 @@ namespace ICEngineElectricGenerator {
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             ICEngineGenerator(GeneratorNum).Name = AlphArray(1);
 
             ICEngineGenerator(GeneratorNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(NumArray(1), 2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             // Not sure what to do with electric nodes, so do not use optional arguments
-            ICEngineGenerator(GeneratorNum).ElectricCircuitNode = GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Electric, NodeConnectionType_Electric, 1, ObjectIsNotParent);
+            ICEngineGenerator(GeneratorNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(
+                AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Electric, DataLoopNode::NodeConnectionType_Electric, 1, DataLoopNode::ObjectIsNotParent);
 
             ICEngineGenerator(GeneratorNum).MinPartLoadRat = NumArray(2);
             ICEngineGenerator(GeneratorNum).MaxPartLoadRat = NumArray(3);
             ICEngineGenerator(GeneratorNum).OptPartLoadRat = NumArray(4);
 
             // Load Special IC ENGINE Generator Curve Fit Inputs
-            ICEngineGenerator(GeneratorNum).ElecOutputFuelCurve = GetCurveIndex(AlphArray(3)); // convert curve name to number
+            ICEngineGenerator(GeneratorNum).ElecOutputFuelCurve = CurveManager::GetCurveIndex(AlphArray(3)); // convert curve name to number
             if (ICEngineGenerator(GeneratorNum).ElecOutputFuelCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(GeneratorNum).RecJacHeattoFuelCurve = GetCurveIndex(AlphArray(4)); // convert curve name to number
+            ICEngineGenerator(GeneratorNum).RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(AlphArray(4)); // convert curve name to number
             if (ICEngineGenerator(GeneratorNum).RecJacHeattoFuelCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(GeneratorNum).RecLubeHeattoFuelCurve = GetCurveIndex(AlphArray(5)); // convert curve name to number
+            ICEngineGenerator(GeneratorNum).RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(AlphArray(5)); // convert curve name to number
             if (ICEngineGenerator(GeneratorNum).RecLubeHeattoFuelCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(GeneratorNum).TotExhausttoFuelCurve = GetCurveIndex(AlphArray(6)); // convert curve name to number
+            ICEngineGenerator(GeneratorNum).TotExhausttoFuelCurve = CurveManager::GetCurveIndex(AlphArray(6)); // convert curve name to number
             if (ICEngineGenerator(GeneratorNum).TotExhausttoFuelCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(GeneratorNum).ExhaustTempCurve = GetCurveIndex(AlphArray(7)); // convert curve name to number
+            ICEngineGenerator(GeneratorNum).ExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(7)); // convert curve name to number
             if (ICEngineGenerator(GeneratorNum).ExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             } else {
-                xValue = CurveValue(ICEngineGenerator(GeneratorNum).ExhaustTempCurve, 1.0);
+                xValue = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).ExhaustTempCurve, 1.0);
                 if (xValue < ReferenceTemp) {
-                    ShowSevereError("GetICEngineGeneratorInput: " + cAlphaFieldNames(7) + " output has very low value.");
-                    ShowContinueError("...curve generates [" + RoundSigDigits(xValue, 3) + " C] at PLR=1.0");
-                    ShowContinueError("...this is less than the Reference Temperature [" + RoundSigDigits(ReferenceTemp, 2) +
+                    ShowSevereError("GetICEngineGeneratorInput: " + DataIPShortCuts::cAlphaFieldNames(7) + " output has very low value.");
+                    ShowContinueError("...curve generates [" + General::RoundSigDigits(xValue, 3) + " C] at PLR=1.0");
+                    ShowContinueError("...this is less than the Reference Temperature [" + General::RoundSigDigits(ReferenceTemp, 2) +
                                       " C] and may cause errors.");
                 }
             }
@@ -359,29 +339,29 @@ namespace ICEngineElectricGenerator {
             ICEngineGenerator(GeneratorNum).DesignHeatRecVolFlowRate = NumArray(10);
             if (ICEngineGenerator(GeneratorNum).DesignHeatRecVolFlowRate > 0.0) {
                 ICEngineGenerator(GeneratorNum).HeatRecActive = true;
-                ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum = GetOnlySingleNode(
-                    AlphArray(8), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(
+                    AlphArray(8), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
                 if (ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
+                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum = GetOnlySingleNode(
-                    AlphArray(9), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                    AlphArray(9), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
                 if (ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(9) + '=' + AlphArray(9));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + AlphArray(9));
+                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
-                RegisterPlantCompDesignFlow(ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum,
+                BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
+                PlantUtilities::RegisterPlantCompDesignFlow(ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum,
                                             ICEngineGenerator(GeneratorNum).DesignHeatRecVolFlowRate);
             } else {
                 ICEngineGenerator(GeneratorNum).HeatRecActive = false;
                 ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum = 0;
                 ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum = 0;
-                if (!lAlphaFieldBlanks(8) || !lAlphaFieldBlanks(9)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + AlphArray(1));
+                if (!DataIPShortCuts::lAlphaFieldBlanks(8) || !DataIPShortCuts::lAlphaFieldBlanks(9)) {
+                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -419,8 +399,8 @@ namespace ICEngineElectricGenerator {
                     ICEngineGenerator(GeneratorNum).FuelType = "OtherFuel2";
 
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(10) + '=' + AlphArray(10));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
+                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -429,7 +409,7 @@ namespace ICEngineElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + cCurrentModuleObject);
+            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
         for (GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum) {
@@ -606,10 +586,6 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // curve fit of performance data:
 
-        using CurveManager::CurveValue;
-        using DataHVACGlobals::TimeStepSys;
-        using FluidProperties::GetSpecificHeatGlycol;
-
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
         static std::string const RoutineName("CalcICEngineGeneratorModel");
@@ -655,8 +631,8 @@ namespace ICEngineElectricGenerator {
         MaxExhaustperPowerOutput = ICEngineGenerator(GeneratorNum).MaxExhaustperPowerOutput;
         if (ICEngineGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInNode = ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum;
-            HeatRecInTemp = Node(HeatRecInNode).Temp;
-            HeatRecMdot = Node(HeatRecInNode).MassFlowRate;
+            HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+            HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
 
         } else {
             HeatRecInTemp = 0.0;
@@ -698,7 +674,7 @@ namespace ICEngineElectricGenerator {
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
         // energy input is calculated in J/s.  The PLBasedFuelInputCurve selects ratio of fuel flow (J/s)/power generated (J/s).
         if (PLR > 0.0) {
-            ElecOutputFuelRat = CurveValue(ICEngineGenerator(GeneratorNum).ElecOutputFuelCurve, PLR);
+            ElecOutputFuelRat = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).ElecOutputFuelCurve, PLR);
             FuelEnergyUseRate = ElecPowerGenerated / ElecOutputFuelRat;
         } else {
             FuelEnergyUseRate = 0.0;
@@ -708,25 +684,25 @@ namespace ICEngineElectricGenerator {
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the water jacket at that
         // particular part load.
 
-        RecJacHeattoFuelRat = CurveValue(ICEngineGenerator(GeneratorNum).RecJacHeattoFuelCurve, PLR);
+        RecJacHeattoFuelRat = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).RecJacHeattoFuelCurve, PLR);
         QJacketRec = FuelEnergyUseRate * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant heat.  This curve calculates the lube heat recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
-        RecLubeHeattoFuelRat = CurveValue(ICEngineGenerator(GeneratorNum).RecLubeHeattoFuelCurve, PLR);
+        RecLubeHeattoFuelRat = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).RecLubeHeattoFuelCurve, PLR);
         QLubeOilRec = FuelEnergyUseRate * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  heat recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
-        TotExhausttoFuelRat = CurveValue(ICEngineGenerator(GeneratorNum).TotExhausttoFuelCurve, PLR);
+        TotExhausttoFuelRat = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).TotExhausttoFuelCurve, PLR);
         QExhaustTotal = FuelEnergyUseRate * TotExhausttoFuelRat;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PLR > 0.0) {
-            ExhaustTemp = CurveValue(ICEngineGenerator(GeneratorNum).ExhaustTempCurve, PLR);
+            ExhaustTemp = CurveManager::CurveValue(ICEngineGenerator(GeneratorNum).ExhaustTempCurve, PLR);
 
             if (ExhaustTemp > ReferenceTemp) {
 
@@ -746,7 +722,7 @@ namespace ICEngineElectricGenerator {
                 if (ICEngineGenerator(GeneratorNum).ErrExhaustTempIndex == 0) {
                     ShowWarningMessage("CalcICEngineGeneratorModel: " + ICEngineGenerator(GeneratorNum).TypeOf + "=\"" +
                                        ICEngineGenerator(GeneratorNum).Name + "\" low Exhaust Temperature from Curve Value");
-                    ShowContinueError("...curve generated temperature=[" + RoundSigDigits(ExhaustTemp, 3) + " C], PLR=[" + RoundSigDigits(PLR, 3) +
+                    ShowContinueError("...curve generated temperature=[" + General::RoundSigDigits(ExhaustTemp, 3) + " C], PLR=[" + General::RoundSigDigits(PLR, 3) +
                                       "].");
                     ShowContinueError("...simulation will continue with exhaust heat reclaim set to 0.");
                 }
@@ -781,11 +757,11 @@ namespace ICEngineElectricGenerator {
         }
 
         // Calculate Energy
-        ElectricEnergyGen = ElecPowerGenerated * TimeStepSys * SecInHour;
-        FuelEnergyUsed = FuelEnergyUseRate * TimeStepSys * SecInHour;
-        JacketEnergyRec = QJacketRec * TimeStepSys * SecInHour;
-        LubeOilEnergyRec = QLubeOilRec * TimeStepSys * SecInHour;
-        ExhaustEnergyRec = QExhaustRec * TimeStepSys * SecInHour;
+        ElectricEnergyGen = ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        FuelEnergyUsed = FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        JacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        LubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ExhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         ICEngineGenerator(GeneratorNum).ElecPowerGenerated = ElecPowerGenerated;
         ICEngineGenerator(GeneratorNum).ElecEnergyGenerated = ElectricEnergyGen;
@@ -825,9 +801,6 @@ namespace ICEngineElectricGenerator {
         // The chiller sets the flow on the loop first by the input design flowrate and then
         // performs a check to verify that
 
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetSpecificHeatGlycol;
-
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
         int HeatRecInNode;
@@ -842,10 +815,10 @@ namespace ICEngineElectricGenerator {
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
 
-        HeatRecInTemp = Node(HeatRecInNode).Temp;
-        HeatRecCp = GetSpecificHeatGlycol(PlantLoop(ICEngineGenerator(Num).HRLoopNum).FluidName,
+        HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+        HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ICEngineGenerator(Num).HRLoopNum).FluidName,
                                           HeatRecInTemp,
-                                          PlantLoop(ICEngineGenerator(Num).HRLoopNum).FluidIndex,
+                                          DataPlant::PlantLoop(ICEngineGenerator(Num).HRLoopNum).FluidIndex,
                                           RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
@@ -901,13 +874,6 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_Generator_ICEngine;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using PlantUtilities::SetComponentFlowRate;
-
         static std::string const RoutineName("InitICEngineGenerators");
 
         int HeatRecInletNode;            // inlet node number in heat recovery loop
@@ -931,10 +897,10 @@ namespace ICEngineElectricGenerator {
             MyOneTimeFlag = false;
             MySizeAndNodeInitFlag = true;
         }
-        if (MyPlantScanFlag(GeneratorNum) && allocated(PlantLoop) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
+        if (MyPlantScanFlag(GeneratorNum) && allocated(DataPlant::PlantLoop) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
             errFlag = false;
-            ScanPlantLoopsForObject(ICEngineGenerator(GeneratorNum).Name,
-                                    TypeOf_Generator_ICEngine,
+            PlantUtilities::ScanPlantLoopsForObject(ICEngineGenerator(GeneratorNum).Name,
+                                    DataPlant::TypeOf_Generator_ICEngine,
                                     ICEngineGenerator(GeneratorNum).HRLoopNum,
                                     ICEngineGenerator(GeneratorNum).HRLoopSideNum,
                                     ICEngineGenerator(GeneratorNum).HRBranchNum,
@@ -958,15 +924,15 @@ namespace ICEngineElectricGenerator {
             HeatRecOutletNode = ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum;
 
             // size mass flow rate
-            rho = GetDensityGlycol(PlantLoop(ICEngineGenerator(GeneratorNum).HRLoopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ICEngineGenerator(GeneratorNum).HRLoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
-                                   PlantLoop(ICEngineGenerator(GeneratorNum).HRLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(ICEngineGenerator(GeneratorNum).HRLoopNum).FluidIndex,
                                    RoutineName);
 
             ICEngineGenerator(GeneratorNum).DesignHeatRecMassFlowRate = rho * ICEngineGenerator(GeneratorNum).DesignHeatRecVolFlowRate;
             ICEngineGenerator(GeneratorNum).HeatRecMdotDesign = ICEngineGenerator(GeneratorNum).DesignHeatRecMassFlowRate;
 
-            InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(0.0,
                                ICEngineGenerator(GeneratorNum).DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
@@ -979,14 +945,14 @@ namespace ICEngineElectricGenerator {
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(GeneratorNum) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
+        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(GeneratorNum) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInletNode = ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecOutletNode = ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
-            Node(HeatRecInletNode).Temp = 20.0;
-            Node(HeatRecOutletNode).Temp = 20.0;
+            DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
-            InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(0.0,
                                ICEngineGenerator(GeneratorNum).DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
@@ -998,7 +964,7 @@ namespace ICEngineElectricGenerator {
             MyEnvrnFlag(GeneratorNum) = false;
         } // end environmental inits
 
-        if (!BeginEnvrnFlag) {
+        if (!DataGlobals::BeginEnvrnFlag) {
             MyEnvrnFlag(GeneratorNum) = true;
         }
 
@@ -1009,7 +975,7 @@ namespace ICEngineElectricGenerator {
                 } else {
                     mdot = 0.0;
                 }
-                SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(mdot,
                                      ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum,
                                      ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum,
                                      ICEngineGenerator(GeneratorNum).HRLoopNum,
@@ -1018,7 +984,7 @@ namespace ICEngineElectricGenerator {
                                      ICEngineGenerator(GeneratorNum).HRCompNum);
 
             } else {
-                SetComponentFlowRate(ICEngineGenerator(GeneratorNum).HeatRecMdotActual,
+                PlantUtilities::SetComponentFlowRate(ICEngineGenerator(GeneratorNum).HeatRecMdotActual,
                                      ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum,
                                      ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum,
                                      ICEngineGenerator(GeneratorNum).HRLoopNum,
@@ -1044,7 +1010,7 @@ namespace ICEngineElectricGenerator {
 
         if (ICEngineGenerator(Num).HeatRecActive) {
             HeatRecOutletNode = ICEngineGenerator(Num).HeatRecOutletNodeNum;
-            Node(HeatRecOutletNode).Temp = ICEngineGenerator(Num).HeatRecOutletTemp;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = ICEngineGenerator(Num).HeatRecOutletTemp;
         }
         ICEngineGeneratorReport(Num).PowerGen = ICEngineGenerator(Num).ElecPowerGenerated;
         ICEngineGeneratorReport(Num).QJacketRecovered = ICEngineGenerator(Num).QJacketRecovered;
