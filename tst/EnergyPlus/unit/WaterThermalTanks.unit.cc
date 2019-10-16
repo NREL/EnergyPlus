@@ -1444,11 +1444,11 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     WaterThermalTanks::UpdateWaterThermalTank(1);
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
-    EXPECT_NEAR(57.2000377, Tank.TankTemp, 0.0000001);         // final tank temperature
+    EXPECT_NEAR(57.202886184308923, Tank.TankTemp, 0.0000001); // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
     EXPECT_EQ(WaterThermalTanks::HeatMode, HeatPump.Mode);     // expect HP to remain in heating mode
-    EXPECT_NEAR(53.6000188, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
-    EXPECT_NEAR(53.6000188, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
+    EXPECT_NEAR(53.601443092154454, Tank.TankTempAvg, 0.0000001); // average tank temp over time step
+    EXPECT_NEAR(53.601443092154454, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp needing only partial HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 56.0;
@@ -1458,11 +1458,11 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     WaterThermalTanks::UpdateWaterThermalTank(1);
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
-    EXPECT_NEAR(60.00110205, Tank.TankTemp, 0.0000001);
-    EXPECT_NEAR(0.5550125, HeatPump.HeatingPLR, 0.0000001);
+    EXPECT_NEAR(60.00113277824243, Tank.TankTemp, 0.0000001);
+    EXPECT_NEAR(0.55480809485623206, HeatPump.HeatingPLR, 0.0000001);
     EXPECT_EQ(WaterThermalTanks::FloatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
-    EXPECT_NEAR(58.00055103, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
-    EXPECT_NEAR(58.00055103, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
+    EXPECT_NEAR(58.000566389121225, Tank.TankTempAvg, 0.0000001); // average tank temp over time step
+    EXPECT_NEAR(58.000566389121225, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
@@ -3109,9 +3109,9 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     //if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
     //total available capacity is substrated by used desuperheater reclaim heat
-    EXPECT_EQ(DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower, DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate);
+    EXPECT_NEAR(DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower, DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate, 0.01);
     //Desuperheater heater rate is correctly calculated
-    EXPECT_EQ(Desuperheater.HeaterRate, (DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25);
+    EXPECT_NEAR(Desuperheater.HeaterRate, (DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25, 0.01);
 
     //Test the float mode
     Tank.SavedTankTemp = 61.0;
