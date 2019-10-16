@@ -30,7 +30,7 @@ class Context {
 public:
   Context(unsigned size = 512);
   ~Context();
-  void showRendering(const SurfaceBuffer &surfaceBuffer);
+  void showRendering(const unsigned surfaceIndex, mat4x4 sunView);
   void setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers);
   float setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
   float setScene(mat4x4 sunView, bool clipFar = true);
@@ -45,13 +45,14 @@ public:
   std::map<unsigned, float>
   calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
                          const std::vector<unsigned> &interiorSurfaces, mat4x4 sunView);
-  void showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurfaces,
-                             const SurfaceBuffer &interiorSurface);
+  void showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIndices,
+                             const unsigned interiorSurfaceIndex,
+                             mat4x4 sunView);
   void clearModel();
 
 private:
   GLFWwindow *window;
-  GLuint query, fbo, rbo;
+  GLuint fbo, rbo;
   static const char *renderVertexShaderSource;
   static const char *renderFragmentShaderSource;
   static const char *calculationVertexShaderSource;
@@ -60,7 +61,6 @@ private:
   std::unique_ptr<GLProgram> renderProgram;
   std::unique_ptr<GLProgram> calcProgram;
   bool modelSet;
-  // float pixelArea;
   float modelBox[8][4];
   mat4x4 projection, view, mvp;
   mat4x4 cameraView;

@@ -28,7 +28,6 @@ public:
   std::vector<float> model;
   std::vector<SurfacePrivate> surfaces;
   bool checkSurface(const unsigned index);
-  // std::vector<SurfaceBuffer> surfaceBuffers;
 };
 
 } // namespace Pumbra

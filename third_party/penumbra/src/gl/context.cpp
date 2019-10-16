@@ -458,7 +458,7 @@ void Context::drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces) {
   glDepthFunc(GL_EQUAL);
 }
 
-void Context::showRendering(const SurfaceBuffer &surfaceBuffer) {
+void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
@@ -466,6 +466,9 @@ void Context::showRendering(const SurfaceBuffer &surfaceBuffer) {
     initRenderMode();
     isRenderMode = true;
   }
+
+  auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+  setScene(surfaceBuffer, sunView);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -480,8 +483,9 @@ void Context::showRendering(const SurfaceBuffer &surfaceBuffer) {
   glfwHideWindow(window);
 }
 
-void Context::showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurfaces,
-                                    const SurfaceBuffer &interiorSurface) {
+void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIndices,
+                                    const unsigned interiorSurfaceIndex,
+                                    mat4x4 sunView) {
   glfwSetWindowSize(window, size, size);
   glfwShowWindow(window);
 
@@ -489,6 +493,14 @@ void Context::showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurf
     initRenderMode();
     isRenderMode = true;
   }
+
+  auto const & interiorSurface = model.surfaceBuffers[interiorSurfaceIndex];
+  std::vector<SurfaceBuffer> hiddenSurfaces;
+  for (auto const hiddenSurf : hiddenSurfaceIndices) {
+    hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
+  }
+
+  setScene(model.surfaceBuffers[hiddenSurfaceIndices.at(0)], sunView, false);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -516,7 +528,7 @@ void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
 void Context::bufferedQuery(const unsigned surfaceIndex) {
   int i = 0;
   for (; i < bufferSize; ++i) {
-    if (indexBuffer[i] == surfaceIndex) break;
+    if (indexBuffer[i] == static_cast<int>(surfaceIndex)) break;
   }
   if (i == bufferSize) return;
 
@@ -540,22 +552,7 @@ void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
   }
 }
 
-// void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
-//   auto const pixelArea = setScene(sunView);
-//   drawModel();
-//   for (size_t i = 0; i < surfaceIndices.size(); ++i) {
-//     auto const surfaceIndex = surfaceIndices[i];
-//     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-//     // auto const pixelArea = setScene(surfaceBuffer, sunView);
-//     // drawModel();
-//     bufferedQuery(surfaceBuffer);
-//     pixelAreas.at(surfaceBuffer.index) = pixelArea;
-//   }
-// }
-
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
-  // auto const pixelArea = setScene(sunView);
-  // drawModel();
   for (auto const surfaceIndex : surfaceIndices) {
     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
     auto const pixelArea = setScene(surfaceBuffer, sunView);
@@ -568,8 +565,6 @@ void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sun
 }
 
 void Context::submitPSSA(mat4x4 sunView) {
-  // auto const pixelArea = setScene(sunView);
-  // drawModel();
   for (auto const & surfaceBuffer : model.surfaceBuffers) {
     auto const pixelArea = setScene(surfaceBuffer, sunView);
     drawModel();
@@ -583,10 +578,10 @@ void Context::submitPSSA(mat4x4 sunView) {
 
 float Context::calculatePSSA(const unsigned surfaceIndex) {
 
-  // if (isRenderMode) { // if currently render mode, switch to off screen mode
-  //   initOffScreenMode();
-  //   isRenderMode = false;
-  // }
+  if (isRenderMode) { // if currently render mode, switch to off screen mode
+    initOffScreenMode();
+    isRenderMode = false;
+  }
 
   // wait until the result is available
   GLint ready(0);
@@ -595,9 +590,6 @@ float Context::calculatePSSA(const unsigned surfaceIndex) {
   }
 
   // retrieve result
-  // if (pixelCounts.at(surfaceIndex) < 0) {
-  //   bufferedQuery(surfaceIndex);
-  // }
   glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
 
   return pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex];
@@ -605,10 +597,10 @@ float Context::calculatePSSA(const unsigned surfaceIndex) {
 
 std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
 
-  // if (isRenderMode) { // if currently render mode, switch to off screen mode
-  //   initOffScreenMode();
-  //   isRenderMode = false;
-  // }
+  if (isRenderMode) { // if currently render mode, switch to off screen mode
+    initOffScreenMode();
+    isRenderMode = false;
+  }
 
   // retrieve result
   std::vector<float> results;
@@ -623,10 +615,10 @@ std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIn
 
 std::vector<float> Context::calculatePSSA() {
 
-  // if (isRenderMode) { // if currently render mode, switch to off screen mode
-  //   initOffScreenMode();
-  //   isRenderMode = false;
-  // }
+  if (isRenderMode) { // if currently render mode, switch to off screen mode
+    initOffScreenMode();
+    isRenderMode = false;
+  }
 
   // retrieve result
   std::vector<float> results;
@@ -643,10 +635,10 @@ std::map<unsigned, float>
 Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndices,
                                 const std::vector<unsigned> &interiorSurfaceIndices, mat4x4 sunView) {
 
-  // if (isRenderMode) { // if currently render mode, switch to off screen mode
-  //   initOffScreenMode();
-  //   isRenderMode = false;
-  // }
+  if (isRenderMode) { // if currently render mode, switch to off screen mode
+    initOffScreenMode();
+    isRenderMode = false;
+  }
 
   std::vector<GLuint> pssasQueries(interiorSurfaceIndices.size());
   std::map<unsigned, float> pssas;

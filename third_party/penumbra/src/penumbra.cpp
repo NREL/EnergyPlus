@@ -87,8 +87,6 @@ float Penumbra::getSunAltitude() {
 
 void Penumbra::submitPSSA(unsigned surfaceIndex) {
   if (penumbra->checkSurface(surfaceIndex)) {
-    // penumbra->context.setScene(penumbra->model.surfaceBuffers[surfaceIndex], penumbra->sun.getView());
-
     penumbra->context.submitPSSA(surfaceIndex, penumbra->sun.getView());
   } else {
     showMessage(MSG_ERR,
@@ -97,16 +95,12 @@ void Penumbra::submitPSSA(unsigned surfaceIndex) {
 }
 
 void Penumbra::submitPSSA(const std::vector<unsigned> &surfaceIndices) {
-//  std::vector<SurfaceBuffer> surfaceBuffers;
-//  surfaceBuffers.reserve(surfaceIndices.size());
-//  for (auto const surfaceIndex : surfaceIndices) {
-//    if (penumbra->checkSurface(surfaceIndex)) {
-//      surfaceBuffers.push_back(penumbra->model.surfaceBuffers[surfaceIndex]);
-//    } else {
-//      showMessage(MSG_ERR,
-//                  "Surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
-//    }
-//  }
+  for (auto const surfaceIndex : surfaceIndices) {
+    if (!penumbra->checkSurface(surfaceIndex)) {
+      showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
+      return;
+    }
+  }
   penumbra->context.submitPSSA(surfaceIndices, penumbra->sun.getView());
 }
 
@@ -116,7 +110,6 @@ void Penumbra::submitPSSA() {
 
 float Penumbra::calculatePSSA(unsigned surfaceIndex) {
   if (penumbra->checkSurface(surfaceIndex)) {
-    // penumbra->context.setScene(penumbra->model.surfaceBuffers[surfaceIndex], penumbra->sun.getView());
     return penumbra->context.calculatePSSA(surfaceIndex);
   } else {
     showMessage(MSG_ERR,
@@ -126,16 +119,12 @@ float Penumbra::calculatePSSA(unsigned surfaceIndex) {
 }
 
 std::vector<float> Penumbra::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
-  // for (auto const surfaceIndex : surfaceIndices) {
-  //   if (penumbra->checkSurface(surfaceIndex)) {
-  //     // penumbra->context.setScene(penumbra->model.surfaceBuffers[surfaceIndex], penumbra->sun.getView());
-
-  //     penumbra->context.calculatePSSA(penumbra->model.surfaceBuffers[surfaceIndex]);
-  //   } else {
-  //     showMessage(MSG_ERR,
-  //                 "Surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
-  //   }
-  // }
+  for (auto const surfaceIndex : surfaceIndices) {
+    if (!penumbra->checkSurface(surfaceIndex)) {
+      showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
+      return {};
+    }
+  }
   return penumbra->context.calculatePSSA(surfaceIndices);;
 }
 
@@ -149,31 +138,21 @@ Penumbra::calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurface
   std::map<unsigned, float> pssas;
   if (transparentSurfaceIndices.size() > 0) {
     if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
-      // penumbra->context.setScene(penumbra->model.surfaceBuffers[transparentSurfaceIndices[0]],
-      //                            penumbra->sun.getView(), false);
-      // std::vector<SurfaceBuffer> transparentSurfaces;
-      // for (auto &transSurf : transparentSurfaceIndices) {
-      //   if (penumbra->checkSurface(transSurf)) {
-      //     transparentSurfaces.push_back(penumbra->model.surfaceBuffers[transSurf]);
-      //   } else {
-      //     showMessage(
-      //         MSG_ERR,
-      //         "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO
-      //                                                                                  // format
-      //                                                                                  // string
-      //   }
-      // }
-      // std::vector<SurfaceBuffer> interiorSurfaces;
-      // for (auto &intSurf : interiorSurfaceIndices) {
-      //   if (penumbra->checkSurface(intSurf)) {
-      //     interiorSurfaces.push_back(penumbra->model.surfaceBuffers[intSurf]);
-      //   } else {
-      //     showMessage(
-      //         MSG_ERR,
-      //         "Interior surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
-      //                                                                               // string
-      //   }
-      // }
+      for (auto &transSurf : transparentSurfaceIndices) {
+        if (!penumbra->checkSurface(transSurf)) {
+          showMessage(
+              MSG_ERR,
+              "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
+        }
+      }
+      for (auto &intSurf : interiorSurfaceIndices) {
+        if (!penumbra->checkSurface(intSurf)) {
+          showMessage(
+              MSG_ERR,
+              "Interior surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
+                                                                                    // string
+        }
+      }
       pssas = penumbra->context.calculateInteriorPSSAs(transparentSurfaceIndices, interiorSurfaceIndices, penumbra->sun.getView());
     } else {
       showMessage(
@@ -189,60 +168,51 @@ Penumbra::calculateInteriorPSSAs(const std::vector<unsigned> &transparentSurface
 }
 
 int Penumbra::renderScene(unsigned surfaceIndex) {
-//  if (penumbra->checkSurface(surfaceIndex)) {
-//    penumbra->context.setScene(penumbra->model.surfaceBuffers[surfaceIndex], penumbra->sun.getView());
-//    penumbra->context.showRendering(penumbra->model.surfaceBuffers[surfaceIndex]);
-//    return PN_SUCCESS;
-//  } else {
-//    showMessage(MSG_ERR,
-//                "Surface index, X, does not exist. Cannot render scene."); // TODO format string
-//    return PN_FAILURE;
-//  }
+ if (penumbra->checkSurface(surfaceIndex)) {
+   penumbra->context.showRendering(surfaceIndex, penumbra->sun.getView());
+   return PN_SUCCESS;
+ } else {
+   showMessage(MSG_ERR,
+               "Surface index, X, does not exist. Cannot render scene."); // TODO format string
+   return PN_FAILURE;
+ }
 }
 
 int Penumbra::renderInteriorScene(std::vector<unsigned> transparentSurfaceIndices,
                                   std::vector<unsigned> interiorSurfaceIndices) {
-//  if (transparentSurfaceIndices.size() > 0) {
-//    if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
-//      penumbra->context.setScene(penumbra->model.surfaceBuffers[transparentSurfaceIndices[0]],
-//                                 penumbra->sun.getView(), false);
-//      std::vector<SurfaceBuffer> transparentSurfaces;
-//      for (auto &transSurf : transparentSurfaceIndices) {
-//        if (penumbra->checkSurface(transSurf)) {
-//          transparentSurfaces.push_back(penumbra->model.surfaceBuffers[transSurf]);
-//        } else {
-//          showMessage(
-//              MSG_ERR,
-//              "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO
-//                                                                                       // format
-//                                                                                       // string
-//        }
-//      }
-//      for (auto &intSurf : interiorSurfaceIndices) {
-//        if (penumbra->checkSurface(intSurf)) {
-//          penumbra->context.showInteriorRendering(transparentSurfaces,
-//                                                  penumbra->model.surfaceBuffers[intSurf]);
-//        } else {
-//          showMessage(
-//              MSG_ERR,
-//              "Interior surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
-//                                                                                    // string
-//          return PN_FAILURE;
-//        }
-//      }
-//      return PN_SUCCESS;
-//    } else {
-//      showMessage(
-//          MSG_ERR,
-//          "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
-//                                                                                   // string
-//      return PN_FAILURE;
-//    }
-//  } else {
-//    showMessage(MSG_ERR, "Cannot calculate interior PSSAs without defining at least one "
-//                         "transparent surface index."); // TODO format string
-//    return PN_FAILURE;
-//  }
+ if (transparentSurfaceIndices.size() > 0) {
+   if (penumbra->checkSurface(transparentSurfaceIndices[0])) {
+     for (auto &transSurf : transparentSurfaceIndices) {
+       if (!penumbra->checkSurface(transSurf)) {
+         showMessage(
+             MSG_ERR,
+             "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
+       }
+     }
+     for (auto &intSurf : interiorSurfaceIndices) {
+       if (penumbra->checkSurface(intSurf)) {
+         penumbra->context.showInteriorRendering(transparentSurfaceIndices, intSurf, penumbra->sun.getView());
+       } else {
+         showMessage(
+             MSG_ERR,
+             "Interior surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
+                                                                                   // string
+         return PN_FAILURE;
+       }
+     }
+     return PN_SUCCESS;
+   } else {
+     showMessage(
+         MSG_ERR,
+         "Transparent surface index, X, does not exist. Cannot calculate PSSA."); // TODO format
+                                                                                  // string
+     return PN_FAILURE;
+   }
+ } else {
+   showMessage(MSG_ERR, "Cannot calculate interior PSSAs without defining at least one "
+                        "transparent surface index."); // TODO format string
+   return PN_FAILURE;
+ }
 }
 
 void Penumbra::setMessageCallback(PenumbraCallbackFunction callBackFunction, void *contextPtr) {
