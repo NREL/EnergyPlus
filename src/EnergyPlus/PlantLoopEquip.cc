@@ -188,7 +188,6 @@ namespace PlantLoopEquip {
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
 
-        using CTElectricGenerator::SimCTPlantHeatRecovery;
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
@@ -197,7 +196,6 @@ namespace PlantLoopEquip {
         using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
 
-        // using PlantLoadProfile::PlantProfileData::simulate;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
@@ -983,23 +981,7 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_Generator_CTurbine) {
-                SimCTPlantHeatRecovery(sim_component.TypeOf,
-                                       sim_component.Name,
-                                       TypeOf_Generator_CTurbine,
-                                       EquipNum,
-                                       RunFlag,
-                                       InitLoopEquip,
-                                       CurLoad,
-                                       MaxLoad,
-                                       MinLoad,
-                                       OptLoad,
-                                       FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Generator Type=" + sim_component.TypeOf);

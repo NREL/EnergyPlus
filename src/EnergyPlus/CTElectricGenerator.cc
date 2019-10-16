@@ -68,6 +68,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -96,23 +97,38 @@ namespace CTElectricGenerator {
     // performance data.
 
     int NumCTGenerators(0); // number of CT Generators specified in input
-    bool GetCTInput(true);  // then TRUE, calls subroutine to read input file.
+    bool getCTInputFlag(true);  // then TRUE, calls subroutine to read input file.
 
     Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
 
     void clear_state()
     {
         NumCTGenerators = 0;
-        GetCTInput = true;
+        getCTInputFlag = true;
         CTGenerator.deallocate();
     }
 
-    void SimCTGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
-                        std::string const &GeneratorName,   // user specified name of Generator
-                        int &GeneratorIndex,
-                        bool const RunFlag,  // simulate Generator when TRUE
-                        Real64 const MyLoad, // generator demand
-                        bool const FirstHVACIteration)
+    PlantComponent *CTGeneratorSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data for generators if it hasn't been done already
+        if (getCTInputFlag) {
+            GetCTGeneratorInput();
+            getCTInputFlag = false;
+        }
+
+        // Now look for this particular generator in the list
+        for (auto &CTGen : CTGenerator) {
+            if (CTGen.Name == objectName) {
+                return &CTGen;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void CTGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -124,85 +140,9 @@ namespace CTElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        int genNum; // Generator number counter
-
-        // Get Generator data from input file
-        if (GetCTInput) {
-            GetCTGeneratorInput();
-            GetCTInput = false;
-        }
-
-        // SELECT and CALL MODELS
-        if (GeneratorIndex == 0) {
-            genNum = UtilityRoutines::FindItemInList(GeneratorName, CTGenerator);
-            if (genNum == 0) ShowFatalError("SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName);
-            GeneratorIndex = genNum;
-        } else {
-            genNum = GeneratorIndex;
-            if (genNum > NumCTGenerators || genNum < 1) {
-                ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) +
-                               ", Number of CT Engine Generators=" + General::TrimSigDigits(NumCTGenerators) + ", Generator name=" + GeneratorName);
-            }
-            if (CTGenerator(genNum).CheckEquipName) {
-                if (GeneratorName != CTGenerator(genNum).Name) {
-                    ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) + ", Generator name=" + GeneratorName +
-                                   ", stored Generator Name for that index=" + CTGenerator(genNum).Name);
-                }
-                CTGenerator(genNum).CheckEquipName = false;
-            }
-        }
-
-        auto &thisCTG = CTGenerator(genNum);
-
-        thisCTG.InitCTGenerators(RunFlag, MyLoad, FirstHVACIteration);
-        thisCTG.CalcCTGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
-        thisCTG.UpdateCTGeneratorRecords();
-    }
-
-    void CTGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
-    {
-
-    }
-
-    void SimCTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
-                                std::string const &CompName,
-                                int const EP_UNUSED(CompTypeNum), // unused1208
-                                int &CompNum,
-                                bool const EP_UNUSED(RunFlag),
-                                bool &InitLoopEquip,
-                                Real64 &EP_UNUSED(MyLoad),
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         BGriffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Fill data needed in PlantLoopEquipments
-
-        if (GetCTInput) {
-            GetCTGeneratorInput();
-            GetCTInput = false;
-        }
-
-        if (InitLoopEquip) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, CTGenerator);
-            if (CompNum == 0) {
-                ShowFatalError("SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName);
-                return;
-            }
-            MinCap = 0.0;
-            MaxCap = 0.0;
-            OptCap = 0.0;
-            return;
-        } // End Of InitLoopEquip
+        // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
+        // calls from the plant side... do nothing.
+        // calls from the ElectricPowerServiceManger call the init and calculation worker function directly.
     }
 
     void GetCTGeneratorInput()
@@ -773,10 +713,14 @@ namespace CTElectricGenerator {
         this->FuelMdot = std::abs(FuelUseRate) / (FuelHeatingValue * KJtoJ);
 
         this->ExhaustStackTemp = ExhaustStackTemp;
+
+        if (this->HeatRecActive) {
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+        }
     }
 
     void CTGeneratorSpecs::InitCTGenerators(bool const RunFlag,             // TRUE when Generator operating
-                          Real64 const EP_UNUSED(MyLoad), // Generator demand
                           bool const FirstHVACIteration)
     {
 
@@ -895,40 +839,30 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorSpecs::UpdateCTGeneratorRecords()
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Dan Fisher
-        //       DATE WRITTEN:    October 1998
-
-        if (this->HeatRecActive) {
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
-        }
-    }
-
-    void GetCTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
-                               int const genNum,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B Griffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // get some results for load center's aggregation
-
-        GeneratorPower = CTGenerator(genNum).ElecPowerGenerated;
-        GeneratorEnergy = CTGenerator(genNum).ElecEnergyGenerated;
-        ThermalPower = CTGenerator(genNum).QTotalHeatRecovered;
-        ThermalEnergy = CTGenerator(genNum).TotalHeatEnergyRec;
-    }
+//    void GetCTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
+//                               int const genNum,
+//                               Real64 &GeneratorPower,  // electrical power
+//                               Real64 &GeneratorEnergy, // electrical energy
+//                               Real64 &ThermalPower,    // heat power
+//                               Real64 &ThermalEnergy    // heat energy
+//    )
+//    {
+//        // SUBROUTINE INFORMATION:
+//        //       AUTHOR         B Griffith
+//        //       DATE WRITTEN   March 2008
+//        //       MODIFIED       na
+//        //       RE-ENGINEERED  na
+//
+//        // PURPOSE OF THIS SUBROUTINE:
+//        // get some results for load center's aggregation
+//
+//        // called by ElectricPowerServiceManager. this function needs to go away eventually.
+//
+//        GeneratorPower = CTGenerator(genNum).ElecPowerGenerated;
+//        GeneratorEnergy = CTGenerator(genNum).ElecEnergyGenerated;
+//        ThermalPower = CTGenerator(genNum).QTotalHeatRecovered;
+//        ThermalEnergy = CTGenerator(genNum).TotalHeatEnergyRec;
+//    }
 
 } // namespace CTElectricGenerator
 

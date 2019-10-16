@@ -59,6 +59,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1271,6 +1272,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;

@@ -147,50 +147,49 @@ namespace CTElectricGenerator {
         void setupOutputVars();
 
         void InitCTGenerators(bool RunFlag,
-                              Real64 MyLoad,
                               bool FirstHVACIteration);
 
         void CalcCTGeneratorModel(bool RunFlag,
                                   Real64 MyLoad,
                                   bool FirstHVACIteration);
 
-        void UpdateCTGeneratorRecords();
+        static PlantComponent *factory(std::string const &objectName);
 
     };
 
     // Object Data
     extern Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
 
-    // Static functions
-    void SimCTGenerator(int GeneratorType,          // type of Generator
-                        std::string const &GeneratorName, // user specified name of Generator
-                        int &GeneratorIndex,
-                        bool RunFlag,  // simulate Generator when TRUE
-                        Real64 MyLoad, // generator demand
-                        bool FirstHVACIteration);
-
-    void SimCTPlantHeatRecovery(std::string const &CompType, // unused1208
-                                std::string const &CompName,
-                                int CompTypeNum, // unused1208
-                                int &CompNum,
-                                bool RunFlag,
-                                bool &InitLoopEquip,
-                                Real64 &MyLoad,
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
+//    // Static functions
+//    void SimCTGenerator(int GeneratorType,          // type of Generator
+//                        std::string const &GeneratorName, // user specified name of Generator
+//                        int &GeneratorIndex,
+//                        bool RunFlag,  // simulate Generator when TRUE
+//                        Real64 MyLoad, // generator demand
+//                        bool FirstHVACIteration);
+//
+//    void SimCTPlantHeatRecovery(std::string const &CompType, // unused1208
+//                                std::string const &CompName,
+//                                int CompTypeNum, // unused1208
+//                                int &CompNum,
+//                                bool RunFlag,
+//                                bool &InitLoopEquip,
+//                                Real64 &MyLoad,
+//                                Real64 &MaxCap,
+//                                Real64 &MinCap,
+//                                Real64 &OptCap,
+//                                bool FirstHVACIteration // TRUE if First iteration of simulation
+//    );
 
     void GetCTGeneratorInput();
 
-    void GetCTGeneratorResults(int GeneratorType, // type of Generator
-                               int genNum,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    );
+//    void GetCTGeneratorResults(int GeneratorType, // type of Generator
+//                               int genNum,
+//                               Real64 &GeneratorPower,  // electrical power
+//                               Real64 &GeneratorEnergy, // electrical energy
+//                               Real64 &ThermalPower,    // heat power
+//                               Real64 &ThermalEnergy    // heat energy
+//    );
 
     void clear_state();
 
