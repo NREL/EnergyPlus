@@ -182,15 +182,15 @@ namespace ICEngineElectricGenerator {
 
     // Functions
 
-    void SimICEngineGenerator(int const GeneratorType,          // type of Generator
+    void SimICEngineGenerator(int GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator
                               int &GeneratorIndex,
-                              bool const RunFlag,  // simulate Generator when TRUE
-                              Real64 const MyLoad, // demand on electric generator
-                              bool const FirstHVACIteration);
+                              bool RunFlag,  // simulate Generator when TRUE
+                              Real64 MyLoad, // demand on electric generator
+                              bool FirstHVACIteration);
 
-    void GetICEGeneratorResults(int const GeneratorType, // type of Generator
-                                int const GeneratorIndex,
+    void GetICEGeneratorResults(int GeneratorType, // type of Generator
+                                int GeneratorIndex,
                                 Real64 &GeneratorPower,  // electrical power
                                 Real64 &GeneratorEnergy, // electrical energy
                                 Real64 &ThermalPower,    // heat power
@@ -199,37 +199,37 @@ namespace ICEngineElectricGenerator {
 
     void SimICEPlantHeatRecovery(std::string const &CompType,
                                  std::string const &CompName,
-                                 int const CompTypeNum,
+                                 int CompTypeNum,
                                  int &CompNum,
-                                 bool const RunFlag,
+                                 bool RunFlag,
                                  bool &InitLoopEquip,
                                  Real64 &MyLoad,
                                  Real64 &MaxCap,
                                  Real64 &MinCap,
                                  Real64 &OptCap,
-                                 bool const FirstHVACIteration // TRUE if First iteration of simulation
+                                 bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
     void GetICEngineGeneratorInput();
 
-    void CalcICEngineGeneratorModel(int const GeneratorNum, // Generator number
-                                    bool const RunFlag,     // TRUE when Generator operating
-                                    Real64 const MyLoad,    // Generator demand
-                                    bool const FirstHVACIteration);
+    void CalcICEngineGeneratorModel(int GeneratorNum, // Generator number
+                                    bool RunFlag,     // TRUE when Generator operating
+                                    Real64 MyLoad,    // Generator demand
+                                    bool FirstHVACIteration);
 
-    void CalcICEngineGenHeatRecovery(int const Num,                // HR Component number
-                                     Real64 const EnergyRecovered, // Amount of heat recovered
-                                     Real64 const HeatRecMdot,
+    void CalcICEngineGenHeatRecovery(int Num,                // HR Component number
+                                     Real64 EnergyRecovered, // Amount of heat recovered
+                                     Real64 HeatRecMdot,
                                      Real64 &HRecRatio // Max Heat recovery ratio
     );
 
-    void InitICEngineGenerators(int const GeneratorNum, // Generator number
-                                bool const RunFlag,     // TRUE when Generator operating
-                                Real64 const MyLoad,    // Generator demand
-                                bool const FirstHVACIteration);
+    void InitICEngineGenerators(int GeneratorNum, // Generator number
+                                bool RunFlag,     // TRUE when Generator operating
+                                Real64 MyLoad,    // Generator demand
+                                bool FirstHVACIteration);
 
-    void UpdateICEngineGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
-                                        int const Num       // Generator number
+    void UpdateICEngineGeneratorRecords(bool RunFlag, // TRUE if Generator operating
+                                        int Num       // Generator number
     );
 
 } // namespace ICEngineElectricGenerator
