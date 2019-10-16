@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -97,4 +98,14 @@ int setActuatorValue(const int handle, const double value) {
     theActuator.RealValue = value;
     theActuator.Actuated = true;
     return 0;
+}
+
+
+// These are extra things which need a pattern to be figured out
+int simDataGetKindOfSim() {
+    return EnergyPlus::DataGlobals::KindOfSim;
+}
+
+int simDataHourOfDay() {
+    return EnergyPlus::DataGlobals::HourOfDay;
 }

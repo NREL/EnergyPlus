@@ -47,7 +47,6 @@
 
 
 #include <EnergyPlus/api/func.h>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
@@ -87,13 +86,4 @@ Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 co
     auto const name = std::string(refrigerantName);
     auto val = EnergyPlus::FluidProperties::GetSatPressureRefrig(name, temperatureC, refrigerantIndex, "");
     return val;
-}
-
-// THESE DON'T BELONG HERE, THEY ARE RUNTIME RELATED, NOT STATIC
-int simDataGetKindOfSim() {
-    return EnergyPlus::DataGlobals::KindOfSim;
-}
-
-int simDataHourOfDay() {
-    return EnergyPlus::DataGlobals::HourOfDay;
 }

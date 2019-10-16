@@ -73,7 +73,7 @@ mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we are making python a required dependency, so find it here
 if("${PYTHON_EXECUTABLE}" STREQUAL "")
-  find_package(PythonInterp 3.4 REQUIRED)
+  find_package(PythonInterp 3 REQUIRED)
 endif()
 
 if( BUILD_TESTING )

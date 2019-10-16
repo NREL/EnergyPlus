@@ -52,6 +52,7 @@ extern "C" {
 
 // C++ Headers
 #include <cmath>
+#include <memory>
 #include <string>
 
 // ObjexxFCL Headers
@@ -329,6 +330,9 @@ namespace SimulationManager {
         PostIPProcessing();
 
         InitializePsychRoutines();
+
+        // Create a new plugin manager which starts up the Python interpreter
+        EnergyPlus::PluginManager::pluginManager = std::unique_ptr<EnergyPlus::PluginManager::PluginManager>(new EnergyPlus::PluginManager::PluginManager);
 
         BeginSimFlag = true;
         BeginFullSimFlag = false;

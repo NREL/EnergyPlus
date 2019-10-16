@@ -62,6 +62,9 @@ double getVariableValue(int handle);
 double getMeterValue(int handle);
 int setActuatorValue(int handle, double value);
 
+int simDataGetKindOfSim();
+int simDataHourOfDay();
+
 #ifdef __cplusplus
 }
 #endif

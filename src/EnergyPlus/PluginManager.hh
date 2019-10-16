@@ -51,15 +51,28 @@
 #include <vector>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#ifdef _DEBUG
+// We don't want to try to import a debug build of Python here
+// so if we are building a Debug build of the C++ code, we need
+// to undefine _DEBUG during the #include command for Python.h.
+// Otherwise it will fail
+#undef _DEBUG
+  #include <Python.h>
+  #define _DEBUG
+#else
+#include <Python.h>
+#endif
+
 namespace EnergyPlus {
 
 namespace PluginManager {
 
     enum class PluginCallingPoints {
-        EndOfHour = 0,
-        BeginningOfHour = 1,
-        BeginningOfZoneTimeStep = 2,
-        EndOfZoneTimeStep = 3
+        Unknown = 0,
+        EndOfHour = 1,
+        BeginningOfHour = 2,
+        BeginningOfZoneTimeStep = 3,
+        EndOfZoneTimeStep = 4
     };
 
     void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)());
@@ -68,6 +81,27 @@ namespace PluginManager {
 
     void clear_state();
 
+    // STUFF RELATED TO PYTHON PLUGINS DOWN HERE
+
+    struct PluginInstance {
+        PluginInstance(const std::string& fileName, const std::string& className);
+        std::string stringIdentifier; // for diagnostic reporting
+        PyObject *pPluginMainFunction = nullptr;  // pointer to the main EMS function
+        void run();
+    };
+
+    class PluginManager {
+    public:
+        PluginManager();
+        ~PluginManager() {
+            Py_FinalizeEx();
+        }
+        static void addToPythonPath(const std::string& path);
+        int callPluginInstances(PluginCallingPoints callingPoint);
+        static std::string sanitizedPath(std::string path);
+    };
+
+    extern std::unique_ptr<PluginManager> pluginManager;
 }
 }
 

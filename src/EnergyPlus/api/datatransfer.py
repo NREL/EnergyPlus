@@ -1,7 +1,6 @@
 from ctypes import cdll, c_bool, c_int, c_char_p
 from common import RealEP
 from typing import Union
-import sys
 
 
 class DataTransfer:
