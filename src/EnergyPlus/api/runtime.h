@@ -62,6 +62,8 @@ int cRunEnergyPlus(const char* filepath);
 
 void registerRuntimeCallbackFromEndOfHour(void (*f)());
 void registerRuntimeCallbackFromBeginningOfHour(void (*f)());
+void registerRuntimeCallbackFromBeginningOfZoneTimeStep(void (*f)());
+void registerRuntimeCallbackFromEndOfZoneTimeStep(void (*f)());
 
 #ifdef __cplusplus
 }

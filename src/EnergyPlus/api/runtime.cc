@@ -69,3 +69,11 @@ void registerRuntimeCallbackFromEndOfHour(void (*f)()) {
 void registerRuntimeCallbackFromBeginningOfHour(void (*f)()) {
     EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour, f);
 }
+
+void registerRuntimeCallbackFromBeginningOfZoneTimeStep(void (*f)()) {
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep, f);
+}
+
+void registerRuntimeCallbackFromEndOfZoneTimeStep(void (*f)()) {
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep, f);
+}

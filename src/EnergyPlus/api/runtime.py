@@ -21,6 +21,10 @@ class Runtime:
         self.api.registerRuntimeCallbackFromEndOfHour.restype = c_void_p
         self.api.registerRuntimeCallbackFromBeginningOfHour.argtypes = [self.py_callback_type]
         self.api.registerRuntimeCallbackFromBeginningOfHour.restype = c_void_p
+        self.api.registerRuntimeCallbackFromBeginningOfZoneTimeStep.argtypes = [self.py_callback_type]
+        self.api.registerRuntimeCallbackFromBeginningOfZoneTimeStep.restype = c_void_p
+        self.api.registerRuntimeCallbackFromEndOfZoneTimeStep.argtypes = [self.py_callback_type]
+        self.api.registerRuntimeCallbackFromEndOfZoneTimeStep.restype = c_void_p
 
     def run_energyplus(self, path_to_dir: Union[str, bytes]):
         return self.api.cRunEnergyPlus(path_to_dir)
@@ -34,6 +38,16 @@ class Runtime:
         cb_ptr = self.py_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.registerRuntimeCallbackFromBeginningOfHour(cb_ptr)
+
+    def register_callback_end_of_zone_time_step(self, f):
+        cb_ptr = self.py_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.registerRuntimeCallbackFromEndOfZoneTimeStep(cb_ptr)
+
+    def register_callback_beginning_of_zone_time_step(self, f):
+        cb_ptr = self.py_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.registerRuntimeCallbackFromBeginningOfZoneTimeStep(cb_ptr)
 
     @staticmethod
     def clear_callbacks(self):

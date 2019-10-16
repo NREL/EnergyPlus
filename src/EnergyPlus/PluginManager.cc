@@ -53,12 +53,18 @@ namespace PluginManager {
 
 std::vector<void (*)()> callbacksCallFromEndOfHour;
 std::vector<void (*)()> callbacksCallFromBeginningOfHour;
+std::vector<void (*)()> callbacksCallFromBeginningOfZoneTimeStep;
+std::vector<void (*)()> callbacksCallFromEndOfZoneTimeStep;
 
 void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)()) {
     if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour) {
         callbacksCallFromEndOfHour.push_back(f);
     } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour) {
         callbacksCallFromBeginningOfHour.push_back(f);
+    } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep) {
+        callbacksCallFromBeginningOfZoneTimeStep.push_back(f);
+    } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep) {
+        callbacksCallFromEndOfZoneTimeStep.push_back(f);
     }
 }
 
@@ -71,12 +77,22 @@ void runAnyRegisteredCallbacks(PluginCallingPoints iCalledFrom) {
         for (auto const &cb : callbacksCallFromBeginningOfHour) {
             cb();
         }
+    } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep) {
+        for (auto const &cb : callbacksCallFromBeginningOfZoneTimeStep) {
+            cb();
+        }
+    } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep) {
+        for (auto const &cb : callbacksCallFromEndOfZoneTimeStep) {
+            cb();
+        }
     }
 }
 
 void clear_state() {
     callbacksCallFromEndOfHour.clear();
     callbacksCallFromBeginningOfHour.clear();
+    callbacksCallFromBeginningOfZoneTimeStep.clear();
+    callbacksCallFromEndOfZoneTimeStep.clear();
 }
 
 }
