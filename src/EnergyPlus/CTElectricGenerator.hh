@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -63,11 +64,8 @@ namespace CTElectricGenerator {
     using DataGlobalConstants::iGeneratorCombTurbine;
 
     extern int NumCTGenerators; // number of CT Generators specified in input
-    extern bool GetCTInput;     // then TRUE, calls subroutine to read input file.
 
-    extern Array1D_bool CheckEquipName;
-
-    struct CTGeneratorSpecs
+    struct CTGeneratorSpecs : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
@@ -144,6 +142,8 @@ namespace CTElectricGenerator {
         {
         }
 
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
         void setupOutputVars();
 
         void InitCTGenerators(bool RunFlag,
@@ -191,6 +191,9 @@ namespace CTElectricGenerator {
                                Real64 &ThermalPower,    // heat power
                                Real64 &ThermalEnergy    // heat energy
     );
+
+    void clear_state();
+
 } // namespace CTElectricGenerator
 
 } // namespace EnergyPlus

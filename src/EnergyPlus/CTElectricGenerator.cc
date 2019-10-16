@@ -100,6 +100,13 @@ namespace CTElectricGenerator {
 
     Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
 
+    void clear_state()
+    {
+        NumCTGenerators = 0;
+        GetCTInput = true;
+        CTGenerator.deallocate();
+    }
+
     void SimCTGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                         std::string const &GeneratorName,   // user specified name of Generator
                         int &GeneratorIndex,
@@ -150,6 +157,11 @@ namespace CTElectricGenerator {
         thisCTG.InitCTGenerators(RunFlag, MyLoad, FirstHVACIteration);
         thisCTG.CalcCTGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
         thisCTG.UpdateCTGeneratorRecords();
+    }
+
+    void CTGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
     }
 
     void SimCTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
