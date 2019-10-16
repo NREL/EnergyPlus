@@ -127,6 +127,7 @@ namespace CTElectricGenerator {
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
         bool CheckEquipName;
+        bool MyFlag;
 
         // Default Constructor
         CTGeneratorSpecs()
@@ -139,9 +140,11 @@ namespace CTElectricGenerator {
               ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
               FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
-              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true)
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true), MyFlag(true)
         {
         }
+
+        void setupOutputVars();
 
         void InitCTGenerators(bool RunFlag,
                               Real64 MyLoad,
