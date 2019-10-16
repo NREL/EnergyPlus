@@ -565,6 +565,7 @@ namespace SimulationManager {
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
+                    if (!WarmupFlag) PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::BeginningOfHour);
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
@@ -598,7 +599,6 @@ namespace SimulationManager {
                                     EndEnvrnFlag = true;
                                 }
                             }
-                            if (!WarmupFlag) PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::EndOfHour);
                         }
 
                         ManageWeather();
@@ -620,6 +620,7 @@ namespace SimulationManager {
 
                     } // TimeStep loop
 
+                    if (!WarmupFlag) PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::EndOfHour);
                     PreviousHour = HourOfDay;
 
                 } // ... End hour loop.

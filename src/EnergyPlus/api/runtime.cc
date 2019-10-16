@@ -65,50 +65,7 @@ int cRunEnergyPlus(const char* filepath) {
 void registerRuntimeCallbackFromEndOfHour(void (*f)()) {
     EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour, f);
 }
-//
-//void registerRuntimeCallbackFromZoneSizing(void (*f)()) {
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromZoneSizing, f);
-//}
-//void registerRuntimeCallbackFromSystemSizing(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromSystemSizing, f);
-//}
-//void registerRuntimeCallbackFromBeginTimestepBeforePredictor(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor, f);
-//}
-//void registerRuntimeCallbackFromEndSystemTimestepBeforeHVACReporting(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting, f);
-//}
-//void registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting, f);
-//}
-//void registerRuntimeCallbackFromBeforeHVACManagers(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers, f);
-//}
-//void registerRuntimeCallbackFromAfterHVACManagers(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers, f);
-//}
-//void registerRuntimeCallbackFromHVACIterationLoop(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop, f);
-//}
-//void registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, f);
-//}
-//void registerRuntimeCallbackFromBeginZoneTimestepAfterInitHeatBalance(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, f);
-//}
-//void registerRuntimeCallbackFromEndZoneTimestepBeforeZoneReporting(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting, f);
-//}
-//void registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting, f);
-//}
-//void registerRuntimeCallbackFromBeginNewEnvironmentAfterWarmUp(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);
-//}
-//void registerRuntimeCallbackFromUnitarySizing(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
-//}
-//void registerRuntimeCallbackFromExternalInterface(void (*f)()){
-//    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromExternalInterface, f);
-//}
 
+void registerRuntimeCallbackFromBeginningOfHour(void (*f)()) {
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour, f);
+}

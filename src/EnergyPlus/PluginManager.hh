@@ -56,7 +56,8 @@ namespace EnergyPlus {
 namespace PluginManager {
 
     enum class PluginCallingPoints {
-        EndOfHour = 0
+        EndOfHour = 0,
+        BeginningOfHour = 1
     };
 
     void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)());

@@ -89,6 +89,11 @@ Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 co
     return val;
 }
 
+// THESE DON'T BELONG HERE, THEY ARE RUNTIME RELATED, NOT STATIC
 int simDataGetKindOfSim() {
     return EnergyPlus::DataGlobals::KindOfSim;
+}
+
+int simDataHourOfDay() {
+    return EnergyPlus::DataGlobals::HourOfDay;
 }

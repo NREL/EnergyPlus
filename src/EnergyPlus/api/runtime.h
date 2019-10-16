@@ -61,22 +61,7 @@ void cRuntimeNoOp();
 int cRunEnergyPlus(const char* filepath);
 
 void registerRuntimeCallbackFromEndOfHour(void (*f)());
-//void registerRuntimeCallbackFromBeginNewEvironment(void (*f)());
-//void registerRuntimeCallbackFromZoneSizing(void (*f)());
-//void registerRuntimeCallbackFromSystemSizing(void (*f)());
-//void registerRuntimeCallbackFromBeginTimestepBeforePredictor(void (*f)());
-//void registerRuntimeCallbackFromEndSystemTimestepBeforeHVACReporting(void (*f)());
-//void registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(void (*f)());
-//void registerRuntimeCallbackFromBeforeHVACManagers(void (*f)());
-//void registerRuntimeCallbackFromAfterHVACManagers(void (*f)());
-//void registerRuntimeCallbackFromHVACIterationLoop(void (*f)());
-//void registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(void (*f)());
-//void registerRuntimeCallbackFromBeginZoneTimestepAfterInitHeatBalance(void (*f)());
-//void registerRuntimeCallbackFromEndZoneTimestepBeforeZoneReporting(void (*f)());
-//void registerRuntimeCallbackFromBeginNewEnvironmentAfterWarmUp(void (*f)());
-//void registerRuntimeCallbackFromUnitarySizing(void (*f)());
-//void registerRuntimeCallbackFromExternalInterface(void (*f)());
-//void registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting(void (*f)());
+void registerRuntimeCallbackFromBeginningOfHour(void (*f)());
 
 #ifdef __cplusplus
 }
