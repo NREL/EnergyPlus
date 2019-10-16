@@ -129,6 +129,9 @@ namespace ICEngineElectricGenerator {
         int HRLoopSideNum;          // cooling water plant loop side index, for heat recovery
         int HRBranchNum;            // cooling water plant loop branch index, for heat recovery
         int HRCompNum;              // cooling water plant loop component index, for heat recovery
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
 
         // Default Constructor
         ICEngineGeneratorSpecs()
@@ -141,7 +144,7 @@ namespace ICEngineElectricGenerator {
               HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0),
               FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
               FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
-              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0)
+              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true)
         {
         }
     };

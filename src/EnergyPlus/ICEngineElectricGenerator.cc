@@ -878,26 +878,12 @@ namespace ICEngineElectricGenerator {
 
         int HeatRecInletNode;            // inlet node number in heat recovery loop
         int HeatRecOutletNode;           // outlet node number in heat recovery loop
-        static bool MyOneTimeFlag(true); // Initialization flag
 
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MySizeAndNodeInitFlag;
         Real64 mdot;
         Real64 rho;
         bool errFlag;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumICEngineGenerators);
-            MyPlantScanFlag.allocate(NumICEngineGenerators);
-            MySizeAndNodeInitFlag.allocate(NumICEngineGenerators);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
-            MyOneTimeFlag = false;
-            MySizeAndNodeInitFlag = true;
-        }
-        if (MyPlantScanFlag(GeneratorNum) && allocated(DataPlant::PlantLoop) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
+        if (ICEngineGenerator(GeneratorNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ICEngineGenerator(GeneratorNum).Name,
                                     DataPlant::TypeOf_Generator_ICEngine,
@@ -915,10 +901,10 @@ namespace ICEngineElectricGenerator {
                 ShowFatalError("InitICEngineGenerators: Program terminated due to previous condition(s).");
             }
 
-            MyPlantScanFlag(GeneratorNum) = false;
+            ICEngineGenerator(GeneratorNum).MyPlantScanFlag = false;
         }
 
-        if (MySizeAndNodeInitFlag(GeneratorNum) && (!MyPlantScanFlag(GeneratorNum)) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
+        if (ICEngineGenerator(GeneratorNum).MySizeAndNodeInitFlag && (!ICEngineGenerator(GeneratorNum).MyPlantScanFlag) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
 
             HeatRecInletNode = ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecOutletNode = ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum;
@@ -941,11 +927,11 @@ namespace ICEngineElectricGenerator {
                                ICEngineGenerator(GeneratorNum).HRBranchNum,
                                ICEngineGenerator(GeneratorNum).HRCompNum);
 
-            MySizeAndNodeInitFlag(GeneratorNum) = false;
+            ICEngineGenerator(GeneratorNum).MySizeAndNodeInitFlag = false;
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(GeneratorNum) && ICEngineGenerator(GeneratorNum).HeatRecActive) {
+        if (DataGlobals::BeginEnvrnFlag && ICEngineGenerator(GeneratorNum).MyEnvrnFlag && ICEngineGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInletNode = ICEngineGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecOutletNode = ICEngineGenerator(GeneratorNum).HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
@@ -961,11 +947,11 @@ namespace ICEngineElectricGenerator {
                                ICEngineGenerator(GeneratorNum).HRBranchNum,
                                ICEngineGenerator(GeneratorNum).HRCompNum);
 
-            MyEnvrnFlag(GeneratorNum) = false;
+            ICEngineGenerator(GeneratorNum).MyEnvrnFlag = false;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(GeneratorNum) = true;
+            ICEngineGenerator(GeneratorNum).MyEnvrnFlag = true;
         }
 
         if (ICEngineGenerator(GeneratorNum).HeatRecActive) {
