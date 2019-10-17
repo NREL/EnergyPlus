@@ -1095,6 +1095,19 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
+    void MTGeneratorSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
+    void MTGeneratorSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                             Real64 &EP_UNUSED(MaxLoad),
+                             Real64 &EP_UNUSED(MinLoad),
+                             Real64 &EP_UNUSED(OptLoad))
+    {
+
+    }
+
     void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
                           Real64 const MyLoad, // electrical load in W
                           bool const FirstHVACIteration)

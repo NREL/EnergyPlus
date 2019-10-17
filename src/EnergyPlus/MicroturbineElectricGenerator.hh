@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -65,10 +66,9 @@ namespace MicroturbineElectricGenerator {
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
 
-    struct MTGeneratorSpecs
+    struct MTGeneratorSpecs : PlantComponent
     {
         // Members
-        //      User inputs
         std::string Name;                  // User identifier (name)
         Real64 RefElecPowerOutput;         // Reference Electrical Power Output from generator (W)
         Real64 MinElecPowerOutput;         // Minimum Electrical Power Output (W)
@@ -194,6 +194,13 @@ namespace MicroturbineElectricGenerator {
               ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0), myFlag(true)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &EP_UNUSED(MaxLoad),
+                                 Real64 &EP_UNUSED(MinLoad),
+                                 Real64 &EP_UNUSED(OptLoad)) override;
 
         void InitMTGenerators( bool RunFlag,
                               Real64 MyLoad, // electrical load in W
