@@ -57,10 +57,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataIPShortCuts.hh>
-#include <HeatBalanceManager.hh>
-#include <WindowManager.hh>
-#include <WindowManagerExteriorData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
 
 #include "Fixtures/EnergyPlusFixture.hh"

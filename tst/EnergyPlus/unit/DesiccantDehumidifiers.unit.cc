@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -67,7 +67,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <General.hh>
+#include <EnergyPlus/General.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

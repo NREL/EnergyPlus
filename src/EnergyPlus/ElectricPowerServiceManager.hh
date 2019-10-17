@@ -57,11 +57,11 @@
 //#include <ObjexxFCL/Array1.hh>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <EMSManager.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
-#include <Plant/PlantLocation.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 

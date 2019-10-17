@@ -47,12 +47,12 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

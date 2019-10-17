@@ -49,15 +49,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <TARCOGArgs.hh>
-#include <TARCOGDeflection.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGMain.hh>
-#include <TARCOGOutput.hh>
-#include <TARCOGParams.hh>
-#include <TarcogShading.hh>
-#include <ThermalEN673Calc.hh>
-#include <ThermalISO15099Calc.hh>
+#include <EnergyPlus/TARCOGArgs.hh>
+#include <EnergyPlus/TARCOGDeflection.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGMain.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/TarcogShading.hh>
+#include <EnergyPlus/ThermalEN673Calc.hh>
+#include <EnergyPlus/ThermalISO15099Calc.hh>
 
 namespace EnergyPlus {
 

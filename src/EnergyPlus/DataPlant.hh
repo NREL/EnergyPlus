@@ -54,17 +54,17 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
-#include <Plant/CallingOrder.hh>
-#include <Plant/Enums.hh>
-#include <Plant/Loop.hh>
-#include <Plant/PlantAvailManager.hh>
-#include <Plant/PlantLoopSolver.hh>
-#include <Plant/ReportLoopData.hh>
-#include <Plant/ReportVars.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/CallingOrder.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/Loop.hh>
+#include <EnergyPlus/Plant/PlantAvailManager.hh>
+#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/ReportLoopData.hh>
+#include <EnergyPlus/Plant/ReportVars.hh>
 
 namespace EnergyPlus {
 

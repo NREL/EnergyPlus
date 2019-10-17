@@ -75,7 +75,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <General.hh>
+#include <EnergyPlus/General.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

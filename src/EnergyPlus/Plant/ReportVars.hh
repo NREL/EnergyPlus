@@ -48,7 +48,7 @@
 #ifndef PlantReportingReportVars_hh_INCLUDED
 #define PlantReportingReportVars_hh_INCLUDED
 
-#include <Plant/LoopSideReportVars.hh>
+#include <EnergyPlus/Plant/LoopSideReportVars.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

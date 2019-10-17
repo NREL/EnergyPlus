@@ -53,11 +53,11 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <RootFinder.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/RootFinder.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

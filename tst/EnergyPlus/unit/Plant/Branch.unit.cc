@@ -54,7 +54,7 @@
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/Plant/Component.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "../Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 

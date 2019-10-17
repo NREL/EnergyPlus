@@ -69,10 +69,10 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
-#include <DataPlant.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;

@@ -51,15 +51,15 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGOutput.hh>
-#include <TARCOGParams.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

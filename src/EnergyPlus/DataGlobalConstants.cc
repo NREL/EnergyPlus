@@ -48,9 +48,9 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

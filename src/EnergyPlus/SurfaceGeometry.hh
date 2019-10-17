@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <HeatBalanceKivaManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
 #include <map>

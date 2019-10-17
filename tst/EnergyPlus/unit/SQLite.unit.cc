@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
-#include "OutputProcessor.hh"
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 

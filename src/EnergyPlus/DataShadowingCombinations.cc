@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataShadowingCombinations.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
 
 namespace EnergyPlus {
 

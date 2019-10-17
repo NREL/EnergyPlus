@@ -52,12 +52,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MatrixDataManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MatrixDataManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

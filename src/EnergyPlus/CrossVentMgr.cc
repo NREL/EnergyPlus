@@ -54,25 +54,25 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <ConvectionCoefficients.hh>
-#include <CrossVentMgr.hh>
-#include <AirflowNetwork/Elements.hpp>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSurfaces.hh>
-#include <DataUCSDSharedData.hh>
-#include <DataZoneEquipment.hh>
-#include <InternalHeatGains.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

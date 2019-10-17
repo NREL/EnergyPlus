@@ -54,7 +54,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
-#include <DataEnvironment.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -65,7 +65,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
