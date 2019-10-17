@@ -497,6 +497,14 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
+            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                // easily converge fewer warmup days are allowed
+                DisplayString("TRACE(R) 3D Plus Mode: Suppressing Initialization of New Environment Parameters");
+                DataGlobals::beginEnvrnWarmStartFlag = true;
+            } else {
+                DataGlobals::beginEnvrnWarmStartFlag = false;
+            }
             EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;

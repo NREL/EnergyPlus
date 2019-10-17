@@ -289,6 +289,14 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
 
             BeginEnvrnFlag = true;
+            if ((KindOfSim == ksHVACSizeDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                // easily converge fewer warmup days are allowed
+                DisplayString("Suppressing Initialization of New Environment Parameters");
+                DataGlobals::beginEnvrnWarmStartFlag = true;
+            } else {
+                DataGlobals::beginEnvrnWarmStartFlag = false;
+            }
             EndEnvrnFlag = false;
             // EndMonthFlag = false;
             WarmupFlag = true;
