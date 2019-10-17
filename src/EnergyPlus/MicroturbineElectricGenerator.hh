@@ -161,6 +161,12 @@ namespace MicroturbineElectricGenerator {
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
+        Real64 EnergyGen;             // Reporting: Electric energy produced (J)
+        Real64 FuelEnergyHHV;         // Reporting: Fuel Energy used (J)
+        Real64 ElectricEfficiencyLHV; // Reporting: Electric efficiency LHV (-)
+        Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
+        Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
+        Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -182,45 +188,13 @@ namespace MicroturbineElectricGenerator {
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
               HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true),
-              MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 PowerGen;              // Reporting: Electric power produced (W)
-        Real64 EnergyGen;             // Reporting: Electric energy produced (J)
-        Real64 QHeatRecovered;        // Reporting: Heat recovered from exhaust to heat water (W)
-        Real64 ExhaustEnergyRec;      // Reporting: Heat recovered from exhaust to heat water (J)
-        Real64 FuelEnergyUseRateHHV;  // Reporting: Fuel Energy use rate, HHV basis (W)
-        Real64 FuelEnergyHHV;         // Reporting: Fuel Energy used (J)
-        Real64 FuelMdot;              // Reporting: Fuel Amount used (kg/s)
-        Real64 ElectricEfficiencyLHV; // Reporting: Electric efficiency LHV (-)
-        Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
-        Real64 HeatRecInletTemp;      // Reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;     // Reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;           // Reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 AncillaryPowerRate;    // Reporting: Ancillary power use rate (W)
-        Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
-        Real64 StandbyPowerRate;      // Reporting: Standby power use rate (W)
-        Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
-        Real64 ExhAirMassFlowRate;    // Actual Exhaust Air Mass Flow Rate (kg/s)
-        Real64 ExhAirTemperature;     // Combustion exhaust air temperature (C)
-
-        // Default Constructor
-        ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QHeatRecovered(0.0), ExhaustEnergyRec(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyHHV(0.0), FuelMdot(0.0),
-              ElectricEfficiencyLHV(0.0), ThermalEfficiencyLHV(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0),
-              AncillaryPowerRate(0.0), AncillaryEnergy(0.0), StandbyPowerRate(0.0), StandbyEnergy(0.0), ExhAirMassFlowRate(0.0),
-              ExhAirTemperature(0.0)
+              MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
+              ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0)
         {
         }
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-    extern Array1D<ReportVars> MTGeneratorReport;
 
     void SimMTGenerator(int GeneratorType,          // Type of generator !unused1208
                         std::string const &GeneratorName, // User-specified name of generator

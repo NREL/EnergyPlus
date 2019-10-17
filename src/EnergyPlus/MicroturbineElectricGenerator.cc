@@ -99,7 +99,6 @@ namespace MicroturbineElectricGenerator {
 
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-    Array1D<ReportVars> MTGeneratorReport;
 
     void SimMTGenerator(int const EP_UNUSED(GeneratorType), // Type of generator !unused1208
                         std::string const &GeneratorName,   // User-specified name of generator
@@ -220,7 +219,6 @@ namespace MicroturbineElectricGenerator {
 
         // ALLOCATE ARRAYS
         MTGenerator.allocate(NumMTGenerators);
-        MTGeneratorReport.allocate(NumMTGenerators);
 
         // LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
         for (int GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
@@ -923,14 +921,14 @@ namespace MicroturbineElectricGenerator {
         for (int GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
             SetupOutputVariable("Generator Produced Electric Power",
                                 OutputProcessor::Unit::W,
-                                MTGeneratorReport(GeneratorNum).PowerGen,
+                                MTGenerator(GeneratorNum).ElecPowerGenerated,
                                 "System",
                                 "Average",
                                 MTGenerator(GeneratorNum).Name);
 
             SetupOutputVariable("Generator Produced Electric Energy",
                                 OutputProcessor::Unit::J,
-                                MTGeneratorReport(GeneratorNum).EnergyGen,
+                                MTGenerator(GeneratorNum).EnergyGen,
                                 "System",
                                 "Sum",
                                 MTGenerator(GeneratorNum).Name,
@@ -942,7 +940,7 @@ namespace MicroturbineElectricGenerator {
 
             SetupOutputVariable("Generator LHV Basis Electric Efficiency",
                                 OutputProcessor::Unit::None,
-                                MTGeneratorReport(GeneratorNum).ElectricEfficiencyLHV,
+                                MTGenerator(GeneratorNum).ElectricEfficiencyLHV,
                                 "System",
                                 "Average",
                                 MTGenerator(GeneratorNum).Name);
@@ -950,14 +948,14 @@ namespace MicroturbineElectricGenerator {
             //    Fuel specific report variables
             SetupOutputVariable("Generator " + FuelType + " HHV Basis Rate",
                                 OutputProcessor::Unit::W,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV,
+                                MTGenerator(GeneratorNum).FuelEnergyUseRateHHV,
                                 "System",
                                 "Average",
                                 MTGenerator(GeneratorNum).Name);
 
             SetupOutputVariable("Generator " + FuelType + " HHV Basis Energy",
                                 OutputProcessor::Unit::J,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyHHV,
+                                MTGenerator(GeneratorNum).FuelEnergyHHV,
                                 "System",
                                 "Sum",
                                 MTGenerator(GeneratorNum).Name,
@@ -969,7 +967,7 @@ namespace MicroturbineElectricGenerator {
 
             SetupOutputVariable("Generator " + FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                MTGeneratorReport(GeneratorNum).FuelMdot,
+                                MTGenerator(GeneratorNum).FuelMdot,
                                 "System",
                                 "Average",
                                 MTGenerator(GeneratorNum).Name);
@@ -977,14 +975,14 @@ namespace MicroturbineElectricGenerator {
             //    general fuel use report (to match other generators)
             SetupOutputVariable("Generator Fuel HHV Basis Rate",
                                 OutputProcessor::Unit::W,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyUseRateHHV,
+                                MTGenerator(GeneratorNum).FuelEnergyUseRateHHV,
                                 "System",
                                 "Average",
                                 MTGenerator(GeneratorNum).Name);
 
             SetupOutputVariable("Generator Fuel HHV Basis Energy",
                                 OutputProcessor::Unit::J,
-                                MTGeneratorReport(GeneratorNum).FuelEnergyHHV,
+                                MTGenerator(GeneratorNum).FuelEnergyHHV,
                                 "System",
                                 "Sum",
                                 MTGenerator(GeneratorNum).Name);
@@ -994,14 +992,14 @@ namespace MicroturbineElectricGenerator {
 
                 SetupOutputVariable("Generator Produced Thermal Rate",
                                     OutputProcessor::Unit::W,
-                                    MTGeneratorReport(GeneratorNum).QHeatRecovered,
+                                    MTGenerator(GeneratorNum).QHeatRecovered,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
-                                    MTGeneratorReport(GeneratorNum).ExhaustEnergyRec,
+                                    MTGenerator(GeneratorNum).ExhaustEnergyRec,
                                     "System",
                                     "Sum",
                                     MTGenerator(GeneratorNum).Name,
@@ -1013,28 +1011,28 @@ namespace MicroturbineElectricGenerator {
 
                 SetupOutputVariable("Generator Thermal Efficiency LHV Basis",
                                     OutputProcessor::Unit::None,
-                                    MTGeneratorReport(GeneratorNum).ThermalEfficiencyLHV,
+                                    MTGenerator(GeneratorNum).ThermalEfficiencyLHV,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    MTGeneratorReport(GeneratorNum).HeatRecInletTemp,
+                                    MTGenerator(GeneratorNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    MTGeneratorReport(GeneratorNum).HeatRecOutletTemp,
+                                    MTGenerator(GeneratorNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Water Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    MTGeneratorReport(GeneratorNum).HeatRecMdot,
+                                    MTGenerator(GeneratorNum).HeatRecMdot,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
@@ -1043,14 +1041,14 @@ namespace MicroturbineElectricGenerator {
             if (MTGenerator(GeneratorNum).StandbyPower > 0.0) { // Report Standby Power if entered by user
                 SetupOutputVariable("Generator Standby Electric Power",
                                     OutputProcessor::Unit::W,
-                                    MTGeneratorReport(GeneratorNum).StandbyPowerRate,
+                                    MTGenerator(GeneratorNum).StandbyPowerRate,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Standby Electric Energy",
                                     OutputProcessor::Unit::J,
-                                    MTGeneratorReport(GeneratorNum).StandbyEnergy,
+                                    MTGenerator(GeneratorNum).StandbyEnergy,
                                     "System",
                                     "Sum",
                                     MTGenerator(GeneratorNum).Name,
@@ -1064,14 +1062,14 @@ namespace MicroturbineElectricGenerator {
             if (MTGenerator(GeneratorNum).AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
                 SetupOutputVariable("Generator Ancillary Electric Power",
                                     OutputProcessor::Unit::W,
-                                    MTGeneratorReport(GeneratorNum).AncillaryPowerRate,
+                                    MTGenerator(GeneratorNum).AncillaryPowerRate,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Ancillary Electric Energy",
                                     OutputProcessor::Unit::J,
-                                    MTGeneratorReport(GeneratorNum).AncillaryEnergy,
+                                    MTGenerator(GeneratorNum).AncillaryEnergy,
                                     "System",
                                     "Sum",
                                     MTGenerator(GeneratorNum).Name);
@@ -1080,13 +1078,13 @@ namespace MicroturbineElectricGenerator {
             if (MTGenerator(GeneratorNum).ExhAirCalcsActive) {
                 SetupOutputVariable("Generator Exhaust Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    MTGeneratorReport(GeneratorNum).ExhAirMassFlowRate,
+                                    MTGenerator(GeneratorNum).ExhaustAirMassFlowRate,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
                 SetupOutputVariable("Generator Exhaust Air Temperature",
                                     OutputProcessor::Unit::C,
-                                    MTGeneratorReport(GeneratorNum).ExhAirTemperature,
+                                    MTGenerator(GeneratorNum).ExhaustAirTemperature,
                                     "System",
                                     "Average",
                                     MTGenerator(GeneratorNum).Name);
@@ -1959,34 +1957,20 @@ namespace MicroturbineElectricGenerator {
             DataLoopNode::Node(ExhaustAirNodeNum).HumRat = MTGenerator(Num).ExhaustAirHumRat;
             DataLoopNode::Node(ExhaustAirNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(CombustAirInletNodeNum).MassFlowRateMaxAvail;
             DataLoopNode::Node(ExhaustAirNodeNum).MassFlowRateMinAvail = DataLoopNode::Node(CombustAirInletNodeNum).MassFlowRateMinAvail;
-
-            // also update the report variables
-            MTGeneratorReport(Num).ExhAirMassFlowRate = MTGenerator(Num).ExhaustAirMassFlowRate;
-            MTGeneratorReport(Num).ExhAirTemperature = MTGenerator(Num).ExhaustAirTemperature;
-            // for exhaust only report
         }
 
-        MTGeneratorReport(Num).PowerGen = MTGenerator(Num).ElecPowerGenerated;
-        MTGeneratorReport(Num).EnergyGen = MTGenerator(Num).ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGeneratorReport(Num).QHeatRecovered = MTGenerator(Num).QHeatRecovered;
-        MTGeneratorReport(Num).ExhaustEnergyRec = MTGenerator(Num).QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGeneratorReport(Num).FuelEnergyUseRateHHV = MTGenerator(Num).FuelEnergyUseRateHHV;
-        MTGeneratorReport(Num).FuelEnergyHHV = MTGenerator(Num).FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGeneratorReport(Num).FuelMdot = MTGenerator(Num).FuelMdot;
+        MTGenerator(Num).EnergyGen = MTGenerator(Num).ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        MTGenerator(Num).ExhaustEnergyRec = MTGenerator(Num).QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        MTGenerator(Num).FuelEnergyHHV = MTGenerator(Num).FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         if (MTGenerator(Num).FuelEnergyUseRateLHV > 0.0) {
-            MTGeneratorReport(Num).ElectricEfficiencyLHV = MTGenerator(Num).ElecPowerGenerated / MTGenerator(Num).FuelEnergyUseRateLHV;
-            MTGeneratorReport(Num).ThermalEfficiencyLHV = MTGenerator(Num).QHeatRecovered / MTGenerator(Num).FuelEnergyUseRateLHV;
+            MTGenerator(Num).ElectricEfficiencyLHV = MTGenerator(Num).ElecPowerGenerated / MTGenerator(Num).FuelEnergyUseRateLHV;
+            MTGenerator(Num).ThermalEfficiencyLHV = MTGenerator(Num).QHeatRecovered / MTGenerator(Num).FuelEnergyUseRateLHV;
         } else {
-            MTGeneratorReport(Num).ElectricEfficiencyLHV = 0.0;
-            MTGeneratorReport(Num).ThermalEfficiencyLHV = 0.0;
+            MTGenerator(Num).ElectricEfficiencyLHV = 0.0;
+            MTGenerator(Num).ThermalEfficiencyLHV = 0.0;
         }
-        MTGeneratorReport(Num).HeatRecInletTemp = MTGenerator(Num).HeatRecInletTemp;
-        MTGeneratorReport(Num).HeatRecOutletTemp = MTGenerator(Num).HeatRecOutletTemp;
-        MTGeneratorReport(Num).HeatRecMdot = MTGenerator(Num).HeatRecMdot;
-        MTGeneratorReport(Num).AncillaryPowerRate = MTGenerator(Num).AncillaryPowerRate;
-        MTGeneratorReport(Num).AncillaryEnergy = MTGenerator(Num).AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGeneratorReport(Num).StandbyPowerRate = MTGenerator(Num).StandbyPowerRate;
-        MTGeneratorReport(Num).StandbyEnergy = MTGenerator(Num).StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        MTGenerator(Num).AncillaryEnergy = MTGenerator(Num).AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        MTGenerator(Num).StandbyEnergy = MTGenerator(Num).StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
     void GetMTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
@@ -2007,10 +1991,10 @@ namespace MicroturbineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // get some results for load center's aggregation
 
-        GeneratorPower = MTGeneratorReport(GeneratorIndex).PowerGen;
-        GeneratorEnergy = MTGeneratorReport(GeneratorIndex).EnergyGen;
-        ThermalPower = MTGeneratorReport(GeneratorIndex).QHeatRecovered;
-        ThermalEnergy = MTGeneratorReport(GeneratorIndex).ExhaustEnergyRec;
+        GeneratorPower = MTGenerator(GeneratorIndex).ElecPowerGenerated;
+        GeneratorEnergy = MTGenerator(GeneratorIndex).EnergyGen;
+        ThermalPower = MTGenerator(GeneratorIndex).QHeatRecovered;
+        ThermalEnergy = MTGenerator(GeneratorIndex).ExhaustEnergyRec;
     }
 
     void GetMTGeneratorExhaustNode(int const EP_UNUSED(CompType), std::string const &CompName, int &ExhaustOutletNodeNum)
