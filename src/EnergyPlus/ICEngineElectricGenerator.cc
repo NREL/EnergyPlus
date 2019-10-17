@@ -140,8 +140,10 @@ namespace ICEngineElectricGenerator {
             }
         }
 
-        InitICEngineGenerators(genNum, RunFlag, MyLoad, FirstHVACIteration);
-        CalcICEngineGeneratorModel(genNum, RunFlag, MyLoad, FirstHVACIteration);
+        auto &thisICE = ICEngineGenerator(genNum);
+
+        thisICE.InitICEngineGenerators(RunFlag, FirstHVACIteration);
+        thisICE.CalcICEngineGeneratorModel(RunFlag, MyLoad);
         UpdateICEngineGeneratorRecords(RunFlag, genNum);
     }
 
@@ -555,10 +557,7 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void CalcICEngineGeneratorModel(int const genNum, // Generator number
-                                    bool const RunFlag,     // TRUE when Generator operating
-                                    Real64 const MyLoad,    // Generator demand
-                                    bool const EP_UNUSED(FirstHVACIteration))
+    void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(bool const RunFlag, Real64 const MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -577,16 +576,16 @@ namespace ICEngineElectricGenerator {
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
         // min allowed operating frac full load
-        Real64 MinPartLoadRat = ICEngineGenerator(genNum).MinPartLoadRat;
+        Real64 MinPartLoadRat = this->MinPartLoadRat;
 
         // max allowed operating frac full load
-        Real64 MaxPartLoadRat = ICEngineGenerator(genNum).MaxPartLoadRat;
+        Real64 MaxPartLoadRat = this->MaxPartLoadRat;
 
         // Generator nominal capacity (W)
-        Real64 RatedPowerOutput = ICEngineGenerator(genNum).RatedPowerOutput;
+        Real64 RatedPowerOutput = this->RatedPowerOutput;
 
         // curve fit parameter
-        Real64 MaxExhaustperPowerOutput = ICEngineGenerator(genNum).MaxExhaustperPowerOutput;
+        Real64 MaxExhaustperPowerOutput = this->MaxExhaustperPowerOutput;
 
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;
@@ -594,8 +593,8 @@ namespace ICEngineElectricGenerator {
         // Heat Recovery Fluid Inlet Temperature (C)
         Real64 HeatRecInTemp;
 
-        if (ICEngineGenerator(genNum).HeatRecActive) {
-            int HeatRecInNode = ICEngineGenerator(genNum).HeatRecInletNodeNum;
+        if (this->HeatRecActive) {
+            int HeatRecInNode = this->HeatRecInletNodeNum;
             HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
             HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
 
@@ -606,23 +605,23 @@ namespace ICEngineElectricGenerator {
 
         // If no loop demand or Generator OFF, return
         if (!RunFlag) {
-            ICEngineGenerator(genNum).ElecPowerGenerated = 0.0;
-            ICEngineGenerator(genNum).ElecEnergyGenerated = 0.0;
-            ICEngineGenerator(genNum).HeatRecInletTemp = HeatRecInTemp;
-            ICEngineGenerator(genNum).HeatRecOutletTemp = HeatRecInTemp;
-            ICEngineGenerator(genNum).HeatRecMdotActual = 0.0;
-            ICEngineGenerator(genNum).QJacketRecovered = 0.0;
-            ICEngineGenerator(genNum).QExhaustRecovered = 0.0;
-            ICEngineGenerator(genNum).QLubeOilRecovered = 0.0;
-            ICEngineGenerator(genNum).QTotalHeatRecovered = 0.0;
-            ICEngineGenerator(genNum).JacketEnergyRec = 0.0;
-            ICEngineGenerator(genNum).ExhaustEnergyRec = 0.0;
-            ICEngineGenerator(genNum).LubeOilEnergyRec = 0.0;
-            ICEngineGenerator(genNum).TotalHeatEnergyRec = 0.0;
-            ICEngineGenerator(genNum).FuelEnergyUseRate = 0.0;
-            ICEngineGenerator(genNum).FuelEnergy = 0.0;
-            ICEngineGenerator(genNum).FuelMdot = 0.0;
-            ICEngineGenerator(genNum).ExhaustStackTemp = 0.0;
+            this->ElecPowerGenerated = 0.0;
+            this->ElecEnergyGenerated = 0.0;
+            this->HeatRecInletTemp = HeatRecInTemp;
+            this->HeatRecOutletTemp = HeatRecInTemp;
+            this->HeatRecMdotActual = 0.0;
+            this->QJacketRecovered = 0.0;
+            this->QExhaustRecovered = 0.0;
+            this->QLubeOilRecovered = 0.0;
+            this->QTotalHeatRecovered = 0.0;
+            this->JacketEnergyRec = 0.0;
+            this->ExhaustEnergyRec = 0.0;
+            this->LubeOilEnergyRec = 0.0;
+            this->TotalHeatEnergyRec = 0.0;
+            this->FuelEnergyUseRate = 0.0;
+            this->FuelEnergy = 0.0;
+            this->FuelMdot = 0.0;
+            this->ExhaustStackTemp = 0.0;
 
             return;
         }
@@ -643,7 +642,7 @@ namespace ICEngineElectricGenerator {
         Real64 FuelEnergyUseRate; // IC ENGINE fuel use rate (W)
         if (PLR > 0.0) {
             // (RELDC) Ratio of generator output to Fuel Energy Input
-            Real64 ElecOutputFuelRat = CurveManager::CurveValue(ICEngineGenerator(genNum).ElecOutputFuelCurve, PLR);
+            Real64 ElecOutputFuelRat = CurveManager::CurveValue(this->ElecOutputFuelCurve, PLR);
             FuelEnergyUseRate = ElecPowerGenerated / ElecOutputFuelRat;
         } else {
             FuelEnergyUseRate = 0.0;
@@ -654,7 +653,7 @@ namespace ICEngineElectricGenerator {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(ICEngineGenerator(genNum).RecJacHeattoFuelCurve, PLR);
+        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PLR);
 
         // water jacket heat recovered (W)
         Real64 QJacketRec = FuelEnergyUseRate * RecJacHeattoFuelRat;
@@ -663,7 +662,7 @@ namespace ICEngineElectricGenerator {
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(ICEngineGenerator(genNum).RecLubeHeattoFuelCurve, PLR);
+        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PLR);
 
         // lube oil cooler heat recovered (W)
         Real64 QLubeOilRec = FuelEnergyUseRate * RecLubeHeattoFuelRat;
@@ -673,7 +672,7 @@ namespace ICEngineElectricGenerator {
         // particular part load.
 
         // (REXDC) Total Exhaust Energy Input to Fuel Energy Input
-        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(ICEngineGenerator(genNum).TotExhausttoFuelCurve, PLR);
+        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PLR);
 
         // total engine exhaust heat (W)
         Real64 QExhaustTotal = FuelEnergyUseRate * TotExhausttoFuelRat;
@@ -682,13 +681,13 @@ namespace ICEngineElectricGenerator {
         Real64 QExhaustRec;
 
         // engine stack temp. (C)
-        Real64 ExhaustStackTemp;
+        Real64 ExhaustStackTemp = 0.0;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PLR > 0.0) {
             // (TEX) Exhaust Gas Temp
-            Real64 ExhaustTemp = CurveManager::CurveValue(ICEngineGenerator(genNum).ExhaustTempCurve, PLR);
+            Real64 ExhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PLR);
 
             if (ExhaustTemp > ReferenceTemp) {
 
@@ -697,10 +696,10 @@ namespace ICEngineElectricGenerator {
 
                 // Use Curve fit to determine stack temp after heat recovery
                 // (UACDC) exhaust gas Heat Exchanger UA
-                Real64 UA = ICEngineGenerator(genNum).UACoef(1) * std::pow(RatedPowerOutput, ICEngineGenerator(genNum).UACoef(2));
+                Real64 UA = this->UACoef(1) * std::pow(RatedPowerOutput, this->UACoef(2));
 
                 // design engine stact saturated steam temp. (C)
-                Real64 DesignMinExitGasTemp = ICEngineGenerator(genNum).DesignMinExitGasTemp;
+                Real64 DesignMinExitGasTemp = this->DesignMinExitGasTemp;
 
                 ExhaustStackTemp =
                     DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
@@ -708,23 +707,23 @@ namespace ICEngineElectricGenerator {
 
                 QExhaustRec = max(ExhaustGasFlow * ExhaustCP * (ExhaustTemp - ExhaustStackTemp), 0.0);
             } else {
-                if (ICEngineGenerator(genNum).ErrExhaustTempIndex == 0) {
-                    ShowWarningMessage("CalcICEngineGeneratorModel: " + ICEngineGenerator(genNum).TypeOf + "=\"" +
-                                       ICEngineGenerator(genNum).Name + "\" low Exhaust Temperature from Curve Value");
+                if (this->ErrExhaustTempIndex == 0) {
+                    ShowWarningMessage("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" +
+                                       this->Name + "\" low Exhaust Temperature from Curve Value");
                     ShowContinueError("...curve generated temperature=[" + General::RoundSigDigits(ExhaustTemp, 3) + " C], PLR=[" + General::RoundSigDigits(PLR, 3) +
                                       "].");
                     ShowContinueError("...simulation will continue with exhaust heat reclaim set to 0.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + ICEngineGenerator(genNum).TypeOf + "=\"" +
-                                               ICEngineGenerator(genNum).Name + "\" low Exhaust Temperature continues...",
-                                               ICEngineGenerator(genNum).ErrExhaustTempIndex,
+                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" +
+                                               this->Name + "\" low Exhaust Temperature continues...",
+                                               this->ErrExhaustTempIndex,
                                                ExhaustTemp,
                                                ExhaustTemp,
                                                _,
                                                "[C]",
                                                "[C]");
                 QExhaustRec = 0.0;
-                ExhaustStackTemp = ICEngineGenerator(genNum).DesignMinExitGasTemp;
+                ExhaustStackTemp = this->DesignMinExitGasTemp;
             }
         } else {
             QExhaustRec = 0.0;
@@ -736,16 +735,16 @@ namespace ICEngineElectricGenerator {
         // When Max Temp is reached the amount of recovered heat has to be reduced.
         Real64 HRecRatio;
 
-        if (ICEngineGenerator(genNum).HeatRecActive) {
-            CalcICEngineGenHeatRecovery(genNum, QTotalHeatRecovered, HeatRecMdot, HRecRatio);
+        if (this->HeatRecActive) {
+            this->CalcICEngineGenHeatRecovery(QTotalHeatRecovered, HeatRecMdot, HRecRatio);
             QExhaustRec *= HRecRatio;
             QLubeOilRec *= HRecRatio;
             QJacketRec *= HRecRatio;
             QTotalHeatRecovered *= HRecRatio;
         } else {
-            ICEngineGenerator(genNum).HeatRecInletTemp = HeatRecInTemp;
-            ICEngineGenerator(genNum).HeatRecOutletTemp = HeatRecInTemp;
-            ICEngineGenerator(genNum).HeatRecMdotActual = HeatRecMdot;
+            this->HeatRecInletTemp = HeatRecInTemp;
+            this->HeatRecOutletTemp = HeatRecInTemp;
+            this->HeatRecMdotActual = HeatRecMdot;
         }
 
         // Calculate Energy
@@ -763,32 +762,28 @@ namespace ICEngineElectricGenerator {
 
         // exhaust gas heat recovered (J)
         Real64 ExhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ICEngineGenerator(genNum).ElecPowerGenerated = ElecPowerGenerated;
-        ICEngineGenerator(genNum).ElecEnergyGenerated = ElectricEnergyGen;
-        ICEngineGenerator(genNum).QJacketRecovered = QJacketRec;
-        ICEngineGenerator(genNum).QLubeOilRecovered = QLubeOilRec;
-        ICEngineGenerator(genNum).QExhaustRecovered = QExhaustRec;
-        ICEngineGenerator(genNum).QTotalHeatRecovered = QTotalHeatRecovered;
-        ICEngineGenerator(genNum).JacketEnergyRec = JacketEnergyRec;
-        ICEngineGenerator(genNum).LubeOilEnergyRec = LubeOilEnergyRec;
-        ICEngineGenerator(genNum).ExhaustEnergyRec = ExhaustEnergyRec;
-        ICEngineGenerator(genNum).QTotalHeatRecovered = (QExhaustRec + QLubeOilRec + QJacketRec);
-        ICEngineGenerator(genNum).TotalHeatEnergyRec = (ExhaustEnergyRec + LubeOilEnergyRec + JacketEnergyRec);
-        ICEngineGenerator(genNum).FuelEnergyUseRate = std::abs(FuelEnergyUseRate);
-        ICEngineGenerator(genNum).FuelEnergy = std::abs(FuelEnergyUsed);
+        this->ElecPowerGenerated = ElecPowerGenerated;
+        this->ElecEnergyGenerated = ElectricEnergyGen;
+        this->QJacketRecovered = QJacketRec;
+        this->QLubeOilRecovered = QLubeOilRec;
+        this->QExhaustRecovered = QExhaustRec;
+        this->QTotalHeatRecovered = QTotalHeatRecovered;
+        this->JacketEnergyRec = JacketEnergyRec;
+        this->LubeOilEnergyRec = LubeOilEnergyRec;
+        this->ExhaustEnergyRec = ExhaustEnergyRec;
+        this->QTotalHeatRecovered = (QExhaustRec + QLubeOilRec + QJacketRec);
+        this->TotalHeatEnergyRec = (ExhaustEnergyRec + LubeOilEnergyRec + JacketEnergyRec);
+        this->FuelEnergyUseRate = std::abs(FuelEnergyUseRate);
+        this->FuelEnergy = std::abs(FuelEnergyUsed);
 
         // Heating Value of Fuel in kJ/kg
-        Real64 FuelHeatingValue = ICEngineGenerator(genNum).FuelHeatingValue;
+        Real64 FuelHeatingValue = this->FuelHeatingValue;
 
-        ICEngineGenerator(genNum).FuelMdot = std::abs(FuelEnergyUseRate) / (FuelHeatingValue * KJtoJ);
-        ICEngineGenerator(genNum).ExhaustStackTemp = ExhaustStackTemp;
+        this->FuelMdot = std::abs(FuelEnergyUseRate) / (FuelHeatingValue * KJtoJ);
+        this->ExhaustStackTemp = ExhaustStackTemp;
     }
 
-    void CalcICEngineGenHeatRecovery(int const genNum,                // HR Component number
-                                     Real64 const EnergyRecovered, // Amount of heat recovered
-                                     Real64 const HeatRecMdot,
-                                     Real64 &HRecRatio // Max Heat recovery ratio
-    )
+    void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(Real64 const EnergyRecovered, Real64 const HeatRecMdot, Real64 &HRecRatio)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brandon Anderson
@@ -805,15 +800,15 @@ namespace ICEngineElectricGenerator {
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
         // Load inputs to local structure
-        int HeatRecInNode = ICEngineGenerator(genNum).HeatRecInletNodeNum;
+        int HeatRecInNode = this->HeatRecInletNodeNum;
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
 
         Real64 HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
-        Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ICEngineGenerator(genNum).HRLoopNum).FluidName,
+        Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                           HeatRecInTemp,
-                                          DataPlant::PlantLoop(ICEngineGenerator(genNum).HRLoopNum).FluidIndex,
+                                          DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                           RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
@@ -830,10 +825,10 @@ namespace ICEngineElectricGenerator {
         }
 
         // Note: check to make sure the Max Temperature was not exceeded
-        if (HeatRecOutTemp > ICEngineGenerator(genNum).HeatRecMaxTemp) {
+        if (HeatRecOutTemp > this->HeatRecMaxTemp) {
             Real64 MinHeatRecMdot;
-            if (ICEngineGenerator(genNum).HeatRecMaxTemp != HeatRecInTemp) {
-                MinHeatRecMdot = (EnergyRecovered) / (HeatRecCp * (ICEngineGenerator(genNum).HeatRecMaxTemp - HeatRecInTemp));
+            if (this->HeatRecMaxTemp != HeatRecInTemp) {
+                MinHeatRecMdot = (EnergyRecovered) / (HeatRecCp * (this->HeatRecMaxTemp - HeatRecInTemp));
                 if (MinHeatRecMdot < 0.0) MinHeatRecMdot = 0.0;
             } else {
                 MinHeatRecMdot = 0.0;
@@ -850,15 +845,12 @@ namespace ICEngineElectricGenerator {
         }
 
         // Update global variables for reporting later
-        ICEngineGenerator(genNum).HeatRecInletTemp = HeatRecInTemp;
-        ICEngineGenerator(genNum).HeatRecOutletTemp = HeatRecOutTemp;
-        ICEngineGenerator(genNum).HeatRecMdotActual = HeatRecMdot;
+        this->HeatRecInletTemp = HeatRecInTemp;
+        this->HeatRecOutletTemp = HeatRecOutTemp;
+        this->HeatRecMdotActual = HeatRecMdot;
     }
 
-    void InitICEngineGenerators(int const genNum,         // Generator number
-                                bool const RunFlag,             // TRUE when Generator operating
-                                Real64 const EP_UNUSED(MyLoad), // Generator demand
-                                bool const FirstHVACIteration)
+    void ICEngineGeneratorSpecs::InitICEngineGenerators(bool const RunFlag, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -877,14 +869,14 @@ namespace ICEngineElectricGenerator {
 
         bool errFlag;
 
-        if (ICEngineGenerator(genNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && ICEngineGenerator(genNum).HeatRecActive) {
+        if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(ICEngineGenerator(genNum).Name,
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                     DataPlant::TypeOf_Generator_ICEngine,
-                                    ICEngineGenerator(genNum).HRLoopNum,
-                                    ICEngineGenerator(genNum).HRLoopSideNum,
-                                    ICEngineGenerator(genNum).HRBranchNum,
-                                    ICEngineGenerator(genNum).HRCompNum,
+                                    this->HRLoopNum,
+                                    this->HRLoopSideNum,
+                                    this->HRBranchNum,
+                                    this->HRCompNum,
                                     errFlag,
                                     _,
                                     _,
@@ -895,83 +887,83 @@ namespace ICEngineElectricGenerator {
                 ShowFatalError("InitICEngineGenerators: Program terminated due to previous condition(s).");
             }
 
-            ICEngineGenerator(genNum).MyPlantScanFlag = false;
+            this->MyPlantScanFlag = false;
         }
 
-        if (ICEngineGenerator(genNum).MySizeAndNodeInitFlag && (!ICEngineGenerator(genNum).MyPlantScanFlag) && ICEngineGenerator(genNum).HeatRecActive) {
+        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
 
-            int HeatRecInletNode = ICEngineGenerator(genNum).HeatRecInletNodeNum;
-            int HeatRecOutletNode = ICEngineGenerator(genNum).HeatRecOutletNodeNum;
+            int HeatRecInletNode = this->HeatRecInletNodeNum;
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
 
             // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ICEngineGenerator(genNum).HRLoopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
-                                   DataPlant::PlantLoop(ICEngineGenerator(genNum).HRLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                    RoutineName);
 
-            ICEngineGenerator(genNum).DesignHeatRecMassFlowRate = rho * ICEngineGenerator(genNum).DesignHeatRecVolFlowRate;
-            ICEngineGenerator(genNum).HeatRecMdotDesign = ICEngineGenerator(genNum).DesignHeatRecMassFlowRate;
+            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
+            this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
 
             PlantUtilities::InitComponentNodes(0.0,
-                               ICEngineGenerator(genNum).DesignHeatRecMassFlowRate,
+                               this->DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
-                               ICEngineGenerator(genNum).HRLoopNum,
-                               ICEngineGenerator(genNum).HRLoopSideNum,
-                               ICEngineGenerator(genNum).HRBranchNum,
-                               ICEngineGenerator(genNum).HRCompNum);
+                               this->HRLoopNum,
+                               this->HRLoopSideNum,
+                               this->HRBranchNum,
+                               this->HRCompNum);
 
-            ICEngineGenerator(genNum).MySizeAndNodeInitFlag = false;
+            this->MySizeAndNodeInitFlag = false;
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && ICEngineGenerator(genNum).MyEnvrnFlag && ICEngineGenerator(genNum).HeatRecActive) {
-            int HeatRecInletNode = ICEngineGenerator(genNum).HeatRecInletNodeNum;
-            int HeatRecOutletNode = ICEngineGenerator(genNum).HeatRecOutletNodeNum;
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
+            int HeatRecInletNode = this->HeatRecInletNodeNum;
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
             DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
             DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
-                               ICEngineGenerator(genNum).DesignHeatRecMassFlowRate,
+                               this->DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
-                               ICEngineGenerator(genNum).HRLoopNum,
-                               ICEngineGenerator(genNum).HRLoopSideNum,
-                               ICEngineGenerator(genNum).HRBranchNum,
-                               ICEngineGenerator(genNum).HRCompNum);
+                               this->HRLoopNum,
+                               this->HRLoopSideNum,
+                               this->HRBranchNum,
+                               this->HRCompNum);
 
-            ICEngineGenerator(genNum).MyEnvrnFlag = false;
+            this->MyEnvrnFlag = false;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            ICEngineGenerator(genNum).MyEnvrnFlag = true;
+            this->MyEnvrnFlag = true;
         }
 
-        if (ICEngineGenerator(genNum).HeatRecActive) {
+        if (this->HeatRecActive) {
             if (FirstHVACIteration) {
                 Real64 mdot;
                 if (RunFlag) {
-                    mdot = ICEngineGenerator(genNum).DesignHeatRecMassFlowRate;
+                    mdot = this->DesignHeatRecMassFlowRate;
                 } else {
                     mdot = 0.0;
                 }
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     ICEngineGenerator(genNum).HeatRecInletNodeNum,
-                                     ICEngineGenerator(genNum).HeatRecOutletNodeNum,
-                                     ICEngineGenerator(genNum).HRLoopNum,
-                                     ICEngineGenerator(genNum).HRLoopSideNum,
-                                     ICEngineGenerator(genNum).HRBranchNum,
-                                     ICEngineGenerator(genNum).HRCompNum);
+                                     this->HeatRecInletNodeNum,
+                                     this->HeatRecOutletNodeNum,
+                                     this->HRLoopNum,
+                                     this->HRLoopSideNum,
+                                     this->HRBranchNum,
+                                     this->HRCompNum);
 
             } else {
-                PlantUtilities::SetComponentFlowRate(ICEngineGenerator(genNum).HeatRecMdotActual,
-                                     ICEngineGenerator(genNum).HeatRecInletNodeNum,
-                                     ICEngineGenerator(genNum).HeatRecOutletNodeNum,
-                                     ICEngineGenerator(genNum).HRLoopNum,
-                                     ICEngineGenerator(genNum).HRLoopSideNum,
-                                     ICEngineGenerator(genNum).HRBranchNum,
-                                     ICEngineGenerator(genNum).HRCompNum);
+                PlantUtilities::SetComponentFlowRate(this->HeatRecMdotActual,
+                                     this->HeatRecInletNodeNum,
+                                     this->HeatRecOutletNodeNum,
+                                     this->HRLoopNum,
+                                     this->HRLoopSideNum,
+                                     this->HRBranchNum,
+                                     this->HRCompNum);
             }
         }
     }

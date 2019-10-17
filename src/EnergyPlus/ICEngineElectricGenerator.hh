@@ -147,6 +147,12 @@ namespace ICEngineElectricGenerator {
               HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true)
         {
         }
+
+        void InitICEngineGenerators(bool RunFlag, bool FirstHVACIteration);
+
+        void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
+
+        void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot,  Real64 &HRecRatio);
     };
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
@@ -180,22 +186,6 @@ namespace ICEngineElectricGenerator {
     );
 
     void GetICEngineGeneratorInput();
-
-    void CalcICEngineGeneratorModel(int genNum, // Generator number
-                                    bool RunFlag,     // TRUE when Generator operating
-                                    Real64 MyLoad,    // Generator demand
-                                    bool FirstHVACIteration);
-
-    void CalcICEngineGenHeatRecovery(int genNum,                // HR Component number
-                                     Real64 EnergyRecovered, // Amount of heat recovered
-                                     Real64 HeatRecMdot,
-                                     Real64 &HRecRatio // Max Heat recovery ratio
-    );
-
-    void InitICEngineGenerators(int genNum, // Generator number
-                                bool RunFlag,     // TRUE when Generator operating
-                                Real64 MyLoad,    // Generator demand
-                                bool FirstHVACIteration);
 
     void UpdateICEngineGeneratorRecords(bool RunFlag, // TRUE if Generator operating
                                         int genNum       // Generator number
