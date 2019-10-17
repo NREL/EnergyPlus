@@ -77,10 +77,6 @@ namespace EnergyPlus {
 
 namespace MicroturbineElectricGenerator {
 
-    //__________________________________________________________________________
-    // New microturbine model added by FSEC:
-    //   MicroturbineElectricGenerator  ! Microturbine Electric Generator Module
-
     // MODULE INFORMATION:
     //       AUTHOR         R. Raustad/D. Shirey
     //       DATE WRITTEN   Mar 2008
@@ -98,7 +94,6 @@ namespace MicroturbineElectricGenerator {
     //  MT Generator models are based on polynomial curve fits of generator
     //  performance data.
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataGlobalConstants::iGeneratorMicroturbine;
@@ -106,10 +101,8 @@ namespace MicroturbineElectricGenerator {
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::SecInHour;
 
-    // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
 
-    // MODULE VARIABLE DECLARATIONS:
     int NumMTGenerators(0); // number of MT Generators specified in input
     bool GetMTInput(true);  // then TRUE, calls subroutine to read input file.
 
@@ -139,10 +132,8 @@ namespace MicroturbineElectricGenerator {
 
         // METHODOLOGY EMPLOYED:       Uses empirical models based on manufacturers data
 
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -218,12 +209,6 @@ namespace MicroturbineElectricGenerator {
         } // End Of InitLoopEquip
     }
 
-    // End MT Generator Module Driver Subroutine
-    //******************************************************************************
-
-    // Beginning of Microturbine (MT) Generator Module Get Input Subroutine
-    //******************************************************************************
-
     void GetMTGeneratorInput()
     {
         // SUBROUTINE INFORMATION:
@@ -235,10 +220,6 @@ namespace MicroturbineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine gets the input information for the Microturbine (MT) Generator model.
 
-        // METHODOLOGY EMPLOYED:
-        //  EnergyPlus input processor.
-
-        // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
@@ -252,7 +233,6 @@ namespace MicroturbineElectricGenerator {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ScheduleManager::GetScheduleIndex;
 
-        // LOCAL VARIABLES:
         int GeneratorNum;                // Index to generator
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -489,28 +469,10 @@ namespace MicroturbineElectricGenerator {
 
                 } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
                     FuelType = "Gas";
-
-                    //    CASE ('DIESEL')
-                    //      FuelType = 'Diesel'
-
-                    //    CASE ('GASOLINE')
-                    //      FuelType = 'Gasoline'
-
-                    //    CASE ('FUEL OIL #1','FUELOIL#1','FUEL OIL','DISTILLATE OIL')
-                    //      FuelType = 'FuelOil#1'
-
-                    //    CASE ('FUEL OIL #2','FUELOIL#2','RESIDUAL OIL')
-                    //      FuelType = 'FuelOil#2'
-
+                    
                 } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
                            (SELECT_CASE_var == "PROPANE GAS")) {
                     FuelType = "Propane";
-
-                    //    CASE ('OTHERFUEL1')
-                    //       FuelType = 'OtherFuel1'
-
-                    //    CASE ('OTHERFUEL2')
-                    //       FuelType = 'OtherFuel2'
 
                 } else {
                     ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -691,15 +653,6 @@ namespace MicroturbineElectricGenerator {
                             cCurrentModuleObject,           // Object Type
                             MTGenerator(GeneratorNum).Name,        // Object Name
                             cAlphaFieldNames(10));           // Field Name
-                        //          NEED TO FIGURE OUT WHAT TO USE FOR Pnet............Shirey
-                        //    HeatRecFlowFTempPowCurveOutput = CurveValue(MTGenerator(GeneratorNum)%HeatRecFlowFTempPowCurveNum, Pnet)
-                        //    IF(ABS(HeatRecFlowFTempPowCurveOutput-1.0d0) .GT. 0.1d0)THEN !
-                        //      CALL ShowWarningError('GENERATOR:MICROTURBINE "'//TRIM(MTGenerator(GeneratorNum)%Name)//'"')
-                        //      CALL ShowContinueError('Heat Recovery Water Flow Rate Modifier Curve (function of temp and power) =
-                        //      '//TRIM(AlphArray(10))) CALL ShowContinueError('... Curve ouput at a reference conditions should equal 1
-                        //      (+-10%).') CALL ShowContinueError('... Curve output =
-                        //      '//TRIM(TrimSigDigits(HeatRecFlowFTempPowCurveOutput,4)))
-                        //    END IF
                     }
 
                 } // End of IF (MTGenerator(GeneratorNum)%InternalFlowControl) THEN
@@ -1173,12 +1126,6 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    // End of Get Input subroutine for the MT Generator Module
-    //******************************************************************************
-
-    // Begin MT Generator Module Initialize Subroutine
-    // *****************************************************************************
-
     void InitMTGenerators(int const GenNum,
                           bool const RunFlag,
                           Real64 const MyLoad, // electrical load in W
@@ -1197,10 +1144,6 @@ namespace MicroturbineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Generator_MicroTurbine;
@@ -1209,19 +1152,8 @@ namespace MicroturbineElectricGenerator {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitMTGenerators");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInletNode;            // Inlet node number in heat recovery loop
         int HeatRecOutletNode;           // Outlet node number in heat recovery loop
         static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
@@ -1232,7 +1164,6 @@ namespace MicroturbineElectricGenerator {
         Real64 DesiredMassFlowRate;
         bool errFlag;
 
-        // FLOW:
         // Do the one time initializations
         if (MyOneTimeFlag) {
             MyEnvrnFlag.allocate(NumMTGenerators);
@@ -1384,12 +1315,6 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    //  End of MT Generator Module Initialize Subroutine
-    // *****************************************************************************
-
-    //  Beginning of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
     void CalcMTGeneratorModel(int const GeneratorNum,                  // Generator number
                               bool const RunFlag,                      // TRUE when generator is being asked to operate
                               Real64 const MyLoad,                     // Generator demand (W)
@@ -1407,10 +1332,7 @@ namespace MicroturbineElectricGenerator {
 
         // METHODOLOGY EMPLOYED:
         //  Curve fits of performance data.
-
-        // REFERENCES: na
-
-        // Using/Aliasing
+        
         using CurveManager::CurveValue;
         using DataEnvironment::Elevation;
         using DataEnvironment::OutBaroPress;
@@ -1425,23 +1347,12 @@ namespace MicroturbineElectricGenerator {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const KJtoJ(1000.0);          // Convert kilojoules to joules
         int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
         Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
         Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
         static std::string const RoutineName("CalcMTGeneratorModel");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        //  na
-
-        // DERIVED TYPE DEFINITIONS:
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;          // Min allowed operating fraction at full load
         Real64 MaxPartLoadRat;          // Max allowed operating fraction at full load
         Real64 ReferencePowerOutput;    // Generator reference capacity (W)
@@ -2089,12 +2000,6 @@ namespace MicroturbineElectricGenerator {
         } // End of IF (MTGenerator(GeneratorNum)%ExhAirCalcsActive) THEN
     }
 
-    //  End of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
-    //  Beginning of record keeping subroutine for the MT Generator Module
-    // *****************************************************************************
-
     void UpdateMTGeneratorRecords(int const Num) // Generator number
     {
         // SUBROUTINE INFORMATION:
@@ -2106,23 +2011,8 @@ namespace MicroturbineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         //  Reporting and updating nodes if necessary.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInletNode;       // Node number for heat recovery (water) inlet node
         int HeatRecOutletNode;      // Node number for heat recovery (water) outlet node
         int ExhaustAirNodeNum;      // Node number for exhaust air node
@@ -2132,11 +2022,7 @@ namespace MicroturbineElectricGenerator {
 
             HeatRecInletNode = MTGenerator(Num).HeatRecInletNodeNum;
             HeatRecOutletNode = MTGenerator(Num).HeatRecOutletNodeNum;
-
-            //   Node(HeatRecOutletNode)%MassFlowRate         = MTGenerator(Num)%HeatRecMdot
             Node(HeatRecOutletNode).Temp = MTGenerator(Num).HeatRecOutletTemp;
-            //    Node(HeatRecOutletNode)%MassFlowRateMaxAvail = Node(HeatRecInletNode)%MassFlowRateMaxAvail
-            //    Node(HeatRecOutletNode)%MassFlowRateMinAvail = Node(HeatRecInletNode)%MassFlowRateMinAvail
         }
 
         if (MTGenerator(Num).ExhAirCalcsActive) {
@@ -2198,28 +2084,6 @@ namespace MicroturbineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // get some results for load center's aggregation
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         GeneratorPower = MTGeneratorReport(GeneratorIndex).PowerGen;
         GeneratorEnergy = MTGeneratorReport(GeneratorIndex).EnergyGen;
         ThermalPower = MTGeneratorReport(GeneratorIndex).QHeatRecovered;
@@ -2237,14 +2101,9 @@ namespace MicroturbineElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // To pass exhaust outlet number from Micro Turbine to Exhaust fired absorption chiller.
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
 
         if (GetMTInput) {
-            // Read input data.
             GetMTGeneratorInput();
             GetMTInput = false;
         }
@@ -2259,9 +2118,6 @@ namespace MicroturbineElectricGenerator {
             ExhaustOutletNodeNum = MTGenerator(CompNum).CombustionAirOutletNodeNum;
         }
     }
-
-    // End of Record Keeping subroutine for the MT Generator Module
-    // *****************************************************************************
 
 } // namespace MicroturbineElectricGenerator
 

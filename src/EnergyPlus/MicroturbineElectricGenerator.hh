@@ -60,24 +60,12 @@ namespace EnergyPlus {
 
 namespace MicroturbineElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorMicroturbine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
-
-    // Types
 
     struct MTGeneratorSpecs
     {
@@ -155,39 +143,22 @@ namespace MicroturbineElectricGenerator {
         Real64 AncillaryPowerRate;        // Ancillary power rate this time step (W)
         //     Warning message variables
         int PowerFTempElevErrorIndex; // Index to power as a function of temp/elevation warning message
-        //       INTEGER    :: PowerFTempElevErrorCount     = 0   ! Counter for power as a function of temp/elevation warning messages
         int EffFTempErrorIndex; // Index to efficiency as a function of temperature warning message
-        //       INTEGER    :: EffFTempErrorCount           = 0   ! Counter for efficiency as a function of temperature warning messages
         int EffFPLRErrorIndex; // Index to efficiency as a function of PLR warning message
-        //       INTEGER    :: EffFPLRErrorCount            = 0   ! Counter for efficiency as a function of PLR warning messages
         int ExhFlowFTempErrorIndex; // Index to exhaust flow as a function of temp warning message
-        //       INTEGER    :: ExhFlowFTempErrorCount       = 0   ! Counter for exhaust flow as a function of temp warning messages
         int ExhFlowFPLRErrorIndex; // Index to exhaust flow as a function of PLR warning message
-        //       INTEGER    :: ExhFlowFPLRErrorCount        = 0   ! Counter for exhaust flow as a function of PLR warning messages
         int ExhTempFTempErrorIndex; // Index to exhaust temp as a function of temp warning message
-        //       INTEGER    :: ExhTempFTempErrorCount       = 0   ! Counter for exhaust temp as a function of temp warning messages
         int ExhTempFPLRErrorIndex; // Index to exhaust temp as a function of PLR warning message
-        //       INTEGER    :: ExhTempFPLRErrorCount        = 0   ! Counter for exhaust temp as a function of PLR warning messages
         int HRMinFlowErrorIndex; // Index to reclaim water flow rate warning message
-        //       INTEGER    :: HRMinFlowErrorCount          = 0   ! Counter for reclaim water flow rate warning messages
         int HRMaxFlowErrorIndex; // Index to reclaim water flow rate warning message
-        //       INTEGER    :: HRMaxFlowErrorCount          = 0   ! Counter for reclaim water flow rate warning messages
         int ExhTempLTInletTempIndex; // Index to exhaust temp < combustion inlet air temp warning messages
-        //       INTEGER    :: ExhTempLTInletTempCount      = 0   ! Counter for exhaust temp < combustion inlet air temp warning messages
         int ExhHRLTInletHRIndex; // Index to exhaust hum rat < combustion inlet air hum rat warning messages
-        //       INTEGER    :: ExhHRLTInletHRCount          = 0   ! Counter for exhaust hum rat < combustion inlet air hum rat warn messages
         int AnciPowerIterErrorIndex; // Index to Ancillary Power iteration loop warning messages
-        //       INTEGER    :: AnciPowerIterErrorCount      = 0   ! Count for Ancillary Power iteration loop warning messages
         int AnciPowerFMdotFuelErrorIndex; // Index to Ancillary Power as a function of fuel input warning messages
-        //       INTEGER    :: AnciPowerFMdotFuelErrorCount = 0   ! Count for Ancillary Power as a function of fuel input warning messages
         int HeatRecRateFPLRErrorIndex; // Index to heat recovery rate as a function of PLR warning messages
-        //       INTEGER    :: HeatRecRateFPLRErrorCount    = 0   ! Count for heat recovery rate as a function of PLR warning messages
         int HeatRecRateFTempErrorIndex; // Index to heat recovery rate as a function of temp warning messages
-        //       INTEGER    :: HeatRecRateFTempErrorCount   = 0   ! Count for heat recovery rate as a function of temp warning messages
         int HeatRecRateFFlowErrorIndex; // Index to heat recovery rate as a function of flow warning messages
-        //       INTEGER    :: HeatRecRateFFlowErrorCount   = 0   ! Count for heat recovery rate as a function of flow warning messages
         int ThermEffFTempElevErrorIndex; // Index to thermal efficiency as a function of temp/elevation warnings
-        //       INTEGER    :: ThermEffFTempElevErrorCount  = 0   ! Count for thermal efficiency as a function of temp/elevation warnings
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -245,11 +216,8 @@ namespace MicroturbineElectricGenerator {
         }
     };
 
-    // Object Data
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
     extern Array1D<ReportVars> MTGeneratorReport;
-
-    // Functions
 
     void SimMTGenerator(int const GeneratorType,          // Type of generator !unused1208
                         std::string const &GeneratorName, // User-specified name of generator
@@ -272,42 +240,18 @@ namespace MicroturbineElectricGenerator {
                                 bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
     );
 
-    // End MT Generator Module Driver Subroutine
-    //******************************************************************************
-
-    // Beginning of Microturbine (MT) Generator Module Get Input Subroutine
-    //******************************************************************************
-
     void GetMTGeneratorInput();
-
-    // End of Get Input subroutine for the MT Generator Module
-    //******************************************************************************
-
-    // Begin MT Generator Module Initialize Subroutine
-    // *****************************************************************************
 
     void InitMTGenerators(int const GenNum,
                           bool const RunFlag,
                           Real64 const MyLoad, // electrical load in W
                           bool const FirstHVACIteration);
 
-    //  End of MT Generator Module Initialize Subroutine
-    // *****************************************************************************
-
-    //  Beginning of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
     void CalcMTGeneratorModel(int const GeneratorNum,       // Generator number
                               bool const RunFlag,           // TRUE when generator is being asked to operate
                               Real64 const MyLoad,          // Generator demand (W)
                               bool const FirstHVACIteration // unused1208
     );
-
-    //  End of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
-    //  Beginning of record keeping subroutine for the MT Generator Module
-    // *****************************************************************************
 
     void UpdateMTGeneratorRecords(int const Num); // Generator number
 
@@ -320,9 +264,6 @@ namespace MicroturbineElectricGenerator {
     );
 
     void GetMTGeneratorExhaustNode(int const CompType, std::string const &CompName, int &ExhaustOutletNodeNum);
-
-    // End of Record Keeping subroutine for the MT Generator Module
-    // *****************************************************************************
 
 } // namespace MicroturbineElectricGenerator
 
