@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +70,7 @@ namespace ICEngineElectricGenerator {
     extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
     extern bool getICEInput;          // When TRUE, calls subroutine to read input file.
 
-    struct ICEngineGeneratorSpecs
+    struct ICEngineGeneratorSpecs : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
@@ -149,6 +150,8 @@ namespace ICEngineElectricGenerator {
               myFlag(true)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitICEngineGenerators(bool RunFlag, bool FirstHVACIteration);
 

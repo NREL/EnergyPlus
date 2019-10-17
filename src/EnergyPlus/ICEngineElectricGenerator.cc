@@ -564,6 +564,12 @@ namespace ICEngineElectricGenerator {
         }
     }
 
+    void ICEngineGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+                                          Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
     void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(bool const RunFlag, Real64 const MyLoad)
     {
         // SUBROUTINE INFORMATION:
