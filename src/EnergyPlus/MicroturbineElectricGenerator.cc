@@ -94,8 +94,6 @@ namespace MicroturbineElectricGenerator {
     //  MT Generator models are based on polynomial curve fits of generator
     //  performance data.
 
-    static std::string const BlankString;
-
     int NumMTGenerators(0); // number of MT Generators specified in input
     bool GetMTInput(true);  // then TRUE, calls subroutine to read input file.
 
@@ -213,7 +211,7 @@ namespace MicroturbineElectricGenerator {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         int IOStat;                      // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);  // Error flag... trips fatal error message at end of get input
+        bool ErrorsFound(false);  // Error flag... trips fatal error message at end of get input
         Real64 ElectOutFTempElevOutput;  // Output of Electrical Power Output Modifier Curve (function of temp and elev)
         Real64 ElecEfficFTempOutput;     // Output of Electrical Efficiency Modifier Curve (function of temp)
         Real64 ElecEfficFPLROutput;      // Output of Electrical Efficiency Modifier Curve (function of PLR)
@@ -228,8 +226,8 @@ namespace MicroturbineElectricGenerator {
         Real64 ExhFlowFPLROutput;        // Output of Exhaust Air Flow Modifier Curve (function of PLR)
         Real64 ExhAirTempFTempOutput;    // Output of Exhaust Air Temperature Modifier Curve (function of inlet air temp)
         Real64 ExhOutAirTempFPLROutput;  // Output of Exhaust Air Temperature Modifier Curve (function of PLR)
-        static Real64 Var1Min(0.0);      // Minimum value for variable 1, value obtained from a curve object
-        static Real64 Var1Max(0.0);      // Maximum value for variable 1, value obtained from a curve object
+        Real64 Var1Min(0.0);      // Minimum value for variable 1, value obtained from a curve object
+        Real64 Var1Max(0.0);      // Maximum value for variable 1, value obtained from a curve object
 
         Array1D<Real64> NumArray(19); // Numeric data array
 
@@ -1119,30 +1117,15 @@ namespace MicroturbineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitMTGenerators");
+        std::string const RoutineName("InitMTGenerators");
 
         int HeatRecInletNode;            // Inlet node number in heat recovery loop
         int HeatRecOutletNode;           // Outlet node number in heat recovery loop
-        static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MySizeAndNodeInitFlag;
-        static bool MyOneTimeFlag(true); // Initialization flag
         Real64 rho;                      // local temporary fluid density
         Real64 DesiredMassFlowRate;
         bool errFlag;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumMTGenerators);
-            MyPlantScanFlag.allocate(NumMTGenerators);
-            MySizeAndNodeInitFlag.allocate(NumMTGenerators);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
-            MySizeAndNodeInitFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (MyPlantScanFlag(GenNum) && allocated(DataPlant::PlantLoop) && MTGenerator(GenNum).HeatRecActive) {
+        if (MTGenerator(GenNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && MTGenerator(GenNum).HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(MTGenerator(GenNum).Name,
                                     DataPlant::TypeOf_Generator_MicroTurbine,
@@ -1160,10 +1143,10 @@ namespace MicroturbineElectricGenerator {
                 ShowFatalError("InitMTGenerators: Program terminated due to previous condition(s).");
             }
 
-            MyPlantScanFlag(GenNum) = false;
+            MTGenerator(GenNum).MyPlantScanFlag = false;
         }
 
-        if (MySizeAndNodeInitFlag(GenNum) && (!MyPlantScanFlag(GenNum)) && MTGenerator(GenNum).HeatRecActive) {
+        if (MTGenerator(GenNum).MySizeAndNodeInitFlag && (!MTGenerator(GenNum).MyPlantScanFlag) && MTGenerator(GenNum).HeatRecActive) {
 
             HeatRecInletNode = MTGenerator(GenNum).HeatRecInletNodeNum;
             HeatRecOutletNode = MTGenerator(GenNum).HeatRecOutletNodeNum;
@@ -1186,7 +1169,7 @@ namespace MicroturbineElectricGenerator {
                                MTGenerator(GenNum).HRBranchNum,
                                MTGenerator(GenNum).HRCompNum);
 
-            MySizeAndNodeInitFlag(GenNum) = false;
+            MTGenerator(GenNum).MySizeAndNodeInitFlag = false;
 
         } // end one time inits
 
@@ -1195,7 +1178,7 @@ namespace MicroturbineElectricGenerator {
         HeatRecInletNode = MTGenerator(GenNum).HeatRecInletNodeNum;
         HeatRecOutletNode = MTGenerator(GenNum).HeatRecOutletNodeNum;
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(GenNum)) {
+        if (DataGlobals::BeginEnvrnFlag && MTGenerator(GenNum).MyEnvrnFlag) {
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
                                MTGenerator(GenNum).HeatRecMaxMassFlowRate,
@@ -1209,11 +1192,11 @@ namespace MicroturbineElectricGenerator {
             DataLoopNode::Node(HeatRecInletNode).Temp = 20.0; // Set the node temperature, assuming freeze control
             DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
 
-            MyEnvrnFlag(GenNum) = false;
+            MTGenerator(GenNum).MyEnvrnFlag = false;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(GenNum) = true;
+            MTGenerator(GenNum).MyEnvrnFlag = true;
         }
 
         // set/request flow rates
@@ -1304,7 +1287,7 @@ namespace MicroturbineElectricGenerator {
         int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
         Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
         Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
-        static std::string const RoutineName("CalcMTGeneratorModel");
+        std::string const RoutineName("CalcMTGeneratorModel");
 
         Real64 MinPartLoadRat;          // Min allowed operating fraction at full load
         Real64 MaxPartLoadRat;          // Max allowed operating fraction at full load
@@ -1345,7 +1328,7 @@ namespace MicroturbineElectricGenerator {
         Real64 HeatRecRateFTemp;       // Heat recovery rate as a function of inlet water temp curve output
         Real64 HeatRecRateFFlow;       // Heat recovery rate as a function of water flow rate curve output
         Real64 FuelHigherHeatingValue(0.0); // Higher heating value (HHV) of fuel (kJ/kg)
-        Real64 FuelLowerHeatingValue;  // Lower heating value (LLV) of fuel kJ/kg)
+        Real64 FuelLowerHeatingValue(0.0);  // Lower heating value (LLV) of fuel kJ/kg)
         Real64 HRecRatio;              // When maximum temperature is reached the amount of recovered heat has to be reduced
         Real64 AncillaryPowerRate;     // Ancillary power used by pump (if not specified in manufacturers data)
         Real64 AncillaryPowerRateLast; // Ancillary power used by pump from last iteration (iteration loop within this subroutine)

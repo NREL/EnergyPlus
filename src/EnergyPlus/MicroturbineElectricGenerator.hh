@@ -158,6 +158,9 @@ namespace MicroturbineElectricGenerator {
         int HeatRecRateFFlowErrorIndex; // Index to heat recovery rate as a function of flow warning messages
         int ThermEffFTempElevErrorIndex; // Index to thermal efficiency as a function of temp/elevation warnings
         bool CheckEquipName;
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -178,7 +181,8 @@ namespace MicroturbineElectricGenerator {
               PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
-              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true)
+              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true),
+              MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true)
         {
         }
     };
