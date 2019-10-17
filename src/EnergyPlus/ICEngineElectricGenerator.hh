@@ -149,41 +149,7 @@ namespace ICEngineElectricGenerator {
         }
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PowerGen;            // reporting: power (W)
-        Real64 EnergyGen;           // reporting: energy (J)
-        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
-        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
-        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
-        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
-        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
-        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-
-        // Default Constructor
-        ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0),
-              TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0),
-              FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
-        {
-        }
-    };
-
-    // Object Data
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-    extern Array1D<ReportVars> ICEngineGeneratorReport;
-
-    // Functions
 
     void SimICEngineGenerator(int GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator

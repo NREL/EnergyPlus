@@ -95,7 +95,6 @@ namespace ICEngineElectricGenerator {
 
     // Object Data
     Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-    Array1D<ReportVars> ICEngineGeneratorReport;
 
     void SimICEngineGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
@@ -154,17 +153,10 @@ namespace ICEngineElectricGenerator {
                                 Real64 &ThermalEnergy    // heat energy
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        GeneratorPower = ICEngineGeneratorReport(GeneratorIndex).PowerGen;
-        GeneratorEnergy = ICEngineGeneratorReport(GeneratorIndex).EnergyGen;
-        ThermalPower = ICEngineGeneratorReport(GeneratorIndex).QTotalHeatRecovered;
-        ThermalEnergy = ICEngineGeneratorReport(GeneratorIndex).TotalHeatEnergyRec;
+        GeneratorPower = ICEngineGenerator(GeneratorIndex).ElecPowerGenerated;
+        GeneratorEnergy = ICEngineGenerator(GeneratorIndex).ElecEnergyGenerated;
+        ThermalPower = ICEngineGenerator(GeneratorIndex).QTotalHeatRecovered;
+        ThermalEnergy = ICEngineGenerator(GeneratorIndex).TotalHeatEnergyRec;
     }
 
     void SimICEPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
@@ -212,10 +204,10 @@ namespace ICEngineElectricGenerator {
                                         DataPlant::TypeOf_Generator_ICEngine,
                                         ICEngineGenerator(CompNum).HeatRecInletNodeNum,
                                         ICEngineGenerator(CompNum).HeatRecOutletNodeNum,
-                                        ICEngineGeneratorReport(CompNum).QTotalHeatRecovered,
-                                        ICEngineGeneratorReport(CompNum).HeatRecInletTemp,
-                                        ICEngineGeneratorReport(CompNum).HeatRecOutletTemp,
-                                        ICEngineGeneratorReport(CompNum).HeatRecMdot,
+                                        ICEngineGenerator(CompNum).QTotalHeatRecovered,
+                                                        ICEngineGenerator(CompNum).HeatRecInletTemp,
+                                                        ICEngineGenerator(CompNum).HeatRecOutletTemp,
+                                                        ICEngineGenerator(CompNum).HeatRecMdotActual,
                                         FirstHVACIteration);
     }
 
@@ -249,8 +241,6 @@ namespace ICEngineElectricGenerator {
 
         // ALLOCATE ARRAYS
         ICEngineGenerator.allocate(NumICEngineGenerators);
-
-        ICEngineGeneratorReport.allocate(NumICEngineGenerators);
 
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
         for (GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum) {
@@ -413,13 +403,13 @@ namespace ICEngineElectricGenerator {
         for (GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum) {
             SetupOutputVariable("Generator Produced Electric Power",
                                 OutputProcessor::Unit::W,
-                                ICEngineGeneratorReport(GeneratorNum).PowerGen,
+                                ICEngineGenerator(GeneratorNum).ElecPowerGenerated,
                                 "System",
                                 "Average",
                                 ICEngineGenerator(GeneratorNum).Name);
             SetupOutputVariable("Generator Produced Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ICEngineGeneratorReport(GeneratorNum).EnergyGen,
+                                ICEngineGenerator(GeneratorNum).ElecEnergyGenerated,
                                 "System",
                                 "Sum",
                                 ICEngineGenerator(GeneratorNum).Name,
@@ -431,13 +421,13 @@ namespace ICEngineElectricGenerator {
 
             SetupOutputVariable("Generator " + ICEngineGenerator(GeneratorNum).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
-                                ICEngineGeneratorReport(GeneratorNum).FuelEnergyUseRate,
+                                ICEngineGenerator(GeneratorNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
                                 ICEngineGenerator(GeneratorNum).Name);
             SetupOutputVariable("Generator " + ICEngineGenerator(GeneratorNum).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                ICEngineGeneratorReport(GeneratorNum).FuelEnergy,
+                                ICEngineGenerator(GeneratorNum).FuelEnergy,
                                 "System",
                                 "Sum",
                                 ICEngineGenerator(GeneratorNum).Name,
@@ -450,27 +440,27 @@ namespace ICEngineElectricGenerator {
             //    general fuel use report to match other generators.
             SetupOutputVariable("Generator Fuel HHV Basis Rate",
                                 OutputProcessor::Unit::W,
-                                ICEngineGeneratorReport(GeneratorNum).FuelEnergyUseRate,
+                                ICEngineGenerator(GeneratorNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
                                 ICEngineGenerator(GeneratorNum).Name);
             SetupOutputVariable("Generator Fuel HHV Basis Energy",
                                 OutputProcessor::Unit::J,
-                                ICEngineGeneratorReport(GeneratorNum).FuelEnergy,
+                                ICEngineGenerator(GeneratorNum).FuelEnergy,
                                 "System",
                                 "Sum",
                                 ICEngineGenerator(GeneratorNum).Name);
 
             SetupOutputVariable("Generator " + ICEngineGenerator(GeneratorNum).FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ICEngineGeneratorReport(GeneratorNum).FuelMdot,
+                                ICEngineGenerator(GeneratorNum).FuelMdot,
                                 "System",
                                 "Average",
                                 ICEngineGenerator(GeneratorNum).Name);
 
             SetupOutputVariable("Generator Exhaust Air Temperature",
                                 OutputProcessor::Unit::C,
-                                ICEngineGeneratorReport(GeneratorNum).ExhaustStackTemp,
+                                ICEngineGenerator(GeneratorNum).ExhaustStackTemp,
                                 "System",
                                 "Average",
                                 ICEngineGenerator(GeneratorNum).Name);
@@ -478,20 +468,20 @@ namespace ICEngineElectricGenerator {
             if (ICEngineGenerator(GeneratorNum).HeatRecActive) {
                 SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ICEngineGeneratorReport(GeneratorNum).HeatRecMdot,
+                                    ICEngineGenerator(GeneratorNum).HeatRecMdotActual,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Jacket Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    ICEngineGeneratorReport(GeneratorNum).QJacketRecovered,
+                                    ICEngineGenerator(GeneratorNum).QJacketRecovered,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
                 SetupOutputVariable("Generator Jacket Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    ICEngineGeneratorReport(GeneratorNum).JacketEnergyRec,
+                                    ICEngineGenerator(GeneratorNum).JacketEnergyRec,
                                     "System",
                                     "Sum",
                                     ICEngineGenerator(GeneratorNum).Name,
@@ -503,13 +493,13 @@ namespace ICEngineElectricGenerator {
 
                 SetupOutputVariable("Generator Lube Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    ICEngineGeneratorReport(GeneratorNum).QLubeOilRecovered,
+                                    ICEngineGenerator(GeneratorNum).QLubeOilRecovered,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
                 SetupOutputVariable("Generator Lube Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    ICEngineGeneratorReport(GeneratorNum).LubeOilEnergyRec,
+                                    ICEngineGenerator(GeneratorNum).LubeOilEnergyRec,
                                     "System",
                                     "Sum",
                                     ICEngineGenerator(GeneratorNum).Name,
@@ -521,13 +511,13 @@ namespace ICEngineElectricGenerator {
 
                 SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    ICEngineGeneratorReport(GeneratorNum).QExhaustRecovered,
+                                    ICEngineGenerator(GeneratorNum).QExhaustRecovered,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
                 SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    ICEngineGeneratorReport(GeneratorNum).ExhaustEnergyRec,
+                                    ICEngineGenerator(GeneratorNum).ExhaustEnergyRec,
                                     "System",
                                     "Sum",
                                     ICEngineGenerator(GeneratorNum).Name,
@@ -539,27 +529,27 @@ namespace ICEngineElectricGenerator {
 
                 SetupOutputVariable("Generator Produced Thermal Rate",
                                     OutputProcessor::Unit::W,
-                                    ICEngineGeneratorReport(GeneratorNum).QTotalHeatRecovered,
+                                    ICEngineGenerator(GeneratorNum).QTotalHeatRecovered,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
-                                    ICEngineGeneratorReport(GeneratorNum).TotalHeatEnergyRec,
+                                    ICEngineGenerator(GeneratorNum).TotalHeatEnergyRec,
                                     "System",
                                     "Sum",
                                     ICEngineGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ICEngineGeneratorReport(GeneratorNum).HeatRecInletTemp,
+                                    ICEngineGenerator(GeneratorNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ICEngineGeneratorReport(GeneratorNum).HeatRecOutletTemp,
+                                    ICEngineGenerator(GeneratorNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     ICEngineGenerator(GeneratorNum).Name);
@@ -996,23 +986,6 @@ namespace ICEngineElectricGenerator {
             HeatRecOutletNode = ICEngineGenerator(Num).HeatRecOutletNodeNum;
             DataLoopNode::Node(HeatRecOutletNode).Temp = ICEngineGenerator(Num).HeatRecOutletTemp;
         }
-        ICEngineGeneratorReport(Num).PowerGen = ICEngineGenerator(Num).ElecPowerGenerated;
-        ICEngineGeneratorReport(Num).QJacketRecovered = ICEngineGenerator(Num).QJacketRecovered;
-        ICEngineGeneratorReport(Num).QLubeOilRecovered = ICEngineGenerator(Num).QLubeOilRecovered;
-        ICEngineGeneratorReport(Num).QExhaustRecovered = ICEngineGenerator(Num).QExhaustRecovered;
-        ICEngineGeneratorReport(Num).QTotalHeatRecovered = ICEngineGenerator(Num).QTotalHeatRecovered;
-        ICEngineGeneratorReport(Num).FuelEnergyUseRate = ICEngineGenerator(Num).FuelEnergyUseRate;
-        ICEngineGeneratorReport(Num).EnergyGen = ICEngineGenerator(Num).ElecEnergyGenerated;
-        ICEngineGeneratorReport(Num).JacketEnergyRec = ICEngineGenerator(Num).JacketEnergyRec;
-        ICEngineGeneratorReport(Num).LubeOilEnergyRec = ICEngineGenerator(Num).LubeOilEnergyRec;
-        ICEngineGeneratorReport(Num).ExhaustEnergyRec = ICEngineGenerator(Num).ExhaustEnergyRec;
-        ICEngineGeneratorReport(Num).TotalHeatEnergyRec = ICEngineGenerator(Num).TotalHeatEnergyRec;
-        ICEngineGeneratorReport(Num).FuelEnergy = ICEngineGenerator(Num).FuelEnergy;
-        ICEngineGeneratorReport(Num).FuelMdot = ICEngineGenerator(Num).FuelMdot;
-        ICEngineGeneratorReport(Num).ExhaustStackTemp = ICEngineGenerator(Num).ExhaustStackTemp;
-        ICEngineGeneratorReport(Num).HeatRecInletTemp = ICEngineGenerator(Num).HeatRecInletTemp;
-        ICEngineGeneratorReport(Num).HeatRecOutletTemp = ICEngineGenerator(Num).HeatRecOutletTemp;
-        ICEngineGeneratorReport(Num).HeatRecMdot = ICEngineGenerator(Num).HeatRecMdotActual;
     }
 
 } // namespace ICEngineElectricGenerator
