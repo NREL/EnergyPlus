@@ -144,7 +144,6 @@ namespace ICEngineElectricGenerator {
 
         thisICE.InitICEngineGenerators(RunFlag, FirstHVACIteration);
         thisICE.CalcICEngineGeneratorModel(RunFlag, MyLoad);
-        UpdateICEngineGeneratorRecords(RunFlag, genNum);
     }
 
     void GetICEGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
@@ -781,6 +780,11 @@ namespace ICEngineElectricGenerator {
 
         this->FuelMdot = std::abs(FuelEnergyUseRate) / (FuelHeatingValue * KJtoJ);
         this->ExhaustStackTemp = ExhaustStackTemp;
+
+        if (this->HeatRecActive) {
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+        }
     }
 
     void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(Real64 const EnergyRecovered, Real64 const HeatRecMdot, Real64 &HRecRatio)
@@ -965,23 +969,6 @@ namespace ICEngineElectricGenerator {
                                      this->HRBranchNum,
                                      this->HRCompNum);
             }
-        }
-    }
-
-    void UpdateICEngineGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
-                                        int const genNum                  // Generator number
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Dan Fisher
-        //       DATE WRITTEN:    October 2000
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        if (ICEngineGenerator(genNum).HeatRecActive) {
-            int HeatRecOutletNode = ICEngineGenerator(genNum).HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = ICEngineGenerator(genNum).HeatRecOutletTemp;
         }
     }
 

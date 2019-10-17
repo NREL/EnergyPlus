@@ -187,10 +187,6 @@ namespace ICEngineElectricGenerator {
 
     void GetICEngineGeneratorInput();
 
-    void UpdateICEngineGeneratorRecords(bool RunFlag, // TRUE if Generator operating
-                                        int genNum       // Generator number
-    );
-
 } // namespace ICEngineElectricGenerator
 
 } // namespace EnergyPlus
