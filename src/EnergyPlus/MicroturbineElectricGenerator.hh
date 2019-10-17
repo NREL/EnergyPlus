@@ -167,6 +167,8 @@ namespace MicroturbineElectricGenerator {
         Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
         Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
         Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
+        std::string FuelType;
+        bool myFlag;
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -189,7 +191,7 @@ namespace MicroturbineElectricGenerator {
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
               HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true),
               MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
-              ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0)
+              ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0), myFlag(true)
         {
         }
 
@@ -203,6 +205,8 @@ namespace MicroturbineElectricGenerator {
         );
 
         void UpdateMTGeneratorRecords();
+
+        void setupOutputVars();
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators

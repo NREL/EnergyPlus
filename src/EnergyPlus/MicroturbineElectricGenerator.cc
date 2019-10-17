@@ -208,7 +208,6 @@ namespace MicroturbineElectricGenerator {
         //  This routine gets the input information for the Microturbine (MT) Generator model.
 
         bool ErrorsFound(false);
-        std::string FuelType;
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
         NumMTGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -422,14 +421,14 @@ namespace MicroturbineElectricGenerator {
             {
                 auto const SELECT_CASE_var(AlphArray(5));
                 if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    FuelType = "Gas";
+                    MTGenerator(GeneratorNum).FuelType = "Gas";
 
                 } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
-                    FuelType = "Gas";
+                    MTGenerator(GeneratorNum).FuelType = "Gas";
 
                 } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
                            (SELECT_CASE_var == "PROPANE GAS")) {
-                    FuelType = "Propane";
+                    MTGenerator(GeneratorNum).FuelType = "Propane";
 
                 } else {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
@@ -918,178 +917,181 @@ namespace MicroturbineElectricGenerator {
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
+    }
 
-        for (int GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
-            SetupOutputVariable("Generator Produced Electric Power",
+    void MTGeneratorSpecs::setupOutputVars()
+    {
+        SetupOutputVariable("Generator Produced Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->ElecPowerGenerated,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Produced Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->EnergyGen,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ElectricityProduced",
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Generator LHV Basis Electric Efficiency",
+                            OutputProcessor::Unit::None,
+                            this->ElectricEfficiencyLHV,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        //    Fuel specific report variables
+        SetupOutputVariable("Generator " + this->FuelType + " HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRateHHV,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator " + this->FuelType + " HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergyHHV,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            this->FuelType,
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Generator " + this->FuelType + " Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->FuelMdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        //    general fuel use report (to match other generators)
+        SetupOutputVariable("Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRateHHV,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergyHHV,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        //    Heat recovery (to water) report variables
+        if (this->HeatRecActive) {
+
+            SetupOutputVariable("Generator Produced Thermal Rate",
                                 OutputProcessor::Unit::W,
-                                MTGenerator(GeneratorNum).ElecPowerGenerated,
+                                this->QHeatRecovered,
                                 "System",
                                 "Average",
-                                MTGenerator(GeneratorNum).Name);
+                                this->Name);
 
-            SetupOutputVariable("Generator Produced Electric Energy",
+            SetupOutputVariable("Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
-                                MTGenerator(GeneratorNum).EnergyGen,
+                                this->ExhaustEnergyRec,
                                 "System",
                                 "Sum",
-                                MTGenerator(GeneratorNum).Name,
+                                this->Name,
                                 _,
-                                "ElectricityProduced",
-                                "COGENERATION",
+                                "ENERGYTRANSFER",
+                                "HEATRECOVERY",
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Generator LHV Basis Electric Efficiency",
+            SetupOutputVariable("Generator Thermal Efficiency LHV Basis",
                                 OutputProcessor::Unit::None,
-                                MTGenerator(GeneratorNum).ElectricEfficiencyLHV,
+                                this->ThermalEfficiencyLHV,
                                 "System",
                                 "Average",
-                                MTGenerator(GeneratorNum).Name);
+                                this->Name);
 
-            //    Fuel specific report variables
-            SetupOutputVariable("Generator " + FuelType + " HHV Basis Rate",
+            SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecInletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecOutletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Heat Recovery Water Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->HeatRecMdot,
+                                "System",
+                                "Average",
+                                this->Name);
+        }
+
+        if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
+            SetupOutputVariable("Generator Standby Electric Power",
                                 OutputProcessor::Unit::W,
-                                MTGenerator(GeneratorNum).FuelEnergyUseRateHHV,
+                                this->StandbyPowerRate,
                                 "System",
                                 "Average",
-                                MTGenerator(GeneratorNum).Name);
+                                this->Name);
 
-            SetupOutputVariable("Generator " + FuelType + " HHV Basis Energy",
+            SetupOutputVariable("Generator Standby Electric Energy",
                                 OutputProcessor::Unit::J,
-                                MTGenerator(GeneratorNum).FuelEnergyHHV,
+                                this->StandbyEnergy,
                                 "System",
                                 "Sum",
-                                MTGenerator(GeneratorNum).Name,
+                                this->Name,
                                 _,
-                                FuelType,
-                                "COGENERATION",
+                                "Electricity",
+                                "Cogeneration",
                                 _,
                                 "Plant");
+        }
 
-            SetupOutputVariable("Generator " + FuelType + " Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                MTGenerator(GeneratorNum).FuelMdot,
-                                "System",
-                                "Average",
-                                MTGenerator(GeneratorNum).Name);
-
-            //    general fuel use report (to match other generators)
-            SetupOutputVariable("Generator Fuel HHV Basis Rate",
+        if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
+            SetupOutputVariable("Generator Ancillary Electric Power",
                                 OutputProcessor::Unit::W,
-                                MTGenerator(GeneratorNum).FuelEnergyUseRateHHV,
+                                this->AncillaryPowerRate,
                                 "System",
                                 "Average",
-                                MTGenerator(GeneratorNum).Name);
+                                this->Name);
 
-            SetupOutputVariable("Generator Fuel HHV Basis Energy",
+            SetupOutputVariable("Generator Ancillary Electric Energy",
                                 OutputProcessor::Unit::J,
-                                MTGenerator(GeneratorNum).FuelEnergyHHV,
+                                this->AncillaryEnergy,
                                 "System",
                                 "Sum",
-                                MTGenerator(GeneratorNum).Name);
+                                this->Name);
+        }
 
-            //    Heat recovery (to water) report variables
-            if (MTGenerator(GeneratorNum).HeatRecActive) {
+        //   Report combustion air outlet conditions if exhaust air calculations are active
+        if (this->ExhAirCalcsActive) {
+            SetupOutputVariable("Generator Exhaust Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->ExhaustAirMassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
 
-                SetupOutputVariable("Generator Produced Thermal Rate",
-                                    OutputProcessor::Unit::W,
-                                    MTGenerator(GeneratorNum).QHeatRecovered,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Produced Thermal Energy",
-                                    OutputProcessor::Unit::J,
-                                    MTGenerator(GeneratorNum).ExhaustEnergyRec,
-                                    "System",
-                                    "Sum",
-                                    MTGenerator(GeneratorNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "HEATRECOVERY",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Thermal Efficiency LHV Basis",
-                                    OutputProcessor::Unit::None,
-                                    MTGenerator(GeneratorNum).ThermalEfficiencyLHV,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MTGenerator(GeneratorNum).HeatRecInletTemp,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MTGenerator(GeneratorNum).HeatRecOutletTemp,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Heat Recovery Water Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    MTGenerator(GeneratorNum).HeatRecMdot,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-            }
-
-            if (MTGenerator(GeneratorNum).StandbyPower > 0.0) { // Report Standby Power if entered by user
-                SetupOutputVariable("Generator Standby Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    MTGenerator(GeneratorNum).StandbyPowerRate,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Standby Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    MTGenerator(GeneratorNum).StandbyEnergy,
-                                    "System",
-                                    "Sum",
-                                    MTGenerator(GeneratorNum).Name,
-                                    _,
-                                    "Electricity",
-                                    "Cogeneration",
-                                    _,
-                                    "Plant");
-            }
-
-            if (MTGenerator(GeneratorNum).AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
-                SetupOutputVariable("Generator Ancillary Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    MTGenerator(GeneratorNum).AncillaryPowerRate,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Ancillary Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    MTGenerator(GeneratorNum).AncillaryEnergy,
-                                    "System",
-                                    "Sum",
-                                    MTGenerator(GeneratorNum).Name);
-            }
-            //   Report combustion air outlet conditions if exhaust air calculations are active
-            if (MTGenerator(GeneratorNum).ExhAirCalcsActive) {
-                SetupOutputVariable("Generator Exhaust Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    MTGenerator(GeneratorNum).ExhaustAirMassFlowRate,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-                SetupOutputVariable("Generator Exhaust Air Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MTGenerator(GeneratorNum).ExhaustAirTemperature,
-                                    "System",
-                                    "Average",
-                                    MTGenerator(GeneratorNum).Name);
-            }
+            SetupOutputVariable("Generator Exhaust Air Temperature",
+                                OutputProcessor::Unit::C,
+                                this->ExhaustAirTemperature,
+                                "System",
+                                "Average",
+                                this->Name);
         }
     }
 
@@ -1112,6 +1114,11 @@ namespace MicroturbineElectricGenerator {
 
         std::string const RoutineName("InitMTGenerators");
         bool errFlag;
+
+        if (this->myFlag) {
+            this->setupOutputVars();
+            this->myFlag = false;
+        }
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
