@@ -153,7 +153,6 @@ namespace MicroturbineElectricGenerator {
 
         thisMTG.InitMTGenerators(RunFlag, MyLoad, FirstHVACIteration);
         thisMTG.CalcMTGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
-        UpdateMTGeneratorRecords(GenNum);
     }
 
     void SimMTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
@@ -1922,46 +1921,34 @@ namespace MicroturbineElectricGenerator {
                     this->ExhaustAirHumRat);
             }
 
-        } // End of IF (MTGenerator(GeneratorNum)%ExhAirCalcsActive) THEN
-    }
-
-    void UpdateMTGeneratorRecords(int const Num) // Generator number
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         R. Raustad/D. Shirey
-        //       DATE WRITTEN   Mar 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //  Reporting and updating nodes if necessary.
-
-        if (MTGenerator(Num).HeatRecActive) {
-            DataLoopNode::Node(MTGenerator(Num).HeatRecOutletNodeNum).Temp = MTGenerator(Num).HeatRecOutletTemp;
         }
 
-        if (MTGenerator(Num).ExhAirCalcsActive) {
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirOutletNodeNum).MassFlowRate = MTGenerator(Num).ExhaustAirMassFlowRate;
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirInletNodeNum).MassFlowRate = MTGenerator(Num).ExhaustAirMassFlowRate;
-
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirOutletNodeNum).Temp = MTGenerator(Num).ExhaustAirTemperature;
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirOutletNodeNum).HumRat = MTGenerator(Num).ExhaustAirHumRat;
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirOutletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(MTGenerator(Num).CombustionAirInletNodeNum).MassFlowRateMaxAvail;
-            DataLoopNode::Node(MTGenerator(Num).CombustionAirOutletNodeNum).MassFlowRateMinAvail = DataLoopNode::Node(MTGenerator(Num).CombustionAirInletNodeNum).MassFlowRateMinAvail;
+        if (this->HeatRecActive) {
+            DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         }
 
-        MTGenerator(Num).EnergyGen = MTGenerator(Num).ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGenerator(Num).ExhaustEnergyRec = MTGenerator(Num).QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGenerator(Num).FuelEnergyHHV = MTGenerator(Num).FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        if (MTGenerator(Num).FuelEnergyUseRateLHV > 0.0) {
-            MTGenerator(Num).ElectricEfficiencyLHV = MTGenerator(Num).ElecPowerGenerated / MTGenerator(Num).FuelEnergyUseRateLHV;
-            MTGenerator(Num).ThermalEfficiencyLHV = MTGenerator(Num).QHeatRecovered / MTGenerator(Num).FuelEnergyUseRateLHV;
+        if (this->ExhAirCalcsActive) {
+            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
+            DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
+
+            DataLoopNode::Node(this->CombustionAirOutletNodeNum).Temp = this->ExhaustAirTemperature;
+            DataLoopNode::Node(this->CombustionAirOutletNodeNum).HumRat = this->ExhaustAirHumRat;
+            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMaxAvail;
+            DataLoopNode::Node(this->CombustionAirOutletNodeNum).MassFlowRateMinAvail = DataLoopNode::Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
+        }
+
+        this->EnergyGen = this->ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ExhaustEnergyRec = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        if (this->FuelEnergyUseRateLHV > 0.0) {
+            this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
+            this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
         } else {
-            MTGenerator(Num).ElectricEfficiencyLHV = 0.0;
-            MTGenerator(Num).ThermalEfficiencyLHV = 0.0;
+            this->ElectricEfficiencyLHV = 0.0;
+            this->ThermalEfficiencyLHV = 0.0;
         }
-        MTGenerator(Num).AncillaryEnergy = MTGenerator(Num).AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        MTGenerator(Num).StandbyEnergy = MTGenerator(Num).StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
     void GetMTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208

@@ -228,8 +228,6 @@ namespace MicroturbineElectricGenerator {
 
     void GetMTGeneratorInput();
 
-    void UpdateMTGeneratorRecords(int Num); // Generator number
-
     void GetMTGeneratorResults(int GeneratorType, // type of Generator !unused1208
                                int GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
