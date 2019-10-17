@@ -90,125 +90,37 @@ namespace ICEngineElectricGenerator {
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
 
-    int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
     bool getICEInput(true);       // When TRUE, calls subroutine to read input file.
+    int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
 
     // Object Data
     Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
 
-    void SimICEngineGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
-                              std::string const &GeneratorName,   // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool const RunFlag,  // simulate Generator when TRUE
-                              Real64 const MyLoad, // demand on electric generator
-                              bool const FirstHVACIteration)
+    void clear_state()
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Dan Fisher
-        //       DATE WRITTEN   Sept. 2000
-        //       RE-ENGINEERED  na
+        getICEInput = true;
+        NumICEngineGenerators = 0;
+        ICEngineGenerator.deallocate();
+    }
 
-        // PURPOSE OF THIS SUBROUTINE: This is the IC ENGINE Generator model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        int genNum; // Generator number counter
-
-        // Get Generator data from input file
+    PlantComponent *ICEngineGeneratorSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data for ICEGen if it hasn't been done already
         if (getICEInput) {
             GetICEngineGeneratorInput();
             getICEInput = false;
         }
 
-        // SELECT and CALL MODELS
-        if (GeneratorIndex == 0) {
-            genNum = UtilityRoutines::FindItemInList(GeneratorName, ICEngineGenerator);
-            if (genNum == 0) ShowFatalError("SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName);
-            GeneratorIndex = genNum;
-        } else {
-            genNum = GeneratorIndex;
-            if (genNum > NumICEngineGenerators || genNum < 1) {
-                ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) +
-                               ", Number of IC Engine Generators=" + General::TrimSigDigits(NumICEngineGenerators) + ", Generator name=" + GeneratorName);
-            }
-            if (ICEngineGenerator(genNum).CheckEquipName) {
-                if (GeneratorName != ICEngineGenerator(genNum).Name) {
-                    ShowFatalError("SimICEngineGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) +
-                                   ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + ICEngineGenerator(genNum).Name);
-                }
-                ICEngineGenerator(genNum).CheckEquipName = false;
+        // Now look for this particular generator in the list
+        for (auto &thisICE : ICEngineGenerator) {
+            if (thisICE.Name == objectName) {
+                return &thisICE;
             }
         }
-
-        auto &thisICE = ICEngineGenerator(genNum);
-
-        thisICE.InitICEngineGenerators(RunFlag, FirstHVACIteration);
-        thisICE.CalcICEngineGeneratorModel(RunFlag, MyLoad);
-    }
-
-    void GetICEGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
-                                int const GeneratorIndex,
-                                Real64 &GeneratorPower,  // electrical power
-                                Real64 &GeneratorEnergy, // electrical energy
-                                Real64 &ThermalPower,    // heat power
-                                Real64 &ThermalEnergy    // heat energy
-    )
-    {
-        GeneratorPower = ICEngineGenerator(GeneratorIndex).ElecPowerGenerated;
-        GeneratorEnergy = ICEngineGenerator(GeneratorIndex).ElecEnergyGenerated;
-        ThermalPower = ICEngineGenerator(GeneratorIndex).QTotalHeatRecovered;
-        ThermalEnergy = ICEngineGenerator(GeneratorIndex).TotalHeatEnergyRec;
-    }
-
-    void SimICEPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
-                                 std::string const &CompName,
-                                 int const EP_UNUSED(CompTypeNum),
-                                 int &CompNum,
-                                 bool const EP_UNUSED(RunFlag),
-                                 bool &InitLoopEquip,
-                                 Real64 &EP_UNUSED(MyLoad),
-                                 Real64 &MaxCap,
-                                 Real64 &MinCap,
-                                 Real64 &OptCap,
-                                 bool const FirstHVACIteration // TRUE if First iteration of simulation
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         BGriffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Fill data needed in PlantLoopEquipments
-
-        if (getICEInput) {
-            GetICEngineGeneratorInput();
-            getICEInput = false;
-        }
-
-        if (InitLoopEquip) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, ICEngineGenerator);
-            if (CompNum == 0) {
-                ShowFatalError("SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName);
-                return;
-            }
-            MinCap = 0.0;
-            MaxCap = 0.0;
-            OptCap = 0.0;
-            return;
-        } // End Of InitLoopEquip
-
-        PlantUtilities::UpdateComponentHeatRecoverySide(ICEngineGenerator(CompNum).HRLoopNum,
-                                        ICEngineGenerator(CompNum).HRLoopSideNum,
-                                        DataPlant::TypeOf_Generator_ICEngine,
-                                        ICEngineGenerator(CompNum).HeatRecInletNodeNum,
-                                        ICEngineGenerator(CompNum).HeatRecOutletNodeNum,
-                                        ICEngineGenerator(CompNum).QTotalHeatRecovered,
-                                                        ICEngineGenerator(CompNum).HeatRecInletTemp,
-                                                        ICEngineGenerator(CompNum).HeatRecOutletTemp,
-                                                        ICEngineGenerator(CompNum).HeatRecMdotActual,
-                                        FirstHVACIteration);
+        // If we didn't find it, fatal
+        ShowFatalError("LocalICEngineGeneratorFactory: Error getting inputs for internal combustion engine generator named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void GetICEngineGeneratorInput()
@@ -564,10 +476,30 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void ICEngineGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void ICEngineGeneratorSpecs::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        MaxLoad = 0.0;
+        MinLoad = 0.0;
+        OptLoad = 0.0;
+    }
+
+    void ICEngineGeneratorSpecs::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration,
                                           Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
+        // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
+        // calls from the plant side only update the plant nodes.
+        // calls from the ElectricPowerServiceManger call the init and calculation worker functions directly.
 
+        PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        DataPlant::TypeOf_Generator_ICEngine,
+                                                        this->HeatRecInletNodeNum,
+                                                        this->HeatRecOutletNodeNum,
+                                                        this->QTotalHeatRecovered,
+                                                        this->HeatRecInletTemp,
+                                                        this->HeatRecOutletTemp,
+                                                        this->HeatRecMdotActual,
+                                                        FirstHVACIteration);
     }
 
     void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(bool const RunFlag, Real64 const MyLoad)

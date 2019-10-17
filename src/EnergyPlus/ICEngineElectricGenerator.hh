@@ -160,37 +160,13 @@ namespace ICEngineElectricGenerator {
         void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot,  Real64 &HRecRatio);
 
         void setupOutputVars();
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-
-    void SimICEngineGenerator(int GeneratorType,          // type of Generator
-                              std::string const &GeneratorName, // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool RunFlag,  // simulate Generator when TRUE
-                              Real64 MyLoad, // demand on electric generator
-                              bool FirstHVACIteration);
-
-    void GetICEGeneratorResults(int GeneratorType, // type of Generator
-                                int GeneratorIndex,
-                                Real64 &GeneratorPower,  // electrical power
-                                Real64 &GeneratorEnergy, // electrical energy
-                                Real64 &ThermalPower,    // heat power
-                                Real64 &ThermalEnergy    // heat energy
-    );
-
-    void SimICEPlantHeatRecovery(std::string const &CompType,
-                                 std::string const &CompName,
-                                 int CompTypeNum,
-                                 int &CompNum,
-                                 bool RunFlag,
-                                 bool &InitLoopEquip,
-                                 Real64 &MyLoad,
-                                 Real64 &MaxCap,
-                                 Real64 &MinCap,
-                                 Real64 &OptCap,
-                                 bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
 
     void GetICEngineGeneratorInput();
 
