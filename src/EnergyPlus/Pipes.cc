@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -107,8 +108,8 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumLocalPipes(0);
-    bool GetPipeInputFlag(true);
+    //!$int NumLocalPipes(0);
+    //!$bool GetPipeInputFlag(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
@@ -119,8 +120,8 @@ namespace Pipes {
     // Functions
     void clear_state()
     {
-        NumLocalPipes = 0;
-        GetPipeInputFlag = true;
+        ep_globals.NumLocalPipes = 0;
+        ep_globals.GetPipeInputFlag = true;
         LocalPipe.deallocate();
         LocalPipeUniqueNames.clear();
     }
@@ -128,9 +129,9 @@ namespace Pipes {
     PlantComponent *LocalPipeData::factory(int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (GetPipeInputFlag) {
+        if (ep_globals.GetPipeInputFlag) {
             GetPipeInput();
-            GetPipeInputFlag = false;
+            ep_globals.GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -213,9 +214,9 @@ namespace Pipes {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(NumLocalPipes));
+        ep_globals.NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(ep_globals.NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(ep_globals.NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {

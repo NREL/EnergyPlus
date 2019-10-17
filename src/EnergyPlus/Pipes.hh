@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -73,8 +74,8 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    extern int NumLocalPipes;
-    extern bool GetPipeInputFlag;
+    //!$extern int NumLocalPipes;
+    //!$extern bool GetPipeInputFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 

@@ -61,9 +61,13 @@ struct Globals
     // MODULE PARAMETER DEFINITIONS
     int const EndZoneSizingCalc = 4;
 
-    // MODULE VARIABLE DECLARATIONS: ExteriorEnergyUse
+    // MODULE VARIABLE DECLARATIONS: 
+    //ExteriorEnergyUse
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+    // Pipes
+    int NumLocalPipes = 0;
+    bool GetPipeInputFlag = true;
 
     //MODULE VARIABLE DECLARATION: Fans
     int NumFans = 0;
