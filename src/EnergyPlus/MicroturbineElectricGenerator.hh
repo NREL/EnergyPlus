@@ -199,8 +199,10 @@ namespace MicroturbineElectricGenerator {
 
         void CalcMTGeneratorModel(bool RunFlag,           // TRUE when generator is being asked to operate
                                   Real64 MyLoad,          // Generator demand (W)
-                                  bool FirstHVACIteration // unused1208
+                                  bool FirstHVACIteration
         );
+
+        void UpdateMTGeneratorRecords();
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators

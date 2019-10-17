@@ -153,6 +153,7 @@ namespace MicroturbineElectricGenerator {
 
         thisMTG.InitMTGenerators(RunFlag, MyLoad, FirstHVACIteration);
         thisMTG.CalcMTGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
+        thisMTG.UpdateMTGeneratorRecords();
     }
 
     void SimMTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
@@ -168,7 +169,6 @@ namespace MicroturbineElectricGenerator {
                                 bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation !unused1208
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
         //       DATE WRITTEN   March 2008
@@ -1920,8 +1920,19 @@ namespace MicroturbineElectricGenerator {
                     this->ExhaustAirHumRat,
                     this->ExhaustAirHumRat);
             }
-
         }
+    }
+
+    void MTGeneratorSpecs::UpdateMTGeneratorRecords()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         R. Raustad/D. Shirey
+        //       DATE WRITTEN   Mar 2008
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //  Reporting and updating nodes if necessary.
 
         if (this->HeatRecActive) {
             DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
@@ -1959,7 +1970,6 @@ namespace MicroturbineElectricGenerator {
                                Real64 &ThermalEnergy    // heat energy
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   March 2008
