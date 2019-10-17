@@ -67,7 +67,7 @@ namespace ICEngineElectricGenerator {
     // off of when calculated exhaust energies.
 
     extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
-    extern bool GetICEInput;          // When TRUE, calls subroutine to read input file.
+    extern bool getICEInput;          // When TRUE, calls subroutine to read input file.
 
     struct ICEngineGeneratorSpecs
     {
@@ -181,24 +181,24 @@ namespace ICEngineElectricGenerator {
 
     void GetICEngineGeneratorInput();
 
-    void CalcICEngineGeneratorModel(int GeneratorNum, // Generator number
+    void CalcICEngineGeneratorModel(int genNum, // Generator number
                                     bool RunFlag,     // TRUE when Generator operating
                                     Real64 MyLoad,    // Generator demand
                                     bool FirstHVACIteration);
 
-    void CalcICEngineGenHeatRecovery(int Num,                // HR Component number
+    void CalcICEngineGenHeatRecovery(int genNum,                // HR Component number
                                      Real64 EnergyRecovered, // Amount of heat recovered
                                      Real64 HeatRecMdot,
                                      Real64 &HRecRatio // Max Heat recovery ratio
     );
 
-    void InitICEngineGenerators(int GeneratorNum, // Generator number
+    void InitICEngineGenerators(int genNum, // Generator number
                                 bool RunFlag,     // TRUE when Generator operating
                                 Real64 MyLoad,    // Generator demand
                                 bool FirstHVACIteration);
 
     void UpdateICEngineGeneratorRecords(bool RunFlag, // TRUE if Generator operating
-                                        int Num       // Generator number
+                                        int genNum       // Generator number
     );
 
 } // namespace ICEngineElectricGenerator
