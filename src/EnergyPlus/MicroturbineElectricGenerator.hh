@@ -192,6 +192,15 @@ namespace MicroturbineElectricGenerator {
               ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0)
         {
         }
+
+        void InitMTGenerators( bool RunFlag,
+                              Real64 MyLoad, // electrical load in W
+                              bool FirstHVACIteration);
+
+        void CalcMTGeneratorModel(bool RunFlag,           // TRUE when generator is being asked to operate
+                                  Real64 MyLoad,          // Generator demand (W)
+                                  bool FirstHVACIteration // unused1208
+        );
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
@@ -218,17 +227,6 @@ namespace MicroturbineElectricGenerator {
     );
 
     void GetMTGeneratorInput();
-
-    void InitMTGenerators(int GenNum,
-                          bool RunFlag,
-                          Real64 MyLoad, // electrical load in W
-                          bool FirstHVACIteration);
-
-    void CalcMTGeneratorModel(int GeneratorNum,       // Generator number
-                              bool RunFlag,           // TRUE when generator is being asked to operate
-                              Real64 MyLoad,          // Generator demand (W)
-                              bool FirstHVACIteration // unused1208
-    );
 
     void UpdateMTGeneratorRecords(int Num); // Generator number
 
