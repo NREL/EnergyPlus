@@ -99,8 +99,6 @@ namespace MicroturbineElectricGenerator {
     int NumMTGenerators(0); // number of MT Generators specified in input
     bool GetMTInput(true);  // then TRUE, calls subroutine to read input file.
 
-    Array1D_bool CheckEquipName;
-
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
     Array1D<ReportVars> MTGeneratorReport;
@@ -145,12 +143,12 @@ namespace MicroturbineElectricGenerator {
                                ", Number of CT Engine Generators = " + General::TrimSigDigits(NumMTGenerators) + ", Generator name = " + GeneratorName);
             }
 
-            if (CheckEquipName(GenNum)) {
+            if (MTGenerator(GenNum).CheckEquipName) {
                 if (GeneratorName != MTGenerator(GenNum).Name) {
                     ShowFatalError("SimMTGenerator: Invalid GeneratorIndex passed = " + General::TrimSigDigits(GenNum) +
                                    ", Generator name = " + GeneratorName + ", stored Generator Name for that index = " + MTGenerator(GenNum).Name);
                 }
-                CheckEquipName(GenNum) = false;
+                MTGenerator(GenNum).CheckEquipName = false;
             }
         }
 
@@ -250,7 +248,6 @@ namespace MicroturbineElectricGenerator {
         // ALLOCATE ARRAYS
         MTGenerator.allocate(NumMTGenerators);
         MTGeneratorReport.allocate(NumMTGenerators);
-        CheckEquipName.dimension(NumMTGenerators, true);
 
         // LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
         for (GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum) {
@@ -1317,7 +1314,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ElecEfficiencyFTemp;     // Electrical efficiency as a function of temperature curve output
         Real64 ElecEfficiencyFPLR;      // Electrical efficiency as a function of PLR curve output
         Real64 ThermalEffFTempElev;     // Thermal efficiency as a function of air temperature and elevation
-        Real64 PLR;                     // Generator operating part load ratio
+        Real64 PLR(0.0);                     // Generator operating part load ratio
         Real64 PowerFTempElev;          // Power ratio as a function of inlet air temperature and elevation
         Real64 CombustionAirInletTemp;  // Combustion air inlet temperature (C)
         Real64 CombustionAirInletPress; // Barometric pressure of combustion inlet air (Pa)
@@ -1330,13 +1327,12 @@ namespace MicroturbineElectricGenerator {
         Real64 ExhaustAirTemp;          // Actual exhaust air temperature (accounting for temp and PLR modifier curves)
         Real64 CpAir;                   // Heat capacity of air (J/kg-C)
         Real64 H2OHtOfVap;              // Heat of vaporization of water (J/kg)
-        Real64 ActualElevation;         // Actual elevation of the microturbine (m)
         Real64 AirDensity;              // Density of air at actual combustion inlet air conditions (kg/m3)
 
-        Real64 ElecPowerGenerated;  // Generator electric power output (W)
+        Real64 ElecPowerGenerated(0.0);  // Generator electric power output (W)
         Real64 FullLoadPowerOutput; // Generator full-load power output at actual inlet conditions and elevation (W)
 
-        Real64 FuelUseEnergyRateLHV;   // Rate of fuel energy required to run microturbine, LHV basis (W)
+        Real64 FuelUseEnergyRateLHV(0.0);   // Rate of fuel energy required to run microturbine, LHV basis (W)
         Real64 QHeatRecToWater;        // Recovered waste heat to water (W)
         Real64 MinHeatRecMdot;         // Heat recovery flow rate if minimal heat recovery is accomplished (kg/s)
         int HeatRecInNode;             // Heat recovery fluid inlet DataLoopNode::Node number
@@ -1348,13 +1344,13 @@ namespace MicroturbineElectricGenerator {
         Real64 HeatRecRateFPLR;        // Heat recovery rate as a function of PLR curve output
         Real64 HeatRecRateFTemp;       // Heat recovery rate as a function of inlet water temp curve output
         Real64 HeatRecRateFFlow;       // Heat recovery rate as a function of water flow rate curve output
-        Real64 FuelHigherHeatingValue; // Higher heating value (HHV) of fuel (kJ/kg)
+        Real64 FuelHigherHeatingValue(0.0); // Higher heating value (HHV) of fuel (kJ/kg)
         Real64 FuelLowerHeatingValue;  // Lower heating value (LLV) of fuel kJ/kg)
         Real64 HRecRatio;              // When maximum temperature is reached the amount of recovered heat has to be reduced
         Real64 AncillaryPowerRate;     // Ancillary power used by pump (if not specified in manufacturers data)
         Real64 AncillaryPowerRateLast; // Ancillary power used by pump from last iteration (iteration loop within this subroutine)
         Real64 AncillaryPowerRateDiff; // Difference between ancillary power rate and ancillary power rate last (last iteration)
-        Real64 AnciPowerFMdotFuel;     // Ancillary power as a function of fuel flow curve output
+        Real64 AnciPowerFMdotFuel(0.0);     // Ancillary power as a function of fuel flow curve output
         int AncPowerCalcIterIndex;     // Index for subroutine iteration loop if Ancillary Power (function of fuel flow) is used
         Real64 rho;                    // local fluid density
 
@@ -1379,7 +1375,6 @@ namespace MicroturbineElectricGenerator {
         MTGenerator(GeneratorNum).ExhaustAirMassFlowRate = 0.0;
         MTGenerator(GeneratorNum).ExhaustAirTemperature = 0.0;
         MTGenerator(GeneratorNum).ExhaustAirHumRat = 0.0;
-        ExhAirTempFTemp = 0.0;
         QHeatRecToWater = 0.0;
 
         if (MTGenerator(GeneratorNum).HeatRecActive) {
@@ -1401,14 +1396,11 @@ namespace MicroturbineElectricGenerator {
             CombustionAirInletTemp = DataEnvironment::OutDryBulbTemp;
             CombustionAirInletW = DataEnvironment::OutHumRat;
             CombustionAirInletPress = DataEnvironment::OutBaroPress;
-            ActualElevation = DataEnvironment::Elevation; // from DataEnvironment
         } else {                         // use inlet node information
             CombustionAirInletTemp = DataLoopNode::Node(MTGenerator(GeneratorNum).CombustionAirInletNodeNum).Temp;
             CombustionAirInletW = DataLoopNode::Node(MTGenerator(GeneratorNum).CombustionAirInletNodeNum).HumRat;
             CombustionAirInletPress = DataLoopNode::Node(MTGenerator(GeneratorNum).CombustionAirInletNodeNum).Press;
-            ActualElevation = DataEnvironment::Elevation; // from DataEnvironment
             if (DataLoopNode::Node(MTGenerator(GeneratorNum).CombustionAirInletNodeNum).Height > 0.0) {
-                ActualElevation = DataEnvironment::Elevation + DataLoopNode::Node(MTGenerator(GeneratorNum).CombustionAirInletNodeNum).Height;
             }
             //     Initialize combustion outlet air conditions to inlet air conditions (all node properties)
             if (MTGenerator(GeneratorNum).ExhAirCalcsActive) {
@@ -1457,7 +1449,6 @@ namespace MicroturbineElectricGenerator {
         FullLoadPowerOutput = max(FullLoadPowerOutput, MTGenerator(GeneratorNum).MinElecPowerOutput);
 
         AncillaryPowerRate = MTGenerator(GeneratorNum).AncillaryPower;
-        AncillaryPowerRateLast = AncillaryPowerRate;
         AncillaryPowerRateDiff = AncPowerDiffToler + 1.0; // Initialize to force through DO WHILE Loop at least once
         AncPowerCalcIterIndex = 0;                        // Initialize iteration index (counter)
 
@@ -1720,7 +1711,6 @@ namespace MicroturbineElectricGenerator {
             }
 
             //     Now verify the maximum heat recovery temperature was not exceeded
-            HRecRatio = 1.0;
             MinHeatRecMdot = 0.0;
             if (HeatRecOutTemp > MTGenerator(GeneratorNum).HeatRecMaxWaterTemp) {
 
@@ -1967,14 +1957,12 @@ namespace MicroturbineElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         //  Reporting and updating nodes if necessary.
 
-        int HeatRecInletNode;       // Node number for heat recovery (water) inlet node
         int HeatRecOutletNode;      // Node number for heat recovery (water) outlet node
         int ExhaustAirNodeNum;      // Node number for exhaust air node
         int CombustAirInletNodeNum; // Node number for combustion inlet air node
 
         if (MTGenerator(Num).HeatRecActive) {
 
-            HeatRecInletNode = MTGenerator(Num).HeatRecInletNodeNum;
             HeatRecOutletNode = MTGenerator(Num).HeatRecOutletNodeNum;
             DataLoopNode::Node(HeatRecOutletNode).Temp = MTGenerator(Num).HeatRecOutletTemp;
         }

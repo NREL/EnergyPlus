@@ -65,8 +65,6 @@ namespace MicroturbineElectricGenerator {
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
 
-    extern Array1D_bool CheckEquipName;
-
     struct MTGeneratorSpecs
     {
         // Members
@@ -159,6 +157,7 @@ namespace MicroturbineElectricGenerator {
         int HeatRecRateFTempErrorIndex; // Index to heat recovery rate as a function of temp warning messages
         int HeatRecRateFFlowErrorIndex; // Index to heat recovery rate as a function of flow warning messages
         int ThermEffFTempElevErrorIndex; // Index to thermal efficiency as a function of temp/elevation warnings
+        bool CheckEquipName;
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -179,7 +178,7 @@ namespace MicroturbineElectricGenerator {
               PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
-              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0)
+              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true)
         {
         }
     };
@@ -219,51 +218,51 @@ namespace MicroturbineElectricGenerator {
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
     extern Array1D<ReportVars> MTGeneratorReport;
 
-    void SimMTGenerator(int const GeneratorType,          // Type of generator !unused1208
+    void SimMTGenerator(int GeneratorType,          // Type of generator !unused1208
                         std::string const &GeneratorName, // User-specified name of generator
                         int &GeneratorIndex,              // Index to microturbine generator
-                        bool const RunFlag,               // Simulate generator when TRUE
-                        Real64 const MyLoad,              // Generator demand (W)
-                        bool const FirstHVACIteration     // Simulation flag for First HVAC (system) iteration
+                        bool RunFlag,               // Simulate generator when TRUE
+                        Real64 MyLoad,              // Generator demand (W)
+                        bool FirstHVACIteration     // Simulation flag for First HVAC (system) iteration
     );
 
-    void SimMTPlantHeatRecovery(std::string const &CompType, // unused1208
+    void SimMTPlantHeatRecovery(std::string const &CompType,
                                 std::string const &CompName,
-                                int const CompTypeNum, // unused1208
+                                int CompTypeNum,
                                 int &CompNum,
-                                bool const RunFlag, // unused1208
+                                bool RunFlag,
                                 bool &InitLoopEquip,
-                                Real64 &MyLoad, // unused1208
+                                Real64 &MyLoad,
                                 Real64 &MaxCap,
                                 Real64 &MinCap,
                                 Real64 &OptCap,
-                                bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
+                                bool FirstHVACIteration // TRUE if First iteration of simulation !unused1208
     );
 
     void GetMTGeneratorInput();
 
-    void InitMTGenerators(int const GenNum,
-                          bool const RunFlag,
-                          Real64 const MyLoad, // electrical load in W
-                          bool const FirstHVACIteration);
+    void InitMTGenerators(int GenNum,
+                          bool RunFlag,
+                          Real64 MyLoad, // electrical load in W
+                          bool FirstHVACIteration);
 
-    void CalcMTGeneratorModel(int const GeneratorNum,       // Generator number
-                              bool const RunFlag,           // TRUE when generator is being asked to operate
-                              Real64 const MyLoad,          // Generator demand (W)
-                              bool const FirstHVACIteration // unused1208
+    void CalcMTGeneratorModel(int GeneratorNum,       // Generator number
+                              bool RunFlag,           // TRUE when generator is being asked to operate
+                              Real64 MyLoad,          // Generator demand (W)
+                              bool FirstHVACIteration // unused1208
     );
 
-    void UpdateMTGeneratorRecords(int const Num); // Generator number
+    void UpdateMTGeneratorRecords(int Num); // Generator number
 
-    void GetMTGeneratorResults(int const GeneratorType, // type of Generator !unused1208
-                               int const GeneratorIndex,
+    void GetMTGeneratorResults(int GeneratorType, // type of Generator !unused1208
+                               int GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
                                Real64 &ThermalPower,    // heat power
                                Real64 &ThermalEnergy    // heat energy
     );
 
-    void GetMTGeneratorExhaustNode(int const CompType, std::string const &CompName, int &ExhaustOutletNodeNum);
+    void GetMTGeneratorExhaustNode(int CompType, std::string const &CompName, int &ExhaustOutletNodeNum);
 
 } // namespace MicroturbineElectricGenerator
 
