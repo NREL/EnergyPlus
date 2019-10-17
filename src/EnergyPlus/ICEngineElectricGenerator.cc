@@ -520,18 +520,6 @@ namespace ICEngineElectricGenerator {
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
-        // min allowed operating frac full load
-        Real64 MinPartLoadRat = this->MinPartLoadRat;
-
-        // max allowed operating frac full load
-        Real64 MaxPartLoadRat = this->MaxPartLoadRat;
-
-        // Generator nominal capacity (W)
-        Real64 RatedPowerOutput = this->RatedPowerOutput;
-
-        // curve fit parameter
-        Real64 MaxExhaustperPowerOutput = this->MaxExhaustperPowerOutput;
-
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;
 
@@ -572,25 +560,25 @@ namespace ICEngineElectricGenerator {
         }
 
         // Generator output (W)
-        Real64 ElecPowerGenerated = min(MyLoad, RatedPowerOutput);
-        ElecPowerGenerated = max(ElecPowerGenerated, 0.0);
+        Real64 elecPowerGenerated = min(MyLoad, this->RatedPowerOutput);
+        elecPowerGenerated = max(elecPowerGenerated, 0.0);
 
         // Generator operating part load ratio
-        Real64 PLR = min(ElecPowerGenerated / RatedPowerOutput, MaxPartLoadRat);
-        PLR = max(PLR, MinPartLoadRat);
-        ElecPowerGenerated = PLR * RatedPowerOutput;
+        Real64 PLR = min(elecPowerGenerated / this->RatedPowerOutput, this->MaxPartLoadRat);
+        PLR = max(PLR, this->MinPartLoadRat);
+        elecPowerGenerated = PLR * this->RatedPowerOutput;
 
         // DETERMINE FUEL CONSUMED AND AVAILABLE WASTE HEAT
 
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
         // energy input is calculated in J/s.  The PLBasedFuelInputCurve selects ratio of fuel flow (J/s)/power generated (J/s).
-        Real64 FuelEnergyUseRate; // IC ENGINE fuel use rate (W)
+        Real64 fuelEnergyUseRate; // IC ENGINE fuel use rate (W)
         if (PLR > 0.0) {
             // (RELDC) Ratio of generator output to Fuel Energy Input
-            Real64 ElecOutputFuelRat = CurveManager::CurveValue(this->ElecOutputFuelCurve, PLR);
-            FuelEnergyUseRate = ElecPowerGenerated / ElecOutputFuelRat;
+            Real64 elecOutputFuelRat = CurveManager::CurveValue(this->ElecOutputFuelCurve, PLR);
+            fuelEnergyUseRate = elecPowerGenerated / elecOutputFuelRat;
         } else {
-            FuelEnergyUseRate = 0.0;
+            fuelEnergyUseRate = 0.0;
         }
 
         // Use Curve fit to determine heat recovered in the water jacket.  This curve calculates the water jacket heat recovered (J/s) by
@@ -598,94 +586,94 @@ namespace ICEngineElectricGenerator {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PLR);
+        Real64 recJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PLR);
 
         // water jacket heat recovered (W)
-        Real64 QJacketRec = FuelEnergyUseRate * RecJacHeattoFuelRat;
+        Real64 QJacketRec = fuelEnergyUseRate * recJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant heat.  This curve calculates the lube heat recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PLR);
+        Real64 recLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PLR);
 
         // lube oil cooler heat recovered (W)
-        Real64 QLubeOilRec = FuelEnergyUseRate * RecLubeHeattoFuelRat;
+        Real64 QLubeOilRec = fuelEnergyUseRate * recLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  heat recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
 
         // (REXDC) Total Exhaust Energy Input to Fuel Energy Input
-        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PLR);
+        Real64 totExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PLR);
 
         // total engine exhaust heat (W)
-        Real64 QExhaustTotal = FuelEnergyUseRate * TotExhausttoFuelRat;
+        Real64 QExhaustTotal = fuelEnergyUseRate * totExhausttoFuelRat;
 
         // exhaust gas heat recovered (W)
         Real64 QExhaustRec;
 
         // engine stack temp. (C)
-        Real64 ExhaustStackTemp = 0.0;
+        Real64 exhaustStackTemp = 0.0;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PLR > 0.0) {
             // (TEX) Exhaust Gas Temp
-            Real64 ExhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PLR);
+            Real64 exhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PLR);
 
-            if (ExhaustTemp > ReferenceTemp) {
+            if (exhaustTemp > ReferenceTemp) {
 
                 // exhaust gas mass flow rate (kg/s)
-                Real64 ExhaustGasFlow = QExhaustTotal / (ExhaustCP * (ExhaustTemp - ReferenceTemp));
+                Real64 ExhaustGasFlow = QExhaustTotal / (ExhaustCP * (exhaustTemp - ReferenceTemp));
 
-                // Use Curve fit to determine stack temp after heat recovery
+                // Use Curve fit to determine stack exhaustTemp after heat recovery
                 // (UACDC) exhaust gas Heat Exchanger UA
-                Real64 UA = this->UACoef(1) * std::pow(RatedPowerOutput, this->UACoef(2));
+                Real64 UA_loc = this->UACoef(1) * std::pow(this->RatedPowerOutput, this->UACoef(2));
 
-                // design engine stact saturated steam temp. (C)
-                Real64 DesignMinExitGasTemp = this->DesignMinExitGasTemp;
+                // design engine stact saturated steam exhaustTemp. (C)
+                Real64 designMinExitGasTemp = this->DesignMinExitGasTemp;
 
-                ExhaustStackTemp =
-                    DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
-                                               std::exp(UA / (max(ExhaustGasFlow, MaxExhaustperPowerOutput * RatedPowerOutput) * ExhaustCP));
+                exhaustStackTemp =
+                        designMinExitGasTemp + (exhaustTemp - designMinExitGasTemp) /
+                                               std::exp(UA_loc / (max(ExhaustGasFlow, this->MaxExhaustperPowerOutput * this->RatedPowerOutput) * ExhaustCP));
 
-                QExhaustRec = max(ExhaustGasFlow * ExhaustCP * (ExhaustTemp - ExhaustStackTemp), 0.0);
+                QExhaustRec = max(ExhaustGasFlow * ExhaustCP * (exhaustTemp - exhaustStackTemp), 0.0);
             } else {
                 if (this->ErrExhaustTempIndex == 0) {
                     ShowWarningMessage("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" +
                                        this->Name + "\" low Exhaust Temperature from Curve Value");
-                    ShowContinueError("...curve generated temperature=[" + General::RoundSigDigits(ExhaustTemp, 3) + " C], PLR=[" + General::RoundSigDigits(PLR, 3) +
+                    ShowContinueError("...curve generated temperature=[" + General::RoundSigDigits(exhaustTemp, 3) + " C], PLR=[" + General::RoundSigDigits(PLR, 3) +
                                       "].");
                     ShowContinueError("...simulation will continue with exhaust heat reclaim set to 0.");
                 }
                 ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" +
                                                this->Name + "\" low Exhaust Temperature continues...",
                                                this->ErrExhaustTempIndex,
-                                               ExhaustTemp,
-                                               ExhaustTemp,
+                                               exhaustTemp,
+                                               exhaustTemp,
                                                _,
                                                "[C]",
                                                "[C]");
                 QExhaustRec = 0.0;
-                ExhaustStackTemp = this->DesignMinExitGasTemp;
+                exhaustStackTemp = this->DesignMinExitGasTemp;
             }
         } else {
             QExhaustRec = 0.0;
-            // Bug ExhaustStackTemp not set but used below
+            // Bug exhaustStackTemp not set but used below
         }
 
-        Real64 QTotalHeatRecovered = QExhaustRec + QLubeOilRec + QJacketRec;
+        Real64 qTotalHeatRecovered = QExhaustRec + QLubeOilRec + QJacketRec;
 
         // When Max Temp is reached the amount of recovered heat has to be reduced.
         Real64 HRecRatio;
 
         if (this->HeatRecActive) {
-            this->CalcICEngineGenHeatRecovery(QTotalHeatRecovered, HeatRecMdot, HRecRatio);
+            this->CalcICEngineGenHeatRecovery(qTotalHeatRecovered, HeatRecMdot, HRecRatio);
             QExhaustRec *= HRecRatio;
             QLubeOilRec *= HRecRatio;
             QJacketRec *= HRecRatio;
-            QTotalHeatRecovered *= HRecRatio;
+            qTotalHeatRecovered *= HRecRatio;
         } else {
             this->HeatRecInletTemp = HeatRecInTemp;
             this->HeatRecOutletTemp = HeatRecInTemp;
@@ -694,38 +682,38 @@ namespace ICEngineElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = ElecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // IC ENGINE fuel use (J)
-        Real64 FuelEnergyUsed = FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 FuelEnergyUsed = fuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // water jacket heat recovered (J)
-        Real64 JacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 jacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // lube oil cooler heat recovered (J)
-        Real64 LubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // exhaust gas heat recovered (J)
-        Real64 ExhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        this->ElecPowerGenerated = ElecPowerGenerated;
+        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
         this->QJacketRecovered = QJacketRec;
         this->QLubeOilRecovered = QLubeOilRec;
         this->QExhaustRecovered = QExhaustRec;
-        this->QTotalHeatRecovered = QTotalHeatRecovered;
-        this->JacketEnergyRec = JacketEnergyRec;
-        this->LubeOilEnergyRec = LubeOilEnergyRec;
-        this->ExhaustEnergyRec = ExhaustEnergyRec;
+        this->QTotalHeatRecovered = qTotalHeatRecovered;
+        this->JacketEnergyRec = jacketEnergyRec;
+        this->LubeOilEnergyRec = lubeOilEnergyRec;
+        this->ExhaustEnergyRec = exhaustEnergyRec;
         this->QTotalHeatRecovered = (QExhaustRec + QLubeOilRec + QJacketRec);
-        this->TotalHeatEnergyRec = (ExhaustEnergyRec + LubeOilEnergyRec + JacketEnergyRec);
-        this->FuelEnergyUseRate = std::abs(FuelEnergyUseRate);
+        this->TotalHeatEnergyRec = (exhaustEnergyRec + lubeOilEnergyRec + jacketEnergyRec);
+        this->FuelEnergyUseRate = std::abs(fuelEnergyUseRate);
         this->FuelEnergy = std::abs(FuelEnergyUsed);
 
         // Heating Value of Fuel in kJ/kg
-        Real64 FuelHeatingValue = this->FuelHeatingValue;
+        Real64 fuelHeatingValue = this->FuelHeatingValue;
 
-        this->FuelMdot = std::abs(FuelEnergyUseRate) / (FuelHeatingValue * KJtoJ);
-        this->ExhaustStackTemp = ExhaustStackTemp;
+        this->FuelMdot = std::abs(fuelEnergyUseRate) / (fuelHeatingValue * KJtoJ);
+        this->ExhaustStackTemp = exhaustStackTemp;
 
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
@@ -749,13 +737,10 @@ namespace ICEngineElectricGenerator {
 
         static std::string const RoutineName("CalcICEngineGeneratorModel");
 
-        // Load inputs to local structure
-        int HeatRecInNode = this->HeatRecInletNodeNum;
-
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
 
-        Real64 HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+        Real64 HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
         Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                           HeatRecInTemp,
                                           DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
@@ -847,9 +832,6 @@ namespace ICEngineElectricGenerator {
 
         if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
 
-            int HeatRecInletNode = this->HeatRecInletNodeNum;
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
@@ -861,8 +843,8 @@ namespace ICEngineElectricGenerator {
 
             PlantUtilities::InitComponentNodes(0.0,
                                this->DesignHeatRecMassFlowRate,
-                               HeatRecInletNode,
-                               HeatRecOutletNode,
+                               this->HeatRecInletNodeNum,
+                               this->HeatRecOutletNodeNum,
                                this->HRLoopNum,
                                this->HRLoopSideNum,
                                this->HRBranchNum,
