@@ -159,6 +159,8 @@ namespace ICEngineElectricGenerator {
 
         void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
+        void update();
+
         void setupOutputVars();
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;

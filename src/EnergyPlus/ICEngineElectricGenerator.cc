@@ -450,7 +450,7 @@ namespace ICEngineElectricGenerator {
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the plant nodes.
-        // calls from the ElectricPowerServiceManger call the init and calculation worker functions directly.
+        // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions directly.
 
         PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
                                                         this->HRLoopSideNum,
@@ -676,11 +676,6 @@ namespace ICEngineElectricGenerator {
 
         this->FuelMdot = std::abs(fuelEnergyUseRate) / (fuelHeatingValue * KJtoJ);
         this->ExhaustStackTemp = exhaustStackTemp;
-
-        if (this->HeatRecActive) {
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
-        }
     }
 
     void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(Real64 const EnergyRecovered, Real64 const HeatRecMdot, Real64 &HRecRatio)
@@ -862,6 +857,14 @@ namespace ICEngineElectricGenerator {
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             }
+        }
+    }
+
+    void ICEngineGeneratorSpecs::update()
+    {
+        if (this->HeatRecActive) {
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
 
