@@ -132,6 +132,7 @@ namespace ICEngineElectricGenerator {
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
         bool CheckEquipName;
+        bool myFlag;
 
         // Default Constructor
         ICEngineGeneratorSpecs()
@@ -144,7 +145,8 @@ namespace ICEngineElectricGenerator {
               HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0),
               FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
               FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
-              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true)
+              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true),
+              myFlag(true)
         {
         }
 
@@ -153,6 +155,8 @@ namespace ICEngineElectricGenerator {
         void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
 
         void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot,  Real64 &HRecRatio);
+
+        void setupOutputVars();
     };
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines

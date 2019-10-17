@@ -398,161 +398,169 @@ namespace ICEngineElectricGenerator {
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
+    }
 
-        for (genNum = 1; genNum <= NumICEngineGenerators; ++genNum) {
-            SetupOutputVariable("Generator Produced Electric Power",
-                                OutputProcessor::Unit::W,
-                                ICEngineGenerator(genNum).ElecPowerGenerated,
-                                "System",
-                                "Average",
-                                ICEngineGenerator(genNum).Name);
-            SetupOutputVariable("Generator Produced Electric Energy",
-                                OutputProcessor::Unit::J,
-                                ICEngineGenerator(genNum).ElecEnergyGenerated,
-                                "System",
-                                "Sum",
-                                ICEngineGenerator(genNum).Name,
-                                _,
-                                "ElectricityProduced",
-                                "COGENERATION",
-                                _,
-                                "Plant");
+    void ICEngineGeneratorSpecs::setupOutputVars()
+    {
+        SetupOutputVariable("Generator Produced Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->ElecPowerGenerated,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Generator " + ICEngineGenerator(genNum).FuelType + " Rate",
-                                OutputProcessor::Unit::W,
-                                ICEngineGenerator(genNum).FuelEnergyUseRate,
-                                "System",
-                                "Average",
-                                ICEngineGenerator(genNum).Name);
-            SetupOutputVariable("Generator " + ICEngineGenerator(genNum).FuelType + " Energy",
-                                OutputProcessor::Unit::J,
-                                ICEngineGenerator(genNum).FuelEnergy,
-                                "System",
-                                "Sum",
-                                ICEngineGenerator(genNum).Name,
-                                _,
-                                ICEngineGenerator(genNum).FuelType,
-                                "COGENERATION",
-                                _,
-                                "Plant");
+        SetupOutputVariable("Generator Produced Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->ElecEnergyGenerated,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ElectricityProduced",
+                            "COGENERATION",
+                            _,
+                            "Plant");
 
-            //    general fuel use report to match other generators.
-            SetupOutputVariable("Generator Fuel HHV Basis Rate",
-                                OutputProcessor::Unit::W,
-                                ICEngineGenerator(genNum).FuelEnergyUseRate,
-                                "System",
-                                "Average",
-                                ICEngineGenerator(genNum).Name);
-            SetupOutputVariable("Generator Fuel HHV Basis Energy",
-                                OutputProcessor::Unit::J,
-                                ICEngineGenerator(genNum).FuelEnergy,
-                                "System",
-                                "Sum",
-                                ICEngineGenerator(genNum).Name);
+        SetupOutputVariable("Generator " + this->FuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Generator " + ICEngineGenerator(genNum).FuelType + " Mass Flow Rate",
+        SetupOutputVariable("Generator " + this->FuelType + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            this->FuelType,
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        //    general fuel use report to match other generators.
+        SetupOutputVariable("Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator " + this->FuelType + " Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->FuelMdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Exhaust Air Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustStackTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        if (this->HeatRecActive) {
+            SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ICEngineGenerator(genNum).FuelMdot,
+                                this->HeatRecMdotActual,
                                 "System",
                                 "Average",
-                                ICEngineGenerator(genNum).Name);
+                                this->Name);
 
-            SetupOutputVariable("Generator Exhaust Air Temperature",
+            SetupOutputVariable("Generator Jacket Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QJacketRecovered,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Jacket Heat Recovery Energy",
+                                OutputProcessor::Unit::J,
+                                this->JacketEnergyRec,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HEATRECOVERY",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Generator Lube Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QLubeOilRecovered,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Lube Heat Recovery Energy",
+                                OutputProcessor::Unit::J,
+                                this->LubeOilEnergyRec,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HEATRECOVERY",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QExhaustRecovered,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
+                                OutputProcessor::Unit::J,
+                                this->ExhaustEnergyRec,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HEATRECOVERY",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Generator Produced Thermal Rate",
+                                OutputProcessor::Unit::W,
+                                this->QTotalHeatRecovered,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Generator Produced Thermal Energy",
+                                OutputProcessor::Unit::J,
+                                this->TotalHeatEnergyRec,
+                                "System",
+                                "Sum",
+                                this->Name);
+
+            SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ICEngineGenerator(genNum).ExhaustStackTemp,
+                                this->HeatRecInletTemp,
                                 "System",
                                 "Average",
-                                ICEngineGenerator(genNum).Name);
+                                this->Name);
 
-            if (ICEngineGenerator(genNum).HeatRecActive) {
-                SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    ICEngineGenerator(genNum).HeatRecMdotActual,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-
-                SetupOutputVariable("Generator Jacket Heat Recovery Rate",
-                                    OutputProcessor::Unit::W,
-                                    ICEngineGenerator(genNum).QJacketRecovered,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-                SetupOutputVariable("Generator Jacket Heat Recovery Energy",
-                                    OutputProcessor::Unit::J,
-                                    ICEngineGenerator(genNum).JacketEnergyRec,
-                                    "System",
-                                    "Sum",
-                                    ICEngineGenerator(genNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "HEATRECOVERY",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Lube Heat Recovery Rate",
-                                    OutputProcessor::Unit::W,
-                                    ICEngineGenerator(genNum).QLubeOilRecovered,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-                SetupOutputVariable("Generator Lube Heat Recovery Energy",
-                                    OutputProcessor::Unit::J,
-                                    ICEngineGenerator(genNum).LubeOilEnergyRec,
-                                    "System",
-                                    "Sum",
-                                    ICEngineGenerator(genNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "HEATRECOVERY",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
-                                    OutputProcessor::Unit::W,
-                                    ICEngineGenerator(genNum).QExhaustRecovered,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-                SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
-                                    OutputProcessor::Unit::J,
-                                    ICEngineGenerator(genNum).ExhaustEnergyRec,
-                                    "System",
-                                    "Sum",
-                                    ICEngineGenerator(genNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "HEATRECOVERY",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Produced Thermal Rate",
-                                    OutputProcessor::Unit::W,
-                                    ICEngineGenerator(genNum).QTotalHeatRecovered,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-                SetupOutputVariable("Generator Produced Thermal Energy",
-                                    OutputProcessor::Unit::J,
-                                    ICEngineGenerator(genNum).TotalHeatEnergyRec,
-                                    "System",
-                                    "Sum",
-                                    ICEngineGenerator(genNum).Name);
-
-                SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    ICEngineGenerator(genNum).HeatRecInletTemp,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-
-                SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    ICEngineGenerator(genNum).HeatRecOutletTemp,
-                                    "System",
-                                    "Average",
-                                    ICEngineGenerator(genNum).Name);
-            }
+            SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecOutletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
         }
     }
 
@@ -798,7 +806,7 @@ namespace ICEngineElectricGenerator {
 
         // METHODOLOGY EMPLOYED: This routine is required for the heat recovery loop.
         // It works in conjunction with the Heat Recovery Manager, and the PlantWaterHeater.
-        // The chiller sets the flow on the loop first by the input design flowrate and then
+        // The chiller sets the flow on the loop first by the input design flow rate and then
         // performs a check to verify that
 
         static std::string const RoutineName("CalcICEngineGeneratorModel");
@@ -872,6 +880,11 @@ namespace ICEngineElectricGenerator {
         static std::string const RoutineName("InitICEngineGenerators");
 
         bool errFlag;
+
+        if (this->myFlag) {
+            this->setupOutputVars();
+            this->myFlag = false;
+        }
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
