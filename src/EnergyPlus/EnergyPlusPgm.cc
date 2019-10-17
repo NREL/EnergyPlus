@@ -329,7 +329,7 @@ int RunEnergyPlus(std::string const & filepath)
 
     get_environment_variable(FullAnnualSimulation, cEnvValue);
     FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-    if (ep_globals.AnnualSimulation) FullAnnualRun = true;
+    if (ep_globals.dataGlobals.AnnualSimulation) FullAnnualRun = true;
 
     get_environment_variable(cDisplayAllWarnings, cEnvValue);
     DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

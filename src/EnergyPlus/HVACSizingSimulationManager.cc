@@ -294,11 +294,11 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             // EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            ep_globals.DayOfSimChr = "0";
+            ep_globals.dataGlobals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(ep_globals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -306,13 +306,13 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
                 }
                 ++DayOfSim;
-                ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
-                strip(ep_globals.DayOfSimChr);
+                ObjexxFCL::gio::write(ep_globals.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
+                strip(ep_globals.dataGlobals.DayOfSimChr);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    ep_globals.DayOfSimChr = "0";
+                    ep_globals.dataGlobals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;

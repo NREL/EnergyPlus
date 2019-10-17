@@ -73,4 +73,4 @@
 
     // Using/Aliasing
 	
-	Globals ep_globals;
+	AllGlobals ep_globals;

@@ -270,7 +270,7 @@ namespace DataGlobals {
     {
         runReadVars = false;
         DDOnlySimulation = false;
-        ep_globals.AnnualSimulation = false;
+        ep_globals.dataGlobals.AnnualSimulation = false;
         outputEpJSONConversion = false;
         isEpJSON = false;
         isCBOR = false;
@@ -283,7 +283,7 @@ namespace DataGlobals {
         BeginFullSimFlag = false;
         BeginTimeStepFlag = false;
         DayOfSim = 0;
-        ep_globals.DayOfSimChr = "0";
+        ep_globals.dataGlobals.DayOfSimChr = "0";
         CalendarYear = 0;
         CalendarYearChr = "0";
         EndEnvrnFlag = false;

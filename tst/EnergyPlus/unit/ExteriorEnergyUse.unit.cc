@@ -68,11 +68,11 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
 {
 
-	ep_globals.NumExteriorLights = 0;
-    ep_globals.NumExteriorEqs = 2;
+	ep_globals.exteriorEnergyUse.NumExteriorLights = 0;
+    ep_globals.exteriorEnergyUse.NumExteriorEqs = 2;
     TimeStepZone = 0.25;
     TimeStepZoneSec = TimeStepZone * SecInHour;
-    ExteriorEquipment.allocate(ep_globals.NumExteriorEqs);
+    ExteriorEquipment.allocate(ep_globals.exteriorEnergyUse.NumExteriorEqs);
     ExteriorEquipment(1).DesignLevel = 1000.0;
     ExteriorEquipment(2).DesignLevel = 0.0;
     ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value

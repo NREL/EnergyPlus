@@ -361,7 +361,7 @@ namespace SizingManager {
                     EndMonthFlag = false;
                     WarmupFlag = true;
                     DayOfSim = 0;
-                    ep_globals.DayOfSimChr = "0";
+                    ep_globals.dataGlobals.DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
                     while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
@@ -371,8 +371,8 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
-                        strip(ep_globals.DayOfSimChr);
+                        ObjexxFCL::gio::write(ep_globals.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
+                        strip(ep_globals.dataGlobals.DayOfSimChr);
                         BeginDayFlag = true;
                         EndDayFlag = false;
 
@@ -474,8 +474,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(ep_globals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(ep_globals.EndZoneSizingCalc);
+                    UpdateZoneSizing(ep_globals.dataGlobals.EndZoneSizingCalc);
+                    UpdateFacilitySizing(ep_globals.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -575,7 +575,7 @@ namespace SizingManager {
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
-                ep_globals.DayOfSimChr = "0";
+                ep_globals.dataGlobals.DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
@@ -585,8 +585,8 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
-                    strip(ep_globals.DayOfSimChr);
+                    ObjexxFCL::gio::write(ep_globals.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
+                    strip(ep_globals.dataGlobals.DayOfSimChr);
                     BeginDayFlag = true;
                     EndDayFlag = false;
 
@@ -4920,7 +4920,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == ep_globals.EndZoneSizingCalc) {
+        } else if (CallIndicator == ep_globals.dataGlobals.EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;

@@ -502,7 +502,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            ep_globals.DayOfSimChr = "0";
+            ep_globals.dataGlobals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
@@ -517,20 +517,20 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(ep_globals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
-                strip(ep_globals.DayOfSimChr);
+                ObjexxFCL::gio::write(ep_globals.dataGlobals.DayOfSimChr, fmtLD) << DayOfSim;
+                strip(ep_globals.dataGlobals.DayOfSimChr);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    ep_globals.DayOfSimChr = "0";
+                    ep_globals.dataGlobals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -557,7 +557,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + ep_globals.DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + ep_globals.dataGlobals.DayOfSimChr);
                     ResetTabularReports();
                 }
 

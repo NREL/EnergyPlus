@@ -6594,7 +6594,7 @@ namespace OutputReportTabular {
 
         // Exterior Lighting
         consumptionTotal = 0.0;
-        for (iLight = 1; iLight <= ep_globals.NumExteriorLights; ++iLight) {
+        for (iLight = 1; iLight <= ep_globals.exteriorEnergyUse.NumExteriorLights; ++iLight) {
             if (ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  ExteriorLights(iLight).Name,
@@ -15430,7 +15430,7 @@ namespace OutputReportTabular {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
-        for (iLight = 1; iLight <= ep_globals.NumExteriorLights; ++iLight) {
+        for (iLight = 1; iLight <= ep_globals.exteriorEnergyUse.NumExteriorLights; ++iLight) {
             ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
             ExteriorLights(iLight).SumConsumption = 0.;
         }

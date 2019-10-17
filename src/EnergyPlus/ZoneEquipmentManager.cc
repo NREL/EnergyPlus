@@ -2577,7 +2577,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == ep_globals.EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == ep_globals.dataGlobals.EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;

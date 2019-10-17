@@ -53,31 +53,49 @@
 
 #include <string>
 
-struct Globals
+struct DataGlobal
 {
     // Data
     bool AnnualSimulation = false;
 
+    // MODULE VARIABLE DECLARATIONS:
+    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
+
     // MODULE PARAMETER DEFINITIONS
     int const EndZoneSizingCalc = 4;
 
-    // MODULE VARIABLE DECLARATIONS: 
-    //ExteriorEnergyUse
-    int NumExteriorLights = 0; // Number of Exterior Light Inputs
-    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
-    // Pipes
-    int NumLocalPipes = 0;
-    bool GetPipeInputFlag = true;
-
-    //MODULE VARIABLE DECLARATION: Fans
-    int NumFans = 0;
-
     // Parameters for EMS Calling Points
     int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
-
-    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
 };
 
-extern Globals ep_globals;
+struct ExteriorEnergyUseGlobals
+{
+    // MODULE VARIABLE DECLARATIONS
+    int NumExteriorLights = 0; // Number of Exterior Light Inputs
+    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+};
+
+struct PipesGlobals
+{
+    // MODULE VARIABLE DECLARATIONS
+    int NumLocalPipes = 0;
+    bool GetPipeInputFlag = true;
+};
+
+struct FansGlobals
+{
+    //MODULE VARIABLE DECLARATION
+    int NumFans = 0;
+};
+
+struct AllGlobals
+{
+    DataGlobal dataGlobals;
+    ExteriorEnergyUseGlobals exteriorEnergyUse;
+    FansGlobals fans;
+    PipesGlobals pipes;
+};
+
+extern AllGlobals ep_globals;
 
 #endif
