@@ -647,25 +647,18 @@ namespace MicroCHPElectricGenerator {
         //       RE-ENGINEERED  na
 
         static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
-        static int DynaCntrlNum(0);
-        Real64 TimeElapsed;              // Fraction of the current hour that has elapsed (h)
+
         static bool MyOneTimeFlag(true); // Initialization flag
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        static Array1D_bool MyPlantScanFlag;
 
         bool errFlag;
         Real64 mdot; // local temporary for mass flow rate
         Real64 rho;  // local temporary for fluid density
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumMicroCHPs);
-            MyPlantScanFlag.allocate(NumMicroCHPs);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
             MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(GeneratorNum) && allocated(DataPlant::PlantLoop)) {
+        if (MicroCHP(GeneratorNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(MicroCHP(GeneratorNum).Name,
                                     DataPlant::TypeOf_Generator_MicroCHP,
@@ -695,10 +688,10 @@ namespace MicroCHPElectricGenerator {
                 }
             }
 
-            MyPlantScanFlag(GeneratorNum) = false;
+            MicroCHP(GeneratorNum).MyPlantScanFlag = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && MicroCHP(GeneratorNum).MySizeFlag && !MyPlantScanFlag(GeneratorNum) && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (!DataGlobals::SysSizingCalc && MicroCHP(GeneratorNum).MySizeFlag && !MicroCHP(GeneratorNum).MyPlantScanFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName,
                                    DataLoopNode::Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp,
                                    DataPlant::PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex,
@@ -738,9 +731,9 @@ namespace MicroCHPElectricGenerator {
 
         if (MicroCHP(GeneratorNum).MySizeFlag) return;
 
-        DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
+        int DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(GeneratorNum)) {
+        if (DataGlobals::BeginEnvrnFlag && MicroCHP(GeneratorNum).MyEnvrnFlag) {
             // reset to starting condition for different environment runperiods, design days
             MicroCHP(GeneratorNum).A42Model.TengLast = 20.0;
             MicroCHP(GeneratorNum).A42Model.TempCWOutLast = 20.0;
@@ -789,10 +782,10 @@ namespace MicroCHPElectricGenerator {
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(GeneratorNum) = true;
+            MicroCHP(GeneratorNum).MyEnvrnFlag = true;
         }
 
-        TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (MicroCHP(GeneratorNum).A42Model.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             // timestep for use as the initial conditions of each iteration that does not advance the system timestep.
@@ -843,31 +836,7 @@ namespace MicroCHPElectricGenerator {
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
         static std::string const RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
-        static Real64 AllowedLoad(0.0);
-        static int CurrentOpMode(0);
-        static Real64 PLRforSubtimestepStartUp(1.0);
-        static Real64 PLRforSubtimestepShutDown(0.0);
-        static bool RunFlag(false);
-        static int DynaCntrlNum(0);
-        static Real64 Pnetss(0.0);
-        static Real64 Pstandby(0.0); // power draw during standby, positive here means negative production
-        static Real64 Pcooler(0.0);  // power draw during cool down, positive here means negative production
-        static Real64 NdotFuel(0.0);
 
-        static bool ConstrainedIncreasingNdot(false);
-        static bool ConstrainedDecreasingNdot(false);
-        static int i(0);
-        static Real64 dt(0.0);
-        static Real64 ElecEff(0.0);
-        static Real64 MdotAir(0.0);
-        static Real64 Qgenss(0.0);
-        static Real64 MdotCW(0.0);
-        static Real64 TcwIn(0.0);
-        static Real64 TcwOut(0.0);
-        static Real64 MdotFuel(0.0);
-        static Real64 MdotFuelAllowed(0.0);
-        static Real64 MdotFuelMax(0.0);
-        static Real64 MdotFuelWarmup(0.0);
         static Real64 Pmax(0.0);
         static Real64 Qgross(0.0);
         static Real64 Teng(0.0);
@@ -875,9 +844,14 @@ namespace MicroCHPElectricGenerator {
         static Real64 Cp(0.0); // local fluid specific heat
         static Real64 thisAmbientTemp(0.0);
 
-        bool EnergyBalOK; // check for balance to exit loop
+        bool EnergyBalOK;
 
-        DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
+        int CurrentOpMode = 0;
+        Real64 AllowedLoad = 0.0;
+        Real64 PLRforSubtimestepStartUp(1.0);
+        Real64 PLRforSubtimestepShutDown(0.0);
+        bool RunFlag(false);
+
 
         GeneratorDynamicsManager::ManageGeneratorControlState(DataGlobalConstants::iGeneratorMicroCHP,
                                     MicroCHP(GeneratorNum).Name,
@@ -895,14 +869,24 @@ namespace MicroCHPElectricGenerator {
         if (RunFlagElectCenter || RunFlagPlant) RunFlag = true;
 
         Teng = MicroCHP(GeneratorNum).A42Model.Teng;
-        TcwOut = MicroCHP(GeneratorNum).A42Model.TcwOut;
-        dt = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 TcwOut = MicroCHP(GeneratorNum).A42Model.TcwOut;
 
         if (MicroCHP(GeneratorNum).ZoneID > 0) {
             thisAmbientTemp = DataHeatBalFanSys::MAT(MicroCHP(GeneratorNum).ZoneID);
         } else { // outdoor location, no zone
             thisAmbientTemp = DataEnvironment::OutDryBulbTemp;
         }
+
+        Real64 Pnetss = 0.0;
+        Real64 Pstandby = 0.0; // power draw during standby, positive here means negative production
+        Real64 Pcooler = 0.0;  // power draw during cool down, positive here means negative production
+        Real64 NdotFuel = 0.0;
+        Real64 ElecEff = 0.0;
+        Real64 MdotAir = 0.0;
+        Real64 Qgenss = 0.0;
+        Real64 MdotCW = 0.0;
+        Real64 TcwIn = 0.0;
+        Real64 MdotFuel = 0.0;
 
         {
             auto const SELECT_CASE_var(CurrentOpMode);
@@ -985,6 +969,10 @@ namespace MicroCHPElectricGenerator {
                                DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
 
+                    bool ConstrainedIncreasingNdot(false);
+                    bool ConstrainedDecreasingNdot(false);
+                    Real64 MdotFuelAllowed = 0.0;
+
                     GeneratorDynamicsManager::ManageGeneratorFuelFlow(DataGlobalConstants::iGeneratorMicroCHP,
                                             MicroCHP(GeneratorNum).Name,
                                             GeneratorNum,
@@ -999,7 +987,7 @@ namespace MicroCHPElectricGenerator {
                         NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                         Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
 
-                        for (i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
+                        for (int i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
                             Pnetss = Qgross * ElecEff;
                             if (MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
                                 MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(GeneratorNum, Pnetss, TcwIn);
@@ -1035,8 +1023,9 @@ namespace MicroCHPElectricGenerator {
                     }
                     NdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                     //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                    MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    Real64 MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
 
+                    Real64 MdotFuelWarmup;
                     if (Teng > thisAmbientTemp) {
                         MdotFuelWarmup = MdotFuelMax + MicroCHP(GeneratorNum).A42Model.kf * MdotFuelMax *
                                                            ((MicroCHP(GeneratorNum).A42Model.TnomEngOp - thisAmbientTemp) / (Teng - thisAmbientTemp));
@@ -1097,6 +1086,11 @@ namespace MicroCHPElectricGenerator {
                 MdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
                            DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                 //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
+
+                bool ConstrainedIncreasingNdot(false);
+                bool ConstrainedDecreasingNdot(false);
+                Real64 MdotFuelAllowed = 0.0;
+
                 GeneratorDynamicsManager::ManageGeneratorFuelFlow(DataGlobalConstants::iGeneratorMicroCHP,
                                         MicroCHP(GeneratorNum).Name,
                                         GeneratorNum,
@@ -1111,7 +1105,7 @@ namespace MicroCHPElectricGenerator {
                     NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
 
-                    for (i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
+                    for (int i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
                         Pnetss = Qgross * ElecEff;
                         if (MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
                             MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(GeneratorNum, Pnetss, TcwIn);
@@ -1152,7 +1146,7 @@ namespace MicroCHPElectricGenerator {
             }
         }
 
-        for (i = 1; i <= 20; ++i) { // sequential search with exit criteria
+        for (int i = 1; i <= 20; ++i) { // sequential search with exit criteria
             // calculate new value for engine temperature
             // for Stirling in warmup, need to include dependency of Qgness on Teng
             if ((MicroCHP(GeneratorNum).A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OpModeWarmUp)) {
@@ -1169,8 +1163,9 @@ namespace MicroCHPElectricGenerator {
                 }
                 NdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                 //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                Real64 MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
 
+                Real64 MdotFuelWarmup;
                 if (Teng > thisAmbientTemp) {
                     MdotFuelWarmup = MdotFuelMax + MicroCHP(GeneratorNum).A42Model.kf * MdotFuelMax *
                                                        ((MicroCHP(GeneratorNum).A42Model.TnomEngOp - thisAmbientTemp) / (Teng - thisAmbientTemp));
@@ -1199,6 +1194,8 @@ namespace MicroCHPElectricGenerator {
                 ThermEff = max(0.0, ThermEff); // protect against bad curve result
                 Qgenss = ThermEff * Qgross;    // W
             }
+
+            Real64 dt = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
             Teng = FuncDetermineEngineTemp(TcwOut,
                                            MicroCHP(GeneratorNum).A42Model.MCeng,

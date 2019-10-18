@@ -233,13 +233,15 @@ namespace MicroCHPElectricGenerator {
         int CWCompNum;                   // cooling water plant loop component index
         bool CheckEquipName;
         bool MySizeFlag;
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
 
         // Default Constructor
         MicroCHPDataStruct()
                 : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
                   PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
                   DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-                  CheckEquipName(true), MySizeFlag(true)
+                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true)
         {
         }
     };
