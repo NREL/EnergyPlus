@@ -11,6 +11,10 @@ all_callbacks = []
 
 
 class Runtime:
+    """
+    This API class does blahblahblah
+    ADD MORE RUNTIME HOOKS
+    """
 
     def __init__(self, api: cdll):
         self.api = api

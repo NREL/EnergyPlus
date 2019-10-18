@@ -3,6 +3,9 @@ from pyenergyplus.common import RealEP
 
 
 class BaseThermalPropertySet:
+    """
+    This class is a Python representation of blablah
+    """
 
     def __init__(self, api: cdll, conductivity: float, density: float, specific_heat: float):
         self.api = api
@@ -27,6 +30,9 @@ class BaseThermalPropertySet:
 
 
 class FluidAndPsychProperties:
+    """
+    This class is a Python representation of blahblah
+    """
 
     def __init__(self, api: cdll, fluid_name: str):
         self.api = api
@@ -46,6 +52,9 @@ class FluidAndPsychProperties:
 
 
 class Functional:
+    """
+    This API class does blahblahblah
+    """
 
     def __init__(self, api: cdll):
         self.api = api

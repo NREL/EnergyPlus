@@ -4,6 +4,9 @@ from typing import Union
 
 
 class DataTransfer:
+    """
+    This API class does blahblahblah
+    """
 
     def __init__(self, api: cdll):
         self.api = api
