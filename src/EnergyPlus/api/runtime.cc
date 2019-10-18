@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
@@ -58,6 +59,7 @@ void cClearAllStates() {
 
 int cRunEnergyPlus(const char* filepath) {
     std::string path(filepath);
+    EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
     return RunEnergyPlus(path);
 }
 

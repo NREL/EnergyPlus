@@ -143,6 +143,7 @@ namespace PluginManager {
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
         Py_InitializeEx(0);
+
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
         // we need to figure out the right way to find the path to the binary itself
         // we want to point Python to a folder containing a pyms folder in it
@@ -225,6 +226,7 @@ namespace PluginManager {
                 }
             }
         }
+
     }
 
     std::string PluginManager::sanitizedPath(std::string path)

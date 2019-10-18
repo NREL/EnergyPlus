@@ -332,7 +332,12 @@ namespace SimulationManager {
         InitializePsychRoutines();
 
         // Create a new plugin manager which starts up the Python interpreter
-        EnergyPlus::PluginManager::pluginManager = std::unique_ptr<EnergyPlus::PluginManager::PluginManager>(new EnergyPlus::PluginManager::PluginManager);
+        // Note this cannot be done if we are running within the library environment, nor would you really to do so
+        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
+        if (!eplusRunningViaAPI) {
+            EnergyPlus::PluginManager::pluginManager =
+                std::unique_ptr<EnergyPlus::PluginManager::PluginManager>(new EnergyPlus::PluginManager::PluginManager);
+        }
 
         BeginSimFlag = true;
         BeginFullSimFlag = false;

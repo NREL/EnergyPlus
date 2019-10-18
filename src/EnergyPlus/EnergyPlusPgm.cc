@@ -293,18 +293,12 @@ int initializeEnergyPlus(std::string const & filepath) {
     DataSystemVariables::TestAllPaths = true;
 
     DisplayString("EnergyPlus Starting");
-    std::cout << "Trying to create input/output processors 0\n";
     DisplayString(DataStringGlobals::VerString);
-    std::cout << "Trying to create input/output processors 1\n";
 
     try {
-        std::cout << "Trying to create input/output processors A\n";
         EnergyPlus::inputProcessor = InputProcessor::factory();
-        std::cout << "Trying to create input/output processors B\n";
         EnergyPlus::inputProcessor->processInput();
-        std::cout << "Trying to create input/output processors C\n";
         ResultsFramework::OutputSchema->setupOutputOptions();
-        std::cout << "Trying to create input/output processors D\n";
     } catch (const FatalError &e) {
         return AbortEnergyPlus();
     } catch (const std::exception &e) {
@@ -362,9 +356,7 @@ int RunEnergyPlus(std::string const & filepath)
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    std::cout << "Inside RunEnergyPlus\n";
     int status = initializeEnergyPlus(filepath);
-    std::cout << "Made it past initializeEnergyPlus\n";
     if (status) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation();

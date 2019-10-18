@@ -268,6 +268,8 @@ namespace DataGlobals {
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
 
+    bool eplusRunningViaAPI;
+
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state()
@@ -373,6 +375,7 @@ namespace DataGlobals {
         err_stream = nullptr;
         eio_stream = nullptr;
         delightin_stream = nullptr;
+        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals
