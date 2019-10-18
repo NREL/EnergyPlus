@@ -188,15 +188,18 @@ namespace MicroCHPElectricGenerator {
         bool MySizeFlag;
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
+        int genArrIdxNum;
 
         // Default Constructor
         MicroCHPDataStruct()
                 : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
                   PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
                   DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true)
+                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), genArrIdxNum(0)
         {
         }
+
+        void InitMicroCHPNoNormalizeGenerators();
     };
 
 
@@ -210,9 +213,6 @@ namespace MicroCHPElectricGenerator {
                               bool FirstHVACIteration);
 
     void GetMicroCHPGeneratorInput();
-
-    void InitMicroCHPNoNormalizeGenerators(int GeneratorNum, // Generator number
-                                           bool FirstHVACIteration);
 
     void CalcMicroCHPNoNormalizeGeneratorModel(int GeneratorNum,        // Generator number
                                                bool RunFlagElectCenter, // TRUE when Generator operating
