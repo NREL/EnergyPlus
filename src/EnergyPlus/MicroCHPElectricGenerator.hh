@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -60,9 +61,6 @@ namespace MicroCHPElectricGenerator {
 
     extern int NumMicroCHPs;
     extern int NumMicroCHPParams; // number of parameter sets for micro chp
-
-    extern bool getMicroChpInputFlag; // When TRUE, calls subroutine to read input file.
-    extern Array1D_bool MySizeFlag;
 
     struct MicroCHPParamsNonNormalized
     {
@@ -157,7 +155,7 @@ namespace MicroCHPElectricGenerator {
         }
     };
 
-    struct MicroCHPDataStruct
+    struct MicroCHPDataStruct : PlantComponent
     {
         std::string Name;                     // name of this Micro CHP Generator
         std::string ParamObjName;             // name of parameter object
@@ -200,6 +198,10 @@ namespace MicroCHPElectricGenerator {
         {
         }
 
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
         void setupOutputVars();
 
         void InitMicroCHPNoNormalizeGenerators();
@@ -212,7 +214,9 @@ namespace MicroCHPElectricGenerator {
                                                    Real64 MyThermalLoad,
                                                    bool FirstHVACIteration);
 
-        void UpdateMicroCHPGeneratorRecords(); // Generator number
+        void UpdateMicroCHPGeneratorRecords();
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
 

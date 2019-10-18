@@ -110,7 +110,36 @@ namespace MicroCHPElectricGenerator {
     Array1D<MicroCHPDataStruct> MicroCHP;
     Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
-    bool getMicroChpInputFlag(true);
+    bool getMicroCHPInputFlag(true);
+
+    void clear_state()
+    {
+        NumMicroCHPs = 0;
+        NumMicroCHPParams = 0;
+        getMicroCHPInputFlag = true;
+        MicroCHP.deallocate();
+        MicroCHPParamInput.deallocate();
+    }
+
+    PlantComponent *MicroCHPDataStruct::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getMicroCHPInputFlag) {
+            GetMicroCHPGeneratorInput();
+            getMicroCHPInputFlag = false;
+        }
+
+        // Now look for this object
+        for (auto &thisMCHP : MicroCHP) {
+            if (thisMCHP.Name == objectName) {
+                return &thisMCHP;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalMicroCHPGenFactory: Error getting inputs for micro-CHP gen named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
 
     void SimMicroCHPGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
@@ -134,10 +163,9 @@ namespace MicroCHPElectricGenerator {
 
         int GenNum; // Generator number counter
 
-        // Get Generator data from input file
-        if (getMicroChpInputFlag) {
+        if (getMicroCHPInputFlag) {
             GetMicroCHPGeneratorInput();
-            getMicroChpInputFlag = false;
+            getMicroCHPInputFlag = false;
         }
 
         if (GeneratorIndex == 0) {
@@ -651,6 +679,11 @@ namespace MicroCHPElectricGenerator {
                                   _,
                                   this->A42Model.SkinLossRadiat);
         }
+    }
+
+    void MicroCHPDataStruct::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+                                      Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag)){
+
     }
 
     void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators()
@@ -1456,9 +1489,9 @@ namespace MicroCHPElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire MicroCHP model
 
-        if (getMicroChpInputFlag) {
+        if (getMicroCHPInputFlag) {
             GetMicroCHPGeneratorInput();
-            getMicroChpInputFlag = false;
+            getMicroCHPInputFlag = false;
         }
 
         if (InitLoopEquip) {
@@ -1489,6 +1522,14 @@ namespace MicroCHPElectricGenerator {
                                         MicroCHP(CompNum).A42Model.HeatRecOutletTemp,
                                         MicroCHP(CompNum).PlantMassFlowRate,
                                         FirstHVACIteration);
+    }
+
+    void MicroCHPDataStruct::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad,
+                                                 Real64 &OptLoad)
+    {
+        MaxLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMax;
+        MinLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMin;
+        OptLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXOpt;
     }
 
     void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords() // Generator number
