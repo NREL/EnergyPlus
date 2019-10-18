@@ -151,6 +151,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER nodeListCount
   INTEGER nodeCountA
   LOGICAL :: nodeFound = .false.
+  INTEGER DuctObjNum
 
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
@@ -748,9 +749,33 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet'
                    POutArgs(2) = TRIM(InArgs(3)) // ' ATInlet'
                    POutArgs(3) = InArgs(3)
-                   POutArgs(4) = InArgs(4) ! this is required, so it should be present
+                   ! Assume that the existing referenced component is a duct - look for it
+                   DuctObjNum = GetObjectItemNum('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT',TRIM(InArgs(4)))
+                   IF (DuctObjNum > 0) THEN
+                     POutArgs(4) = TRIM(InArgs(1)) // ' ATInlet Duct' ! reference a new tiny duct object created next
+                   ELSE
+                     CALL ShowWarningError('Linkage component name for AirflowNetwork:Distribution:Linkage= ' // TRIM(InArgs(1)),Auditf)
+                     CALL ShowContinueError('Is not an AirflowNetwork:Distribution:Component:Duct. Diffs may result from duplicate linkage component.',Auditf)
+                     POutArgs(4) = TRIM(InArgs(4))
+                   END IF
                    IF (CurArgs > 4) POutArgs(5) = InArgs(5)
                    CALL WriteOutIDFLines(DifLfn,'AirflowNetwork:Distribution:Linkage',CurArgs,POutArgs,NwFldNames,NwFldUnits)
+                   IF (DuctObjNum > 0) THEN
+                     ! If duct was found above create a very short matching new duct object for the new linkage
+                     CALL GetObjectItem('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT',DuctObjNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                     CALL GetNewObjectDefInIDD('AirflowNetwork:Distribution:Component:Duct',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                     POutArgs = Blank
+                     POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet Duct'
+                     POutArgs(2) = '0.01'
+                     PNumArgs = NumNumbers + 1
+                     ! First, copy all the same values for remaining fields
+                     POutArgs(3:PNumArgs) = Numbers(2:NumNumbers)
+                     ! Now set loss coefficients as small as possible to minimize diffs
+                     POutArgs(6) = '0.0'
+                     POutArgs(7) = '0.0000001'
+                     POutArgs(8) = '0.0000001'
+                     CALL WriteOutIDFLines(DifLfn,'AirflowNetwork:Distribution:Component:Duct',PNumArgs,POutArgs,PFldNames,PFldUnits)
+                   END IF
                  ELSE
                    ! Do nothing with this object, let it pass through unchanged
                    OutArgs(1:CurArgs) = InArgs(1:CurArgs)
