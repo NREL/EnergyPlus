@@ -140,23 +140,23 @@ namespace MicroturbineElectricGenerator {
         Real64 StandbyPowerRate;          // Standby power rate this time step (W)
         Real64 AncillaryPowerRate;        // Ancillary power rate this time step (W)
         //     Warning message variables
-        int PowerFTempElevErrorIndex; // Index to power as a function of temp/elevation warning message
-        int EffFTempErrorIndex; // Index to efficiency as a function of temperature warning message
-        int EffFPLRErrorIndex; // Index to efficiency as a function of PLR warning message
-        int ExhFlowFTempErrorIndex; // Index to exhaust flow as a function of temp warning message
-        int ExhFlowFPLRErrorIndex; // Index to exhaust flow as a function of PLR warning message
-        int ExhTempFTempErrorIndex; // Index to exhaust temp as a function of temp warning message
-        int ExhTempFPLRErrorIndex; // Index to exhaust temp as a function of PLR warning message
-        int HRMinFlowErrorIndex; // Index to reclaim water flow rate warning message
-        int HRMaxFlowErrorIndex; // Index to reclaim water flow rate warning message
-        int ExhTempLTInletTempIndex; // Index to exhaust temp < combustion inlet air temp warning messages
-        int ExhHRLTInletHRIndex; // Index to exhaust hum rat < combustion inlet air hum rat warning messages
-        int AnciPowerIterErrorIndex; // Index to Ancillary Power iteration loop warning messages
+        int PowerFTempElevErrorIndex;     // Index to power as a function of temp/elevation warning message
+        int EffFTempErrorIndex;           // Index to efficiency as a function of temperature warning message
+        int EffFPLRErrorIndex;            // Index to efficiency as a function of PLR warning message
+        int ExhFlowFTempErrorIndex;       // Index to exhaust flow as a function of temp warning message
+        int ExhFlowFPLRErrorIndex;        // Index to exhaust flow as a function of PLR warning message
+        int ExhTempFTempErrorIndex;       // Index to exhaust temp as a function of temp warning message
+        int ExhTempFPLRErrorIndex;        // Index to exhaust temp as a function of PLR warning message
+        int HRMinFlowErrorIndex;          // Index to reclaim water flow rate warning message
+        int HRMaxFlowErrorIndex;          // Index to reclaim water flow rate warning message
+        int ExhTempLTInletTempIndex;      // Index to exhaust temp < combustion inlet air temp warning messages
+        int ExhHRLTInletHRIndex;          // Index to exhaust hum rat < combustion inlet air hum rat warning messages
+        int AnciPowerIterErrorIndex;      // Index to Ancillary Power iteration loop warning messages
         int AnciPowerFMdotFuelErrorIndex; // Index to Ancillary Power as a function of fuel input warning messages
-        int HeatRecRateFPLRErrorIndex; // Index to heat recovery rate as a function of PLR warning messages
-        int HeatRecRateFTempErrorIndex; // Index to heat recovery rate as a function of temp warning messages
-        int HeatRecRateFFlowErrorIndex; // Index to heat recovery rate as a function of flow warning messages
-        int ThermEffFTempElevErrorIndex; // Index to thermal efficiency as a function of temp/elevation warnings
+        int HeatRecRateFPLRErrorIndex;    // Index to heat recovery rate as a function of PLR warning messages
+        int HeatRecRateFTempErrorIndex;   // Index to heat recovery rate as a function of temp warning messages
+        int HeatRecRateFFlowErrorIndex;   // Index to heat recovery rate as a function of flow warning messages
+        int ThermEffFTempElevErrorIndex;  // Index to thermal efficiency as a function of temp/elevation warnings
         bool CheckEquipName;
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
@@ -189,8 +189,8 @@ namespace MicroturbineElectricGenerator {
               PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
-              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true),
-              MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
+              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true), MyEnvrnFlag(true),
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
               ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0), myFlag(true)
         {
         }
@@ -202,12 +202,12 @@ namespace MicroturbineElectricGenerator {
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void InitMTGenerators( bool RunFlag,
+        void InitMTGenerators(bool RunFlag,
                               Real64 MyLoad, // electrical load in W
                               bool FirstHVACIteration);
 
-        void CalcMTGeneratorModel(bool RunFlag,           // TRUE when generator is being asked to operate
-                                  Real64 MyLoad          // Generator demand (W)
+        void CalcMTGeneratorModel(bool RunFlag, // TRUE when generator is being asked to operate
+                                  Real64 MyLoad // Generator demand (W)
         );
 
         void UpdateMTGeneratorRecords();
