@@ -66,8 +66,6 @@ namespace MicroCHPElectricGenerator {
 
     struct MicroCHPParamsNonNormalized
     {
-        // Members
-        // user parameters
         std::string Name;         // name of this PowerModule data
         Real64 MaxElecPower;      // net electric power [W]
         Real64 MinElecPower;      // net electric power [W]
@@ -123,6 +121,17 @@ namespace MicroCHPElectricGenerator {
         Real64 QdotSkin; // rate of heat loss to zone
         Real64 QdotConvZone;
         Real64 QdotRadZone;
+        Real64 ACPowerGen;           // reporting: power (W)
+        Real64 ACEnergyGen;          // reporting: energy (J)
+        Real64 QdotHX;               // reporting: rate of heat exchange from engine to coolant (W)
+        Real64 QdotHR;               // reporting: rate of heat recovered (W)
+        Real64 TotalHeatEnergyRec;   // reporting: total heat recovered (J)
+        Real64 FuelEnergyLHV;        // reporting: Fuel Energy used in Lower Heating Value(J)
+        Real64 FuelEnergyUseRateLHV; // reporting: Fuel Energy used in Lower Heating Value(W)
+        Real64 FuelEnergyHHV;        // reporting: Fuel Energy used in Higher Heating Value(J)
+        Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
+        Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
+        Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
 
         // Default Constructor
         MicroCHPParamsNonNormalized()
@@ -133,54 +142,48 @@ namespace MicroCHPElectricGenerator {
                   MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
                   WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
                   Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
-                  QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0)
+                  QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
+                  TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
+                  HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0)
         {
         }
     };
 
     struct MicroCHPReportDataStruct // these are all for reporting only!
     {
-        // Members
-        int Mode;                    // report operating mode (dev only, remove at end)
-        Real64 OffModeTime;          // amount of time generator spent in Off mode
-        Real64 StandyByModeTime;     // amount of time generator spent in standby mode
-        Real64 WarmUpModeTime;       // amount of time generator spent in warm up mode
-        Real64 NormalModeTime;       // amount of time generator spent in normal mode
-        Real64 CoolDownModeTime;     // amount of time generator spent in Cool down mode
-        Real64 ACPowerGen;           // reporting: power (W)
-        Real64 ACEnergyGen;          // reporting: energy (J)
-        Real64 QdotGross;            // reporting: interim gross power (W)
-        Real64 Qgenss;               // reporting: net recovered heat rate steadystate(0)
-        Real64 QdotHX;               // reporting: rate of heat exchange from engine to coolant (W)
-        Real64 QdotHR;               // reporting: rate of heat recovered (W)
-        Real64 Tengine;              // reporting: engine mass temperature (C)
-        Real64 TotalHeatEnergyRec;   // reporting: total heat recovered (J)
-        Real64 ExhaustEnergyRec;     // reporting: exhaust gas heat recovered (J)
-        Real64 FuelEnergyLHV;        // reporting: Fuel Energy used in Lower Heating Value(J)
-        Real64 FuelEnergyUseRateLHV; // reporting: Fuel Energy used in Lower Heating Value(W)
-        Real64 FuelEnergyHHV;        // reporting: Fuel Energy used in Higher Heating Value(J)
-        Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
-        Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;          // reporting: Heat Recovery Loop Mass flow rate (kg/s)
+//        int Mode;                    // report operating mode (dev only, remove at end)
+//        Real64 OffModeTime;          // amount of time generator spent in Off mode
+//        Real64 StandyByModeTime;     // amount of time generator spent in standby mode
+//        Real64 WarmUpModeTime;       // amount of time generator spent in warm up mode
+//        Real64 NormalModeTime;       // amount of time generator spent in normal mode
+//        Real64 CoolDownModeTime;     // amount of time generator spent in Cool down mode
+//        Real64 ACPowerGen;           // reporting: power (W)
+//        Real64 ACEnergyGen;          // reporting: energy (J)
+//        Real64 QdotGross;            // reporting: interim gross power (W)
+//        Real64 Qgenss;               // reporting: net recovered heat rate steadystate(0)
+//        Real64 QdotHX;               // reporting: rate of heat exchange from engine to coolant (W)
+//        Real64 QdotHR;               // reporting: rate of heat recovered (W)
+//        Real64 Tengine;              // reporting: engine mass temperature (C)
+//        Real64 TotalHeatEnergyRec;   // reporting: total heat recovered (J)
+//        Real64 ExhaustEnergyRec;     // reporting: exhaust gas heat recovered (J)
+//        Real64 FuelEnergyLHV;        // reporting: Fuel Energy used in Lower Heating Value(J)
+//        Real64 FuelEnergyUseRateLHV; // reporting: Fuel Energy used in Lower Heating Value(W)
+//        Real64 FuelEnergyHHV;        // reporting: Fuel Energy used in Higher Heating Value(J)
+//        Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
+//        Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
+//        Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
+//        Real64 HeatRecMdot;          // reporting: Heat Recovery Loop Mass flow rate (kg/s)
         // air supply and blower
-        Real64 TairInlet; // State point 1
-        Real64 MdotAir;   // air flow in kmol/sec
+//        Real64 TairInlet; // State point 1
+//        Real64 MdotAir;   // air flow in kmol/sec
         // fuel supply and compressor
-        Real64 TfuelInlet;           // State point 2 [C]
+//        Real64 TfuelInlet;           // State point 2 [C]
         Real64 NdotFuel;             // fuel flow in [kmol/sec]
         Real64 MdotFuel;             // fuel flow in [kg/s]
         Real64 FuelCompressPower;    // electrical power used by fuel supply compressor [W]
         Real64 FuelCompressEnergy;   // electrical energy used by fuel supply compressor [J]
         Real64 FuelCompressSkinLoss; // heat rate of losses.by fuel supply compressor [W]
         // heat exchanger for water to exhaust heat recovery
-        //   REAL(r64)    :: qHX = 0.0d0 ! heat flow from gas stream to water [W]
-        //   REAL(r64)    :: HXenergy = 0.0d0 !energy from gas stream to water [J]
-        //   REAL(r64)    :: THXexh = 0.0d0 ! temperature of exhaust gases leaving heat exchanger.
-        //   REAL(r64)    :: WaterVaporFractExh = 0.0d0 ! water vapor fraction in exhaust gas stream
-        // relative to water vapor entering HX  (NdotH20/Ndoaux-mix)
-        //    INTEGER :: SeqSubstIterations = 0 ! number of iterations in SOFC loop
-        //    INTEGER :: RegulaFalsiIterations = 0 ! number of iterations in Tproduct gas solving
         Real64 SkinLossPower;   // heat loss to surrounding zone [W]
         Real64 SkinLossEnergy;  // heat loss to surround zone [J]
         Real64 SkinLossConvect; // convective heat loss to zone [W]
@@ -191,10 +194,8 @@ namespace MicroCHPElectricGenerator {
 
         // Default Constructor
         MicroCHPReportDataStruct()
-                : Mode(0), OffModeTime(0.0), StandyByModeTime(0.0), WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), ACPowerGen(0.0),
-                  ACEnergyGen(0.0), QdotGross(0.0), Qgenss(0.0), QdotHX(0.0), QdotHR(0.0), Tengine(0.0), TotalHeatEnergyRec(0.0), ExhaustEnergyRec(0.0),
-                  FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0), HeatRecInletTemp(0.0),
-                  HeatRecOutletTemp(0.0), HeatRecMdot(0.0), TairInlet(0.0), MdotAir(0.0), TfuelInlet(0.0), NdotFuel(0.0), MdotFuel(0.0),
+                :
+                  NdotFuel(0.0), MdotFuel(0.0),
                   FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0),
                   SkinLossConvect(0.0), SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0)
         {
@@ -203,8 +204,6 @@ namespace MicroCHPElectricGenerator {
 
     struct MicroCHPDataStruct
     {
-        // Members
-        // user input data
         std::string Name;                     // name of this Micro CHP Generator
         std::string ParamObjName;             // name of parameter object
         MicroCHPParamsNonNormalized A42Model; // Nested parameter data structure
