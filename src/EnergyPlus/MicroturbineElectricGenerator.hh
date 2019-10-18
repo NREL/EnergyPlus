@@ -207,49 +207,19 @@ namespace MicroturbineElectricGenerator {
                               bool FirstHVACIteration);
 
         void CalcMTGeneratorModel(bool RunFlag,           // TRUE when generator is being asked to operate
-                                  Real64 MyLoad,          // Generator demand (W)
-                                  bool FirstHVACIteration
+                                  Real64 MyLoad          // Generator demand (W)
         );
 
         void UpdateMTGeneratorRecords();
 
         void setupOutputVars();
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
-    void SimMTGenerator(int GeneratorType,          // Type of generator !unused1208
-                        std::string const &GeneratorName, // User-specified name of generator
-                        int &GeneratorIndex,              // Index to microturbine generator
-                        bool RunFlag,               // Simulate generator when TRUE
-                        Real64 MyLoad,              // Generator demand (W)
-                        bool FirstHVACIteration     // Simulation flag for First HVAC (system) iteration
-    );
-
-    void SimMTPlantHeatRecovery(std::string const &CompType,
-                                std::string const &CompName,
-                                int CompTypeNum,
-                                int &CompNum,
-                                bool RunFlag,
-                                bool &InitLoopEquip,
-                                Real64 &MyLoad,
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool FirstHVACIteration // TRUE if First iteration of simulation !unused1208
-    );
-
     void GetMTGeneratorInput();
-
-    void GetMTGeneratorResults(int GeneratorType, // type of Generator !unused1208
-                               int GeneratorIndex,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    );
-
-    void GetMTGeneratorExhaustNode(int CompType, std::string const &CompName, int &ExhaustOutletNodeNum);
 
 } // namespace MicroturbineElectricGenerator
 

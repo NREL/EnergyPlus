@@ -100,100 +100,24 @@ namespace MicroturbineElectricGenerator {
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
-    void SimMTGenerator(int const EP_UNUSED(GeneratorType), // Type of generator !unused1208
-                        std::string const &GeneratorName,   // User-specified name of generator
-                        int &GeneratorIndex,                // Index to microturbine generator
-                        bool const RunFlag,                 // Simulate generator when TRUE
-                        Real64 const MyLoad,                // Generator demand (W)
-                        bool const FirstHVACIteration       // Simulation flag for First HVAC (system) iteration
-    )
+    PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         R. Raustad/D. Shirey
-        //       DATE WRITTEN   Mar 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE: This is the MT Generator driver subroutine. It gets the input
-        //                             for the model, initializes simulation variables, calls
-        //                             the appropriate model and updates reporting variables.
-
-        // METHODOLOGY EMPLOYED:       Uses empirical models based on manufacturers data
-
-        int GenNum; // Generator number counter
-
-        // Get Generator data from input file
+        // Process the input data for generator if it hasn't been done already
         if (GetMTInput) {
             GetMTGeneratorInput();
             GetMTInput = false;
         }
 
-        // SELECT and CALL GENERATOR MODEL
-        if (GeneratorIndex == 0) {
-            GenNum = UtilityRoutines::FindItemInList(GeneratorName, MTGenerator);
-            if (GenNum == 0) ShowFatalError("SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName);
-            GeneratorIndex = GenNum;
-        } else {
-            GenNum = GeneratorIndex;
-            if (GenNum > NumMTGenerators || GenNum < 1) {
-                ShowFatalError("SimMTGenerator: Invalid GeneratorIndex passed = " + General::TrimSigDigits(GenNum) +
-                               ", Number of CT Engine Generators = " + General::TrimSigDigits(NumMTGenerators) + ", Generator name = " + GeneratorName);
-            }
-
-            if (MTGenerator(GenNum).CheckEquipName) {
-                if (GeneratorName != MTGenerator(GenNum).Name) {
-                    ShowFatalError("SimMTGenerator: Invalid GeneratorIndex passed = " + General::TrimSigDigits(GenNum) +
-                                   ", Generator name = " + GeneratorName + ", stored Generator Name for that index = " + MTGenerator(GenNum).Name);
-                }
-                MTGenerator(GenNum).CheckEquipName = false;
+        // Now look for this particular gen in the list
+        for (auto &thisMTG : MTGenerator) {
+            if (thisMTG.Name == objectName) {
+                return &thisMTG;
             }
         }
-
-        auto &thisMTG = MTGenerator(GenNum);
-
-        thisMTG.InitMTGenerators(RunFlag, MyLoad, FirstHVACIteration);
-        thisMTG.CalcMTGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
-        thisMTG.UpdateMTGeneratorRecords();
-    }
-
-    void SimMTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
-                                std::string const &CompName,
-                                int const EP_UNUSED(CompTypeNum), // unused1208
-                                int &CompNum,
-                                bool const EP_UNUSED(RunFlag), // unused1208
-                                bool &InitLoopEquip,
-                                Real64 &EP_UNUSED(MyLoad), // unused1208
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation !unused1208
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         BGriffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Fill data needed in PlantLoopEquipments
-
-        if (GetMTInput) {
-            GetMTGeneratorInput();
-            GetMTInput = false;
-        }
-
-        if (InitLoopEquip) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, MTGenerator);
-            if (CompNum == 0) {
-                ShowFatalError("SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName);
-                return;
-            }
-            MinCap = MTGenerator(CompNum).MinThermalPowerOutput;
-            MaxCap = MTGenerator(CompNum).MaxThermalPowerOutput;
-            OptCap = MTGenerator(CompNum).RefThermalPowerOutput;
-            return;
-        } // End Of InitLoopEquip
+        // If we didn't find it, fatal
+        ShowFatalError("LocalMicroTurbineGeneratorFactory: Error getting inputs for microturbine generator named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void GetMTGeneratorInput()
@@ -1097,15 +1021,19 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
-
+        // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
+        // calls from the plant side... do nothing.
+        // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
     }
 
     void MTGeneratorSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                             Real64 &EP_UNUSED(MaxLoad),
-                             Real64 &EP_UNUSED(MinLoad),
-                             Real64 &EP_UNUSED(OptLoad))
+                             Real64 &MaxLoad,
+                             Real64 &MinLoad,
+                             Real64 &OptLoad)
     {
-
+        MaxLoad = 0.0;
+        MinLoad = 0.0;
+        OptLoad = 0.0;
     }
 
     void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
@@ -1269,10 +1197,8 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::CalcMTGeneratorModel( bool const RunFlag,                      // TRUE when generator is being asked to operate
-                              Real64 const MyLoad,                     // Generator demand (W)
-                              bool const EP_UNUSED(FirstHVACIteration) // unused1208
-    )
+    void MTGeneratorSpecs::CalcMTGeneratorModel(bool const RunFlag,                      // TRUE when generator is being asked to operate
+                              Real64 const MyLoad)                    // Generator demand (W)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad/D. Shirey
@@ -1980,57 +1906,6 @@ namespace MicroturbineElectricGenerator {
         }
         this->AncillaryEnergy = this->AncillaryPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         this->StandbyEnergy = this->StandbyPowerRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-    }
-
-    void GetMTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
-                               int const GeneratorIndex,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B Griffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // get some results for load center's aggregation
-
-        GeneratorPower = MTGenerator(GeneratorIndex).ElecPowerGenerated;
-        GeneratorEnergy = MTGenerator(GeneratorIndex).EnergyGen;
-        ThermalPower = MTGenerator(GeneratorIndex).QHeatRecovered;
-        ThermalEnergy = MTGenerator(GeneratorIndex).ExhaustEnergyRec;
-    }
-
-    void GetMTGeneratorExhaustNode(int const EP_UNUSED(CompType), std::string const &CompName, int &ExhaustOutletNodeNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mahabir Bhandari
-        //       DATE WRITTEN   Jul 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To pass exhaust outlet number from Micro Turbine to Exhaust fired absorption chiller.
-
-        if (GetMTInput) {
-            GetMTGeneratorInput();
-            GetMTInput = false;
-        }
-
-        ExhaustOutletNodeNum = 0;
-
-        int CompNum = UtilityRoutines::FindItemInList(CompName, MTGenerator);
-
-        if (CompNum == 0) {
-            ShowFatalError("GetMTGeneratorExhaustNode: Unit not found=" + CompName);
-        } else {
-            ExhaustOutletNodeNum = MTGenerator(CompNum).CombustionAirOutletNodeNum;
-        }
     }
 
 } // namespace MicroturbineElectricGenerator
