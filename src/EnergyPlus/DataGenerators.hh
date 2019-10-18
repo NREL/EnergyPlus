@@ -130,18 +130,10 @@ namespace DataGenerators {
 
     extern Real64 const ImBalanceTol; // used as fraction of electrical power at power module
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern int NumFuelConstit;
     extern int NumGeneratorFuelSups;
     extern int NumFuelCellGenerators; // number of SOFC Generators specified in input
-    extern int NumMicroCHPs;
-    extern int NumMicroCHPParams; // number of parameter sets for micro chp
     extern int NumGensWDynamics;  // number of dynamics controls for generators
-
-    // Types
 
     struct FCPowerModuleStruct
     {

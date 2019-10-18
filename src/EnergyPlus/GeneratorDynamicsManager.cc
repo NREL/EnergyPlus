@@ -158,7 +158,7 @@ namespace GeneratorDynamicsManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // get the number of generators that might use this module
-        NumGensWDynamics = NumMicroCHPs; // TODO  + NumFuelCellCGenerators
+        NumGensWDynamics = MicroCHPElectricGenerator::NumMicroCHPs; // TODO  + NumFuelCellCGenerators
 
         if (!allocated(GeneratorDynamics)) {
             GeneratorDynamics.allocate(NumGensWDynamics);

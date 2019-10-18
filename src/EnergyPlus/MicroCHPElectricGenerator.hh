@@ -58,6 +58,9 @@ namespace EnergyPlus {
 
 namespace MicroCHPElectricGenerator {
 
+    extern int NumMicroCHPs;
+    extern int NumMicroCHPParams; // number of parameter sets for micro chp
+
     extern bool GetMicroCHPInput; // When TRUE, calls subroutine to read input file.
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool MySizeFlag;
