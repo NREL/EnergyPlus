@@ -132,6 +132,13 @@ namespace MicroCHPElectricGenerator {
         Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
         Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
         Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
+        Real64 FuelCompressPower;    // electrical power used by fuel supply compressor [W]
+        Real64 FuelCompressEnergy;   // electrical energy used by fuel supply compressor [J]
+        Real64 FuelCompressSkinLoss; // heat rate of losses.by fuel supply compressor [W]
+        Real64 SkinLossPower;   // heat loss to surrounding zone [W]
+        Real64 SkinLossEnergy;  // heat loss to surround zone [J]
+        Real64 SkinLossConvect; // convective heat loss to zone [W]
+        Real64 SkinLossRadiat;  // radiative heat loss to zone [W]
 
         // Default Constructor
         MicroCHPParamsNonNormalized()
@@ -144,60 +151,8 @@ namespace MicroCHPElectricGenerator {
                   Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
                   QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
                   TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
-                  HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0)
-        {
-        }
-    };
-
-    struct MicroCHPReportDataStruct // these are all for reporting only!
-    {
-//        int Mode;                    // report operating mode (dev only, remove at end)
-//        Real64 OffModeTime;          // amount of time generator spent in Off mode
-//        Real64 StandyByModeTime;     // amount of time generator spent in standby mode
-//        Real64 WarmUpModeTime;       // amount of time generator spent in warm up mode
-//        Real64 NormalModeTime;       // amount of time generator spent in normal mode
-//        Real64 CoolDownModeTime;     // amount of time generator spent in Cool down mode
-//        Real64 ACPowerGen;           // reporting: power (W)
-//        Real64 ACEnergyGen;          // reporting: energy (J)
-//        Real64 QdotGross;            // reporting: interim gross power (W)
-//        Real64 Qgenss;               // reporting: net recovered heat rate steadystate(0)
-//        Real64 QdotHX;               // reporting: rate of heat exchange from engine to coolant (W)
-//        Real64 QdotHR;               // reporting: rate of heat recovered (W)
-//        Real64 Tengine;              // reporting: engine mass temperature (C)
-//        Real64 TotalHeatEnergyRec;   // reporting: total heat recovered (J)
-//        Real64 ExhaustEnergyRec;     // reporting: exhaust gas heat recovered (J)
-//        Real64 FuelEnergyLHV;        // reporting: Fuel Energy used in Lower Heating Value(J)
-//        Real64 FuelEnergyUseRateLHV; // reporting: Fuel Energy used in Lower Heating Value(W)
-//        Real64 FuelEnergyHHV;        // reporting: Fuel Energy used in Higher Heating Value(J)
-//        Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
-//        Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
-//        Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
-//        Real64 HeatRecMdot;          // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        // air supply and blower
-//        Real64 TairInlet; // State point 1
-//        Real64 MdotAir;   // air flow in kmol/sec
-        // fuel supply and compressor
-//        Real64 TfuelInlet;           // State point 2 [C]
-        Real64 NdotFuel;             // fuel flow in [kmol/sec]
-        Real64 MdotFuel;             // fuel flow in [kg/s]
-        Real64 FuelCompressPower;    // electrical power used by fuel supply compressor [W]
-        Real64 FuelCompressEnergy;   // electrical energy used by fuel supply compressor [J]
-        Real64 FuelCompressSkinLoss; // heat rate of losses.by fuel supply compressor [W]
-        // heat exchanger for water to exhaust heat recovery
-        Real64 SkinLossPower;   // heat loss to surrounding zone [W]
-        Real64 SkinLossEnergy;  // heat loss to surround zone [J]
-        Real64 SkinLossConvect; // convective heat loss to zone [W]
-        Real64 SkinLossRadiat;  // radiative heat loss to zone [W}
-        Real64 ElectEfficiency;
-        Real64 ThermalEfficiency;
-        Real64 OverallEfficiency;
-
-        // Default Constructor
-        MicroCHPReportDataStruct()
-                :
-                  NdotFuel(0.0), MdotFuel(0.0),
-                  FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0),
-                  SkinLossConvect(0.0), SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0)
+                  HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0),
+                  SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
         {
         }
     };
@@ -222,7 +177,6 @@ namespace MicroCHPElectricGenerator {
         int AirInletNodeID;
         std::string AirOutletNodeName;
         int AirOutletNodeID;
-        MicroCHPReportDataStruct Report; // structure of report variables
         int FuelSupplyID;                // index for fuel supply data structure
         int DynamicsControlID;           // index in GeneratorDynamics data where control issues are handled
         int AvailabilitySchedID;         // index for availability schedule
