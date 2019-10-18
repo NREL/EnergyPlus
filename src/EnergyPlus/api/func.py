@@ -55,3 +55,7 @@ class Functional:
 
     def fluid_properties(self, fluid_name: str) -> FluidAndPsychProperties:
         return FluidAndPsychProperties(self.api, fluid_name)
+
+    @staticmethod
+    def energyplus_version() -> str:
+        return "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
