@@ -1220,10 +1220,10 @@ namespace MicroturbineElectricGenerator {
 
         //   Load local variables from data structure (for code readability)
         // Min allowed operating fraction at full load
-        Real64 MinPartLoadRat = this->MinPartLoadRat;
+        Real64 minPartLoadRat = this->MinPartLoadRat;
 
         // Max allowed operating fraction at full load
-        Real64 MaxPartLoadRat = this->MaxPartLoadRat;
+        Real64 maxPartLoadRat = this->MaxPartLoadRat;
 
         // Generator reference capacity (W)
         Real64 ReferencePowerOutput = this->RefElecPowerOutput;
@@ -1248,7 +1248,7 @@ namespace MicroturbineElectricGenerator {
         this->ExhaustAirHumRat = 0.0;
 
         Real64 HeatRecInTemp;          // Heat recovery fluid inlet temperature (C)
-        Real64 HeatRecMdot;            // Heat recovery fluid mass flow rate (kg/s)
+        Real64 heatRecMdot;            // Heat recovery fluid mass flow rate (kg/s)
         Real64 HeatRecCp;              // Specific heat of the heat recovery fluid (J/kg-K)
 
         if (this->HeatRecActive) {
@@ -1257,11 +1257,11 @@ namespace MicroturbineElectricGenerator {
                                               HeatRecInTemp,
                                               DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                               RoutineName);
-            HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
+            heatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
         } else {
             HeatRecInTemp = 0.0;
             HeatRecCp = 0.0;
-            HeatRecMdot = 0.0;
+            heatRecMdot = 0.0;
         }
 
         Real64 CombustionAirInletTemp;  // Combustion air inlet temperature (C)
@@ -1329,16 +1329,16 @@ namespace MicroturbineElectricGenerator {
         FullLoadPowerOutput = max(FullLoadPowerOutput, this->MinElecPowerOutput);
 
         // Ancillary power used by pump (if not specified in manufacturers data)
-        Real64 AncillaryPowerRate = this->AncillaryPower;
+        Real64 ancillaryPowerRate = this->AncillaryPower;
 
         // Difference between ancillary power rate and ancillary power rate last (last iteration)
         Real64 AncillaryPowerRateDiff = AncPowerDiffToler + 1.0; // Initialize to force through DO WHILE Loop at least once
 
         Real64 PLR(0.0);                     // Generator operating part load ratio
-        Real64 ElecPowerGenerated(0.0);  // Generator electric power output (W)
+        Real64 elecPowerGenerated(0.0);  // Generator electric power output (W)
         Real64 FuelUseEnergyRateLHV(0.0);   // Rate of fuel energy required to run microturbine, LHV basis (W)
-        Real64 FuelHigherHeatingValue(0.0);  // Higher heating value (LLV) of fuel kJ/kg)
-        Real64 FuelLowerHeatingValue(0.0);  // Lower heating value (LLV) of fuel kJ/kg)
+        Real64 fuelHigherHeatingValue(0.0);  // Higher heating value (LLV) of fuel kJ/kg)
+        Real64 fuelLowerHeatingValue(0.0);  // Lower heating value (LLV) of fuel kJ/kg)
         Real64 AnciPowerFMdotFuel(0.0);     // Ancillary power as a function of fuel flow curve output
         int AncPowerCalcIterIndex = 0;     // Index for subroutine iteration loop if Ancillary Power (function of fuel flow) is used
 
@@ -1347,18 +1347,18 @@ namespace MicroturbineElectricGenerator {
             ++AncPowerCalcIterIndex; // Increment iteration loop counter
 
             //     Calculate operating power output (gross)
-            ElecPowerGenerated = min(max(0.0, MyLoad + AncillaryPowerRate), FullLoadPowerOutput);
+            elecPowerGenerated = min(max(0.0, MyLoad + ancillaryPowerRate), FullLoadPowerOutput);
 
             //     Calculate PLR, but must be between the minPLR and maxPLR
             if (FullLoadPowerOutput > 0.0) {
-                PLR = min(ElecPowerGenerated / FullLoadPowerOutput, MaxPartLoadRat);
-                PLR = max(PLR, MinPartLoadRat);
+                PLR = min(elecPowerGenerated / FullLoadPowerOutput, maxPartLoadRat);
+                PLR = max(PLR, minPartLoadRat);
             } else {
                 PLR = 0.0;
             }
 
-            //     Recalculate ElecPowerGenerated based on "final" PLR
-            ElecPowerGenerated = FullLoadPowerOutput * PLR;
+            //     Recalculate elecPowerGenerated based on "final" PLR
+            elecPowerGenerated = FullLoadPowerOutput * PLR;
 
             //     Calculate electrical efficiency modifier curve output (function of temp)
             // Electrical efficiency as a function of temperature curve output
@@ -1412,18 +1412,18 @@ namespace MicroturbineElectricGenerator {
 
             //     Calculate fuel use (W = J/s), LHV basis
             if (OperatingElecEfficiency > 0.0) {
-                FuelUseEnergyRateLHV = ElecPowerGenerated / OperatingElecEfficiency;
+                FuelUseEnergyRateLHV = elecPowerGenerated / OperatingElecEfficiency;
             } else {
                 FuelUseEnergyRateLHV = 0.0; // If fuel use rate is zero, then
-                ElecPowerGenerated = 0.0;   //  electric power generated must be zero.
+                elecPowerGenerated = 0.0;   //  electric power generated must be zero.
             }
 
             //     Set fuel heating values
-            FuelHigherHeatingValue = this->FuelHigherHeatingValue;
-            FuelLowerHeatingValue = this->FuelLowerHeatingValue;
+            fuelHigherHeatingValue = this->FuelHigherHeatingValue;
+            fuelLowerHeatingValue = this->FuelLowerHeatingValue;
 
             //     Calculate fuel mass flow rate
-            this->FuelMdot = FuelUseEnergyRateLHV / (FuelLowerHeatingValue * KJtoJ);
+            this->FuelMdot = FuelUseEnergyRateLHV / (fuelLowerHeatingValue * KJtoJ);
 
             //     Calculate ancillary power requirement
             if (this->AncillaryPowerFuelCurveNum > 0) {
@@ -1451,14 +1451,14 @@ namespace MicroturbineElectricGenerator {
             }
 
             // Ancillary power used by pump from last iteration (iteration loop within this subroutine)
-            Real64 AncillaryPowerRateLast = AncillaryPowerRate;
+            Real64 AncillaryPowerRateLast = ancillaryPowerRate;
 
             if (this->AncillaryPowerFuelCurveNum > 0) {
-                AncillaryPowerRate =
+                ancillaryPowerRate =
                     RelaxFactor * this->AncillaryPower * AnciPowerFMdotFuel - (1.0 - RelaxFactor) * AncillaryPowerRateLast;
             }
 
-            AncillaryPowerRateDiff = std::abs(AncillaryPowerRate - AncillaryPowerRateLast);
+            AncillaryPowerRateDiff = std::abs(ancillaryPowerRate - AncillaryPowerRateLast);
         }
 
         if (AncPowerCalcIterIndex > MaxAncPowerIter) {
@@ -1467,7 +1467,7 @@ namespace MicroturbineElectricGenerator {
                 ShowWarningMessage("GENERATOR:MICROTURBINE \"" + this->Name + "\"");
                 ShowContinueError("... Iteration loop for electric power generation is not converging within tolerance.");
                 ShowContinueError("... Check the Ancillary Power Modifier Curve (function of fuel input).");
-                ShowContinueError("... Ancillary Power = " + General::TrimSigDigits(AncillaryPowerRate, 1) + " W.");
+                ShowContinueError("... Ancillary Power = " + General::TrimSigDigits(ancillaryPowerRate, 1) + " W.");
                 ShowContinueError("... Fuel input rate = " + General::TrimSigDigits(AnciPowerFMdotFuel, 4) + " kg/s.");
                 ShowContinueErrorTimeStamp("... Simulation will continue.");
             }
@@ -1477,11 +1477,11 @@ namespace MicroturbineElectricGenerator {
         }
 
         //   Calculate electrical power generated
-        this->ElecPowerGenerated = ElecPowerGenerated - AncillaryPowerRate;
+        this->ElecPowerGenerated = elecPowerGenerated - ancillaryPowerRate;
 
         //   Report fuel energy use rate on HHV basis, which is the unit of measure when the fuel is sold
-        this->FuelEnergyUseRateHHV = this->FuelMdot * FuelHigherHeatingValue * KJtoJ;
-        this->AncillaryPowerRate = AncillaryPowerRate;     // Move to data structure for later reporting
+        this->FuelEnergyUseRateHHV = this->FuelMdot * fuelHigherHeatingValue * KJtoJ;
+        this->AncillaryPowerRate = ancillaryPowerRate;     // Move to data structure for later reporting
         this->FuelEnergyUseRateLHV = FuelUseEnergyRateLHV; // Move to data structure for reporting calculations
 
         //   When generator operates, standby losses are 0
@@ -1581,7 +1581,7 @@ namespace MicroturbineElectricGenerator {
                                        RoutineName);
 
                 // Heat recovery fluid flow rate (m3/s)
-                Real64 HeatRecVolFlowRate = HeatRecMdot / rho;
+                Real64 HeatRecVolFlowRate = heatRecMdot / rho;
                 HeatRecRateFFlow = CurveManager::CurveValue(this->HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
                 if (HeatRecRateFFlow < 0.0) {
                     if (this->HeatRecRateFFlowErrorIndex == 0) {
@@ -1608,10 +1608,10 @@ namespace MicroturbineElectricGenerator {
             Real64 HeatRecOutTemp;         // Heat recovery fluid outlet temperature (C)
 
             //     Check for divide by zero
-            if ((HeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
-                HeatRecOutTemp = HeatRecInTemp + QHeatRecToWater / (HeatRecMdot * HeatRecCp);
+            if ((heatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
+                HeatRecOutTemp = HeatRecInTemp + QHeatRecToWater / (heatRecMdot * HeatRecCp);
             } else {
-                HeatRecMdot = 0.0;
+                heatRecMdot = 0.0;
                 HeatRecOutTemp = HeatRecInTemp;
                 QHeatRecToWater = 0.0;
             }
@@ -1632,7 +1632,7 @@ namespace MicroturbineElectricGenerator {
 
                 if ((MinHeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
                     HeatRecOutTemp = QHeatRecToWater / (MinHeatRecMdot * HeatRecCp) + HeatRecInTemp;
-                    HRecRatio = HeatRecMdot / MinHeatRecMdot;
+                    HRecRatio = heatRecMdot / MinHeatRecMdot;
                 } else {
                     HeatRecOutTemp = HeatRecInTemp;
                     HRecRatio = 0.0;
@@ -1641,43 +1641,43 @@ namespace MicroturbineElectricGenerator {
             }
 
             //     Check water mass flow rate against minimum
-            if (this->HeatRecMinMassFlowRate > HeatRecMdot && HeatRecMdot > 0.0) {
+            if (this->HeatRecMinMassFlowRate > heatRecMdot && heatRecMdot > 0.0) {
                 if (this->HRMinFlowErrorIndex == 0) {
                     ShowWarningError("GENERATOR:MICROTURBINE \"" + this->Name + "\"");
                     ShowContinueError("...Heat reclaim water flow rate is below the generators minimum mass flow rate of (" +
                                       General::TrimSigDigits(this->HeatRecMinMassFlowRate, 4) + ").");
-                    ShowContinueError("...Heat reclaim water mass flow rate = " + General::TrimSigDigits(HeatRecMdot, 4) + '.');
+                    ShowContinueError("...Heat reclaim water mass flow rate = " + General::TrimSigDigits(heatRecMdot, 4) + '.');
                     ShowContinueErrorTimeStamp("...Check inputs for heat recovery water flow rate.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Heat recovery water flow rate is below the generators minimum mass flow rate warning continues...",
                     this->HRMinFlowErrorIndex,
-                    HeatRecMdot,
-                    HeatRecMdot);
+                    heatRecMdot,
+                    heatRecMdot);
             }
 
             //     Check water mass flow rate against maximum
-            if (HeatRecMdot > this->HeatRecMaxMassFlowRate && HeatRecMdot > 0.0) {
+            if (heatRecMdot > this->HeatRecMaxMassFlowRate && heatRecMdot > 0.0) {
                 if (this->HRMaxFlowErrorIndex == 0) {
                     ShowWarningError("GENERATOR:MICROTURBINE \"" + this->Name + "\"");
                     ShowContinueError("...Heat reclaim water flow rate is above the generators maximum mass flow rate of (" +
                                       General::TrimSigDigits(this->HeatRecMaxMassFlowRate, 4) + ").");
-                    ShowContinueError("...Heat reclaim water mass flow rate = " + General::TrimSigDigits(HeatRecMdot, 4) + '.');
+                    ShowContinueError("...Heat reclaim water mass flow rate = " + General::TrimSigDigits(heatRecMdot, 4) + '.');
                     ShowContinueErrorTimeStamp("...Check inputs for heat recovery water flow rate.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Heat recovery water flow rate is above the generators maximum mass flow rate warning continues...",
                     this->HRMaxFlowErrorIndex,
-                    HeatRecMdot,
-                    HeatRecMdot);
+                    heatRecMdot,
+                    heatRecMdot);
             }
 
             //     Set report variables
             this->HeatRecInletTemp = HeatRecInTemp;
             this->HeatRecOutletTemp = HeatRecOutTemp;
-            this->HeatRecMdot = HeatRecMdot;
+            this->HeatRecMdot = heatRecMdot;
             this->QHeatRecovered = QHeatRecToWater;
 
         } // End of  IF (MTGenerator(GeneratorNum)%HeatRecActive) THEN
@@ -1825,7 +1825,7 @@ namespace MicroturbineElectricGenerator {
                 if (H2OHtOfVap > 0.0) {
                     this->ExhaustAirHumRat =
                         CombustionAirInletW + this->FuelMdot *
-                                                  ((FuelHigherHeatingValue - FuelLowerHeatingValue) * KJtoJ / H2OHtOfVap) / ExhAirMassFlowRate;
+                                              ((fuelHigherHeatingValue - fuelLowerHeatingValue) * KJtoJ / H2OHtOfVap) / ExhAirMassFlowRate;
                 } else {
                     this->ExhaustAirHumRat = CombustionAirInletW;
                 }
