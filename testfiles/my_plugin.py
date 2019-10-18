@@ -6,10 +6,11 @@ class MyPlugin(EnergyPlusPlugin):
 
     def __init__(self):
         super().__init__()
+        print("Inside my plugin constructor")
         api = EnergyPlusAPI()
         self.version_string = api.energyplus_version()
         self.transfer = api.data_transfer()
-        self.db_handle = self.transfer.get_variable_handle("Site Outdoor Air Drybulb Temperature", "Environment")
+        self.db_handle = self.transfer.get_variable_handle(u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT")
         self.error = False
         if self.db_handle <= 0:
             self.error = True

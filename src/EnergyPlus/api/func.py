@@ -1,5 +1,5 @@
 from ctypes import cdll, c_char_p, c_int, c_void_p
-from common import RealEP
+from pyenergyplus.common import RealEP
 
 
 class BaseThermalPropertySet:
@@ -19,10 +19,10 @@ class BaseThermalPropertySet:
     def __del__(self):
         self.api.delCBaseThermalPropertySet(self.instance)
 
-    def diffusivity(self):
+    def diffusivity(self) -> float:
         return self.api.cBaseThermalPropertySet_diffusivity(self.instance)
 
-    def set_conductivity(self, conductivity: float):
+    def set_conductivity(self, conductivity: float) -> None:
         self.api.cBaseThermalPropertySet_setConductivity(self.instance, conductivity)
 
 
@@ -39,10 +39,10 @@ class FluidAndPsychProperties:
 
         self.api.initializeFunctionalAPI()
 
-    def get_sat_press_refrigerant(self):
+    def get_sat_press_refrigerant(self) -> float:
         index = 0
         val = self.api.fluidProperty_GetSatPressureRefrig(self.fluid_name.encode('utf-8'), 25.5, index)
-        print("Calculated saturation pressure = " + str(val))
+        return float(val)
 
 
 class Functional:
@@ -50,8 +50,8 @@ class Functional:
     def __init__(self, api: cdll):
         self.api = api
 
-    def base_struct(self, conductivity: float, density: float, specific_heat: float):
+    def base_struct(self, conductivity: float, density: float, specific_heat: float) -> BaseThermalPropertySet:
         return BaseThermalPropertySet(self.api, conductivity, density, specific_heat)
 
-    def fluid_properties(self, fluid_name: str):
+    def fluid_properties(self, fluid_name: str) -> FluidAndPsychProperties:
         return FluidAndPsychProperties(self.api, fluid_name)

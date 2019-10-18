@@ -2,9 +2,9 @@ from ctypes import cdll
 import os
 import sys
 
-from .func import Functional
-from .datatransfer import DataTransfer
-from .runtime import Runtime
+from pyenergyplus.func import Functional
+from pyenergyplus.datatransfer import DataTransfer
+from pyenergyplus.runtime import Runtime
 
 
 def api_path():
