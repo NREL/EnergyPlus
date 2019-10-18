@@ -222,8 +222,6 @@ namespace MicroCHPElectricGenerator {
                                               DataIPShortCuts::lAlphaFieldBlanks,
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
-                // Can't validate this name
-                // UtilityRoutines::IsNameEmpty(AlphArray(1),DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
                 std::string ObjMSGName = DataIPShortCuts::cCurrentModuleObject + " Named " + AlphArray(1);
 
@@ -312,8 +310,6 @@ namespace MicroCHPElectricGenerator {
                 ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
-
-            // ALLOCATE ARRAYS
 
             if (!(allocated(MicroCHP))) {
                 MicroCHP.allocate(NumMicroCHPs); // inits handeled in derived type definitions
@@ -404,236 +400,258 @@ namespace MicroCHPElectricGenerator {
 
             // setup report variables
             for (int GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum) {
-
-                SetupOutputVariable("Generator Off Mode Time",
-                                    OutputProcessor::Unit::s,
-                                    MicroCHP(GeneratorNum).A42Model.OffModeTime,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Standby Mode Time",
-                                    OutputProcessor::Unit::s,
-                                    MicroCHP(GeneratorNum).A42Model.StandyByModeTime,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Warm Up Mode Time",
-                                    OutputProcessor::Unit::s,
-                                    MicroCHP(GeneratorNum).A42Model.WarmUpModeTime,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Normal Operating Mode Time",
-                                    OutputProcessor::Unit::s,
-                                    MicroCHP(GeneratorNum).A42Model.NormalModeTime,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Cool Down Mode Time",
-                                    OutputProcessor::Unit::s,
-                                    MicroCHP(GeneratorNum).A42Model.CoolDownModeTime,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Produced Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.ACPowerGen,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Produced Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.ACEnergyGen,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name,
-                                    _,
-                                    "ElectricityProduced",
-                                    "COGENERATION",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Generator Produced Thermal Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.QdotHR,
-                                    "system",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Produced Thermal Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.TotalHeatEnergyRec,
-                                    "system",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "COGENERATION",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Electric Efficiency",
-                                    OutputProcessor::Unit::None,
-                                    MicroCHP(GeneratorNum).A42Model.ElecEff,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Thermal Efficiency",
-                                    OutputProcessor::Unit::None,
-                                    MicroCHP(GeneratorNum).A42Model.ThermEff,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Gross Input Heat Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.Qgross,
-                                    "system",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Steady State Engine Heat Generation Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.Qgenss,
-                                    "system",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Engine Heat Exchange Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.QdotHX,
-                                    "system",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    MicroCHP(GeneratorNum).A42Model.MdotAir,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Molar Flow Rate",
-                                    OutputProcessor::Unit::kmol_s,
-                                    MicroCHP(GeneratorNum).A42Model.NdotFuel,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    MicroCHP(GeneratorNum).A42Model.MdotFuel,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Engine Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MicroCHP(GeneratorNum).A42Model.Teng,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Coolant Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MicroCHP(GeneratorNum).A42Model.HeatRecInletTemp,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Coolant Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    MicroCHP(GeneratorNum).A42Model.HeatRecOutletTemp,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                // this next one needs to be reconciled with non-gas fuel constituents.
-                //   need custom resourceTypeKey or something for user defined fuel compositions.
-                SetupOutputVariable("Generator Fuel HHV Basis Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.FuelEnergyHHV,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name,
-                                    _,
-                                    "Gas",
-                                    "COGENERATION",
-                                    _,
-                                    "Plant");
-
-                SetupOutputVariable("Generator Fuel HHV Basis Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.FuelEnergyUseRateHHV,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Fuel LHV Basis Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.FuelEnergyLHV,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel LHV Basis Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.FuelEnergyUseRateLHV,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Fuel Compressor Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.FuelCompressPower,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Compressor Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.FuelCompressEnergy,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.FuelCompressSkinLoss,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                SetupOutputVariable("Generator Zone Sensible Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.SkinLossPower,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Sensible Heat Transfer Energy",
-                                    OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).A42Model.SkinLossEnergy,
-                                    "System",
-                                    "Sum",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Convection Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.SkinLossConvect,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Radiation Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).A42Model.SkinLossRadiat,
-                                    "System",
-                                    "Average",
-                                    MicroCHP(GeneratorNum).Name);
-
-                if (MicroCHP(GeneratorNum).ZoneID > 0) {
-                    SetupZoneInternalGain(MicroCHP(GeneratorNum).ZoneID,
-                                          "Generator:MicroCHP",
-                                          MicroCHP(GeneratorNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
-                                          MicroCHP(GeneratorNum).A42Model.SkinLossConvect,
-                                          _,
-                                          MicroCHP(GeneratorNum).A42Model.SkinLossRadiat);
-                }
             }
 
             MyOneTimeFlag = false;
         }
     }
 
-    // PARAMETERS
+    void MicroCHPDataStruct::setupOutputVars()
+    {
+        SetupOutputVariable("Generator Off Mode Time",
+                            OutputProcessor::Unit::s,
+                            this->A42Model.OffModeTime,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Standby Mode Time",
+                            OutputProcessor::Unit::s,
+                            this->A42Model.StandyByModeTime,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Warm Up Mode Time",
+                            OutputProcessor::Unit::s,
+                            this->A42Model.WarmUpModeTime,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Normal Operating Mode Time",
+                            OutputProcessor::Unit::s,
+                            this->A42Model.NormalModeTime,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Cool Down Mode Time",
+                            OutputProcessor::Unit::s,
+                            this->A42Model.CoolDownModeTime,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Produced Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.ACPowerGen,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Produced Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.ACEnergyGen,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ElectricityProduced",
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.QdotHR,
+                            "system",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Produced Thermal Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.TotalHeatEnergyRec,
+                            "system",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Generator Electric Efficiency",
+                            OutputProcessor::Unit::None,
+                            this->A42Model.ElecEff,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Thermal Efficiency",
+                            OutputProcessor::Unit::None,
+                            this->A42Model.ThermEff,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Gross Input Heat Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.Qgross,
+                            "system",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Steady State Engine Heat Generation Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.Qgenss,
+                            "system",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Engine Heat Exchange Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.QdotHX,
+                            "system",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Air Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->A42Model.MdotAir,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel Molar Flow Rate",
+                            OutputProcessor::Unit::kmol_s,
+                            this->A42Model.NdotFuel,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->A42Model.MdotFuel,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Engine Temperature",
+                            OutputProcessor::Unit::C,
+                            this->A42Model.Teng,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Coolant Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->A42Model.HeatRecInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Coolant Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->A42Model.HeatRecOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        // this next one needs to be reconciled with non-gas fuel constituents.
+        //   need custom resourceTypeKey or something for user defined fuel compositions.
+        SetupOutputVariable("Generator Fuel HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.FuelEnergyHHV,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "Gas",
+                            "COGENERATION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.FuelEnergyUseRateHHV,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel LHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.FuelEnergyLHV,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel LHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.FuelEnergyUseRateLHV,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel Compressor Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.FuelCompressPower,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel Compressor Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.FuelCompressEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.FuelCompressSkinLoss,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Zone Sensible Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.SkinLossPower,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Zone Sensible Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->A42Model.SkinLossEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Generator Zone Convection Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.SkinLossConvect,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator Zone Radiation Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->A42Model.SkinLossRadiat,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        if (this->ZoneID > 0) {
+            SetupZoneInternalGain(this->ZoneID,
+                                  "Generator:MicroCHP",
+                                  this->Name,
+                                  DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
+                                  this->A42Model.SkinLossConvect,
+                                  _,
+                                  this->A42Model.SkinLossRadiat);
+        }
+    }
 
     void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators()
     {
@@ -646,6 +664,11 @@ namespace MicroCHPElectricGenerator {
         static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
 
         bool errFlag;
+
+        if (this->myFlag) {
+            this->setupOutputVars();
+            this->myFlag = false;
+        }
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
