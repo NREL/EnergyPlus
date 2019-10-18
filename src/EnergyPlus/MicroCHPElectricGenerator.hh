@@ -133,24 +133,24 @@ namespace MicroCHPElectricGenerator {
         Real64 FuelCompressPower;    // electrical power used by fuel supply compressor [W]
         Real64 FuelCompressEnergy;   // electrical energy used by fuel supply compressor [J]
         Real64 FuelCompressSkinLoss; // heat rate of losses.by fuel supply compressor [W]
-        Real64 SkinLossPower;   // heat loss to surrounding zone [W]
-        Real64 SkinLossEnergy;  // heat loss to surround zone [J]
-        Real64 SkinLossConvect; // convective heat loss to zone [W]
-        Real64 SkinLossRadiat;  // radiative heat loss to zone [W]
+        Real64 SkinLossPower;        // heat loss to surrounding zone [W]
+        Real64 SkinLossEnergy;       // heat loss to surround zone [J]
+        Real64 SkinLossConvect;      // convective heat loss to zone [W]
+        Real64 SkinLossRadiat;       // radiative heat loss to zone [W]
 
         // Default Constructor
         MicroCHPParamsNonNormalized()
-                : MaxElecPower(0.0), MinElecPower(0.0), MinWaterMdot(0.0), MaxWaterTemp(0.0), ElecEffCurveID(0), ThermalEffCurveID(0),
-                  InternalFlowControl(false), PlantFlowControl(true), WaterFlowCurveID(0), AirFlowCurveID(0), DeltaPelMax(0.0), DeltaFuelMdotMax(0.0),
-                  UAhx(0.0), UAskin(0.0), RadiativeFraction(0.0), MCeng(0.0), MCcw(0.0), Pstandby(0.0), WarmUpByTimeDelay(false),
-                  WarmUpByEngineTemp(true), kf(0.0), TnomEngOp(0.0), kp(0.0), Rfuelwarmup(0.0), WarmUpDelay(0.0), PcoolDown(0.0), CoolDownDelay(0.0),
-                  MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
-                  WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
-                  Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
-                  QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
-                  TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
-                  HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0),
-                  SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
+            : MaxElecPower(0.0), MinElecPower(0.0), MinWaterMdot(0.0), MaxWaterTemp(0.0), ElecEffCurveID(0), ThermalEffCurveID(0),
+              InternalFlowControl(false), PlantFlowControl(true), WaterFlowCurveID(0), AirFlowCurveID(0), DeltaPelMax(0.0), DeltaFuelMdotMax(0.0),
+              UAhx(0.0), UAskin(0.0), RadiativeFraction(0.0), MCeng(0.0), MCcw(0.0), Pstandby(0.0), WarmUpByTimeDelay(false),
+              WarmUpByEngineTemp(true), kf(0.0), TnomEngOp(0.0), kp(0.0), Rfuelwarmup(0.0), WarmUpDelay(0.0), PcoolDown(0.0), CoolDownDelay(0.0),
+              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
+              WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
+              Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
+              QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
+              TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
+              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0),
+              SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
         {
         }
     };
@@ -175,13 +175,13 @@ namespace MicroCHPElectricGenerator {
         int AirInletNodeID;
         std::string AirOutletNodeName;
         int AirOutletNodeID;
-        int FuelSupplyID;                // index for fuel supply data structure
-        int DynamicsControlID;           // index in GeneratorDynamics data where control issues are handled
-        int AvailabilitySchedID;         // index for availability schedule
-        int CWLoopNum;                   // cooling water plant loop index number
-        int CWLoopSideNum;               // cooling water plant loop side index
-        int CWBranchNum;                 // cooling water plant loop branch index
-        int CWCompNum;                   // cooling water plant loop component index
+        int FuelSupplyID;        // index for fuel supply data structure
+        int DynamicsControlID;   // index in GeneratorDynamics data where control issues are handled
+        int AvailabilitySchedID; // index for availability schedule
+        int CWLoopNum;           // cooling water plant loop index number
+        int CWLoopSideNum;       // cooling water plant loop side index
+        int CWBranchNum;         // cooling water plant loop branch index
+        int CWCompNum;           // cooling water plant loop component index
         bool CheckEquipName;
         bool MySizeFlag;
         bool MyEnvrnFlag;
@@ -190,10 +190,10 @@ namespace MicroCHPElectricGenerator {
 
         // Default Constructor
         MicroCHPDataStruct()
-                : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
-                  PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
-                  DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
+            : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
+              PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
+              DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true),
+              MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }
 
