@@ -2141,18 +2141,23 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         break;
     }
     case GeneratorType::microCHP: {
-        MicroCHPElectricGenerator::SimMicroCHPGenerator(DataGlobalConstants::iGeneratorMicroCHP,
-                                                        name,
-                                                        generatorIndex,
-                                                        runFlag,
-                                                        false,
-                                                        myElecLoadRequest,
-                                                        DataPrecisionGlobals::constant_zero,
-                                                        FirstHVACIteration);
-        MicroCHPElectricGenerator::GetMicroCHPGeneratorResults(
-            DataGlobalConstants::iGeneratorMicroCHP, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
-        electricPowerOutput = electProdRate;
-        thermalPowerOutput = thermProdRate;
+        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(name);
+
+        // simulate
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators();
+
+        if (!DataPlant::PlantFirstSizeCompleted) break;
+
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(runFlag,
+                                                                                                                       false,
+                                                                                                                       myElecLoadRequest,
+                                                                                                                       DataPrecisionGlobals::constant_zero,
+                                                                                                                       FirstHVACIteration);
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcUpdateHeatRecovery();
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->UpdateMicroCHPGeneratorRecords();
+
+        thermalPowerOutput = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.ACPowerGen;
+        thermalPowerOutput = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.QdotHR;
         break;
     }
     case GeneratorType::microturbine: {

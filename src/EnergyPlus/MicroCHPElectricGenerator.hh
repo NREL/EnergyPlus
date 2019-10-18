@@ -186,7 +186,6 @@ namespace MicroCHPElectricGenerator {
         bool MySizeFlag;
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
-        int genArrIdxNum;
         bool myFlag;
 
         // Default Constructor
@@ -194,13 +193,15 @@ namespace MicroCHPElectricGenerator {
                 : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
                   PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
                   DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), genArrIdxNum(0), myFlag(true)
+                  CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void setupOutputVars();
 
@@ -218,16 +219,6 @@ namespace MicroCHPElectricGenerator {
 
         static PlantComponent *factory(std::string const &objectName);
     };
-
-
-    void SimMicroCHPGenerator(int GeneratorType,          // type of Generator
-                              std::string const &GeneratorName, // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool RunFlagElectCenter, // simulate Generator when TRUE
-                              bool RunFlagPlant,       // simulate generator when true.
-                              Real64 MyElectricLoad,   // demand on electric generator
-                              Real64 MyThermalLoad,    // thermal demand on cogenerator
-                              bool FirstHVACIteration);
 
     void GetMicroCHPGeneratorInput();
 
@@ -265,30 +256,10 @@ namespace MicroCHPElectricGenerator {
 
     void FigureMicroCHPZoneGains();
 
-    void SimMicroCHPPlantHeatRecovery(std::string const &CompType,
-                                      std::string const &CompName,
-                                      int &CompNum,
-                                      bool RunFlag,
-                                      bool &InitLoopEquip,
-                                      Real64 &MyThermalLoad,
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap,
-                                      bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    void GetMicroCHPGeneratorResults(int GeneratorType, // type of Generator
-                                     int GeneratorIndex,
-                                     Real64 &GeneratorPower,  // electrical power
-                                     Real64 &GeneratorEnergy, // electrical energy
-                                     Real64 &ThermalPower,    // heat power
-                                     Real64 &ThermalEnergy    // heat energy
-    );
+    void clear_state();
 
     extern Array1D<MicroCHPDataStruct> MicroCHP;
     extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
-
-    void clear_state();
 
 } // namespace MicroCHPElectricGenerator
 
