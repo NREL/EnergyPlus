@@ -112,9 +112,6 @@ namespace MicroCHPElectricGenerator {
 
     bool GetMicroCHPInput(true);
 
-    Array1D_bool CheckEquipName;
-    Array1D_bool MySizeFlag;
-
     void SimMicroCHPGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
                               int &GeneratorIndex,
@@ -153,12 +150,12 @@ namespace MicroCHPElectricGenerator {
                 ShowFatalError("SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                ", Number of Micro CHP Generators=" + General::TrimSigDigits(NumMicroCHPs) + ", Generator name=" + GeneratorName);
             }
-            if (CheckEquipName(GenNum)) {
+            if (MicroCHP(GenNum).CheckEquipName) {
                 if (GeneratorName != MicroCHP(GenNum).Name) {
                     ShowFatalError("SimMicroCHPNoNormalizeGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                    ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + MicroCHP(GenNum).Name);
                 }
-                CheckEquipName(GenNum) = false;
+                MicroCHP(GenNum).CheckEquipName = false;
             }
         }
 
@@ -214,7 +211,6 @@ namespace MicroCHPElectricGenerator {
             }
 
             MicroCHPParamInput.allocate(NumMicroCHPParams);
-            CheckEquipName.dimension(NumMicroCHPParams, true);
 
             for (CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum) {
                 inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
@@ -664,10 +660,8 @@ namespace MicroCHPElectricGenerator {
         if (MyOneTimeFlag) {
             MyEnvrnFlag.allocate(NumMicroCHPs);
             MyPlantScanFlag.allocate(NumMicroCHPs);
-            MySizeFlag.allocate(NumMicroCHPs);
             MyEnvrnFlag = true;
             MyPlantScanFlag = true;
-            MySizeFlag = true;
             MyOneTimeFlag = false;
         }
 
@@ -704,7 +698,7 @@ namespace MicroCHPElectricGenerator {
             MyPlantScanFlag(GeneratorNum) = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && MySizeFlag(GeneratorNum) && !MyPlantScanFlag(GeneratorNum) && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (!DataGlobals::SysSizingCalc && MicroCHP(GeneratorNum).MySizeFlag && !MyPlantScanFlag(GeneratorNum) && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName,
                                    DataLoopNode::Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp,
                                    DataPlant::PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex,
@@ -739,10 +733,10 @@ namespace MicroCHPElectricGenerator {
                                                                   DataLoopNode::Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
 
             GeneratorDynamicsManager::SetupGeneratorControlStateManager(GeneratorNum);
-            MySizeFlag(GeneratorNum) = false;
+            MicroCHP(GeneratorNum).MySizeFlag = false;
         }
 
-        if (MySizeFlag(GeneratorNum)) return;
+        if (MicroCHP(GeneratorNum).MySizeFlag) return;
 
         DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
 
@@ -1050,8 +1044,6 @@ namespace MicroCHPElectricGenerator {
                         if (MdotFuelWarmup > MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax) {
                             MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                         }
-                    } else if (Teng < thisAmbientTemp) {
-                        MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                     } else { // equal would divide by zero
                         MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                     }
@@ -1160,7 +1152,6 @@ namespace MicroCHPElectricGenerator {
             }
         }
 
-        EnergyBalOK = false;
         for (i = 1; i <= 20; ++i) { // sequential search with exit criteria
             // calculate new value for engine temperature
             // for Stirling in warmup, need to include dependency of Qgness on Teng
@@ -1196,9 +1187,6 @@ namespace MicroCHPElectricGenerator {
                     } else { // equal would divide by zero
                         Pnetss = Pmax;
                     }
-
-                } else if (Teng < thisAmbientTemp) {
-                    MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                 } else { // equal would divide by zero
                     MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                 }
@@ -1517,7 +1505,7 @@ namespace MicroCHPElectricGenerator {
                 return;
             }
             InitMicroCHPNoNormalizeGenerators(CompNum, FirstHVACIteration);
-            if (MySizeFlag(CompNum)) return;
+            if (MicroCHP(CompNum).MySizeFlag) return;
             MinCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMin;
             MaxCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMax;
             OptCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXOpt;
