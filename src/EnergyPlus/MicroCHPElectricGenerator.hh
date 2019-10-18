@@ -61,7 +61,7 @@ namespace MicroCHPElectricGenerator {
     extern int NumMicroCHPs;
     extern int NumMicroCHPParams; // number of parameter sets for micro chp
 
-    extern bool GetMicroCHPInput; // When TRUE, calls subroutine to read input file.
+    extern bool getMicroChpInputFlag; // When TRUE, calls subroutine to read input file.
     extern Array1D_bool MySizeFlag;
 
     struct MicroCHPParamsNonNormalized
@@ -200,6 +200,16 @@ namespace MicroCHPElectricGenerator {
         }
 
         void InitMicroCHPNoNormalizeGenerators();
+
+        void CalcUpdateHeatRecovery();
+
+        void CalcMicroCHPNoNormalizeGeneratorModel(bool RunFlagElectCenter, // TRUE when Generator operating
+                                                   bool RunFlagPlant,
+                                                   Real64 MyElectricLoad, // Generator demand
+                                                   Real64 MyThermalLoad,
+                                                   bool FirstHVACIteration);
+
+        void UpdateMicroCHPGeneratorRecords(); // Generator number
     };
 
 
@@ -213,13 +223,6 @@ namespace MicroCHPElectricGenerator {
                               bool FirstHVACIteration);
 
     void GetMicroCHPGeneratorInput();
-
-    void CalcMicroCHPNoNormalizeGeneratorModel(int GeneratorNum,        // Generator number
-                                               bool RunFlagElectCenter, // TRUE when Generator operating
-                                               bool RunFlagPlant,
-                                               Real64 MyElectricLoad, // Generator demand
-                                               Real64 MyThermalLoad,
-                                               bool FirstHVACIteration);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine
@@ -255,9 +258,6 @@ namespace MicroCHPElectricGenerator {
 
     void FigureMicroCHPZoneGains();
 
-    void CalcUpdateHeatRecovery(int Num, // Generator number
-                                bool FirstHVACIteration);
-
     void SimMicroCHPPlantHeatRecovery(std::string const &CompType,
                                       std::string const &CompName,
                                       int &CompNum,
@@ -269,8 +269,6 @@ namespace MicroCHPElectricGenerator {
                                       Real64 &OptCap,
                                       bool FirstHVACIteration // TRUE if First iteration of simulation
     );
-
-    void UpdateMicroCHPGeneratorRecords(int Num); // Generator number
 
     void GetMicroCHPGeneratorResults(int GeneratorType, // type of Generator
                                      int GeneratorIndex,
