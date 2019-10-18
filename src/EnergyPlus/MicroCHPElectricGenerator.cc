@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -105,17 +104,12 @@ namespace MicroCHPElectricGenerator {
     // Combustion-based Residential CHP Devices"  Alex Ferguson, Nick Kelly, IEA Annex 42.
     // Module developed from
 
-    using namespace DataPrecisionGlobals;
-    using namespace DataGenerators;
     using namespace DataLoopNode;
-    using DataGlobalConstants::iGeneratorFuelCell;
-    using DataGlobals::HoursInDay;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::ScheduleAlwaysOn;
     using namespace GeneratorDynamicsManager;
     using namespace GeneratorFuelSupply;
+
+    Array1D<MicroCHPDataStruct> MicroCHP;
+    Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
     bool GetMicroCHPInput(true); // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
@@ -158,9 +152,9 @@ namespace MicroCHPElectricGenerator {
             GeneratorIndex = GenNum;
         } else {
             GenNum = GeneratorIndex;
-            if (GenNum > NumMicroCHPs || GenNum < 1) {
+            if (GenNum > DataGenerators::NumMicroCHPs || GenNum < 1) {
                 ShowFatalError("SimMicroCHPGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(GenNum) +
-                               ", Number of Micro CHP Generators=" + TrimSigDigits(NumMicroCHPs) + ", Generator name=" + GeneratorName);
+                               ", Number of Micro CHP Generators=" + TrimSigDigits(DataGenerators::NumMicroCHPs) + ", Generator name=" + GeneratorName);
             }
             if (CheckEquipName(GenNum)) {
                 if (GeneratorName != MicroCHP(GenNum).Name) {
@@ -419,7 +413,7 @@ namespace MicroCHPElectricGenerator {
                 }
 
                 if (lAlphaFieldBlanks(9)) {
-                    MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleAlwaysOn;
+                    MicroCHP(GeneratorNum).AvailabilitySchedID = DataGlobals::ScheduleAlwaysOn;
                 } else {
                     MicroCHP(GeneratorNum).AvailabilitySchedID = GetScheduleIndex(AlphArray(9));
                     if (MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {
@@ -713,9 +707,9 @@ namespace MicroCHPElectricGenerator {
         Real64 rho;  // local temporary for fluid density
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumMicroCHPs);
-            MyPlantScanFlag.allocate(NumMicroCHPs);
-            MySizeFlag.allocate(NumMicroCHPs);
+            MyEnvrnFlag.allocate(DataGenerators::NumMicroCHPs);
+            MyPlantScanFlag.allocate(DataGenerators::NumMicroCHPs);
+            MySizeFlag.allocate(DataGenerators::NumMicroCHPs);
             MyEnvrnFlag = true;
             MyPlantScanFlag = true;
             MySizeFlag = true;
@@ -822,18 +816,18 @@ namespace MicroCHPElectricGenerator {
             MicroCHP(GeneratorNum).A42Model.QdotSkin = 0.0;
             MicroCHP(GeneratorNum).A42Model.QdotConvZone = 0.0;
             MicroCHP(GeneratorNum).A42Model.QdotRadZone = 0.0;
-            GeneratorDynamics(DynaCntrlNum).LastOpMode = OpModeOff;
-            GeneratorDynamics(DynaCntrlNum).CurrentOpMode = OpModeOff;
-            GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown = 0.0;
-            GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp = 0.0;
-            GeneratorDynamics(DynaCntrlNum).HasBeenOn = false;
-            GeneratorDynamics(DynaCntrlNum).DuringStartUp = false;
-            GeneratorDynamics(DynaCntrlNum).DuringShutDown = false;
-            GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep = 0.0;
-            GeneratorDynamics(DynaCntrlNum).PelLastTimeStep = 0.0;
-            GeneratorDynamics(DynaCntrlNum).NumCycles = 0;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OpModeOff;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OpModeOff;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown = 0.0;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp = 0.0;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).HasBeenOn = false;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).DuringStartUp = false;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).DuringShutDown = false;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep = 0.0;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).PelLastTimeStep = 0.0;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).NumCycles = 0;
 
-            FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).QskinLoss = 0.0;
+            DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).QskinLoss = 0.0;
 
             InitComponentNodes(0.0,
                                MicroCHP(GeneratorNum).PlantMassFlowRateMax,
@@ -856,9 +850,9 @@ namespace MicroCHPElectricGenerator {
             MicroCHP(GeneratorNum).A42Model.TengLast = MicroCHP(GeneratorNum).A42Model.Teng;
             MicroCHP(GeneratorNum).A42Model.TempCWOutLast = MicroCHP(GeneratorNum).A42Model.TcwOut;
             MicroCHP(GeneratorNum).A42Model.TimeElapsed = TimeElapsed;
-            GeneratorDynamics(DynaCntrlNum).LastOpMode = GeneratorDynamics(DynaCntrlNum).CurrentOpMode;
-            GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep = MicroCHP(GeneratorNum).A42Model.MdotFuel;
-            GeneratorDynamics(DynaCntrlNum).PelLastTimeStep = MicroCHP(GeneratorNum).A42Model.Pnet;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::GeneratorDynamics(DynaCntrlNum).CurrentOpMode;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).FuelMdotLastTimestep = MicroCHP(GeneratorNum).A42Model.MdotFuel;
+            DataGenerators::GeneratorDynamics(DynaCntrlNum).PelLastTimeStep = MicroCHP(GeneratorNum).A42Model.Pnet;
         }
 
         if (!MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
@@ -978,7 +972,7 @@ namespace MicroCHPElectricGenerator {
         {
             auto const SELECT_CASE_var(CurrentOpMode);
 
-            if (SELECT_CASE_var == OpModeOff) { // same as standby in model spec but no Pnet standby electicity losses.
+            if (SELECT_CASE_var == DataGenerators::OpModeOff) { // same as standby in model spec but no Pnet standby electicity losses.
 
                 Qgenss = 0.0;
                 MdotCW = Node(MicroCHP(GeneratorNum).PlantInletNodeID).MassFlowRate; // kg/s
@@ -1003,7 +997,7 @@ namespace MicroCHPElectricGenerator {
                                      MicroCHP(GeneratorNum).CWCompNum);
                 MicroCHP(GeneratorNum).PlantMassFlowRate = MdotCW;
 
-            } else if (SELECT_CASE_var == OpModeStandby) {
+            } else if (SELECT_CASE_var == DataGenerators::OpModeStandby) {
                 Qgenss = 0.0;
                 MdotCW = Node(MicroCHP(GeneratorNum).PlantInletNodeID).MassFlowRate; // kg/s
                 TcwIn = Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp;          // C
@@ -1027,7 +1021,7 @@ namespace MicroCHPElectricGenerator {
                                      MicroCHP(GeneratorNum).CWCompNum);
                 MicroCHP(GeneratorNum).PlantMassFlowRate = MdotCW;
 
-            } else if (SELECT_CASE_var == OpModeWarmUp) {
+            } else if (SELECT_CASE_var == DataGenerators::OpModeWarmUp) {
 
                 if (MicroCHP(GeneratorNum).A42Model.WarmUpByTimeDelay) {
                     // Internal combustion engine.  This is just like normal  operation but no net power yet.
@@ -1052,8 +1046,8 @@ namespace MicroCHPElectricGenerator {
 
                     Qgenss = ThermEff * Qgross; // W
 
-                    MdotFuel = Qgross / (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
-                               FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    MdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
+                               DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
 
                     ManageGeneratorFuelFlow(iGeneratorMicroCHP,
@@ -1067,8 +1061,8 @@ namespace MicroCHPElectricGenerator {
 
                     if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
                         MdotFuel = MdotFuelAllowed;
-                        NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
-                        Qgross = NdotFuel * (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                        NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                        Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
 
                         for (i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
                             Pnetss = Qgross * ElecEff;
@@ -1084,7 +1078,7 @@ namespace MicroCHPElectricGenerator {
                         Qgenss = ThermEff * Qgross;    // W
                     }
                     Pnetss = 0.0; // no actually power produced here.
-                    NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     MdotAir = CurveValue(MicroCHP(GeneratorNum).A42Model.AirFlowCurveID, MdotFuel);
                     MdotAir = max(0.0, MdotAir); // protect against bad curve result
 
@@ -1104,9 +1098,9 @@ namespace MicroCHPElectricGenerator {
                     } else {
                         Qgross = 0.0;
                     }
-                    NdotFuel = Qgross / (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                    NdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                     //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                    MdotFuelMax = NdotFuel * FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
 
                     if (Teng > thisAmbientTemp) {
                         MdotFuelWarmup = MdotFuelMax + MicroCHP(GeneratorNum).A42Model.kf * MdotFuelMax *
@@ -1131,16 +1125,16 @@ namespace MicroCHPElectricGenerator {
                     }
 
                     MdotFuel = MdotFuelWarmup;
-                    NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     MdotAir = CurveValue(MicroCHP(GeneratorNum).A42Model.AirFlowCurveID, MdotFuelWarmup);
                     MdotAir = max(0.0, MdotAir); // protect against bad curve result
-                    Qgross = NdotFuel * (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                    Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                     ThermEff = CurveValue(MicroCHP(GeneratorNum).A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
                     Qgenss = ThermEff * Qgross; // W
                 }
-                NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
 
-            } else if (SELECT_CASE_var == OpModeNormal) {
+            } else if (SELECT_CASE_var == DataGenerators::OpModeNormal) {
                 if (PLRforSubtimestepStartUp < 1.0) {
                     if (RunFlagElectCenter) Pnetss = MyElectricLoad; // W
                     if (RunFlagPlant) Pnetss = AllowedLoad;
@@ -1167,8 +1161,8 @@ namespace MicroCHPElectricGenerator {
                 ThermEff = CurveValue(MicroCHP(GeneratorNum).A42Model.ThermalEffCurveID, Pnetss, MdotCW, TcwIn);
                 ThermEff = max(0.0, ThermEff); // protect against bad curve result
                 Qgenss = ThermEff * Qgross;    // W
-                MdotFuel = Qgross / (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
-                           FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                MdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
+                           DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                 //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
                 ManageGeneratorFuelFlow(iGeneratorMicroCHP,
                                         MicroCHP(GeneratorNum).Name,
@@ -1181,8 +1175,8 @@ namespace MicroCHPElectricGenerator {
 
                 if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
                     MdotFuel = MdotFuelAllowed;
-                    NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
-                    Qgross = NdotFuel * (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                    NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                    Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
 
                     for (i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
                         Pnetss = Qgross * ElecEff;
@@ -1198,14 +1192,14 @@ namespace MicroCHPElectricGenerator {
                     Qgenss = ThermEff * Qgross;    // W
                 }
 
-                NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                 MdotAir = CurveValue(MicroCHP(GeneratorNum).A42Model.AirFlowCurveID, MdotFuel);
                 MdotAir = max(0.0, MdotAir); // protect against bad curve result
                 if (PLRforSubtimestepStartUp < 1.0) {
                     Pnetss = AllowedLoad;
                 }
 
-            } else if (SELECT_CASE_var == OpModeCoolDown) {
+            } else if (SELECT_CASE_var == DataGenerators::OpModeCoolDown) {
 
                 Pnetss = 0.0;
                 Pstandby = 0.0;
@@ -1229,7 +1223,7 @@ namespace MicroCHPElectricGenerator {
         for (i = 1; i <= 20; ++i) { // sequential search with exit criteria
             // calculate new value for engine temperature
             // for Stirling in warmup, need to include dependency of Qgness on Teng
-            if ((MicroCHP(GeneratorNum).A42Model.WarmUpByEngineTemp) && (CurrentOpMode == OpModeWarmUp)) {
+            if ((MicroCHP(GeneratorNum).A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OpModeWarmUp)) {
 
                 Pmax = MicroCHP(GeneratorNum).A42Model.MaxElecPower;
                 TcwIn = Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp;          // C
@@ -1241,9 +1235,9 @@ namespace MicroCHPElectricGenerator {
                 } else {
                     Qgross = 0.0;
                 }
-                NdotFuel = Qgross / (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                NdotFuel = Qgross / (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                 //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                MdotFuelMax = NdotFuel * FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                MdotFuelMax = NdotFuel * DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
 
                 if (Teng > thisAmbientTemp) {
                     MdotFuelWarmup = MdotFuelMax + MicroCHP(GeneratorNum).A42Model.kf * MdotFuelMax *
@@ -1268,10 +1262,10 @@ namespace MicroCHPElectricGenerator {
                     MdotFuelWarmup = MicroCHP(GeneratorNum).A42Model.Rfuelwarmup * MdotFuelMax;
                 }
                 MdotFuel = MdotFuelWarmup;
-                NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
+                NdotFuel = MdotFuel / DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                 MdotAir = CurveValue(MicroCHP(GeneratorNum).A42Model.AirFlowCurveID, MdotFuelWarmup);
                 MdotAir = max(0.0, MdotAir); // protect against bad curve result
-                Qgross = NdotFuel * (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
+                Qgross = NdotFuel * (DataGenerators::FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0);
                 ThermEff = CurveValue(MicroCHP(GeneratorNum).A42Model.ThermalEffCurveID, Pmax, MdotCW, TcwIn);
                 ThermEff = max(0.0, ThermEff); // protect against bad curve result
                 Qgenss = ThermEff * Qgross;    // W
@@ -1493,10 +1487,10 @@ namespace MicroCHPElectricGenerator {
         int CHPnum;
         static bool MyEnvrnFlag(true);
 
-        if (NumMicroCHPs == 0) return;
+        if (DataGenerators::NumMicroCHPs == 0) return;
 
         if (BeginEnvrnFlag && MyEnvrnFlag) {
-            for (auto &e : FuelSupply)
+            for (auto &e : DataGenerators::FuelSupply)
                 e.QskinLoss = 0.0;
             for (auto &e : MicroCHP) {
                 e.A42Model.QdotSkin = 0.0;
@@ -1508,8 +1502,8 @@ namespace MicroCHPElectricGenerator {
 
         if (!BeginEnvrnFlag) MyEnvrnFlag = true;
 
-        for (CHPnum = 1; CHPnum <= NumMicroCHPs; ++CHPnum) {
-            TotalZoneHeatGain = FuelSupply(MicroCHP(CHPnum).FuelSupplyID).QskinLoss + MicroCHP(CHPnum).A42Model.QdotSkin;
+        for (CHPnum = 1; CHPnum <= DataGenerators::NumMicroCHPs; ++CHPnum) {
+            TotalZoneHeatGain = DataGenerators::FuelSupply(MicroCHP(CHPnum).FuelSupplyID).QskinLoss + MicroCHP(CHPnum).A42Model.QdotSkin;
 
             MicroCHP(CHPnum).A42Model.QdotConvZone = TotalZoneHeatGain * (1 - MicroCHP(CHPnum).A42Model.RadiativeFraction);
             MicroCHP(CHPnum).Report.SkinLossConvect = MicroCHP(CHPnum).A42Model.QdotConvZone;
@@ -1595,9 +1589,9 @@ namespace MicroCHPElectricGenerator {
             }
             InitMicroCHPNoNormalizeGenerators(CompNum, FirstHVACIteration);
             if (MySizeFlag(CompNum)) return;
-            MinCap = GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMin;
-            MaxCap = GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMax;
-            OptCap = GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXOpt;
+            MinCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMin;
+            MaxCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXMax;
+            OptCap = DataGenerators::GeneratorDynamics(MicroCHP(CompNum).DynamicsControlID).QdotHXOpt;
             return;
         } // End Of InitLoopEquip
 
@@ -1668,21 +1662,21 @@ namespace MicroCHPElectricGenerator {
         MicroCHP(Num).Report.NdotFuel = MicroCHP(Num).A42Model.NdotFuel; // fuel flow in kmol/sec
         MicroCHP(Num).Report.MdotFuel = MicroCHP(Num).A42Model.MdotFuel; // fuel flow in kg/sec
 
-        MicroCHP(Num).Report.FuelCompressPower = FuelSupply(MicroCHP(Num).FuelSupplyID).PfuelCompEl;
+        MicroCHP(Num).Report.FuelCompressPower = DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).PfuelCompEl;
         // electrical power used by fuel supply compressor [W]
-        MicroCHP(Num).Report.FuelCompressEnergy = FuelSupply(MicroCHP(Num).FuelSupplyID).PfuelCompEl * TimeStepSys * SecInHour; // elect energy
-        MicroCHP(Num).Report.FuelCompressSkinLoss = FuelSupply(MicroCHP(Num).FuelSupplyID).QskinLoss;
+        MicroCHP(Num).Report.FuelCompressEnergy = DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).PfuelCompEl * TimeStepSys * SecInHour; // elect energy
+        MicroCHP(Num).Report.FuelCompressSkinLoss = DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).QskinLoss;
         // heat rate of losses.by fuel supply compressor [W]
-        MicroCHP(Num).Report.FuelEnergyHHV = MicroCHP(Num).A42Model.NdotFuel * FuelSupply(MicroCHP(Num).FuelSupplyID).HHV *
-                                             FuelSupply(MicroCHP(Num).FuelSupplyID).KmolPerSecToKgPerSec * TimeStepSys * SecInHour;
+        MicroCHP(Num).Report.FuelEnergyHHV = MicroCHP(Num).A42Model.NdotFuel * DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).HHV *
+                                             DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).KmolPerSecToKgPerSec * TimeStepSys * SecInHour;
         // reporting: Fuel Energy used (W)
-        MicroCHP(Num).Report.FuelEnergyUseRateHHV = MicroCHP(Num).A42Model.NdotFuel * FuelSupply(MicroCHP(Num).FuelSupplyID).HHV *
-                                                    FuelSupply(MicroCHP(Num).FuelSupplyID).KmolPerSecToKgPerSec;
+        MicroCHP(Num).Report.FuelEnergyUseRateHHV = MicroCHP(Num).A42Model.NdotFuel * DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).HHV *
+                                                    DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).KmolPerSecToKgPerSec;
         // reporting: Fuel Energy used (J)
         MicroCHP(Num).Report.FuelEnergyLHV =
-            MicroCHP(Num).A42Model.NdotFuel * FuelSupply(MicroCHP(Num).FuelSupplyID).LHV * 1000000.0 * TimeStepSys * SecInHour;
+            MicroCHP(Num).A42Model.NdotFuel * DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).LHV * 1000000.0 * TimeStepSys * SecInHour;
         // reporting: Fuel Energy used (W)
-        MicroCHP(Num).Report.FuelEnergyUseRateLHV = MicroCHP(Num).A42Model.NdotFuel * FuelSupply(MicroCHP(Num).FuelSupplyID).LHV * 1000000.0;
+        MicroCHP(Num).Report.FuelEnergyUseRateLHV = MicroCHP(Num).A42Model.NdotFuel * DataGenerators::FuelSupply(MicroCHP(Num).FuelSupplyID).LHV * 1000000.0;
 
         MicroCHP(Num).Report.SkinLossPower = MicroCHP(Num).A42Model.QdotConvZone + MicroCHP(Num).A42Model.QdotRadZone;
         MicroCHP(Num).Report.SkinLossEnergy = (MicroCHP(Num).A42Model.QdotConvZone + MicroCHP(Num).A42Model.QdotRadZone) * TimeStepSys * SecInHour;
