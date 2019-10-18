@@ -84,11 +84,6 @@ namespace EnergyPlus {
 
 namespace MicroCHPElectricGenerator {
 
-    //_______________________________________________________________________
-    // IEA Annex 42 generators:
-    // MicroCHPElectricGenerator
-    // (small-scale/residential internal combustion and Stirling Engine for CHP, )
-
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffth
     //       DATE WRITTEN   June 2006
@@ -110,10 +105,6 @@ namespace MicroCHPElectricGenerator {
     // Combustion-based Residential CHP Devices"  Alex Ferguson, Nick Kelly, IEA Annex 42.
     // Module developed from
 
-    // OTHER NOTES:
-    // N/A
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataGenerators;
     using namespace DataLoopNode;
@@ -126,22 +117,9 @@ namespace MicroCHPElectricGenerator {
     using namespace GeneratorDynamicsManager;
     using namespace GeneratorFuelSupply;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
     bool GetMicroCHPInput(true); // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
     Array1D_bool MySizeFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Combustion Generator Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
 
     void SimMicroCHPGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
@@ -163,11 +141,9 @@ namespace MicroCHPElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using DataPlant::PlantFirstSizeCompleted;
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -175,8 +151,6 @@ namespace MicroCHPElectricGenerator {
             GetMicroCHPGeneratorInput();
             GetMicroCHPInput = false;
         }
-
-        //  Call InitMicroCHPNoNormalizeGenerators
 
         if (GeneratorIndex == 0) {
             GenNum = UtilityRoutines::FindItemInList(GeneratorName, MicroCHP);
@@ -208,12 +182,6 @@ namespace MicroCHPElectricGenerator {
             UpdateMicroCHPGeneratorRecords(GenNum);
         }
     }
-
-    // End MicroCHPNoNormalize Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Combustion Generator Module Get Input subroutines
-    //******************************************************************************
 
     void GetMicroCHPGeneratorInput()
     {
@@ -704,22 +672,12 @@ namespace MicroCHPElectricGenerator {
     void InitMicroCHPNoNormalizeGenerators(int const GeneratorNum, // Generator number
                                            bool const EP_UNUSED(FirstHVACIteration))
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
         //       DATE WRITTEN   March 2007
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // inits
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveCheck;
         using DataGlobals::BeginEnvrnFlag;
@@ -743,18 +701,7 @@ namespace MicroCHPElectricGenerator {
         using PlantUtilities::SetComponentFlowRate;
         using namespace GeneratorDynamicsManager;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int DynaCntrlNum(0);
         Real64 TimeElapsed;              // Fraction of the current hour that has elapsed (h)
         static bool MyOneTimeFlag(true); // Initialization flag
@@ -952,7 +899,6 @@ namespace MicroCHPElectricGenerator {
         // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
@@ -967,19 +913,7 @@ namespace MicroCHPElectricGenerator {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 AllowedLoad(0.0);
         static int CurrentOpMode(0);
         static Real64 PLRforSubtimestepStartUp(1.0);
@@ -989,7 +923,6 @@ namespace MicroCHPElectricGenerator {
         static Real64 Pnetss(0.0);
         static Real64 Pstandby(0.0); // power draw during standby, positive here means negative production
         static Real64 Pcooler(0.0);  // power draw during cool down, positive here means negative production
-        //  REAL(r64)    :: Pnet   = 0.0d0
         static Real64 NdotFuel(0.0);
 
         static bool ConstrainedIncreasingNdot(false);
@@ -1196,11 +1129,6 @@ namespace MicroCHPElectricGenerator {
                     } else { // equal would divide by zero
                         Pnetss = Pmax;
                     }
-
-                    // if ( MicroCHP( GeneratorNum ).A42Model.TnomEngOp < thisAmbientTemp ) {
-                    // this case where zone is super hot and more than engine op. temp.
-                    //  never going to get here because E+ zones don't like to be over 50C. (and no cogen devices should operate below 50C)
-                    //}
 
                     MdotFuel = MdotFuelWarmup;
                     NdotFuel = MdotFuel / FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
@@ -1426,28 +1354,8 @@ namespace MicroCHPElectricGenerator {
         // model is dynamic in that previous condition affects current timestep
         //  solve ode for engine temp using analytical solution
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 FuncDetermineEngineTemp;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 a;
         Real64 b;
 
@@ -1482,28 +1390,10 @@ namespace MicroCHPElectricGenerator {
         // model is dynamic in that previous condition affects current timestep
         //  solve ode for coolant water outlet temp using analytical solution
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::MaxEXPArg;
 
-        // Return value
         Real64 FuncDetermineCoolantWaterExitTemp;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 a;
         Real64 b;
 
@@ -1547,28 +1437,8 @@ namespace MicroCHPElectricGenerator {
         // put all terms of dynamic energy balances on RHS and compute magnitude of imbalance
         //  compare imbalance to scalable thresholds and make a boolean conclusion.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         bool CheckMicroCHPThermalBalance;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 a;               // working variable, "a" term in generic ODE
         Real64 b;               // working variable "b" term in generic ODE
         Real64 DTengDTime;      // derivative of engine temp wrt time
@@ -1617,29 +1487,10 @@ namespace MicroCHPElectricGenerator {
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER :: thisZone ! index in Zone structure array
         Real64 TotalZoneHeatGain;
         int CHPnum;
-        //  INTEGER :: ZoneNum
         static bool MyEnvrnFlag(true);
 
         if (NumMicroCHPs == 0) return;
@@ -1665,11 +1516,6 @@ namespace MicroCHPElectricGenerator {
             MicroCHP(CHPnum).A42Model.QdotRadZone = TotalZoneHeatGain * MicroCHP(CHPnum).A42Model.RadiativeFraction;
             MicroCHP(CHPnum).Report.SkinLossRadiat = MicroCHP(CHPnum).A42Model.QdotRadZone;
         }
-
-        // this routine needs to do something for zone gains during sizing
-        //  IF(DoingSizing)THEN
-
-        //  ENDIF
     }
 
     void CalcUpdateHeatRecovery(int const Num, // Generator number
@@ -1685,35 +1531,16 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcUpdateHeatRecovery");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNodeNum;
         int OutNodeNum;
         Real64 Cp; // local Specific heat of fluid
-        //  REAL(r64) :: mdot !local mass flow rate
 
-        // now update water outlet node Changing to Kg/s!
         OutNodeNum = MicroCHP(Num).PlantOutletNodeID;
         InNodeNum = MicroCHP(Num).PlantInletNodeID;
 
@@ -1750,17 +1577,12 @@ namespace MicroCHPElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire MicroCHP model
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // Using/Aliasing
         using namespace DataGlobalConstants;
         using DataPlant::TypeOf_Generator_MicroCHP;
         using PlantUtilities::UpdateComponentHeatRecoverySide;
 
         if (GetMicroCHPInput) {
 
-            // Read input data.
             GetMicroCHPGeneratorInput();
             GetMicroCHPInput = false;
         }
@@ -1803,34 +1625,15 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update variables in structures linked to output reports
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateMicroCHPGeneratorRecords");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Cp; // local fluid specific heat
 
-        // na
         MicroCHP(Num).Report.Mode = MicroCHP(Num).A42Model.OpMode;
         MicroCHP(Num).Report.OffModeTime = MicroCHP(Num).A42Model.OffModeTime;
         MicroCHP(Num).Report.StandyByModeTime = MicroCHP(Num).A42Model.StandyByModeTime;
@@ -1914,27 +1717,6 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // provide a get method to collect results at the load center level
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         GeneratorPower = MicroCHP(GeneratorIndex).Report.ACPowerGen;
         GeneratorEnergy = MicroCHP(GeneratorIndex).Report.ACEnergyGen;
         ThermalPower = MicroCHP(GeneratorIndex).Report.QdotHR;

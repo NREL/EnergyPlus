@@ -58,17 +58,9 @@ namespace EnergyPlus {
 
 namespace MicroCHPElectricGenerator {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
     extern bool GetMicroCHPInput; // When TRUE, calls subroutine to read input file.
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool MySizeFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
-
-    // Functions
 
     void SimMicroCHPGenerator(int const GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator
@@ -79,15 +71,7 @@ namespace MicroCHPElectricGenerator {
                               Real64 const MyThermalLoad,    // thermal demand on cogenerator
                               bool const FirstHVACIteration);
 
-    // End MicroCHPNoNormalize Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Combustion Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetMicroCHPGeneratorInput();
-
-    // PARAMETERS
 
     void InitMicroCHPNoNormalizeGenerators(int const GeneratorNum, // Generator number
                                            bool const FirstHVACIteration);
