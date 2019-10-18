@@ -150,7 +150,7 @@ namespace PluginManager {
         // for the case of this prototype, it's the root of the repo
         // for the case of an E+ distribution, it will be probably the root of the E+ install
         // I think this is already available from the command line interface work
-        PluginManager::addToPythonPath(".");
+        PluginManager::addToPythonPath(".", false);
 
         // so I think we'll want to add to the front of path, in this order:
         // - the program executable parent directory, so that it could find the installed pyms,
@@ -159,7 +159,7 @@ namespace PluginManager {
         std::string programPath = FileSystem::getProgramPath();
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
-        PluginManager::addToPythonPath(sanitizedDir);
+        PluginManager::addToPythonPath(sanitizedDir, false);
 
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";
@@ -179,19 +179,19 @@ namespace PluginManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
                 if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_1"));
+                    PluginManager::addToPythonPath(fields.at("search_path_1"), true);
                 }
                 if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_2"));
+                    PluginManager::addToPythonPath(fields.at("search_path_2"), true);
                 }
                 if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_3"));
+                    PluginManager::addToPythonPath(fields.at("search_path_3"), true);
                 }
                 if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_4"));
+                    PluginManager::addToPythonPath(fields.at("search_path_4"), true);
                 }
                 if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_5"));
+                    PluginManager::addToPythonPath(fields.at("search_path_5"), true);
                 }
             }
         }
@@ -262,7 +262,17 @@ namespace PluginManager {
         // should decrement it.
         Py_DECREF(pModuleName);
         if (!pModule) {
-            EnergyPlus::ShowFatalError("Failed to import module \"" + moduleName + "\"");
+            // So we can ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
+            // Unfortunately there's not an equivalent PyErr_GetErrorText or anything, the only option is to print it out directly
+            // So if we leave this in, the message will be seen right on the terminal, not in the error file
+            // I may consider hijacking stdout and stderr right before calling PyErr_Print and then resetting it
+            // But for now I'm not doing that
+//            if (PyErr_Occurred()) {
+//                PyErr_Print();
+//            }
+            EnergyPlus::ShowSevereError("Failed to import module \"" + moduleName + "\"");
+            EnergyPlus::ShowContinueError("It could be that the module could not be found, or that there was an error in importing");
+            EnergyPlus::ShowFatalError("Python import error causes program termination, see error file.");
         }
         PyObject *pModuleDict = PyModule_GetDict(pModule);
         Py_DECREF(pModule); // PyImport_Import returns a new reference, decrement it
@@ -289,8 +299,8 @@ namespace PluginManager {
 
         // now grab the function pointers to the main call function
         std::string const mainFunctionName = "main";
-        PyObject *pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
-        if (!pPluginMainFunction || !PyCallable_Check(pPluginMainFunction)) {
+        this->pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
+        if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
             if (PyErr_Occurred()) {
                 PyErr_Print();
             }
@@ -299,7 +309,6 @@ namespace PluginManager {
 
         // update the rest of the plugin call instance and store it
         this->stringIdentifier = moduleName + "." + className;
-        this->pPluginMainFunction = pPluginMainFunction;
     }
 
     void PluginInstance::run()
@@ -324,12 +333,14 @@ namespace PluginManager {
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
     }
 
-    void PluginManager::addToPythonPath(const std::string &path)
+    void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if (PyRun_SimpleString(command.c_str()) == 0) {
-            EnergyPlus::ShowMessage("Successfully added path \"" + path + "\" to the sys.path in Python");
-            PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
+            if (userDefinedPath) {
+                EnergyPlus::ShowMessage("Successfully added path \"" + path + "\" to the sys.path in Python");
+            }
+            // PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }

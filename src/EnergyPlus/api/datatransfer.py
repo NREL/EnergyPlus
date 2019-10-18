@@ -21,8 +21,7 @@ class DataTransfer:
         self.api.setActuatorValue.restype = c_bool
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]):
-        variable_name = variable_name.upper()
-        variable_key = variable_key.upper()
+        # API accepts case-insensitive name and key; it converts to upper internally in C API wrapper
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
         if isinstance(variable_key, str):
@@ -30,14 +29,14 @@ class DataTransfer:
         return self.api.getVariableHandle(variable_name, variable_key)
 
     def get_meter_handle(self, meter_name: Union[str, bytes]):
+        # API accepts case-insensitive meter_name; it converts to upper internally in C API wrapper
         meter_name = meter_name.upper()
         if isinstance(meter_name, str):
             meter_name = meter_name.encode('utf-8')
         return self.api.getMeterHandle(meter_name)
 
     def get_actuator_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]):
-        variable_name = variable_name.upper()
-        variable_key = variable_key.upper()
+        # API accepts case-insensitive name and key; it converts to upper internally in C API wrapper
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
         if isinstance(variable_key, str):

@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -53,11 +54,20 @@
 void dataTransferNoOp() {}
 
 int getVariableHandle(const char* type, const char* key) {
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle;
     handle = 0;
+    std::cout << "Trying to get variable: " << typeUC << ", " << keyUC << std::endl << std::flush;
+    std::cout << "Found " << std::to_string(EnergyPlus::OutputProcessor::RVariableTypes.size()) << " vars to search through" << std::endl << std::flush;
+    static int i = 0;
     for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
         handle++;
-        if (type == availOutputVar.VarNameOnlyUC && key == availOutputVar.KeyNameOnlyUC) {
+        i++;
+        if (i == 1) {
+            std::cout << "Candidate variable: " << availOutputVar.VarNameOnlyUC << ", " << availOutputVar.KeyNameOnlyUC << std::endl << std::flush;
+        }
+        if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
             return handle;
         }
     }
@@ -65,15 +75,20 @@ int getVariableHandle(const char* type, const char* key) {
 }
 
 int getMeterHandle(const char* meterName) {
-    return EnergyPlus::GetMeterIndex(meterName);
+    std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
+    return EnergyPlus::GetMeterIndex(meterNameUC);
 }
 
 int getActuatorHandle(const char* type, const char* key) {
     int handle;
     handle = 0;
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
         handle++;
-        if (type == availActuator.ControlTypeName && key == availActuator.UniqueIDName) {
+        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
+        if (type == actuatorTypeUC && key == actuatorIDUC) {
             return handle;
         }
     }

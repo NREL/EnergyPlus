@@ -96,7 +96,7 @@ namespace PluginManager {
         ~PluginManager() {
             Py_FinalizeEx();
         }
-        static void addToPythonPath(const std::string& path);
+        static void addToPythonPath(const std::string& path, bool userDefinedPath);
         int callPluginInstances(PluginCallingPoints callingPoint);
         static std::string sanitizedPath(std::string path);
     };

@@ -1,3 +1,6 @@
+from pyenergyplus.api import EnergyPlusAPI
+
+
 class EnergyPlusPlugin(object):
     """
     The EnergyPlusPlugin class is the base class for all Python Plugin classes.
@@ -9,7 +12,7 @@ class EnergyPlusPlugin(object):
         Constructor for the Plugin interface base class.  Does not take any arguments, initializes member variables
         """
         super().__init__()
-        self.api = None  # will be set up to link to data transfer and functional APIs
+        self.api = EnergyPlusAPI()
 
     def main(self) -> int:
         """
