@@ -662,11 +662,24 @@ find_package(PythonLibs 3 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 message("Python Library Details: \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")
 
+add_custom_target(
+        pythonapi
+        ALL
+        COMMAND ${CMAKE_COMMAND}
+        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
+        -DBUILD_DIR="${CMAKE_BINARY_DIR}"
+        -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
+        -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
+        -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
+        -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
+        -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
+)
+
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
 target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib ${PYTHON_LIBRARIES})
-add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
+add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )
@@ -685,6 +698,7 @@ else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi energypluslib )
+add_dependencies( energyplusapi pythonapi)
 
 set_target_properties(
   energyplusapi
@@ -727,13 +741,3 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
-
-add_custom_target(
-  pythonapi
-  ALL
-  COMMAND ${CMAKE_COMMAND}
-        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
-        -DBUILD_DIR="${CMAKE_BINARY_DIR}"
-        -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
-)
-add_dependencies(pythonapi energyplusapi)

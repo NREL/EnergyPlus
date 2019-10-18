@@ -90,12 +90,12 @@
 
 PythonPlugin:SearchPaths,
    MySearchPaths, ! field Name
-   /eplus/repos/myoldmopar/src/EnergyPlus/api; ! field Search Path 1
+   /eplus/repos/myoldmopar/testfiles; ! field Search Path 1
 
 PythonPlugin:Instance,
    MyPlugin1, ! field Name
-   test_plugin, ! field Python File Name
-   MyPluginAfterHour, ! field Plugin Class Name
+   my_plugin, ! field Python File Name
+   MyPlugin, ! field Plugin Class Name
    EndOfHour; ! field Calling Point
 
   Version,9.2;

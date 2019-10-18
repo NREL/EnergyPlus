@@ -2,9 +2,9 @@ from ctypes import cdll
 import os
 import sys
 
-from func import Functional
-from datatransfer import DataTransfer
-from runtime import Runtime
+from .func import Functional
+from .datatransfer import DataTransfer
+from .runtime import Runtime
 
 
 def api_path():
@@ -30,3 +30,11 @@ class EnergyPlusAPI:
 
     def runtime(self) -> Runtime:
         return Runtime(self.api)
+
+    @staticmethod
+    def energyplus_version() -> str:
+        return "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"
+
+    @staticmethod
+    def api_version() -> float:
+        return 0.1
