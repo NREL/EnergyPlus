@@ -68,7 +68,7 @@
 ! HVAC:                           Two AirLoopHVAC:Unitary:Furnace:HeatCool systems provide space cooling and heating.
 !                                 Thermostat setting at 21.1C for space heating and 23.9C for space cooling.
 !
-! Zonal Equipment:                Living Zone - AirTerminal:SingleDuct:ConstantVolume:NoRheat (2)
+! Zonal Equipment:                Living Zone - AirTerminal:SingleDuct:Uncontrolled (2)
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      Yes
 ! Coils:                          Coil:Cooling:DX:SingleSpeed

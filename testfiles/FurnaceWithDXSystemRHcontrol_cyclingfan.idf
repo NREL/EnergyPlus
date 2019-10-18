@@ -86,7 +86,7 @@
 !                                 Fresh air is also introduced each weekday from 7:00 am to 7:30 am to purge contaminants
 !                                 from the building interior.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:ConstantVolume:NoRheat
+! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              No

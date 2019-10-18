@@ -76,7 +76,7 @@
 ! HVAC:                           Example of Constant Volume blowthru furnace, heat only, fuel oil heater.
 !                                 Central fuel oil heating coil.  Thermostat setting at 20 C in winter with 15 C set back temperature.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:ConstantVolume:NoRheat
+! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              No

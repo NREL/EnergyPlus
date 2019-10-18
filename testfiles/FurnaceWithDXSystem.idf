@@ -76,7 +76,7 @@
 !                                 Thermostat setting at 20 C in winter with 15 C set back temperature, 24 C in summer
 !                                 with 30 C set back temperature. Cooling coil off in winter, heating coil on all year.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:ConstantVolume:NoRheat
+! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No (chilled water loop volume is autosized although not used)
 ! Purchased Cooling:              No

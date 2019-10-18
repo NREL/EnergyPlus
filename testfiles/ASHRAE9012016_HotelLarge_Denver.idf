@@ -11487,7 +11487,7 @@
     0.0,                     !- Minimum Hot Water Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_1_Flr_3 Direct Air, !- Name

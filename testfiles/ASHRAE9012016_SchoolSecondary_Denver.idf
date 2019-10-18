@@ -20383,7 +20383,7 @@
     HTGSETP_SCH_Setback,     !- Heating Setpoint Temperature Schedule Name
     CLGSETP_SCH_setup;       !- Cooling Setpoint Temperature Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Gym_ZN_1_FLR_1 Direct Air,  !- Name

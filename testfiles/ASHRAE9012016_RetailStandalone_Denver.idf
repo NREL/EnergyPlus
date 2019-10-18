@@ -5606,7 +5606,7 @@
     0.001,                   !- Heating Convergence Tolerance
     ;                        !- Availability Manager List Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Back_Space Direct Air,   !- Name

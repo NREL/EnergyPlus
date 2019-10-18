@@ -1378,8 +1378,6 @@
 
   Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
 
-  report variable dictionary;
-
   Output:Variable,*,Site Solar Azimuth Angle,timestep;
 
   Output:Variable,*,Site Solar Altitude Angle,timestep;

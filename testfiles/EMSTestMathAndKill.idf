@@ -6400,7 +6400,6 @@
     Curve_Quadratic_Ptr,     !- Name
     HPACCOOLPLFFPLR_curve;   !- Curve or Table Object Name
 
-
   Table:IndependentVariable,
     HPACCOOLPLFFPLR_IndependentVariable1,  !- Name
     Linear,                  !- Interpolation Method
@@ -6413,7 +6412,7 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     0.0,                     !- Value 1
-    1.0;                     !- Extended Field
+    1.0;                     !- Value 2
 
   Table:IndependentVariableList,
     HPACCOOLPLFFPLR_IndependentVariableList,  !- Name
@@ -6431,7 +6430,7 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     0.75,                    !- Output Value 1
-    1.0;                     !- Extended Field
+    1.0;                     !- Output Value 2
 
   EnergyManagementSystem:CurveOrTableIndexVariable,
     Table_Quadratic_Ptr,     !- Name
