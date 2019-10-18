@@ -58,15 +58,8 @@ int getVariableHandle(const char* type, const char* key) {
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle;
     handle = 0;
-    std::cout << "Trying to get variable: " << typeUC << ", " << keyUC << std::endl << std::flush;
-    std::cout << "Found " << std::to_string(EnergyPlus::OutputProcessor::RVariableTypes.size()) << " vars to search through" << std::endl << std::flush;
-    static int i = 0;
     for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
         handle++;
-        i++;
-        if (i == 1) {
-            std::cout << "Candidate variable: " << availOutputVar.VarNameOnlyUC << ", " << availOutputVar.KeyNameOnlyUC << std::endl << std::flush;
-        }
         if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
             return handle;
         }
