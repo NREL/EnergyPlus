@@ -1,5 +1,5 @@
 
-# set REPO_ROOT, BUILD_DIR, and major/minor/etc version variables when calling
+# set REPO_ROOT, BUILD_DIR, and E+ and API major/minor/etc version variables when calling
 
 if (NOT EXISTS "${CMAKE_BINARY_DIR}/Produces/pyenergyplus")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")

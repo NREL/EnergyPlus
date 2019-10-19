@@ -3,6 +3,8 @@ if(WIN32)
   configure_file( energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 
+set(PYTHON_API_VERSION_MAJOR 0)
+set(PYTHON_API_VERSION_MINOR 1)
 configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
@@ -672,6 +674,8 @@ add_custom_target(
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
         -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
         -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
+        -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
+        -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
 )
 

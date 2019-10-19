@@ -89,12 +89,12 @@ class EnergyPlusAPI:
         return Runtime(self.api)
 
     @staticmethod
-    def api_version() -> float:
+    def api_version() -> str:
         """
-        Returns a floating point representation of the version of this API.  The EnergyPlus API will evolve over time,
+        Returns a string representation of the version of this API.  The EnergyPlus API will evolve over time,
         but in most cases, it will be simply adding new functionality and methods, not breaking existing API calls.
         The fractional portion of the API will be incremented when new functionality is added, and the whole number
         portion will be incremented when an existing API is broken.
         :return:
         """
-        return 0.01
+        return "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"

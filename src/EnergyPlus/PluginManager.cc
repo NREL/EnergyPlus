@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -145,17 +146,11 @@ namespace PluginManager {
         Py_InitializeEx(0);
 
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
-        // we need to figure out the right way to find the path to the binary itself
-        // we want to point Python to a folder containing a pyms folder in it
-        // for the case of this prototype, it's the root of the repo
-        // for the case of an E+ distribution, it will be probably the root of the E+ install
-        // I think this is already available from the command line interface work
-        PluginManager::addToPythonPath(".", false);
 
-        // so I think we'll want to add to the front of path, in this order:
-        // - the program executable parent directory, so that it could find the installed pyms,
-        // - the current working directory, so if they have pyms installed locally it will find that one first
-        // - any additional paths they ask for in the input file
+        // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
+        // we will then optionally add the current working directory to allow Python to find scripts in the current directory
+        // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
+        // we will then optionally add any additional paths the user specifies on the search paths object
         std::string programPath = FileSystem::getProgramPath();
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
@@ -178,6 +173,15 @@ namespace PluginManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
+
+                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                if (workingDirFlagUC == "YES") {
+                    PluginManager::addToPythonPath(".", false);
+                }
+                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                if (inputFileDirFlagUC == "YES") {
+                    PluginManager::addToPythonPath(DataStringGlobals::inputDirPathName, false);
+                }
                 if (fields.find("search_path_1") != fields.end()) {
                     PluginManager::addToPythonPath(fields.at("search_path_1"), true);
                 }
@@ -212,7 +216,7 @@ namespace PluginManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-                std::string fileName = fields.at("python_file_name");
+                std::string fileName = fields.at("python_module_name");
                 std::string className = fields.at("plugin_class_name");
                 std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
                 if (sCallingPoint == "BEGINNINGOFHOUR") {

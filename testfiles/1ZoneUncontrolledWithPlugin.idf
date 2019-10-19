@@ -90,11 +90,13 @@
 
 PythonPlugin:SearchPaths,
    MySearchPaths, ! field Name
-   /eplus/repos/myoldmopar/testfiles; ! field Search Path 1
+   Yes,           !- Add Current Working Directory to Search Path
+   Yes;            !- Add Input File Directory to Search Path
+   !/dummy/path/here; ! field Search Path 1
 
 PythonPlugin:Instance,
    MyPlugin1, ! field Name
-   my_plugin, ! field Python File Name
+   1ZoneUncontrolledWithPlugin, ! field Python File Name
    MyPlugin, ! field Plugin Class Name
    EndOfHour; ! field Calling Point
 
