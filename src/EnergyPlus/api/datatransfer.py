@@ -37,7 +37,7 @@ class DataTransfer:
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_bool
 
-    def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]):
+    def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an output variable in a running simulation.  For now, this variable *must* be defined as an
         output variable in the input file being run.  In a future version, this restriction may be lifted.
@@ -59,7 +59,7 @@ class DataTransfer:
             variable_key = variable_key.encode('utf-8')
         return self.api.getVariableHandle(variable_name, variable_key)
 
-    def get_meter_handle(self, meter_name: Union[str, bytes]):
+    def get_meter_handle(self, meter_name: Union[str, bytes]) -> int:
         """
         Get a handle to a meter in a running simulation.
 
@@ -77,7 +77,7 @@ class DataTransfer:
             meter_name = meter_name.encode('utf-8')
         return self.api.getMeterHandle(meter_name)
 
-    def get_actuator_handle(self, actuator_name: Union[str, bytes], actuator_key: Union[str, bytes]):
+    def get_actuator_handle(self, actuator_name: Union[str, bytes], actuator_key: Union[str, bytes]) -> int:
         """
         Get a handle to an available actuator in a running simulation.  For now, there *must* be at least one EMS
         related object in the IDF, even just an unused EMS global variable.  This is because the simulation skips much
@@ -100,27 +100,39 @@ class DataTransfer:
             actuator_key = actuator_key.encode('utf-8')
         return self.api.getActuatorHandle(actuator_name, actuator_key)
 
-    def get_variable_value(self, variable_handle: int):
+    def get_variable_value(self, variable_handle: int) -> float:
         """
+        Get the current value of a variable in a running simulation.  The `get_variable_handle` function is first used
+        to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to
+        then get the value of the variable.
 
-        :param variable_handle:
-        :return:
+        :param variable_handle: An integer returned from the `get_variable_handle` function.
+        :return: Floating point representation of the current variable value
         """
         return self.api.getVariableValue(variable_handle)
 
-    def get_meter_value(self, meter_handle: int):
+    def get_meter_value(self, meter_handle: int) -> float:
         """
+        Get the current value of a meter in a running simulation.  The `get_meter_handle` function is first used
+        to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
+        then get the value of the meter.
 
-        :param meter_handle:
-        :return:
+        Note this function is not completed yet.  It currently gives an instant reading of the meter, not an aggregate
+        value throughout the simulation.  Use caution
+
+        :param meter_handle: An integer returned from the `get_meter_handle` function.
+        :return: Floating point representation of the current meter value
         """
         return self.api.getMeterValue(meter_handle)
 
-    def set_actuator_value(self, variable_handle: int, variable_value: RealEP):
+    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> bool:
         """
+        Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
+        to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
+        along with the value to assign, to then set the value of the actuator.
 
-        :param variable_handle:
-        :param variable_value:
-        :return:
+        :param actuator_handle: An integer returned from the `get_actuator_handle` function.
+        :param actuator_value: The value to assign to the actuator
+        :return: A bool response value for success of setting the actuator value, True is success, False is failure
         """
-        return self.api.setActuatorValue(variable_handle, variable_value)
+        return self.api.setActuatorValue(actuator_handle, actuator_value)

@@ -5,7 +5,7 @@ class MyPlugin(EnergyPlusPlugin):
 
     def __init__(self):
         super().__init__()
-        self.version_string = self.functional.energyplus_version()
+        self.version_string = str(self.functional.ep_version())
         self.db_handle = 0
 
     def main(self):
