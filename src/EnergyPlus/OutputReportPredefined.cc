@@ -1994,7 +1994,8 @@ namespace OutputReportPredefined {
             newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
         pdch2CoilLvgDryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
         pdch2CoilLvgWetBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
-        pdch2CoilLvgHumRatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]");
+        pdch2CoilLvgHumRatIdealPeak =
+            newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
         pdch2OADryBulbIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]");
         pdch2OAHumRatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
         pdch2OAWetBulbatIdealPeak = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Outdoor Air Wetbulb at Ideal Loads Peak [C]");
@@ -2089,7 +2090,8 @@ namespace OutputReportPredefined {
         pdchCoilEntEnthalpyIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]");
         pdchCoilLvgDryBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]");
         pdchCoilLvgWetBulbIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]");
-        pdchCoilLvgHumRatIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]");
+        pdchCoilLvgHumRatIdealPeak =
+            newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]");
         pdchCoilLvgEnthalpyIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]");
         pdchCoilWaterMassFlowIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]");
         pdchCoilEntWaterTempIdealPeak =
