@@ -1943,7 +1943,7 @@ namespace ReportSizingManager {
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
                             ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
                             ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [KGWATER/KGDRYAIR]");
+                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]");
                             AutosizeDes = DataDesInletAirHumRat;
                             ShowContinueError("....coil leaving humidity ratio will be reset to:");
                             ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6));
@@ -3019,15 +3019,15 @@ namespace ReportSizingManager {
                          UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) { // flow here is water vol flow rate
                         ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                          "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.");
-                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [KGWATER/KGDRYAIR]");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
+                        ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
+                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
                         if (DataDesInletAirHumRat > 0.016) {
                             AutosizeDes = 0.5 * DataDesInletAirHumRat;
                         } else {
                             AutosizeDes = DataDesInletAirHumRat;
                         }
                         ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
+                        ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
                     }
 
                     // check for dry coil and reset outlet humrat if needed
@@ -3039,14 +3039,14 @@ namespace ReportSizingManager {
                             ShowWarningError(CallingRoutine + ":" + " Coil=\"" + CompName +
                                              "\", Cooling Coil is running dry for sizing because minimum humidity ratio at saturation for inlet "
                                              "chilled water temperature > design air entering humidity ratio.");
-                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [KGWATER/KGDRYAIR]");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
+                            ShowContinueError("    Wair,in =  " + RoundSigDigits(DataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]");
+                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
                             ShowContinueError("    Inlet chilled water temperature = " + RoundSigDigits(DataDesInletWaterTemp, 3) + " [C]");
                             ShowContinueError("    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [KGWATER/KGDRYAIR]");
+                                              RoundSigDigits(DesHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]");
                             AutosizeDes = DataDesInletAirHumRat;
                             ShowContinueError("....coil leaving humidity ratio will be reset to:");
-                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [KGWATER/KGDRYAIR]");
+                            ShowContinueError("    Wair,out = " + RoundSigDigits(AutosizeDes, 6) + " [kgWater/kgDryAir]");
                         }
                     }
                     bCheckForZero = false;

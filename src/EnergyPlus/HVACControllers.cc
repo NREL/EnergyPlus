@@ -1777,17 +1777,17 @@ namespace HVACControllers {
                         ShowContinueError("Controller sensed temperature = " + TrimSigDigits(ControllerProps(ControlNum).SensedValue, 2) + " [C]");
                     } else if (ControllerProps(ControlNum).ControlVar == iHumidityRatio) {
                         ShowContinueError("Controller humidity ratio setpoint = " + TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 2) +
-                                          " [kg-H2O/kg-air]");
+                                          " [kgWater/kgDryAir]");
                         ShowContinueError("Controller sensed humidity ratio = " + TrimSigDigits(ControllerProps(ControlNum).SensedValue, 2) +
-                                          " [kg-H2O/kg-air]");
+                                          " [kgWater/kgDryAir]");
                     } else if (ControllerProps(ControlNum).ControlVar == iTemperatureAndHumidityRatio) {
                         ShowContinueError("Controller temperature setpoint = " + TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 2) +
                                           " [C]");
                         ShowContinueError("Controller sensed temperature = " + TrimSigDigits(ControllerProps(ControlNum).SensedValue, 2) + " [C]");
                         ShowContinueError("Controller humidity ratio setpoint = " +
-                                          TrimSigDigits(Node(ControllerProps(ControlNum).SensedNode).HumRatMax, 2) + " [kg-H2O/kg-air]");
+                                          TrimSigDigits(Node(ControllerProps(ControlNum).SensedNode).HumRatMax, 2) + " [kgWater/kgDryAir]");
                         ShowContinueError("Controller sensed humidity ratio = " +
-                                          TrimSigDigits(Node(ControllerProps(ControlNum).SensedNode).HumRat, 2) + " [kg-H2O/kg-air]");
+                                          TrimSigDigits(Node(ControllerProps(ControlNum).SensedNode).HumRat, 2) + " [kgWater/kgDryAir]");
                     } else if (ControllerProps(ControlNum).ControlVar == iFlow) {
                         ShowContinueError("Controller mass flow rate setpoint = " + TrimSigDigits(ControllerProps(ControlNum).SetPointValue, 2) +
                                           " [kg/s]");

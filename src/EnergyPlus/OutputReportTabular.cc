@@ -14096,10 +14096,10 @@ namespace OutputReportTabular {
                     rowHead(1) = "Time of Peak Load";
                     rowHead(2) = "Outside Dry Bulb Temperature [C]";
                     rowHead(3) = "Outside Wet Bulb Temperature [C]";
-                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [C]";
                     rowHead(6) = "Zone Relative Humidity [%]";
-                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
 
                     rowHead(8) = "Supply Air Temperature [C]";
                     rowHead(9) = "Mixed Air Temperature [C]";
