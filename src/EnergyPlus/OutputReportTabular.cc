@@ -15917,7 +15917,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 116;
+        UnitConvSize = 115;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15944,7 +15944,7 @@ namespace OutputReportTabular {
         UnitConv(23).siName = "J";
         UnitConv(24).siName = "J";
         UnitConv(25).siName = "J/KG";
-        UnitConv(26).siName = "J/KG H2O";
+        UnitConv(26).siName = "J/KGWATER";
         UnitConv(27).siName = "J/M2";
         UnitConv(28).siName = "K/M";
         UnitConv(29).siName = "KG";
@@ -16027,14 +16027,13 @@ namespace OutputReportTabular {
         UnitConv(106).siName = "AH";
         UnitConv(107).siName = "CLO";
         UnitConv(108).siName = "J/KG-K";
-        UnitConv(109).siName = "J/KGWATER";
-        UnitConv(110).siName = "KGWATER/S";
-        UnitConv(111).siName = "PPM";
-        UnitConv(112).siName = "RAD";
-        UnitConv(113).siName = "REV/MIN";
-        UnitConv(114).siName = "NM";
-        UnitConv(115).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(116).siName = "PERSON/M2";
+        UnitConv(109).siName = "KGWATER/S";
+        UnitConv(110).siName = "PPM";
+        UnitConv(111).siName = "RAD";
+        UnitConv(112).siName = "REV/MIN";
+        UnitConv(113).siName = "NM";
+        UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(115).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -16144,14 +16143,13 @@ namespace OutputReportTabular {
         UnitConv(106).ipName = "Ah";
         UnitConv(107).ipName = "clo";
         UnitConv(108).ipName = "Btu/lbm-R";
-        UnitConv(109).ipName = "Btu/lbWater";
-        UnitConv(110).ipName = "lbWater/s";
-        UnitConv(111).ipName = "ppm";
-        UnitConv(112).ipName = "rad";
-        UnitConv(113).ipName = "rev/min";
-        UnitConv(114).ipName = "lbf-ft";
-        UnitConv(115).ipName = "Btu/W-h";
-        UnitConv(116).ipName = "person/ft2";
+        UnitConv(109).ipName = "lbWater/s";
+        UnitConv(110).ipName = "ppm";
+        UnitConv(111).ipName = "rad";
+        UnitConv(112).ipName = "rev/min";
+        UnitConv(113).ipName = "lbf-ft";
+        UnitConv(114).ipName = "Btu/W-h";
+        UnitConv(115).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -16261,14 +16259,13 @@ namespace OutputReportTabular {
         UnitConv(106).mult = 1.0;
         UnitConv(107).mult = 1.0;
         UnitConv(108).mult = 0.000238845896627;
-        UnitConv(109).mult = 0.0000004302105;
-        UnitConv(110).mult = 2.2046;
+        UnitConv(109).mult = 2.2046;
+        UnitConv(110).mult = 1.0;
         UnitConv(111).mult = 1.0;
         UnitConv(112).mult = 1.0;
-        UnitConv(113).mult = 1.0;
-        UnitConv(114).mult = 0.737562149277;
-        UnitConv(115).mult = 1.0;
-        UnitConv(116).mult = 0.09290304;
+        UnitConv(113).mult = 0.737562149277;
+        UnitConv(114).mult = 1.0;
+        UnitConv(115).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;
