@@ -15917,7 +15917,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 117;
+        UnitConvSize = 116;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15951,7 +15951,7 @@ namespace OutputReportTabular {
         UnitConv(30).siName = "KG/KG";
         UnitConv(31).siName = "KG/M3";
         UnitConv(32).siName = "KG/S";
-        UnitConv(33).siName = "KGWATER/KGAIR";
+        UnitConv(33).siName = "KGWATER/KGDRYAIR";
         UnitConv(34).siName = "KGWATER/SEC";
         UnitConv(35).siName = "KMOL/S";
         UnitConv(36).siName = "KMOL/SEC";
@@ -16023,19 +16023,18 @@ namespace OutputReportTabular {
         UnitConv(102).siName = "$";
         UnitConv(103).siName = "$/UNIT ENERGY";
         UnitConv(104).siName = "KW";
-        UnitConv(105).siName = "KGWATER/KGDRYAIR";
-        UnitConv(106).siName = " ";
-        UnitConv(107).siName = "AH";
-        UnitConv(108).siName = "CLO";
-        UnitConv(109).siName = "J/KG-K";
-        UnitConv(110).siName = "J/KGWATER";
-        UnitConv(111).siName = "KGWATER/S";
-        UnitConv(112).siName = "PPM";
-        UnitConv(113).siName = "RAD";
-        UnitConv(114).siName = "REV/MIN";
-        UnitConv(115).siName = "NM";
-        UnitConv(116).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(117).siName = "PERSON/M2";
+        UnitConv(105).siName = " ";
+        UnitConv(106).siName = "AH";
+        UnitConv(107).siName = "CLO";
+        UnitConv(108).siName = "J/KG-K";
+        UnitConv(109).siName = "J/KGWATER";
+        UnitConv(110).siName = "KGWATER/S";
+        UnitConv(111).siName = "PPM";
+        UnitConv(112).siName = "RAD";
+        UnitConv(113).siName = "REV/MIN";
+        UnitConv(114).siName = "NM";
+        UnitConv(115).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(116).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -16069,7 +16068,7 @@ namespace OutputReportTabular {
         UnitConv(30).ipName = "lb/lb";
         UnitConv(31).ipName = "lb/ft3";
         UnitConv(32).ipName = "lb/s";
-        UnitConv(33).ipName = "lbWater/lbAir";
+        UnitConv(33).ipName = "lbWater/lbDryAir";
         UnitConv(34).ipName = "lbWater/s";
         UnitConv(35).ipName = "kmol/s";
         UnitConv(36).ipName = "kmol/sec";
@@ -16141,19 +16140,18 @@ namespace OutputReportTabular {
         UnitConv(102).ipName = "$";
         UnitConv(103).ipName = "$/unit energy";
         UnitConv(104).ipName = "kW";
-        UnitConv(105).ipName = "lbWater/lbDryAir";
-        UnitConv(106).ipName = " ";
-        UnitConv(107).ipName = "Ah";
-        UnitConv(108).ipName = "clo";
-        UnitConv(109).ipName = "Btu/lbm-R";
-        UnitConv(110).ipName = "Btu/lbWater";
-        UnitConv(111).ipName = "lbWater/s";
-        UnitConv(112).ipName = "ppm";
-        UnitConv(113).ipName = "rad";
-        UnitConv(114).ipName = "rev/min";
-        UnitConv(115).ipName = "lbf-ft";
-        UnitConv(116).ipName = "Btu/W-h";
-        UnitConv(117).ipName = "person/ft2";
+        UnitConv(105).ipName = " ";
+        UnitConv(106).ipName = "Ah";
+        UnitConv(107).ipName = "clo";
+        UnitConv(108).ipName = "Btu/lbm-R";
+        UnitConv(109).ipName = "Btu/lbWater";
+        UnitConv(110).ipName = "lbWater/s";
+        UnitConv(111).ipName = "ppm";
+        UnitConv(112).ipName = "rad";
+        UnitConv(113).ipName = "rev/min";
+        UnitConv(114).ipName = "lbf-ft";
+        UnitConv(115).ipName = "Btu/W-h";
+        UnitConv(116).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -16262,16 +16260,15 @@ namespace OutputReportTabular {
         UnitConv(105).mult = 1.0;
         UnitConv(106).mult = 1.0;
         UnitConv(107).mult = 1.0;
-        UnitConv(108).mult = 1.0;
-        UnitConv(109).mult = 0.000238845896627;
-        UnitConv(110).mult = 0.0000004302105;
-        UnitConv(111).mult = 2.2046;
+        UnitConv(108).mult = 0.000238845896627;
+        UnitConv(109).mult = 0.0000004302105;
+        UnitConv(110).mult = 2.2046;
+        UnitConv(111).mult = 1.0;
         UnitConv(112).mult = 1.0;
         UnitConv(113).mult = 1.0;
-        UnitConv(114).mult = 1.0;
-        UnitConv(115).mult = 0.737562149277;
-        UnitConv(116).mult = 1.0;
-        UnitConv(117).mult = 0.09290304;
+        UnitConv(114).mult = 0.737562149277;
+        UnitConv(115).mult = 1.0;
+        UnitConv(116).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;
