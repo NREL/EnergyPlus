@@ -1969,9 +1969,12 @@ namespace HeatBalanceIntRadExchange {
         static const int maxIt = 100;
         static const double tol = 0.0001;
         double fChange, fLast;
+        double sumAFNew = sumAF;
         for (unsigned i = 0; i < maxIt; i++) {
             fChange = 0.;
             bool errorsFound(false);
+            sumAF = sumAFNew;
+            sumAFNew = 0.0;
             for (int iS = 0; iS < N; iS++) {
                 fLast = FMRT[iS];
                 FMRT[iS] = 1./(1. - A[iS]*FMRT[iS]/(sumAF));
@@ -1981,8 +1984,9 @@ namespace HeatBalanceIntRadExchange {
                     break;
                 }
                 fChange += fabs(FMRT[iS] - fLast);
-                sumAF += (FMRT[iS] - fLast)*A[iS];
+                sumAFNew += A[iS]*FMRT[iS];
             }
+
             if (errorsFound || fChange / N < tol) {
                 break;
             }
