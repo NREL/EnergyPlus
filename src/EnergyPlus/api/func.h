@@ -50,6 +50,7 @@
 #define ENERGYPLUS_FUNC_H
 
 #include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/public/EnergyPlusAPI.hh>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,14 +59,14 @@ extern "C" {
 void functionalNoOp();
 
 // Test out a real E+ struct with methods
-typedef void *CBaseThermalPropertySet;
-CBaseThermalPropertySet newCBaseThermalPropertySet(Real64 conductivity, Real64 density, Real64 specificHeat);
-void delCBaseThermalPropertySet(CBaseThermalPropertySet);
-Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet);
-void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
+ENERGYPLUSLIB_API typedef void *CBaseThermalPropertySet;
+ENERGYPLUSLIB_API CBaseThermalPropertySet newCBaseThermalPropertySet(Real64 conductivity, Real64 density, Real64 specificHeat);
+ENERGYPLUSLIB_API void delCBaseThermalPropertySet(CBaseThermalPropertySet);
+ENERGYPLUSLIB_API Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet);
+ENERGYPLUSLIB_API void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
 
-void initializeFunctionalAPI();
-Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
+ENERGYPLUSLIB_API void initializeFunctionalAPI();
+ENERGYPLUSLIB_API Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
 
 #ifdef __cplusplus
 }

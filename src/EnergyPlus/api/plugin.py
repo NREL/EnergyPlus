@@ -31,16 +31,3 @@ class EnergyPlusPlugin(object):
         raise NotImplementedError(
             "Encountered EnergyPlusPlugin::main base function -- override this in your plugin class"
         )
-
-    def ems_program_name(self) -> str:
-        """
-        If this Python Plugin is to be used as a standard EMS program, this would be the name of the program referenced
-        in the input file.  For example, if this was used as a program for a user-defined component, this name would be
-        entered in the user-defined component input fields
-
-        If this Python Plugin is not intended for use in that way, but rather as regular plugins, this function does not
-        need to be overridden.
-
-        :return: A string program name to be used as an alias in typical EMS program name inputs
-        """
-        return ""

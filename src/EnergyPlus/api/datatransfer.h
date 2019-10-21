@@ -49,21 +49,22 @@
 #define EnergyPlusAPIFunctional_h_INCLUDED
 
 #include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/public/EnergyPlusAPI.hh>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void dataTransferNoOp();
-int getVariableHandle(const char* type, const char* key);
-int getMeterHandle(const char* meterName);
-int getActuatorHandle(const char* type, const char* key);
-double getVariableValue(int handle);
-double getMeterValue(int handle);
-int setActuatorValue(int handle, double value);
+ENERGYPLUSLIB_API void dataTransferNoOp();
+ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
+ENERGYPLUSLIB_API int getActuatorHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API double getVariableValue(int handle);
+ENERGYPLUSLIB_API double getMeterValue(int handle);
+ENERGYPLUSLIB_API int setActuatorValue(int handle, double value);
 
-int simDataGetKindOfSim();
-int simDataHourOfDay();
+ENERGYPLUSLIB_API int simDataGetKindOfSim();
+ENERGYPLUSLIB_API int simDataHourOfDay();
 
 #ifdef __cplusplus
 }

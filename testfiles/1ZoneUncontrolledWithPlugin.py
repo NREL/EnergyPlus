@@ -17,6 +17,3 @@ class MyPlugin(EnergyPlusPlugin):
             odb = self.transfer.get_variable_value(self.db_handle)
             print("Inside " + type(self).__name__ + " in E+ version: " + self.version_string + "; ODB = " + str(odb))
         return 0
-
-    def ems_program_name(self) -> str:
-        return "my ems name"

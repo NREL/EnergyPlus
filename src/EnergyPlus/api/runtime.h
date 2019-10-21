@@ -54,16 +54,16 @@
 extern "C" {
 #endif
 
-void cClearAllStates();
-void cRuntimeNoOp();
+ENERGYPLUSLIB_API void cClearAllStates();
+ENERGYPLUSLIB_API void cRuntimeNoOp();
 
     // Program level functions
-int cRunEnergyPlus(const char* filepath);
+ENERGYPLUSLIB_API int cRunEnergyPlus(const char* filepath);
 
-void registerRuntimeCallbackFromEndOfHour(void (*f)());
-void registerRuntimeCallbackFromBeginningOfHour(void (*f)());
-void registerRuntimeCallbackFromBeginningOfZoneTimeStep(void (*f)());
-void registerRuntimeCallbackFromEndOfZoneTimeStep(void (*f)());
+ENERGYPLUSLIB_API void registerRuntimeCallbackFromEndOfHour(void (*f)());
+ENERGYPLUSLIB_API void registerRuntimeCallbackFromBeginningOfHour(void (*f)());
+ENERGYPLUSLIB_API void registerRuntimeCallbackFromBeginningOfZoneTimeStep(void (*f)());
+ENERGYPLUSLIB_API void registerRuntimeCallbackFromEndOfZoneTimeStep(void (*f)());
 
 #ifdef __cplusplus
 }
