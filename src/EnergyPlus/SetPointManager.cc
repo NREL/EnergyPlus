@@ -6873,7 +6873,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -6952,7 +6952,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 

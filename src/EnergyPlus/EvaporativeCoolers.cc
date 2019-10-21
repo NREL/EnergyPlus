@@ -1739,8 +1739,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).RecircPumpPower;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapCond(EvapCoolNum).EvapWaterConsumpRate =
@@ -1897,9 +1897,9 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(TDBSec);
             RhoAir =
@@ -2054,8 +2054,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-            //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+            //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+            //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
             //******************
             //***** FIRST calculate the heat exchange on the primary air side**********
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -2397,8 +2397,8 @@ namespace EvaporativeCoolers {
 
                 EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
                 //******************
-                //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-                //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+                //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+                //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
                 //******************
                 //***** FIRST calculate the heat exchange on the primary air side**********
                 RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -3373,8 +3373,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower = EvapCond(EvapCoolNum).RecircPumpPower * PumpPowerModCurveValue;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapVdot = (EvapCond(EvapCoolNum).OutletHumRat - EvapCond(EvapCoolNum).InletHumRat) * EvapCond(EvapCoolNum).InletMassFlowRate / RhoWater;

@@ -338,8 +338,8 @@ namespace DataSizing {
         Real64 HeatDesTemp;              // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff;          // zone design cooling supply air temperature difference [deltaC]
         Real64 HeatDesTempDiff;          // zone design heating supply air temperature difference [deltaC]
-        Real64 CoolDesHumRat;            // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-        Real64 HeatDesHumRat;            // zone design heating supply air humidity ratio [kg-H2O/kg-air]
+        Real64 CoolDesHumRat;            // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
+        Real64 HeatDesHumRat;            // zone design heating supply air humidity ratio [kgWater/kgDryAir]
         std::string DesignSpecOAObjName; // name of the design specification outdoor air object
         int OADesMethod;                 // choice of how to calculate minimum outside air;
         //  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
@@ -409,8 +409,8 @@ namespace DataSizing {
         Real64 HeatDesTemp;        // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff;    // zone design cooling supply air temperature difference [deltaC]
         Real64 HeatDesTempDiff;    // zone design heating supply air temperature difference [deltaC]
-        Real64 CoolDesHumRat;      // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-        Real64 HeatDesHumRat;      // zone design heating supply air humidity ratio [kg-H2O/kg-air]
+        Real64 CoolDesHumRat;      // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
+        Real64 HeatDesHumRat;      // zone design heating supply air humidity ratio [kgWater/kgDryAir]
         int ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         int OADesMethod;           // choice of how to calculate minimum outside air;
         //  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
@@ -569,7 +569,7 @@ namespace DataSizing {
         Real64 DOASLatAdd;      // current latent heat addition rate from DOAS supply air [W]
         Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
         Real64 DOASSupTemp;     // current DOAS supply air temperature [C]
-        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kgWater/kgDryAir]
         Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
         Array1D<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
         Array1D<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
@@ -577,7 +577,7 @@ namespace DataSizing {
         Array1D<Real64> DOASLatAddSeq;      // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
         Array1D<Real64> DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
         Array1D<Real64> DOASSupTempSeq;     // daily sequence of zone DOAS supply temperature (zone time step) [C]
-        Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
+        Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kgWater/kgDryAir]
         Array1D<Real64> DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
 
         // Default Constructor

@@ -2852,7 +2852,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(5)) {
                         ZoneSizingInput(ZoneSizIndex).CoolDesHumRat = 0.0;
                     } else if (rNumericArgs(5) < 0.0) {
@@ -2866,7 +2866,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(6)) {
                         ZoneSizingInput(ZoneSizIndex).HeatDesHumRat = 0.0;
                     } else if (rNumericArgs(6) < 0.0) {
