@@ -178,22 +178,23 @@ namespace PluginManager {
                 }
                 std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
                 if (inputFileDirFlagUC == "YES") {
-                    PluginManager::addToPythonPath(DataStringGlobals::inputDirPathName, false);
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    PluginManager::addToPythonPath(sanitizedInputFileDir, false);
                 }
                 if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_1"), true);
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
                 }
                 if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_2"), true);
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
                 }
                 if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_3"), true);
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
                 }
                 if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_4"), true);
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
                 }
                 if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(fields.at("search_path_5"), true);
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
                 }
             }
         }
@@ -217,13 +218,13 @@ namespace PluginManager {
                 std::string className = fields.at("plugin_class_name");
                 std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
                 if (sCallingPoint == "BEGINNINGOFHOUR") {
-                    pluginsCallFromBeginningOfHour.emplace_back(fileName, className);
+                    pluginsCallFromBeginningOfHour.emplace_back(fileName, className, thisObjectName);
                 } else if (sCallingPoint == "BEGINNINGOFZONETIMESTEP") {
-                    pluginsCallFromBeginningOfZoneTimeStep.emplace_back(fileName, className);
+                    pluginsCallFromBeginningOfZoneTimeStep.emplace_back(fileName, className, thisObjectName);
                 } else if (sCallingPoint == "ENDOFZONETIMESTEP") {
-                    pluginsCallFromEndOfZoneTimeStep.emplace_back(fileName, className);
+                    pluginsCallFromEndOfZoneTimeStep.emplace_back(fileName, className, thisObjectName);
                 } else if (sCallingPoint == "ENDOFHOUR") {
-                    pluginsCallFromEndOfHour.emplace_back(fileName, className);
+                    pluginsCallFromEndOfHour.emplace_back(fileName, className, thisObjectName);
                 }
             }
         }
@@ -261,7 +262,7 @@ namespace PluginManager {
         EnergyPlus::ShowContinueError(strExcValue);
     }
 
-    PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className)
+    PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className, const std::string &emsName)
     {
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
@@ -343,35 +344,9 @@ namespace PluginManager {
             EnergyPlus::ShowFatalError("Python main() function error causes program termination");
         }
 
-        // now grab the function pointers to the main call function
-        std::string const emsNameFunctionName = "ems_program_name";
-        PyObject *emsNameFunction = PyObject_GetAttrString(pClassInstance, emsNameFunctionName.c_str());
-        if (!emsNameFunction || !PyCallable_Check(emsNameFunction)) {
-            EnergyPlus::ShowSevereError("Could not find function \"" + emsNameFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("The base class includes a definition of this function, so this is unexpected behavior.");
-            }
-            EnergyPlus::ShowFatalError("Python ems_program_name() function error causes program termination");
-        }
-        PyObject *emsNameResponse = PyObject_CallFunction(emsNameFunction, nullptr);
-        if (!emsNameResponse) {
-            EnergyPlus::ShowSevereError("Could not call " + emsNameFunctionName + " function on class \"" + moduleName + "." + className + ", make sure it is defined and error free");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("The base class includes a definition of this function, so this is unexpected behavior.");
-            }
-            EnergyPlus::ShowFatalError("Python ems_program_name() function call error causes program termination");
-        }
-        std::string emsName = PyUnicode_AsUTF8(emsNameResponse);
-        if (!emsName.empty()) {
-            this->emsAlias = emsName;
-        }
-
         // update the rest of the plugin call instance and store it
         this->stringIdentifier = moduleName + "." + className;
+        this->emsAlias = emsName;
     }
 
     void PluginInstance::run()
@@ -379,15 +354,20 @@ namespace PluginManager {
         // then call the main function
         PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginMainFunction, nullptr);
         if (!pFunctionResponse) {
-            PyErr_Print();
-            EnergyPlus::ShowFatalError("Call to " + this->stringIdentifier + " failed!");
+            EnergyPlus::ShowSevereError("Call to " + this->stringIdentifier + " failed!");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
+            }
+            EnergyPlus::ShowFatalError("Program terminates after call to " + this->stringIdentifier + " failed!");
         }
         if (PyLong_Check(pFunctionResponse)) {
             int exitCode = (int)PyLong_AsLong(pFunctionResponse);
             if (exitCode == 0) {
                 // success
             } else if (exitCode == 1) {
-                // we should FATAL ERROR HERE
+                EnergyPlus::ShowFatalError("Python Plugin \"" + this->stringIdentifier + "\" returned 1 to indicate EnergyPlus should abort");
             }
         } else {
             EnergyPlus::ShowFatalError("Invalid return from main() on class \"" + this->stringIdentifier +
@@ -403,7 +383,7 @@ namespace PluginManager {
             if (userDefinedPath) {
                 EnergyPlus::ShowMessage("Successfully added path \"" + path + "\" to the sys.path in Python");
             }
-            // PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
+            // DEBUGGING PATHS: PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
