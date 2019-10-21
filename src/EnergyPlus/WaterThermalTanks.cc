@@ -220,18 +220,18 @@ namespace WaterThermalTanks {
 
     }
 
-    void SimWaterThermalTank(int const CompType,
-                             std::string const &CompName,
-                             int &CompIndex,
-                             bool const EP_UNUSED(RunFlag), // unused1208
-                             bool const InitLoopEquip,
-                             Real64 &MyLoad,
-                             Real64 &MaxCap,
-                             Real64 &MinCap,
-                             Real64 &OptCap,
-                             bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                             Optional_int_const LoopNum,
-                             Optional_int_const LoopSideNum)
+    void SimWaterThermalTank_WaterTank(int const CompType,
+                                       std::string const &CompName,
+                                       int &CompIndex,
+                                       bool const EP_UNUSED(RunFlag), // unused1208
+                                       bool const InitLoopEquip,
+                                       Real64 &MyLoad,
+                                       Real64 &MaxCap,
+                                       Real64 &MinCap,
+                                       Real64 &OptCap,
+                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                                       Optional_int_const LoopNum,
+                                       Optional_int_const LoopSideNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -239,280 +239,277 @@ namespace WaterThermalTanks {
         //       MODIFIED       FSEC, July 2005
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // The main subroutine for simulating a water heater, heat pump water heater, or desuperheater
-        // heating coil.  This routine will:
-        // 1. Gets Input if necessary
-        // 2. Determines the load the water heater (or heat pump water heater) must support
-        // 3. Determine the type of water heater, heat pump water heater, or desuperheater
-        //    heating coil to be simulated
-        // 4. Calls simulation routines
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
         if (modGetWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             modGetWaterThermalTankInputFlag = false;
         }
 
         int CompNum;
-        // Find the correct Equipment
-        if (CompType != DataPlant::TypeOf_HeatPumpWtrHeaterPumped && CompType != DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-            if (CompIndex == 0) {
-                CompNum = UtilityRoutines::FindItem(CompName, WaterThermalTank);
-                if (CompNum == 0) {
-                    ShowFatalError("SimWaterThermalTank:  Unit not found=" + CompName);
-                }
-                CompIndex = CompNum;
-            } else {
-                CompNum = CompIndex;
-                if (CompNum > modNumWaterThermalTank || CompNum < 1) {
-                    ShowFatalError("SimWaterThermalTank:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", Number of Units=" + General::TrimSigDigits(modNumWaterThermalTank) + ", Entered Unit name=" + CompName);
-                }
-                if (WaterThermalTank(CompNum).CheckWTTEquipName) {
-                    if (CompName != WaterThermalTank(CompNum).Name) {
-                        ShowFatalError("SimWaterThermalTank: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
-                                       ", stored Unit Name for that index=" + WaterThermalTank(CompNum).Name);
-                    }
-                    WaterThermalTank(CompNum).CheckWTTEquipName = false;
-                }
+
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItem(CompName, WaterThermalTank);
+            if (CompNum == 0) {
+                ShowFatalError("SimWaterThermalTank_WaterTank:  Unit not found=" + CompName);
             }
+            CompIndex = CompNum;
         } else {
-            if (CompIndex == 0) {
-                CompNum = UtilityRoutines::FindItem(CompName, HPWaterHeater);
-                if (CompNum == 0) {
-                    ShowFatalError("SimWaterThermalTank:  Unit not found=" + CompName);
+            CompNum = CompIndex;
+            if (CompNum > modNumWaterThermalTank || CompNum < 1) {
+                ShowFatalError("SimWaterThermalTank_WaterTank:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                               ", Number of Units=" + General::TrimSigDigits(modNumWaterThermalTank) + ", Entered Unit name=" + CompName);
+            }
+            if (WaterThermalTank(CompNum).CheckWTTEquipName) {
+                if (CompName != WaterThermalTank(CompNum).Name) {
+                    ShowFatalError("SimWaterThermalTank_WaterTank: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+                                   ", stored Unit Name for that index=" + WaterThermalTank(CompNum).Name);
                 }
-                CompIndex = CompNum;
-            } else {
-                CompNum = CompIndex;
-                if (CompNum > modNumWaterThermalTank || CompNum < 1) {
-                    ShowFatalError("SimWaterThermalTank:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", Number of Units=" + General::TrimSigDigits(modNumHeatPumpWaterHeater) + ", Entered Unit name=" + CompName);
-                }
-                if (HPWaterHeater(CompNum).CheckHPWHEquipName) {
-                    if (CompName != HPWaterHeater(CompNum).Name) {
-                        ShowFatalError("SimWaterThermalTank: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
-                                       ", stored Unit Name for that index=" + HPWaterHeater(CompNum).Name);
-                    }
-                    HPWaterHeater(CompNum).CheckHPWHEquipName = false;
-                }
+                WaterThermalTank(CompNum).CheckWTTEquipName = false;
             }
         }
 
-        // this case statement needs integerization.
-        {
-            auto const SELECT_CASE_var(CompType);
-
-            // string comparisons to remove here.
-            // =========================  Water Heater and Chilled Water Storage
-            if ((SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterMixed) || (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) ||
-                (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) || (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-
-                if (InitLoopEquip) {
-                    if (present(LoopNum)) {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
-                    } else {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
-                    }
-                    WaterThermalTank(CompNum).MinePlantStructForInfo();
-                    if (present(LoopNum)) {
-                        if (((WaterThermalTank(CompNum).SrcSide.loopNum == LoopNum) &&
-                             (WaterThermalTank(CompNum).SrcSide.loopSideNum == LoopSideNum)) ||
-                            ((WaterThermalTank(CompNum).UseSide.loopNum == LoopNum) &&
-                             (WaterThermalTank(CompNum).UseSide.loopSideNum == LoopSideNum))) {
-
-                            WaterThermalTank(CompNum).SizeTankForDemandSide();
-                            WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                            WaterThermalTank(CompNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
-                            WaterThermalTank(CompNum).SizeTankForSupplySide();
-                        } else {
-                            return;
-                        }
-                    } else {
-                        WaterThermalTank(CompNum).SizeTankForDemandSide();
-                        WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                        WaterThermalTank(CompNum).SizeSupplySidePlantConnections();
-                        WaterThermalTank(CompNum).SizeTankForSupplySide();
-                    }
-
-                    // Calculate and report water heater standard ratings to EIO file (now that sizing is done)
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                        if (!WaterThermalTank(CompNum).IsChilledWaterTank) {
-                            WaterThermalTank(CompNum).CalcStandardRatings();
-                        } else {
-                            WaterThermalTank(CompNum).ReportCWTankInits();
-                        }
-                    }
-                    MinCap = 0.0;
-                    MaxCap = WaterThermalTank(CompNum).MaxCapacity;
-                    OptCap = WaterThermalTank(CompNum).MaxCapacity;
-                    if (present(LoopNum)) {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
-                    } else {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
-                    }
-                    return;
-                }
-
-                if (WaterThermalTank(CompNum).MyOneTimeFlagWH) {
-                    WaterThermalTank(CompNum).MyOneTimeFlagWH = false;
-                } else {
-                    if (WaterThermalTank(CompNum).MyTwoTimeFlagWH) {
-                        WaterThermalTank(CompNum).MinePlantStructForInfo(); // call it again to get control types filled out
-                        WaterThermalTank(CompNum).MyTwoTimeFlagWH = false;
-                    }
-                }
-                WaterThermalTank(CompNum).UseSideLoadRequested = std::abs(MyLoad);
-                int tmpLoopNum = WaterThermalTank(CompNum).UseSide.loopNum;
-                if (tmpLoopNum > 0 && WaterThermalTank(CompNum).UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-                    WaterThermalTank(CompNum).UseCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
-                } else {
-                    WaterThermalTank(CompNum).UseCurrentFlowLock = 1;
-                }
-                tmpLoopNum = WaterThermalTank(CompNum).SrcSide.loopNum;
-                if (tmpLoopNum > 0 && WaterThermalTank(CompNum).SrcSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-                    WaterThermalTank(CompNum).SourceCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
-                } else {
-                    WaterThermalTank(CompNum).SourceCurrentFlowLock = 1;
-                }
+        if (InitLoopEquip) {
+            if (present(LoopNum)) {
+                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+            } else {
                 WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
-                //       Plant connected water heaters may have a desuperheater heating coil attached
-                if (WaterThermalTank(CompNum).DesuperheaterNum == 0) {
-                    if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
-                        WaterThermalTank(CompNum).CalcWaterThermalTankMixed();
-                    } else if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
-                               (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-                        WaterThermalTank(CompNum).CalcWaterThermalTankStratified();
-                    }
-                } else if (WaterThermalTank(CompNum).DesuperheaterNum > 0) {
-                    CalcDesuperheaterWaterHeater(CompNum, FirstHVACIteration);
-                }
-                WaterThermalTank(CompNum).UpdateWaterThermalTank();
-                WaterThermalTank(CompNum).ReportWaterThermalTank();
+            }
+            WaterThermalTank(CompNum).MinePlantStructForInfo();
+            if (present(LoopNum)) {
+                if (((WaterThermalTank(CompNum).SrcSide.loopNum == LoopNum) &&
+                     (WaterThermalTank(CompNum).SrcSide.loopSideNum == LoopSideNum)) ||
+                    ((WaterThermalTank(CompNum).UseSide.loopNum == LoopNum) &&
+                     (WaterThermalTank(CompNum).UseSide.loopSideNum == LoopSideNum))) {
 
-                // =========================  Heat Pump Water Heater
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || SELECT_CASE_var == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-                if (InitLoopEquip) {
-                    // CompNum is index to heatpump model, not tank so get the tank index
-                    int TankNum = HPWaterHeater(CompNum).WaterHeaterTankNum;
-                    if (present(LoopNum)) {
-                        WaterThermalTank(TankNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
-                    } else {
-                        WaterThermalTank(TankNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
-                    }
-                    WaterThermalTank(TankNum).MinePlantStructForInfo();
-                    if (present(LoopNum)) {
-                        if (((WaterThermalTank(TankNum).SrcSide.loopNum == LoopNum) &&
-                             (WaterThermalTank(TankNum).SrcSide.loopSideNum == LoopSideNum)) ||
-                            ((WaterThermalTank(TankNum).UseSide.loopNum == LoopNum) &&
-                             (WaterThermalTank(TankNum).UseSide.loopSideNum == LoopSideNum))) {
-                            WaterThermalTank(CompNum).SizeTankForDemandSide();
-                            WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                            WaterThermalTank(TankNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
-                            WaterThermalTank(TankNum).SizeTankForSupplySide();
-                        } else {
-                            return;
-                        }
-                    } else {
-                        WaterThermalTank(CompNum).SizeTankForDemandSide();
-                        WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                        WaterThermalTank(TankNum).SizeSupplySidePlantConnections();
-                        WaterThermalTank(TankNum).SizeTankForSupplySide();
-                    }
-
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                        WaterThermalTank(TankNum).CalcStandardRatings();
-                        DataSizing::DataNonZoneNonAirloopValue = 0.0;
-                    }
-                    MinCap = 0.0;
-                    MaxCap = HPWaterHeater(CompNum).Capacity;
-                    OptCap = HPWaterHeater(CompNum).Capacity;
-
+                    WaterThermalTank(CompNum).SizeTankForDemandSide();
+                    WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
+                    WaterThermalTank(CompNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    WaterThermalTank(CompNum).SizeTankForSupplySide();
+                } else {
                     return;
                 }
-
-                if (HPWaterHeater(CompNum).MyOneTimeFlagHP) {
-                    HPWaterHeater(CompNum).MyOneTimeFlagHP = false;
-                } else {
-                    if (HPWaterHeater(CompNum).MyTwoTimeFlagHP) {
-                        WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).MinePlantStructForInfo(); // call it again to get control types filled out
-                        HPWaterHeater(CompNum).MyTwoTimeFlagHP = false;
-                    }
-                }
-                WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSideLoadRequested = std::abs(MyLoad);
-                int tmpLoopNum = WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSide.loopNum;
-                int tmpLoopSideNum = WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSide.loopSideNum;
-                if (tmpLoopNum > 0 && tmpLoopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseCurrentFlowLock =
-                        DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
-                } else {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseCurrentFlowLock = 1;
-                }
-                if (present(LoopNum)) {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration, LoopNum, LoopSideNum);
-                } else {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration);
-                }
-
-                int InletNodeSav = HPWaterHeater(CompNum).HeatPumpAirInletNode;
-                int OutletNodeSav = HPWaterHeater(CompNum).HeatPumpAirOutletNode;
-                int DXINletNodeSav = HPWaterHeater(CompNum).DXCoilAirInletNode;
-                int IHPFanIndexSav = HPWaterHeater(CompNum).FanNum;
-                std::string IHPFanNameSave = HPWaterHeater(CompNum).FanName;
-                int IHPFanplaceSav = HPWaterHeater(CompNum).FanPlacement;
-
-                if (HPWaterHeater(CompNum).bIsIHP) // pass the tank indexes to the IHP object
-                {
-                    IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankType = CompType;
-                    IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankName = CompName;
-                    IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankID = CompIndex;
-                    if (present(LoopNum)) {
-                        IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopNum = LoopNum;
-                        IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopSideNum = LoopSideNum;
-                    }
-
-                    IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(HPWaterHeater(CompNum).DXCoilNum);
-                    if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
-                        (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
-                        (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
-                        bool bDWHCoilReading = false;
-                        HPWaterHeater(CompNum).HeatPumpAirInletNode =
-                            VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-                                                          IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).DWHCoilName,
-                                                          bDWHCoilReading);
-                        HPWaterHeater(CompNum).HeatPumpAirOutletNode =
-                            VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-                                                           IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).DWHCoilName,
-                                                           bDWHCoilReading);
-                        HPWaterHeater(CompNum).DXCoilAirInletNode = HPWaterHeater(CompNum).HeatPumpAirInletNode;
-                    } else // default is to input outdoor fan to the the HPWH
-                    {
-                        HPWaterHeater(CompNum).FanNum = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanID;
-                        HPWaterHeater(CompNum).FanName = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanName;
-                        HPWaterHeater(CompNum).FanPlacement = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanPlace;
-                    }
-                }
-
-                CalcHeatPumpWaterHeater(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration);
-                WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UpdateWaterThermalTank();
-                WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).ReportWaterThermalTank();
-
-                HPWaterHeater(CompNum).HeatPumpAirInletNode = InletNodeSav;
-                HPWaterHeater(CompNum).HeatPumpAirOutletNode = OutletNodeSav;
-                HPWaterHeater(CompNum).DXCoilAirInletNode = DXINletNodeSav;
-                HPWaterHeater(CompNum).FanNum = IHPFanIndexSav;
-                HPWaterHeater(CompNum).FanName = IHPFanNameSave;
-                HPWaterHeater(CompNum).FanPlacement = IHPFanplaceSav;
-
             } else {
-                ShowSevereError("SimWaterThermalTank: Invalid Water Thermal Tank Equipment Type=" + General::TrimSigDigits(CompType));
-                ShowContinueError("Occurs in Water Thermal Tank Equipment named = " + CompName);
-                ShowFatalError("Preceding condition causes termination.");
+                WaterThermalTank(CompNum).SizeTankForDemandSide();
+                WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
+                WaterThermalTank(CompNum).SizeSupplySidePlantConnections();
+                WaterThermalTank(CompNum).SizeTankForSupplySide();
+            }
+
+            // Calculate and report water heater standard ratings to EIO file (now that sizing is done)
+            if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                if (!WaterThermalTank(CompNum).IsChilledWaterTank) {
+                    WaterThermalTank(CompNum).CalcStandardRatings();
+                } else {
+                    WaterThermalTank(CompNum).ReportCWTankInits();
+                }
+            }
+            MinCap = 0.0;
+            MaxCap = WaterThermalTank(CompNum).MaxCapacity;
+            OptCap = WaterThermalTank(CompNum).MaxCapacity;
+            if (present(LoopNum)) {
+                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+            } else {
+                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+            }
+            return;
+        }
+
+        if (WaterThermalTank(CompNum).MyOneTimeFlagWH) {
+            WaterThermalTank(CompNum).MyOneTimeFlagWH = false;
+        } else {
+            if (WaterThermalTank(CompNum).MyTwoTimeFlagWH) {
+                WaterThermalTank(CompNum).MinePlantStructForInfo(); // call it again to get control types filled out
+                WaterThermalTank(CompNum).MyTwoTimeFlagWH = false;
             }
         }
+        WaterThermalTank(CompNum).UseSideLoadRequested = std::abs(MyLoad);
+        int tmpLoopNum = WaterThermalTank(CompNum).UseSide.loopNum;
+        if (tmpLoopNum > 0 && WaterThermalTank(CompNum).UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            WaterThermalTank(CompNum).UseCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        } else {
+            WaterThermalTank(CompNum).UseCurrentFlowLock = 1;
+        }
+        tmpLoopNum = WaterThermalTank(CompNum).SrcSide.loopNum;
+        if (tmpLoopNum > 0 && WaterThermalTank(CompNum).SrcSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            WaterThermalTank(CompNum).SourceCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        } else {
+            WaterThermalTank(CompNum).SourceCurrentFlowLock = 1;
+        }
+        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+        //       Plant connected water heaters may have a desuperheater heating coil attached
+        if (WaterThermalTank(CompNum).DesuperheaterNum == 0) {
+            if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
+                WaterThermalTank(CompNum).CalcWaterThermalTankMixed();
+            } else if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
+                       (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+                WaterThermalTank(CompNum).CalcWaterThermalTankStratified();
+            }
+        } else if (WaterThermalTank(CompNum).DesuperheaterNum > 0) {
+            CalcDesuperheaterWaterHeater(CompNum, FirstHVACIteration);
+        }
+        WaterThermalTank(CompNum).UpdateWaterThermalTank();
+        WaterThermalTank(CompNum).ReportWaterThermalTank();
+
+    }
+
+    void SimWaterThermalTank_HeatPump(int const CompType,
+                                      std::string const &CompName,
+                                      int &CompIndex,
+                                      bool const EP_UNUSED(RunFlag), // unused1208
+                                      bool const InitLoopEquip,
+                                      Real64 &MyLoad,
+                                      Real64 &MaxCap,
+                                      Real64 &MinCap,
+                                      Real64 &OptCap,
+                                      bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                                      Optional_int_const LoopNum,
+                                      Optional_int_const LoopSideNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brandon Anderson
+        //       DATE WRITTEN   May 2000
+        //       MODIFIED       FSEC, July 2005
+        //       RE-ENGINEERED  na
+
+        if (modGetWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput();
+            modGetWaterThermalTankInputFlag = false;
+        }
+
+        int CompNum;
+
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItem(CompName, HPWaterHeater);
+            if (CompNum == 0) {
+                ShowFatalError("SimWaterThermalTank_HeatPump:  Unit not found=" + CompName);
+            }
+            CompIndex = CompNum;
+        } else {
+            CompNum = CompIndex;
+            if (CompNum > modNumWaterThermalTank || CompNum < 1) {
+                ShowFatalError("SimWaterThermalTank_HeatPump:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                               ", Number of Units=" + General::TrimSigDigits(modNumHeatPumpWaterHeater) + ", Entered Unit name=" + CompName);
+            }
+            if (HPWaterHeater(CompNum).CheckHPWHEquipName) {
+                if (CompName != HPWaterHeater(CompNum).Name) {
+                    ShowFatalError("SimWaterThermalTank_HeatPump: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+                                   ", stored Unit Name for that index=" + HPWaterHeater(CompNum).Name);
+                }
+                HPWaterHeater(CompNum).CheckHPWHEquipName = false;
+            }
+        }
+
+        if (InitLoopEquip) {
+            // CompNum is index to heatpump model, not tank so get the tank index
+            int TankNum = HPWaterHeater(CompNum).WaterHeaterTankNum;
+            if (present(LoopNum)) {
+                WaterThermalTank(TankNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+            } else {
+                WaterThermalTank(TankNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+            }
+            WaterThermalTank(TankNum).MinePlantStructForInfo();
+            if (present(LoopNum)) {
+                if (((WaterThermalTank(TankNum).SrcSide.loopNum == LoopNum) &&
+                     (WaterThermalTank(TankNum).SrcSide.loopSideNum == LoopSideNum)) ||
+                    ((WaterThermalTank(TankNum).UseSide.loopNum == LoopNum) &&
+                     (WaterThermalTank(TankNum).UseSide.loopSideNum == LoopSideNum))) {
+                    WaterThermalTank(CompNum).SizeTankForDemandSide();
+                    WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
+                    WaterThermalTank(TankNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    WaterThermalTank(TankNum).SizeTankForSupplySide();
+                } else {
+                    return;
+                }
+            } else {
+                WaterThermalTank(CompNum).SizeTankForDemandSide();
+                WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
+                WaterThermalTank(TankNum).SizeSupplySidePlantConnections();
+                WaterThermalTank(TankNum).SizeTankForSupplySide();
+            }
+
+            if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                WaterThermalTank(TankNum).CalcStandardRatings();
+                DataSizing::DataNonZoneNonAirloopValue = 0.0;
+            }
+            MinCap = 0.0;
+            MaxCap = HPWaterHeater(CompNum).Capacity;
+            OptCap = HPWaterHeater(CompNum).Capacity;
+
+            return;
+        }
+
+        if (HPWaterHeater(CompNum).MyOneTimeFlagHP) {
+            HPWaterHeater(CompNum).MyOneTimeFlagHP = false;
+        } else {
+            if (HPWaterHeater(CompNum).MyTwoTimeFlagHP) {
+                WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).MinePlantStructForInfo(); // call it again to get control types filled out
+                HPWaterHeater(CompNum).MyTwoTimeFlagHP = false;
+            }
+        }
+        WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSideLoadRequested = std::abs(MyLoad);
+        int tmpLoopNum = WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSide.loopNum;
+        int tmpLoopSideNum = WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseSide.loopSideNum;
+        if (tmpLoopNum > 0 && tmpLoopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseCurrentFlowLock =
+                    DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        } else {
+            WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseCurrentFlowLock = 1;
+        }
+        if (present(LoopNum)) {
+            WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration, LoopNum, LoopSideNum);
+        } else {
+            WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration);
+        }
+
+        int InletNodeSav = HPWaterHeater(CompNum).HeatPumpAirInletNode;
+        int OutletNodeSav = HPWaterHeater(CompNum).HeatPumpAirOutletNode;
+        int DXINletNodeSav = HPWaterHeater(CompNum).DXCoilAirInletNode;
+        int IHPFanIndexSav = HPWaterHeater(CompNum).FanNum;
+        std::string IHPFanNameSave = HPWaterHeater(CompNum).FanName;
+        int IHPFanplaceSav = HPWaterHeater(CompNum).FanPlacement;
+
+        if (HPWaterHeater(CompNum).bIsIHP) // pass the tank indexes to the IHP object
+        {
+            IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankType = CompType;
+            IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankName = CompName;
+            IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).WHtankID = CompIndex;
+            if (present(LoopNum)) {
+                IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopNum = LoopNum;
+                IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).LoopSideNum = LoopSideNum;
+            }
+
+            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(HPWaterHeater(CompNum).DXCoilNum);
+            if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
+                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
+                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
+                bool bDWHCoilReading = false;
+                HPWaterHeater(CompNum).HeatPumpAirInletNode =
+                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                                                                          IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).DWHCoilName,
+                                                                          bDWHCoilReading);
+                HPWaterHeater(CompNum).HeatPumpAirOutletNode =
+                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                                                                           IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).DWHCoilName,
+                                                                           bDWHCoilReading);
+                HPWaterHeater(CompNum).DXCoilAirInletNode = HPWaterHeater(CompNum).HeatPumpAirInletNode;
+            } else // default is to input outdoor fan to the the HPWH
+            {
+                HPWaterHeater(CompNum).FanNum = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanID;
+                HPWaterHeater(CompNum).FanName = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanName;
+                HPWaterHeater(CompNum).FanPlacement = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(CompNum).DXCoilNum).IDFanPlace;
+            }
+        }
+
+        CalcHeatPumpWaterHeater(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration);
+        WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UpdateWaterThermalTank();
+        WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).ReportWaterThermalTank();
+
+        HPWaterHeater(CompNum).HeatPumpAirInletNode = InletNodeSav;
+        HPWaterHeater(CompNum).HeatPumpAirOutletNode = OutletNodeSav;
+        HPWaterHeater(CompNum).DXCoilAirInletNode = DXINletNodeSav;
+        HPWaterHeater(CompNum).FanNum = IHPFanIndexSav;
+        HPWaterHeater(CompNum).FanName = IHPFanNameSave;
+        HPWaterHeater(CompNum).FanPlacement = IHPFanplaceSav;
+
     }
 
     void WaterHeaterDesuperheaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -555,7 +552,7 @@ namespace WaterThermalTanks {
             bool LocalRunFlag = true;
             bool LocalInitLoopEquip = false;
             int TestNum = WaterHeaterNum;
-            SimWaterThermalTank(WaterThermalTank(WaterHeaterNum).TypeNum,
+            SimWaterThermalTank_WaterTank(WaterThermalTank(WaterHeaterNum).TypeNum,
                                 WaterThermalTank(WaterHeaterNum).Name,
                                 TestNum,
                                 LocalRunFlag,
@@ -582,7 +579,7 @@ namespace WaterThermalTanks {
                  HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == AmbientTemp::Schedule)) {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
-                SimWaterThermalTank(HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).TypeNum,
+                SimWaterThermalTank_HeatPump(HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).TypeNum,
                                     HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).Name,
                                     WaterThermalTank(WaterHeaterNum).HeatPumpNum,
                                     LocalRunFlag,
@@ -601,7 +598,7 @@ namespace WaterThermalTanks {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
                 int TestNum = WaterHeaterNum;
-                SimWaterThermalTank(WaterThermalTank(WaterHeaterNum).TypeNum,
+                SimWaterThermalTank_WaterTank(WaterThermalTank(WaterHeaterNum).TypeNum,
                                     WaterThermalTank(WaterHeaterNum).Name,
                                     TestNum,
                                     LocalRunFlag,
@@ -682,7 +679,7 @@ namespace WaterThermalTanks {
             Real64 MinCap;
             Real64 MaxCap;
             Real64 OptCap;
-            SimWaterThermalTank(HPWaterHeater(HeatPumpNum).TypeNum,
+            SimWaterThermalTank_HeatPump(HPWaterHeater(HeatPumpNum).TypeNum,
                                 HPWaterHeater(HeatPumpNum).Name,
                                 HeatPumpNum,
                                 LocalRunFlag,

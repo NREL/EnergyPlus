@@ -186,7 +186,8 @@ namespace PlantLoopEquip {
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
-        using WaterThermalTanks::SimWaterThermalTank;
+        using WaterThermalTanks::SimWaterThermalTank_WaterTank;
+        using WaterThermalTanks::SimWaterThermalTank_HeatPump;
 
         using CTElectricGenerator::SimCTPlantHeatRecovery;
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
@@ -686,7 +687,7 @@ namespace PlantLoopEquip {
 
 //                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                SimWaterThermalTank(EquipTypeNum,
+                SimWaterThermalTank_WaterTank(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,
                                     RunFlag,
@@ -710,7 +711,7 @@ namespace PlantLoopEquip {
 
 //                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                SimWaterThermalTank(EquipTypeNum,
+                SimWaterThermalTank_HeatPump(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,
                                     RunFlag,
@@ -854,7 +855,7 @@ namespace PlantLoopEquip {
 
 //                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                SimWaterThermalTank(EquipTypeNum,
+                SimWaterThermalTank_WaterTank(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,
                                     RunFlag,

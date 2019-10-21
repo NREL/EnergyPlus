@@ -53,6 +53,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
@@ -2201,7 +2202,6 @@ namespace IntegratedHeatPump {
         using DataHVACGlobals::TimeStepSys;
         using General::TrimSigDigits;
         using WaterThermalTanks::GetWaterThermalTankInput;
-        using WaterThermalTanks::SimWaterThermalTank;
 
         Real64 MyLoad(0.0);
         Real64 MaxCap(0.0);
@@ -2234,18 +2234,38 @@ namespace IntegratedHeatPump {
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
                 GetWaterVolFlowRateIHP(DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
             Node(IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
-            SimWaterThermalTank(IntegratedHeatPumps(DXCoilNum).WHtankType,
-                                IntegratedHeatPumps(DXCoilNum).WHtankName,
-                                IntegratedHeatPumps(DXCoilNum).WHtankID,
-                                false,
-                                false,
-                                MyLoad,
-                                MaxCap,
-                                MinCap,
-                                OptCap,
-                                true,
-                                IntegratedHeatPumps(DXCoilNum).LoopNum,
-                                IntegratedHeatPumps(DXCoilNum).LoopSideNum);
+
+            int tankType = IntegratedHeatPumps(DXCoilNum).WHtankType;
+
+            if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
+                (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+
+                WaterThermalTanks::SimWaterThermalTank_WaterTank(IntegratedHeatPumps(DXCoilNum).WHtankType,
+                                    IntegratedHeatPumps(DXCoilNum).WHtankName,
+                                    IntegratedHeatPumps(DXCoilNum).WHtankID,
+                                    false,
+                                    false,
+                                    MyLoad,
+                                    MaxCap,
+                                    MinCap,
+                                    OptCap,
+                                    true,
+                                    IntegratedHeatPumps(DXCoilNum).LoopNum,
+                                    IntegratedHeatPumps(DXCoilNum).LoopSideNum);
+            } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
+                WaterThermalTanks::SimWaterThermalTank_HeatPump(IntegratedHeatPumps(DXCoilNum).WHtankType,
+                                                                IntegratedHeatPumps(DXCoilNum).WHtankName,
+                                                                IntegratedHeatPumps(DXCoilNum).WHtankID,
+                                                                false,
+                                                                false,
+                                                                MyLoad,
+                                                                MaxCap,
+                                                                MinCap,
+                                                                OptCap,
+                                                                true,
+                                                                IntegratedHeatPumps(DXCoilNum).LoopNum,
+                                                                IntegratedHeatPumps(DXCoilNum).LoopSideNum);
+            }
         }
         IntegratedHeatPumps(DXCoilNum).CheckWHCall = false; // clear checking flag
 
