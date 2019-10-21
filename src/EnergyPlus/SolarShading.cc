@@ -3782,6 +3782,388 @@ namespace SolarShading {
         }
     }
 
+    inline bool neq(Real64 a, Real64 b) {
+        return std::abs(a-b) > 2.0;
+    }
+
+    inline bool d_eq(Real64 a, Real64 b) {
+        return std::abs(a-b) < 2.0;
+    }
+
+    inline void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2,
+                         Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev)  {
+        // SLATER & BARSKY 1994
+        Real64 dx, dy, e, xinc, yinc, tempVar;
+        bool needX = true, needY = true;
+        int c1, c2;
+
+        if (x1 > x2) { //reverse for efficiency
+            tempVar = x1;
+            x1 = x2;
+            x2 = tempVar;
+            tempVar = y1;
+            y1 = y2;
+            y2 = tempVar;
+            rev = true;
+        }
+        if (x1 > maxX || x2 < minX) return; // x is positive
+        if (x1 < minX) {
+            if (y1 < minY) {
+                if (y2 < minY) return;
+                c1 = 0;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                e = dy*(minX-x1) + dx*(y1-minY);
+            } else if (y1 > maxY) {
+                if (y2 > maxY) return;
+                c1 = 6;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                e = dy*(minX-x1) + dx*(y1-maxY);
+            } else {
+                c1 = 3;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                if (dy > 0) {
+                    e = dy*(minX-x1) + dx*(y1-maxY);
+                } else {
+                    e = dy*(minX-x1) + dx*(y1-minY);
+                }
+            }
+        } else {
+            if (y1 < minY) {
+                if (y2 < minY) return;
+                c1 = 1;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                e = dy*(maxX-x1) + dx*(y1-minY);
+            } else if (y1 > maxY) {
+                if (y2 > maxY) return;
+                c1 = 7;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                e = dy*(maxX-x1) + dx*(y1-maxY);
+            } else {
+                visible = true;
+                if (x2 <= maxX && (y2 >= minY && y2 <= maxY)) return;
+                c1 = 4;
+                dx = x2 - x1;
+                dy = y2 - y1;
+                if (dy > 0) {
+                    e = dy*(maxX-x1) + dx*(y1-maxY);
+                } else {
+                    e = dy*(maxX-x1) + dx*(y1-minY);
+                }
+            }
+        }
+        c2 = c1;
+        if (dy > 0) {
+            while(true) {
+                if (e < 0.0) {
+                    if (c2 == 1) return;
+                    else if (c2 == 3) {
+                        visible = true;
+                        x1 = minX;
+                        y1 = maxY + e/dx;
+                        if (x2 <= maxX && y2 <= maxY) return;
+                    } else if (c2 == 4) {
+                        x2 = maxX;
+                        y2 = maxY + e/dx;
+                        return;
+                    }
+                    if (needX) {
+                        xinc = dy*(maxX - minX);
+                        needX = false;
+                    }
+                    e += xinc;
+                    c2 += 1;
+                } else {
+                    if (c2 == 3) return;
+                    else if (c2 == 1) {
+                        visible = true;
+                        x1 = maxX - e/dy;
+                        y1 = minY;
+                        if (x2 <= maxX && y2 <= maxY) return;
+                    } else if (c2 == 4) {
+                        x2 = maxX - e/dy;
+                        y2 = maxY;
+                        return;
+                    }
+                    if (needY) {
+                        yinc = dx*(maxY - minY);
+                        needY = false;
+                    }
+                    e -= yinc;
+                    c2 += 3;
+                }
+            }
+        } else {
+            while(true) {
+                if (e >= 0.0) {
+                    if (c2 == 7) return;
+                    else if (c2 == 3) {
+                        visible = true;
+                        x1 = minX;
+                        y1 = minY + e/dx;
+                        if (x2 <= maxX && y2 >= minY) return;
+                    } else if (c2 == 4) {
+                        x2 = maxX;
+                        y2 = minY + e/dx;
+                        return;
+                    }
+                    if (needX) {
+                        xinc = dy*(maxX - minX);
+                        needX = false;
+                    }
+                    e += xinc;
+                    c2 += 1;
+                } else {
+                    if (c2 == 3) return;
+                    else if (c2 == 7) {
+                        visible = true;
+                        x1 = maxX - e/dy;
+                        y1 = maxY;
+                        if (x2 <= maxX && y2 >= minY) return;
+                    } else if (c2 == 4) {
+                        x2 = maxX - e/dy;
+                        y2 = minY;
+                        return;
+                    }
+                    if (needY) {
+                        yinc = dx*(maxY - minY);
+                        needY = false;
+                    }
+                    e += yinc;
+                    c2 -= 3;
+                }
+            }
+        }
+    }
+
+    void CLIPRECT(int const NS2, int const NV1, int &NV3) {
+        bool INTFLAG = false;
+        auto l(HCA.index(NS2, 1));
+        Real64 maxX, minX, maxY, minY;
+        if (HCX[l] > HCX[l+2]) {
+            maxX = HCX[l];
+            minX = HCX[l+2];
+        } else {
+            maxX = HCX[l+2];
+            minX = HCX[l];
+        }
+        if (HCY[l] > HCY[l+2]) {
+            maxY = HCY[l];
+            minY = HCY[l+2];
+        } else {
+            maxY = HCY[l+2];
+            minY = HCY[l];
+        }
+
+        Real64 arrx[20]; //Temp array for output X
+        Real64 arry[20]; //Temp array for output Y
+        int arrc = 0; //Number of items in output
+
+        for (int j = 0; j < NV1; ++j) {
+            Real64 x_1 = XTEMP[j];
+            Real64 y_1 = YTEMP[j];
+            Real64 x_2 = XTEMP[(j+1) % NV1];
+            Real64 y_2 = YTEMP[(j+1) % NV1];
+            Real64 x1 = x_1, x2 = x_2, y1 = y_1, y2 = y_2;
+
+            bool visible = false;
+            bool rev = false;
+            CLIPLINE(x_1, x_2,y_1, y_2, maxX, minX, maxY, minY, visible, rev);
+            if (visible) {
+                if ((x_1 != x1 || y_1 != y1) || (x_2 != x2 || y_2 != y2)) {
+                    INTFLAG = true;
+                }
+                if (rev) { //undo reverse
+                    auto tempVar = x_1;
+                    x_1 = x_2;
+                    x_2 = tempVar;
+                    tempVar = y_1;./
+                    y_1 = y_2;
+                    y_2 = tempVar;
+                }
+                //if line on edge, or inside, add both points
+                if (arrc == 0 || ((neq(arrx[arrc-1], x_1) || neq(arry[arrc-1], y_1)) && (neq(arrx[0], x_1) || neq(arry[0], y_1)))) {
+                    arrx[arrc] = x_1;
+                    arry[arrc] = y_1;
+                    arrc += 1;
+                    if ((neq(x_1, x_2) || neq(y_1, y_2)) && (neq(arrx[0], x_2) || neq(arry[0], y_2))) {
+                        arrx[arrc] = x_2;
+                        arry[arrc] = y_2;
+                        arrc += 1;
+                    }
+                } else if ((neq(arrx[arrc-1], x_2) || neq(arry[arrc-1], y_2)) && (neq(arrx[0], x_2) || neq(arry[0], y_2))) {
+                    arrx[arrc] = x_2;
+                    arry[arrc] = y_2;
+                    arrc += 1;
+                }
+            }
+        }
+        NV3 = arrc;
+
+        // Re-populate XTEMP/YTEMP
+        if (NV3 > 1) {
+            int LastEdgeIndex = -1, incr = 0;
+            double cornerXs[4] = {minX, minX, maxX, maxX};
+            double cornerYs[4] = {minY, maxY, maxY, minY};
+            Real64 edges[4] = { minX, maxY, maxX, minY };
+            Real64 LastEdgeX, LastEdgeY;
+            for (int i = 0; i <= arrc; i++) {
+                int k = i % arrc;
+
+                Real64 currX = arrx[k], currY = arry[k];
+
+                int edgeCount = 0, EdgeIndex = -1;
+                for (int m = 0; m < 4; m++) {
+                    if (m%2 == 0 && d_eq(currX, edges[m])) { //MinX or MaxX
+                        edgeCount ++;
+                        EdgeIndex = m;
+                    } else if (m%2 == 1 && d_eq(currY, edges[m])) {
+                        edgeCount ++;
+                        EdgeIndex = m;
+                    }
+                }
+                if (edgeCount == 0) { //On inside
+                    if (i != arrc) {
+                        XTEMP[incr] = currX;
+                        YTEMP[incr] = currY;
+                        incr ++;
+                    }
+                    continue;
+                } else if (edgeCount > 1) { //On corner
+                    if (d_eq(currX, minX)) {
+                        if (d_eq(currY, minY)) {
+                            EdgeIndex = 3;
+                        } else {
+                            EdgeIndex = 0;
+                        }
+                    } else {
+                        if (d_eq(currY, maxY)) {
+                            EdgeIndex = 1;
+                        } else {
+                            EdgeIndex = 2;
+                        }
+                    }
+                }
+                if ((LastEdgeIndex > -1 && EdgeIndex > -1) && LastEdgeIndex != EdgeIndex) {
+                    int jumpCount = 0;
+                    if ((EdgeIndex == 0 && LastEdgeIndex == 3) || (EdgeIndex - LastEdgeIndex == 1)) {
+                        jumpCount = 1;
+                    } else if (EdgeIndex%2 == LastEdgeIndex%2) {
+                        //Clockwise double jump
+                        jumpCount = 2;
+                    } else if ((EdgeIndex == 3 && LastEdgeIndex == 0) || (LastEdgeIndex - EdgeIndex == 1)) {
+                        //Clockwise triple jump
+                        jumpCount = 3;
+                    }
+                    if (jumpCount > 0) {
+                        Real64 cornerX;
+                        Real64 cornerY;
+                        int startIndex = (LastEdgeIndex + 1) % 4;
+                        int added = 0;
+                        for (int i1 = startIndex, j1 = 0; j1 < jumpCount; i1 = (i1 + 1) % 4, j1++) {
+                            cornerX = cornerXs[i1];
+                            cornerY = cornerYs[i1];
+                            if (cornerX == LastEdgeX && cornerY == LastEdgeY) continue; //skip if jump started on corner
+
+                            bool insideFlag = true;
+                            for (int j = 0; j < NV1; ++j) {
+                                if ((ATEMP[j] * cornerX) + (cornerY * BTEMP[j]) + CTEMP[j] > 0.0) {
+                                    insideFlag = false;
+                                    break;
+                                }
+                            }
+
+                            if (insideFlag && (incr == 0 || ((neq(cornerX, XTEMP[incr-1]) || neq(cornerY, YTEMP[incr-1])) && (neq(cornerX, XTEMP[0]) || neq(cornerY, YTEMP[0])))))
+                            {
+                                XTEMP[incr] = cornerX;
+                                YTEMP[incr] = cornerY;
+                                incr ++;
+                                added ++;
+                            }
+                        }
+                        if (jumpCount > 2 && (added == jumpCount && edgeCount == 1)) {
+                            if (i != arrc) {
+                                XTEMP[incr] = currX;
+                                YTEMP[incr] = currY;
+                                incr ++;
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (i != arrc) {
+                    XTEMP[incr] = currX;
+                    YTEMP[incr] = currY;
+                    incr ++;
+                }
+                LastEdgeIndex = EdgeIndex;
+                LastEdgeX = currX;
+                LastEdgeY = currY;
+            }
+            NV3 = incr;
+
+        } else {
+            if (NV3 == 1) {
+                XTEMP[0] = arrx[0];
+                YTEMP[0] = arry[0];
+            } if (NV3 == 0) {
+                double cornerXs[4] = {minX, minX, maxX, maxX};
+                double cornerYs[4] = {minY, maxY, maxY, minY};
+                Real64 cornerX = cornerXs[0];
+                Real64 cornerY = cornerYs[0];
+                bool insideFlag = true;
+                for (int j = 0; j < NV1; ++j) {
+                    if ((ATEMP[j] * cornerX) + (cornerY * BTEMP[j]) + CTEMP[j] >= 0.0) {
+                        insideFlag = false;
+                        break;
+                    }
+                }
+                if (insideFlag) {
+                    for (int i1 = 0; i1 < 4; i1++){
+                        XTEMP[i1] = cornerXs[i1];
+                        YTEMP[i1] = cornerYs[i1];
+                    }
+                    NV3 = 4;
+                    INTFLAG = true;
+                }
+            }
+        }
+
+        // update homogenous edges A,B,C
+        if (NV3 > 0) {
+            Real64 const X_0(XTEMP[0]);
+            Real64 const Y_0(YTEMP[0]);
+            Real64 XP_0 = X_0, XP_1;
+            Real64 YP_0 = Y_0, YP_1;
+            for (int P = 0; P < NV3-1; ++P) {
+                XP_1 = XTEMP[P + 1];
+                YP_1 = YTEMP[P + 1];
+
+                ATEMP[P] = YP_0 - YP_1;
+                BTEMP[P] = XP_1 - XP_0;
+                CTEMP[P] = XP_0 * YP_1 - YP_0 * XP_1;
+                XP_0 = XP_1;
+                YP_0 = YP_1;
+            }
+
+            ATEMP[NV3-1] = YP_1 - Y_0;
+            BTEMP[NV3-1] = X_0 - XP_1;
+            CTEMP[NV3-1] = XP_1 * Y_0 - YP_1 * X_0;
+        }
+
+        //Determine overlap status
+        if (NV3 < 3) { // Determine overlap status
+            OverlapStatus = NoOverlap;
+        } else if (!INTFLAG) {
+            OverlapStatus = FirstSurfWithinSecond;
+        }
+    }
+
+
     void CLIPPOLY(int const NS1, // Figure number of figure 1 (The subject polygon)
                   int const NS2, // Figure number of figure 2 (The clipping polygon)
                   int const NV1, // Number of vertices of figure 1
@@ -3858,6 +4240,20 @@ namespace SolarShading {
         INTFLAG = false;
         NVTEMP = 0;
         KK = 0;
+
+        //Check if clipping polygon is rectangle
+        auto l1(HCA.index(NS2, 1));
+        bool rectFlag = ((NV2 == 4) &&
+                (((((HCX[l1] == HCX[l1+1] && HCY[l1] != HCY[l1+1]) &&
+                ((HCY[l1+2] == HCY[l1+1] && HCY[l1+3] == HCY[l1]))) && HCX[l1+2] == HCX[l1+3]) ||
+                  ((((HCY[l1] == HCY[l1+1] && HCX[l1] != HCX[l1+1]) &&
+                   (HCX[l1+2] == HCX[l1+1] && HCX[l1+3] == HCX[l1])) && (HCY[l1+2] == HCY[l1+3]))))));
+
+
+        if (rectFlag) {
+            CLIPRECT(NS2, NV1, NV3);
+            return;
+        }
 
         auto l(HCA.index(NS2, 1));
         for (int E = 1; E <= NV2; ++E, ++l) { // Loop over edges of the clipping polygon
