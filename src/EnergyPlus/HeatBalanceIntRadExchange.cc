@@ -641,53 +641,60 @@ namespace HeatBalanceIntRadExchange {
                 continue; // Go to the next enclosure in the loop
             }
 
-            //  Get user supplied view factors if available in idf.
-
-            NoUserInputF = true;
-
-            std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
-            int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-            if (NumZonesWithUserFbyS > 0) {
-
-                GetInputViewFactorsbyName(thisEnclosure.Name,
-                                          thisEnclosure.NumOfSurfaces,
-                                          thisEnclosure.F,
-                                          thisEnclosure.SurfacePtr,
-                                          NoUserInputF,
-                                          ErrorsFound); // Obtains user input view factors from input file
-            }
-
-            if (NoUserInputF) {
-
-                // Calculate the view factors and make sure they satisfy reciprocity
-                CalcApproximateViewFactors(thisEnclosure.NumOfSurfaces,
-                                           thisEnclosure.Area,
-                                           thisEnclosure.Azimuth,
-                                           thisEnclosure.Tilt,
-                                           thisEnclosure.F,
-                                           thisEnclosure.SurfacePtr);
-            }
-
-            if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
-                SaveApproximateViewFactors.allocate(thisEnclosure.NumOfSurfaces, thisEnclosure.NumOfSurfaces);
-                SaveApproximateViewFactors = thisEnclosure.F;
-            }
-
-            FixViewFactors(thisEnclosure.NumOfSurfaces,
-                           thisEnclosure.Area,
-                           thisEnclosure.F,
-                           thisEnclosure.Name,
-                           thisEnclosure.ZoneNums,
-                           CheckValue1,
-                           CheckValue2,
-                           FinalCheckValue,
-                           NumIterations,
-                           FixedRowSum);
 
             if (CarrollMethod) {
+
+                // User View Factors cannot be used with Carroll method.
+                if(inputProcessor->getNumObjectsFound("ZoneProperty:UserViewFactors:bySurfaceName")) {
+                    ShowWarningError("ZoneProperty:UserViewFactors:bySurfaceName objects have been defined, however View");
+                    ShowContinueError("  Factors are not used when Zone Radiant Exchange Algorithm is set to CarrollMRT.");
+                }
                 CalcFMRT(thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.FMRT);
                 CalcFp(thisEnclosure.NumOfSurfaces, thisEnclosure.Emissivity, thisEnclosure.FMRT, thisEnclosure.Fp);
             } else {
+                //  Get user supplied view factors if available in idf.
+
+                NoUserInputF = true;
+
+                std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
+                int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+                if (NumZonesWithUserFbyS > 0) {
+
+                    GetInputViewFactorsbyName(thisEnclosure.Name,
+                                              thisEnclosure.NumOfSurfaces,
+                                              thisEnclosure.F,
+                                              thisEnclosure.SurfacePtr,
+                                              NoUserInputF,
+                                              ErrorsFound); // Obtains user input view factors from input file
+                }
+
+                if (NoUserInputF) {
+
+                    // Calculate the view factors and make sure they satisfy reciprocity
+                    CalcApproximateViewFactors(thisEnclosure.NumOfSurfaces,
+                                               thisEnclosure.Area,
+                                               thisEnclosure.Azimuth,
+                                               thisEnclosure.Tilt,
+                                               thisEnclosure.F,
+                                               thisEnclosure.SurfacePtr);
+                }
+
+                if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
+                    SaveApproximateViewFactors.allocate(thisEnclosure.NumOfSurfaces, thisEnclosure.NumOfSurfaces);
+                    SaveApproximateViewFactors = thisEnclosure.F;
+                }
+
+                FixViewFactors(thisEnclosure.NumOfSurfaces,
+                               thisEnclosure.Area,
+                               thisEnclosure.F,
+                               thisEnclosure.Name,
+                               thisEnclosure.ZoneNums,
+                               CheckValue1,
+                               CheckValue2,
+                               FinalCheckValue,
+                               NumIterations,
+                               FixedRowSum);
+
                 // Calculate the script F factors
                 CalcScriptF(thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.F, thisEnclosure.Emissivity, thisEnclosure.ScriptF);
                 if (ViewFactorReport) { // Write to SurfInfo File
