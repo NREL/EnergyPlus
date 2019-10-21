@@ -1661,7 +1661,7 @@ namespace RefrigeratedCase {
         Real64 LatKgPerS_ToZoneRate; // Latent water to zone on sys time step from coils, neg when water removed (kg/s)
         Real64 SenCreditToZoneRate;  // Net sensible credit to zone on sys time step from coil (W)
         Real64 SenCreditToZoneEnergy;
-        Real64 ReportH20RemovedKgPerS_FromZoneRate; // same but positive for reporting purposes (kg/s)
+        Real64 ReportH2ORemovedKgPerS_FromZoneRate; // same but positive for reporting purposes (kg/s)
         Real64 ReportLatCreditToZoneRate;           // Positive for reporting Net latent credit to zone on sys time step from coil (W)
         Real64 ReportLatCreditToZoneEnergy;
         Real64 ReportHeatingToZoneRate; // Positive for reporting Net sensible credit to zone on sys time step from coil (W)
@@ -1674,7 +1674,7 @@ namespace RefrigeratedCase {
         // Default Constructor
         CoilCreditData()
             : LatCreditToZoneRate(0.0), LatCreditToZoneEnergy(0.0), LatKgPerS_ToZoneRate(0.0), SenCreditToZoneRate(0.0), SenCreditToZoneEnergy(0.0),
-              ReportH20RemovedKgPerS_FromZoneRate(0.0), ReportLatCreditToZoneRate(0.0), ReportLatCreditToZoneEnergy(0.0),
+              ReportH2ORemovedKgPerS_FromZoneRate(0.0), ReportLatCreditToZoneRate(0.0), ReportLatCreditToZoneEnergy(0.0),
               ReportHeatingToZoneRate(0.0), ReportHeatingToZoneEnergy(0.0), ReportSenCoolingToZoneRate(0.0), ReportSenCoolingToZoneEnergy(0.0),
               ReportTotCoolingToZoneRate(0.0), ReportTotCoolingToZoneEnergy(0.0)
         {
@@ -1688,7 +1688,7 @@ namespace RefrigeratedCase {
             LatKgPerS_ToZoneRate = 0.0;
             SenCreditToZoneRate = 0.0;
             SenCreditToZoneEnergy = 0.0;
-            ReportH20RemovedKgPerS_FromZoneRate = 0.0;
+            ReportH2ORemovedKgPerS_FromZoneRate = 0.0;
             ReportLatCreditToZoneRate = 0.0;
             ReportLatCreditToZoneEnergy = 0.0;
             ReportHeatingToZoneRate = 0.0;

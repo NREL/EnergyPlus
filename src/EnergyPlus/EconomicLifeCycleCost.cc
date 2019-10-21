@@ -2559,7 +2559,7 @@ namespace EconomicLifeCycleCost {
                 columnHead(8) = "cons";
                 columnHead(9) = "slvg";
                 columnHead(10) = "oCap";
-                columnHead(11) = "H20";
+                columnHead(11) = "H2O";
                 columnHead(12) = "ene";
                 columnHead(13) = "tEne";
                 columnHead(14) = "tOpr";

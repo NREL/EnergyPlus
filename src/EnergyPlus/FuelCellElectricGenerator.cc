@@ -1448,11 +1448,11 @@ namespace FuelCellElectricGenerator {
         Real64 NdotStoicAir;    // Air to match fuel molar rate coeff, working variable
         Real64 NdotExcessAir;   // Air in excess of match for fuel
         Real64 NdotCO2ProdGas;  // CO2 from reaction
-        Real64 NdotH20ProdGas;  // Water from reaction
+        Real64 NdotH2OProdGas;  // Water from reaction
         Real64 NdotCO2;         // temp CO2 molar rate coef product gas stream
         Real64 NdotN2;          // temp Nitrogen rate coef product gas stream
         Real64 Ndot02;          // temp Oxygen rate coef product gas stream
-        Real64 NdotH20;         // temp Water rate coef product gas stream
+        Real64 NdotH2O;         // temp Water rate coef product gas stream
         Real64 NdotAr;          // tmep Argon rate coef product gas stream
         Real64 Cp;              // temp Heat Capacity, used in thermochemistry units of (J/mol K)
         Real64 Hmolfuel;        // temp enthalpy of fuel mixture in KJ/mol
@@ -1824,13 +1824,13 @@ namespace FuelCellElectricGenerator {
 
             NdotCO2ProdGas = FuelCell(GeneratorNum).FCPM.NdotFuel * FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CO2ProductGasCoef;
 
-            NdotH20ProdGas = FuelCell(GeneratorNum).FCPM.NdotFuel * FuelSupply(FuelCell(GeneratorNum).FuelSupNum).H20ProductGasCoef;
+            NdotH2OProdGas = FuelCell(GeneratorNum).FCPM.NdotFuel * FuelSupply(FuelCell(GeneratorNum).FuelSupNum).H2OProductGasCoef;
 
             //  set product gas constituent fractions  (assume five usual components)
             NdotCO2 = 0.0;
             NdotN2 = 0.0;
             Ndot02 = 0.0;
-            NdotH20 = 0.0;
+            NdotH2O = 0.0;
             NdotAr = 0.0;
 
             // Product gas constiuents are fixed (not a user defined thing)
@@ -1853,8 +1853,8 @@ namespace FuelCellElectricGenerator {
                         Ndot02 = NdotExcessAir * FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisGas);
 
                     } else if (SELECT_CASE_var == 4) {
-                        // all the H20 comming in plus the new H20 from reactions and the H20 from water used in reforming
-                        NdotH20 = NdotH20ProdGas + FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisGas) * FuelCell(GeneratorNum).FCPM.NdotAir;
+                        // all the H2O comming in plus the new H2O from reactions and the H2O from water used in reforming
+                        NdotH2O = NdotH2OProdGas + FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisGas) * FuelCell(GeneratorNum).FCPM.NdotAir;
                         //+ FuelCell(GeneratorNum)%FCPM%NdotLiqwater
 
                     } else if (SELECT_CASE_var == 5) {
@@ -1866,7 +1866,7 @@ namespace FuelCellElectricGenerator {
                 }
             }
 
-            FuelCell(GeneratorNum).FCPM.NdotProdGas = NdotCO2 + NdotN2 + Ndot02 + NdotH20 + NdotAr;
+            FuelCell(GeneratorNum).FCPM.NdotProdGas = NdotCO2 + NdotN2 + Ndot02 + NdotH2O + NdotAr;
 
             // now that we have the total, figure molar fractions
 
@@ -1878,8 +1878,8 @@ namespace FuelCellElectricGenerator {
             // all the oxygen in the excess air stream
             FuelCell(GeneratorNum).FCPM.ConstitMolalFract(3) = Ndot02 / FuelCell(GeneratorNum).FCPM.NdotProdGas;
 
-            // all the H20 comming in plus the new H20 from reactions and the H20 from water used in reforming
-            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(4) = NdotH20 / FuelCell(GeneratorNum).FCPM.NdotProdGas;
+            // all the H2O comming in plus the new H2O from reactions and the H2O from water used in reforming
+            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(4) = NdotH2O / FuelCell(GeneratorNum).FCPM.NdotProdGas;
 
             // all the argon coming in.
             FuelCell(GeneratorNum).FCPM.ConstitMolalFract(5) = NdotAr / FuelCell(GeneratorNum).FCPM.NdotProdGas;
@@ -3249,7 +3249,7 @@ namespace FuelCellElectricGenerator {
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
     }
 
-    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH20, Real64 &LHV)
+    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH2O, Real64 &LHV)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3284,7 +3284,7 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DelfHfuel;
         Real64 DelfHCO2;
-        Real64 DelfHH20;
+        Real64 DelfHH2O;
         int i;
         Real64 h_i;
         int CO2dataID;
@@ -3305,9 +3305,9 @@ namespace FuelCellElectricGenerator {
 
         DelfHCO2 = GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm * NdotCO2;
 
-        DelfHH20 = GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm * NdotH20;
+        DelfHH2O = GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm * NdotH2O;
 
-        LHV = (DelfHfuel - DelfHCO2 - DelfHH20) / NdotFuel; // Equation 6
+        LHV = (DelfHfuel - DelfHCO2 - DelfHH2O) / NdotFuel; // Equation 6
     }
 
     void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill)

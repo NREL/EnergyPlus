@@ -3354,7 +3354,7 @@ namespace HVACDXSystem {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet hum rat [kg_h20/kg_dryair]
+        // par(2) = desired air outlet hum rat [kgWater/kgDryAir]
         // par(3) = TES coil operating mode
         // par(4) = outlet node number
         // par(5) = supply air fan operating mode (ContFanCycCoil)
@@ -3370,7 +3370,7 @@ namespace HVACDXSystem {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;          // index of this coil
-        Real64 OutletAirHumRat; // outlet air humidity ratio [kg_H20/Kg_dryair]
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kgWater/kgDryAir]
         int FanOpMode;          // Supply air fan operating mode
         int TESOpMode;
         int OutletNodeNum;

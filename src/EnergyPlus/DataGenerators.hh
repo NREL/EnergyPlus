@@ -552,7 +552,7 @@ namespace DataGenerators {
         Real64 HXenergy;           // energy from gas stream to water [J]
         Real64 THXexh;             // temperature of exhaust gases leaving heat exchanger.
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream
-        // relative to water vapor entering HX  (NdotH20/Ndoaux-mix)
+        // relative to water vapor entering HX  (NdotH2O/Ndoaux-mix)
         Real64 CondensateRate;     // water condensation rate [kmol/s]
         int SeqSubstIterations;    // number of iterations in SOFC loop
         int RegulaFalsiIterations; // number of iterations in Tproduct gas solving
@@ -665,14 +665,14 @@ namespace DataGenerators {
         Real64 PfuelCompEl;       // fuel compressor power
         Real64 QskinLoss;         // pumping losses for zone
         Real64 CO2ProductGasCoef; // molar multiplier for stoic products of this fuel
-        Real64 H20ProductGasCoef; // molar multiplier for stoic products of this fuel
+        Real64 H2OProductGasCoef; // molar multiplier for stoic products of this fuel
 
         // Default Constructor
         GeneratorFuelSupplyDataStruct()
             : FuelTempMode(0), FuelTypeMode(0), NodeNum(0), SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14),
               ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0),
               KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0), TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0),
-              CO2ProductGasCoef(0.0), H20ProductGasCoef(0.0)
+              CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
         {
         }
     };
@@ -893,7 +893,7 @@ namespace DataGenerators {
         //   REAL(r64)    :: HXenergy = 0.0d0 !energy from gas stream to water [J]
         //   REAL(r64)    :: THXexh = 0.0d0 ! temperature of exhaust gases leaving heat exchanger.
         //   REAL(r64)    :: WaterVaporFractExh = 0.0d0 ! water vapor fraction in exhaust gas stream
-        // relative to water vapor entering HX  (NdotH20/Ndoaux-mix)
+        // relative to water vapor entering HX  (NdotH2O/Ndoaux-mix)
         //    INTEGER :: SeqSubstIterations = 0 ! number of iterations in SOFC loop
         //    INTEGER :: RegulaFalsiIterations = 0 ! number of iterations in Tproduct gas solving
         Real64 SkinLossPower;   // heat loss to surrounding zone [W]

@@ -162,7 +162,7 @@ namespace FuelCellElectricGenerator {
                                   Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH20, Real64 &LHV);
+    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH2O, Real64 &LHV);
 
     void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill);
 
