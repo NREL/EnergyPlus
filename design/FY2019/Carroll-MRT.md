@@ -5,7 +5,7 @@ Carroll Mean Radiant Temperature option for Interior Radiant Exchange
 
 ## Justification for New Feature ##
 
-A well-known performance bottleneck in EnergyPlus is the calculation of interior long-wave radiation exchange. This is a dense-matrix, linear algebra problem with O(n^2 ) complexity. One approach used in other programs with comparable accuracy is the Carroll method (see Carroll 1980, 1980a, & 1981).
+A well-known performance bottleneck in EnergyPlus is the calculation of interior long-wave radiation exchange. This is a dense-matrix, linear algebra problem with O(n^2 ) complexity. One approach used in other programs with comparable accuracy is the Carroll method (see Carroll 1980, 1980a, & 1981). There are several similar MRT methods with linear complexity including methdods by Walton (used in BLAST) and Seem (used in TRNSYS). Unlike Walton's method, Carroll's method balances radiant heat without an additional term to balance the heat flow between surfaces.
 
 ## Approach ##
 
