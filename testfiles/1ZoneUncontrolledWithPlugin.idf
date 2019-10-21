@@ -96,7 +96,7 @@ PythonPlugin:SearchPaths,
 
 PythonPlugin:Instance,
    MyPlugin1, ! field Name
-   1ZoneUncontrolledWithPlugin, ! field Python File Name
+   1ZoneUncontrolledWithPlugin, ! field Python Module Name
    MyPlugin, ! field Plugin Class Name
    EndOfHour; ! field Calling Point
 
