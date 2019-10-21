@@ -7329,7 +7329,59 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 
     EXPECT_EQ("2.8", s);
 }
+// https://github.com/NREL/EnergyPlus/issues/7565
+TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
+    WriteTabularFiles = true;
+
+    SetupUnitConversions();
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
+
+    SetPredefinedTables();
+    std::string CompName = "My DX Coil";
+
+    PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(OutputReportPredefined::pdch2CoilLvgHumRatIdealPeak, CompName,  0.006, 8);
+    // CoilSizingDetails
+    PreDefTableEntry(OutputReportPredefined::pdchCoilLvgHumRatIdealPeak, CompName,  0.006, 8);
+
+    // We enable the reports we care about, making sure we have the right ones
+    EXPECT_EQ("HVACSizingSummary", OutputReportPredefined::reportName(6).name);
+    OutputReportPredefined::reportName(6).show = true;
+    EXPECT_EQ("CoilSizingDetails", OutputReportPredefined::reportName(7).name);
+    OutputReportPredefined::reportName(7).show = true;
+
+    WritePredefinedTables();
+    EnergyPlus::sqlite->sqliteCommit();
+    EnergyPlus::sqlite->initializeIndexes();
+
+    for (const std::string reportName: {"HVACSizingSummary", "CoilSizingDetails"}) {
+
+
+        auto result = queryResult("SELECT Value, Units From TabularDataWithStrings "
+                                 "WHERE ReportName = \"" + reportName + "\""
+                                 "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
+                                 "TabularDataWithStrings");
+
+        EnergyPlus::sqlite->sqliteCommit();
+
+        EXPECT_EQ(1u, result.size());
+        // Because the table has 8 cols
+        EXPECT_EQ(8u, result[0].size());
+
+        // 0.006 is a ratio, so unitconv = 1
+        std::string s = result[0][0];
+        // Trim the string, it has leading spaces
+        s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
+
+        EXPECT_EQ("0.00600000", s);
+
+        EXPECT_EQ("lbWater/lbDryAir", result[0][1]);
+    }
+}
 
 // Test for #7046
 // Ensures that we get consistency between the displayed Azimuth and its cardinal classification
