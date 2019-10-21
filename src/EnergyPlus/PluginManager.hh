@@ -85,7 +85,9 @@ namespace PluginManager {
 
     struct PluginInstance {
         PluginInstance(const std::string& fileName, const std::string& className);
+        static void reportPythonError();
         std::string stringIdentifier; // for diagnostic reporting
+        std::string emsAlias; // to allow the Python Plugin to alias as an EMS program
         PyObject *pPluginMainFunction = nullptr;  // pointer to the main EMS function
         void run();
     };

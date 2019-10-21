@@ -158,14 +158,12 @@ namespace PluginManager {
 
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";
-        bool errorsFound = false;
         int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
         if (searchPaths > 0) {
             auto const instances = inputProcessor->epJSON.find(sPaths);
             if (instances == inputProcessor->epJSON.end()) {
                 ShowSevereError(                                                                             // LCOV_EXCL_LINE
                     "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                          // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -208,7 +206,6 @@ namespace PluginManager {
             if (instances == inputProcessor->epJSON.end()) {
                 ShowSevereError(                                                                          // LCOV_EXCL_LINE
                     "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                       // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -254,6 +251,16 @@ namespace PluginManager {
         return sanitizedDir;
     }
 
+    void PluginInstance::reportPythonError() {
+        PyObject *exc_type = nullptr, *exc_value = nullptr, *exc_tb = nullptr;
+        PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
+        PyObject* str_exc_value = PyObject_Repr(exc_value); //Now a unicode object
+        PyObject* pyStr2 = PyUnicode_AsEncodedString(str_exc_value, "utf-8", "Error ~");
+        char *strExcValue =  PyBytes_AS_STRING(pyStr2);
+        EnergyPlus::ShowContinueError("Python error description follows: ");
+        EnergyPlus::ShowContinueError(strExcValue);
+    }
+
     PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className)
     {
         // this first section is really all about just ultimately getting a full Python class instance
@@ -266,35 +273,57 @@ namespace PluginManager {
         // should decrement it.
         Py_DECREF(pModuleName);
         if (!pModule) {
-            // So we can ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
-            // Unfortunately there's not an equivalent PyErr_GetErrorText or anything, the only option is to print it out directly
-            // So if we leave this in, the message will be seen right on the terminal, not in the error file
-            // I may consider hijacking stdout and stderr right before calling PyErr_Print and then resetting it
-            // But for now I'm not doing that
-//            if (PyErr_Occurred()) {
-//                PyErr_Print();
-//            }
             EnergyPlus::ShowSevereError("Failed to import module \"" + moduleName + "\"");
-            EnergyPlus::ShowContinueError("It could be that the module could not be found, or that there was an error in importing");
-            EnergyPlus::ShowFatalError("Python import error causes program termination, see error file.");
+            // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError(
+                        "It could be that the module could not be found, or that there was an error in importing");
+            }
+            EnergyPlus::ShowFatalError("Python import error causes program termination");
         }
         PyObject *pModuleDict = PyModule_GetDict(pModule);
         Py_DECREF(pModule); // PyImport_Import returns a new reference, decrement it
         if (!pModuleDict) {
-            EnergyPlus::ShowFatalError("Failed to read module dictionary from module \"" + moduleName + "\"");
+            EnergyPlus::ShowSevereError("Failed to read module dictionary from module \"" + moduleName + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("It could be that the module was empty");
+            }
+            EnergyPlus::ShowFatalError("Python module error causes program termination");
         }
         PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
         // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
         if (!pClass) {
-            EnergyPlus::ShowFatalError("Failed to get class type \"" + className + "\" from module \"" + moduleName + "\"");
+            EnergyPlus::ShowSevereError("Failed to get class type \"" + className + "\" from module \"" + moduleName + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("It could be the class name is misspelled or missing.");
+            }
+            EnergyPlus::ShowFatalError("Python class import error causes program termination");
         }
         if (!PyCallable_Check(pClass)) {
-            EnergyPlus::ShowFatalError("Got class type \"" + className + "\", but it cannot be called/instantiated");
+            EnergyPlus::ShowSevereError("Got class type \"" + className + "\", but it cannot be called/instantiated");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("Is it possible the class name is actually just a variable?");
+            }
+            EnergyPlus::ShowFatalError("Python class check error causes program termination");
         }
         PyObject *pClassInstance = PyObject_CallObject(pClass, nullptr);
         // Py_DECREF(pClass);  // PyDict_GetItemString returns a borrowed reference, DO NOT decrement
         if (!pClassInstance) {
-            EnergyPlus::ShowFatalError("Something went awry calling class constructor for class \"" + className + "\"");
+            EnergyPlus::ShowSevereError("Something went awry calling class constructor for class \"" + className + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("It is possible the plugin class constructor takes extra arguments - it shouldn't.");
+            }
+            EnergyPlus::ShowFatalError("Python class constructor error causes program termination");
         }
         // PyObject_CallObject returns a new reference, that we need to manage
         // I think we need to keep it around in memory though so the class methods can be called later on,
@@ -305,10 +334,40 @@ namespace PluginManager {
         std::string const mainFunctionName = "main";
         this->pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
         if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
+            EnergyPlus::ShowSevereError("Could not find or call function \"" + mainFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
             if (PyErr_Occurred()) {
-                PyErr_Print();
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("Make sure the plugin class overrides the main() function, and does not require arguments.");
             }
-            EnergyPlus::ShowFatalError("Could not find function \"" + mainFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+            EnergyPlus::ShowFatalError("Python main() function error causes program termination");
+        }
+
+        // now grab the function pointers to the main call function
+        std::string const emsNameFunctionName = "ems_program_name";
+        PyObject *emsNameFunction = PyObject_GetAttrString(pClassInstance, emsNameFunctionName.c_str());
+        if (!emsNameFunction || !PyCallable_Check(emsNameFunction)) {
+            EnergyPlus::ShowSevereError("Could not find function \"" + emsNameFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("The base class includes a definition of this function, so this is unexpected behavior.");
+            }
+            EnergyPlus::ShowFatalError("Python ems_program_name() function error causes program termination");
+        }
+        PyObject *emsNameResponse = PyObject_CallFunction(emsNameFunction, nullptr);
+        if (!emsNameResponse) {
+            EnergyPlus::ShowSevereError("Could not call " + emsNameFunctionName + " function on class \"" + moduleName + "." + className + ", make sure it is defined and error free");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("The base class includes a definition of this function, so this is unexpected behavior.");
+            }
+            EnergyPlus::ShowFatalError("Python ems_program_name() function call error causes program termination");
+        }
+        std::string emsName = PyUnicode_AsUTF8(emsNameResponse);
+        if (!emsName.empty()) {
+            this->emsAlias = emsName;
         }
 
         // update the rest of the plugin call instance and store it
