@@ -316,6 +316,7 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
+  Globals/PipesGlobals.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc

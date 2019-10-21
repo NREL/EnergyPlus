@@ -45,51 +45,19 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef Globals_hh_INCLUDED
-#define Globals_hh_INCLUDED
+#ifndef PipesGlobals_hh_INCLUDED
+#define PipesGlobals_hh_INCLUDED
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/PipesGlobals.hh>
 
 #include <string>
 
-struct DataGlobal
-{
-    // Data
-    bool AnnualSimulation = false;
-
-    // MODULE VARIABLE DECLARATIONS:
-    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
-
-    // MODULE PARAMETER DEFINITIONS
-    int const EndZoneSizingCalc = 4;
-
-    // Parameters for EMS Calling Points
-    int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
-};
-
-struct ExteriorEnergyUseGlobals
+struct PipesGlobals
 {
     // MODULE VARIABLE DECLARATIONS
-    int NumExteriorLights = 0; // Number of Exterior Light Inputs
-    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+    int NumLocalPipes = 0;
+    bool GetPipeInputFlag = true;
 };
-
-struct FansGlobals
-{
-    //MODULE VARIABLE DECLARATION
-    int NumFans = 0;
-};
-
-struct AllGlobals
-{
-    DataGlobal dataGlobals;
-    ExteriorEnergyUseGlobals exteriorEnergyUse;
-    FansGlobals fans;
-    PipesGlobals pipes;
-};
-
-extern AllGlobals ep_globals;
 
 #endif
