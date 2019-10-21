@@ -83,12 +83,6 @@ namespace EnergyPlus {
 
 namespace FuelCellElectricGenerator {
 
-    //_______________________________________________________________________
-    // IEA Annex 42 generators:
-    // FuelCellElectricGenerator  (Solid Oxide Fuel Cell (SOFC))
-    //                            (Proton Exchange Membrane FC (PEMFC))
-    //                            IEA/ECBCS Annex 42 model)
-
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffth
     //       DATE WRITTEN   August. 2005
@@ -110,16 +104,6 @@ namespace FuelCellElectricGenerator {
     // Using/Aliasing
     using namespace DataGenerators;
     using namespace DataLoopNode;
-    using DataGlobalConstants::iGeneratorFuelCell;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::CurrentTime;
-    using DataGlobals::DayOfSim;
-    using DataGlobals::HoursInDay;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::NumOfTimeStepInHour;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SecInHour;
-    using DataGlobals::WarmupFlag;
     using namespace GeneratorFuelSupply;
     using namespace GeneratorDynamicsManager;
 
@@ -142,8 +126,6 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        using General::TrimSigDigits;
-
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -159,12 +141,12 @@ namespace FuelCellElectricGenerator {
         } else {
             GenNum = GeneratorIndex;
             if (GenNum > NumFuelCellGenerators || GenNum < 1) {
-                ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(GenNum) +
-                               ", Number of FuelCell Generators=" + TrimSigDigits(NumFuelCellGenerators) + ", Generator name=" + GeneratorName);
+                ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
+                               ", Number of FuelCell Generators=" + General::TrimSigDigits(NumFuelCellGenerators) + ", Generator name=" + GeneratorName);
             }
             if (CheckEquipName(GenNum)) {
                 if (GeneratorName != FuelCell(GenNum).Name) {
-                    ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(GenNum) +
+                    ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
                                    ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + FuelCell(GenNum).Name);
                 }
                 CheckEquipName(GenNum) = false;
@@ -195,14 +177,7 @@ namespace FuelCellElectricGenerator {
 
         using namespace DataGenerators;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using BranchNodeConnections::TestCompSet;
-        using CurveManager::GetCurveIndex;
-        using DataGlobals::DisplayAdvancedReportVariables;
-        using DataHeatBalance::IntGainTypeOf_GeneratorFuelCell;
-        using DataHeatBalance::Zone;
-        using General::RoundSigDigits;
         using NodeInputManager::GetOnlySingleNode;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetScheduleIndex;
 
         int GeneratorNum;              // Generator counter
@@ -311,7 +286,7 @@ namespace FuelCellElectricGenerator {
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                         ErrorsFound = true;
                     }
-                    FuelCell(thisFuelCell).FCPM.EffCurveID = GetCurveIndex(AlphArray(3));
+                    FuelCell(thisFuelCell).FCPM.EffCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if (FuelCell(thisFuelCell).FCPM.EffCurveID == 0) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -327,11 +302,11 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).FCPM.ThreshRunHours = NumArray(7);
                     FuelCell(thisFuelCell).FCPM.UpTranLimit = NumArray(8);
                     FuelCell(thisFuelCell).FCPM.DownTranLimit = NumArray(9);
-                    FuelCell(thisFuelCell).FCPM.StartUpTime = NumArray(10) / SecInHour; // convert to hours from seconds
+                    FuelCell(thisFuelCell).FCPM.StartUpTime = NumArray(10) / DataGlobals::SecInHour; // convert to hours from seconds
                     FuelCell(thisFuelCell).FCPM.StartUpFuel = NumArray(11);
                     FuelCell(thisFuelCell).FCPM.StartUpElectConsum = NumArray(12);
                     FuelCell(thisFuelCell).FCPM.StartUpElectProd = NumArray(13);
-                    FuelCell(thisFuelCell).FCPM.ShutDownTime = NumArray(14) / SecInHour; // convert to hours from seconds
+                    FuelCell(thisFuelCell).FCPM.ShutDownTime = NumArray(14) / DataGlobals::SecInHour; // convert to hours from seconds
                     FuelCell(thisFuelCell).FCPM.ShutDownFuel = NumArray(15);
                     FuelCell(thisFuelCell).FCPM.ShutDownElectConsum = NumArray(16);
                     FuelCell(thisFuelCell).FCPM.ANC0 = NumArray(17);
@@ -348,7 +323,7 @@ namespace FuelCellElectricGenerator {
                         ErrorsFound = true;
                     }
                     FuelCell(thisFuelCell).FCPM.ZoneName = AlphArray(5);
-                    FuelCell(thisFuelCell).FCPM.ZoneID = UtilityRoutines::FindItemInList(FuelCell(thisFuelCell).FCPM.ZoneName, Zone);
+                    FuelCell(thisFuelCell).FCPM.ZoneID = UtilityRoutines::FindItemInList(FuelCell(thisFuelCell).FCPM.ZoneName, DataHeatBalance::Zone);
                     if (FuelCell(thisFuelCell).FCPM.ZoneID == 0 && !lAlphaBlanks(5)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -360,7 +335,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).FCPM.QdotSkin = NumArray(20);
                     FuelCell(thisFuelCell).FCPM.UAskin = NumArray(21);
 
-                    FuelCell(thisFuelCell).FCPM.SkinLossCurveID = GetCurveIndex(AlphArray(6));
+                    FuelCell(thisFuelCell).FCPM.SkinLossCurveID = CurveManager::GetCurveIndex(AlphArray(6));
                     if (FuelCell(thisFuelCell).FCPM.SkinLossCurveID == 0) {
                         if (FuelCell(thisFuelCell).FCPM.SkinLossMode == QuadraticFuelNdotSkin) {
                             ShowSevereError("Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -433,7 +408,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).AirSup.SupNodeNum = GetOnlySingleNode(
                         AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-                    FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = GetCurveIndex(AlphArray(3));
+                    FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if (FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID == 0) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -456,7 +431,7 @@ namespace FuelCellElectricGenerator {
 
                     FuelCell(thisFuelCell).AirSup.Stoics = NumArray(2) + 1.0;
 
-                    FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID = GetCurveIndex(AlphArray(5));
+                    FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID = CurveManager::GetCurveIndex(AlphArray(5));
                     if ((FuelCell(thisFuelCell).AirSup.AirFuncPelCurveID == 0) &&
                         (FuelCell(thisFuelCell).AirSup.AirSupRateMode == QuadraticFuncofPel)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
@@ -467,7 +442,7 @@ namespace FuelCellElectricGenerator {
 
                     FuelCell(thisFuelCell).AirSup.AirTempCoeff = NumArray(3);
 
-                    FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID = GetCurveIndex(AlphArray(6));
+                    FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID = CurveManager::GetCurveIndex(AlphArray(6));
                     if ((FuelCell(thisFuelCell).AirSup.AirFuncNdotCurveID == 0) &&
                         (FuelCell(thisFuelCell).AirSup.AirSupRateMode == QuadraticFuncofNdot)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
@@ -509,7 +484,7 @@ namespace FuelCellElectricGenerator {
                         FuelCell(thisFuelCell).AirSup.NumConstituents = NumAirConstit;
 
                         if (NumAirConstit > 5) {
-                            ShowSevereError("Invalid " + cNumericFieldNames(4) + '=' + RoundSigDigits(NumArray(4), 2));
+                            ShowSevereError("Invalid " + cNumericFieldNames(4) + '=' + General::RoundSigDigits(NumArray(4), 2));
                             ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                             ShowContinueError("Fuel Cell model not set up for more than 5 air constituents");
                             ErrorsFound = true;
@@ -545,7 +520,7 @@ namespace FuelCellElectricGenerator {
                     if (std::abs(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract) - 1.0) > 0.0001) {
 
                         ShowSevereError(cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError("..Sum was=" + RoundSigDigits(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract), 1));
+                        ShowContinueError("..Sum was=" + General::RoundSigDigits(sum(FuelCell(thisFuelCell).AirSup.ConstitMolalFract), 1));
                         ShowContinueError("Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }
@@ -606,14 +581,14 @@ namespace FuelCellElectricGenerator {
                 if (thisFuelCell > 0) {
                     //  this is only the first instance of a FuelCell generator using this type of Water supply module
                     FuelCell(thisFuelCell).WaterSup.Name = AlphArray(1);
-                    FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID = GetCurveIndex(AlphArray(2));
+                    FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID = CurveManager::GetCurveIndex(AlphArray(2));
                     if (FuelCell(thisFuelCell).WaterSup.WaterSupRateCurveID == 0) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                         ShowContinueError("Curve name was not found ");
                         ErrorsFound = true;
                     }
-                    FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID = GetCurveIndex(AlphArray(3));
+                    FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if (FuelCell(thisFuelCell).WaterSup.PmpPowerCurveID == 0) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -714,7 +689,7 @@ namespace FuelCellElectricGenerator {
                     }
 
                     FuelCell(thisFuelCell).AuxilHeat.ZoneName = AlphArray(3);
-                    FuelCell(thisFuelCell).AuxilHeat.ZoneID = UtilityRoutines::FindItemInList(AlphArray(3), Zone);
+                    FuelCell(thisFuelCell).AuxilHeat.ZoneID = UtilityRoutines::FindItemInList(AlphArray(3), DataHeatBalance::Zone);
                     if ((FuelCell(thisFuelCell).AuxilHeat.ZoneID == 0) && (FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination == SurroundingZone)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -777,7 +752,7 @@ namespace FuelCellElectricGenerator {
                                                                                       NodeConnectionType_Outlet,
                                                                                       1,
                                                                                       ObjectIsNotParent);
-                    TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
+                    BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
 
                     // CR9240
                     FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNodeName = AlphArray(4);
@@ -818,7 +793,7 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).ExhaustHX.CondensationThresholdTemp = NumArray(19);
 
                     // store cooling water volume flow rate for autosizing system
-                    RegisterPlantCompDesignFlow(FuelCell(thisFuelCell).ExhaustHX.WaterInNode, FuelCell(thisFuelCell).ExhaustHX.WaterVolumeFlowMax);
+                    PlantUtilities::RegisterPlantCompDesignFlow(FuelCell(thisFuelCell).ExhaustHX.WaterInNode, FuelCell(thisFuelCell).ExhaustHX.WaterVolumeFlowMax);
                 } else {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(1) + " = " + AlphArray(1));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -900,7 +875,7 @@ namespace FuelCellElectricGenerator {
 
                     FuelCell(thisFuelCell).Inverter.ConstEff = NumArray(1);
 
-                    FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = GetCurveIndex(AlphArray(3));
+                    FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if ((FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID == 0) &&
                         (FuelCell(thisFuelCell).Inverter.EffMode == InverterEffQuadratic)) {
                         ShowSevereError("Invalid, " + cAlphaFieldNames(3) + " = " + AlphArray(3));
@@ -963,7 +938,7 @@ namespace FuelCellElectricGenerator {
                                                                                             NodeConnectionType_Outlet,
                                                                                             1,
                                                                                             ObjectIsNotParent);
-                        TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
+                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
 
                         FuelCell(thisFuelCell).StackCooler.TstackNom = NumArray(1);
                         FuelCell(thisFuelCell).StackCooler.TstackActual = NumArray(2);
@@ -1080,13 +1055,13 @@ namespace FuelCellElectricGenerator {
                     SetupZoneInternalGain(FuelCell(GeneratorNum).FCPM.ZoneID,
                                           "Generator:FuelCell",
                                           FuelCell(GeneratorNum).Name,
-                                          IntGainTypeOf_GeneratorFuelCell,
+                                          DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
                                           FuelCell(GeneratorNum).Report.SkinLossConvect,
                                           _,
                                           FuelCell(GeneratorNum).Report.SkinLossRadiat);
                 }
 
-                if (DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
+                if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
                     SetupOutputVariable("Generator Air Inlet Temperature",
                                         OutputProcessor::Unit::C,
                                         FuelCell(GeneratorNum).Report.TairInlet,
@@ -1393,12 +1368,7 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: IEA/ECBCS Annex 42....
 
-        using CurveManager::CurveValue;
-        using DataEnvironment::WaterMainsTemp;
         using DataHeatBalFanSys::ZT;
-        using DataHVACGlobals::SysTimeElapsed;
-        using General::RoundSigDigits;
-        using General::SolveRoot;
         using ScheduleManager::GetCurrentScheduleValue;
 
         static Real64 PpcuLosses; // losses in inverter [W]
@@ -1455,7 +1425,7 @@ namespace FuelCellElectricGenerator {
 
                 // set Day and Time of Last Shut Down
                 FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown =
-                    double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / HoursInDay;
+                    double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
                 FuelCell(GeneratorNum).FCPM.HasBeenOn = false;
 
                 if (FuelCell(GeneratorNum).FCPM.ShutDownTime > 0.0) FuelCell(GeneratorNum).FCPM.DuringShutDown = true;
@@ -1473,7 +1443,7 @@ namespace FuelCellElectricGenerator {
             // set Day and Time of Last STart Up
 
             FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp =
-                double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / HoursInDay;
+                double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
             FuelCell(GeneratorNum).FCPM.HasBeenOn = true;
             ++FuelCell(GeneratorNum).FCPM.NumCycles; // increment cycling counter
@@ -1541,7 +1511,7 @@ namespace FuelCellElectricGenerator {
             if (FuelCell(GeneratorNum).FCPM.EffMode == NormalizedCurveMode) {
                 // Equation (8) in FuelCell Spec modified for normalized curve
 
-                Eel = CurveValue(FuelCell(GeneratorNum).FCPM.EffCurveID, Pel / FuelCell(GeneratorNum).FCPM.NomPel) *
+                Eel = CurveManager::CurveValue(FuelCell(GeneratorNum).FCPM.EffCurveID, Pel / FuelCell(GeneratorNum).FCPM.NomPel) *
                       FuelCell(GeneratorNum).FCPM.NomEff *
                       (1.0 - FuelCell(GeneratorNum).FCPM.NumCycles * FuelCell(GeneratorNum).FCPM.CyclingDegradRat) *
                       (1.0 - max((FuelCell(GeneratorNum).FCPM.NumRunHours - FuelCell(GeneratorNum).FCPM.ThreshRunHours), 0.0) *
@@ -1549,7 +1519,7 @@ namespace FuelCellElectricGenerator {
 
             } else if (FuelCell(GeneratorNum).FCPM.EffMode == DirectCurveMode) {
                 // Equation (8) in FuelCell Spec
-                Eel = CurveValue(FuelCell(GeneratorNum).FCPM.EffCurveID, Pel) *
+                Eel = CurveManager::CurveValue(FuelCell(GeneratorNum).FCPM.EffCurveID, Pel) *
                       (1.0 - FuelCell(GeneratorNum).FCPM.NumCycles * FuelCell(GeneratorNum).FCPM.CyclingDegradRat) *
                       (1.0 - max((FuelCell(GeneratorNum).FCPM.NumRunHours - FuelCell(GeneratorNum).FCPM.ThreshRunHours), 0.0) *
                                  FuelCell(GeneratorNum).FCPM.OperateDegradRat);
@@ -1581,19 +1551,19 @@ namespace FuelCellElectricGenerator {
 
             } else if (FuelCell(GeneratorNum).AirSup.AirSupRateMode == QuadraticFuncofPel) { // MEthod 2
 
-                FuelCell(GeneratorNum).FCPM.NdotAir = CurveValue(FuelCell(GeneratorNum).AirSup.AirFuncPelCurveID, Pel) *
+                FuelCell(GeneratorNum).FCPM.NdotAir = CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.AirFuncPelCurveID, Pel) *
                                                       (1 + FuelCell(GeneratorNum).AirSup.AirTempCoeff * FuelCell(GeneratorNum).AirSup.TairIntoFCPM);
 
             } else if (FuelCell(GeneratorNum).AirSup.AirSupRateMode == QuadraticFuncofNdot) { // method 3
                 FuelCell(GeneratorNum).FCPM.NdotAir =
-                    CurveValue(FuelCell(GeneratorNum).AirSup.AirFuncNdotCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel) *
+                    CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.AirFuncNdotCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel) *
                     (1 + FuelCell(GeneratorNum).AirSup.AirTempCoeff * FuelCell(GeneratorNum).AirSup.TairIntoFCPM);
             }
 
             // Calculation Step 4. fuel compressor power
 
             FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl =
-                CurveValue(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+                CurveManager::CurveValue(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
 
             // calculation Step 5, Fuel Compressor (need outlet temperature)
 
@@ -1628,7 +1598,7 @@ namespace FuelCellElectricGenerator {
 
             if (FuelSupply(FuelCell(GeneratorNum).FuelSupNum).QskinLoss < 0.0) {
                 //   write(*,*) 'problem in FuelSupply%QskinLoss ', FuelSupply(FuelCell(GeneratorNum)%FuelSupNum)%QskinLoss
-                ShowWarningError("problem in FuelSupply%QskinLoss " + RoundSigDigits(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).QskinLoss, 3));
+                ShowWarningError("problem in FuelSupply%QskinLoss " + General::RoundSigDigits(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).QskinLoss, 3));
                 FuelSupply(FuelCell(GeneratorNum).FuelSupNum).QskinLoss = 0.0;
             }
 
@@ -1646,7 +1616,7 @@ namespace FuelCellElectricGenerator {
             // calculate water consumption
 
             FuelCell(GeneratorNum).FCPM.NdotLiqwater =
-                CurveValue(FuelCell(GeneratorNum).WaterSup.WaterSupRateCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+                CurveManager::CurveValue(FuelCell(GeneratorNum).WaterSup.WaterSupRateCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
 
             // set inlet temp.  (could move to init)
 
@@ -1655,7 +1625,7 @@ namespace FuelCellElectricGenerator {
 
                 if (SELECT_CASE_var == WaterInReformMains) {
 
-                    FuelCell(GeneratorNum).WaterSup.TwaterIntoCompress = WaterMainsTemp;
+                    FuelCell(GeneratorNum).WaterSup.TwaterIntoCompress = DataEnvironment::WaterMainsTemp;
 
                 } else if ((SELECT_CASE_var == WaterInReformAirNode) || (SELECT_CASE_var == WaterInReformWaterNode)) {
 
@@ -1668,7 +1638,7 @@ namespace FuelCellElectricGenerator {
             }
 
             FuelCell(GeneratorNum).WaterSup.PwaterCompEl =
-                CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
+                CurveManager::CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
 
             // 75.325  J/mol K Water at 0.1 MPa and 298 K, reference NIST WEBBOOK
             FigureLiquidWaterHeatCap(FuelCell(GeneratorNum).WaterSup.TwaterIntoCompress, CpWater);
@@ -1702,7 +1672,7 @@ namespace FuelCellElectricGenerator {
             FuelCell(GeneratorNum).AirSup.TairIntoBlower = Node(FuelCell(GeneratorNum).AirSup.SupNodeNum).Temp;
 
             FuelCell(GeneratorNum).AirSup.PairCompEl =
-                CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
+                CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
 
             Tavg = (FuelCell(GeneratorNum).AirSup.TairIntoBlower + FuelCell(GeneratorNum).AirSup.TairIntoFCPM) / 2.0;
 
@@ -1758,7 +1728,7 @@ namespace FuelCellElectricGenerator {
 
             if (FuelCell(GeneratorNum).AirSup.QskinLoss < 0.0) {
                 //   write(*,*) 'problem in AirSup%QskinLoss ', FuelCell(GeneratorNum)%AirSup%QskinLoss
-                ShowWarningError("problem in AirSup%QskinLoss " + RoundSigDigits(FuelCell(GeneratorNum).AirSup.QskinLoss, 3));
+                ShowWarningError("problem in AirSup%QskinLoss " + General::RoundSigDigits(FuelCell(GeneratorNum).AirSup.QskinLoss, 3));
                 FuelCell(GeneratorNum).AirSup.QskinLoss = 0.0;
             }
 
@@ -1871,7 +1841,7 @@ namespace FuelCellElectricGenerator {
 
             } else if (FuelCell(GeneratorNum).FCPM.SkinLossMode == QuadraticFuelNdotSkin) {
 
-                FuelCell(GeneratorNum).FCPM.QdotSkin = CurveValue(FuelCell(GeneratorNum).FCPM.SkinLossCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+                FuelCell(GeneratorNum).FCPM.QdotSkin = CurveManager::CurveValue(FuelCell(GeneratorNum).FCPM.SkinLossCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
             }
 
             // calculation Step 10, AC FCPM power ancillaries
@@ -1917,7 +1887,7 @@ namespace FuelCellElectricGenerator {
             Par(2) = tmpTotProdGasEnthalphy;
             Par(3) = FuelCell(GeneratorNum).FCPM.NdotProdGas;
             tmpTprodGas = FuelCell(GeneratorNum).FCPM.TprodGasLeavingFCPM;
-            SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par);
+            General::SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, FuelCellProductGasEnthResidual, MinProductGasTemp, MaxProductGasTemp, Par);
 
             if (SolverFlag == -2) {
 
@@ -1947,7 +1917,7 @@ namespace FuelCellElectricGenerator {
 
             if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffQuadratic) {
 
-                PpcuLosses = (1.0 - CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, PintoInverter)) * PintoInverter;
+                PpcuLosses = (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, PintoInverter)) * PintoInverter;
             }
 
             PoutofInverter = PintoInverter - PpcuLosses;
@@ -1991,8 +1961,6 @@ namespace FuelCellElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // manage controls and calculations related to electrical storage in FuelCell model
-
-        using DataHVACGlobals::TimeStepSys;
 
         Real64 tmpPdraw;   // power draw from storage, working var
         Real64 tmpPcharge; // power charge to storage, working var
@@ -2042,20 +2010,20 @@ namespace FuelCellElectricGenerator {
 
                 // now add energy to storage from charging
                 if ((FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                     tmpPcharge * TimeStepSys * SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge) <
+                     tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge) <
                     FuelCell(Num).ElecStorage.NominalEnergyCapacity) {
 
                     FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
                         FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * TimeStepSys * SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
                 } else { // would over charge this time step
 
                     tmpPcharge = (FuelCell(Num).ElecStorage.NominalEnergyCapacity - FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge) /
-                                 (TimeStepSys * SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge);
+                                 (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge);
                     Constrained = true;
                     FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
                         FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * TimeStepSys * SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
                 }
 
                 // losses go into QairIntake
@@ -2092,17 +2060,17 @@ namespace FuelCellElectricGenerator {
 
                 // now take energy from storage by drawing  (amplified by energetic effic)
                 if ((FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                     tmpPdraw * TimeStepSys * SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge) > 0.0) {
+                     tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge) > 0.0) {
 
                     FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
                         FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * TimeStepSys * SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
                 } else { // would over drain storage this timestep so reduce tmpPdraw
                     tmpPdraw = FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge * FuelCell(Num).ElecStorage.EnergeticEfficDischarge /
-                               (TimeStepSys * SecInHour);
+                               (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
                     FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
                         FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * TimeStepSys * SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
 
                     Constrained = true;
                 }
@@ -2223,8 +2191,8 @@ namespace FuelCellElectricGenerator {
 
         tempCp = 0.0;
 
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -2304,8 +2272,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5;       // NASA poly coeff
         Real64 A6;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2390,8 +2358,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4;       // NASA poly coeff
         Real64 A5;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2474,8 +2442,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5;       // NASA poly coeff
         Real64 A6;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2563,8 +2531,8 @@ namespace FuelCellElectricGenerator {
         Real64 A5;       // NASA poly coeff
         Real64 A6;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2637,8 +2605,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4;       // NASA poly coeff
         Real64 A5;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2707,8 +2675,8 @@ namespace FuelCellElectricGenerator {
         Real64 A4;       // NASA poly coeff
         Real64 A5;       // NASA poly coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
 
         // loop through fuel constituents and sum up Cp
 
@@ -2775,7 +2743,7 @@ namespace FuelCellElectricGenerator {
         Real64 const D = -0.95914; // shomate coeff
         Real64 const E = 0.11725;  // shomate coeff
         Real64 const F = -250.569; // shomate coeff
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
     }
@@ -2805,7 +2773,7 @@ namespace FuelCellElectricGenerator {
         Real64 const E = 3.85533;   // shomate coeff
         Real64 const F = -256.5478; // shomate coeff
 
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HLiqWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
     }
@@ -2829,7 +2797,7 @@ namespace FuelCellElectricGenerator {
         Real64 const C = -3196.413; // shomate coeff
         Real64 const D = 2474.455;  // shomate coeff
         Real64 const E = 3.85533;   // shomate coeff
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0;
+        Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0;
 
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
     }
@@ -2846,8 +2814,6 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the AC ancillaries to determine Pel
 
-        using CurveManager::CurveValue;
-
         //  Using lagged values inside a sequential substitution loop
         PacAncill = 0.0;
         // sect. 5.9
@@ -2855,14 +2821,14 @@ namespace FuelCellElectricGenerator {
             FuelCell(GeneratorNum).FCPM.ANC0 + FuelCell(GeneratorNum).FCPM.ANC1 * FuelCell(GeneratorNum).FCPM.NdotFuel;
 
         // sect 6.0
-        FuelCell(GeneratorNum).AirSup.PairCompEl = CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
+        FuelCell(GeneratorNum).AirSup.PairCompEl = CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
         // sect 7.0
         FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl =
-            CurveValue(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+            CurveManager::CurveValue(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
 
         // sect. 8.0
         FuelCell(GeneratorNum).WaterSup.PwaterCompEl =
-            CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
+            CurveManager::CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
 
         PacAncill = FuelCell(GeneratorNum).FCPM.PelancillariesAC + FuelCell(GeneratorNum).AirSup.PairCompEl +
                     FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl + FuelCell(GeneratorNum).WaterSup.PwaterCompEl;
@@ -2880,8 +2846,6 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate inverter losses
 
-        using CurveManager::CurveValue;
-
         Real64 lastPpcuLosses; // used in iterative solution
         int iter;
         Real64 Pel;
@@ -2894,14 +2858,14 @@ namespace FuelCellElectricGenerator {
         if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffQuadratic) {
 
             // first use Pdemand instead of Pel to get initial estimate
-            lastPpcuLosses = Pdemand * (1.0 - CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
-                             CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand);
+            lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
+                             CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand);
 
             for (iter = 1; iter <= 20; ++iter) { // seems like need to iterate (??) Need to investigate number and convergence success here
 
                 Pel = Pdemand + lastPpcuLosses;
 
-                lastPpcuLosses = (1.0 - CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pel)) * Pel;
+                lastPpcuLosses = (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pel)) * Pel;
             }
 
             PpcuLosses = lastPpcuLosses;
@@ -2921,9 +2885,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
-
         Real64 CurrentFractionalDay; // working var, time in decimal days
         Real64 EndingFractionalDay;  // working var, time is decimal days
         Real64 MaxPel;               // working variable for max allowed by transient constraint
@@ -2936,9 +2897,9 @@ namespace FuelCellElectricGenerator {
         if (FuelCell(GeneratorNum).FCPM.DuringStartUp) {
 
             // calculate time for end of start up period
-            CurrentFractionalDay = double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / HoursInDay;
+            CurrentFractionalDay = double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
-            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp + FuelCell(GeneratorNum).FCPM.StartUpTime / HoursInDay;
+            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp + FuelCell(GeneratorNum).FCPM.StartUpTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
@@ -2950,9 +2911,9 @@ namespace FuelCellElectricGenerator {
         if (FuelCell(GeneratorNum).FCPM.DuringShutDown) {
 
             // calculate time for end of shut down period
-            CurrentFractionalDay = double(DayOfSim) + (int(CurrentTime) + (SysTimeElapsed + (CurrentTime - int(CurrentTime)))) / HoursInDay;
+            CurrentFractionalDay = double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
-            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown + FuelCell(GeneratorNum).FCPM.ShutDownTime / HoursInDay;
+            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown + FuelCell(GeneratorNum).FCPM.ShutDownTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
@@ -2964,7 +2925,7 @@ namespace FuelCellElectricGenerator {
         if (!(FuelCell(GeneratorNum).FCPM.DuringShutDown) && !(FuelCell(GeneratorNum).FCPM.DuringStartUp)) {
             // unit is neither starting or stopping and the only constraints would come from transient limits
             if (Pel > FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering up
-                MaxPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep + FuelCell(GeneratorNum).FCPM.UpTranLimit * TimeStepSys * SecInHour;
+                MaxPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep + FuelCell(GeneratorNum).FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
@@ -2972,7 +2933,7 @@ namespace FuelCellElectricGenerator {
                     Constrained = false;
                 }
             } else if (Pel < FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering down
-                MinPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep - FuelCell(GeneratorNum).FCPM.DownTranLimit * TimeStepSys * SecInHour;
+                MinPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep - FuelCell(GeneratorNum).FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -3029,7 +2990,6 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: Annex 42 model documentation
 
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         static std::string const RoutineName("CalcFuelCellGenHeatRecovery");
@@ -3095,7 +3055,7 @@ namespace FuelCellElectricGenerator {
                 THXexh = TprodGasIn - qHX / (NdotGas * CpProdGasMol * 1000.0);
 
                 Cp = GetSpecificHeatGlycol(
-                    PlantLoop(FuelCell(Num).CWLoopNum).FluidName, TwaterIn, PlantLoop(FuelCell(Num).CWLoopNum).FluidIndex, RoutineName);
+                    DataPlant::PlantLoop(FuelCell(Num).CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(FuelCell(Num).CWLoopNum).FluidIndex, RoutineName);
 
                 if (MdotWater * Cp <= 0.0) {
                     TwaterOut = TwaterIn;
@@ -3333,10 +3293,6 @@ namespace FuelCellElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire FuelCell model
 
-        using DataPlant::TypeOf_Generator_FCExhaust;
-        using DataPlant::TypeOf_Generator_FCStackCooler;
-        using PlantUtilities::UpdateComponentHeatRecoverySide;
-
         if (GetFuelCellInput) {
 
             // Read input data.
@@ -3345,9 +3301,9 @@ namespace FuelCellElectricGenerator {
         }
 
         if (InitLoopEquip) {
-            if (CompTypeNum == TypeOf_Generator_FCExhaust) {
+            if (CompTypeNum == DataPlant::TypeOf_Generator_FCExhaust) {
                 CompNum = UtilityRoutines::FindItemInList(CompName, FuelCell, &FCDataStruct::NameExhaustHX);
-            } else if (CompTypeNum == TypeOf_Generator_FCStackCooler) {
+            } else if (CompTypeNum == DataPlant::TypeOf_Generator_FCStackCooler) {
                 CompNum = UtilityRoutines::FindItemInList(CompName, FuelCell, &FCDataStruct::NameStackCooler);
             }
             if (CompNum == 0) {
@@ -3359,10 +3315,10 @@ namespace FuelCellElectricGenerator {
             return;
         } // End Of InitLoopEquip
 
-        if (CompTypeNum == TypeOf_Generator_FCStackCooler) {
-            UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
+        if (CompTypeNum == DataPlant::TypeOf_Generator_FCStackCooler) {
+            PlantUtilities::UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
                                             FuelCell(CompNum).CWLoopSideNum,
-                                            TypeOf_Generator_FCStackCooler,
+                                            DataPlant::TypeOf_Generator_FCStackCooler,
                                             FuelCell(CompNum).StackCooler.WaterInNode,
                                             FuelCell(CompNum).StackCooler.WaterOutNode,
                                             FuelCell(CompNum).Report.qHX,
@@ -3370,10 +3326,10 @@ namespace FuelCellElectricGenerator {
                                             FuelCell(CompNum).Report.HeatRecOutletTemp,
                                             FuelCell(CompNum).Report.HeatRecMdot,
                                             FirstHVACIteration);
-        } else if (CompTypeNum == TypeOf_Generator_FCExhaust) {
-            UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
+        } else if (CompTypeNum == DataPlant::TypeOf_Generator_FCExhaust) {
+            PlantUtilities::UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
                                             FuelCell(CompNum).CWLoopSideNum,
-                                            TypeOf_Generator_FCExhaust,
+                                            DataPlant::TypeOf_Generator_FCExhaust,
                                             FuelCell(CompNum).ExhaustHX.WaterInNode,
                                             FuelCell(CompNum).ExhaustHX.WaterOutNode,
                                             FuelCell(CompNum).ExhaustHX.qHX,
@@ -3399,20 +3355,8 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using DataGlobals::BeginEnvrnFlag;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::SecInHour;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
-        using DataHVACGlobals::SysTimeElapsed;
-        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_Generator_FCExhaust;
         using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using PlantUtilities::SetComponentFlowRate;
 
         static std::string const RoutineName("InitFuelCellGenerators");
 
@@ -3438,11 +3382,11 @@ namespace FuelCellElectricGenerator {
             MyPlantScanFlag = true;
         } // end one time setups and inits
 
-        if (MyPlantScanFlag(FCnum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(FCnum) && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
 
-            ScanPlantLoopsForObject(FuelCell(FCnum).NameExhaustHX,
-                                    TypeOf_Generator_FCExhaust,
+            PlantUtilities::ScanPlantLoopsForObject(FuelCell(FCnum).NameExhaustHX,
+                                    DataPlant::TypeOf_Generator_FCExhaust,
                                     FuelCell(FCnum).CWLoopNum,
                                     FuelCell(FCnum).CWLoopSideNum,
                                     FuelCell(FCnum).CWBranchNum,
@@ -3463,7 +3407,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(FCnum) && !MyPlantScanFlag(FCnum)) {
+        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(FCnum) && !MyPlantScanFlag(FCnum)) {
 
             FuelSupply(FuelCell(FCnum).FuelSupNum).PfuelCompEl = 0.0;
             FuelSupply(FuelCell(FCnum).FuelSupNum).TfuelIntoFCPM = 0.0;
@@ -3520,7 +3464,7 @@ namespace FuelCellElectricGenerator {
             FuelCell(FCnum).Inverter.QairIntake = 0.0;
 
             rho = GetDensityGlycol(
-                PlantLoop(FuelCell(FCnum).CWLoopNum).FluidName, InitHRTemp, PlantLoop(FuelCell(FCnum).CWLoopNum).FluidIndex, RoutineName);
+                DataPlant::PlantLoop(FuelCell(FCnum).CWLoopNum).FluidName, InitHRTemp, DataPlant::PlantLoop(FuelCell(FCnum).CWLoopNum).FluidIndex, RoutineName);
 
             FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign = FuelCell(FCnum).ExhaustHX.WaterVolumeFlowMax * rho;
             FuelCell(FCnum).ExhaustHX.WaterMassFlowRate = FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
@@ -3529,7 +3473,7 @@ namespace FuelCellElectricGenerator {
             Node(inNode).Temp = InitHRTemp;
             Node(outNode).Temp = InitHRTemp;
 
-            InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(0.0,
                                FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign,
                                inNode,
                                outNode,
@@ -3542,11 +3486,11 @@ namespace FuelCellElectricGenerator {
             MyWarmupFlag(FCnum) = true;
         } // end environmental inits
 
-        if (!BeginEnvrnFlag) {
+        if (!DataGlobals::BeginEnvrnFlag) {
             MyEnvrnFlag(FCnum) = true;
         }
 
-        if (MyWarmupFlag(FCnum) && (!WarmupFlag)) {
+        if (MyWarmupFlag(FCnum) && (!DataGlobals::WarmupFlag)) {
             // need to reset initial state of charge at beginning of environment but after warm up is complete
             FuelCell(FCnum).ElecStorage.LastTimeStepStateOfCharge = FuelCell(FCnum).ElecStorage.StartingEnergyStored;
             FuelCell(FCnum).ElecStorage.ThisTimeStepStateOfCharge = FuelCell(FCnum).ElecStorage.StartingEnergyStored;
@@ -3554,7 +3498,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (FuelCell(FCnum).TimeElapsed != TimeElapsed) {
 
             FuelCell(FCnum).ElecStorage.LastTimeStepStateOfCharge = FuelCell(FCnum).ElecStorage.ThisTimeStepStateOfCharge;
@@ -3565,7 +3509,7 @@ namespace FuelCellElectricGenerator {
             // intialize flow rate in water loop, this is "requesting" flow
             mdot = FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
 
-            SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(mdot,
                                  inNode,
                                  outNode,
                                  FuelCell(FCnum).CWLoopNum,
@@ -3579,7 +3523,7 @@ namespace FuelCellElectricGenerator {
         } else {
             inNode = FuelCell(FCnum).ExhaustHX.WaterInNode;
 
-            SetComponentFlowRate(FuelCell(FCnum).ExhaustHX.WaterMassFlowRate,
+            PlantUtilities::SetComponentFlowRate(FuelCell(FCnum).ExhaustHX.WaterMassFlowRate,
                                  FuelCell(FCnum).ExhaustHX.WaterInNode,
                                  FuelCell(FCnum).ExhaustHX.WaterOutNode,
                                  FuelCell(FCnum).CWLoopNum,
@@ -3631,7 +3575,7 @@ namespace FuelCellElectricGenerator {
 
         if (NumFuelCellGenerators == 0) return;
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : FuelSupply)
                 e.QskinLoss = 0.0;
             MyEnvrnFlag = false;
@@ -3653,7 +3597,7 @@ namespace FuelCellElectricGenerator {
             }
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
 
         // this routine needs to do something for zone gains during sizing
 
@@ -3709,8 +3653,6 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        using PlantUtilities::SafeCopyPlantNode;
-
         int InNodeNum;
         int OutNodeNum;
 
@@ -3718,7 +3660,7 @@ namespace FuelCellElectricGenerator {
         OutNodeNum = FuelCell(Num).ExhaustHX.WaterOutNode;
         InNodeNum = FuelCell(Num).ExhaustHX.WaterInNode;
 
-        SafeCopyPlantNode(InNodeNum, OutNodeNum);
+        PlantUtilities::SafeCopyPlantNode(InNodeNum, OutNodeNum);
 
         Node(OutNodeNum).Temp = FuelCell(Num).ExhaustHX.WaterOutletTemp;
         Node(OutNodeNum).Enthalpy = FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
@@ -3728,14 +3670,8 @@ namespace FuelCellElectricGenerator {
                                         int const Num                  // Generator number
     )
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          BG
-        //       DATE WRITTEN:
-
-        using DataHVACGlobals::TimeStepSys;
-
         FuelCell(Num).Report.ACPowerGen = FuelCell(Num).ACPowerGen;                            // electrical power produced [W]
-        FuelCell(Num).Report.ACEnergyGen = FuelCell(Num).ACPowerGen * TimeStepSys * SecInHour; // energy produced (J)
+        FuelCell(Num).Report.ACEnergyGen = FuelCell(Num).ACPowerGen * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // energy produced (J)
         FuelCell(Num).Report.QdotExhaust = 0.0;                                                // reporting: exhaust gas heat recovered (W)
         FuelCell(Num).Report.TotalHeatEnergyRec = 0.0;                                         // reporting: total heat recovered (J)
         FuelCell(Num).Report.ExhaustEnergyRec = 0.0;                                           // reporting: exhaust gas heat recovered (J)
@@ -3754,7 +3690,7 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).Report.NdotAir = FuelCell(Num).FCPM.NdotAir;                                     // air flow in kmol/sec
         FuelCell(Num).Report.TotAirInEnthalphy = FuelCell(Num).FCPM.TotAirInEnthalphy;                 // State point 4
         FuelCell(Num).Report.BlowerPower = FuelCell(Num).AirSup.PairCompEl;                            // electrical power used by air supply blower
-        FuelCell(Num).Report.BlowerEnergy = FuelCell(Num).AirSup.PairCompEl * TimeStepSys * SecInHour; // electrical energy
+        FuelCell(Num).Report.BlowerEnergy = FuelCell(Num).AirSup.PairCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // electrical energy
         FuelCell(Num).Report.BlowerSkinLoss = FuelCell(Num).AirSup.QskinLoss;                          // heat rate of losses by blower
 
         FuelCell(Num).Report.TfuelInlet = FuelSupply(FuelCell(Num).FuelSupNum).TfuelIntoCompress; // State point 2
@@ -3763,15 +3699,15 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).Report.TotFuelInEnthalpy = FuelCell(Num).FCPM.TotFuelInEnthalphy;           // enthalpy at state point 5 [W]
         FuelCell(Num).Report.FuelCompressPower = FuelSupply(FuelCell(Num).FuelSupNum).PfuelCompEl;
         // electrical power used by fuel supply compressor [W]
-        FuelCell(Num).Report.FuelCompressEnergy = FuelSupply(FuelCell(Num).FuelSupNum).PfuelCompEl * TimeStepSys * SecInHour; // elect energy
+        FuelCell(Num).Report.FuelCompressEnergy = FuelSupply(FuelCell(Num).FuelSupNum).PfuelCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // elect energy
         FuelCell(Num).Report.FuelCompressSkinLoss = FuelSupply(FuelCell(Num).FuelSupNum).QskinLoss;
         // heat rate of losses.by fuel supply compressor [W]
-        FuelCell(Num).Report.FuelEnergyLHV = FuelCell(Num).FCPM.NdotFuel * FuelSupply(FuelCell(Num).FuelSupNum).LHV * 1000000.0 * TimeStepSys *
-                                             SecInHour; // reporting: Fuel Energy used (J)
+        FuelCell(Num).Report.FuelEnergyLHV = FuelCell(Num).FCPM.NdotFuel * FuelSupply(FuelCell(Num).FuelSupNum).LHV * 1000000.0 * DataHVACGlobals::TimeStepSys *
+                                             DataGlobals::SecInHour; // reporting: Fuel Energy used (J)
         FuelCell(Num).Report.FuelEnergyUseRateLHV =
             FuelCell(Num).FCPM.NdotFuel * FuelSupply(FuelCell(Num).FuelSupNum).LHV * 1000000.0; // reporting: Fuel Energy used (W)
         FuelCell(Num).Report.FuelEnergyHHV = FuelCell(Num).FCPM.NdotFuel * FuelSupply(FuelCell(Num).FuelSupNum).HHV *
-                                             FuelSupply(FuelCell(Num).FuelSupNum).KmolPerSecToKgPerSec * TimeStepSys * SecInHour;
+                                             FuelSupply(FuelCell(Num).FuelSupNum).KmolPerSecToKgPerSec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         FuelCell(Num).Report.FuelEnergyUseRateHHV =
             FuelCell(Num).FCPM.NdotFuel * FuelSupply(FuelCell(Num).FuelSupNum).HHV * FuelSupply(FuelCell(Num).FuelSupNum).KmolPerSecToKgPerSec;
@@ -3782,7 +3718,7 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).Report.TwaterIntoFCPM = FuelCell(Num).WaterSup.TwaterIntoFCPM;
         FuelCell(Num).Report.NdotWater = FuelCell(Num).FCPM.NdotLiqwater; // water flow in kmol/sec (reformer water)
         FuelCell(Num).Report.WaterPumpPower = FuelCell(Num).WaterSup.PwaterCompEl;
-        FuelCell(Num).Report.WaterPumpEnergy = FuelCell(Num).WaterSup.PwaterCompEl * TimeStepSys * SecInHour; // electrical energy
+        FuelCell(Num).Report.WaterPumpEnergy = FuelCell(Num).WaterSup.PwaterCompEl * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // electrical energy
         FuelCell(Num).Report.WaterIntoFCPMEnthalpy = FuelCell(Num).FCPM.WaterInEnthalpy;
 
         FuelCell(Num).Report.TprodGas = FuelCell(Num).FCPM.TprodGasLeavingFCPM;      // temperature at State point 7
@@ -3795,7 +3731,7 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).Report.NdotProdO2 = FuelCell(Num).FCPM.ConstitMolalFract(3) * FuelCell(Num).FCPM.NdotProdGas;
 
         FuelCell(Num).Report.qHX = FuelCell(Num).ExhaustHX.qHX;
-        FuelCell(Num).Report.HXenergy = FuelCell(Num).ExhaustHX.qHX * TimeStepSys * SecInHour;
+        FuelCell(Num).Report.HXenergy = FuelCell(Num).ExhaustHX.qHX * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         FuelCell(Num).Report.THXexh = FuelCell(Num).ExhaustHX.THXexh;
         FuelCell(Num).Report.WaterVaporFractExh = FuelCell(Num).ExhaustHX.WaterVaporFractExh;
         FuelCell(Num).Report.CondensateRate = FuelCell(Num).ExhaustHX.CondensateRate;
@@ -3804,19 +3740,19 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).Report.RegulaFalsiIterations = FuelCell(Num).FCPM.RegulaFalsiIter; // number of iterations in Tproduct gas solving
 
         FuelCell(Num).Report.ACancillariesPower = FuelCell(Num).FCPM.PelancillariesAC;
-        FuelCell(Num).Report.ACancillariesEnergy = FuelCell(Num).FCPM.PelancillariesAC * TimeStepSys * SecInHour;
+        FuelCell(Num).Report.ACancillariesEnergy = FuelCell(Num).FCPM.PelancillariesAC * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         FuelCell(Num).Report.PCUlosses = FuelCell(Num).Inverter.PCUlosses; // inverter losses
         FuelCell(Num).Report.DCPowerGen = FuelCell(Num).FCPM.Pel;          // DC power out of FCPM.
         FuelCell(Num).Report.DCPowerEff = FuelCell(Num).FCPM.Eel;          // FCPM efficienty Eel.
         FuelCell(Num).Report.ElectEnergyinStorage = FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge;
         FuelCell(Num).Report.StoredPower = FuelCell(Num).ElecStorage.PelIntoStorage;
-        FuelCell(Num).Report.StoredEnergy = FuelCell(Num).ElecStorage.PelIntoStorage * TimeStepSys * SecInHour;
+        FuelCell(Num).Report.StoredEnergy = FuelCell(Num).ElecStorage.PelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         FuelCell(Num).Report.DrawnPower = FuelCell(Num).ElecStorage.PelFromStorage;
-        FuelCell(Num).Report.DrawnEnergy = FuelCell(Num).ElecStorage.PelFromStorage * TimeStepSys * SecInHour;
+        FuelCell(Num).Report.DrawnEnergy = FuelCell(Num).ElecStorage.PelFromStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         FuelCell(Num).Report.SkinLossPower = FuelCell(Num).QconvZone + FuelCell(Num).QradZone;
-        FuelCell(Num).Report.SkinLossEnergy = (FuelCell(Num).QconvZone + FuelCell(Num).QradZone) * TimeStepSys * SecInHour;
+        FuelCell(Num).Report.SkinLossEnergy = (FuelCell(Num).QconvZone + FuelCell(Num).QradZone) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         FuelCell(Num).Report.SkinLossConvect = FuelCell(Num).QconvZone;
         FuelCell(Num).Report.SkinLossRadiat = FuelCell(Num).QradZone;
     }
