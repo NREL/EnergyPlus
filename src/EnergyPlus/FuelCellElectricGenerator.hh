@@ -145,11 +145,6 @@ namespace FuelCellElectricGenerator {
                                    Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureHXleavingGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                   Real64 const FluidTemp, // degree C
-                                   Real64 &Cp              // (J/mol*K)
-    );
-
     void FigureGaseousWaterEnthalpy(Real64 const FluidTemp, // degree C
                                     Real64 &HGasWater       // kJ/mol
     );
@@ -161,8 +156,6 @@ namespace FuelCellElectricGenerator {
     void FigureLiquidWaterHeatCap(Real64 const FluidTemp, // degree C
                                   Real64 &Cp              // (J/mol*K)
     );
-
-    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH20, Real64 &LHV);
 
     void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill);
 
@@ -191,26 +184,12 @@ namespace FuelCellElectricGenerator {
                                       bool const FirstHVACIteration // TRUE if First iteration of simulation
     );
 
-    // End FuelCell Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin FuelCell Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitFuelCellGenerators(int const FCnum); // index to specific fuel cell generator
 
     void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
                                               std::string &heatRecoveryCompName);
 
-    // End FuelCell Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the FuelCell Generator Module
-    // *****************************************************************************
-
     void FigureFuelCellZoneGains();
-
-    void UpdateExhaustAirFlows(int const Num); // generator number
 
     void CalcUpdateHeatRecovery(int const Num, // Generator number
                                 bool const FirstHVACIteration);

@@ -123,7 +123,6 @@ namespace FuelCellElectricGenerator {
     using namespace GeneratorFuelSupply;
     using namespace GeneratorDynamicsManager;
 
-    // MODULE VARIABLE DECLARATIONS:
     bool GetFuelCellInput(true); // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
 
@@ -143,10 +142,8 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GenNum; // Generator number counter
 
         // Get Generator data from input file
@@ -183,12 +180,6 @@ namespace FuelCellElectricGenerator {
         UpdateFuelCellGeneratorRecords(RunFlag, GenNum);
     }
 
-    // End FuelCell Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of FuelCell Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetFuelCellGeneratorInput()
     {
         // SUBROUTINE INFORMATION:
@@ -202,7 +193,6 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        // Using/Aliasing
         using namespace DataGenerators;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
@@ -215,7 +205,6 @@ namespace FuelCellElectricGenerator {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetScheduleIndex;
 
-        // LOCAL VARIABLES
         int GeneratorNum;              // Generator counter
         int NumAlphas;                 // Number of elements in the alpha array
         int NumNums;                   // Number of elements in the numeric array
@@ -226,18 +215,15 @@ namespace FuelCellElectricGenerator {
         static bool ErrorsFound(false); // error flag
         int NumFuelCellPMs;             // number of power subsystems in input file
         int NumFuelCellAirSups;         // number of air supply subsystems in input file
-        //  INTEGER       :: NumFuelCellFuelSups      ! number of fuel supply subsystems in input file
         int NumFCWaterSups; // number of water supply subsystems in input file
         int NumFuelCellAuxilHeaters;
         int NumFCExhaustGasHXs;
         int NumFCElecStorageUnits; // number of electrical storage objects in input file
-        //  INTEGER       :: NumBatteries  !number of Manwell and McGowan battery data objects
         int NumFCPowerCondUnits; // number of power conditioning units (inverter)
         int NumFCStackCoolers;   // number of stack coolers.
         int NumAirConstit;       // number of gas constituents in air
         int FCPMNum;             // loop counter over power subsystems
         int FCAirSupNum;         // loop counter over air supply subsystems
-        //  INTEGER       :: FCFuelSupNum !loop counter over fuel supply subsystems
         int ConstitNum;    // loop counter for consituents
         int FCWaterSupNum; // loop counter over water supply subsystems
         int FCHXNum;       // loop counter for heat exchangers
@@ -255,9 +241,7 @@ namespace FuelCellElectricGenerator {
         int thisGasID;
         int FuelSupNum;
 
-        // Autodesk:Uninit Initialize variables used uninitialized
-        thisFuelCell = 0; // Autodesk:Uninit Force default initialization: Will cause intentional failure if used as a FuelCell array index: Issue may
-                          // be fixed by changes in EP 8.2 but that wasn't documented here (initialization is harmless so left in for now)
+        thisFuelCell = 0;
 
         // execution
         if (MyOneTimeFlag) {
@@ -297,7 +281,7 @@ namespace FuelCellElectricGenerator {
             cCurrentModuleObject = "Generator:FuelCell:PowerModule";
             NumFuelCellPMs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-            if (NumFuelCellPMs <= 0) { // Autodesk:Uninit Allowing code to continue past this condition used thisFuelCell uninitialized in EP 8.0
+            if (NumFuelCellPMs <= 0) {
                 ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
@@ -1389,11 +1373,6 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    // End of Get Input subroutines for the FuelCell Generator Module
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
-
     void CalcFuelCellGeneratorModel(int const GeneratorNum, // Generator number
                                     bool const RunFlag,     // TRUE when Generator operating
                                     Real64 const MyLoad,    // Generator demand
@@ -1414,7 +1393,6 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: IEA/ECBCS Annex 42....
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::WaterMainsTemp;
         using DataHeatBalFanSys::ZT;
@@ -1423,15 +1401,6 @@ namespace FuelCellElectricGenerator {
         using General::SolveRoot;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 PpcuLosses; // losses in inverter [W]
         Real64 Pel;               // DC power generated in Fuel Cell Power Module
         Real64 Pdemand;
@@ -1467,11 +1436,7 @@ namespace FuelCellElectricGenerator {
         int MaxIter;            // iteration control for SolveRoot
         int SolverFlag;         // feed back flag from SolveRoot
         Array1D<Real64> Par(3); // parameters passed in to SolveRoot
-        // Par(1) = generator number index in structure
-        // Par(2) = targeted enthalpy (W)
-        // Par(3) = molar flow rate of product gases (kmol/s)
         Real64 tmpTprodGas;
-        // unused  REAL(r64) :: LHV  !Lower Heating Value
         bool ConstrainedStorage;    // contrained overall elect because of storage
         Real64 PgridExtra;          // extra electric power that should go into storage but can't
         Real64 Pstorage;            // power into storage (+),  power from storage (-)
@@ -1479,7 +1444,7 @@ namespace FuelCellElectricGenerator {
         Real64 PoutofInverter;      // power out of inverter after losses and including storage
         Real64 PacAncillariesTotal; // total AC ancillaries
 
-        //! begin controls block to be moved out to GeneratorDynamics module
+        // begin controls block to be moved out to GeneratorDynamics module
         // If no loop demand or Generator OFF, return
         if (!RunFlag) {
 
@@ -2027,27 +1992,8 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // manage controls and calculations related to electrical storage in FuelCell model
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpPdraw;   // power draw from storage, working var
         Real64 tmpPcharge; // power charge to storage, working var
         bool drawing;      // true if drawing power
@@ -2217,30 +2163,8 @@ namespace FuelCellElectricGenerator {
         // Calculates residual function for product gas enthalpy
         // calls procedure FigureProductGasesEnthalpy
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 Residuum; // F(x)
 
-        // Argument array dimensioning
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // par(2) = Desired Enthalpy
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int GeneratorNum;
         Real64 thisHmolalProdGases;
         Real64 desiredHprodGases;
@@ -2279,22 +2203,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;
@@ -2378,22 +2286,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempHair;
         Real64 HairI;
         int thisConstit; // loop index
@@ -2484,22 +2376,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2580,22 +2456,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempHfuel;
         Real64 HfuelI;
         int thisConstit; // loop index
@@ -2686,22 +2546,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempHprodGases;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2779,44 +2623,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2887,44 +2693,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2983,114 +2751,6 @@ namespace FuelCellElectricGenerator {
         Cp = tempCp;
     }
 
-    void FigureHXleavingGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                   Real64 const FluidTemp, // degree C
-                                   Real64 &Cp              // (J/mol*K)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Aug. 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 tempCp;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
-        Real64 A;        // shomate coeff
-        Real64 B;        // shomate coeff
-        Real64 C;        // shomate coeff
-        Real64 D;        // shomate coeff
-        Real64 E;        // shomate coeff
-        Real64 A1;       // NASA poly coeff
-        Real64 A2;       // NASA poly coeff
-        Real64 A3;       // NASA poly coeff
-        Real64 A4;       // NASA poly coeff
-        Real64 A5;       // NASA poly coeff
-
-        Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
-        Real64 const Tkel = (FluidTemp + KelvinConv);          // temp for NASA eq. in Kelvin
-
-        // loop through fuel constituents and sum up Cp
-
-        tempCp = 0.0;
-
-        Real64 const pow_2_Tsho(pow_2(Tsho));
-        Real64 const pow_3_Tsho(pow_3(Tsho));
-        Real64 const pow_2_Tkel(pow_2(Tkel));
-        Real64 const pow_3_Tkel(pow_3(Tkel));
-        Real64 const pow_4_Tkel(pow_4(Tkel));
-
-        for (thisConstit = 1; thisConstit <= isize(FuelCell(GeneratorNum).ExhaustHX.GasLibID); ++thisConstit) {
-            gasID = FuelCell(GeneratorNum).ExhaustHX.GasLibID(thisConstit);
-            if (gasID > 0) {
-                if (GasPhaseThermoChemistryData(gasID).ThermoMode == NISTShomate) {
-
-                    A = GasPhaseThermoChemistryData(gasID).ShomateA;
-                    B = GasPhaseThermoChemistryData(gasID).ShomateB;
-                    C = GasPhaseThermoChemistryData(gasID).ShomateC;
-                    D = GasPhaseThermoChemistryData(gasID).ShomateD;
-                    E = GasPhaseThermoChemistryData(gasID).ShomateE;
-
-                    tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                               FuelCell(GeneratorNum).ExhaustHX.ConstitMolalFract(thisConstit));
-                }
-
-                if (GasPhaseThermoChemistryData(gasID).ThermoMode == NASAPolynomial) {
-                    A1 = GasPhaseThermoChemistryData(gasID).NASA_A1;
-                    A2 = GasPhaseThermoChemistryData(gasID).NASA_A2;
-                    A3 = GasPhaseThermoChemistryData(gasID).NASA_A3;
-                    A4 = GasPhaseThermoChemistryData(gasID).NASA_A4;
-                    A5 = GasPhaseThermoChemistryData(gasID).NASA_A5;
-
-                    tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * RinKJperMolpK *
-                              FuelCell(GeneratorNum).ExhaustHX.ConstitMolalFract(thisConstit);
-                }
-            }
-        }
-
-        Cp = tempCp;
-    }
-
     void FigureGaseousWaterEnthalpy(Real64 const FluidTemp, // degree C
                                     Real64 &HGasWater       // kJ/mol
     )
@@ -3106,35 +2766,15 @@ namespace FuelCellElectricGenerator {
         // calculate Enthalpy from Shomate equations for gaseous water
         // No ethalphy of formation in this one.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 const A = 29.0373;  // shomate coeff
         Real64 const B = 10.2573;  // shomate coeff
         Real64 const C = 2.81048;  // shomate coeff
         Real64 const D = -0.95914; // shomate coeff
         Real64 const E = 0.11725;  // shomate coeff
         Real64 const F = -250.569; // shomate coeff
-        //  REAL(r64) :: H ! shomate coeff
-
         Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
@@ -3155,34 +2795,15 @@ namespace FuelCellElectricGenerator {
         // calculate Enthalpy from Shomate equations for liquid water
         // No enthalpy of formation in this one
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 const A = -203.606;  // shomate coeff
         Real64 const B = 1523.29;   // shomate coeff
         Real64 const C = -3196.413; // shomate coeff
         Real64 const D = 2474.455;  // shomate coeff
         Real64 const E = 3.85533;   // shomate coeff
         Real64 const F = -256.5478; // shomate coeff
-        // Real64 const H = -285.8304; // shomate coeff (currently unused)
 
         Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
@@ -3203,111 +2824,14 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate shomate eq. for pure liquid water
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 const A = -203.606;  // shomate coeff
         Real64 const B = 1523.29;   // shomate coeff
         Real64 const C = -3196.413; // shomate coeff
         Real64 const D = 2474.455;  // shomate coeff
         Real64 const E = 3.85533;   // shomate coeff
-
         Real64 const Tsho = (FluidTemp + KelvinConv) / 1000.0;
 
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
-    }
-
-    void FigureLHVofFuel(int const Num, Real64 const NdotFuel, Real64 const NdotCO2, Real64 const NdotH20, Real64 &LHV)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B Griffith
-        //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculate LHV
-
-        // METHODOLOGY EMPLOYED:
-        // ANNEX 42 eq. 6 method from molar enthalpies
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 DelfHfuel;
-        Real64 DelfHCO2;
-        Real64 DelfHH20;
-        int i;
-        Real64 h_i;
-        int CO2dataID;
-        int WaterDataID;
-        int thisGasID;
-
-        CO2dataID = 1;   // hard-coded in SetupFuelAndAirConstituentData
-        WaterDataID = 4; // hard-coded in SetupFuelAndAirConstituentData
-        DelfHfuel = 0.0;
-
-        for (i = 1; i <= FuelSupply(FuelCell(Num).FuelSupNum).NumConstituents; ++i) {
-            thisGasID = FuelSupply(FuelCell(Num).FuelSupNum).GasLibID(i);
-
-            h_i = GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm;
-
-            DelfHfuel += NdotFuel * h_i * FuelSupply(FuelCell(Num).FuelSupNum).ConstitMolalFract(i);
-        }
-
-        DelfHCO2 = GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm * NdotCO2;
-
-        DelfHH20 = GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm * NdotH20;
-
-        LHV = (DelfHfuel - DelfHCO2 - DelfHH20) / NdotFuel; // Equation 6
     }
 
     void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill)
@@ -3322,30 +2846,7 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the AC ancillaries to determine Pel
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using CurveManager::CurveValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         //  Using lagged values inside a sequential substitution loop
         PacAncill = 0.0;
@@ -3379,30 +2880,8 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate inverter losses
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 lastPpcuLosses; // used in iterative solution
         int iter;
         Real64 Pel;
@@ -3442,34 +2921,9 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused  REAL(r64)  :: CurrentHours
         Real64 CurrentFractionalDay; // working var, time in decimal days
         Real64 EndingFractionalDay;  // working var, time is decimal days
         Real64 MaxPel;               // working variable for max allowed by transient constraint
@@ -3553,39 +3007,6 @@ namespace FuelCellElectricGenerator {
     void CalcFuelCellAuxHeater(int const Num) // Generator number
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         // not yet implemented, just pass product gases thru nul domain
 
         FuelCell(Num).AuxilHeat.TauxMix = FuelCell(Num).FCPM.TprodGasLeavingFCPM;
@@ -3608,20 +3029,11 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: Annex 42 model documentation
 
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcFuelCellGenHeatRecovery");
 
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 eHX; // fixed effectiveness
         Real64 MdotWater(0.0);
         int inNodeNum(0);
@@ -3708,16 +3120,6 @@ namespace FuelCellElectricGenerator {
                 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                 FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
-
-                // commented out protection for taking exponent of too large a number
-                //   because it hasn't been a problem in testing
-                // testVal = LOG(huge(NdotCpAuxMix))
-                // ExpTestVal = 700.0
-                // IF (UAeff*(1/NdotCpAuxMix) > ExpTestVal) THEN
-                // write(*,*) 'Houston, we have a problem, EXP [] func will fail for UAeff*(1/NdotCpAuxMix):', UAeff*(1/NdotCpAuxMix)
-                // ELSEIF (UAeff*(1/NdotCpWater) > ExpTestVal) THEN
-                //   write(*,*) 'Houston, we have a problem, EXP [] func will fail for UAeff*(1/NdotCpWater:', UAeff*(1/NdotCpWater)
-                //  ELSE
 
                 if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
                     // now evaluate Eq. 44
@@ -3891,45 +3293,6 @@ namespace FuelCellElectricGenerator {
                     NdotWaterCond = 0.0;
                     waterFract = -9999.0; // not defined
                 }
-                // init input from Auxiliary heater
-                // FuelCell(Num)%ExhaustHX%NdotHXleaving      = FuelCell(Num)%AuxilHeat%NdotAuxMix
-                // FuelCell(Num)%ExhaustHX%ConstitMolalFract  = FuelCell(Num)%AuxilHeat%ConstitMolalFract
-                // FuelCell(Num)%ExhaustHX%GasLibID           = FuelCell(Num)%AuxilHeat%GasLibID
-
-                // now modify leaving gas constituents for condensed water.
-                // FuelCell(Num)%ExhaustHX%NdotHXleaving = FuelCell(Num)%AuxilHeat%NdotAuxMix - NdotWaterCond
-                // If ( FuelCell(Num)%ExhaustHX%NdotHXleaving > 0) then
-                //   DO I = 1, SIZE(FuelCell(Num)%AuxilHeat%GasLibID)
-                //     If (FuelCell(Num)%AuxilHeat%GasLibID(I) == 4) then ! water constituent
-                //       FuelCell(Num)%ExhaustHX%ConstitMolalFract(I) = &
-                //            (FuelCell(Num)%AuxilHeat%ConstitMolalFract(I)* FuelCell(Num)%AuxilHeat%NdotAuxMix - NdotWaterCond) &
-                //            /     FuelCell(Num)%ExhaustHX%NdotHXleaving
-                //       cycle
-                //     ENDIF
-
-                //     FuelCell(Num)%ExhaustHX%ConstitMolalFract(I) = FuelCell(Num)%AuxilHeat%ConstitMolalFract(I) &
-                //                                       * FuelCell(Num)%AuxilHeat%NdotAuxMix / FuelCell(Num)%ExhaustHX%NdotHXleaving
-                //   ENDDO
-                // ENDIF
-
-                // get new average heat capacity
-                // CALL FigureHXleavingGasHeatCap(Num, (THXexh + TauxMix)/2 , CpHXleavingGasMol)
-
-                // NdotCpHXleaving = FuelCell(Num)%ExhaustHX%NdotHXleaving*CpHXleavingGasMol* 1000.0
-
-                // update gas leaving temperature with modified heat transfer rate
-                //  IF ((NdotCpHXleaving > 0) .AND. (qHX > 0)) THEN
-                //     THXexh = TauxMix - (qHX / NdotCpHXleaving)
-                //  ELSE
-                //     THXexh = TauxMix
-                //  ENDIF
-                // update water leaving temperature with modified heat transfer rate
-                //  IF (MdotWater * CPCW( (TwaterIn + TwaterOut)/2 )  <= 0.0) THEN
-                //    TwaterOut =  TwaterIn
-                //  ELSE
-                //    TwaterOut  =  TwaterIn + qHX / (MdotWater * CPCW( (TwaterIn + TwaterOut)/2 ))
-                //  ENDIF
-
             } else {
                 assert(false); // Variables not set are used below
             }
@@ -3944,13 +3307,6 @@ namespace FuelCellElectricGenerator {
         FuelCell(Num).ExhaustHX.CondensateRate = NdotWaterCond;
         FuelCell(Num).ExhaustHX.WaterOutletTemp = TwaterOut;
         FuelCell(Num).ExhaustHX.WaterOutletEnthalpy = Node(inNodeNum).Enthalpy + qHX;
-
-        // now update water outlet node Changing to Kg/s!
-        //  OutNodeNum = FuelCell(Num)%ExhaustHX%WaterOutNode
-        //  inNodeNum  = FuelCell(Num)%ExhaustHX%WaterInNode
-        //  Node(OutNodeNum)%Temp = Twaterout
-        //  Node(OutNodeNum)%Enthalpy =
-        //  Node(OutNodeNum)%MassFlowRate = MdotWater
     }
 
     void SimFuelCellPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
@@ -3977,7 +3333,6 @@ namespace FuelCellElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire FuelCell model
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Generator_FCExhaust;
         using DataPlant::TypeOf_Generator_FCStackCooler;
         using PlantUtilities::UpdateComponentHeatRecoverySide;
@@ -4029,12 +3384,6 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    // End FuelCell Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin FuelCell Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitFuelCellGenerators(int const FCnum) // index to specific fuel cell generator
     {
 
@@ -4050,12 +3399,6 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
@@ -4071,19 +3414,8 @@ namespace FuelCellElectricGenerator {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitFuelCellGenerators");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool InitGeneratorOnce(true); // flag for 1 time initialization
         static Array1D_bool MyEnvrnFlag;     // flag for init once at start of environment
         static Array1D_bool MyWarmupFlag;    // flag for init after warmup complete
@@ -4095,7 +3427,6 @@ namespace FuelCellElectricGenerator {
         Real64 rho;  // local temporary fluid density
         bool errFlag;
 
-        // FLOW:
         // Do the one time initializations
         if (InitGeneratorOnce) {
             MyEnvrnFlag.allocate(NumFuelCellGenerators);
@@ -4176,7 +3507,6 @@ namespace FuelCellElectricGenerator {
             FuelCell(FCnum).ExhaustHX.NdotHXleaving = 0.0;
             FuelCell(FCnum).ExhaustHX.WaterOutletTemp = 0.0;
             FuelCell(FCnum).ExhaustHX.WaterOutletEnthalpy = 0.0;
-
             FuelCell(FCnum).ElecStorage.LastTimeStepStateOfCharge = FuelCell(FCnum).ElecStorage.StartingEnergyStored;
             FuelCell(FCnum).ElecStorage.ThisTimeStepStateOfCharge = FuelCell(FCnum).ElecStorage.StartingEnergyStored;
             FuelCell(FCnum).ElecStorage.PelNeedFromStorage = 0.0;
@@ -4277,11 +3607,6 @@ namespace FuelCellElectricGenerator {
             heatRecoveryCompName = FuelCell(thisFuelCell).ExhaustHX.Name;
         }
     }
-    // End FuelCell Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the FuelCell Generator Module
-    // *****************************************************************************
 
     void FigureFuelCellZoneGains()
     {
@@ -4300,10 +3625,7 @@ namespace FuelCellElectricGenerator {
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused  INTEGER :: thisZone ! index in Zone structure array
         Real64 TotalZoneHeatGain; // working variable for zone gain [w]
-        //  INTEGER :: ZoneNum
         int FCnum; // number of fuel cell
         static bool MyEnvrnFlag(true);
 
@@ -4372,47 +3694,6 @@ namespace FuelCellElectricGenerator {
             FuelCell(FCnum).Report.SkinLossRadiat = FuelCell(FCnum).QradZone;
 
         } // over number of Fuel cells
-
-        //  IF(DoingSizing)THEN
-
-        //  ENDIF
-    }
-
-    void UpdateExhaustAirFlows(int const EP_UNUSED(Num)) // generator number
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
     }
 
     void CalcUpdateHeatRecovery(int const Num, // Generator number
@@ -4428,27 +3709,8 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNodeNum;
         int OutNodeNum;
 
@@ -4460,29 +3722,6 @@ namespace FuelCellElectricGenerator {
 
         Node(OutNodeNum).Temp = FuelCell(Num).ExhaustHX.WaterOutletTemp;
         Node(OutNodeNum).Enthalpy = FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
-
-        //  IF (FirstHVACIteration) Then
-        //    Node(InNodeNum)%MassFlowRateMaxAvail     = FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign
-        //    Node(InNodeNum)%MassFlowRateMinAvail     = 0.0D0
-        //    Node(InNodeNum)%MassFlowRate             = MAX(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMin)
-        //    Node(InNodeNum)%MassFlowRate             = MIN(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMax)
-        //  ELSE
-        //    Node(InNodeNum)%MassFlowRate             = MAX(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMin)
-        //    Node(InNodeNum)%MassFlowRate             = MAX(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMinAvail)
-        //    Node(InNodeNum)%MassFlowRate             = MIN(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMax)
-        //    Node(InNodeNum)%MassFlowRate             = MIN(FuelCell(Num)%ExhaustHX%WaterMassFlowRateDesign,   &
-        //                                                   Node(InNodeNum)%MassFlowRateMaxAvail)
-        //  ENDIF
-        //  Node(OutNodeNum)%MassFlowRate             = Node(InNodeNum)%MassFlowRate
-        //  Node(OutNodeNum)%MassFlowRateMaxAvail     = Node(InNodeNum)%MassFlowRateMaxAvail
-        //  Node(OutNodeNum)%MassFlowRateMinAvail     = Node(InNodeNum)%MassFlowRateMinAvail
-        //  Node(OutNodeNum)%MassFlowRateMax          = Node(InNodeNum)%MassFlowRateMax
-        //  Node(OutNodeNum)%MassFlowRateMin          = Node(InNodeNum)%MassFlowRateMin
     }
 
     void UpdateFuelCellGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
@@ -4493,27 +3732,7 @@ namespace FuelCellElectricGenerator {
         //       AUTHOR:          BG
         //       DATE WRITTEN:
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         FuelCell(Num).Report.ACPowerGen = FuelCell(Num).ACPowerGen;                            // electrical power produced [W]
         FuelCell(Num).Report.ACEnergyGen = FuelCell(Num).ACPowerGen * TimeStepSys * SecInHour; // energy produced (J)
@@ -4620,28 +3839,6 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // provide a get method to collect results at the load center level
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         GeneratorPower = FuelCell(GeneratorIndex).Report.ACPowerGen;
         GeneratorEnergy = FuelCell(GeneratorIndex).Report.ACEnergyGen;
         ThermalPower = FuelCell(GeneratorIndex).Report.qHX;

@@ -60,7 +60,9 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F(EnergyPlusFixture, FuelCellTest_LowInletEnthalySover1)
+class FuelCellGenFixture : public EnergyPlusFixture {};
+
+TEST_F(FuelCellGenFixture, FuelCellTest_LowInletEnthalySover1)
 {
 
     std::string const idf_objects = delimited_string({
