@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef ENERGYPLUS_FUNC_H
-#define ENERGYPLUS_FUNC_H
+#ifndef EnergyPlusAPIFunctional_h_INCLUDED
+#define EnergyPlusAPIFunctional_h_INCLUDED
 
 #include <EnergyPlus/TypeDefs.h>
 #include <EnergyPlus/public/EnergyPlusAPI.hh>
@@ -73,4 +73,4 @@ ENERGYPLUSLIB_API Real64 fluidProperty_GetSatPressureRefrig(const char* refriger
 #endif
 
 
-#endif //ENERGYPLUS_FUNC_H
+#endif //EnergyPlusAPIFunctional_h_INCLUDED

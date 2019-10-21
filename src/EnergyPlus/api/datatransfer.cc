@@ -112,7 +112,3 @@ int setActuatorValue(const int handle, const double value) {
 int simDataGetKindOfSim() {
     return EnergyPlus::DataGlobals::KindOfSim;
 }
-
-int simDataHourOfDay() {
-    return EnergyPlus::DataGlobals::HourOfDay;
-}

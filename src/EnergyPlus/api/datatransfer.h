@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusAPIFunctional_h_INCLUDED
-#define EnergyPlusAPIFunctional_h_INCLUDED
+#ifndef EnergyPlusAPIDataTransfer_h_INCLUDED
+#define EnergyPlusAPIDataTransfer_h_INCLUDED
 
 #include <EnergyPlus/TypeDefs.h>
 #include <EnergyPlus/public/EnergyPlusAPI.hh>
@@ -64,10 +64,9 @@ ENERGYPLUSLIB_API double getMeterValue(int handle);
 ENERGYPLUSLIB_API int setActuatorValue(int handle, double value);
 
 ENERGYPLUSLIB_API int simDataGetKindOfSim();
-ENERGYPLUSLIB_API int simDataHourOfDay();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // EnergyPlusAPIFunctional_h_INCLUDED
+#endif // EnergyPlusAPIDataTransfer_h_INCLUDED
