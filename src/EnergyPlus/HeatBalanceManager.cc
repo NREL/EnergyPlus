@@ -1021,10 +1021,11 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
-
+                    DataHeatBalance::AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1036,6 +1037,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
+                    DataHeatBalance::AllCTF = false;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +

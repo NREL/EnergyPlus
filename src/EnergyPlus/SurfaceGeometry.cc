@@ -7130,24 +7130,28 @@ namespace SurfaceGeometry {
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (DataHeatBalance::AnyEMPD) {
+            DataHeatBalance::AllCTF = false;
             AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (DataHeatBalance::AnyCondFD) {
+            DataHeatBalance::AllCTF = false;
             AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (DataHeatBalance::AnyHAMT) {
+            DataHeatBalance::AllCTF = false;
             AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)
                 << AlgoName << RoundSigDigits(MaxSurfaceTempLimit, 0) << RoundSigDigits(LowHConvLimit, 2) << RoundSigDigits(HighHConvLimit, 1);
         }
         if (DataHeatBalance::AnyKiva) {
+            DataHeatBalance::AllCTF = false;
             AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
             ObjexxFCL::gio::write(OutputFileInits, Format_725)

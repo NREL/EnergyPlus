@@ -751,6 +751,11 @@ namespace HeatBalanceSurfaceManager {
 
         CTFConstOutPart = 0.0;
         CTFConstInPart = 0.0;
+        CTFCross0 = 0.0;
+        CTFInside0 = 0.0;
+        CTFSourceIn0 = 0.0;
+        QsrcHistSurf1 = 0.0;
+        TH11Surf = 0.0;
         if (AnyConstructInternalSourceInInput) {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
@@ -1351,6 +1356,11 @@ namespace HeatBalanceSurfaceManager {
         // Use the total number of surfaces to allocate variables to avoid a surface number limit
         CTFConstInPart.dimension(TotSurfaces, 0.0);
         CTFConstOutPart.dimension(TotSurfaces, 0.0);
+        CTFCross0.dimension(TotSurfaces, 0.0);
+        CTFInside0.dimension(TotSurfaces, 0.0);
+        TH11Surf.dimension(TotSurfaces, 0.0);
+        CTFSourceIn0.dimension(TotSurfaces, 0.0);
+        QsrcHistSurf1.dimension(TotSurfaces, 0.0);
         if (AnyConstructInternalSourceInInput) {
             CTFTsrcConstPart.dimension(TotSurfaces, 0.0);
             CTFTuserConstPart.dimension(TotSurfaces, 0.0);
@@ -5744,11 +5754,17 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRep = 0.0;
             ZoneWinHeatLossRepEnergy = 0.0;
 
-            CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList,
-                                       DataSurfaces::AllIZSurfaceList,
-                                       DataSurfaces::AllHTNonWindowSurfaceList,
-                                       DataSurfaces::AllHTWindowSurfaceList);
-
+            if (AllCTF) {
+                CalcHeatBalanceInsideSurf2CTFOnly(DataSurfaces::AllHTSurfaceList,
+                                                  DataSurfaces::AllIZSurfaceList,
+                                                  DataSurfaces::AllHTNonWindowSurfaceList,
+                                                  DataSurfaces::AllHTWindowSurfaceList);
+            } else {
+                CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList,
+                                           DataSurfaces::AllIZSurfaceList,
+                                           DataSurfaces::AllHTNonWindowSurfaceList,
+                                           DataSurfaces::AllHTWindowSurfaceList);
+            }
             // Sort window heat gain/loss
             for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
                 if (ZoneWinHeatGain(zoneNum) >= 0.0) {
@@ -5771,8 +5787,11 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             auto const &zoneHTNonWindowSurfList(Zone(ZoneToResimulate).ZoneHTNonWindowSurfaceList);
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
-            CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
-
+            if (AllCTF) {
+                CalcHeatBalanceInsideSurf2CTFOnly(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            } else {
+                CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+            }
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
@@ -6534,6 +6553,8 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // ...end of loop to check for convergence
 
+            ShowContinueErrorTimeStamp("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  MaxDelTemp=" + RoundSigDigits(MaxDelTemp, 8));
+
             if (!DataHeatBalance::AnyCondFD) {
                 if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
             } else {
@@ -6674,6 +6695,665 @@ namespace HeatBalanceSurfaceManager {
                                                                       OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
                                                                                       // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
                     SumHmARaW(ZoneNum) += FD_Area_fac * RhoVaporSurfIn(SurfNum);
+                }
+            }
+        }
+
+        ReportIntMovInsInsideSurfTemp();
+        
+        CalculateZoneMRT(ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
+    }
+
+    void CalcHeatBalanceInsideSurf2CTFOnly(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+                                    const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
+                                    const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
+                                    const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
+                                    Optional_int_const ZoneToResimulate)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         George Walton
+        //       DATE WRITTEN   December 1979
+        //       MODIFIED       Jun 1990 (RDT for new CTF arrays)
+        //                      Dec 1999 (FCW for window calculation)
+        //                      May 2000 (FCW for window frame and dividers)
+        //                      Aug 2000 (RJL for MTF moisture calculations)
+        //                      Sep 2000 (RKS for new radiant exchange algorithm)
+        //                      Dec 2000 (RKS for radiant system model addition)
+        //                      Jul 2003 (CC) set the reference temperatures for inside surface heat balance
+        //                                    depending on convection algorithms and/or air models used
+        //                      May 2006 (RR  account for exterior window screen)
+        //                      Jul 2008 (P. Biddulph include calls to HAMT)
+        //                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
+        //       RE-ENGINEERED  Mar 1998 (RKS)
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine performs a heat balance on the inside face of each
+        // surface in the building.
+
+        // METHODOLOGY EMPLOYED:
+        // Various boundary conditions are set and additional parameters are set-
+        // up.  Then, the proper heat balance equation is selected based on whether
+        // the surface is a partition or not and on whether or not movable
+        // insulation is present on the inside face.
+
+        // REFERENCES:
+        // (I)BLAST legacy routine HBSRF
+
+        using namespace DataGlobals;
+        using namespace DataEnvironment;
+        using ConvectionCoefficients::InitExteriorConvectionCoeff;
+        using ConvectionCoefficients::InitInteriorConvectionCoeffs;
+        using ConvectionCoefficients::SetExtConvectionCoeff;
+        using DataLoopNode::Node;
+        using DataZoneEquipment::ZoneEquipConfig;
+        using General::RoundSigDigits;
+        using namespace Psychrometrics;
+        using DataSizing::CurOverallSimDay;
+
+        Real64 const Sigma(5.6697e-08);              // Stefan-Boltzmann constant
+        Real64 const IterDampConst(5.0);             // Damping constant for inside surface temperature iterations
+        int const ItersReevalConvCoeff(30);          // Number of iterations between inside convection coefficient reevaluations
+        Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
+        int const MaxIterations(500);                // Maximum number of iterations allowed for inside surface temps
+        int const IterationsForCondFDRelaxChange(5); // number of iterations for inside temps that triggers a change
+        Real64 const SmallNumber(0.0001);            // avoid numerical junk causing problems?
+        // in the CondFD relaxation factor.
+        int const MinEMPDIterations(4); // Minimum number of iterations required for EMPD solution
+        static std::string const rhoAirZone("RhoAirZone");
+        static std::string const wsurf("Wsurf");
+        static std::string const HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
+        static std::string const Inside("Inside");
+        static std::string const BlankString;
+
+        Real64 AbsInt;     // Solar absorptance of inside movable insulation
+        bool Converged;    // .TRUE. if inside heat balance has converged
+        Real64 F1;         // Intermediate calculation value
+        Real64 HMovInsul;  // "Convection" coefficient of movable insulation
+        Real64 MaxDelTemp; // Maximum change in surface temperature for any
+        //  opaque surface from one iteration to the next
+        static Array1D<Real64> TempInsOld; // Holds previous iteration's value for convergence check
+        Real64 TempSurfOutTmp;             // Local Temporary Surface temperature for the outside surface face
+        Real64 TempSurfInSat;              // Local temporary surface dew point temperature
+
+        int OtherSideSurfNum;     // Surface number index for other side of an interzone partition
+        static int MinIterations; // Minimum number of iterations for the inside heat balance
+        static int ErrCount(0);
+        Real64 Ueff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
+
+        int ZoneEquipConfigNum;
+        int NodeNum;
+        Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
+        Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
+        Real64 MassFlowRate;
+        Real64 NodeTemp;
+        Real64 CpAir;
+        static Array1D<Real64> RefAirTemp; // reference air temperatures
+        static bool MyEnvrnFlag(true);
+        static int InsideSurfErrCount(0);
+        Real64 Wsurf;         // Moisture ratio for HAMT
+        Real64 RhoAirZone;    // Zone moisture density for HAMT
+        int OtherSideZoneNum; // Zone Number index for other side of an interzone partition HAMT
+        static int WarmupSurfTemp;
+        static int TimeStepInDay(0); // time step number
+
+        if (calcHeatBalanceInsideSurfFirstTime) {
+            TempInsOld.allocate(TotSurfaces);
+            RefAirTemp.allocate(TotSurfaces);
+                MinIterations = 1;
+            if (DisplayAdvancedReportVariables) {
+                SetupOutputVariable("Surface Inside Face Heat Balance Calculation Iteration Count",
+                                    OutputProcessor::Unit::None,
+                                    InsideSurfIterations,
+                                    "ZONE",
+                                    "Sum",
+                                    "Simulation");
+            }
+            // Precompute whether CTF temperature limits will be needed
+            DataHeatBalSurface::Zone_has_mixed_HT_models.resize(NumOfZones + 1, false);
+            for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
+                auto const &zone(Zone(iZone));
+                for (int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf) {
+                    auto const alg(Surface(iSurf).HeatTransferAlgorithm);
+                    if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
+                        DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
+                        break;
+                    }
+                }
+            }
+            calcHeatBalanceInsideSurfFirstTime = false;
+        }
+        if (BeginEnvrnFlag && MyEnvrnFlag) {
+            TempInsOld = 23.0;
+            RefAirTemp = 23.0;
+            TempEffBulkAir = 23.0;
+            WarmupSurfTemp = 0;
+            MyEnvrnFlag = false;
+        }
+        if (!BeginEnvrnFlag) {
+            MyEnvrnFlag = true;
+        }
+
+        // determine reference air temperatures
+        for (int SurfNum : HTSurfs) {
+            int ZoneNum = Surface(SurfNum).Zone;
+
+            // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
+            if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
+
+            {
+                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                if (SELECT_CASE_var == ZoneMeanAirTemp) {
+                    RefAirTemp(SurfNum) = MAT(ZoneNum);
+                    TempEffBulkAir(SurfNum) = MAT(ZoneNum); // for reporting surf adjacent air temp
+                } else if (SELECT_CASE_var == AdjacentAirTemp) {
+                    RefAirTemp(SurfNum) = TempEffBulkAir(SurfNum);
+                } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
+                    // determine ZoneEquipConfigNum for this zone
+                    ZoneEquipConfigNum = ZoneNum;
+                    // check whether this zone is a controlled zone or not
+                    if (!Zone(ZoneNum).IsControlled) {
+                        ShowFatalError("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                        return;
+                    }
+                    // determine supply air conditions
+                    SumSysMCp = 0.0;
+                    SumSysMCpT = 0.0;
+                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                        NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        SumSysMCp += MassFlowRate * CpAir;
+                        SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+                    }
+                    // a weighted average of the inlet temperatures.
+                    if (SumSysMCp > 0.0) {                            // protect div by zero
+                        RefAirTemp(SurfNum) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
+                    } else {
+                        RefAirTemp(SurfNum) = MAT(ZoneNum);
+                    }
+                    TempEffBulkAir(SurfNum) = RefAirTemp(SurfNum); // for reporting surf adjacent air temp
+                } else {
+                    // currently set to mean air temp but should add error warning here
+                    RefAirTemp(SurfNum) = MAT(ZoneNum);
+                    TempEffBulkAir(SurfNum) = MAT(ZoneNum); // for reporting surf adjacent air temp
+                }
+            }
+        }
+
+        // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
+        // CalcWindowHeatBalance is called, then, multiple times and these need to be initialized before each call to
+        // CalcWindowHeatBalance.
+        // Only for Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window
+        for (int surfNum : HTWindowSurfs) {
+            WinHeatGain(surfNum) = 0.0;
+            WinHeatTransfer(surfNum) = 0.0;
+            WinHeatGainRep(surfNum) = 0.0;
+            WinHeatLossRep(surfNum) = 0.0;
+            WinGainConvGlazToZoneRep(surfNum) = 0.0;
+            WinGainIRGlazToZoneRep(surfNum) = 0.0;
+            WinLossSWZoneToOutWinRep(surfNum) = 0.0;
+            WinGainFrameDividerToZoneRep(surfNum) = 0.0;
+            WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
+            WinGainConvShadeToZoneRep(surfNum) = 0.0;
+            OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
+            WinGainIRShadeToZoneRep(surfNum) = 0.0;
+            SurfaceWindow(surfNum).FrameQRadOutAbs = 0.0;
+            SurfaceWindow(surfNum).FrameQRadInAbs = 0.0;
+            SurfaceWindow(surfNum).DividerQRadOutAbs = 0.0;
+            SurfaceWindow(surfNum).DividerQRadInAbs = 0.0;
+        }
+
+        InsideSurfIterations = 0;
+
+        // Calculate heat extract due to additional heat flux source term as the surface boundary condition
+        if (DataSurfaces::AnyHeatBalanceInsideSourceTerm) {
+            for (int SurfNum : HTSurfs) {
+                if (Surface(SurfNum).InsideHeatSourceTermSchedule) {
+                    QAdditionalHeatSourceInside(SurfNum) =
+                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(Surface(SurfNum).InsideHeatSourceTermSchedule);
+                }
+            }
+        }
+
+        // Set up coefficient arrays prior to calculations
+        for (int SurfNum : HTNonWindowSurfs) {
+            int const ConstrNum = Surface(SurfNum).Construction;
+            auto const& construct(Construct(ConstrNum));
+            CTFCross0(SurfNum) = construct.CTFCross(0);
+            CTFInside0(SurfNum) = construct.CTFInside(0);
+            CTFSourceIn0(SurfNum) = construct.CTFSourceIn(0);
+            TH11Surf(SurfNum) = TH(1, 1, SurfNum);
+            if (construct.SourceSinkPresent) {
+                QsrcHistSurf1(SurfNum) = QsrcHist(SurfNum, 1);
+            } else {
+                QsrcHistSurf1(SurfNum) = 0.0;
+            }
+
+        }
+        Converged = false;
+        while (!Converged) { // Start of main inside heat balance DO loop...
+
+            TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
+
+            HeatBalanceIntRadExchange::CalcInteriorRadExchange(
+                TempSurfIn, InsideSurfIterations, NetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
+
+            // Every 30 iterations, recalculate the inside convection coefficients in case
+            // there has been a significant drift in the surface temperatures predicted.
+            // This is not fool-proof and it basically means that the outside surface
+            // heat balance is in error (potentially) once HConvIn is re-evaluated.
+            // The choice of 30 is not significant--just want to do this a couple of
+            // times before the iteration limit is hit.
+            if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
+                InitInteriorConvectionCoeffs(TempSurfIn, ZoneToResimulate);
+            }
+
+            for (int SurfNum : HTNonWindowSurfs) {
+                // Perform heat balance on the inside face of the surface ...
+                // The following are possibilities here:
+                //   (a) the surface is a pool (no movable insulation, no source/sink, only CTF solution algorithm)
+                //   (b) the surface is a partition, in which case the temperature of both sides are the same
+                //   (c) standard (or interzone) opaque surface with no movable insulation, normal heat balance equation
+                //   (d) standard (or interzone) window: call to CalcWindowHeatBalance to get window layer temperatures
+                //   (e) standard opaque surface with movable insulation, special two-part equation
+                // In the surface calculation there are the following Algorithm types for opaque surfaces that
+                // do not have movable insulation:
+                //   (a) the regular CTF calc (SolutionAlgo = UseCTF)
+                //   (b) the EMPD calc (Solutionalgo = UseEMPD)
+                //   (c) the CondFD calc (SolutionAlgo = UseCondFD)
+                //   (d) the HAMT calc (solutionalgo = UseHAMT).
+
+                auto &surface(Surface(SurfNum));
+                Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
+
+                if (surface.ExtBoundCond == SurfNum) {
+                    // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
+                    // Surface is adiabatic
+                    // Pre-calculate a few terms
+                    //
+                    Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
+                                            QAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
+                                            QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                                            QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
+                    Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) - CTFCross0(SurfNum) + HConvIn_surf + IterDampConst));
+                    // Calculate the current inside surface temperature
+                    if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                        TempSurfInTmp(SurfNum) =
+                            (TempTerm + CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IterDampConst * TempInsOld(SurfNum)) *
+                            TempDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation
+                                        // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
+                                        // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
+                                        // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
+                                        // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
+                                        // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
+                                        // same temp) | Convection and damping term | Radiation from AFN ducts
+                    } else { // this is a pool and it has been simulated this time step
+                        TempSurfInTmp(SurfNum) = (CTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) + IterDampConst * TempInsOld(SurfNum)) /
+                                                    (CTFInside0(SurfNum) - CTFCross0(SurfNum) + PoolHeatTransCoefs(SurfNum) +
+                                                    IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms (see
+                                                                    // non-pool equation for details) | Iterative damping term (for stability) |
+                                                                    // Conduction term (both partition sides same temp) | Pool and damping term
+                    }
+
+                    // Radiant system does not need the damping coefficient terms (hopefully) // Partitions are assumed to be symmetric
+                    Real64 const RadSysDiv(1.0 / (CTFInside0(SurfNum) - CTFCross0(SurfNum) + HConvIn_surf));
+                    RadSysToHBConstCoef(SurfNum) = RadSysTiHBConstCoef(SurfNum) =
+                        TempTerm * RadSysDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW
+                                                // radiation from internal sources | Convection from surface to zone air | Radiant flux from
+                                                // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant
+                                                // flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net
+                                                // radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Cond
+                                                // term (both partition sides same temp) | Convection and damping term
+                    RadSysToHBTinCoef(SurfNum) = RadSysTiHBToutCoef(SurfNum) =
+                        0.0; // The outside temp is assumed to be equal to the inside temp for a partition
+                    RadSysToHBQsrcCoef(SurfNum) = RadSysTiHBQsrcCoef(SurfNum) =
+                        CTFSourceIn0(SurfNum) * RadSysDiv; // QTF term for the source | Cond term (both partition sides same temp) | Cond
+                                                                // term (both partition sides same temp) | Convection and damping term
+
+                TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
+
+                } else { // Standard surface or interzone surface
+
+                    HMovInsul = 0.0;
+                    if (surface.MaterialMovInsulInt > 0) HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+
+                    if (HMovInsul <= 0.0) { // No movable insulation present, normal heat balance equation
+
+                        // Pre-calculate a few terms
+                        Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
+                                                QAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
+                                                QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                                                QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) +
+                                                (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
+                        Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf + IterDampConst));
+                        // Calculate the current inside surface temperature
+                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
+                                                    (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
+                            TempSurfInTmp(SurfNum) =
+                                (TempTerm + CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
+                                    CTFCross0(SurfNum) * TH11Surf(SurfNum)) *
+                                TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
+                                            // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
+                                            // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
+                                            // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
+                                            // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
+                                            // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
+                                            // outside surface | Coefficient for conduction (current time) | Convection and damping term |
+                                            // Radiation from AFN ducts
+                        } else { // surface is a pool and the pool has been simulated this time step
+                            TempSurfInTmp(SurfNum) = (CTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) +
+                                                        IterDampConst * TempInsOld(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
+                                                        (CTFInside0(SurfNum) + PoolHeatTransCoefs(SurfNum) +
+                                                        IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms
+                                                                        // (see non-pool equation for details) | Iterative damping term (for
+                                                                        // stability) | Current conduction from | the outside surface |
+                                                                        // Coefficient for conduction (current time) | Pool and damping term
+                        }
+
+                        // Radiant system does not need the damping coefficient terms (hopefully)
+                        Real64 const RadSysDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf));
+                        RadSysTiHBConstCoef(SurfNum) =
+                            TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
+                                                    // radiation from internal sources | Convection from surface to zone air | Radiant flux
+                                                    // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
+                                                    // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
+                                                    // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
+                                                    // sides same temp) | Convection and damping term
+                        RadSysTiHBToutCoef(SurfNum) = CTFCross0(SurfNum) * RadSysDiv;    // Outside temp=inside temp for a partition |
+                                                                                            // Cond term (both partition sides same temp) |
+                                                                                            // Convection and damping term
+                        RadSysTiHBQsrcCoef(SurfNum) = CTFSourceIn0(SurfNum) * RadSysDiv; // QTF term for the source | Cond term (both
+                                                                                            // partition sides same temp) | Convection and
+                                                                                            // damping term
+
+                        if (surface.ExtBoundCond > 0) { // This is an interzone partition and we need to set outside params
+                            // The inside coefficients of one side are equal to the outside coefficients of the other side.  But,
+                            // the inside coefficients are set up once the heat balance equation for that side has been calculated.
+                            // For both sides to actually have been set, we have to wait until we get to the second side in the surface
+                            // derived type.  At that point, both inside coefficient sets have been evaluated.
+                            if (surface.ExtBoundCond < SurfNum) { // Both of the inside coefficients have now been set
+                                OtherSideSurfNum = surface.ExtBoundCond;
+                                RadSysToHBConstCoef(OtherSideSurfNum) = RadSysTiHBConstCoef(SurfNum);
+                                RadSysToHBTinCoef(OtherSideSurfNum) = RadSysTiHBToutCoef(SurfNum);
+                                RadSysToHBQsrcCoef(OtherSideSurfNum) = RadSysTiHBQsrcCoef(SurfNum);
+                                RadSysToHBConstCoef(SurfNum) = RadSysTiHBConstCoef(OtherSideSurfNum);
+                                RadSysToHBTinCoef(SurfNum) = RadSysTiHBToutCoef(OtherSideSurfNum);
+                                RadSysToHBQsrcCoef(SurfNum) = RadSysTiHBQsrcCoef(OtherSideSurfNum);
+                            }
+                        }
+
+                        TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
+
+                    } else { // Movable insulation present
+
+                        F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
+
+                        TempSurfIn(SurfNum) =
+                            (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum) +
+                             F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + NetLWRadToSurf(SurfNum) + QHTRadSysSurf(SurfNum) +
+                                   QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                                   QElecBaseboardSurf(SurfNum) + QAdditionalHeatSourceInside(SurfNum) + IterDampConst * TempInsOld(SurfNum))) /
+                            (CTFInside0(SurfNum) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
+
+                        TempSurfInTmp(SurfNum) = (CTFInside0(SurfNum) * TempSurfIn(SurfNum) + HMovInsul * TempSurfIn(SurfNum) -
+                                                  QRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) - CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
+                                                 (HMovInsul);
+                    }
+                }
+            }
+            for (int SurfNum : HTWindowSurfs) {
+                auto &surface(Surface(SurfNum));
+                Real64 &TH11(TH(1, 1, SurfNum));
+                int ConstrNum = surface.Construction; // Not const, because storm window may change this
+                auto const &construct(Construct(ConstrNum));
+                if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
+                    // Lookup up the TDD:DOME object
+                    int const pipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
+                    int const domeNum = DataDaylightingDevices::TDDPipe(pipeNum).Dome;
+                    Ueff = 1.0 / DataDaylightingDevices::TDDPipe(pipeNum).Reff;
+
+                    // Similar to opaque surface but outside surface temp of TDD:DOME is used, and no embedded sources/sinks.
+                    // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
+                    //   = QRadSWwinAbs(SurfNum,1)/2.0
+                    Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
+                    TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum) =
+                        (QRadThermInAbs(SurfNum) + QRadSWwinAbs(1, SurfNum) / 2.0 + QAdditionalHeatSourceInside(SurfNum) +
+                         HConvIn_surf * RefAirTemp(SurfNum) + NetLWRadToSurf(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
+                         Ueff * TH(1, 1, domeNum)) /
+                        (Ueff + HConvIn_surf + IterDampConst); // LW radiation from internal sources | SW radiation from internal sources and
+                                                               // solar | Convection from surface to zone air | Net radiant exchange with
+                                                               // other zone surfaces | Iterative damping term (for stability) | Current
+                                                               // conduction from the outside surface | Coefficient for conduction (current
+                                                               // time) | Convection and damping term
+
+                    Real64 const Sigma_Temp_4(Sigma * pow_4(TempSurfIn(SurfNum)));
+
+                    // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
+                    WinHeatGain(SurfNum) =
+                        WinTransSolar(SurfNum) + HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum)) +
+                        Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
+                            (Sigma_Temp_4 - (SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
+                                             QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum))) -
+                        QS(surface.SolarEnclIndex) * surface.Area *
+                            Construct(surface.Construction).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+                    // Zone diffuse interior shortwave reflected back into the TDD
+                    WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+
+                    // fill out report vars for components of Window Heat Gain
+                    WinGainConvGlazToZoneRep(SurfNum) = HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum));
+                    WinGainIRGlazToZoneRep(SurfNum) =
+                        Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
+                        (Sigma_Temp_4 - (SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
+                                         QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)));
+                    WinLossSWZoneToOutWinRep(SurfNum) = QS(surface.SolarEnclIndex) * surface.Area * Construct(surface.Construction).TransDiff;
+                } else {                             // Regular window
+                    if (InsideSurfIterations == 0) { // Do windows only once
+                        if (SurfaceWindow(SurfNum).StormWinFlag == 1) ConstrNum = surface.StormWinConstruction;
+                        // Get outside convection coeff for exterior window here to avoid calling
+                        // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
+                        // (HeatBalanceSurfaceManager USEing and WindowManager and
+                        // WindowManager USEing HeatBalanceSurfaceManager)
+                        if (surface.ExtBoundCond == ExternalEnvironment) {
+                            int RoughSurf = Material(construct.LayerPoint(1)).Roughness;           // Outside surface roughness
+                            Real64 EmisOut = Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
+                            auto const shading_flag(SurfaceWindow(SurfNum).ShadingFlag);
+                            if (shading_flag == ExtShadeOn || shading_flag == ExtBlindOn || shading_flag == ExtScreenOn) {
+                                // Exterior shade in place
+                                int ConstrNumSh = SurfaceWindow(SurfNum).ShadedConstruction;
+                                if (ConstrNumSh != 0) {
+                                    RoughSurf = Material(Construct(ConstrNumSh).LayerPoint(1)).Roughness;
+                                    EmisOut = Material(Construct(ConstrNumSh).LayerPoint(1)).AbsorpThermal;
+                                }
+                            }
+
+                            // Get the outside effective emissivity for Equivalent layer model
+                            if (construct.WindowTypeEQL) {
+                                EmisOut = WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss(ConstrNum);
+                            }
+                            // Set Exterior Convection Coefficient...
+                            if (surface.ExtConvCoeff > 0) {
+
+                                HcExtSurf(SurfNum) = SetExtConvectionCoeff(SurfNum);
+
+                            } else if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
+
+                                // Calculate exterior heat transfer coefficients with windspeed (windspeed is calculated internally in
+                                // subroutine)
+                                InitExteriorConvectionCoeff(SurfNum,
+                                                            0.0,
+                                                            RoughSurf,
+                                                            EmisOut,
+                                                            TH11,
+                                                            HcExtSurf(SurfNum),
+                                                            HSkyExtSurf(SurfNum),
+                                                            HGrdExtSurf(SurfNum),
+                                                            HAirExtSurf(SurfNum));
+
+                                if (IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
+                                    HcExtSurf(SurfNum) = 1000.0; // Reset HcExtSurf because of wetness
+                                }
+
+                            } else { // Not Wind exposed
+
+                                // Calculate exterior heat transfer coefficients for windspeed = 0
+                                InitExteriorConvectionCoeff(SurfNum,
+                                                            0.0,
+                                                            RoughSurf,
+                                                            EmisOut,
+                                                            TH11,
+                                                            HcExtSurf(SurfNum),
+                                                            HSkyExtSurf(SurfNum),
+                                                            HGrdExtSurf(SurfNum),
+                                                            HAirExtSurf(SurfNum));
+                            }
+                        } else { // Interior Surface
+
+                            if (surface.ExtConvCoeff > 0) {
+                                HcExtSurf(SurfNum) = SetExtConvectionCoeff(SurfNum);
+                            } else {
+                                // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
+                                // same
+                                HcExtSurf(SurfNum) = HConvIn(surface.ExtBoundCond);
+                            }
+                        }
+
+                        // Following call determines inside surface temperature of glazing, and of
+                        // frame and/or divider, if present
+                        CalcWindowHeatBalance(SurfNum, HcExtSurf(SurfNum), TempSurfInTmp(SurfNum), TH11);
+
+                        TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
+                    }
+                }
+            } // ...end of inside surface heat balance equation selection
+
+            for (int SurfNum : HTSurfs) {
+                int const ZoneNum = Surface(SurfNum).Zone;
+                auto &surface(Surface(SurfNum));
+                auto &zone(Zone(ZoneNum));
+                Real64 &TH11(TH(1, 1, SurfNum));
+                Real64 &TH12(TH(2, 1, SurfNum));
+                TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
+                TempSurfOut(SurfNum) = TH11; // For reporting
+
+                if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
+                    // Tubular daylighting devices are treated as one big object with an effective R value.
+                    // The outside face temperature of the TDD:DOME and the inside face temperature of the
+                    // TDD:DIFFUSER are calculated with the outside and inside heat balances respectively.
+                    // Below, the resulting temperatures are copied to the inside face of the TDD:DOME
+                    // and the outside face of the TDD:DIFFUSER for reporting.
+
+                    // Set inside temp variables of TDD:DOME equal to inside temp of TDD:DIFFUSER
+                    int domeNum = DataDaylightingDevices::TDDPipe(SurfaceWindow(SurfNum).TDDPipeNum).Dome;
+                    TH(2, 1, domeNum) = TempSurfIn(domeNum) = TempSurfInTmp(domeNum) = TempSurfInRep(domeNum) = TempSurfIn(SurfNum);
+
+                    // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
+                    // Reset outside temp variables of TDD:DIFFUSER equal to outside temp of TDD:DOME
+                    TH11 = TempSurfOut(SurfNum) = TempSurfOut(domeNum) = TH(1, 1, domeNum);
+                }
+
+                if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
+                    TestSurfTempCalcHeatBalanceInsideSurf(TH12, surface, zone, WarmupSurfTemp);
+                }
+
+            } // ...end of main loops over all surfaces for inside heat balances
+
+            // Interzone surface updating: interzone surfaces have other side temperatures
+            // which can vary as the simulation iterates through the inside heat
+            // balance.  This block is intended to "lock" the opposite side (outside)
+            // temperatures to the correct value, namely the value calculated by the
+            // inside surface heat balance for the other side.
+            assert(TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
+            auto const l211(TH.index(2, 1, 1) - 1);
+            for (int SurfNum : IZSurfs) {
+                int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
+                // Set the outside surface temperature to the inside surface temperature of the interzone pair.
+                // By going through all of the surfaces, this should pick up the other side as well as affect the next iteration.
+                // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
+                // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
+                TempSurfOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
+                TH11Surf(SurfNum) = TempSurfOut(SurfNum);
+            }
+
+            ++InsideSurfIterations;
+
+            // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
+            MaxDelTemp = 0.0;
+            for (int SurfNum : HTNonWindowSurfs) {
+                MaxDelTemp = max(std::abs(TempSurfIn(SurfNum) - TempInsOld(SurfNum)), MaxDelTemp);
+            } // ...end of loop to check for convergence
+
+            ShowContinueErrorTimeStamp("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  MaxDelTemp=" + RoundSigDigits(MaxDelTemp, 8));
+
+            if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
+
+#ifdef EP_Count_Calls
+            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, InsideSurfIterations);
+#endif
+
+            if (InsideSurfIterations < MinIterations) Converged = false;
+
+            if (InsideSurfIterations > MaxIterations) {
+                if (!WarmupFlag) {
+                    ++ErrCount;
+                    if (ErrCount < 16) {
+                        ShowWarningError(
+                            "Inside surface heat balance did not converge with Max Temp Difference [C] =" + RoundSigDigits(MaxDelTemp, 3) +
+                            " vs Max Allowed Temp Diff [C] =" + RoundSigDigits(MaxAllowedDelTempCondFD, 6));
+                        ShowContinueErrorTimeStamp("");
+                    } else {
+                        ShowRecurringWarningErrorAtEnd(
+                            "Inside surface heat balance convergence problem continues", InsideSurfErrCount, MaxDelTemp, MaxDelTemp, _, "[C]", "[C]");
+                    }
+                }
+                break; // iteration loop
+            }
+
+        } // ...end of main inside heat balance DO loop (ends when Converged)
+
+        // Set various surface output variables and other record keeping - after iterations are complete
+        for (int surfNum : HTSurfs) {
+            if (Surface(surfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
+
+            // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
+            auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
+            QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
+            QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
+            QConvInReport(surfNum) = QdotConvInRep(surfNum) * TimeStepZoneSec;
+
+            // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
+            // sizing for both the normal and pulse cases so that load components can be derived later.
+            if (ZoneSizingCalc && CompLoadReportIsReq) {
+                if (!WarmupFlag) {
+                    TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    if (isPulseZoneSizing) {
+                        OutputReportTabular::loadConvectedWithPulse(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                    } else {
+                        OutputReportTabular::loadConvectedNormal(CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                        OutputReportTabular::netSurfRadSeq(CurOverallSimDay, TimeStepInDay, surfNum) = QdotRadNetSurfInRep(surfNum);
+                    }
+                }
+            }
+
+            // Window heat gain/loss
+            if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
+                if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
+                    DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
+                    DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                } else {
+                    DataSurfaces::WinHeatLossRep(surfNum) = -DataSurfaces::WinHeatGain(surfNum);
+                    DataSurfaces::WinHeatLossRepEnergy(surfNum) = DataSurfaces::WinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                }
+
+                DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                if (DataSurfaces::SurfaceWindow(surfNum).OriginalClass == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
+                    int pipeNum = DataSurfaces::SurfaceWindow(surfNum).TDDPipeNum;
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
+                }
+                if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
+                    int zoneNum = DataSurfaces::Surface(surfNum).Zone;
+                    DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::WinHeatGain(surfNum);
                 }
             }
         }

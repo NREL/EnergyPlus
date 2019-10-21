@@ -491,6 +491,7 @@ namespace DataHeatBalance {
     int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
 
     // Flags for HeatTransfer Algorithms Used
+    bool AllCTF(true);                      // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF(false);                     // CTF used
     bool AnyEMPD(false);                    // EMPD used
     bool AnyCondFD(false);                  // CondFD used

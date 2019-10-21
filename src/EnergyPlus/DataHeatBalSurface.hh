@@ -80,6 +80,11 @@ namespace DataHeatBalSurface {
     extern Real64 MaxSurfaceTempLimitBeforeFatal; // 2.5 times MaxSurfaceTempLimit
     extern Array1D<Real64> CTFConstInPart;        // Constant Inside Portion of the CTF calculation
     extern Array1D<Real64> CTFConstOutPart;       // Constant Outside Portion of the CTF calculation
+    extern Array1D<Real64> CTFCross0;             // Construct.CTFCross(0)
+    extern Array1D<Real64> CTFInside0;            // Construct.CTFInside(0)
+    extern Array1D<Real64> CTFSourceIn0;          // Construct.CTFSourceIn(0)
+    extern Array1D<Real64> TH11Surf;              // TH(1,1,SurfNum)
+    extern Array1D<Real64> QsrcHistSurf1;         // QsrcHist(SurfNum, 1)
     extern Array1D<Real64> TempSurfIn;            // Temperature of the Inside Surface for each heat transfer surface
     extern Array1D<Real64> TempSurfInTmp;         // Inside Surface Temperature Of Each Heat Transfer Surface
     extern Array1D<Real64> HcExtSurf;             // Outside Convection Coefficient

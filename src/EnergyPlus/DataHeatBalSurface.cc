@@ -93,6 +93,11 @@ namespace DataHeatBalSurface {
     Real64 MaxSurfaceTempLimitBeforeFatal(500.0); // 2.5 times MaxSurfaceTempLimit
     Array1D<Real64> CTFConstInPart;               // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart;              // Constant Outside Portion of the CTF calculation
+    Array1D<Real64> CTFCross0;                    // Construct.CTFCross(0)
+    Array1D<Real64> CTFInside0;                   // Construct.CTFInside(0)
+    Array1D<Real64> CTFSourceIn0;                 // Construct.CTFSourceIn(0)
+    Array1D<Real64> TH11Surf;                     // TH(1,1,SurfNum)
+    Array1D<Real64> QsrcHistSurf1;                // QsrcHist(SurfNum, 1)
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
@@ -264,6 +269,11 @@ namespace DataHeatBalSurface {
         Zone_has_mixed_HT_models.clear();
         CTFConstInPart.deallocate();
         CTFConstOutPart.deallocate();
+        CTFCross0.deallocate();
+        CTFInside0.deallocate();
+        CTFSourceIn0.deallocate();
+        TH11Surf.deallocate();
+        QsrcHistSurf1.deallocate();
         TempSurfIn.deallocate();
         TempSurfInTmp.deallocate();
         HcExtSurf.deallocate();

@@ -344,6 +344,7 @@ namespace DataHeatBalance {
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
  
    // Flags for HeatTransfer Algorithms Used
+    extern bool AllCTF;                     // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva
     extern bool AnyCTF;                     // CTF used
     extern bool AnyEMPD;                    // EMPD used
     extern bool AnyCondFD;                  // CondFD used
