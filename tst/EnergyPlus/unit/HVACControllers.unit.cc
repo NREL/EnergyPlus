@@ -781,4 +781,68 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     EXPECT_EQ(thisController.NumCalcCalls, 5);
 
 }
+
+TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
+{
+    std::string const idf_objects = delimited_string({
+        " Coil:Cooling:Water,",
+        "   Chilled Water Coil, !- Name",
+        "   AvailSched,         !- Availability Schedule Name",
+        "   autosize,           !- Design Water Flow Rate { m3 / s }",
+        "   autosize,           !- Design Air Flow Rate { m3 / s }",
+        "   autosize,           !- Design Inlet Water Temperature { C }",
+        "   autosize,           !- Design Inlet Air Temperature { C }",
+        "   autosize,           !- Design Outlet Air Temperature { C }",
+        "   autosize,           !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   autosize,           !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   Water Inlet Node,   !- Water Inlet Node Name",
+        "   Water Outlet Node,  !- Water Outlet Node Name",
+        "   Air Inlet Node,     !- Air Inlet Node Name",
+        "   Air Outlet Node,    !- Air Outlet Node Name",
+        "   SimpleAnalysis,     !- Type of Analysis",
+        "   CrossFlow;          !- Heat Exchanger Configuration",
+        " Controller:WaterCoil,",
+        "   CW Coil Controller, !- Name",
+        "   HumidityRatio,      !- Control Variable",
+        "   Reverse,            !- Action",
+        "   FLOW,               !- Actuator Variable",
+        "   Air Outlet Node,    !- Sensor Node Name",
+        "   Water Inlet Node,   !- Actuator Node Name",
+        "   ,                   !- Controller Convergence Tolerance { deltaC }",
+        "   ,                   !- Maximum Actuated Flow { m3 / s }",
+        "   ;                   !- Minimum Actuated Flow { m3 / s }",
+        " SetpointManager:Scheduled,",
+        "   HumRatSPManager,    !- Name",
+        "   HumidityRatio,      !- Control Variable",
+        "   HumRatioSched,      !- Schedule Name",
+        "   Air Outlet Node;    !- Setpoint Node or NodeList Name",
+        " Schedule:Compact,",
+        "   HumRatioSched,      !- Name",
+        "   Any Number,         !- Schedule Type Limits Name",
+        "   Through: 12/31,     !- Field 1",
+        "   For: AllDays,       !- Field 2",
+        "   Until: 24:00, 0.015; !- Field 3",
+        " Schedule:Compact,",
+        "   AvailSched,         !- Name",
+        "   Fraction,           !- Schedule Type Limits Name",
+        "   Through: 12/31,     !- Field 1",
+        "   For: AllDays,       !- Field 2",
+        "   Until: 24:00, 1.0;  !- Field 3",
+        " AirLoopHVAC:ControllerList,",
+        "   CW Coil Controller, !- Name",
+        "   Controller:WaterCoil, !- Controller 1 Object Type",
+        "   CW Coil Controller; !- Controller 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetSetPointManagerInputs();
+
+    GetControllerInput();
+
+    ASSERT_EQ(ControllerProps.size(), 1u);
+    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
+}
+
 } // namespace EnergyPlus
