@@ -685,10 +685,7 @@ namespace PlantLoopEquip {
 
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-
-                SimWaterThermalTank_WaterTank(EquipTypeNum,
-                                    sim_component.Name,
+                SimWaterThermalTank_WaterTank(sim_component.Name,
                                     EquipNum,
                                     RunFlag,
                                     InitLoopEquip,
@@ -853,10 +850,7 @@ namespace PlantLoopEquip {
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-
-                SimWaterThermalTank_WaterTank(EquipTypeNum,
-                                    sim_component.Name,
+                SimWaterThermalTank_WaterTank(sim_component.Name,
                                     EquipNum,
                                     RunFlag,
                                     InitLoopEquip,

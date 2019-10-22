@@ -168,7 +168,7 @@ namespace WaterThermalTanks {
     extern int modNumHeatPumpWaterHeater;      // number of heat pump water heaters
 
     extern Real64 modHPPartLoadRatio;            // part load ratio of HPWH
-    extern bool modGetWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
+    extern bool getWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
     extern Real64 modMixerInletAirSchedule;      // output of inlet air mixer node schedule
     extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
     extern int modNumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
@@ -484,8 +484,6 @@ namespace WaterThermalTanks {
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-//        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation));
-
         Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
         void CalcNodeMassFlows(int InletMode_loc);
@@ -687,11 +685,13 @@ namespace WaterThermalTanks {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
     };
 
-    struct WaterHeaterDesuperheaterData : PlantComponent
+    struct WaterHeaterDesuperheaterData
     {
         // Members
         std::string Name;              // Name of heat pump water heater desuperheater
@@ -764,9 +764,6 @@ namespace WaterThermalTanks {
               RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
         {
         }
-
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
-
     };
 
     // Object Data
@@ -776,8 +773,7 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimWaterThermalTank_WaterTank(int CompType,
-                             std::string const &CompName,
+    void SimWaterThermalTank_WaterTank(std::string const &CompName,
                              int &CompIndex,
                              bool RunFlag, // unused1208
                              bool InitLoopEquip,

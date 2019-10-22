@@ -2240,8 +2240,7 @@ namespace IntegratedHeatPump {
             if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
                 (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
 
-                WaterThermalTanks::SimWaterThermalTank_WaterTank(IntegratedHeatPumps(DXCoilNum).WHtankType,
-                                    IntegratedHeatPumps(DXCoilNum).WHtankName,
+                WaterThermalTanks::SimWaterThermalTank_WaterTank(IntegratedHeatPumps(DXCoilNum).WHtankName,
                                     IntegratedHeatPumps(DXCoilNum).WHtankID,
                                     false,
                                     false,

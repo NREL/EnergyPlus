@@ -167,7 +167,7 @@ namespace WaterThermalTanks {
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
 
-    bool modGetWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
+    bool getWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
     bool modCalcWaterThermalTankZoneGains_MyEnvrnFlag(true);
 
     void clear_state()
@@ -190,19 +190,19 @@ namespace WaterThermalTanks {
         WaterHeaterDesuperheater.deallocate();
         UniqueWaterThermalTankNames.clear();
 
-        modGetWaterThermalTankInputFlag = true;
+        getWaterThermalTankInputFlag = true;
         modCalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
     }
 
     PlantComponent *WaterThermalTankData::factory(std::string const &objectName)
     {
         // Process the input data
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
-            modGetWaterThermalTankInputFlag = false;
+            getWaterThermalTankInputFlag = false;
         }
 
-        // Now look for this particular pipe in the list
+        // Now look for this object in the list
         for (auto &tank : WaterThermalTank) {
             if (tank.Name == objectName) {
                 return &tank;
@@ -220,8 +220,7 @@ namespace WaterThermalTanks {
 
     }
 
-    void SimWaterThermalTank_WaterTank(int const CompType,
-                                       std::string const &CompName,
+    void SimWaterThermalTank_WaterTank(std::string const &CompName,
                                        int &CompIndex,
                                        bool const EP_UNUSED(RunFlag), // unused1208
                                        bool const InitLoopEquip,
@@ -239,9 +238,9 @@ namespace WaterThermalTanks {
         //       MODIFIED       FSEC, July 2005
         //       RE-ENGINEERED  na
 
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
-            modGetWaterThermalTankInputFlag = false;
+            getWaterThermalTankInputFlag = false;
         }
 
         int CompNum;
@@ -267,87 +266,89 @@ namespace WaterThermalTanks {
             }
         }
 
+        auto Tank = &WaterThermalTank(CompNum);
+
         if (InitLoopEquip) {
             if (present(LoopNum)) {
-                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                Tank->InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
             } else {
-                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+                Tank->InitWaterThermalTank(CompNum, FirstHVACIteration);
             }
-            WaterThermalTank(CompNum).MinePlantStructForInfo();
+            Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
-                if (((WaterThermalTank(CompNum).SrcSide.loopNum == LoopNum) &&
-                     (WaterThermalTank(CompNum).SrcSide.loopSideNum == LoopSideNum)) ||
-                    ((WaterThermalTank(CompNum).UseSide.loopNum == LoopNum) &&
-                     (WaterThermalTank(CompNum).UseSide.loopSideNum == LoopSideNum))) {
+                if (((Tank->SrcSide.loopNum == LoopNum) &&
+                     (Tank->SrcSide.loopSideNum == LoopSideNum)) ||
+                    ((Tank->UseSide.loopNum == LoopNum) &&
+                     (Tank->UseSide.loopSideNum == LoopSideNum))) {
 
-                    WaterThermalTank(CompNum).SizeTankForDemandSide();
-                    WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                    WaterThermalTank(CompNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
-                    WaterThermalTank(CompNum).SizeTankForSupplySide();
+                    Tank->SizeTankForDemandSide();
+                    Tank->SizeDemandSidePlantConnections();
+                    Tank->SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    Tank->SizeTankForSupplySide();
                 } else {
                     return;
                 }
             } else {
-                WaterThermalTank(CompNum).SizeTankForDemandSide();
-                WaterThermalTank(CompNum).SizeDemandSidePlantConnections();
-                WaterThermalTank(CompNum).SizeSupplySidePlantConnections();
-                WaterThermalTank(CompNum).SizeTankForSupplySide();
+                Tank->SizeTankForDemandSide();
+                Tank->SizeDemandSidePlantConnections();
+                Tank->SizeSupplySidePlantConnections();
+                Tank->SizeTankForSupplySide();
             }
 
             // Calculate and report water heater standard ratings to EIO file (now that sizing is done)
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (!WaterThermalTank(CompNum).IsChilledWaterTank) {
-                    WaterThermalTank(CompNum).CalcStandardRatings();
+                if (!Tank->IsChilledWaterTank) {
+                    Tank->CalcStandardRatings();
                 } else {
-                    WaterThermalTank(CompNum).ReportCWTankInits();
+                    Tank->ReportCWTankInits();
                 }
             }
             MinCap = 0.0;
-            MaxCap = WaterThermalTank(CompNum).MaxCapacity;
-            OptCap = WaterThermalTank(CompNum).MaxCapacity;
+            MaxCap = Tank->MaxCapacity;
+            OptCap = Tank->MaxCapacity;
             if (present(LoopNum)) {
-                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                Tank->InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
             } else {
-                WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+                Tank->InitWaterThermalTank(CompNum, FirstHVACIteration);
             }
             return;
         }
 
-        if (WaterThermalTank(CompNum).MyOneTimeFlagWH) {
-            WaterThermalTank(CompNum).MyOneTimeFlagWH = false;
+        if (Tank->MyOneTimeFlagWH) {
+            Tank->MyOneTimeFlagWH = false;
         } else {
-            if (WaterThermalTank(CompNum).MyTwoTimeFlagWH) {
-                WaterThermalTank(CompNum).MinePlantStructForInfo(); // call it again to get control types filled out
-                WaterThermalTank(CompNum).MyTwoTimeFlagWH = false;
+            if (Tank->MyTwoTimeFlagWH) {
+                Tank->MinePlantStructForInfo(); // call it again to get control types filled out
+                Tank->MyTwoTimeFlagWH = false;
             }
         }
-        WaterThermalTank(CompNum).UseSideLoadRequested = std::abs(MyLoad);
-        int tmpLoopNum = WaterThermalTank(CompNum).UseSide.loopNum;
-        if (tmpLoopNum > 0 && WaterThermalTank(CompNum).UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            WaterThermalTank(CompNum).UseCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        Tank->UseSideLoadRequested = std::abs(MyLoad);
+        int tmpLoopNum = Tank->UseSide.loopNum;
+        if (tmpLoopNum > 0 && Tank->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            Tank->UseCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
         } else {
-            WaterThermalTank(CompNum).UseCurrentFlowLock = 1;
+            Tank->UseCurrentFlowLock = 1;
         }
-        tmpLoopNum = WaterThermalTank(CompNum).SrcSide.loopNum;
-        if (tmpLoopNum > 0 && WaterThermalTank(CompNum).SrcSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            WaterThermalTank(CompNum).SourceCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        tmpLoopNum = Tank->SrcSide.loopNum;
+        if (tmpLoopNum > 0 && Tank->SrcSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            Tank->SourceCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
         } else {
-            WaterThermalTank(CompNum).SourceCurrentFlowLock = 1;
+            Tank->SourceCurrentFlowLock = 1;
         }
-        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+        Tank->InitWaterThermalTank(CompNum, FirstHVACIteration);
         //       Plant connected water heaters may have a desuperheater heating coil attached
-        if (WaterThermalTank(CompNum).DesuperheaterNum == 0) {
-            if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
-                WaterThermalTank(CompNum).CalcWaterThermalTankMixed();
-            } else if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
-                       (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-                WaterThermalTank(CompNum).CalcWaterThermalTankStratified();
+        if (Tank->DesuperheaterNum == 0) {
+            if ((Tank->TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (Tank->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
+                Tank->CalcWaterThermalTankMixed();
+            } else if ((Tank->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
+                       (Tank->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+                Tank->CalcWaterThermalTankStratified();
             }
-        } else if (WaterThermalTank(CompNum).DesuperheaterNum > 0) {
+        } else if (Tank->DesuperheaterNum > 0) {
             CalcDesuperheaterWaterHeater(CompNum, FirstHVACIteration);
         }
-        WaterThermalTank(CompNum).UpdateWaterThermalTank();
-        WaterThermalTank(CompNum).ReportWaterThermalTank();
+        Tank->UpdateWaterThermalTank();
+        Tank->ReportWaterThermalTank();
 
     }
 
@@ -370,9 +371,9 @@ namespace WaterThermalTanks {
         //       MODIFIED       FSEC, July 2005
         //       RE-ENGINEERED  na
 
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
-            modGetWaterThermalTankInputFlag = false;
+            getWaterThermalTankInputFlag = false;
         }
 
         int CompNum;
@@ -512,12 +513,6 @@ namespace WaterThermalTanks {
 
     }
 
-    void WaterHeaterDesuperheaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
-    {
-
-    }
-
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
     {
 
@@ -542,18 +537,19 @@ namespace WaterThermalTanks {
         Real64 OptCap;
 
         // FLOW:
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
-            modGetWaterThermalTankInputFlag = false;
+            getWaterThermalTankInputFlag = false;
         }
 
+        auto Tank = &WaterThermalTank(WaterHeaterNum);
+
         // Only simulate stand-alone water heaters here.  Plant connected water heaters are called by the PlantLoopEquipments.
-        if (WaterThermalTank(WaterHeaterNum).StandAlone) {
+        if (Tank->StandAlone) {
             bool LocalRunFlag = true;
             bool LocalInitLoopEquip = false;
             int TestNum = WaterHeaterNum;
-            SimWaterThermalTank_WaterTank(WaterThermalTank(WaterHeaterNum).TypeNum,
-                                WaterThermalTank(WaterHeaterNum).Name,
+            SimWaterThermalTank_WaterTank(Tank->Name,
                                 TestNum,
                                 LocalRunFlag,
                                 LocalInitLoopEquip,
@@ -565,23 +561,26 @@ namespace WaterThermalTanks {
             if (TestNum != WaterHeaterNum) {
                 ShowFatalError("SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + General::TrimSigDigits(WaterHeaterNum) +
                                "] does not match returned WaterHeater Num[" + General::TrimSigDigits(TestNum) + "] Name=\"" +
-                               WaterThermalTank(WaterHeaterNum).Name + "\".");
+                               Tank->Name + "\".");
             }
 
             // HPWHs with inlet air from a zone and not connected to a plant loop are simulated through a CALL from ZoneEquipmentManager.
             // HPWHs that are plant connected are always simulated through a CALL from PlantLoopEquipments directly to SimWaterThermalTank.
 
             // NOTE: HPWHs with inlet air from a zone AND plant connected are not stand alone and are simulated in PlantLoopEquipments
-        } else if (WaterThermalTank(WaterHeaterNum).HeatPumpNum > 0) {
+        } else if (Tank->HeatPumpNum > 0) {
             //   Only HPWHs with inlet air from outdoors or scheduled HPWHs (not connected to a plant loop) are simulated here.
-            if (HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).StandAlone &&
-                (HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == AmbientTemp::OutsideAir ||
-                 HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == AmbientTemp::Schedule)) {
+
+            auto HPWaterHtr = &HPWaterHeater(Tank->HeatPumpNum);
+
+            if (HPWaterHtr->StandAlone &&
+                (HPWaterHtr->InletAirConfiguration == AmbientTemp::OutsideAir ||
+                 HPWaterHtr->InletAirConfiguration == AmbientTemp::Schedule)) {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
-                SimWaterThermalTank_HeatPump(HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).TypeNum,
-                                    HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).Name,
-                                    WaterThermalTank(WaterHeaterNum).HeatPumpNum,
+                SimWaterThermalTank_HeatPump(HPWaterHtr->TypeNum,
+                                    HPWaterHtr->Name,
+                                    Tank->HeatPumpNum,
                                     LocalRunFlag,
                                     LocalInitLoopEquip,
                                     MyLoad,
@@ -593,13 +592,12 @@ namespace WaterThermalTanks {
 
             // Only simulate stand-alone water heaters with desuperheater water heating coils here.  Plant connected water heaters
             // with desuperheater water heating coils are called by PlantLoopEquipments.
-        } else if (WaterThermalTank(WaterHeaterNum).DesuperheaterNum > 0) {
-            if (WaterHeaterDesuperheater(WaterThermalTank(WaterHeaterNum).DesuperheaterNum).StandAlone) {
+        } else if (Tank->DesuperheaterNum > 0) {
+            if (WaterHeaterDesuperheater(Tank->DesuperheaterNum).StandAlone) {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
                 int TestNum = WaterHeaterNum;
-                SimWaterThermalTank_WaterTank(WaterThermalTank(WaterHeaterNum).TypeNum,
-                                    WaterThermalTank(WaterHeaterNum).Name,
+                SimWaterThermalTank_WaterTank(Tank->Name,
                                     TestNum,
                                     LocalRunFlag,
                                     LocalInitLoopEquip,
@@ -611,10 +609,30 @@ namespace WaterThermalTanks {
                 if (TestNum != WaterHeaterNum) {
                     ShowFatalError("SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + General::TrimSigDigits(WaterHeaterNum) +
                                    "] does not match returned WaterHeater Num[" + General::TrimSigDigits(TestNum) + "] Name=\"" +
-                                   WaterThermalTank(WaterHeaterNum).Name + "\".");
+                                   Tank->Name + "\".");
                 }
             }
         }
+    }
+
+    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput();
+            getWaterThermalTankInputFlag = false;
+        }
+
+        // Now look for this object in the list
+        for (auto &HPWtrHtr : HPWaterHeater) {
+            if (HPWtrHtr.Name == objectName) {
+                return &HPWtrHtr;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for heat pump water heater named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -643,9 +661,9 @@ namespace WaterThermalTanks {
         // The necessary control flags and dummy variables are set and passed into SimWaterHeater.
 
         // FLOW:
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
-            modGetWaterThermalTankInputFlag = false;
+            getWaterThermalTankInputFlag = false;
         }
 
         // Find the correct Heat Pump Water Heater
@@ -721,9 +739,9 @@ namespace WaterThermalTanks {
             if (!DataGlobals::DoingSizing) {
                 return;
             } else {
-                if (modGetWaterThermalTankInputFlag) {
+                if (getWaterThermalTankInputFlag) {
                     GetWaterThermalTankInput();
-                    modGetWaterThermalTankInputFlag = false;
+                    getWaterThermalTankInputFlag = false;
                 }
                 if (modNumWaterThermalTank == 0) return;
             }
@@ -742,17 +760,18 @@ namespace WaterThermalTanks {
         if (!DataGlobals::BeginEnvrnFlag) modCalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
 
         for (int WaterThermalTankNum = 1; WaterThermalTankNum <= modNumWaterThermalTank; ++WaterThermalTankNum) {
-            if (WaterThermalTank(WaterThermalTankNum).AmbientTempZone == 0) continue;
+            auto Tank = &WaterThermalTank(WaterThermalTankNum);
+            if (Tank->AmbientTempZone == 0) continue;
             if (DataGlobals::DoingSizing) {
                 // Initialize tank temperature to setpoint
                 // (use HPWH or Desuperheater heating coil set point if applicable)
                 int SchIndex;
-                if (WaterThermalTank(WaterThermalTankNum).HeatPumpNum > 0) {
-                    SchIndex = HPWaterHeater(WaterThermalTank(WaterThermalTankNum).HeatPumpNum).SetPointTempSchedule;
-                } else if (WaterThermalTank(WaterThermalTankNum).DesuperheaterNum > 0) {
-                    SchIndex = WaterHeaterDesuperheater(WaterThermalTank(WaterThermalTankNum).DesuperheaterNum).SetPointTempSchedule;
+                if (Tank->HeatPumpNum > 0) {
+                    SchIndex = HPWaterHeater(Tank->HeatPumpNum).SetPointTempSchedule;
+                } else if (Tank->DesuperheaterNum > 0) {
+                    SchIndex = WaterHeaterDesuperheater(Tank->DesuperheaterNum).SetPointTempSchedule;
                 } else {
-                    SchIndex = WaterThermalTank(WaterThermalTankNum).SetPointTempSchedule;
+                    SchIndex = Tank->SetPointTempSchedule;
                 }
 
                 Real64 TankTemp;
@@ -763,29 +782,29 @@ namespace WaterThermalTanks {
                     TankTemp = 20.0;
                 }
                 {
-                    auto const SELECT_CASE_var(WaterThermalTank(WaterThermalTankNum).TypeNum);
+                    auto const SELECT_CASE_var(Tank->TypeNum);
                     if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterMixed) {
                         QLossToZone =
-                            max(WaterThermalTank(WaterThermalTankNum).OnCycLossCoeff * WaterThermalTank(WaterThermalTankNum).OnCycLossFracToZone,
-                                WaterThermalTank(WaterThermalTankNum).OffCycLossCoeff * WaterThermalTank(WaterThermalTankNum).OffCycLossFracToZone) *
-                            (TankTemp - DataHeatBalFanSys::MAT(WaterThermalTank(WaterThermalTankNum).AmbientTempZone));
+                            max(Tank->OnCycLossCoeff * Tank->OnCycLossFracToZone,
+                                Tank->OffCycLossCoeff * Tank->OffCycLossFracToZone) *
+                            (TankTemp - DataHeatBalFanSys::MAT(Tank->AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
-                        QLossToZone = max(WaterThermalTank(WaterThermalTankNum).Node(1).OnCycLossCoeff *
-                                              WaterThermalTank(WaterThermalTankNum).SkinLossFracToZone,
-                                          WaterThermalTank(WaterThermalTankNum).Node(1).OffCycLossCoeff *
-                                              WaterThermalTank(WaterThermalTankNum).SkinLossFracToZone) *
-                                      (TankTemp - DataHeatBalFanSys::MAT(WaterThermalTank(WaterThermalTankNum).AmbientTempZone));
+                        QLossToZone = max(Tank->Node(1).OnCycLossCoeff *
+                                              Tank->SkinLossFracToZone,
+                                          Tank->Node(1).OffCycLossCoeff *
+                                              Tank->SkinLossFracToZone) *
+                                      (TankTemp - DataHeatBalFanSys::MAT(Tank->AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
-                        QLossToZone = WaterThermalTank(WaterThermalTankNum).OffCycLossCoeff *
-                                      WaterThermalTank(WaterThermalTankNum).OffCycLossFracToZone *
-                                      (TankTemp - DataHeatBalFanSys::MAT(WaterThermalTank(WaterThermalTankNum).AmbientTempZone));
+                        QLossToZone = Tank->OffCycLossCoeff *
+                                      Tank->OffCycLossFracToZone *
+                                      (TankTemp - DataHeatBalFanSys::MAT(Tank->AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
-                        QLossToZone = WaterThermalTank(WaterThermalTankNum).Node(1).OffCycLossCoeff *
-                                      WaterThermalTank(WaterThermalTankNum).SkinLossFracToZone *
-                                      (TankTemp - DataHeatBalFanSys::MAT(WaterThermalTank(WaterThermalTankNum).AmbientTempZone));
+                        QLossToZone = Tank->Node(1).OffCycLossCoeff *
+                                      Tank->SkinLossFracToZone *
+                                      (TankTemp - DataHeatBalFanSys::MAT(Tank->AmbientTempZone));
                     }
                 }
-                WaterThermalTank(WaterThermalTankNum).AmbientZoneGain = QLossToZone;
+                Tank->AmbientZoneGain = QLossToZone;
             }
         }
     }
@@ -842,7 +861,7 @@ namespace WaterThermalTanks {
         // Make sure refrigeration input is gotten before this input
         RefrigeratedCase::CheckRefrigerationInput();
 
-        if (modGetWaterThermalTankInputFlag) {
+        if (getWaterThermalTankInputFlag) {
             modNumWaterHeaterMixed = inputProcessor->getNumObjectsFound(cMixedWHModuleObj);
             modNumWaterHeaterStratified = inputProcessor->getNumObjectsFound(cStratifiedWHModuleObj);
             modNumChilledWaterMixed = inputProcessor->getNumObjectsFound(cMixedCWTankModuleObj);
@@ -8185,117 +8204,119 @@ namespace WaterThermalTanks {
 
         Array1D<Real64> Par(5);     // Parameters passed to RegulaFalsi
 
-        // FLOW:
-        int DesuperheaterNum = WaterThermalTank(WaterThermalTankNum).DesuperheaterNum;
-        int WaterInletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode;
-        int WaterOutletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode;
+        auto Tank = &WaterThermalTank(WaterThermalTankNum);
+        auto DesuperheaterNum = Tank->DesuperheaterNum;
+        auto DesupHtr = &WaterHeaterDesuperheater(DesuperheaterNum);
+
+        int WaterInletNode = DesupHtr->WaterInletNode;
+        int WaterOutletNode = DesupHtr->WaterOutletNode;
 
         // store first iteration tank temperature and desuperheater mode of operation
-        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag) {
+        if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && DesupHtr->FirstTimeThroughFlag) {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
-            WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-            WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
-            WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
-            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
+            Tank->SavedTankTemp = Tank->TankTemp;
+            Tank->SavedSourceOutletTemp = Tank->SourceOutletTemp;
+            DesupHtr->SaveMode = DesupHtr->Mode;
+            DesupHtr->FirstTimeThroughFlag = false;
         }
 
         else if (!FirstHVACIteration) {
-            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
+            DesupHtr->FirstTimeThroughFlag = true;
         }
 
         // initialize variables before invoking any RETURN statement
-        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = 0.0;
+        Tank->SourceMassFlowRate = 0.0;
         // reset tank inlet temp from previous time step
-        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
-        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
+        Tank->SourceInletTemp = Tank->SavedSourceOutletTemp;
+        DesupHtr->DesuperheaterPLR = 0.0;
 
         DataLoopNode::Node(WaterInletNode).MassFlowRate = 0.0;
         DataLoopNode::Node(WaterOutletNode).MassFlowRate = 0.0;
-        DataLoopNode::Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
+        DataLoopNode::Node(WaterOutletNode).Temp = Tank->SavedSourceOutletTemp;
 
-        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelRate = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelEnergy = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelRate = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelEnergy = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).HEffFTempOutput = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).HeaterEnergy = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).PumpPower = 0.0;
-        WaterHeaterDesuperheater(DesuperheaterNum).PumpEnergy = 0.0;
+        DesupHtr->DesuperheaterPLR = 0.0;
+        DesupHtr->OnCycParaFuelRate = 0.0;
+        DesupHtr->OnCycParaFuelEnergy = 0.0;
+        DesupHtr->OffCycParaFuelRate = 0.0;
+        DesupHtr->OffCycParaFuelEnergy = 0.0;
+        DesupHtr->HEffFTempOutput = 0.0;
+        DesupHtr->HeaterRate = 0.0;
+        DesupHtr->HeaterEnergy = 0.0;
+        DesupHtr->PumpPower = 0.0;
+        DesupHtr->PumpEnergy = 0.0;
 
         // simulate only the water heater tank if the desuperheater coil is scheduled off
-        Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr);
+        Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(DesupHtr->AvailSchedPtr);
         if (AvailSchedule == 0.0) {
-            WaterHeaterDesuperheater(DesuperheaterNum).Mode = modFloatMode;
-            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
+            DesupHtr->Mode = modFloatMode;
+            Tank->CalcWaterThermalTank();
             return;
         }
 
         // simulate only the water heater tank if the lowest temperature available from the desuperheater coil
         // is less than water inlet temperature if the reclaim source is a refrigeration condenser
-        if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
-            int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
-                if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= WaterThermalTank(WaterThermalTankNum).SourceInletTemp) {
-                    WaterHeaterDesuperheater(DesuperheaterNum).Mode = modFloatMode;
-                    WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
-                    ShowRecurringWarningErrorAtEnd("WaterHeating:Desuperheater " + WaterHeaterDesuperheater(DesuperheaterNum).Name +
+        if (DesupHtr->ValidSourceType) {
+            int SourceID = DesupHtr->ReclaimHeatingSourceIndexNum;
+            if (DesupHtr->ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
+                if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= Tank->SourceInletTemp) {
+                    DesupHtr->Mode = modFloatMode;
+                    Tank->CalcWaterThermalTank();
+                    ShowRecurringWarningErrorAtEnd("WaterHeating:Desuperheater " + DesupHtr->Name +
                                                        " - Waste heat source temperature was too low to be useful.",
-                                                   WaterHeaterDesuperheater(DesuperheaterNum).InsuffTemperatureWarn);
+                                                   DesupHtr->InsuffTemperatureWarn);
                     return;
                 } // Temp too low
             }     // desuperheater source is condenser_refrigeration
         }         // validsourcetype
 
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelRate = WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad;
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelEnergy =
-            WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr->OffCycParaFuelRate = DesupHtr->OffCycParaLoad;
+        DesupHtr->OffCycParaFuelEnergy =
+            DesupHtr->OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check that water heater tank cut-in temp is greater than desuperheater cut-in temp
-        Real64 SetPointTemp = WaterHeaterDesuperheater(DesuperheaterNum).SetPointTemp;
-        Real64 DeadBandTempDiff = WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff;
-        if ((SetPointTemp - DeadBandTempDiff) <= WaterThermalTank(WaterThermalTankNum).SetPointTemp) {
+        Real64 SetPointTemp = DesupHtr->SetPointTemp;
+        Real64 DeadBandTempDiff = DesupHtr->DeadBandTempDiff;
+        if ((SetPointTemp - DeadBandTempDiff) <= Tank->SetPointTemp) {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 Real64 MinTemp = SetPointTemp - DeadBandTempDiff;
-                ++WaterHeaterDesuperheater(DesuperheaterNum).SetPointError;
-                if (WaterHeaterDesuperheater(DesuperheaterNum).SetPointError < 5) {
-                    ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                ++DesupHtr->SetPointError;
+                if (DesupHtr->SetPointError < 5) {
+                    ShowWarningError(DesupHtr->Type + " \"" + DesupHtr->Name +
                                      "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the "
                                      "desuperheater. Desuperheater will be disabled.");
                     ShowContinueErrorTimeStamp(" ...Desuperheater cut-in temperature = " + General::RoundSigDigits(MinTemp, 2));
                 } else {
-                    ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                       WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                    ShowRecurringWarningErrorAtEnd(DesupHtr->Type + " \"" +
+                                                       DesupHtr->Name +
                                                        "\":  Water heater tank set point temperature is greater than or equal to the cut-in "
                                                        "temperature of the desuperheater. Desuperheater will be disabled warning continues...",
-                                                   WaterHeaterDesuperheater(DesuperheaterNum).SetPointErrIndex1,
+                                                   DesupHtr->SetPointErrIndex1,
                                                    MinTemp,
                                                    MinTemp);
                 }
             }
 
             //   Simulate tank if desuperheater unavailable for water heating
-            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
+            Tank->CalcWaterThermalTank();
             return;
         }
 
-        Real64 Effic = WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+        Real64 Effic = DesupHtr->HeatReclaimRecoveryEff;
 
-        Real64 TankTemp = WaterThermalTank(WaterThermalTankNum).SavedTankTemp;
-        DataLoopNode::Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
-        WaterHeaterDesuperheater(DesuperheaterNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveMode;
+        Real64 TankTemp = Tank->SavedTankTemp;
+        DataLoopNode::Node(WaterInletNode).Temp = Tank->SavedSourceOutletTemp;
+        DesupHtr->Mode = DesupHtr->SaveMode;
 
         Real64 HEffFTemp;
-        if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
-            HEffFTemp = max(0.0, CurveManager::CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, TankTemp, DataEnvironment::OutDryBulbTemp));
+        if (DesupHtr->HEffFTemp > 0) {
+            HEffFTemp = max(0.0, CurveManager::CurveValue(DesupHtr->HEffFTemp, TankTemp, DataEnvironment::OutDryBulbTemp));
         } else {
             HEffFTemp = 1.0;
         }
 
         // set limits on heat recovery efficiency
-        if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
+        if (DesupHtr->ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
             if ((HEffFTemp * Effic) > 0.9) HEffFTemp = 0.9 / Effic;
         } else { // max is 0.3 for all other sources
             if ((HEffFTemp * Effic) > 0.3) HEffFTemp = 0.3 / Effic;
@@ -8303,47 +8324,47 @@ namespace WaterThermalTanks {
 
         // Access the appropriate structure to find the average heating capacity of the desuperheater heating coil
         Real64 AverageWasteHeat;
-        if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
-            int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
+        if (DesupHtr->ValidSourceType) {
+            int SourceID = DesupHtr->ReclaimHeatingSourceIndexNum;
+            if (DesupHtr->ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
                 // Refrigeration systems are solved outside the time step iteration, so the
                 //  appropriate decrement for other waste heat applications is handled differently
                 AverageWasteHeat = DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).AvailCapacity - DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).UsedHVACCoil;
-                WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
+                DesupHtr->DXSysPLR = 1.0;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailCapacity - DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).UsedHVACCoil;
-                WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXCooling ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiMode) {
+                DesupHtr->DXSysPLR = 1.0;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::DXCooling ||
+                       DesupHtr->ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
+                       DesupHtr->ReclaimHeatingSource == CoilObj::DXMultiMode) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity;
-                WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = DXCoils::DXCoil(SourceID).PartLoadRatio;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXVariableCooling) {
+                DesupHtr->DXSysPLR = DXCoils::DXCoil(SourceID).PartLoadRatio;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::DXVariableCooling) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity;
-                WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
+                DesupHtr->DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity;
-                WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = WaterToAirHeatPumpSimple::SimpleWatertoAirHP(SourceID).PartLoadRatio;
+                DesupHtr->DXSysPLR = WaterToAirHeatPumpSimple::SimpleWatertoAirHP(SourceID).PartLoadRatio;
             }
         } else {
             AverageWasteHeat = 0.0;
         }
 
         // simulate only water heater tank if reclaim heating source is off
-        if (WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR == 0.0) {
-            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
+        if (DesupHtr->DXSysPLR == 0.0) {
+            Tank->CalcWaterThermalTank();
             return;
         }
 
         // If the set point is higher than the maximum water temp, reset both the set point and the dead band temperature difference
-        if (SetPointTemp > WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp) {
+        if (SetPointTemp > DesupHtr->MaxInletWaterTemp) {
             Real64 CutInTemp = SetPointTemp - DeadBandTempDiff;
-            SetPointTemp = WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp;
+            SetPointTemp = DesupHtr->MaxInletWaterTemp;
             DeadBandTempDiff = max(0.0, (SetPointTemp - CutInTemp));
         }
 
         Real64 Acc; // Accuracy of result from RegulaFalsi
-        if (WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
+        if (DesupHtr->TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
             Acc = 0.001;
         }
         else {
@@ -8352,11 +8373,11 @@ namespace WaterThermalTanks {
 
         // set the water-side mass flow rate
         Real64 CpWater = Psychrometrics::CPHW(DataLoopNode::Node(WaterInletNode).Temp);
-        Real64 MdotWater = WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate * Psychrometrics::RhoH2O(DataLoopNode::Node(WaterInletNode).Temp);
+        Real64 MdotWater = DesupHtr->OperatingWaterFlowRate * Psychrometrics::RhoH2O(DataLoopNode::Node(WaterInletNode).Temp);
         Real64 QHeatRate = 0.0;
-        if (DataLoopNode::Node(WaterInletNode).Temp <= WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp + Acc) {
-            QHeatRate = ((AverageWasteHeat * Effic * HEffFTemp) / WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR) +
-                        (WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower * WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater);
+        if (DataLoopNode::Node(WaterInletNode).Temp <= DesupHtr->MaxInletWaterTemp + Acc) {
+            QHeatRate = ((AverageWasteHeat * Effic * HEffFTemp) / DesupHtr->DXSysPLR) +
+                        (DesupHtr->PumpElecPower * DesupHtr->PumpFracToWater);
         }
 
         if (MdotWater > 0.0) {
@@ -8368,38 +8389,38 @@ namespace WaterThermalTanks {
         // change to tanktypenum using parameters?
         Real64 PartLoadRatio =0.0;
         {
-            auto const TankType(WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum);
+            auto const TankType(DesupHtr->TankTypeNum);
 
             if (TankType == DataPlant::TypeOf_WtrHeaterMixed||TankType == DataPlant::TypeOf_WtrHeaterStratified) {
 
-                WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode = WaterThermalTank(WaterThermalTankNum).Mode;
+                DesupHtr->SaveWHMode = Tank->Mode;
 
                 {
-                    auto const SELECT_CASE_var1(WaterHeaterDesuperheater(DesuperheaterNum).Mode);
+                    auto const SELECT_CASE_var1(DesupHtr->Mode);
                     if (SELECT_CASE_var1 == modHeatMode) {
 
-                        PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
+                        PartLoadRatio = DesupHtr->DXSysPLR;
 
                         //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                        Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                         //         set the source mass flow rate for the tank
-                        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
+                        Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
 
-                        WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                        WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-                        WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
-                        Real64 NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                        Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
+                        Tank->MinCapacity = DesupHtr->BackupElementCapacity;
+                        DesupHtr->DesuperheaterPLR = PartLoadRatio;
+                        DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
+                        Tank->CalcWaterThermalTank();
+                        Real64 NewTankTemp = Tank->TankTemp;
 
                         if (NewTankTemp > SetPointTemp) {
                             //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
-                            if (NewTankTemp > WaterHeaterDesuperheater(DesuperheaterNum).SetPointTemp) {
-                                WaterHeaterDesuperheater(DesuperheaterNum).Mode = modFloatMode;
+                            if (NewTankTemp > DesupHtr->SetPointTemp) {
+                                DesupHtr->Mode = modFloatMode;
                             }
                             Par(1) = SetPointTemp;
-                            Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                            Par(2) = DesupHtr->SaveWHMode;
                             Par(3) = WaterThermalTankNum;
                             if (FirstHVACIteration) {
                                 Par(4) = 1.0;
@@ -8415,26 +8436,26 @@ namespace WaterThermalTanks {
                                       PartLoadRatio,
                                       PLRResidualWaterThermalTank,
                                       0.0,
-                                      WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                      DesupHtr->DXSysPLR,
                                       Par);
                             if (SolFla == -1) {
                                 ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
                                 if (!DataGlobals::WarmupFlag) {
-                                    ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1;
-                                    if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1 == 1) {
-                                        ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                         WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                    ++DesupHtr->IterLimitExceededNum1;
+                                    if (DesupHtr->IterLimitExceededNum1 == 1) {
+                                        ShowWarningError(DesupHtr->Type + " \"" +
+                                                         DesupHtr->Name + "\"");
                                         ShowContinueError(
                                             "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
                                             IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(PartLoadRatio, 3));
                                         ShowContinueErrorTimeStamp("This error occurred in heating mode.");
                                     } else {
                                         ShowRecurringWarningErrorAtEnd(
-                                            WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                            DesupHtr->Type + " \"" +
+                                                DesupHtr->Name +
                                                 "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.",
-                                            WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex1,
+                                            DesupHtr->IterLimitErrIndex1,
                                             PartLoadRatio,
                                             PartLoadRatio);
                                     }
@@ -8442,31 +8463,31 @@ namespace WaterThermalTanks {
                             } else if (SolFla == -2) {
                                 PartLoadRatio = max(
                                     0.0,
-                                    min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
+                                    min(DesupHtr->DXSysPLR, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
                                 if (!DataGlobals::WarmupFlag) {
-                                    ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1;
-                                    if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1 == 1) {
-                                        ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                         WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                    ++DesupHtr->RegulaFalsiFailedNum1;
+                                    if (DesupHtr->RegulaFalsiFailedNum1 == 1) {
+                                        ShowWarningError(DesupHtr->Type + " \"" +
+                                                         DesupHtr->Name + "\"");
                                         ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
                                                           "Part-load ratio used = " +
                                                           General::RoundSigDigits(PartLoadRatio, 3));
                                         ShowContinueError("Please send this information to the EnergyPlus support group.");
                                         ShowContinueErrorTimeStamp("This error occurred in heating mode.");
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                        ShowRecurringWarningErrorAtEnd(DesupHtr->Type + " \"" +
+                                                                           DesupHtr->Name +
                                                                            "\":  Part-load ratio calculation failed in heating mode warning "
                                                                            "continues. Part-load ratio statistics follow.",
-                                                                       WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex1,
+                                                                       DesupHtr->RegulaFalsiFailedIndex1,
                                                                        PartLoadRatio,
                                                                        PartLoadRatio);
                                     }
                                 }
                             }
-                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                            NewTankTemp = Tank->TankTemp;
                         } else {
-                            PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
+                            PartLoadRatio = DesupHtr->DXSysPLR;
                         }
 
                     } else if (SELECT_CASE_var1 == modFloatMode) {
@@ -8475,43 +8496,43 @@ namespace WaterThermalTanks {
                         PartLoadRatio = 0.0;
 
                         //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                        Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                         //         check tank temperature by setting source inlet mass flow rate to zero
-                        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = 0.0;
+                        Tank->SourceMassFlowRate = 0.0;
 
                         //         disable the tank heater to find PLR of the HPWH
-                        WaterThermalTank(WaterThermalTankNum).MaxCapacity = 0.0;
-                        WaterThermalTank(WaterThermalTankNum).MinCapacity = 0.0;
-                        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-                        WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
-                        Real64 NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                        Tank->MaxCapacity = 0.0;
+                        Tank->MinCapacity = 0.0;
+                        DesupHtr->DesuperheaterPLR = PartLoadRatio;
+                        DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
+                        Tank->CalcWaterThermalTank();
+                        Real64 NewTankTemp = Tank->TankTemp;
 
                         if (NewTankTemp <= (SetPointTemp - DeadBandTempDiff)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).Mode = modHeatMode;
-                            WaterThermalTank(WaterThermalTankNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                            DesupHtr->Mode = modHeatMode;
+                            Tank->Mode = DesupHtr->SaveWHMode;
                             if ((TankTemp - NewTankTemp) != 0.0) {
-                                PartLoadRatio = min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                PartLoadRatio = min(DesupHtr->DXSysPLR,
                                                     max(0.0, ((SetPointTemp - DeadBandTempDiff) - NewTankTemp) / (TankTemp - NewTankTemp)));
                             } else {
-                                PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
+                                PartLoadRatio = DesupHtr->DXSysPLR;
                             }
 
                             //           set the full load outlet temperature on the water heater source inlet node
-                            WaterThermalTank(WaterThermalTankNum).SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                            Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                             //           set the source mass flow rate for the tank and enable backup heating element
-                            WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
-                            WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                            WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                            WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-                            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
-                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                            Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
+                            Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
+                            Tank->MinCapacity = DesupHtr->BackupElementCapacity;
+                            DesupHtr->DesuperheaterPLR = PartLoadRatio;
+                            DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
+                            Tank->CalcWaterThermalTank();
+                            NewTankTemp = Tank->TankTemp;
                             if (NewTankTemp > SetPointTemp) {
                                 Par(1) = SetPointTemp;
-                                Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                                Par(2) = DesupHtr->SaveWHMode;
                                 Par(3) = WaterThermalTankNum;
                                 if (FirstHVACIteration) {
                                     Par(4) = 1.0;
@@ -8527,50 +8548,50 @@ namespace WaterThermalTanks {
                                           PartLoadRatio,
                                           PLRResidualWaterThermalTank,
                                           0.0,
-                                          WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                          DesupHtr->DXSysPLR,
                                           Par);
                                 if (SolFla == -1) {
                                     ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                     strip(IterNum);
                                     if (!DataGlobals::WarmupFlag) {
-                                        ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2;
-                                        if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2 == 1) {
-                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                        ++DesupHtr->IterLimitExceededNum2;
+                                        if (DesupHtr->IterLimitExceededNum2 == 1) {
+                                            ShowWarningError(DesupHtr->Type + " \"" +
+                                                             DesupHtr->Name + "\"");
                                             ShowContinueError(
                                                 "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
                                                 IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(PartLoadRatio, 3));
                                             ShowContinueErrorTimeStamp("This error occurred in float mode.");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                               WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(DesupHtr->Type + " \"" +
+                                                                               DesupHtr->Name +
                                                                                "\":  Iteration limit exceeded in float mode warning continues. "
                                                                                "Part-load ratio statistics follow.",
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex2,
+                                                                           DesupHtr->IterLimitErrIndex2,
                                                                            PartLoadRatio,
                                                                            PartLoadRatio);
                                         }
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadRatio = max(0.0,
-                                                        min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                                        min(DesupHtr->DXSysPLR,
                                                             (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
                                     if (!DataGlobals::WarmupFlag) {
-                                        ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2;
-                                        if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2 == 1) {
-                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                        ++DesupHtr->RegulaFalsiFailedNum2;
+                                        if (DesupHtr->RegulaFalsiFailedNum2 == 1) {
+                                            ShowWarningError(DesupHtr->Type + " \"" +
+                                                             DesupHtr->Name + "\"");
                                             ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
                                                               "Part-load ratio used = " +
                                                               General::RoundSigDigits(PartLoadRatio, 3));
                                             ShowContinueError("Please send this information to the EnergyPlus support group.");
                                             ShowContinueErrorTimeStamp("This error occurred in float mode.");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                               WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                            ShowRecurringWarningErrorAtEnd(DesupHtr->Type + " \"" +
+                                                                               DesupHtr->Name +
                                                                                "\": Part-load ratio calculation failed in float mode warning "
                                                                                "continues. Part-load ratio statistics follow.",
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
+                                                                           DesupHtr->RegulaFalsiFailedIndex2,
                                                                            PartLoadRatio,
                                                                            PartLoadRatio);
                                         }
@@ -8578,8 +8599,8 @@ namespace WaterThermalTanks {
                                 }
                             }
                         } else {
-                            WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                            WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
+                            Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
+                            Tank->MinCapacity = DesupHtr->BackupElementCapacity;
                         }
 
                     } else {
@@ -8588,55 +8609,55 @@ namespace WaterThermalTanks {
 
                 //   should never get here, case is checked in GetWaterThermalTankInput
             } else {
-                ShowFatalError("Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                               ":  invalid water heater tank type and name entered = " + WaterHeaterDesuperheater(DesuperheaterNum).TankType + ", " +
-                               WaterHeaterDesuperheater(DesuperheaterNum).TankName);
+                ShowFatalError("Coil:WaterHeating:Desuperheater = " + DesupHtr->Name +
+                               ":  invalid water heater tank type and name entered = " + DesupHtr->TankType + ", " +
+                               DesupHtr->TankName);
             }
         }
 
         if (QHeatRate == 0) PartLoadRatio = 0.0;
 
         DataLoopNode::Node(WaterOutletNode).MassFlowRate = MdotWater * PartLoadRatio;
-        WaterHeaterDesuperheater(DesuperheaterNum).HEffFTempOutput = HEffFTemp;
-        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
+        DesupHtr->HEffFTempOutput = HEffFTemp;
+        DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
+        Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
 
         if (PartLoadRatio == 0) {
-            WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
-            DataLoopNode::Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
-            WaterHeaterDesuperheater(DesuperheaterNum).HEffFTempOutput = 0.0;
-            WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = 0.0;
+            Tank->SourceInletTemp = Tank->SourceOutletTemp;
+            DataLoopNode::Node(WaterOutletNode).Temp = Tank->SourceOutletTemp;
+            DesupHtr->HEffFTempOutput = 0.0;
+            DesupHtr->HeaterRate = 0.0;
         }
 
-        WaterHeaterDesuperheater(DesuperheaterNum).HeaterEnergy = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-        WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelRate = WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad * PartLoadRatio;
-        WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelEnergy =
-            WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelRate =
-            WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad * (1 - PartLoadRatio);
-        WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelEnergy =
-            WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        WaterHeaterDesuperheater(DesuperheaterNum).PumpPower = WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower * (PartLoadRatio);
-        WaterHeaterDesuperheater(DesuperheaterNum).PumpEnergy = WaterHeaterDesuperheater(DesuperheaterNum).PumpPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr->HeaterEnergy = DesupHtr->HeaterRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr->DesuperheaterPLR = PartLoadRatio;
+        DesupHtr->OnCycParaFuelRate = DesupHtr->OnCycParaLoad * PartLoadRatio;
+        DesupHtr->OnCycParaFuelEnergy =
+            DesupHtr->OnCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr->OffCycParaFuelRate =
+            DesupHtr->OffCycParaLoad * (1 - PartLoadRatio);
+        DesupHtr->OffCycParaFuelEnergy =
+            DesupHtr->OffCycParaFuelRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DesupHtr->PumpPower = DesupHtr->PumpElecPower * (PartLoadRatio);
+        DesupHtr->PumpEnergy = DesupHtr->PumpPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // Update remaining waste heat (just in case multiple users of waste heat use same source)
-        if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
-            int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
+        if (DesupHtr->ValidSourceType) {
+            int SourceID = DesupHtr->ReclaimHeatingSourceIndexNum;
+            if (DesupHtr->ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
                 //    Refrigeration systems are simulated at the zone time step, do not decrement available capacity
-                DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
-                DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXCooling ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiMode) {
-                DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXVariableCooling) {
-                DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).UsedWaterHeater = DesupHtr->HeaterRate;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
+                DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).UsedWaterHeater = DesupHtr->HeaterRate;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::DXCooling ||
+                       DesupHtr->ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
+                       DesupHtr->ReclaimHeatingSource == CoilObj::DXMultiMode) {
+                DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity -= DesupHtr->HeaterRate;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::DXVariableCooling) {
+                DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= DesupHtr->HeaterRate;
+            } else if (DesupHtr->ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= DesupHtr->HeaterRate;
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = DesupHtr->HeaterRate;
             }
         }
     }
