@@ -48,6 +48,7 @@
 #ifndef EnergyPlusAPIRuntime_h_INCLUDED
 #define EnergyPlusAPIRuntime_h_INCLUDED
 
+#include <EnergyPlus/api/EnergyPlusAPI.hh>
 #include <EnergyPlus/TypeDefs.h>
 
 #ifdef __cplusplus
@@ -60,10 +61,23 @@ ENERGYPLUSLIB_API void cRuntimeNoOp();
     // Program level functions
 ENERGYPLUSLIB_API int cRunEnergyPlus(const char* filepath);
 
-ENERGYPLUSLIB_API void registerRuntimeCallbackFromEndOfHour(void (*f)());
-ENERGYPLUSLIB_API void registerRuntimeCallbackFromBeginningOfHour(void (*f)());
-ENERGYPLUSLIB_API void registerRuntimeCallbackFromBeginningOfZoneTimeStep(void (*f)());
-ENERGYPLUSLIB_API void registerRuntimeCallbackFromEndOfZoneTimeStep(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromBeginNewEnvironment(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromAfterNewEnvironmentWarmupComplete(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromBeginZoneTimeStepBeforeInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromBeginZoneTimeStepAfterInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromBeginTimeStepBeforePredictor(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromAfterPredictorBeforeHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromAfterPredictorAfterHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromInsideSystemIterationLoop(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneTimeStepBeforeZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemTimeStepBeforeHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemTimeStepAfterHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneSizing(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemSizing(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromEndOfAfterComponentGetInput(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromUserDefinedComponentModel(void (*f)());
+ENERGYPLUSLIB_API void registerCallbackFromUnitarySystemSizing(void (*f)());
 
 #ifdef __cplusplus
 }

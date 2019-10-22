@@ -99,7 +99,7 @@
     No,               !- Run During Warmup Days
     1ZoneUncontrolledWithPlugin, !- Python Module Name
     MyPlugin,          !- Plugin Class Name
-    EndOfHour;         !- Calling Point
+    EndOfZoneTimestepBeforeZoneReporting;         !- Calling Point
 
   Version,9.2;
 

@@ -67,17 +67,9 @@ namespace EnergyPlus {
 
 namespace PluginManager {
 
-    enum class PluginCallingPoints {
-        Unknown = 0,
-        EndOfHour = 1,
-        BeginningOfHour = 2,
-        BeginningOfZoneTimeStep = 3,
-        EndOfZoneTimeStep = 4
-    };
+    void registerNewCallback(int iCalledFrom, void (*f)());
 
-    void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)());
-
-    void runAnyRegisteredCallbacks(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom);
+    void runAnyRegisteredCallbacks(int iCalledFrom);
 
     void clear_state();
 
@@ -100,7 +92,8 @@ namespace PluginManager {
             Py_FinalizeEx();
         }
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
-        static std::string sanitizedPath(std::string path);
+        static std::string sanitizedPath(std::string path); // intentionally not a const& string
+        static int calledFromFromString(std::string const &calledFrom);
     };
 
     extern std::unique_ptr<PluginManager> pluginManager;

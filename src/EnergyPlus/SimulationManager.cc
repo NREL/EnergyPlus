@@ -574,10 +574,8 @@ namespace SimulationManager {
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
-                    PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::BeginningOfHour);
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
-                        PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep);
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(false);
                         }
@@ -627,10 +625,8 @@ namespace SimulationManager {
                         BeginEnvrnFlag = false;
                         BeginSimFlag = false;
                         BeginFullSimFlag = false;
-                        PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::EndOfZoneTimeStep);
                     } // TimeStep loop
 
-                    PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::EndOfHour);
                     PreviousHour = HourOfDay;
 
                 } // ... End hour loop.

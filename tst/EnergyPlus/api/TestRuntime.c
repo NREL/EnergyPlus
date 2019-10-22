@@ -50,11 +50,11 @@
 
 void newEnvrnHandler()
 {
-    printf("STARTING A NEW ENVIRONMENT\n");
+    printf("Finishing another zone time step\n");
 }
 
 int main() {
-    registerRuntimeCallbackFromBeginNewEvironment(newEnvrnHandler);
+    registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(newEnvrnHandler);
     cRunEnergyPlus("/tmp/epdll");
     return 0;
 }

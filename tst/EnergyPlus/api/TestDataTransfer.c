@@ -51,7 +51,7 @@
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
 
-void afterHourHandler()
+void afterZoneTimeStepHandler()
 {
     printf("STARTING A NEW ENVIRONMENT\n");
     int kindOfSim = simDataGetKindOfSim();
@@ -95,7 +95,7 @@ void afterHourHandler()
 
 
 int main() {
-    registerRuntimeCallbackFromEndOfHour(afterHourHandler);
+    registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
     cRunEnergyPlus("/tmp/epdll");
     return 0;
 }

@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <map>
+
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -68,72 +70,28 @@ namespace EnergyPlus {
 namespace PluginManager {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::vector<void (*)()> callbacksCallFromEndOfHour;
-    std::vector<void (*)()> callbacksCallFromBeginningOfHour;
-    std::vector<void (*)()> callbacksCallFromBeginningOfZoneTimeStep;
-    std::vector<void (*)()> callbacksCallFromEndOfZoneTimeStep;
+    std::map<int, std::vector<void (*)()>> callbacks;
+    std::map<int, std::vector<PluginInstance>> plugins;
 
-    std::vector<PluginInstance> pluginsCallFromEndOfHour;
-    std::vector<PluginInstance> pluginsCallFromBeginningOfHour;
-    std::vector<PluginInstance> pluginsCallFromBeginningOfZoneTimeStep;
-    std::vector<PluginInstance> pluginsCallFromEndOfZoneTimeStep;
-
-    void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)())
+    void registerNewCallback(int iCalledFrom, void (*f)())
     {
-        if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour) {
-            callbacksCallFromEndOfHour.push_back(f);
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour) {
-            callbacksCallFromBeginningOfHour.push_back(f);
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep) {
-            callbacksCallFromBeginningOfZoneTimeStep.push_back(f);
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep) {
-            callbacksCallFromEndOfZoneTimeStep.push_back(f);
-        }
+        callbacks[iCalledFrom].push_back(f);
     }
 
-    void runAnyRegisteredCallbacks(PluginCallingPoints iCalledFrom)
+    void runAnyRegisteredCallbacks(int iCalledFrom)
     {
-        if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour) {
-            for (auto const &cb : callbacksCallFromEndOfHour) {
-                cb();
-            }
-            for (auto &plugin : pluginsCallFromEndOfHour) {
-                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
-            }
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour) {
-            for (auto const &cb : callbacksCallFromBeginningOfHour) {
-                cb();
-            }
-            for (auto &plugin : pluginsCallFromBeginningOfHour) {
-                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
-            }
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep) {
-            for (auto const &cb : callbacksCallFromBeginningOfZoneTimeStep) {
-                cb();
-            }
-            for (auto &plugin : pluginsCallFromBeginningOfZoneTimeStep) {
-                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
-            }
-        } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep) {
-            for (auto const &cb : callbacksCallFromEndOfZoneTimeStep) {
-                cb();
-            }
-            for (auto &plugin : pluginsCallFromEndOfZoneTimeStep) {
-                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
-            }
+        for (auto const &cb : callbacks[iCalledFrom]) {
+            cb();
+        }
+        for (auto &plugin : plugins[iCalledFrom]) {
+            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
         }
     }
 
     void clear_state()
     {
-        callbacksCallFromEndOfHour.clear();
-        callbacksCallFromBeginningOfHour.clear();
-        callbacksCallFromBeginningOfZoneTimeStep.clear();
-        callbacksCallFromEndOfZoneTimeStep.clear();
-        pluginsCallFromEndOfHour.clear();
-        pluginsCallFromBeginningOfHour.clear();
-        pluginsCallFromBeginningOfZoneTimeStep.clear();
-        pluginsCallFromEndOfZoneTimeStep.clear();
+        callbacks.clear();
+        plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
     }
 
@@ -171,7 +129,6 @@ namespace PluginManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-
                 std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
                 if (workingDirFlagUC == "YES") {
                     PluginManager::addToPythonPath(".", false);
@@ -201,8 +158,8 @@ namespace PluginManager {
 
         // Now read all the actual plugins and interpret them
         std::string const sPlugins = "PythonPlugin:Instance";
-        int plugins = inputProcessor->getNumObjectsFound(sPaths);
-        if (plugins > 0) {
+        int pluginInstances = inputProcessor->getNumObjectsFound(sPaths);
+        if (pluginInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sPlugins);
             if (instances == inputProcessor->epJSON.end()) {
                 ShowSevereError(                                                                          // LCOV_EXCL_LINE
@@ -222,15 +179,8 @@ namespace PluginManager {
                 if (sWarmup == "YES") {
                     warmup = true;
                 }
-                if (sCallingPoint == "BEGINNINGOFHOUR") {
-                    pluginsCallFromBeginningOfHour.emplace_back(fileName, className, thisObjectName, warmup);
-                } else if (sCallingPoint == "BEGINNINGOFZONETIMESTEP") {
-                    pluginsCallFromBeginningOfZoneTimeStep.emplace_back(fileName, className, thisObjectName, warmup);
-                } else if (sCallingPoint == "ENDOFZONETIMESTEP") {
-                    pluginsCallFromEndOfZoneTimeStep.emplace_back(fileName, className, thisObjectName, warmup);
-                } else if (sCallingPoint == "ENDOFHOUR") {
-                    pluginsCallFromEndOfHour.emplace_back(fileName, className, thisObjectName, warmup);
-                }
+                int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
+                plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
             }
         }
 
@@ -392,6 +342,47 @@ namespace PluginManager {
             // DEBUGGING PATHS: PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
+        }
+    }
+
+    int PluginManager::calledFromFromString(std::string const &calledFrom) {
+        if (calledFrom == "BEGINNEWENVIRONMENT") {
+            return DataGlobals::emsCallFromBeginNewEvironment;
+        } else if (calledFrom == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
+            return DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
+        } else if (calledFrom == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
+            return DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
+        } else if (calledFrom == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
+            return DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
+        } else if (calledFrom == "BEGINTIMESTEPBEFOREPREDICTOR") {
+            return DataGlobals::emsCallFromBeginTimestepBeforePredictor;
+        } else if (calledFrom == "AFTERPREDICTORBEFOREHVACMANAGERS") {
+            return DataGlobals::emsCallFromBeforeHVACManagers;
+        } else if (calledFrom == "AFTERPREDICTORAFTERHVACMANAGERS") {
+            return DataGlobals::emsCallFromAfterHVACManagers;
+        } else if (calledFrom == "INSIDEHVACSYSTEMITERATIONLOOP") {
+            return DataGlobals::emsCallFromHVACIterationLoop;
+        } else if (calledFrom == "ENDOFZONETIMESTEPBEFOREZONEREPORTING") {
+            return DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
+        } else if (calledFrom == "ENDOFZONETIMESTEPAFTERZONEREPORTING") {
+            return DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
+        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING") {
+            return DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
+        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING") {
+            return DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
+        } else if (calledFrom == "ENDOFZONESIZING") {
+            return DataGlobals::emsCallFromZoneSizing;
+        } else if (calledFrom == "ENDOFSYSTEMSIZING") {
+            return DataGlobals::emsCallFromSystemSizing;
+        } else if (calledFrom == "AFTERCOMPONENTINPUTREADIN") {
+            return DataGlobals::emsCallFromComponentGetInput;
+        } else if (calledFrom == "USERDEFINEDCOMPONENTMODEL") {
+            return DataGlobals::emsCallFromUserDefinedComponentModel;
+        } else if (calledFrom == "UNITARYSYSTEMSIZING") {
+            return DataGlobals::emsCallFromUnitarySystemSizing;
+        } else {
+            EnergyPlus::ShowFatalError("Invalid calledFrom string passed to calledFromFromString");
+            return -1;
         }
     }
 

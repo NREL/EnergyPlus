@@ -8,7 +8,7 @@ data = api.data_transfer()
 env_count = 0
 
 
-def hour_handler():
+def time_step_handler():
     global env_count
     env_count += 1
     print("OH HAI NEW HOUR")
@@ -28,5 +28,5 @@ def hour_handler():
     print("Actuated Dew Point temp value is: %s" % dp_temp)
 
 
-runtime.register_callback_end_of_hour(hour_handler)
+runtime.register_callback_end_zone_timestep_after_zone_reporting(time_step_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
