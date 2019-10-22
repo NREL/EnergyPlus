@@ -125,12 +125,14 @@ namespace SwimmingPool {
     Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    bool getSwimmingPoolInput = true;
 
     Array1D<SwimmingPoolData> Pool;
 
     void clear_state()
     {
         NumSwimmingPools = 0;
+        getSwimmingPoolInput = true;
         CheckEquipName.deallocate();
         SurfaceToPoolIndex.deallocate();
         QPoolSrcAvg.deallocate();
@@ -158,12 +160,11 @@ namespace SwimmingPool {
         // Standard EnergyPlus methodology (Get, Init, Calc, Update, Report, etc.)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
         int PoolNum;                    // Pool number index
 
-        if (GetInputFlag) {
+        if (getSwimmingPoolInput) {
             GetSwimmingPool();
-            GetInputFlag = false;
+            getSwimmingPoolInput = false;
         }
 
         // System wide (for all pools) inits
@@ -204,7 +205,7 @@ namespace SwimmingPool {
         Real64 const MinPowerFactor(0.0);                          // minimum power factor for miscellaneous equipment
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false);  // Set to true if something goes wrong
+        bool ErrorsFound(false);  // Set to true if something goes wrong
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -615,9 +616,6 @@ namespace SwimmingPool {
         Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true); // Flag for one-time initializations
-        static bool MyEnvrnFlagGeneral(true);
-        static Array1D_bool MyPlantScanFlagPool;
         Real64 mdot;
         Real64 HeatGainPerPerson;
         Real64 PeopleModifier;
@@ -625,11 +623,7 @@ namespace SwimmingPool {
         int SurfNum;
         Real64 Density;
 
-        if (MyOneTimeFlag) {
-            MyOneTimeFlag = false;
-            MyPlantScanFlagPool.allocate(NumSwimmingPools);
-            MyPlantScanFlagPool = true;
-
+        if (Pool(PoolNum).MyOneTimeFlag) {
             ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
             ZeroSourceSumHATsurf = 0.0;
             QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
@@ -646,9 +640,9 @@ namespace SwimmingPool {
             LastTimeStepSys = 0.0;
         }
 
-        InitSwimmingPoolPlantLoopIndex(PoolNum, MyPlantScanFlagPool(PoolNum));
+        InitSwimmingPoolPlantLoopIndex(PoolNum, Pool(PoolNum).MyPlantScanFlagPool);
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlagGeneral) {
+        if (DataGlobals::BeginEnvrnFlag && Pool(PoolNum).MyEnvrnFlagGeneral) {
             ZeroSourceSumHATsurf = 0.0;
             QPoolSrcAvg = 0.0;
             HeatTransCoefsAvg = 0.0;
@@ -656,9 +650,10 @@ namespace SwimmingPool {
             LastHeatTransCoefs = 0.0;
             LastSysTimeElapsed = 0.0;
             LastTimeStepSys = 0.0;
-            MyEnvrnFlagGeneral = false;
+            Pool(PoolNum).MyEnvrnFlagGeneral = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlagGeneral = true;
+
+        if (!DataGlobals::BeginEnvrnFlag) Pool(PoolNum).MyEnvrnFlagGeneral = true;
 
         if (DataGlobals::BeginEnvrnFlag) {
             Pool(PoolNum).PoolWaterTemp = 23.0;
@@ -673,7 +668,7 @@ namespace SwimmingPool {
             Density = FluidProperties::GetDensityGlycol("WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName);
             Pool(PoolNum).WaterMass = DataSurfaces::Surface(Pool(PoolNum).SurfacePtr).Area * Pool(PoolNum).AvgDepth * Density;
             Pool(PoolNum).WaterMassFlowRateMax = Pool(PoolNum).WaterVolFlowMax * Density;
-            InitSwimmingPoolPlantNodeFlow(PoolNum, MyPlantScanFlagPool(PoolNum));
+            InitSwimmingPoolPlantNodeFlow(PoolNum, Pool(PoolNum).MyPlantScanFlagPool);
         }
 
         if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
@@ -1005,7 +1000,7 @@ namespace SwimmingPool {
     )
     {
         static std::string const RoutineName("CalcSwimmingPoolEvap");
-        static Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
+        Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
 
         Real64 PSatPool;
         Real64 PParAir;

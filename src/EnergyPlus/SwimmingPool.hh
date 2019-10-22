@@ -142,6 +142,9 @@ namespace SwimmingPool {
         Real64 RadConvertToConvectRep;  // LW and SW radiation converted to convective gain by pool cover (reporting) in W
         Real64 EvapHeatLossRate;        // Heat lost due to evaporation of pool water as a rate in Watts
         Real64 EvapEnergyLoss;          // Energy lost due to evaporation in Joules
+        bool MyOneTimeFlag;
+        bool MyEnvrnFlagGeneral;
+        bool MyPlantScanFlagPool;
 
         // Default Constructor
         SwimmingPoolData()
@@ -153,7 +156,8 @@ namespace SwimmingPool {
               PeopleSchedPtr(0), PeopleHeatGainSchedPtr(0), PeopleHeatGain(0.0), GlycolIndex(0), WaterMass(0.0), SatPressPoolWaterTemp(0.0),
               PartPressZoneAirTemp(0.0), PoolWaterTemp(23.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterMassFlowRate(0.0),
               MakeUpWaterMassFlowRate(0.0), MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0), MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0),
-              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0)
+              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0),
+              MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
     };
