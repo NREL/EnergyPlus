@@ -1,4 +1,4 @@
-from ctypes import cdll, c_bool, c_int, c_char_p
+from ctypes import cdll, c_int, c_char_p
 from pyenergyplus.common import RealEP
 from typing import Union
 
@@ -35,7 +35,7 @@ class DataTransfer:
         self.api.getMeterValue.argtypes = [c_int]
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
-        self.api.setActuatorValue.restype = c_bool
+        self.api.setActuatorValue.restype = c_int
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
@@ -125,7 +125,7 @@ class DataTransfer:
         """
         return self.api.getMeterValue(meter_handle)
 
-    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> bool:
+    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> int:
         """
         Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
         to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
@@ -133,6 +133,6 @@ class DataTransfer:
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :param actuator_value: The value to assign to the actuator
-        :return: A bool response value for success of setting the actuator value, True is success, False is failure
+        :return: An integer response value for success of setting the actuator value, 0 is success, failure otherwise
         """
         return self.api.setActuatorValue(actuator_handle, actuator_value)
