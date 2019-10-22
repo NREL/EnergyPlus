@@ -490,8 +490,7 @@ namespace WaterThermalTanks {
 
         void SetupStratifiedNodes();
 
-        void InitWaterThermalTank(int WaterThermalTankNum,
-                                  bool FirstHVACIteration,
+        void InitWaterThermalTank(bool FirstHVACIteration,
                                   Optional_int_const LoopNum = _,
                                   Optional_int_const LoopSideNum = _);
 
@@ -530,6 +529,18 @@ namespace WaterThermalTanks {
         Real64 FindStratifiedTankSensedTemp(bool UseAverage = false);
 
         Real64 getDeadBandTemp();
+
+        Real64 PlantMassFlowRatesFunc(int InNodeNum,
+                                      bool FirstHVACIteration,
+                                      int WaterThermalTankSide,
+                                      int PlantLoopSide,
+                                      bool PlumbedInSeries, // !unused1208
+                                      int BranchControlType,
+                                      Real64 OutletTemp,
+                                      Real64 DeadBandTemp,
+                                      Real64 SetPointTemp);
+
+        void SetupChilledWaterTankOutputs();
     };
 
     struct HeatPumpWaterHeaterData : PlantComponent
@@ -876,17 +887,6 @@ namespace WaterThermalTanks {
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 
-    Real64 PlantMassFlowRatesFunc(int WaterThermalTankNum,
-                                  int InNodeNum,
-                                  bool FirstHVACIteration,
-                                  int WaterThermalTankSide,
-                                  int PlantLoopSide,
-                                  bool PlumbedInSeries, // !unused1208
-                                  int BranchControlType,
-                                  Real64 OutletTemp,
-                                  Real64 DeadBandTemp,
-                                  Real64 SetPointTemp);
-
     void SetVSHPWHFlowRates(WaterThermalTankData &Tank,
                             HeatPumpWaterHeaterData &HPWH,
                             int SpeedNum,
@@ -899,8 +899,6 @@ namespace WaterThermalTanks {
     // STATIC FUNCTIONS
 
     void SetupWaterHeaterOutputs(int WaterThermalTankNum);
-
-    void SetupChilledWaterTankOutputs(int WaterThermalTankNum);
 
     // used by: CalcHeatPumpWaterHeater
     Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
