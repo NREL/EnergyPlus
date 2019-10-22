@@ -45,9 +45,9 @@ class FluidAndPsychProperties:
 
         self.api.initializeFunctionalAPI()
 
-    def get_sat_press_refrigerant(self) -> float:
+    def get_sat_press_refrigerant(self, temperature) -> float:
         index = 0
-        val = self.api.fluidProperty_GetSatPressureRefrig(self.fluid_name.encode('utf-8'), 25.5, index)
+        val = self.api.fluidProperty_GetSatPressureRefrig(self.fluid_name.encode('utf-8'), temperature, index)
         return float(val)
 
 

@@ -12,5 +12,5 @@ d = thermal_props.diffusivity()
 print("Python API Test: Updated thermal diffusivity = " + str(d))
 
 fluid_properties = functional_api.fluid_properties("STEAM")
-sat_press = fluid_properties.get_sat_press_refrigerant()
+sat_press = fluid_properties.get_sat_press_refrigerant(25.5)
 print("Python API Test: Saturation pressure = " + str(sat_press))
