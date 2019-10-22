@@ -829,23 +829,6 @@ namespace WaterThermalTanks {
         static std::string const RoutineName("GetWaterThermalTankInput: ");
         static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
 
-        struct WaterHeaterSaveNodes
-        {
-            // Members
-            std::string InletNodeName1;
-            std::string OutletNodeName1;
-            std::string InletNodeName2;
-            std::string OutletNodeName2;
-
-            // Default Constructor
-            WaterHeaterSaveNodes() = default;
-        };
-
-        // Object Data
-        Array1D<WaterHeaterSaveNodes> HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
-        Array1D<WaterHeaterSaveNodes> WHSaveNodeNames;   // temporary for WH node names used in later checks
-        Array1D<WaterHeaterSaveNodes> CoilSaveNodeNames; // temporary for coil node names used in later checks
-
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
                                    "','Standard Rated Energy Factor')");
@@ -882,18 +865,15 @@ namespace WaterThermalTanks {
             if (modNumWaterThermalTank > 0) {
                 WaterThermalTank.allocate(modNumWaterThermalTank);
                 UniqueWaterThermalTankNames.reserve(static_cast<unsigned>(modNumWaterThermalTank));
-                WHSaveNodeNames.allocate(modNumWaterThermalTank);
             }
             if (modNumHeatPumpWaterHeater > 0) {
                 HPWaterHeater.allocate(modNumHeatPumpWaterHeater);
-                HPWHSaveNodeNames.allocate(modNumHeatPumpWaterHeater);
 
                 for (int IHPIndex = 1; IHPIndex <= modNumHeatPumpWaterHeater; ++IHPIndex) HPWaterHeater(IHPIndex).bIsIHP = false;
             }
 
             if (modNumWaterHeaterDesuperheater > 0) {
                 WaterHeaterDesuperheater.allocate(modNumWaterHeaterDesuperheater);
-                CoilSaveNodeNames.allocate(modNumWaterHeaterDesuperheater);
             }
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
@@ -1002,8 +982,8 @@ namespace WaterThermalTanks {
                                                                                                    1,
                                                                                                    DataLoopNode::ObjectIsParent);
 
-                    CoilSaveNodeNames(DesuperheaterNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(5);
-                    CoilSaveNodeNames(DesuperheaterNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(6);
+                    WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(5);
+                    WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(6);
 
                     WaterHeaterDesuperheater(DesuperheaterNum).TankType = DataIPShortCuts::cAlphaArgs(7);
 
@@ -1199,7 +1179,6 @@ namespace WaterThermalTanks {
 
                     // Create reference to current HPWH object in array.
                     HeatPumpWaterHeaterData &HPWH = HPWaterHeater(HPWaterHeaterNum);
-                    WaterHeaterSaveNodes &HPWHSaveNode = HPWHSaveNodeNames(HPWaterHeaterNum);
 
                     // Initialize the offsets to zero
                     nAlphaOffset = 0;
@@ -1304,10 +1283,10 @@ namespace WaterThermalTanks {
                         // Condenser Inlet/Outlet Nodes
                         HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(
                             hpwhAlpha[4], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 2, DataLoopNode::ObjectIsParent);
-                        HPWHSaveNode.InletNodeName1 = hpwhAlpha[4];
+                        HPWH.InletNodeName1 = hpwhAlpha[4];
                         HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(
                             hpwhAlpha[5], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsParent);
-                        HPWHSaveNode.OutletNodeName1 = hpwhAlpha[5];
+                        HPWH.OutletNodeName1 = hpwhAlpha[5];
 
                         // Condenser Water Flow Rate
                         HPWH.OperatingWaterFlowRate = hpwhNumeric[2];
@@ -1448,11 +1427,11 @@ namespace WaterThermalTanks {
                     // Use Side Inlet/Outlet
                     // Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
                     // Save the name of the node for use with set up comp sets
-                    HPWHSaveNode.InletNodeName2 = hpwhAlpha[16 + nAlphaOffset];
-                    HPWHSaveNode.OutletNodeName2 = hpwhAlpha[17 + nAlphaOffset];
+                    HPWH.InletNodeName2 = hpwhAlpha[16 + nAlphaOffset];
+                    HPWH.OutletNodeName2 = hpwhAlpha[17 + nAlphaOffset];
 
                     if (!hpwhAlphaBlank[16 + nAlphaOffset] && !hpwhAlphaBlank[17 + nAlphaOffset]) {
-                        HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(HPWHSaveNode.InletNodeName2,
+                        HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName2,
                                                                 ErrorsFound,
                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                 HPWH.Name,
@@ -1460,7 +1439,7 @@ namespace WaterThermalTanks {
                                                                 DataLoopNode::NodeConnectionType_Inlet,
                                                                 1,
                                                                 DataLoopNode::ObjectIsParent);
-                        HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(HPWHSaveNode.OutletNodeName2,
+                        HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName2,
                                                                  ErrorsFound,
                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                  HPWH.Name,
@@ -1554,8 +1533,8 @@ namespace WaterThermalTanks {
                     if (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped) {
                         DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
 
-                        HPWHSaveNode.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
-                        HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(HPWHSaveNode.InletNodeName1,
+                        HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
+                        HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
                                                                     ErrorsFound,
                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                     HPWH.Name,
@@ -1563,8 +1542,8 @@ namespace WaterThermalTanks {
                                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                                     2,
                                                                     DataLoopNode::ObjectIsParent);
-                        HPWHSaveNode.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
-                        HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(HPWHSaveNode.OutletNodeName1,
+                        HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
+                        HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
                                                                      ErrorsFound,
                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                      HPWH.Name,
@@ -2726,7 +2705,7 @@ namespace WaterThermalTanks {
                                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(14);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(14);
                         WaterThermalTank(WaterThermalTankNum).UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(15),
                                                                                                 ErrorsFound,
                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -2735,7 +2714,7 @@ namespace WaterThermalTanks {
                                                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(15);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(15);
 
                         if (DataIPShortCuts::rNumericArgs(17) > 0) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -2762,7 +2741,7 @@ namespace WaterThermalTanks {
                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
                                                                                                   2,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(16);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(16);
                         WaterThermalTank(WaterThermalTankNum).SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(17),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
@@ -2771,7 +2750,7 @@ namespace WaterThermalTanks {
                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
                                                                                                    2,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(17);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(17);
                     }
 
                     if (!DataIPShortCuts::lAlphaFieldBlanks(18)) {
@@ -3343,7 +3322,7 @@ namespace WaterThermalTanks {
                                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(16);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(16);
                         WaterThermalTank(WaterThermalTankNum).UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(17),
                                                                                                 ErrorsFound,
                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -3352,7 +3331,7 @@ namespace WaterThermalTanks {
                                                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(17);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(17);
 
                         if (DataIPShortCuts::rNumericArgs(22) > 0) {
                             ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -3379,7 +3358,7 @@ namespace WaterThermalTanks {
                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
                                                                                                   2,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(18);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(18);
                         WaterThermalTank(WaterThermalTankNum).SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(19),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
@@ -3388,7 +3367,7 @@ namespace WaterThermalTanks {
                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
                                                                                                    2,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(19);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(19);
                     }
 
                     // Validate inlet mode
@@ -3675,7 +3654,7 @@ namespace WaterThermalTanks {
                                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(7);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(7);
                         WaterThermalTank(WaterThermalTankNum).UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(8),
                                                                                                 ErrorsFound,
                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -3684,7 +3663,7 @@ namespace WaterThermalTanks {
                                                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
                     }
 
                     if ((!DataIPShortCuts::lAlphaFieldBlanks(10)) || (!DataIPShortCuts::lAlphaFieldBlanks(11))) {
@@ -3696,7 +3675,7 @@ namespace WaterThermalTanks {
                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
                                                                                                   2,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(10);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(10);
                         WaterThermalTank(WaterThermalTankNum).SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
@@ -3705,7 +3684,7 @@ namespace WaterThermalTanks {
                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
                                                                                                    2,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
                     }
 
                     if (WaterThermalTank(WaterThermalTankNum).UseSide.loopSideNum == DataPlant::DemandSide &&
@@ -3977,7 +3956,7 @@ namespace WaterThermalTanks {
                                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(8);
                         WaterThermalTank(WaterThermalTankNum).UseOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(9),
                                                                                                 ErrorsFound,
                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -3986,7 +3965,7 @@ namespace WaterThermalTanks {
                                                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                                                 1,
                                                                                                 DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(9);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(9);
                     }
 
                     if ((!DataIPShortCuts::lAlphaFieldBlanks(11)) || (!DataIPShortCuts::lAlphaFieldBlanks(12))) {
@@ -3998,7 +3977,7 @@ namespace WaterThermalTanks {
                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
                                                                                                   2,
                                                                                                   DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
+                        WaterThermalTank(WaterThermalTankNum).InletNodeName2 = DataIPShortCuts::cAlphaArgs(11);
                         WaterThermalTank(WaterThermalTankNum).SourceOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(12),
                                                                                                    ErrorsFound,
                                                                                                    DataIPShortCuts::cCurrentModuleObject,
@@ -4007,7 +3986,7 @@ namespace WaterThermalTanks {
                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
                                                                                                    2,
                                                                                                    DataLoopNode::ObjectIsNotParent);
-                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(12);
+                        WaterThermalTank(WaterThermalTankNum).OutletNodeName2 = DataIPShortCuts::cAlphaArgs(12);
                     }
 
                     if (DataIPShortCuts::lAlphaFieldBlanks(10)) {
@@ -4100,11 +4079,11 @@ namespace WaterThermalTanks {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
                             ShowContinueError("Desuperheater inlet node name does not match thermal tank source outlet node name.");
                             ShowContinueError(
-                                "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames(DesuperheaterNum).InletNodeName1 + " and " +
-                                CoilSaveNodeNames(DesuperheaterNum).OutletNodeName1);
+                                "Desuperheater water inlet and outlet node names = " + WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 + " and " +
+                                        WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1);
                             ShowContinueError(
-                                "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName2 +
-                                " and " + WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName2);
+                                "Thermal tank source side inlet and outlet node names      = " + WaterThermalTank(CheckWaterHeaterNum).InletNodeName2 +
+                                " and " + WaterThermalTank(CheckWaterHeaterNum).OutletNodeName2);
                             ErrorsFound = true;
                         }
 
@@ -4112,11 +4091,11 @@ namespace WaterThermalTanks {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
                             ShowContinueError("Desuperheater water outlet node name does not match thermal tank source inlet node name.");
                             ShowContinueError(
-                                "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames(DesuperheaterNum).InletNodeName1 + " and " +
-                                CoilSaveNodeNames(DesuperheaterNum).OutletNodeName1);
+                                "Desuperheater water inlet and outlet node names = " + WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 + " and " +
+                                        WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1);
                             ShowContinueError(
-                                "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName2 +
-                                " and " + WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName2);
+                                "Thermal tank source side inlet and outlet node names      = " + WaterThermalTank(CheckWaterHeaterNum).InletNodeName2 +
+                                " and " + WaterThermalTank(CheckWaterHeaterNum).OutletNodeName2);
                             ErrorsFound = true;
                         }
 
@@ -4180,30 +4159,29 @@ namespace WaterThermalTanks {
                         }
 
                         // Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
-                        WaterHeaterSaveNodes const &HPWHSaveNode = HPWHSaveNodeNames(HPWaterHeaterNum);
                         if (HPWH.bIsIHP) {
                             BranchNodeConnections::SetUpCompSets(HPWH.Type,
                                           HPWH.Name,
                                           HPWH.DXCoilType,
                                           HPWH.DXCoilName + " Water Coil",
-                                          HPWHSaveNode.InletNodeName1,
-                                          HPWHSaveNode.OutletNodeName1,
+                                          HPWH.InletNodeName1,
+                                          HPWH.OutletNodeName1,
                                           "HPWH To Coil");
                         } else {
                             BranchNodeConnections::SetUpCompSets(HPWH.Type,
                                           HPWH.Name,
                                           HPWH.DXCoilType,
                                           HPWH.DXCoilName,
-                                          HPWHSaveNode.InletNodeName1,
-                                          HPWHSaveNode.OutletNodeName1,
+                                          HPWH.InletNodeName1,
+                                          HPWH.OutletNodeName1,
                                           "HPWH To Coil");
                         }
                         BranchNodeConnections::SetUpCompSets(HPWH.Type,
                                       HPWH.Name,
                                       HPWH.TankType,
                                       HPWH.TankName,
-                                      HPWHSaveNode.OutletNodeName1,
-                                      HPWHSaveNode.InletNodeName1,
+                                      HPWH.OutletNodeName1,
+                                      HPWH.InletNodeName1,
                                       "HPWH To Tank");
 
                         // do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
@@ -4241,9 +4219,7 @@ namespace WaterThermalTanks {
                                 ShowContinueError("Please leave the source side inlet and outlet fields blank.");
                                 ErrorsFound = true;
                             } else {
-                                WaterHeaterSaveNodes &HPWHNodeNames = HPWHSaveNodeNames(HPWaterHeaterNum);
-                                WaterHeaterSaveNodes &TankNodenames = WHSaveNodeNames(CheckWaterHeaterNum);
-                                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(HPWHNodeNames.OutletNodeName1,
+                                Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
                                                                          ErrorsFound,
                                                                          Tank.Type,
                                                                          Tank.Name,
@@ -4251,8 +4227,8 @@ namespace WaterThermalTanks {
                                                                          DataLoopNode::NodeConnectionType_Inlet,
                                                                          2,
                                                                          DataLoopNode::ObjectIsNotParent);
-                                TankNodenames.InletNodeName2 = HPWHNodeNames.OutletNodeName1;
-                                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(HPWHNodeNames.InletNodeName1,
+                                Tank.InletNodeName2 = HPWH.OutletNodeName1;
+                                Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
                                                                           ErrorsFound,
                                                                           Tank.Type,
                                                                           Tank.Name,
@@ -4260,7 +4236,7 @@ namespace WaterThermalTanks {
                                                                           DataLoopNode::NodeConnectionType_Outlet,
                                                                           2,
                                                                           DataLoopNode::ObjectIsNotParent);
-                                TankNodenames.OutletNodeName2 = HPWHNodeNames.InletNodeName1;
+                                Tank.OutletNodeName2 = HPWH.InletNodeName1;
                             }
 
                             // Mark the tank as not stand alone because it is connected now.
@@ -4276,11 +4252,11 @@ namespace WaterThermalTanks {
                                               "outlet node names for water heater tank = " +
                                               HPWH.TankType + ": " + HPWH.TankName);
                             ShowContinueError("Heat pump water heater use side inlet and outlet node names = " +
-                                              HPWHSaveNodeNames(HPWaterHeaterNum).InletNodeName2 + " and " +
-                                              HPWHSaveNodeNames(HPWaterHeaterNum).OutletNodeName2);
+                                                      HPWH.InletNodeName2 + " and " +
+                                                      HPWH.OutletNodeName2);
                             ShowContinueError("Water heater tank use side inlet and outlet node names      = " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName1 + " and " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName1);
+                                              Tank.InletNodeName1 + " and " +
+                                              Tank.OutletNodeName1);
                             ErrorsFound = true;
                         } else {
                             if (!HPWH.StandAlone) {
@@ -4291,8 +4267,8 @@ namespace WaterThermalTanks {
                                 //                     WHSaveNodeNames(CheckWaterHeaterNum)%InletNodeName1,WHSaveNodeNames(CheckWaterHeaterNum)%OutletNodeName1)
                                 BranchNodeConnections::TestCompSet(HPWH.Type,
                                             HPWH.Name,
-                                            WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName1,
-                                            WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName1,
+                                            Tank.InletNodeName1,
+                                            Tank.OutletNodeName1,
                                             "Water Nodes");
                             }
                         }
@@ -4302,11 +4278,11 @@ namespace WaterThermalTanks {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError("Heat Pump condenser water inlet node name does not match water heater tank source outlet node name.");
                             ShowContinueError(
-                                "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames(HPWaterHeaterNum).InletNodeName1 +
-                                " and " + HPWHSaveNodeNames(HPWaterHeaterNum).OutletNodeName1);
+                                "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 +
+                                " and " + HPWH.OutletNodeName1);
                             ShowContinueError("Water heater tank source side inlet and outlet node names      = " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName2 + " and " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName2);
+                                              Tank.InletNodeName2 + " and " +
+                                              Tank.OutletNodeName2);
                             ErrorsFound = true;
                         }
 
@@ -4314,11 +4290,11 @@ namespace WaterThermalTanks {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError("Heat Pump condenser water outlet node name does not match water heater tank source inlet node name.");
                             ShowContinueError(
-                                "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames(HPWaterHeaterNum).InletNodeName1 +
-                                " and " + HPWHSaveNodeNames(HPWaterHeaterNum).OutletNodeName1);
+                                "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 +
+                                " and " + HPWH.OutletNodeName1);
                             ShowContinueError("Water heater tank source side inlet and outlet node names      = " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).InletNodeName2 + " and " +
-                                              WHSaveNodeNames(CheckWaterHeaterNum).OutletNodeName2);
+                                              Tank.InletNodeName2 + " and " +
+                                              Tank.OutletNodeName2);
                             ErrorsFound = true;
                         }
 
@@ -4722,8 +4698,8 @@ namespace WaterThermalTanks {
                         } else {
                             BranchNodeConnections::TestCompSet(WaterThermalTank(WaterThermalTankNum).Type,
                                         WaterThermalTank(WaterThermalTankNum).Name,
-                                        WHSaveNodeNames(WaterThermalTankNum).InletNodeName1,
-                                        WHSaveNodeNames(WaterThermalTankNum).OutletNodeName1,
+                                                               WaterThermalTank(WaterThermalTankNum).InletNodeName1,
+                                                               WaterThermalTank(WaterThermalTankNum).OutletNodeName1,
                                         "Use Side Water Nodes");
                         }
                     }
@@ -4731,8 +4707,8 @@ namespace WaterThermalTanks {
 
                         BranchNodeConnections::TestCompSet(WaterThermalTank(WaterThermalTankNum).Type,
                                     WaterThermalTank(WaterThermalTankNum).Name,
-                                    WHSaveNodeNames(WaterThermalTankNum).InletNodeName2,
-                                    WHSaveNodeNames(WaterThermalTankNum).OutletNodeName2,
+                                                           WaterThermalTank(WaterThermalTankNum).InletNodeName2,
+                                                           WaterThermalTank(WaterThermalTankNum).OutletNodeName2,
                                     "Source Side Water Nodes");
                     }
                 }

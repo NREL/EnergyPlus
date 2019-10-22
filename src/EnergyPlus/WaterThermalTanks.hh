@@ -443,6 +443,11 @@ namespace WaterThermalTanks {
         bool MyHPSizeFlag;
         bool CheckWTTEquipName;
 
+        std::string InletNodeName1;
+        std::string OutletNodeName1;
+        std::string InletNodeName2;
+        std::string OutletNodeName2;
+
         // Default Constructor
         WaterThermalTankData()
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
@@ -668,6 +673,11 @@ namespace WaterThermalTanks {
         std::string CoilOutletNode_str;        // Used to set up comp set
         bool CheckHPWHEquipName;
 
+        std::string InletNodeName1;
+        std::string OutletNodeName1;
+        std::string InletNodeName2;
+        std::string OutletNodeName2;
+
         // end of variables for variable-speed HPWH
 
         // Default Constructor
@@ -761,6 +771,11 @@ namespace WaterThermalTanks {
         int RegulaFalsiFailedNum2;   // Counter for recurring RegulaFalsi failed warning messages
         bool FirstTimeThroughFlag;   // Flag for saving water heater status
         bool ValidSourceType;
+
+        std::string InletNodeName1;
+        std::string OutletNodeName1;
+        std::string InletNodeName2;
+        std::string OutletNodeName2;
 
         // Default Constructor
         WaterHeaterDesuperheaterData()
