@@ -14,12 +14,6 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
-  api/datatransfer.h
-  api/datatransfer.cc
-  api/func.h
-  api/func.cc
-  api/runtime.h
-  api/runtime.cc
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
@@ -633,8 +627,6 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
   StateManagement.cc
   StateManagement.hh
-  api/func.cc
-  api/func.h
   PluginManager.cc
   PluginManager.hh)
 
@@ -696,10 +688,21 @@ if (WIN32)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
+SET( API_CORE_SRC
+  api/func.h
+  api/func.cc
+  api/runtime.h
+  api/runtime.cc
+  api/datatransfer.h
+  api/datatransfer.cc
+  api/EnergyPlusPgm.hh
+  api/EnergyPlusPgm.cc
+)
+
 if (APPLE OR UNIX)
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC})
 else()  # windows
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi energypluslib )
 add_dependencies( energyplusapi pythonapi)

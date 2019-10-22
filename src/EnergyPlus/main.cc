@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int main(int argc, const char *argv[])
