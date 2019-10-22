@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -140,6 +141,10 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
     // ControllerProps always expects the control variable type to be "HumididtyRatio"
     ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType_HumRat, ControllerProps(1).HumRatCntrlType);
+
+    ASSERT_EQ(ControllerProps.size(), 1u);
+    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
