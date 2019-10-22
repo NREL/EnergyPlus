@@ -4448,7 +4448,8 @@ namespace WeatherManager {
                 ConstantHumidityRatio = true;
 
             } else if (SELECT_CASE_var == DDHumIndType_Enthalpy) {
-                HumidityRatio = PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue * 1000.0, RoutineNamePsyWFnTdbH);
+                // HumIndValue is already in J/kg, so no conversions needed
+                HumidityRatio = PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, RoutineNamePsyWFnTdbH);
                 ConstantHumidityRatio = true;
 
             } else if (SELECT_CASE_var == DDHumIndType_RelHumSch) {
@@ -7362,7 +7363,7 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Enthalpy")) {
                 cAlphaArgs(5) = "Enthalpy";
-                //   N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
+                //   N7,  \field Enthalpy at Maximum Dry-Bulb {J/kg}.
                 if (!lNumericFieldBlanks(7)) {
                     DesDayInput(EnvrnNum).HumIndValue = rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
