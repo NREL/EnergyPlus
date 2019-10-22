@@ -5,8 +5,8 @@ class MyPlugin(EnergyPlusPlugin):
 
     def main(self):
         db_handle = self.transfer.get_variable_handle(u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT")
-        my_glycol = self.functional.glycol("water")
         outdoor_db = self.transfer.get_variable_value(db_handle)
+        my_glycol = self.functional.glycol("water")
         water_cp_at_outdoor_db = my_glycol.specific_heat(outdoor_db)
         print("Inside Plugin; Outdoor DB = %f, Water CP @ ODB = %f" % (outdoor_db, water_cp_at_outdoor_db))
         return 0
