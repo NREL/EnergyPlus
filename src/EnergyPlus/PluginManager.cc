@@ -98,28 +98,28 @@ namespace PluginManager {
                 cb();
             }
             for (auto &plugin : pluginsCallFromEndOfHour) {
-                plugin.run();
+                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
             }
         } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfHour) {
             for (auto const &cb : callbacksCallFromBeginningOfHour) {
                 cb();
             }
             for (auto &plugin : pluginsCallFromBeginningOfHour) {
-                plugin.run();
+                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
             }
         } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::BeginningOfZoneTimeStep) {
             for (auto const &cb : callbacksCallFromBeginningOfZoneTimeStep) {
                 cb();
             }
             for (auto &plugin : pluginsCallFromBeginningOfZoneTimeStep) {
-                plugin.run();
+                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
             }
         } else if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfZoneTimeStep) {
             for (auto const &cb : callbacksCallFromEndOfZoneTimeStep) {
                 cb();
             }
             for (auto &plugin : pluginsCallFromEndOfZoneTimeStep) {
-                plugin.run();
+                if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
             }
         }
     }
@@ -217,14 +217,19 @@ namespace PluginManager {
                 std::string fileName = fields.at("python_module_name");
                 std::string className = fields.at("plugin_class_name");
                 std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
+                std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
+                bool warmup = false;
+                if (sWarmup == "YES") {
+                    warmup = true;
+                }
                 if (sCallingPoint == "BEGINNINGOFHOUR") {
-                    pluginsCallFromBeginningOfHour.emplace_back(fileName, className, thisObjectName);
+                    pluginsCallFromBeginningOfHour.emplace_back(fileName, className, thisObjectName, warmup);
                 } else if (sCallingPoint == "BEGINNINGOFZONETIMESTEP") {
-                    pluginsCallFromBeginningOfZoneTimeStep.emplace_back(fileName, className, thisObjectName);
+                    pluginsCallFromBeginningOfZoneTimeStep.emplace_back(fileName, className, thisObjectName, warmup);
                 } else if (sCallingPoint == "ENDOFZONETIMESTEP") {
-                    pluginsCallFromEndOfZoneTimeStep.emplace_back(fileName, className, thisObjectName);
+                    pluginsCallFromEndOfZoneTimeStep.emplace_back(fileName, className, thisObjectName, warmup);
                 } else if (sCallingPoint == "ENDOFHOUR") {
-                    pluginsCallFromEndOfHour.emplace_back(fileName, className, thisObjectName);
+                    pluginsCallFromEndOfHour.emplace_back(fileName, className, thisObjectName, warmup);
                 }
             }
         }
@@ -262,7 +267,7 @@ namespace PluginManager {
         EnergyPlus::ShowContinueError(strExcValue);
     }
 
-    PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className, const std::string &emsName)
+    PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className, const std::string &emsName, const bool runPluginDuringWarmup)
     {
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
@@ -347,6 +352,7 @@ namespace PluginManager {
         // update the rest of the plugin call instance and store it
         this->stringIdentifier = moduleName + "." + className;
         this->emsAlias = emsName;
+        this->runDuringWarmup = runPluginDuringWarmup;
     }
 
     void PluginInstance::run()

@@ -84,9 +84,10 @@ namespace PluginManager {
     // STUFF RELATED TO PYTHON PLUGINS DOWN HERE
 
     struct PluginInstance {
-        PluginInstance(const std::string& fileName, const std::string& className, const std::string& emsName);
+        PluginInstance(const std::string& fileName, const std::string& className, const std::string& emsName, bool runPluginDuringWarmup);
         static void reportPythonError();
         std::string stringIdentifier; // for diagnostic reporting
+        bool runDuringWarmup;
         std::string emsAlias;
         PyObject *pPluginMainFunction = nullptr;  // pointer to the main EMS function
         void run();

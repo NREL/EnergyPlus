@@ -88,17 +88,18 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-PythonPlugin:SearchPaths,
-   MySearchPaths, ! field Name
-   Yes,           !- Add Current Working Directory to Search Path
-   Yes;            !- Add Input File Directory to Search Path
-   !/dummy/path/here; ! field Search Path 1
+  PythonPlugin:SearchPaths,
+    MySearchPaths,     !- Name
+    Yes,               !- Add Current Working Directory to Search Path
+    Yes;               !- Add Input File Directory to Search Path
+    !/dummy/path/here; !- Search Path 1
 
-PythonPlugin:Instance,
-   MyPlugin1, ! field Name
-   1ZoneUncontrolledWithPlugin, ! field Python Module Name
-   MyPlugin, ! field Plugin Class Name
-   EndOfHour; ! field Calling Point
+  PythonPlugin:Instance,
+    MyPlugin1,         !- Name
+    No,               !- Run During Warmup Days
+    1ZoneUncontrolledWithPlugin, !- Python Module Name
+    MyPlugin,          !- Plugin Class Name
+    EndOfHour;         !- Calling Point
 
   Version,9.2;
 
