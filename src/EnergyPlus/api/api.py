@@ -1,4 +1,4 @@
-from ctypes import cdll
+from ctypes import cdll, c_char_p
 import os
 import sys
 
@@ -57,6 +57,14 @@ class EnergyPlusAPI:
 
     def __init__(self):
         self.api = cdll.LoadLibrary(api_path())
+        self.api.apiVersionFromEPlus.argtypes = []
+        self.api.apiVersionFromEPlus.restype = c_char_p
+        api_version_from_ep = float(self.api.apiVersionFromEPlus())
+        api_version_defined_here = float(self.api_version())
+        if api_version_defined_here != api_version_from_ep:
+            raise Exception("API version does not match, this API version: %s; E+ is expecting version: %s" % (
+                api_version_defined_here, api_version_from_ep
+            ))
 
     def functional(self) -> Functional:
         """

@@ -53,7 +53,8 @@ class FluidAndPsychProperties:
 
 class EnergyPlusVersion:
     """
-    Could also just call into the DLL and get the version
+    This is the EnergyPlus version.  Could also call into the DLL but it's the same effect.
+
     """
     def __init__(self):
         self.ep_version_major = int("${CMAKE_VERSION_MAJOR}")
