@@ -66,7 +66,7 @@ ENERGYPLUSLIB_API Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropert
 ENERGYPLUSLIB_API void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
 
 ENERGYPLUSLIB_API void initializeFunctionalAPI();
-ENERGYPLUSLIB_API Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
+ENERGYPLUSLIB_API Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int *refrigerantIndex);
 
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus();
 

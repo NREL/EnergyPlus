@@ -83,9 +83,9 @@ void initializeFunctionalAPI() {
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
-Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 const temperatureC, int refrigerantIndex) {
+Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 const temperatureC, int *refrigerantIndex) {
     auto const name = std::string(refrigerantName);
-    auto val = EnergyPlus::FluidProperties::GetSatPressureRefrig(name, temperatureC, refrigerantIndex, "");
+    auto val = EnergyPlus::FluidProperties::GetSatPressureRefrig(name, temperatureC, *refrigerantIndex, "");
     return val;
 }
 

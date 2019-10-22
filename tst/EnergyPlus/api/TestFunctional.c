@@ -61,7 +61,7 @@ int main() {
     delCBaseThermalPropertySet(props);
 
     int index = 0;
-    Real64 val = fluidProperty_GetSatPressureRefrig("STEAM", 25.5, index);
+    Real64 val = fluidProperty_GetSatPressureRefrig("STEAM", 25.5, &index);
     printf("C API Test: Calculated sat pressure: %8.4f \n", val);
     return 0;
 }
