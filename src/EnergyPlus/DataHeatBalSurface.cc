@@ -98,6 +98,12 @@ namespace DataHeatBalSurface {
     Array1D<Real64> CTFSourceIn0;                 // Construct.CTFSourceIn(0)
     Array1D<Real64> TH11Surf;                     // TH(1,1,SurfNum)
     Array1D<Real64> QsrcHistSurf1;                // QsrcHist(SurfNum, 1)
+    Array1D_int IsAdiabatic;               // 0 not adiabatic, 1 is adiabatic
+    Array1D_int IsNotAdiabatic;            // 1 not adiabatic, 0 is adiabatic
+    Array1D_int IsSource;                  // 0 no internal source/sink, 1 has internal source/sing
+    Array1D_int IsNotSource;               // 1 no internal source/sink, 0 has internal source/sing
+    Array1D_int IsPoolSurf;                // 0 not pool, 1 is pool
+    Array1D_int IsNotPoolSurf;             // 1 not pool, 0 is pool
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
@@ -274,6 +280,12 @@ namespace DataHeatBalSurface {
         CTFSourceIn0.deallocate();
         TH11Surf.deallocate();
         QsrcHistSurf1.deallocate();
+        IsAdiabatic.deallocate();
+        IsNotAdiabatic.deallocate();
+        IsSource.deallocate();
+        IsNotSource.deallocate();
+        IsPoolSurf.deallocate();
+        IsNotPoolSurf.deallocate();
         TempSurfIn.deallocate();
         TempSurfInTmp.deallocate();
         HcExtSurf.deallocate();
