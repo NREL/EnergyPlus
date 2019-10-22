@@ -5669,7 +5669,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         }
         ++NumTotalRVariable;
 
-        if (!OnMeter && !ThisOneOnTheList) continue;
+        if (!OnMeter && !ThisOneOnTheList & !DataGlobals::eplusRunningViaAPI) continue;
 
         ++NumOfRVariable;
         if (Loop == 1 && VariableType == StoreType::Summed) {
