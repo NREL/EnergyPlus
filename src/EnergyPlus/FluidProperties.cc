@@ -9534,6 +9534,30 @@ namespace FluidProperties {
         }
     }
 
+    GlycolAPI::GlycolAPI(std::string glycolName) {
+        this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
+        this->glycolIndex = 0;
+        this->cf = "GlycolAPI:Instance";
+        if (this->glycolName != "WATER") {
+            EnergyPlus::ShowFatalError("Can only do water right now");
+        }
+    }
+
+    Real64 GlycolAPI::specificHeat(Real64 temperature) {
+        return FluidProperties::GetSpecificHeatGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::density(Real64 temperature) {
+        return FluidProperties::GetDensityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::conductivity(Real64 temperature) {
+        return FluidProperties::GetConductivityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::viscosity(Real64 temperature) {
+        return FluidProperties::GetViscosityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+
+
+
 } // namespace FluidProperties
 
 } // namespace EnergyPlus

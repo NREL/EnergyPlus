@@ -16,7 +16,7 @@ class EnergyPlusPlugin(object):
         """
         super().__init__()
         api = EnergyPlusAPI()
-        self.functional = api.functional()
+        self.functional = api.functional(False)
         self.transfer = api.data_transfer()
 
     def main(self) -> int:

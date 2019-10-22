@@ -51,17 +51,17 @@
 int main() {
     initializeFunctionalAPI();
 
-    CBaseThermalPropertySet *props = NULL;
-    props = newCBaseThermalPropertySet(1.0, 2.0, 3.0);
-    Real64 diffusivity = cBaseThermalPropertySet_diffusivity(props);
-    printf("C API Test: Calculated thermal diffusivity: %8.4f \n", diffusivity);
-    cBaseThermalPropertySet_setConductivity(props, 4.0);
-    diffusivity = cBaseThermalPropertySet_diffusivity(props);
-    printf("C API Test: Updated thermal diffusivity: %8.4f \n", diffusivity);
-    delCBaseThermalPropertySet(props);
+    Glycol *glycol = NULL;
+    glycol = glycolNew("WatEr");
+    for (int temp=5; temp<35; temp+=10) {
+        Real64 thisTemp = (float)temp;
+        Real64 specificHeat = glycolSpecificHeat(glycol, thisTemp);
+        Real64 density = glycolDensity(glycol, thisTemp);
+        Real64 conductivity = glycolConductivity(glycol, thisTemp);
+        Real64 viscosity = glycolViscosity(glycol, thisTemp);
+        printf("C API Test: Calculated props at T=%4.1f: %8.4f, %8.4f, %8.4f, %8.4f \n", thisTemp, specificHeat, density, conductivity, viscosity);
+    }
+    glycolDelete(glycol);
 
-    int index = 0;
-    Real64 val = fluidProperty_GetSatPressureRefrig("STEAM", 25.5, &index);
-    printf("C API Test: Calculated sat pressure: %8.4f \n", val);
     return 0;
 }

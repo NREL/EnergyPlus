@@ -706,6 +706,18 @@ namespace FluidProperties {
 
     void GetFluidSpecificHeatTemperatureLimits(int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
+    struct GlycolAPI {
+        std::string glycolName;
+        int glycolIndex;
+        std::string cf;
+        explicit GlycolAPI(std::string glycolName);
+        ~GlycolAPI() = default;
+        Real64 specificHeat(Real64 temperature);
+        Real64 density(Real64 temperature);
+        Real64 conductivity(Real64 temperature);
+        Real64 viscosity(Real64 temperature);
+    };
+
 } // namespace FluidProperties
 
 } // namespace EnergyPlus

@@ -58,17 +58,23 @@ extern "C" {
 
 void functionalNoOp();
 
-// Test out a real E+ struct with methods
-ENERGYPLUSLIB_API typedef void *CBaseThermalPropertySet;
-ENERGYPLUSLIB_API CBaseThermalPropertySet newCBaseThermalPropertySet(Real64 conductivity, Real64 density, Real64 specificHeat);
-ENERGYPLUSLIB_API void delCBaseThermalPropertySet(CBaseThermalPropertySet);
-ENERGYPLUSLIB_API Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet);
-ENERGYPLUSLIB_API void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
 
 ENERGYPLUSLIB_API void initializeFunctionalAPI();
-ENERGYPLUSLIB_API Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int *refrigerantIndex);
-
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus();
+
+// Glycol("WATER")
+ENERGYPLUSLIB_API typedef void *Glycol;
+ENERGYPLUSLIB_API Glycol glycolNew(const char* glycolName);
+ENERGYPLUSLIB_API void glycolDelete(Glycol);
+ENERGYPLUSLIB_API Real64 glycolSpecificHeat(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolDensity(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolConductivity(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolViscosity(Glycol, Real64 temperature);
+
+//Real64 Refrig("STEAM")
+
+
+//Real64 Psychrometric(props...)
 
 #ifdef __cplusplus
 }

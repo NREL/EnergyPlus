@@ -66,15 +66,17 @@ class EnergyPlusAPI:
                 api_version_defined_here, api_version_from_ep
             ))
 
-    def functional(self) -> Functional:
+    def functional(self, init_ep: bool = True) -> Functional:
         """
         Returns a new instance of a Functional API class.  In most cases, this should be called once, and the script
         should keep a reference to the new instance.  All functional API calls can then be made on this one instance,
         rather than making multiple instances by calling this function multiple times.
 
+        :param init_ep: If E+ should be initialized, this should be True.  In the case of Python Plugins, EnergyPlus is
+                        already running, and so this should be set to False when calling from the Plugin base class.
         :return: A "Functional" API class instance.
         """
-        return Functional(self.api)
+        return Functional(self.api, init_ep)
 
     def data_transfer(self) -> DataTransfer:
         """

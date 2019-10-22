@@ -2,53 +2,45 @@ from ctypes import cdll, c_char_p, c_int, c_void_p
 from pyenergyplus.common import RealEP
 
 
-class BaseThermalPropertySet:
+class Glycol:
     """
-    This class is a Python representation of blablah - DONT WORRY ABOUT DOCUMENTING FOR NOW
+    This class is a Python representation of the glycol properties calculations inside EnergyPlus.
+    For now, the only glycol name allowed is plain water.  This is because other fluids are only
+    initialized when they are declared in the input file.  When calling this way, through the API,
+    there is no input file, so no other fluids are declared.  This is ripe for a refactor to enable
+    additional fluids, but water will suffice for now as an example.
     """
 
-    def __init__(self, api: cdll, conductivity: float, density: float, specific_heat: float):
+    def __init__(self, api: cdll, glycol_name: bytes):
         self.api = api
-        self.api.newCBaseThermalPropertySet.argtypes = [RealEP, RealEP, RealEP]
-        self.api.newCBaseThermalPropertySet.restype = c_void_p
-        self.api.delCBaseThermalPropertySet.argtypes = [c_void_p]
-        self.api.delCBaseThermalPropertySet.restype = c_void_p
-        self.api.cBaseThermalPropertySet_diffusivity.argtypes = [c_void_p]
-        self.api.cBaseThermalPropertySet_diffusivity.restype = RealEP
-        self.api.cBaseThermalPropertySet_setConductivity.argtypes = [c_void_p, RealEP]
-        self.api.cBaseThermalPropertySet_setConductivity.restype = c_void_p
-        self.instance = self.api.newCBaseThermalPropertySet(conductivity, density, specific_heat)
+        self.api.glycolNew.argtypes = [c_char_p]
+        self.api.glycolNew.restype = c_void_p
+        self.api.glycolDelete.argtypes = [c_void_p]
+        self.api.glycolDelete.restype = c_void_p
+        self.api.glycolSpecificHeat.argtypes = [c_void_p, RealEP]
+        self.api.glycolSpecificHeat.restype = RealEP
+        self.api.glycolDensity.argtypes = [c_void_p, RealEP]
+        self.api.glycolDensity.restype = RealEP
+        self.api.glycolConductivity.argtypes = [c_void_p, RealEP]
+        self.api.glycolConductivity.restype = RealEP
+        self.api.glycolViscosity.argtypes = [c_void_p, RealEP]
+        self.api.glycolViscosity.restype = RealEP
+        self.instance = self.api.glycolNew(glycol_name)
 
     def __del__(self):
-        self.api.delCBaseThermalPropertySet(self.instance)
+        self.api.glycolDelete(self.instance)
 
-    def diffusivity(self) -> float:
-        return self.api.cBaseThermalPropertySet_diffusivity(self.instance)
+    def specific_heat(self, temperature: float) -> float:
+        return self.api.glycolSpecificHeat(self.instance, temperature)
 
-    def set_conductivity(self, conductivity: float) -> None:
-        self.api.cBaseThermalPropertySet_setConductivity(self.instance, conductivity)
+    def density(self, temperature: float) -> float:
+        return self.api.glycolDensity(self.instance, temperature)
 
+    def conductivity(self, temperature: float) -> float:
+        return self.api.glycolConductivity(self.instance, temperature)
 
-class FluidAndPsychProperties:
-    """
-    This class is a Python representation of blahblah - DONT WORRY ABOUT DOCUMENTING FOR NOW, SPLIT FOR PSYCH/FLUID
-    """
-
-    def __init__(self, api: cdll, fluid_name: str):
-        self.api = api
-        self.fluid_name = fluid_name
-
-        self.api.initializeFunctionalAPI.argtypes = []
-        self.api.initializeFunctionalAPI.restype = c_void_p
-        self.api.fluidProperty_GetSatPressureRefrig.argtypes = [c_char_p, RealEP, c_int]
-        self.api.fluidProperty_GetSatPressureRefrig.restype = RealEP
-
-        self.api.initializeFunctionalAPI()
-
-    def get_sat_press_refrigerant(self, temperature) -> float:
-        index = 0
-        val = self.api.fluidProperty_GetSatPressureRefrig(self.fluid_name.encode('utf-8'), temperature, index)
-        return float(val)
+    def viscosity(self, temperature: float) -> float:
+        return self.api.glycolViscosity(self.instance, temperature)
 
 
 class EnergyPlusVersion:
@@ -82,28 +74,23 @@ class Functional:
     member variable.  Clients should use that directly when needing to make functional calls into the library.
     """
 
-    def __init__(self, api: cdll):
+    def __init__(self, api: cdll, init_ep: bool = True):
         self.api = api
+        self.api.initializeFunctionalAPI.argtypes = []
+        self.api.initializeFunctionalAPI.restype = c_void_p
+        if init_ep:
+            self.api.initializeFunctionalAPI()
 
-    def base_struct(self, conductivity: float, density: float, specific_heat: float) -> BaseThermalPropertySet:
+    def glycol(self, glycol_name: str) -> Glycol:
         """
-        Returns a BaseThermalPropertySet instance, which is just a collection of thermal properties.
+        Returns a Glycol instance, which allows calculation of glycol properties.
 
-        :param conductivity: Thermal conductivity, W/m-K
-        :param density: Density, kg/m3
-        :param specific_heat: Specific Heat, J/kg-K
-        :return: An instantiated thermal property structure, ready for use with the initial properties
+        :param glycol_name: Name of the Glycol, for now only water is allowed
+        :return: An instantiated Glycol structure
         """
-        return BaseThermalPropertySet(self.api, conductivity, density, specific_heat)
-
-    def fluid_properties(self, fluid_name: str) -> FluidAndPsychProperties:
-        """
-        Returns a FluidAndPsychProperties instance, which collects fluid property calculation methods
-
-        :param fluid_name: The name of the fluid to instantiate; EnergyPlus only allows a few built in: STEAM...
-        :return: An instantiated fluid properties structure created for the given fluid name
-        """
-        return FluidAndPsychProperties(self.api, fluid_name)
+        if isinstance(glycol_name, str):
+            glycol_name = glycol_name.encode('utf-8')
+        return Glycol(self.api, glycol_name)
 
     @staticmethod
     def ep_version() -> EnergyPlusVersion:
