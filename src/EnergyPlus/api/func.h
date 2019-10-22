@@ -63,7 +63,7 @@ ENERGYPLUSLIB_API void initializeFunctionalAPI();
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus();
 
 // Glycol("WATER")
-ENERGYPLUSLIB_API typedef void *Glycol;
+ENERGYPLUSLIB_API typedef void * Glycol;
 ENERGYPLUSLIB_API Glycol glycolNew(const char* glycolName);
 ENERGYPLUSLIB_API void glycolDelete(Glycol);
 ENERGYPLUSLIB_API Real64 glycolSpecificHeat(Glycol, Real64 temperature);
@@ -72,7 +72,17 @@ ENERGYPLUSLIB_API Real64 glycolConductivity(Glycol, Real64 temperature);
 ENERGYPLUSLIB_API Real64 glycolViscosity(Glycol, Real64 temperature);
 
 //Real64 Refrig("STEAM")
-
+ENERGYPLUSLIB_API typedef void * Refrigerant;
+ENERGYPLUSLIB_API Refrigerant refrigerantNew(const char* refrigerantName);
+ENERGYPLUSLIB_API void refrigerantDelete(Refrigerant);
+ENERGYPLUSLIB_API Real64 refrigerantSaturationPressure(Refrigerant, Real64 temperature);
+ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(Refrigerant, Real64 pressure);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
+ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
+ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
 
 //Real64 Psychrometric(props...)
 

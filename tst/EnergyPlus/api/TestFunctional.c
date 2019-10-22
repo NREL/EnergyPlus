@@ -51,7 +51,7 @@
 int main() {
     initializeFunctionalAPI();
 
-    Glycol *glycol = NULL;
+    Glycol glycol = NULL;
     glycol = glycolNew("WatEr");
     for (int temp=5; temp<35; temp+=10) {
         Real64 thisTemp = (float)temp;
@@ -62,6 +62,25 @@ int main() {
         printf("C API Test: Calculated props at T=%4.1f: %8.4f, %8.4f, %8.4f, %8.4f \n", thisTemp, specificHeat, density, conductivity, viscosity);
     }
     glycolDelete(glycol);
+
+    Refrigerant refrig = NULL;
+    refrig = refrigerantNew("SteaM");
+    Real64 temperature = 100.0;
+    Real64 satPress = refrigerantSaturationPressure(refrig, temperature); // expecting about 100,000 Pa
+    Real64 thisPress = 100000;
+    Real64 satTemp = refrigerantSaturationTemperature(refrig, thisPress); // expecting about 100 degC
+    Real64 satLiqDens = refrigerantSaturatedDensity(refrig, temperature, 0.0); // liq = 958 kg/m3
+    Real64 satLiqCp = refrigerantSaturatedSpecificHeat(refrig, temperature, 0.0); // liq = 4,216 J/kgK
+    Real64 satLiqEnth = refrigerantSaturatedEnthalpy(refrig, temperature, 0.0);
+    Real64 satVapDens = refrigerantSaturatedDensity(refrig, temperature, 1.0); // vap = 1/1.6718 ~~ 0.59 kg/m3
+    Real64 satVapCp = refrigerantSaturatedSpecificHeat(refrig, temperature, 1.0); // vap = 2,080 J/kgK
+    Real64 satVapEnth = refrigerantSaturatedEnthalpy(refrig, temperature, 1.0);
+    Real64 enthDifference = satVapEnth - satLiqEnth; // vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+    temperature = 150;
+//    Real64 supEnth = refrigerantSuperHeatedEnthalpy(refrig, temperature, thisPress);
+//    Real64 thisEnth = 303;
+//    Real64 supPress = refrigerantSuperHeatedPressure(refrig, temperature, thisEnth);
+//    Real64 supDensity = refrigerantSuperHeatedDensity(refrig, temperature, thisPress);
 
     return 0;
 }

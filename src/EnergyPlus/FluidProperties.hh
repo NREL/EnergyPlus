@@ -710,12 +710,28 @@ namespace FluidProperties {
         std::string glycolName;
         int glycolIndex;
         std::string cf;
-        explicit GlycolAPI(std::string glycolName);
+        explicit GlycolAPI(std::string const &glycolName);
         ~GlycolAPI() = default;
         Real64 specificHeat(Real64 temperature);
         Real64 density(Real64 temperature);
         Real64 conductivity(Real64 temperature);
         Real64 viscosity(Real64 temperature);
+    };
+
+    struct RefrigerantAPI {
+        std::string rName;
+        int rIndex;
+        std::string cf;
+        explicit RefrigerantAPI(std::string const &refrigName);
+        ~RefrigerantAPI() = default;
+        Real64 saturationPressure(Real64 temperature);
+        Real64 saturationTemperature(Real64 pressure);
+        Real64 saturatedEnthalpy(Real64 temperature, Real64 quality);
+        Real64 saturatedDensity(Real64 temperature, Real64 quality);
+        Real64 saturatedSpecificHeat(Real64 temperature, Real64 quality);
+        Real64 superHeatedEnthalpy(Real64 temperature, Real64 pressure);
+        Real64 superHeatedPressure(Real64 temperature, Real64 enthalpy);
+        Real64 superHeatedDensity(Real64 temperature, Real64 pressure);
     };
 
 } // namespace FluidProperties
