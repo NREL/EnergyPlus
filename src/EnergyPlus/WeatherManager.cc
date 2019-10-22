@@ -4135,7 +4135,7 @@ namespace WeatherManager {
         Real64 const ZHGlobalSolarConstant(1355.0);
         static ObjexxFCL::gio::Fmt EnvDDHdFormat(
             "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   "
-            "'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
+            "'Hum Ind Type, Hum Ind Value at Max Temp, Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
             "Speed {m/s}, Clearness, Rain, Snow')");
         static ObjexxFCL::gio::Fmt EnvDDayFormat("('Environment:Design Day Data,')");
         static ObjexxFCL::gio::Fmt DDayMiscHdFormat(
@@ -4324,12 +4324,14 @@ namespace WeatherManager {
                 flags.ADVANCE("No");
                 ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
             }
+
+            // Hum Ind Type, Hum Ind Value at Max Temp
             if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
                 StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
                 StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
-                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {kJ/kg},";
+                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {J/kg},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
                 StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
@@ -4341,6 +4343,12 @@ namespace WeatherManager {
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
                 StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
             }
+            {
+                IOFlags flags;
+                flags.ADVANCE("No");
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
+            }
+
             StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
             {
                 IOFlags flags;
