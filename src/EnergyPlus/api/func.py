@@ -1,4 +1,4 @@
-from ctypes import cdll, c_char_p, c_int, c_void_p
+from ctypes import cdll, c_char_p, c_void_p
 from pyenergyplus.common import RealEP
 
 
@@ -41,6 +41,126 @@ class Glycol:
 
     def viscosity(self, temperature: float) -> float:
         return self.api.glycolViscosity(self.instance, temperature)
+
+
+class Refrigerant:
+
+    def __init__(self, api: cdll, refrigerant_name: bytes):
+        self.refrigerant_name = refrigerant_name
+        self.api = api
+
+
+class Psychrometrics:
+    """
+
+    """
+    def __init__(self, api: cdll):
+        self.api = api
+        self.api.psyRhoFnPbTdbW.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyRhoFnPbTdbW.restype = RealEP
+        self.api.psyHfgAirFnWTdb.argtypes = [RealEP]
+        self.api.psyHfgAirFnWTdb.restype = RealEP
+        self.api.psyHgAirFnWTdb.argtypes = [RealEP]
+        self.api.psyHgAirFnWTdb.restype = RealEP
+        self.api.psyHFnTdbW.argtypes = [RealEP, RealEP]
+        self.api.psyHFnTdbW.restype = RealEP
+        self.api.psyCpAirFnWTdb.argtypes = [RealEP, RealEP]
+        self.api.psyCpAirFnWTdb.restype = RealEP
+        self.api.psyTdbFnHW.argtypes = [RealEP, RealEP]
+        self.api.psyTdbFnHW.restype = RealEP
+        self.api.psyRhovFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyRhovFnTdbWPb.restype = RealEP
+        self.api.psyTwbFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyTwbFnTdbWPb.restype = RealEP
+        self.api.psyVFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyVFnTdbWPb.restype = RealEP
+        self.api.psyWFnTdbH.argtypes = [RealEP, RealEP]
+        self.api.psyWFnTdbH.restype = RealEP
+        self.api.psyPsatFnTemp.argtypes = [RealEP]
+        self.api.psyPsatFnTemp.restype = RealEP
+        self.api.psyTsatFnHPb.argtypes = [RealEP, RealEP]
+        self.api.psyTsatFnHPb.restype = RealEP
+        self.api.psyRhovFnTdbRh.argtypes = [RealEP, RealEP]
+        self.api.psyRhovFnTdbRh.restype = RealEP
+        self.api.psyRhFnTdbRhov.argtypes = [RealEP, RealEP]
+        self.api.psyRhFnTdbRhov.restype = RealEP
+        self.api.psyRhFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyRhFnTdbWPb.restype = RealEP
+        self.api.psyWFnTdpPb.argtypes = [RealEP, RealEP]
+        self.api.psyWFnTdpPb.restype = RealEP
+        self.api.psyWFnTdbRhPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyWFnTdbRhPb.restype = RealEP
+        self.api.psyWFnTdbTwbPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyWFnTdbTwbPb.restype = RealEP
+        self.api.psyHFnTdbRhPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyHFnTdbRhPb.restype = RealEP
+        self.api.psyTdpFnWPb.argtypes = [RealEP, RealEP]
+        self.api.psyTdpFnWPb.restype = RealEP
+        self.api.psyTdpFnTdbTwbPb.argtypes = [RealEP, RealEP, RealEP]
+        self.api.psyTdpFnTdbTwbPb.restype = RealEP
+
+    def density(self, barometric_pressure: float, dry_bulb_temp: float, humidity_ratio: float) -> float:
+        return self.api.psyRhoFnPbTdbW(barometric_pressure, dry_bulb_temp, humidity_ratio)
+
+    def latent_energy_of_air(self, dry_bulb_temp: float) -> float:
+        return self.api.psyHfgAirFnWTdb(dry_bulb_temp)
+
+    def latent_energy_of_moisture_in_air(self, dry_bulb_temp: float) -> float:
+        return self.api.psyHgAirFnWTdb(dry_bulb_temp)
+
+    def enthalpy(self, dry_bulb_temp: float, humidity_ratio: float) -> float:
+        return self.api.psyHFnTdbW(dry_bulb_temp, humidity_ratio)
+
+    def enthalpy_b(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
+        return self.api.psyHFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
+
+    def specific_heat(self, humidity_ratio: float, dry_bulb_temp: float) -> float:
+        return self.api.psyCpAirFnWTdb(humidity_ratio, dry_bulb_temp)
+
+    def dry_bulb(self, enthalpy: float, humidity_ratio: float) -> float:
+        return self.api.psyTdbFnHW(enthalpy, humidity_ratio)
+
+    def vapor_density(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        return self.api.psyRhovFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
+
+    def relative_humidity(self, dry_bulb_temp: float, vapor_density: float) -> float:
+        return self.api.psyRhFnTdbRhov(dry_bulb_temp, vapor_density)
+
+    def relative_humidity_b(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        return self.api.psyRhFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
+
+    def wet_bulb(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        return self.api.psyTwbFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
+
+    def specific_volume(self, dry_bulb_temp: float, humidity_ratio: float, barometric_pressure: float) -> float:
+        return self.api.psyVFnTdbWPb(dry_bulb_temp, humidity_ratio, barometric_pressure)
+
+    def saturation_pressure(self, dry_bulb_temp: float) -> float:
+        return self.api.psyPsatFnTemp(dry_bulb_temp)
+
+    def saturation_temperature(self, enthalpy: float, barometric_pressure: float) -> float:
+        return self.api.psyTsatFnHPb(enthalpy, barometric_pressure)
+
+    def vapor_density_b(self, dry_bulb_temp: float, relative_humidity_fraction: float) -> float:
+        return self.api.psyRhovFnTdbRh(dry_bulb_temp, relative_humidity_fraction)
+
+    def humidity_ratio(self, dry_bulb_temp: float, enthalpy: float) -> float:
+        return self.api.psyWFnTdbH(dry_bulb_temp, enthalpy)
+
+    def humidity_ratio_b(self, dew_point_temp: float, barometric_pressure: float) -> float:
+        return self.api.psyWFnTdpPb(dew_point_temp, barometric_pressure)
+
+    def humidity_ratio_c(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
+        return self.api.psyWFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
+
+    def humidity_ratio_d(self, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
+        return self.api.psyWFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
+
+    def dew_point(self, humidity_ratio: float, barometric_pressure: float) -> float:
+        return self.api.psyTdpFnWPb(humidity_ratio, barometric_pressure)
+
+    def dew_point_b(self, dry_bulb_temp: float, wet_bulb_temp: float, barometric_pressure: float) -> float:
+        return self.api.psyTdpFnTdbTwbPb(dry_bulb_temp, wet_bulb_temp, barometric_pressure)
 
 
 class EnergyPlusVersion:
@@ -91,6 +211,25 @@ class Functional:
         if isinstance(glycol_name, str):
             glycol_name = glycol_name.encode('utf-8')
         return Glycol(self.api, glycol_name)
+
+    def refrigerant(self, refrigerant_name: str) -> Refrigerant:
+        """
+        Returns a Refrigerant instance, which allows calculation of refrigerant properties.
+
+        :param refrigerant_name: Name of the Refrigerant, for now only steam is allowed
+        :return: An instantiated Refrigerant structure
+        """
+        if isinstance(refrigerant_name, str):
+            refrigerant_name = refrigerant_name.encode('utf-8')
+        return Refrigerant(self.api, refrigerant_name)
+
+    def psychrometrics(self) -> Psychrometrics:
+        """
+        Returns a Psychrometric instance, which allows calculation of psychrometric properties.
+
+        :return: An instantiated Psychrometric structure
+        """
+        return Psychrometrics(self.api)
 
     @staticmethod
     def ep_version() -> EnergyPlusVersion:

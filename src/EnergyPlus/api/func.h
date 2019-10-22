@@ -80,11 +80,32 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(Refrigerant, Real64 pr
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(Refrigerant, Real64 temperature, Real64 quality);
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(Refrigerant, Real64 temperature, Real64 quality);
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(Refrigerant, Real64 temperature, Real64 quality);
-ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
-ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
-ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
+//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
+//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
+//ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
 
 //Real64 Psychrometric(props...)
+ENERGYPLUSLIB_API Real64 psyRhoFnPbTdbW(Real64 pb, Real64 tdb, Real64 dw);                                     
+ENERGYPLUSLIB_API Real64 psyHfgAirFnWTdb(Real64 T);
+ENERGYPLUSLIB_API Real64 psyHgAirFnWTdb(Real64 T);
+ENERGYPLUSLIB_API Real64 psyHFnTdbW(Real64 TDB, Real64 dW);
+ENERGYPLUSLIB_API Real64 psyCpAirFnWTdb(Real64 dw, Real64 T);
+ENERGYPLUSLIB_API Real64 psyTdbFnHW(Real64 H, Real64 dW);
+ENERGYPLUSLIB_API Real64 psyRhovFnTdbWPb(Real64 Tdb, Real64 dW, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyTwbFnTdbWPb(Real64 Tdb, Real64 W, Real64 Pb);
+ENERGYPLUSLIB_API Real64 psyVFnTdbWPb(Real64 TDB, Real64 dW, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyWFnTdbH(Real64 TDB, Real64 H);
+ENERGYPLUSLIB_API Real64 psyPsatFnTemp(Real64 T);
+ENERGYPLUSLIB_API Real64 psyTsatFnHPb(Real64 H, Real64 Pb);
+ENERGYPLUSLIB_API Real64 psyRhovFnTdbRh(Real64 Tdb, Real64 RH);
+ENERGYPLUSLIB_API Real64 psyRhFnTdbRhov(Real64 Tdb, Real64 Rhovapor);
+ENERGYPLUSLIB_API Real64 psyRhFnTdbWPb(Real64 TDB, Real64 dW, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyWFnTdpPb(Real64 TDP, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyWFnTdbRhPb(Real64 TDB, Real64 RH, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyWFnTdbTwbPb(Real64 TDB, Real64 TWBin, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyHFnTdbRhPb(Real64 TDB, Real64 RH, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyTdpFnWPb(Real64 W, Real64 PB);
+ENERGYPLUSLIB_API Real64 psyTdpFnTdbTwbPb(Real64 TDB, Real64 TWB, Real64 PB);
 
 #ifdef __cplusplus
 }
