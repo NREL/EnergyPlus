@@ -6919,7 +6919,11 @@ namespace HeatBalanceSurfaceManager {
         for (int SurfNum : HTNonWindowSurfs) {
             int const ConstrNum = Surface(SurfNum).Construction;
             auto const& construct(Construct(ConstrNum));
-            CTFCross0(SurfNum) = construct.CTFCross(0);
+            if (Surface(SurfNum).ExtBoundCond == SurfNum) {
+                CTFCross0(SurfNum) = 0.0;
+            } else { 
+                CTFCross0(SurfNum) = construct.CTFCross(0);
+            }
             CTFInside0(SurfNum) = construct.CTFInside(0);
             CTFSourceIn0(SurfNum) = construct.CTFSourceIn(0);
             TH11Surf(SurfNum) = TH(1, 1, SurfNum);
@@ -6966,140 +6970,90 @@ namespace HeatBalanceSurfaceManager {
                 auto &surface(Surface(SurfNum));
                 Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
 
-                if (surface.ExtBoundCond == SurfNum) {
-                    // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
-                    // Surface is adiabatic
+                HMovInsul = 0.0;
+                if (surface.MaterialMovInsulInt > 0) HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
+
+                if (HMovInsul <= 0.0) { // No movable insulation present, normal heat balance equation
+
                     // Pre-calculate a few terms
-                    //
                     Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
                                             QAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
                                             QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
-                                            QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) + (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
-                    Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) - CTFCross0(SurfNum) + HConvIn_surf + IterDampConst));
+                                            QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) +
+                                            (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
+                    Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf + IterDampConst));
                     // Calculate the current inside surface temperature
                     if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
                                                 (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
                         TempSurfInTmp(SurfNum) =
-                            (TempTerm + CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IterDampConst * TempInsOld(SurfNum)) *
-                            TempDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation
-                                        // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
-                                        // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
-                                        // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
-                                        // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
-                                        // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
-                                        // same temp) | Convection and damping term | Radiation from AFN ducts
-                    } else { // this is a pool and it has been simulated this time step
-                        TempSurfInTmp(SurfNum) = (CTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) + IterDampConst * TempInsOld(SurfNum)) /
-                                                    (CTFInside0(SurfNum) - CTFCross0(SurfNum) + PoolHeatTransCoefs(SurfNum) +
-                                                    IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms (see
-                                                                    // non-pool equation for details) | Iterative damping term (for stability) |
-                                                                    // Conduction term (both partition sides same temp) | Pool and damping term
+                            (TempTerm + CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
+                                CTFCross0(SurfNum) * TH11Surf(SurfNum)) *
+                            TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
+                                        // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
+                                        // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
+                                        // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
+                                        // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
+                                        // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
+                                        // outside surface | Coefficient for conduction (current time) | Convection and damping term |
+                                        // Radiation from AFN ducts
+                    } else { // surface is a pool and the pool has been simulated this time step
+                        TempSurfInTmp(SurfNum) = (CTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) +
+                                                    IterDampConst * TempInsOld(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
+                                                    (CTFInside0(SurfNum) + PoolHeatTransCoefs(SurfNum) +
+                                                    IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms
+                                                                    // (see non-pool equation for details) | Iterative damping term (for
+                                                                    // stability) | Current conduction from | the outside surface |
+                                                                    // Coefficient for conduction (current time) | Pool and damping term
                     }
 
-                    // Radiant system does not need the damping coefficient terms (hopefully) // Partitions are assumed to be symmetric
-                    Real64 const RadSysDiv(1.0 / (CTFInside0(SurfNum) - CTFCross0(SurfNum) + HConvIn_surf));
-                    RadSysToHBConstCoef(SurfNum) = RadSysTiHBConstCoef(SurfNum) =
-                        TempTerm * RadSysDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW
-                                                // radiation from internal sources | Convection from surface to zone air | Radiant flux from
-                                                // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant
-                                                // flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net
-                                                // radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Cond
-                                                // term (both partition sides same temp) | Convection and damping term
-                    RadSysToHBTinCoef(SurfNum) = RadSysTiHBToutCoef(SurfNum) =
-                        0.0; // The outside temp is assumed to be equal to the inside temp for a partition
-                    RadSysToHBQsrcCoef(SurfNum) = RadSysTiHBQsrcCoef(SurfNum) =
-                        CTFSourceIn0(SurfNum) * RadSysDiv; // QTF term for the source | Cond term (both partition sides same temp) | Cond
-                                                                // term (both partition sides same temp) | Convection and damping term
+                    // Radiant system does not need the damping coefficient terms (hopefully)
+                    Real64 const RadSysDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf));
+                    RadSysTiHBConstCoef(SurfNum) =
+                        TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
+                                                // radiation from internal sources | Convection from surface to zone air | Radiant flux
+                                                // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
+                                                // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
+                                                // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
+                                                // sides same temp) | Convection and damping term
+                    RadSysTiHBToutCoef(SurfNum) = CTFCross0(SurfNum) * RadSysDiv;    // Outside temp=inside temp for a partition |
+                                                                                        // Cond term (both partition sides same temp) |
+                                                                                        // Convection and damping term
+                    RadSysTiHBQsrcCoef(SurfNum) = CTFSourceIn0(SurfNum) * RadSysDiv; // QTF term for the source | Cond term (both
+                                                                                        // partition sides same temp) | Convection and
+                                                                                        // damping term
 
-                TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
-
-                } else { // Standard surface or interzone surface
-
-                    HMovInsul = 0.0;
-                    if (surface.MaterialMovInsulInt > 0) HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
-
-                    if (HMovInsul <= 0.0) { // No movable insulation present, normal heat balance equation
-
-                        // Pre-calculate a few terms
-                        Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
-                                                QAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
-                                                QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
-                                                QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) +
-                                                (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
-                        Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf + IterDampConst));
-                        // Calculate the current inside surface temperature
-                        if ((!surface.IsPool) || ((surface.IsPool) && (std::abs(QPoolSurfNumerator(SurfNum)) < SmallNumber) &&
-                                                    (std::abs(PoolHeatTransCoefs(SurfNum)) < SmallNumber))) {
-                            TempSurfInTmp(SurfNum) =
-                                (TempTerm + CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
-                                    CTFCross0(SurfNum) * TH11Surf(SurfNum)) *
-                                TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
-                                            // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
-                                            // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
-                                            // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
-                                            // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
-                                            // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
-                                            // outside surface | Coefficient for conduction (current time) | Convection and damping term |
-                                            // Radiation from AFN ducts
-                        } else { // surface is a pool and the pool has been simulated this time step
-                            TempSurfInTmp(SurfNum) = (CTFConstInPart(SurfNum) + QPoolSurfNumerator(SurfNum) +
-                                                        IterDampConst * TempInsOld(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
-                                                        (CTFInside0(SurfNum) + PoolHeatTransCoefs(SurfNum) +
-                                                        IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms
-                                                                        // (see non-pool equation for details) | Iterative damping term (for
-                                                                        // stability) | Current conduction from | the outside surface |
-                                                                        // Coefficient for conduction (current time) | Pool and damping term
+                    if (surface.ExtBoundCond > 0) { // This is an interzone partition and we need to set outside params
+                        // The inside coefficients of one side are equal to the outside coefficients of the other side.  But,
+                        // the inside coefficients are set up once the heat balance equation for that side has been calculated.
+                        // For both sides to actually have been set, we have to wait until we get to the second side in the surface
+                        // derived type.  At that point, both inside coefficient sets have been evaluated.
+                        if (surface.ExtBoundCond <= SurfNum) { // Both of the inside coefficients have now been set
+                            OtherSideSurfNum = surface.ExtBoundCond;
+                            RadSysToHBConstCoef(OtherSideSurfNum) = RadSysTiHBConstCoef(SurfNum);
+                            RadSysToHBTinCoef(OtherSideSurfNum) = RadSysTiHBToutCoef(SurfNum);
+                            RadSysToHBQsrcCoef(OtherSideSurfNum) = RadSysTiHBQsrcCoef(SurfNum);
+                            RadSysToHBConstCoef(SurfNum) = RadSysTiHBConstCoef(OtherSideSurfNum);
+                            RadSysToHBTinCoef(SurfNum) = RadSysTiHBToutCoef(OtherSideSurfNum);
+                            RadSysToHBQsrcCoef(SurfNum) = RadSysTiHBQsrcCoef(OtherSideSurfNum);
                         }
-
-                        // Radiant system does not need the damping coefficient terms (hopefully)
-                        Real64 const RadSysDiv(1.0 / (CTFInside0(SurfNum) + HConvIn_surf));
-                        RadSysTiHBConstCoef(SurfNum) =
-                            TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
-                                                    // radiation from internal sources | Convection from surface to zone air | Radiant flux
-                                                    // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
-                                                    // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
-                                                    // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
-                                                    // sides same temp) | Convection and damping term
-                        RadSysTiHBToutCoef(SurfNum) = CTFCross0(SurfNum) * RadSysDiv;    // Outside temp=inside temp for a partition |
-                                                                                            // Cond term (both partition sides same temp) |
-                                                                                            // Convection and damping term
-                        RadSysTiHBQsrcCoef(SurfNum) = CTFSourceIn0(SurfNum) * RadSysDiv; // QTF term for the source | Cond term (both
-                                                                                            // partition sides same temp) | Convection and
-                                                                                            // damping term
-
-                        if (surface.ExtBoundCond > 0) { // This is an interzone partition and we need to set outside params
-                            // The inside coefficients of one side are equal to the outside coefficients of the other side.  But,
-                            // the inside coefficients are set up once the heat balance equation for that side has been calculated.
-                            // For both sides to actually have been set, we have to wait until we get to the second side in the surface
-                            // derived type.  At that point, both inside coefficient sets have been evaluated.
-                            if (surface.ExtBoundCond < SurfNum) { // Both of the inside coefficients have now been set
-                                OtherSideSurfNum = surface.ExtBoundCond;
-                                RadSysToHBConstCoef(OtherSideSurfNum) = RadSysTiHBConstCoef(SurfNum);
-                                RadSysToHBTinCoef(OtherSideSurfNum) = RadSysTiHBToutCoef(SurfNum);
-                                RadSysToHBQsrcCoef(OtherSideSurfNum) = RadSysTiHBQsrcCoef(SurfNum);
-                                RadSysToHBConstCoef(SurfNum) = RadSysTiHBConstCoef(OtherSideSurfNum);
-                                RadSysToHBTinCoef(SurfNum) = RadSysTiHBToutCoef(OtherSideSurfNum);
-                                RadSysToHBQsrcCoef(SurfNum) = RadSysTiHBQsrcCoef(OtherSideSurfNum);
-                            }
-                        }
-
-                        TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
-
-                    } else { // Movable insulation present
-
-                        F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
-
-                        TempSurfIn(SurfNum) =
-                            (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum) +
-                             F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + NetLWRadToSurf(SurfNum) + QHTRadSysSurf(SurfNum) +
-                                   QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
-                                   QElecBaseboardSurf(SurfNum) + QAdditionalHeatSourceInside(SurfNum) + IterDampConst * TempInsOld(SurfNum))) /
-                            (CTFInside0(SurfNum) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
-
-                        TempSurfInTmp(SurfNum) = (CTFInside0(SurfNum) * TempSurfIn(SurfNum) + HMovInsul * TempSurfIn(SurfNum) -
-                                                  QRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) - CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
-                                                 (HMovInsul);
                     }
+
+                    TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
+
+                } else { // Movable insulation present
+
+                    F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
+
+                    TempSurfIn(SurfNum) =
+                        (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + CTFCross0(SurfNum) * TH11Surf(SurfNum) +
+                            F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) + NetLWRadToSurf(SurfNum) + QHTRadSysSurf(SurfNum) +
+                                QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                                QElecBaseboardSurf(SurfNum) + QAdditionalHeatSourceInside(SurfNum) + IterDampConst * TempInsOld(SurfNum))) /
+                        (CTFInside0(SurfNum) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
+
+                    TempSurfInTmp(SurfNum) = (CTFInside0(SurfNum) * TempSurfIn(SurfNum) + HMovInsul * TempSurfIn(SurfNum) -
+                                                QRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) - CTFCross0(SurfNum) * TH11Surf(SurfNum)) /
+                                                (HMovInsul);
                 }
             }
             for (int SurfNum : HTWindowSurfs) {
