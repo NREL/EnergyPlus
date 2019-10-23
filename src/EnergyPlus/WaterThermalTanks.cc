@@ -809,7 +809,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void getDesuperHtrInput()
+    bool getDesuperHtrInput()
     {
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
@@ -1098,6 +1098,1110 @@ namespace WaterThermalTanks {
         if (ErrorsFound) {
             ShowFatalError("Errors found in getting " + DataIPShortCuts::cCurrentModuleObject + " input. Preceding condition causes termination.");
         }
+
+        return ErrorsFound;
+    }
+
+    bool getHPWaterHeaterInput()
+    {
+        bool ErrorsFound = false;
+
+        int const NumPumpedCondenser =
+                inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
+        int nAlphaOffset;            // the difference of array location between alpha items between pumped and wrapped condensers
+        int nNumericOffset;          // the difference of array location between numeric items between pumped and wrapped condensers
+        int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
+        int nNumPossibleAlphaArgs;   // the number of possible numeric arguments in the idd
+
+        for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= modNumHeatPumpWaterHeater; ++HPWaterHeaterNum) {
+
+            // Create reference to current HPWH object in array.
+            HeatPumpWaterHeaterData &HPWH = HPWaterHeater(HPWaterHeaterNum);
+
+            // Initialize the offsets to zero
+            nAlphaOffset = 0;
+            nNumericOffset = 0;
+            if (HPWaterHeaterNum <= NumPumpedCondenser) {
+                // Pumped Condenser
+                DataIPShortCuts::cCurrentModuleObject = cHPWHPumpedCondenser;
+                HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
+                nNumPossibleAlphaArgs = 29;
+                nNumPossibleNumericArgs = 9;
+            } else {
+                // Wrapped Condenser
+                DataIPShortCuts::cCurrentModuleObject = cHPWHWrappedCondenser;
+                HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
+                nNumPossibleAlphaArgs = 27;
+                nNumPossibleNumericArgs = 10;
+            }
+
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          HPWaterHeaterNum,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          NumAlphas,
+                                          DataIPShortCuts::rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
+
+            // Copy those lists into C++ std::maps
+            std::map<int, std::string> hpwhAlpha;
+            std::map<int, Real64> hpwhNumeric;
+            std::map<int, bool> hpwhAlphaBlank;
+            std::map<int, bool> hpwhNumericBlank;
+            std::map<int, std::string> hpwhAlphaFieldNames;
+            std::map<int, std::string> hpwhNumericFieldNames;
+            for (int i = 1; i <= NumNums; ++i) {
+                hpwhNumeric[i] = DataIPShortCuts::rNumericArgs(i);
+                hpwhNumericBlank[i] = DataIPShortCuts::lNumericFieldBlanks(i);
+                hpwhNumericFieldNames[i] = DataIPShortCuts::cNumericFieldNames(i);
+            }
+            for (int i = NumNums + 1; i <= nNumPossibleNumericArgs; ++i) {
+                hpwhNumericBlank[i] = true;
+            }
+            for (int i = 1; i <= NumAlphas; ++i) {
+                hpwhAlpha[i] = DataIPShortCuts::cAlphaArgs(i);
+                hpwhAlphaBlank[i] = DataIPShortCuts::lAlphaFieldBlanks(i);
+                hpwhAlphaFieldNames[i] = DataIPShortCuts::cAlphaFieldNames(i);
+            }
+            for (int i = NumAlphas + 1; i <= nNumPossibleAlphaArgs; ++i) {
+                hpwhAlphaBlank[i] = true;
+            }
+            UtilityRoutines::IsNameEmpty(hpwhAlpha[1], DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+
+            // Name and type
+            HPWH.Name = hpwhAlpha[1];
+            HPWH.Type = DataIPShortCuts::cCurrentModuleObject;
+
+            // Availability Schedule
+            // convert schedule name to pointer
+            if (!hpwhAlphaBlank[2]) {
+                HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[2]);
+                if (HPWH.AvailSchedPtr == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
+                    ErrorsFound = true;
+                }
+            } else {
+                HPWH.AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+            }
+
+            // Compressor Setpoint Temperature Schedule
+            // convert schedule name to pointer
+            if (!hpwhAlphaBlank[3]) {
+                HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[3]);
+                if (HPWH.SetPointTempSchedule == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
+                    ErrorsFound = true;
+                }
+            } else {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError("required " + hpwhAlphaFieldNames[3] + " is blank.");
+                ErrorsFound = true;
+            }
+
+            // Dead Band Temperature Difference
+            HPWH.DeadBandTempDiff = hpwhNumeric[1 + nNumericOffset];
+            if (HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(hpwhNumericFieldNames[1 + nNumericOffset] +
+                                  " difference must be > 0 and <= 20. Dead band = " + General::TrimSigDigits(hpwhNumeric[1 + nNumericOffset], 1));
+                ErrorsFound = true;
+            }
+
+            if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
+
+                // Condenser Inlet/Outlet Nodes
+                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(
+                        hpwhAlpha[4], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 2, DataLoopNode::ObjectIsParent);
+                HPWH.InletNodeName1 = hpwhAlpha[4];
+                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(
+                        hpwhAlpha[5], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsParent);
+                HPWH.OutletNodeName1 = hpwhAlpha[5];
+
+                // Condenser Water Flow Rate
+                HPWH.OperatingWaterFlowRate = hpwhNumeric[2];
+                if (HPWH.OperatingWaterFlowRate <= 0.0 && hpwhNumeric[2] != DataGlobals::AutoCalculate) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                    ShowContinueError(hpwhNumericFieldNames[2] +
+                                      " must be greater than 0. Condenser water flow rate = " + General::TrimSigDigits(hpwhNumeric[2], 6));
+                    ErrorsFound = true;
+                }
+
+            } else if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
+
+                // Wrapped Condenser Location
+                HPWH.WrappedCondenserBottomLocation = hpwhNumeric[2 + nNumericOffset];
+                HPWH.WrappedCondenserTopLocation = hpwhNumeric[3 + nNumericOffset];
+
+                if (HPWH.WrappedCondenserBottomLocation < 0.0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                    ShowContinueError(hpwhNumericFieldNames[2] + " must be greater than 0. Condenser bottom location = " +
+                                      General::TrimSigDigits(HPWH.WrappedCondenserBottomLocation, 6));
+                    ErrorsFound = true;
+                }
+
+                if (HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                    ShowContinueError(hpwhNumericFieldNames[3] + " (" + General::TrimSigDigits(HPWH.WrappedCondenserTopLocation, 6) +
+                                      ") must be greater than " + hpwhNumericFieldNames[2] + " (" +
+                                      General::TrimSigDigits(HPWH.WrappedCondenserBottomLocation, 6) + ").");
+                    ErrorsFound = true;
+                }
+
+                // Reset the offset
+                nAlphaOffset = -2;
+                nNumericOffset = 1;
+
+            } else {
+                assert(0);
+            }
+
+            // Evaporator Air Flow Rate
+            HPWH.OperatingAirFlowRate = hpwhNumeric[3 + nNumericOffset];
+            if (HPWH.OperatingAirFlowRate <= 0.0 && hpwhNumeric[3 + nNumericOffset] != DataGlobals::AutoCalculate) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                ShowContinueError(hpwhNumericFieldNames[3 + nNumericOffset] +
+                                  " must be greater than 0. Evaporator air flow rate = " + General::TrimSigDigits(hpwhNumeric[3 + nNumericOffset], 6));
+                ErrorsFound = true;
+            }
+
+            // Inlet Air Configuration
+            {
+                auto const SELECT_CASE_var(hpwhAlpha[6 + nAlphaOffset]);
+
+                if (SELECT_CASE_var == "SCHEDULE") {
+                    HPWH.InletAirConfiguration = AmbientTemp::Schedule;
+
+                    // Inlet Air Temperature Schedule
+                    if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
+                        HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[11 + nAlphaOffset]);
+                        if (HPWH.AmbientTempSchedule == 0) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                            ShowContinueError(hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                        ShowContinueError("required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
+                        ErrorsFound = true;
+                    }
+
+                    // Inlet Air Humidity Schedule
+                    if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
+                        HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[12 + nAlphaOffset]);
+                        if (HPWH.AmbientRHSchedule == 0) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                            ShowContinueError(hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
+                            ErrorsFound = true;
+                        } else {
+                            if (!ScheduleManager::CheckScheduleValueMinMax(HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
+                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
+                                ShowContinueError(hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
+                                                  "\", schedule values must be (>=0., <=1.)");
+                                ErrorsFound = true;
+                            }
+                        }
+                    } else {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                        ShowContinueError("required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
+                        ErrorsFound = true;
+                    }
+
+                } else if (SELECT_CASE_var == "ZONEAIRONLY") {
+                    HPWH.InletAirConfiguration = AmbientTemp::TempZone;
+
+                    // Inlet Air Zone
+                    if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
+                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
+                        if (HPWH.AmbientTempZone == 0) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                            ShowContinueError(hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                        ShowContinueError("required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                        ErrorsFound = true;
+                    }
+
+                } else if (SELECT_CASE_var == "OUTDOORAIRONLY") {
+                    HPWH.InletAirConfiguration = AmbientTemp::OutsideAir;
+
+                } else if (SELECT_CASE_var == "ZONEANDOUTDOORAIR") {
+                    HPWH.InletAirConfiguration = AmbientTemp::ZoneAndOA;
+
+                    // Inlet Air Zone
+                    if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
+                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
+                        if (HPWH.AmbientTempZone == 0) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                            ShowContinueError(hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                        ShowContinueError("required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
+
+            // Read air inlet nodes after mixer/splitter nodes have been read in (DataIPShortCuts::cAlphaArgs 7-10),
+            // Node_ConnectionType differs for inlet node if mixer/splitter node exists
+
+            // Tank Name
+            // We will verify this exists and is the right kind of tank later when the tanks are all loaded.
+            HPWH.TankName = hpwhAlpha[15 + nAlphaOffset];
+            HPWH.TankType = hpwhAlpha[14 + nAlphaOffset];
+
+            // Use Side Inlet/Outlet
+            // Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
+            // Save the name of the node for use with set up comp sets
+            HPWH.InletNodeName2 = hpwhAlpha[16 + nAlphaOffset];
+            HPWH.OutletNodeName2 = hpwhAlpha[17 + nAlphaOffset];
+
+            if (!hpwhAlphaBlank[16 + nAlphaOffset] && !hpwhAlphaBlank[17 + nAlphaOffset]) {
+                HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName2,
+                                                                          ErrorsFound,
+                                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                                          HPWH.Name,
+                                                                          DataLoopNode::NodeType_Water,
+                                                                          DataLoopNode::NodeConnectionType_Inlet,
+                                                                          1,
+                                                                          DataLoopNode::ObjectIsParent);
+                HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName2,
+                                                                           ErrorsFound,
+                                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                                           HPWH.Name,
+                                                                           DataLoopNode::NodeType_Water,
+                                                                           DataLoopNode::NodeConnectionType_Outlet,
+                                                                           1,
+                                                                           DataLoopNode::ObjectIsParent);
+            }
+
+            // DX Coil
+            // get Coil:DX:HeatPumpWaterHeater object
+            HPWH.DXCoilName = hpwhAlpha[19 + nAlphaOffset];
+            HPWH.DXCoilType = hpwhAlpha[18 + nAlphaOffset];
+
+            // check that the DX Coil exists
+            bool DXCoilErrFlag = false;
+            bool bIsVScoil = false;
+            DXCoils::GetDXCoilIndex(HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
+            if (DXCoilErrFlag) {
+                // This could be a variable speed heat pump water heater
+                bool bVSCoilErrFlag = false;
+
+                bool checkIHPFirst = IntegratedHeatPump::IHPInModel();
+                if (checkIHPFirst) {
+                    HPWH.DXCoilNum = IntegratedHeatPump::GetCoilIndexIHP("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
+
+                    if (!bVSCoilErrFlag) {
+                        HPWH.bIsIHP = true;
+                    }
+                }
+
+                if (bVSCoilErrFlag || !checkIHPFirst) {
+                    bVSCoilErrFlag = false;
+                    HPWH.DXCoilNum =
+                            VariableSpeedCoils::GetCoilIndexVariableSpeed("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag);
+
+                    if (bVSCoilErrFlag) {
+                        ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + " =" + HPWH.Name);
+                        ShowContinueError("...could not find either DXCoils::DXCoil or Variable Speed Coil " + HPWH.DXCoilName);
+                        ErrorsFound = true;
+                    }
+                }
+
+                bIsVScoil = true;
+                HPWH.DXCoilTypeNum = 0;
+                if (HPWH.bIsIHP) {
+                    HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
+                } else {
+                    HPWH.DXCoilType = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
+                }
+            } else {
+                // this is a single speed coil
+                DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+                if (!UtilityRoutines::SameString(HPWH.DXCoilType, Coil.DXCoilType)) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                    ShowContinueError("specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
+                    ShowContinueError("However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
+                    ErrorsFound = true;
+                }
+                HPWH.DXCoilTypeNum = Coil.DXCoilType_Num;
+            }
+
+            // Make sure that the coil and tank are compatible.
+            if (bIsVScoil) {
+                if (HPWH.TypeNum != DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed can only be used with a pumped condenser heat pump "
+                                      "water heater.");
+                    ErrorsFound = true;
+                }
+            } else {
+                if (!((HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped &&
+                       HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) ||
+                      (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped &&
+                       HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped))) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    std::string ExpectedCoilType;
+                    if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
+                        ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped);
+                    } else if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
+                        ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped);
+                    } else {
+                        assert(0);
+                    }
+                    ShowContinueError("can only be used with " + ExpectedCoilType);
+                    ErrorsFound = true;
+                }
+            }
+
+            // Dummy condenser Inlet/Outlet Nodes for wrapped tanks
+            if (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped) {
+                DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+
+                HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
+                HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
+                                                                              ErrorsFound,
+                                                                              DataIPShortCuts::cCurrentModuleObject,
+                                                                              HPWH.Name,
+                                                                              DataLoopNode::NodeType_Water,
+                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                              2,
+                                                                              DataLoopNode::ObjectIsParent);
+                HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
+                HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
+                                                                               ErrorsFound,
+                                                                               DataIPShortCuts::cCurrentModuleObject,
+                                                                               HPWH.Name,
+                                                                               DataLoopNode::NodeType_Water,
+                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                               2,
+                                                                               DataLoopNode::ObjectIsParent);
+            }
+
+            // Minimum Inlet Air Temperature for Compressor Operation
+            HPWH.MinAirTempForHPOperation = hpwhNumeric[4 + nNumericOffset];
+            if (HPWH.MinAirTempForHPOperation < -5) {
+                ShowWarningError(
+                        DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
+                        "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to -5 C.");
+                ShowContinueError("...Minimum inlet air temperature = " + General::TrimSigDigits(hpwhNumeric[4 + nNumericOffset], 1));
+            }
+
+            // Maximum Inlet Air Temperature for Compressor Operation
+            HPWH.MaxAirTempForHPOperation = hpwhNumeric[5 + nNumericOffset];
+            if (HPWH.MaxAirTempForHPOperation <= HPWH.MinAirTempForHPOperation) {
+                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
+                                 "\": maximum inlet air temperature for heat pump compressor operation");
+                ShowContinueError("must be greater than the minimum inlet air temperature for heat pump compressor operation.");
+                ShowContinueError("...Minimum inlet air temperature = " + General::TrimSigDigits(HPWH.MinAirTempForHPOperation, 1));
+                ShowContinueError("...Maximum inlet air temperature = " + General::TrimSigDigits(HPWH.MaxAirTempForHPOperation, 1));
+            }
+
+            // Compressor Location
+            {
+                auto const SELECT_CASE_var(hpwhAlpha[20 + nAlphaOffset]);
+                if (SELECT_CASE_var == "SCHEDULE") {
+                    HPWH.CrankcaseTempIndicator = CrankTemp::Schedule;
+                    if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                        // Compressor Ambient Temperature Schedule
+                        HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[21 + nAlphaOffset]);
+                        if (HPWH.CrankcaseTempSchedule == 0) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                            ShowContinueError(hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+                        ShowContinueError("required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
+                        ErrorsFound = true;
+                    }
+
+                } else if (SELECT_CASE_var == "ZONE") {
+                    HPWH.CrankcaseTempIndicator = CrankTemp::Zone;
+                    if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
+                                        "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
+                        ShowContinueError(" Outdoor Air when compressor location equals ZONE.");
+                        ErrorsFound = true;
+                    }
+
+                    if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
+                                         " was provided but will not be used based on compressor location input=\"" +
+                                         hpwhAlpha[20 + nAlphaOffset] + "\".");
+                    }
+                } else if (SELECT_CASE_var == "OUTDOORS") {
+                    HPWH.CrankcaseTempIndicator = CrankTemp::Exterior;
+                    if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
+                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
+                                         " was provided but will not be used based on " + hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" +
+                                         hpwhAlpha[20 + nAlphaOffset] + "\".");
+                    }
+                }
+            }
+
+            // Fan Name
+            HPWH.FanName = hpwhAlpha[23 + nAlphaOffset];
+            HPWH.FanType = hpwhAlpha[22 + nAlphaOffset];
+
+            // check that the fan exists
+            bool errFlag = false;
+            ValidateComponent(HPWH.FanType, HPWH.FanName, errFlag, DataIPShortCuts::cCurrentModuleObject);
+
+            Real64 FanVolFlow = 0.0;
+            if (errFlag) {
+                ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + ", unit=\"" + HPWH.Name + "\".");
+                ErrorsFound = true;
+            } else {
+                if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
+                    HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
+                    HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
+                    FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
+
+                } else {
+                    Fans::GetFanType(HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
+                    Fans::GetFanIndex(HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                    Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
+                }
+            }
+            // issue #5630, set fan info in coils.
+            if (bIsVScoil) {
+                VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(HPWH.DXCoilNum, HPWH.FanType_Num);
+                VariableSpeedCoils::setVarSpeedHPWHFanIndex(HPWH.DXCoilNum, HPWH.FanNum);
+            } else {
+                DXCoils::SetDXCoolingCoilData(
+                        HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
+                DXCoils::SetDXCoolingCoilData(HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
+                DXCoils::SetDXCoolingCoilData(
+                        HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanType_Num);
+            }
+
+            if (errFlag) {
+                ErrorsFound = true;
+            } else if (HPWH.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
+                       HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
+                ShowContinueError(" The fan object (" + HPWH.FanName +
+                                  ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.");
+                ErrorsFound = true;
+            } else if (!UtilityRoutines::SameString(HPWH.FanType, "Fan:OnOff") &&
+                       !UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
+                ShowContinueError(" The " + DataIPShortCuts::cCurrentModuleObject + " must specify that the fan object");
+                ShowContinueError(
+                        " is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
+            }
+
+            if (FanVolFlow != DataSizing::AutoSize && !errFlag) {
+                if (FanVolFlow < HPWH.OperatingAirFlowRate) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " - air flow rate = " + General::TrimSigDigits(FanVolFlow, 7) + " in fan object " +
+                                    HPWH.FanName + " is less than the  HPWHs evaporator air flow rate.");
+                    ShowContinueError(" The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate.");
+                    ShowContinueError(" Occurs in unit = " + HPWH.Name);
+                    ErrorsFound = true;
+                }
+            }
+
+            // Fan Placement
+            if (UtilityRoutines::SameString(hpwhAlpha[24 + nAlphaOffset], "BlowThrough")) {
+                HPWH.FanPlacement = DataHVACGlobals::BlowThru;
+
+            } else if (UtilityRoutines::SameString(hpwhAlpha[24 + nAlphaOffset], "DrawThrough")) {
+                HPWH.FanPlacement = DataHVACGlobals::DrawThru;
+
+            } else {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid ");
+                ShowContinueError(hpwhAlphaFieldNames[24 + nAlphaOffset] + "=\"" + hpwhAlpha[24 + nAlphaOffset] + "\".");
+                ErrorsFound = true;
+            }
+
+            if (HPWH.DXCoilNum > 0 && !bIsVScoil) {
+                // get HPWH capacity, air inlet node, and PLF curve info from DX coil object
+                HPWH.Capacity = DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2;
+                HPWH.DXCoilAirInletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
+                HPWH.DXCoilPLFFPLR = DXCoils::DXCoil(HPWH.DXCoilNum).PLFFPLR(1);
+                // check the range of condenser pump power to be <= 5 gpm/ton
+                if (DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2 > 0.1422) {
+                    ShowWarningError(
+                            DXCoils::DXCoil(HPWH.DXCoilNum).DXCoilType + "= " + DXCoils::DXCoil(HPWH.DXCoilNum).Name +
+                            ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W "
+                            "(41.67 watt/MBH). Condenser pump power per watt = " +
+                            General::TrimSigDigits((DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2), 4));
+                }
+            } else if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
+
+                if (HPWH.bIsIHP) {
+                    HPWH.Capacity = GetDWHCoilCapacityIHP(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                    HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilPLFFPLR =
+                            GetIHPDWHCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                } else {
+                    HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilPLFFPLR = VariableSpeedCoils::GetVSCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                }
+                //         check the range of condenser pump power to be <= 5 gpm/ton, will be checked in the coil object
+            }
+
+            if (HPWH.OperatingWaterFlowRate == DataGlobals::AutoCalculate) {
+                HPWH.OperatingWaterFlowRate = 0.00000004487 * HPWH.Capacity;
+                HPWH.WaterFlowRateAutoSized = true;
+            }
+
+            if (HPWH.OperatingAirFlowRate == DataGlobals::AutoCalculate) {
+                HPWH.OperatingAirFlowRate = 0.00005035 * HPWH.Capacity;
+                HPWH.AirFlowRateAutoSized = true;
+            }
+
+            // On Cycle Parasitic Electric Load
+            HPWH.OnCycParaLoad = hpwhNumeric[6 + nNumericOffset];
+            if (HPWH.OnCycParaLoad < 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
+                ShowContinueError(hpwhNumericFieldNames[6 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[6 + nNumericOffset] +
+                                  " = " + General::TrimSigDigits(hpwhNumeric[6 + nNumericOffset], 2));
+                ErrorsFound = true;
+            }
+
+            // Off Cycle Parasitic Electric Load
+            HPWH.OffCycParaLoad = hpwhNumeric[7 + nNumericOffset];
+            if (HPWH.OffCycParaLoad < 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
+                ShowContinueError(hpwhNumericFieldNames[7 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[2 + nNumericOffset] +
+                                  " = " + General::TrimSigDigits(hpwhNumeric[7 + nNumericOffset], 2));
+                ErrorsFound = true;
+            }
+
+            // Parasitic Heat Rejection Location
+            if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
+                HPWH.ParasiticTempIndicator = AmbientTemp::TempZone;
+                if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
+                    ShowContinueError(hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
+                    ShowContinueError(" when parasitic heat rejection location equals Zone.");
+                    ErrorsFound = true;
+                }
+            } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
+                HPWH.ParasiticTempIndicator = AmbientTemp::OutsideAir;
+            } else {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowContinueError(" parasitic heat rejection location must be either Zone or Outdoors.");
+                ErrorsFound = true;
+            }
+
+            // Inlet Air Mixer Node
+            // get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
+            if (!hpwhAlphaBlank[26 + nAlphaOffset]) {
+                // For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
+                if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                    HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[26 + nAlphaOffset],
+                                                                                 ErrorsFound,
+                                                                                 DataIPShortCuts::cCurrentModuleObject + " inlet air mixer",
+                                                                                 HPWH.Name,
+                                                                                 DataLoopNode::NodeType_Air,
+                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 1,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+                } else {
+                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as "
+                                      "Zone and OutdoorAir. Node name disregarded and simulation continues.");
+                }
+            } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowContinueError("Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
+                ErrorsFound = true;
+            }
+
+            // Outlet Air Splitter Node
+            if (!hpwhAlphaBlank[27 + nAlphaOffset]) {
+                //  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
+                if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                    HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[27 + nAlphaOffset],
+                                                                                     ErrorsFound,
+                                                                                     DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
+                                                                                     HPWH.Name,
+                                                                                     DataLoopNode::NodeType_Air,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+                } else {
+                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as "
+                                      "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
+                }
+            } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowContinueError("Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
+                ErrorsFound = true;
+            }
+
+            // get node data for HPWH
+            if (HPWH.InletAirMixerNode != 0) {
+                // when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as DataLoopNode::ObjectIsNotParent
+
+                HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                                                                                ErrorsFound,
+                                                                                DataIPShortCuts::cCurrentModuleObject + "-INLET AIR MIXER",
+                                                                                HPWH.Name,
+                                                                                DataLoopNode::NodeType_Air,
+                                                                                DataLoopNode::NodeConnectionType_Inlet,
+                                                                                1,
+                                                                                DataLoopNode::ObjectIsNotParent);
+
+                HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                                                                                 ErrorsFound,
+                                                                                 DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
+                                                                                 HPWH.Name,
+                                                                                 DataLoopNode::NodeType_Air,
+                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 1,
+                                                                                 DataLoopNode::ObjectIsNotParent);
+
+                HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
+                                                                          ErrorsFound,
+                                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                                          HPWH.Name,
+                                                                          DataLoopNode::NodeType_Air,
+                                                                          DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                          1,
+                                                                          DataLoopNode::ObjectIsParent);
+                if (hpwhAlpha[9 + nAlphaOffset] != "") {
+                    bool Okay;
+                    OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
+                    if (!Okay) {
+                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
+                                         "\": Adding outdoor air node=" + hpwhAlpha[9 + nAlphaOffset]);
+                    }
+                }
+
+                HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
+                                                                          ErrorsFound,
+                                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                                          HPWH.Name,
+                                                                          DataLoopNode::NodeType_Air,
+                                                                          DataLoopNode::NodeConnectionType_ReliefAir,
+                                                                          1,
+                                                                          DataLoopNode::ObjectIsParent);
+
+            } else {
+                // when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as DataLoopNode::ObjectIsParent
+                if (HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
+                    // for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
+                    // to avoid node connection errors
+                    HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                                                                                    ErrorsFound,
+                                                                                    DataIPShortCuts::cCurrentModuleObject,
+                                                                                    HPWH.Name,
+                                                                                    DataLoopNode::NodeType_Air,
+                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                    1,
+                                                                                    DataLoopNode::ObjectIsParent);
+
+                    HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                                                                                     ErrorsFound,
+                                                                                     DataIPShortCuts::cCurrentModuleObject,
+                                                                                     HPWH.Name,
+                                                                                     DataLoopNode::NodeType_Air,
+                                                                                     DataLoopNode::NodeConnectionType_Outlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsParent);
+
+                } else { // HPWH is connected to a zone with no mixer/splitter nodes
+                    if (HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
+                        HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
+                                                                                        ErrorsFound,
+                                                                                        DataIPShortCuts::cCurrentModuleObject,
+                                                                                        HPWH.Name,
+                                                                                        DataLoopNode::NodeType_Air,
+                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                        1,
+                                                                                        DataLoopNode::ObjectIsParent);
+
+                        HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
+                                                                                         ErrorsFound,
+                                                                                         DataIPShortCuts::cCurrentModuleObject,
+                                                                                         HPWH.Name,
+                                                                                         DataLoopNode::NodeType_Air,
+                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                         1,
+                                                                                         DataLoopNode::ObjectIsParent);
+                    } else { // HPWH is located outdoors
+                        HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
+                                                                                  ErrorsFound,
+                                                                                  DataIPShortCuts::cCurrentModuleObject,
+                                                                                  HPWH.Name,
+                                                                                  DataLoopNode::NodeType_Air,
+                                                                                  DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                  1,
+                                                                                  DataLoopNode::ObjectIsParent);
+                        if (!hpwhAlphaBlank[9 + nAlphaOffset]) {
+                            bool Okay;
+                            OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
+                            if (!Okay) {
+                                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
+                                                 "\": Adding outdoor air node =" + hpwhAlpha[9 + nAlphaOffset]);
+                            }
+                        }
+
+                        HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
+                                                                                  ErrorsFound,
+                                                                                  DataIPShortCuts::cCurrentModuleObject,
+                                                                                  HPWH.Name,
+                                                                                  DataLoopNode::NodeType_Air,
+                                                                                  DataLoopNode::NodeConnectionType_ReliefAir,
+                                                                                  1,
+                                                                                  DataLoopNode::ObjectIsParent);
+                    }
+                }
+            }
+            // check that required node names are present
+            if (HPWH.InletAirConfiguration == AmbientTemp::Schedule || HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
+                if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
+                    ShowContinueError(hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] +
+                                      " must be specified.");
+                    ErrorsFound = true;
+                }
+            } else if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
+                if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
+                    ShowContinueError(hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] +
+                                      " must be specified.");
+                    ErrorsFound = true;
+                }
+            } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 ||
+                    HPWH.ExhaustAirNode == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
+                    if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
+                        ShowContinueError(hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] +
+                                          " must be specified.");
+                    }
+                    if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
+                        ShowContinueError(hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] +
+                                          " must be specified.");
+                    }
+                    ErrorsFound = true;
+                }
+            }
+
+            // check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
+            // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
+            if ((HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) &&
+                HPWH.AmbientTempZone > 0) {
+                if (!DataZoneEquipment::ZoneEquipInputsFilled) {
+                    DataZoneEquipment::GetZoneEquipmentData();
+                    DataZoneEquipment::ZoneEquipInputsFilled = true;
+                }
+                if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
+                    bool FoundInletNode = false;
+                    bool FoundOutletNode = false;
+                    int ZoneNum;
+                    for (ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+                        if (HPWH.AmbientTempZone == DataZoneEquipment::ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
+                    }
+                    if (ZoneNum <= DataGlobals::NumOfZones) {
+                        for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
+                            if (HPWH.HeatPumpAirOutletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
+                            FoundOutletNode = true;
+                        }
+                        for (int ExhAirOut = 1; ExhAirOut <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhAirOut) {
+                            if (HPWH.HeatPumpAirInletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).ExhaustNode(ExhAirOut)) continue;
+                            FoundInletNode = true;
+                        }
+                        if (!FoundInletNode) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                            ShowContinueError("The HPWH's air inlet node name = " + hpwhAlpha[7 + nAlphaOffset] +
+                                              " was not properly specified ");
+                            ShowContinueError("as an exhaust air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
+                                              " in a ZoneHVAC:EquipmentConnections object.");
+                            ErrorsFound = true;
+                        }
+                        if (!FoundOutletNode) {
+                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                            ShowContinueError("The HPWH's air outlet node name = " + hpwhAlpha[8 + nAlphaOffset] +
+                                              " was not properly specified ");
+                            ShowContinueError("as an inlet air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
+                                              " in a ZoneHVAC:EquipmentConnections object.");
+                            ErrorsFound = true;
+                        }
+                    }
+                } else {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Heat pump water heater air inlet node name and air outlet node name must be listed in a "
+                                      "ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or "
+                                      "ZoneAndOutdoorAir.");
+                    ErrorsFound = true;
+                }
+            }
+
+            // only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
+            if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
+                HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
+                if (HPWH.InletAirMixerSchPtr == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                    ShowContinueError(hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
+                    ErrorsFound = true;
+                } else {
+                    bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
+                    if (!ValidScheduleValue) {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
+                        ShowContinueError(hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
+                                          hpwhAlpha[28 + nAlphaOffset] + "\".");
+                        ErrorsFound = true;
+                    }
+                    //           set outlet air splitter schedule index equal to inlet air mixer schedule index
+                    //           (place holder for when zone pressurization/depressurization is allowed and different schedules can be used)
+                    HPWH.OutletAirSplitterSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
+                }
+            }
+
+            // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
+            if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+                if (HPWH.OutletAirSplitterNode != 0) {
+                    HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
+                } else {
+                    if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
+                        HPWH.FanOutletNode = HPWH.ExhaustAirNode;
+                    } else {
+                        HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
+                    }
+                }
+            } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+                // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
+                if (bIsVScoil) {
+                    if (HPWH.bIsIHP) {
+                        HPWH.FanOutletNode = IntegratedHeatPump::GetDWHCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    } else {
+                        HPWH.FanOutletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    }
+                } else {
+                    HPWH.FanOutletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
+                }
+            }
+
+            // check that fan outlet node is indeed correct
+            int FanOutletNodeNum(0);
+            if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
+            } else {
+                errFlag = false;
+                FanOutletNodeNum = Fans::GetFanOutletNode(HPWH.FanType, HPWH.FanName, errFlag);
+                if (errFlag) {
+                    ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
+                    ErrorsFound = true;
+                }
+            }
+            if (FanOutletNodeNum != HPWH.FanOutletNode) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowContinueError("Heat pump water heater fan outlet node name does not match next connected component.");
+                if (FanOutletNodeNum != 0) {
+                    ShowContinueError("Fan outlet node name = " + DataLoopNode::NodeID(FanOutletNodeNum));
+                }
+                if (HPWH.FanOutletNode != 0) {
+                    ShowContinueError("Expected fan outlet node name = " + DataLoopNode::NodeID(HPWH.FanOutletNode));
+                }
+                ErrorsFound = true;
+            }
+            int FanInletNodeNum(0);
+            if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
+            } else {
+                errFlag = false;
+                FanInletNodeNum = Fans::GetFanInletNode(HPWH.FanType, HPWH.FanName, errFlag);
+                if (errFlag) {
+                    ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
+                    ErrorsFound = true;
+                }
+            }
+            int HPWHFanInletNodeNum(0);
+            if (HPWH.InletAirMixerNode != 0) {
+                HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
+            } else {
+                if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
+                    HPWHFanInletNodeNum = HPWH.OutsideAirNode;
+                } else {
+                    HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
+                }
+            }
+            if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+                if (FanInletNodeNum != HPWHFanInletNodeNum) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Heat pump water heater fan inlet node name does not match previous connected component.");
+                    if (FanOutletNodeNum != 0) {
+                        ShowContinueError("Fan inlet node name = " + DataLoopNode::NodeID(FanInletNodeNum));
+                    }
+                    if (HPWH.FanOutletNode != 0) {
+                        ShowContinueError("Expected fan inlet node name = " + DataLoopNode::NodeID(HPWHFanInletNodeNum));
+                    }
+                    ErrorsFound = true;
+                }
+            }
+
+            int DXCoilAirOutletNodeNum(0);
+            if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
+                if (HPWH.bIsIHP) {
+                    DXCoilAirOutletNodeNum = IntegratedHeatPump::GetDWHCoilOutletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                } else {
+                    DXCoilAirOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                }
+
+            } else if (HPWH.DXCoilNum > 0) {
+                DXCoilAirOutletNodeNum = DXCoils::DXCoil(HPWH.DXCoilNum).AirOutNode;
+            }
+            if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+                if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Heat pump water heater fan inlet node name does not match previous connected component.");
+                    if (FanInletNodeNum != 0) {
+                        ShowContinueError("Fan inlet node name = " + DataLoopNode::NodeID(FanInletNodeNum));
+                    }
+                    if (DXCoilAirOutletNodeNum != 0) {
+                        ShowContinueError("Expected fan inlet node name = " + DataLoopNode::NodeID(DXCoilAirOutletNodeNum));
+                    }
+                    ErrorsFound = true;
+                }
+            } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+                int HPWHCoilOutletNodeNum(0);
+                if (HPWH.OutletAirSplitterNode != 0) {
+                    HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
+                } else {
+                    if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
+                        HPWHCoilOutletNodeNum = HPWH.ExhaustAirNode;
+                    } else {
+                        HPWHCoilOutletNodeNum = HPWH.HeatPumpAirOutletNode;
+                    }
+                }
+                if (DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                    ShowContinueError("Heat pump water heater coil outlet node name does not match next connected component.");
+                    if (DXCoilAirOutletNodeNum != 0) {
+                        ShowContinueError("Coil outlet node name = " + DataLoopNode::NodeID(DXCoilAirOutletNodeNum));
+                    }
+                    if (HPWHCoilOutletNodeNum != 0) {
+                        ShowContinueError("Expected coil outlet node name = " + DataLoopNode::NodeID(HPWHCoilOutletNodeNum));
+                    }
+                    ErrorsFound = true;
+                }
+            }
+
+            // set the max mass flow rate for outdoor fans
+            if (HPWH.FanOutletNode > 0)
+                DataLoopNode::Node(HPWH.FanOutletNode).MassFlowRateMax = HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+
+            if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+                if (HPWH.InletAirMixerNode > 0) {
+                    HPWH.FanInletNode_str = hpwhAlpha[26 + nAlphaOffset];
+                    HPWH.FanOutletNode_str = "UNDEFINED";
+                } else {
+                    if (HPWH.OutsideAirNode == 0) {
+                        HPWH.FanInletNode_str = hpwhAlpha[7 + nAlphaOffset];
+                        HPWH.FanOutletNode_str = "UNDEFINED";
+                    } else {
+                        HPWH.FanInletNode_str = hpwhAlpha[9 + nAlphaOffset];
+                        HPWH.FanOutletNode_str = "UNDEFINED";
+                    }
+                }
+                if (HPWH.OutletAirSplitterNode > 0) {
+                    HPWH.CoilInletNode_str = "UNDEFINED";
+                    HPWH.CoilOutletNode_str = hpwhAlpha[27 + nAlphaOffset];
+                } else {
+                    if (HPWH.OutsideAirNode == 0) {
+                        HPWH.CoilInletNode_str = "UNDEFINED";
+                        HPWH.CoilOutletNode_str = hpwhAlpha[8 + nAlphaOffset];
+                    } else {
+                        HPWH.CoilInletNode_str = "UNDEFINED";
+                        HPWH.CoilOutletNode_str = hpwhAlpha[10 + nAlphaOffset];
+                    }
+                }
+            } else {
+                if (HPWH.InletAirMixerNode > 0) {
+                    HPWH.CoilInletNode_str = hpwhAlpha[26 + nAlphaOffset];
+                    HPWH.CoilOutletNode_str = "UNDEFINED";
+                } else {
+                    if (HPWH.OutsideAirNode == 0) {
+                        HPWH.CoilInletNode_str = hpwhAlpha[7 + nAlphaOffset];
+                        HPWH.CoilOutletNode_str = "UNDEFINED";
+                    } else {
+                        HPWH.CoilInletNode_str = hpwhAlpha[9 + nAlphaOffset];
+                        HPWH.CoilOutletNode_str = "UNDEFINED";
+                    }
+                }
+                if (HPWH.OutletAirSplitterNode > 0) {
+                    HPWH.FanInletNode_str = "UNDEFINED";
+                    HPWH.FanOutletNode_str = hpwhAlpha[27 + nAlphaOffset];
+                } else {
+                    if (HPWH.OutsideAirNode == 0) {
+                        HPWH.FanInletNode_str = "UNDEFINED";
+                        HPWH.FanOutletNode_str = hpwhAlpha[8 + nAlphaOffset];
+                    } else {
+                        HPWH.FanInletNode_str = "UNDEFINED";
+                        HPWH.FanOutletNode_str = hpwhAlpha[10 + nAlphaOffset];
+                    }
+                }
+            }
+
+            // set up comp set for air side nodes (can be blow thru or draw thru, may or may not have damper nodes)
+            if (HPWH.bIsIHP) {
+                BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName + " Outdoor Coil", HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
+            } else {
+                BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
+            }
+
+            BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
+
+            // Control Logic Flag
+            std::string CtrlLogicFlag = hpwhAlphaBlank[29 + nAlphaOffset] ? "SIMULTANEOUS" : hpwhAlpha[29 + nAlphaOffset];
+            if (UtilityRoutines::SameString(CtrlLogicFlag, "SIMULTANEOUS")) {
+                HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
+            } else if (UtilityRoutines::SameString(CtrlLogicFlag, "MUTUALLYEXCLUSIVE")) {
+                HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
+            } else {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
+                ShowContinueError(CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic.");
+                ErrorsFound = true;
+            }
+
+            // Control Sensor 1 Location In Stratified Tank
+            if (!hpwhNumericBlank[8 + nNumericOffset]) {
+                HPWH.ControlSensor1Height = hpwhNumeric[8 + nNumericOffset];
+            } else {
+                // use heater1 location, which we don't know right now
+                HPWH.ControlSensor1Height = -1.0;
+            }
+
+            // Control Sensor 1 Weight
+            HPWH.ControlSensor1Weight = hpwhNumericBlank[9 + nNumericOffset] ? 1.0 : hpwhNumeric[9 + nNumericOffset];
+
+            // Control Sensor 2 Location In Stratified Tank
+            if (!hpwhNumericBlank[10 + nNumericOffset]) {
+                HPWH.ControlSensor2Height = hpwhNumeric[10 + nNumericOffset];
+            } else {
+                HPWH.ControlSensor2Height = -1.0;
+            }
+
+            // Control Sensor 2 Weight
+            HPWH.ControlSensor2Weight = 1.0 - HPWH.ControlSensor1Weight;
+        }
+
+        return ErrorsFound;
     }
 
     bool GetWaterThermalTankInput()
@@ -1159,8 +2263,6 @@ namespace WaterThermalTanks {
             }
             if (modNumHeatPumpWaterHeater > 0) {
                 HPWaterHeater.allocate(modNumHeatPumpWaterHeater);
-
-                for (int IHPIndex = 1; IHPIndex <= modNumHeatPumpWaterHeater; ++IHPIndex) HPWaterHeater(IHPIndex).bIsIHP = false;
             }
 
             if (modNumWaterHeaterDesuperheater > 0) {
@@ -1169,1110 +2271,15 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (modNumWaterHeaterDesuperheater > 0) {
-                getDesuperHtrInput();
+                ErrorsFound |= getDesuperHtrInput();
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
 
             //   get input for heat pump water heater object
             if (modNumHeatPumpWaterHeater > 0) {
-                int const NumPumpedCondenser =
-                    inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser); // number of WaterHeater:HeatPump:PumpedCondenser objects
-                int nAlphaOffset;            // the difference of array location between alpha items between pumped and wrapped condensers
-                int nNumericOffset;          // the difference of array location between numeric items between pumped and wrapped condensers
-                int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
-                int nNumPossibleAlphaArgs;   // the number of possible numeric arguments in the idd
-
-                for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= modNumHeatPumpWaterHeater; ++HPWaterHeaterNum) {
-
-                    // Create reference to current HPWH object in array.
-                    HeatPumpWaterHeaterData &HPWH = HPWaterHeater(HPWaterHeaterNum);
-
-                    // Initialize the offsets to zero
-                    nAlphaOffset = 0;
-                    nNumericOffset = 0;
-                    if (HPWaterHeaterNum <= NumPumpedCondenser) {
-                        // Pumped Condenser
-                        DataIPShortCuts::cCurrentModuleObject = cHPWHPumpedCondenser;
-                        HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
-                        nNumPossibleAlphaArgs = 29;
-                        nNumPossibleNumericArgs = 9;
-                    } else {
-                        // Wrapped Condenser
-                        DataIPShortCuts::cCurrentModuleObject = cHPWHWrappedCondenser;
-                        HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
-                        nNumPossibleAlphaArgs = 27;
-                        nNumPossibleNumericArgs = 10;
-                    }
-
-                    int NumAlphas;
-                    int NumNums;
-                    int IOStat;
-                    inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                                  HPWaterHeaterNum,
-                                                  DataIPShortCuts::cAlphaArgs,
-                                                  NumAlphas,
-                                                  DataIPShortCuts::rNumericArgs,
-                                                  NumNums,
-                                                  IOStat,
-                                                  DataIPShortCuts::lNumericFieldBlanks,
-                                                  DataIPShortCuts::lAlphaFieldBlanks,
-                                                  DataIPShortCuts::cAlphaFieldNames,
-                                                  DataIPShortCuts::cNumericFieldNames);
-
-                    // Copy those lists into C++ std::maps
-                    std::map<int, std::string> hpwhAlpha;
-                    std::map<int, Real64> hpwhNumeric;
-                    std::map<int, bool> hpwhAlphaBlank;
-                    std::map<int, bool> hpwhNumericBlank;
-                    std::map<int, std::string> hpwhAlphaFieldNames;
-                    std::map<int, std::string> hpwhNumericFieldNames;
-                    for (int i = 1; i <= NumNums; ++i) {
-                        hpwhNumeric[i] = DataIPShortCuts::rNumericArgs(i);
-                        hpwhNumericBlank[i] = DataIPShortCuts::lNumericFieldBlanks(i);
-                        hpwhNumericFieldNames[i] = DataIPShortCuts::cNumericFieldNames(i);
-                    }
-                    for (int i = NumNums + 1; i <= nNumPossibleNumericArgs; ++i) {
-                        hpwhNumericBlank[i] = true;
-                    }
-                    for (int i = 1; i <= NumAlphas; ++i) {
-                        hpwhAlpha[i] = DataIPShortCuts::cAlphaArgs(i);
-                        hpwhAlphaBlank[i] = DataIPShortCuts::lAlphaFieldBlanks(i);
-                        hpwhAlphaFieldNames[i] = DataIPShortCuts::cAlphaFieldNames(i);
-                    }
-                    for (int i = NumAlphas + 1; i <= nNumPossibleAlphaArgs; ++i) {
-                        hpwhAlphaBlank[i] = true;
-                    }
-                    UtilityRoutines::IsNameEmpty(hpwhAlpha[1], DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
-
-                    // Name and type
-                    HPWH.Name = hpwhAlpha[1];
-                    HPWH.Type = DataIPShortCuts::cCurrentModuleObject;
-
-                    // Availability Schedule
-                    // convert schedule name to pointer
-                    if (!hpwhAlphaBlank[2]) {
-                        HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[2]);
-                        if (HPWH.AvailSchedPtr == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                            ShowContinueError(hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        HPWH.AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
-                    }
-
-                    // Compressor Setpoint Temperature Schedule
-                    // convert schedule name to pointer
-                    if (!hpwhAlphaBlank[3]) {
-                        HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[3]);
-                        if (HPWH.SetPointTempSchedule == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                            ShowContinueError(hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                        ShowContinueError("required " + hpwhAlphaFieldNames[3] + " is blank.");
-                        ErrorsFound = true;
-                    }
-
-                    // Dead Band Temperature Difference
-                    HPWH.DeadBandTempDiff = hpwhNumeric[1 + nNumericOffset];
-                    if (HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                        ShowContinueError(hpwhNumericFieldNames[1 + nNumericOffset] +
-                                          " difference must be > 0 and <= 20. Dead band = " + General::TrimSigDigits(hpwhNumeric[1 + nNumericOffset], 1));
-                        ErrorsFound = true;
-                    }
-
-                    if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
-
-                        // Condenser Inlet/Outlet Nodes
-                        HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(
-                            hpwhAlpha[4], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 2, DataLoopNode::ObjectIsParent);
-                        HPWH.InletNodeName1 = hpwhAlpha[4];
-                        HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(
-                            hpwhAlpha[5], ErrorsFound, DataIPShortCuts::cCurrentModuleObject, HPWH.Name, DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsParent);
-                        HPWH.OutletNodeName1 = hpwhAlpha[5];
-
-                        // Condenser Water Flow Rate
-                        HPWH.OperatingWaterFlowRate = hpwhNumeric[2];
-                        if (HPWH.OperatingWaterFlowRate <= 0.0 && hpwhNumeric[2] != DataGlobals::AutoCalculate) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                            ShowContinueError(hpwhNumericFieldNames[2] +
-                                              " must be greater than 0. Condenser water flow rate = " + General::TrimSigDigits(hpwhNumeric[2], 6));
-                            ErrorsFound = true;
-                        }
-
-                    } else if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-
-                        // Wrapped Condenser Location
-                        HPWH.WrappedCondenserBottomLocation = hpwhNumeric[2 + nNumericOffset];
-                        HPWH.WrappedCondenserTopLocation = hpwhNumeric[3 + nNumericOffset];
-
-                        if (HPWH.WrappedCondenserBottomLocation < 0.0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                            ShowContinueError(hpwhNumericFieldNames[2] + " must be greater than 0. Condenser bottom location = " +
-                                              General::TrimSigDigits(HPWH.WrappedCondenserBottomLocation, 6));
-                            ErrorsFound = true;
-                        }
-
-                        if (HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                            ShowContinueError(hpwhNumericFieldNames[3] + " (" + General::TrimSigDigits(HPWH.WrappedCondenserTopLocation, 6) +
-                                              ") must be greater than " + hpwhNumericFieldNames[2] + " (" +
-                                              General::TrimSigDigits(HPWH.WrappedCondenserBottomLocation, 6) + ").");
-                            ErrorsFound = true;
-                        }
-
-                        // Reset the offset
-                        nAlphaOffset = -2;
-                        nNumericOffset = 1;
-
-                    } else {
-                        assert(0);
-                    }
-
-                    // Evaporator Air Flow Rate
-                    HPWH.OperatingAirFlowRate = hpwhNumeric[3 + nNumericOffset];
-                    if (HPWH.OperatingAirFlowRate <= 0.0 && hpwhNumeric[3 + nNumericOffset] != DataGlobals::AutoCalculate) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                        ShowContinueError(hpwhNumericFieldNames[3 + nNumericOffset] +
-                                          " must be greater than 0. Evaporator air flow rate = " + General::TrimSigDigits(hpwhNumeric[3 + nNumericOffset], 6));
-                        ErrorsFound = true;
-                    }
-
-                    // Inlet Air Configuration
-                    {
-                        auto const SELECT_CASE_var(hpwhAlpha[6 + nAlphaOffset]);
-
-                        if (SELECT_CASE_var == "SCHEDULE") {
-                            HPWH.InletAirConfiguration = AmbientTemp::Schedule;
-
-                            // Inlet Air Temperature Schedule
-                            if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
-                                HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[11 + nAlphaOffset]);
-                                if (HPWH.AmbientTempSchedule == 0) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                    ShowContinueError(hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
-                                    ErrorsFound = true;
-                                }
-                            } else {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                                ShowContinueError("required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
-                                ErrorsFound = true;
-                            }
-
-                            // Inlet Air Humidity Schedule
-                            if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
-                                HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[12 + nAlphaOffset]);
-                                if (HPWH.AmbientRHSchedule == 0) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                    ShowContinueError(hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
-                                    ErrorsFound = true;
-                                } else {
-                                    if (!ScheduleManager::CheckScheduleValueMinMax(HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
-                                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
-                                        ShowContinueError(hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
-                                                          "\", schedule values must be (>=0., <=1.)");
-                                        ErrorsFound = true;
-                                    }
-                                }
-                            } else {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                                ShowContinueError("required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
-                                ErrorsFound = true;
-                            }
-
-                        } else if (SELECT_CASE_var == "ZONEAIRONLY") {
-                            HPWH.InletAirConfiguration = AmbientTemp::TempZone;
-
-                            // Inlet Air Zone
-                            if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                                HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
-                                if (HPWH.AmbientTempZone == 0) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                    ShowContinueError(hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
-                                    ErrorsFound = true;
-                                }
-                            } else {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                                ShowContinueError("required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
-                                ErrorsFound = true;
-                            }
-
-                        } else if (SELECT_CASE_var == "OUTDOORAIRONLY") {
-                            HPWH.InletAirConfiguration = AmbientTemp::OutsideAir;
-
-                        } else if (SELECT_CASE_var == "ZONEANDOUTDOORAIR") {
-                            HPWH.InletAirConfiguration = AmbientTemp::ZoneAndOA;
-
-                            // Inlet Air Zone
-                            if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                                HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
-                                if (HPWH.AmbientTempZone == 0) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                    ShowContinueError(hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
-                                    ErrorsFound = true;
-                                }
-                            } else {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                                ShowContinueError("required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-
-                    // Read air inlet nodes after mixer/splitter nodes have been read in (DataIPShortCuts::cAlphaArgs 7-10),
-                    // Node_ConnectionType differs for inlet node if mixer/splitter node exists
-
-                    // Tank Name
-                    // We will verify this exists and is the right kind of tank later when the tanks are all loaded.
-                    HPWH.TankName = hpwhAlpha[15 + nAlphaOffset];
-                    HPWH.TankType = hpwhAlpha[14 + nAlphaOffset];
-
-                    // Use Side Inlet/Outlet
-                    // Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
-                    // Save the name of the node for use with set up comp sets
-                    HPWH.InletNodeName2 = hpwhAlpha[16 + nAlphaOffset];
-                    HPWH.OutletNodeName2 = hpwhAlpha[17 + nAlphaOffset];
-
-                    if (!hpwhAlphaBlank[16 + nAlphaOffset] && !hpwhAlphaBlank[17 + nAlphaOffset]) {
-                        HPWH.WHUseInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName2,
-                                                                ErrorsFound,
-                                                                DataIPShortCuts::cCurrentModuleObject,
-                                                                HPWH.Name,
-                                                                DataLoopNode::NodeType_Water,
-                                                                DataLoopNode::NodeConnectionType_Inlet,
-                                                                1,
-                                                                DataLoopNode::ObjectIsParent);
-                        HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName2,
-                                                                 ErrorsFound,
-                                                                 DataIPShortCuts::cCurrentModuleObject,
-                                                                 HPWH.Name,
-                                                                 DataLoopNode::NodeType_Water,
-                                                                 DataLoopNode::NodeConnectionType_Outlet,
-                                                                 1,
-                                                                 DataLoopNode::ObjectIsParent);
-                    }
-
-                    // DX Coil
-                    // get Coil:DX:HeatPumpWaterHeater object
-                    HPWH.DXCoilName = hpwhAlpha[19 + nAlphaOffset];
-                    HPWH.DXCoilType = hpwhAlpha[18 + nAlphaOffset];
-
-                    // check that the DX Coil exists
-                    bool DXCoilErrFlag = false;
-                    bool bIsVScoil = false;
-                    DXCoils::GetDXCoilIndex(HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
-                    if (DXCoilErrFlag) {
-                        // This could be a variable speed heat pump water heater
-                        bool bVSCoilErrFlag = false;
-
-                        bool checkIHPFirst = IntegratedHeatPump::IHPInModel();
-                        if (checkIHPFirst) {
-                            HPWH.DXCoilNum = IntegratedHeatPump::GetCoilIndexIHP("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
-
-                            if (!bVSCoilErrFlag) {
-                                HPWH.bIsIHP = true;
-                            }
-                        }
-
-                        if (bVSCoilErrFlag || !checkIHPFirst) {
-                            bVSCoilErrFlag = false;
-                            HPWH.DXCoilNum =
-                                VariableSpeedCoils::GetCoilIndexVariableSpeed("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag);
-
-                            if (bVSCoilErrFlag) {
-                                ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + " =" + HPWH.Name);
-                                ShowContinueError("...could not find either DXCoils::DXCoil or Variable Speed Coil " + HPWH.DXCoilName);
-                                ErrorsFound = true;
-                            }
-                        }
-
-                        bIsVScoil = true;
-                        HPWH.DXCoilTypeNum = 0;
-                        if (HPWH.bIsIHP) {
-                            HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";
-                        } else {
-                            HPWH.DXCoilType = VariableSpeedCoils::VarSpeedCoil(HPWH.DXCoilNum).VarSpeedCoilType;
-                        }
-                    } else {
-                        // this is a single speed coil
-                        DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
-                        if (!UtilityRoutines::SameString(HPWH.DXCoilType, Coil.DXCoilType)) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                            ShowContinueError("specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
-                            ShowContinueError("However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
-                            ErrorsFound = true;
-                        }
-                        HPWH.DXCoilTypeNum = Coil.DXCoilType_Num;
-                    }
-
-                    // Make sure that the coil and tank are compatible.
-                    if (bIsVScoil) {
-                        if (HPWH.TypeNum != DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed can only be used with a pumped condenser heat pump "
-                                              "water heater.");
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        if (!((HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped &&
-                               HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) ||
-                              (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped &&
-                               HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped))) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            std::string ExpectedCoilType;
-                            if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
-                                ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped);
-                            } else if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-                                ExpectedCoilType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped);
-                            } else {
-                                assert(0);
-                            }
-                            ShowContinueError("can only be used with " + ExpectedCoilType);
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    // Dummy condenser Inlet/Outlet Nodes for wrapped tanks
-                    if (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped) {
-                        DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
-
-                        HPWH.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
-                        HPWH.CondWaterInletNode = NodeInputManager::GetOnlySingleNode(HPWH.InletNodeName1,
-                                                                    ErrorsFound,
-                                                                    DataIPShortCuts::cCurrentModuleObject,
-                                                                    HPWH.Name,
-                                                                    DataLoopNode::NodeType_Water,
-                                                                    DataLoopNode::NodeConnectionType_Inlet,
-                                                                    2,
-                                                                    DataLoopNode::ObjectIsParent);
-                        HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
-                        HPWH.CondWaterOutletNode = NodeInputManager::GetOnlySingleNode(HPWH.OutletNodeName1,
-                                                                     ErrorsFound,
-                                                                     DataIPShortCuts::cCurrentModuleObject,
-                                                                     HPWH.Name,
-                                                                     DataLoopNode::NodeType_Water,
-                                                                     DataLoopNode::NodeConnectionType_Outlet,
-                                                                     2,
-                                                                     DataLoopNode::ObjectIsParent);
-                    }
-
-                    // Minimum Inlet Air Temperature for Compressor Operation
-                    HPWH.MinAirTempForHPOperation = hpwhNumeric[4 + nNumericOffset];
-                    if (HPWH.MinAirTempForHPOperation < -5) {
-                        ShowWarningError(
-                            DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
-                            "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to -5 C.");
-                        ShowContinueError("...Minimum inlet air temperature = " + General::TrimSigDigits(hpwhNumeric[4 + nNumericOffset], 1));
-                    }
-
-                    // Maximum Inlet Air Temperature for Compressor Operation
-                    HPWH.MaxAirTempForHPOperation = hpwhNumeric[5 + nNumericOffset];
-                    if (HPWH.MaxAirTempForHPOperation <= HPWH.MinAirTempForHPOperation) {
-                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
-                                         "\": maximum inlet air temperature for heat pump compressor operation");
-                        ShowContinueError("must be greater than the minimum inlet air temperature for heat pump compressor operation.");
-                        ShowContinueError("...Minimum inlet air temperature = " + General::TrimSigDigits(HPWH.MinAirTempForHPOperation, 1));
-                        ShowContinueError("...Maximum inlet air temperature = " + General::TrimSigDigits(HPWH.MaxAirTempForHPOperation, 1));
-                    }
-
-                    // Compressor Location
-                    {
-                        auto const SELECT_CASE_var(hpwhAlpha[20 + nAlphaOffset]);
-                        if (SELECT_CASE_var == "SCHEDULE") {
-                            HPWH.CrankcaseTempIndicator = CrankTemp::Schedule;
-                            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                                // Compressor Ambient Temperature Schedule
-                                HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[21 + nAlphaOffset]);
-                                if (HPWH.CrankcaseTempSchedule == 0) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                    ShowContinueError(hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
-                                    ErrorsFound = true;
-                                }
-                            } else {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                                ShowContinueError("required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
-                                ErrorsFound = true;
-                            }
-
-                        } else if (SELECT_CASE_var == "ZONE") {
-                            HPWH.CrankcaseTempIndicator = CrankTemp::Zone;
-                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
-                                                "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
-                                ShowContinueError(" Outdoor Air when compressor location equals ZONE.");
-                                ErrorsFound = true;
-                            }
-
-                            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
-                                                 " was provided but will not be used based on compressor location input=\"" +
-                                                 hpwhAlpha[20 + nAlphaOffset] + "\".");
-                            }
-                        } else if (SELECT_CASE_var == "OUTDOORS") {
-                            HPWH.CrankcaseTempIndicator = CrankTemp::Exterior;
-                            if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
-                                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
-                                                 " was provided but will not be used based on " + hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" +
-                                                 hpwhAlpha[20 + nAlphaOffset] + "\".");
-                            }
-                        }
-                    }
-
-                    // Fan Name
-                    HPWH.FanName = hpwhAlpha[23 + nAlphaOffset];
-                    HPWH.FanType = hpwhAlpha[22 + nAlphaOffset];
-
-                    // check that the fan exists
-                    bool errFlag = false;
-                    ValidateComponent(HPWH.FanType, HPWH.FanName, errFlag, DataIPShortCuts::cCurrentModuleObject);
-
-                    Real64 FanVolFlow = 0.0;
-                    if (errFlag) {
-                        ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + ", unit=\"" + HPWH.Name + "\".");
-                        ErrorsFound = true;
-                    } else {
-                        if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
-                            HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                            HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
-                            HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
-                            FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
-
-                        } else {
-                            Fans::GetFanType(HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
-                            Fans::GetFanIndex(HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
-                            Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
-                        }
-                    }
-                    // issue #5630, set fan info in coils.
-                    if (bIsVScoil) {
-                        VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(HPWH.DXCoilNum, HPWH.FanType_Num);
-                        VariableSpeedCoils::setVarSpeedHPWHFanIndex(HPWH.DXCoilNum, HPWH.FanNum);
-                    } else {
-                        DXCoils::SetDXCoolingCoilData(
-                            HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
-                        DXCoils::SetDXCoolingCoilData(HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
-                        DXCoils::SetDXCoolingCoilData(
-                            HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanType_Num);
-                    }
-
-                    if (errFlag) {
-                        ErrorsFound = true;
-                    } else if (HPWH.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
-                               HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
-                        ShowContinueError(" The fan object (" + HPWH.FanName +
-                                          ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.");
-                        ErrorsFound = true;
-                    } else if (!UtilityRoutines::SameString(HPWH.FanType, "Fan:OnOff") &&
-                               !UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
-                        ShowContinueError(" The " + DataIPShortCuts::cCurrentModuleObject + " must specify that the fan object");
-                        ShowContinueError(
-                            " is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
-                    }
-
-                    if (FanVolFlow != DataSizing::AutoSize && !errFlag) {
-                        if (FanVolFlow < HPWH.OperatingAirFlowRate) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " - air flow rate = " + General::TrimSigDigits(FanVolFlow, 7) + " in fan object " +
-                                            HPWH.FanName + " is less than the  HPWHs evaporator air flow rate.");
-                            ShowContinueError(" The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate.");
-                            ShowContinueError(" Occurs in unit = " + HPWH.Name);
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    // Fan Placement
-                    if (UtilityRoutines::SameString(hpwhAlpha[24 + nAlphaOffset], "BlowThrough")) {
-                        HPWH.FanPlacement = DataHVACGlobals::BlowThru;
-
-                    } else if (UtilityRoutines::SameString(hpwhAlpha[24 + nAlphaOffset], "DrawThrough")) {
-                        HPWH.FanPlacement = DataHVACGlobals::DrawThru;
-
-                    } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid ");
-                        ShowContinueError(hpwhAlphaFieldNames[24 + nAlphaOffset] + "=\"" + hpwhAlpha[24 + nAlphaOffset] + "\".");
-                        ErrorsFound = true;
-                    }
-
-                    if (HPWH.DXCoilNum > 0 && !bIsVScoil) {
-                        // get HPWH capacity, air inlet node, and PLF curve info from DX coil object
-                        HPWH.Capacity = DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2;
-                        HPWH.DXCoilAirInletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
-                        HPWH.DXCoilPLFFPLR = DXCoils::DXCoil(HPWH.DXCoilNum).PLFFPLR(1);
-                        // check the range of condenser pump power to be <= 5 gpm/ton
-                        if (DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2 > 0.1422) {
-                            ShowWarningError(
-                                DXCoils::DXCoil(HPWH.DXCoilNum).DXCoilType + "= " + DXCoils::DXCoil(HPWH.DXCoilNum).Name +
-                                ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W "
-                                "(41.67 watt/MBH). Condenser pump power per watt = " +
-                                General::TrimSigDigits((DXCoils::DXCoil(HPWH.DXCoilNum).HPWHCondPumpElecNomPower / DXCoils::DXCoil(HPWH.DXCoilNum).RatedTotCap2), 4));
-                        }
-                    } else if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
-
-                        if (HPWH.bIsIHP) {
-                            HPWH.Capacity = GetDWHCoilCapacityIHP(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
-                            HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                            HPWH.DXCoilPLFFPLR =
-                                GetIHPDWHCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
-                        } else {
-                            HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                            HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                            HPWH.DXCoilPLFFPLR = VariableSpeedCoils::GetVSCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                        }
-                        //         check the range of condenser pump power to be <= 5 gpm/ton, will be checked in the coil object
-                    }
-
-                    if (HPWH.OperatingWaterFlowRate == DataGlobals::AutoCalculate) {
-                        HPWH.OperatingWaterFlowRate = 0.00000004487 * HPWH.Capacity;
-                        HPWH.WaterFlowRateAutoSized = true;
-                    }
-
-                    if (HPWH.OperatingAirFlowRate == DataGlobals::AutoCalculate) {
-                        HPWH.OperatingAirFlowRate = 0.00005035 * HPWH.Capacity;
-                        HPWH.AirFlowRateAutoSized = true;
-                    }
-
-                    // On Cycle Parasitic Electric Load
-                    HPWH.OnCycParaLoad = hpwhNumeric[6 + nNumericOffset];
-                    if (HPWH.OnCycParaLoad < 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-                        ShowContinueError(hpwhNumericFieldNames[6 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[6 + nNumericOffset] +
-                                          " = " + General::TrimSigDigits(hpwhNumeric[6 + nNumericOffset], 2));
-                        ErrorsFound = true;
-                    }
-
-                    // Off Cycle Parasitic Electric Load
-                    HPWH.OffCycParaLoad = hpwhNumeric[7 + nNumericOffset];
-                    if (HPWH.OffCycParaLoad < 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-                        ShowContinueError(hpwhNumericFieldNames[7 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[2 + nNumericOffset] +
-                                          " = " + General::TrimSigDigits(hpwhNumeric[7 + nNumericOffset], 2));
-                        ErrorsFound = true;
-                    }
-
-                    // Parasitic Heat Rejection Location
-                    if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
-                        HPWH.ParasiticTempIndicator = AmbientTemp::TempZone;
-                        if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-                            ShowContinueError(hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
-                            ShowContinueError(" when parasitic heat rejection location equals Zone.");
-                            ErrorsFound = true;
-                        }
-                    } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
-                        HPWH.ParasiticTempIndicator = AmbientTemp::OutsideAir;
-                    } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(" parasitic heat rejection location must be either Zone or Outdoors.");
-                        ErrorsFound = true;
-                    }
-
-                    // Inlet Air Mixer Node
-                    // get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
-                    if (!hpwhAlphaBlank[26 + nAlphaOffset]) {
-                        // For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
-                        if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                            HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[26 + nAlphaOffset],
-                                                                       ErrorsFound,
-                                                                       DataIPShortCuts::cCurrentModuleObject + " inlet air mixer",
-                                                                       HPWH.Name,
-                                                                       DataLoopNode::NodeType_Air,
-                                                                       DataLoopNode::NodeConnectionType_Outlet,
-                                                                       1,
-                                                                       DataLoopNode::ObjectIsNotParent);
-                        } else {
-                            ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as "
-                                              "Zone and OutdoorAir. Node name disregarded and simulation continues.");
-                        }
-                    } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError("Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
-                        ErrorsFound = true;
-                    }
-
-                    // Outlet Air Splitter Node
-                    if (!hpwhAlphaBlank[27 + nAlphaOffset]) {
-                        //  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
-                        if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                            HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[27 + nAlphaOffset],
-                                                                           ErrorsFound,
-                                                                           DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
-                                                                           HPWH.Name,
-                                                                           DataLoopNode::NodeType_Air,
-                                                                           DataLoopNode::NodeConnectionType_Inlet,
-                                                                           1,
-                                                                           DataLoopNode::ObjectIsNotParent);
-                        } else {
-                            ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as "
-                                              "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
-                        }
-                    } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError("Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
-                        ErrorsFound = true;
-                    }
-
-                    // get node data for HPWH
-                    if (HPWH.InletAirMixerNode != 0) {
-                        // when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as DataLoopNode::ObjectIsNotParent
-
-                        HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
-                                                                      ErrorsFound,
-                                                                      DataIPShortCuts::cCurrentModuleObject + "-INLET AIR MIXER",
-                                                                      HPWH.Name,
-                                                                      DataLoopNode::NodeType_Air,
-                                                                      DataLoopNode::NodeConnectionType_Inlet,
-                                                                      1,
-                                                                      DataLoopNode::ObjectIsNotParent);
-
-                        HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
-                                                                       ErrorsFound,
-                                                                       DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
-                                                                       HPWH.Name,
-                                                                       DataLoopNode::NodeType_Air,
-                                                                       DataLoopNode::NodeConnectionType_Outlet,
-                                                                       1,
-                                                                       DataLoopNode::ObjectIsNotParent);
-
-                        HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
-                                                                ErrorsFound,
-                                                                DataIPShortCuts::cCurrentModuleObject,
-                                                                HPWH.Name,
-                                                                DataLoopNode::NodeType_Air,
-                                                                DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                1,
-                                                                DataLoopNode::ObjectIsParent);
-                        if (hpwhAlpha[9 + nAlphaOffset] != "") {
-                            bool Okay;
-                            OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
-                            if (!Okay) {
-                                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
-                                                 "\": Adding outdoor air node=" + hpwhAlpha[9 + nAlphaOffset]);
-                            }
-                        }
-
-                        HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
-                                                                ErrorsFound,
-                                                                DataIPShortCuts::cCurrentModuleObject,
-                                                                HPWH.Name,
-                                                                DataLoopNode::NodeType_Air,
-                                                                DataLoopNode::NodeConnectionType_ReliefAir,
-                                                                1,
-                                                                DataLoopNode::ObjectIsParent);
-
-                    } else {
-                        // when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as DataLoopNode::ObjectIsParent
-                        if (HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
-                            // for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
-                            // to avoid node connection errors
-                            HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
-                                                                          ErrorsFound,
-                                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                                          HPWH.Name,
-                                                                          DataLoopNode::NodeType_Air,
-                                                                          DataLoopNode::NodeConnectionType_Outlet,
-                                                                          1,
-                                                                          DataLoopNode::ObjectIsParent);
-
-                            HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
-                                                                           ErrorsFound,
-                                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                                           HPWH.Name,
-                                                                           DataLoopNode::NodeType_Air,
-                                                                           DataLoopNode::NodeConnectionType_Outlet,
-                                                                           1,
-                                                                           DataLoopNode::ObjectIsParent);
-
-                        } else { // HPWH is connected to a zone with no mixer/splitter nodes
-                            if (HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
-                                HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
-                                                                              ErrorsFound,
-                                                                              DataIPShortCuts::cCurrentModuleObject,
-                                                                              HPWH.Name,
-                                                                              DataLoopNode::NodeType_Air,
-                                                                              DataLoopNode::NodeConnectionType_Inlet,
-                                                                              1,
-                                                                              DataLoopNode::ObjectIsParent);
-
-                                HPWH.HeatPumpAirOutletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[8 + nAlphaOffset],
-                                                                               ErrorsFound,
-                                                                               DataIPShortCuts::cCurrentModuleObject,
-                                                                               HPWH.Name,
-                                                                               DataLoopNode::NodeType_Air,
-                                                                               DataLoopNode::NodeConnectionType_Outlet,
-                                                                               1,
-                                                                               DataLoopNode::ObjectIsParent);
-                            } else { // HPWH is located outdoors
-                                HPWH.OutsideAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[9 + nAlphaOffset],
-                                                                        ErrorsFound,
-                                                                        DataIPShortCuts::cCurrentModuleObject,
-                                                                        HPWH.Name,
-                                                                        DataLoopNode::NodeType_Air,
-                                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                        1,
-                                                                        DataLoopNode::ObjectIsParent);
-                                if (!hpwhAlphaBlank[9 + nAlphaOffset]) {
-                                    bool Okay;
-                                    OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
-                                    if (!Okay) {
-                                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
-                                                         "\": Adding outdoor air node =" + hpwhAlpha[9 + nAlphaOffset]);
-                                    }
-                                }
-
-                                HPWH.ExhaustAirNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[10 + nAlphaOffset],
-                                                                        ErrorsFound,
-                                                                        DataIPShortCuts::cCurrentModuleObject,
-                                                                        HPWH.Name,
-                                                                        DataLoopNode::NodeType_Air,
-                                                                        DataLoopNode::NodeConnectionType_ReliefAir,
-                                                                        1,
-                                                                        DataLoopNode::ObjectIsParent);
-                            }
-                        }
-                    }
-                    // check that required node names are present
-                    if (HPWH.InletAirConfiguration == AmbientTemp::Schedule || HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
-                        if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                            ShowContinueError(hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] +
-                                              " must be specified.");
-                            ErrorsFound = true;
-                        }
-                    } else if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
-                        if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                            ShowContinueError(hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] +
-                                              " must be specified.");
-                            ErrorsFound = true;
-                        }
-                    } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                        if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 ||
-                            HPWH.ExhaustAirNode == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                            if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
-                                ShowContinueError(hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] +
-                                                  " must be specified.");
-                            }
-                            if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                                ShowContinueError(hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] +
-                                                  " must be specified.");
-                            }
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    // check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
-                    // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-                    if ((HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) &&
-                        HPWH.AmbientTempZone > 0) {
-                        if (!DataZoneEquipment::ZoneEquipInputsFilled) {
-                            DataZoneEquipment::GetZoneEquipmentData();
-                            DataZoneEquipment::ZoneEquipInputsFilled = true;
-                        }
-                        if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
-                            bool FoundInletNode = false;
-                            bool FoundOutletNode = false;
-                            int ZoneNum;
-                            for (ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
-                                if (HPWH.AmbientTempZone == DataZoneEquipment::ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
-                            }
-                            if (ZoneNum <= DataGlobals::NumOfZones) {
-                                for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
-                                    if (HPWH.HeatPumpAirOutletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
-                                    FoundOutletNode = true;
-                                }
-                                for (int ExhAirOut = 1; ExhAirOut <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhAirOut) {
-                                    if (HPWH.HeatPumpAirInletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).ExhaustNode(ExhAirOut)) continue;
-                                    FoundInletNode = true;
-                                }
-                                if (!FoundInletNode) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                                    ShowContinueError("The HPWH's air inlet node name = " + hpwhAlpha[7 + nAlphaOffset] +
-                                                      " was not properly specified ");
-                                    ShowContinueError("as an exhaust air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
-                                                      " in a ZoneHVAC:EquipmentConnections object.");
-                                    ErrorsFound = true;
-                                }
-                                if (!FoundOutletNode) {
-                                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                                    ShowContinueError("The HPWH's air outlet node name = " + hpwhAlpha[8 + nAlphaOffset] +
-                                                      " was not properly specified ");
-                                    ShowContinueError("as an inlet air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
-                                                      " in a ZoneHVAC:EquipmentConnections object.");
-                                    ErrorsFound = true;
-                                }
-                            }
-                        } else {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Heat pump water heater air inlet node name and air outlet node name must be listed in a "
-                                              "ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or "
-                                              "ZoneAndOutdoorAir.");
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    // only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
-                    if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
-                        HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
-                        if (HPWH.InletAirMixerSchPtr == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                            ShowContinueError(hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
-                            ErrorsFound = true;
-                        } else {
-                            bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
-                            if (!ValidScheduleValue) {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                                ShowContinueError(hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
-                                                  hpwhAlpha[28 + nAlphaOffset] + "\".");
-                                ErrorsFound = true;
-                            }
-                            //           set outlet air splitter schedule index equal to inlet air mixer schedule index
-                            //           (place holder for when zone pressurization/depressurization is allowed and different schedules can be used)
-                            HPWH.OutletAirSplitterSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
-                        }
-                    }
-
-                    // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-                    if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
-                        if (HPWH.OutletAirSplitterNode != 0) {
-                            HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
-                        } else {
-                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
-                                HPWH.FanOutletNode = HPWH.ExhaustAirNode;
-                            } else {
-                                HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
-                            }
-                        }
-                    } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
-                        // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-                        if (bIsVScoil) {
-                            if (HPWH.bIsIHP) {
-                                HPWH.FanOutletNode = IntegratedHeatPump::GetDWHCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                            } else {
-                                HPWH.FanOutletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                            }
-                        } else {
-                            HPWH.FanOutletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
-                        }
-                    }
-
-                    // check that fan outlet node is indeed correct
-                    int FanOutletNodeNum(0);
-                    if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
-                    } else {
-                        errFlag = false;
-                        FanOutletNodeNum = Fans::GetFanOutletNode(HPWH.FanType, HPWH.FanName, errFlag);
-                        if (errFlag) {
-                            ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (FanOutletNodeNum != HPWH.FanOutletNode) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError("Heat pump water heater fan outlet node name does not match next connected component.");
-                        if (FanOutletNodeNum != 0) {
-                            ShowContinueError("Fan outlet node name = " + DataLoopNode::NodeID(FanOutletNodeNum));
-                        }
-                        if (HPWH.FanOutletNode != 0) {
-                            ShowContinueError("Expected fan outlet node name = " + DataLoopNode::NodeID(HPWH.FanOutletNode));
-                        }
-                        ErrorsFound = true;
-                    }
-                    int FanInletNodeNum(0);
-                    if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
-                    } else {
-                        errFlag = false;
-                        FanInletNodeNum = Fans::GetFanInletNode(HPWH.FanType, HPWH.FanName, errFlag);
-                        if (errFlag) {
-                            ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
-                            ErrorsFound = true;
-                        }
-                    }
-                    int HPWHFanInletNodeNum(0);
-                    if (HPWH.InletAirMixerNode != 0) {
-                        HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
-                    } else {
-                        if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
-                            HPWHFanInletNodeNum = HPWH.OutsideAirNode;
-                        } else {
-                            HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
-                        }
-                    }
-                    if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
-                        if (FanInletNodeNum != HPWHFanInletNodeNum) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Heat pump water heater fan inlet node name does not match previous connected component.");
-                            if (FanOutletNodeNum != 0) {
-                                ShowContinueError("Fan inlet node name = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            }
-                            if (HPWH.FanOutletNode != 0) {
-                                ShowContinueError("Expected fan inlet node name = " + DataLoopNode::NodeID(HPWHFanInletNodeNum));
-                            }
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    int DXCoilAirOutletNodeNum(0);
-                    if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
-                        if (HPWH.bIsIHP) {
-                            DXCoilAirOutletNodeNum = IntegratedHeatPump::GetDWHCoilOutletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                        } else {
-                            DXCoilAirOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                        }
-
-                    } else if (HPWH.DXCoilNum > 0) {
-                        DXCoilAirOutletNodeNum = DXCoils::DXCoil(HPWH.DXCoilNum).AirOutNode;
-                    }
-                    if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
-                        if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Heat pump water heater fan inlet node name does not match previous connected component.");
-                            if (FanInletNodeNum != 0) {
-                                ShowContinueError("Fan inlet node name = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            }
-                            if (DXCoilAirOutletNodeNum != 0) {
-                                ShowContinueError("Expected fan inlet node name = " + DataLoopNode::NodeID(DXCoilAirOutletNodeNum));
-                            }
-                            ErrorsFound = true;
-                        }
-                    } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
-                        int HPWHCoilOutletNodeNum(0);
-                        if (HPWH.OutletAirSplitterNode != 0) {
-                            HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
-                        } else {
-                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
-                                HPWHCoilOutletNodeNum = HPWH.ExhaustAirNode;
-                            } else {
-                                HPWHCoilOutletNodeNum = HPWH.HeatPumpAirOutletNode;
-                            }
-                        }
-                        if (DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                            ShowContinueError("Heat pump water heater coil outlet node name does not match next connected component.");
-                            if (DXCoilAirOutletNodeNum != 0) {
-                                ShowContinueError("Coil outlet node name = " + DataLoopNode::NodeID(DXCoilAirOutletNodeNum));
-                            }
-                            if (HPWHCoilOutletNodeNum != 0) {
-                                ShowContinueError("Expected coil outlet node name = " + DataLoopNode::NodeID(HPWHCoilOutletNodeNum));
-                            }
-                            ErrorsFound = true;
-                        }
-                    }
-
-                    // set the max mass flow rate for outdoor fans
-                    if (HPWH.FanOutletNode > 0)
-                        DataLoopNode::Node(HPWH.FanOutletNode).MassFlowRateMax = HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
-
-                    if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
-                        if (HPWH.InletAirMixerNode > 0) {
-                            HPWH.FanInletNode_str = hpwhAlpha[26 + nAlphaOffset];
-                            HPWH.FanOutletNode_str = "UNDEFINED";
-                        } else {
-                            if (HPWH.OutsideAirNode == 0) {
-                                HPWH.FanInletNode_str = hpwhAlpha[7 + nAlphaOffset];
-                                HPWH.FanOutletNode_str = "UNDEFINED";
-                            } else {
-                                HPWH.FanInletNode_str = hpwhAlpha[9 + nAlphaOffset];
-                                HPWH.FanOutletNode_str = "UNDEFINED";
-                            }
-                        }
-                        if (HPWH.OutletAirSplitterNode > 0) {
-                            HPWH.CoilInletNode_str = "UNDEFINED";
-                            HPWH.CoilOutletNode_str = hpwhAlpha[27 + nAlphaOffset];
-                        } else {
-                            if (HPWH.OutsideAirNode == 0) {
-                                HPWH.CoilInletNode_str = "UNDEFINED";
-                                HPWH.CoilOutletNode_str = hpwhAlpha[8 + nAlphaOffset];
-                            } else {
-                                HPWH.CoilInletNode_str = "UNDEFINED";
-                                HPWH.CoilOutletNode_str = hpwhAlpha[10 + nAlphaOffset];
-                            }
-                        }
-                    } else {
-                        if (HPWH.InletAirMixerNode > 0) {
-                            HPWH.CoilInletNode_str = hpwhAlpha[26 + nAlphaOffset];
-                            HPWH.CoilOutletNode_str = "UNDEFINED";
-                        } else {
-                            if (HPWH.OutsideAirNode == 0) {
-                                HPWH.CoilInletNode_str = hpwhAlpha[7 + nAlphaOffset];
-                                HPWH.CoilOutletNode_str = "UNDEFINED";
-                            } else {
-                                HPWH.CoilInletNode_str = hpwhAlpha[9 + nAlphaOffset];
-                                HPWH.CoilOutletNode_str = "UNDEFINED";
-                            }
-                        }
-                        if (HPWH.OutletAirSplitterNode > 0) {
-                            HPWH.FanInletNode_str = "UNDEFINED";
-                            HPWH.FanOutletNode_str = hpwhAlpha[27 + nAlphaOffset];
-                        } else {
-                            if (HPWH.OutsideAirNode == 0) {
-                                HPWH.FanInletNode_str = "UNDEFINED";
-                                HPWH.FanOutletNode_str = hpwhAlpha[8 + nAlphaOffset];
-                            } else {
-                                HPWH.FanInletNode_str = "UNDEFINED";
-                                HPWH.FanOutletNode_str = hpwhAlpha[10 + nAlphaOffset];
-                            }
-                        }
-                    }
-
-                    // set up comp set for air side nodes (can be blow thru or draw thru, may or may not have damper nodes)
-                    if (HPWH.bIsIHP) {
-                        BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName + " Outdoor Coil", HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
-                    } else {
-                        BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
-                    }
-
-                    BranchNodeConnections::SetUpCompSets(HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
-
-                    // Control Logic Flag
-                    std::string CtrlLogicFlag = hpwhAlphaBlank[29 + nAlphaOffset] ? "SIMULTANEOUS" : hpwhAlpha[29 + nAlphaOffset];
-                    if (UtilityRoutines::SameString(CtrlLogicFlag, "SIMULTANEOUS")) {
-                        HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = true;
-                    } else if (UtilityRoutines::SameString(CtrlLogicFlag, "MUTUALLYEXCLUSIVE")) {
-                        HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
-                    } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic.");
-                        ErrorsFound = true;
-                    }
-
-                    // Control Sensor 1 Location In Stratified Tank
-                    if (!hpwhNumericBlank[8 + nNumericOffset]) {
-                        HPWH.ControlSensor1Height = hpwhNumeric[8 + nNumericOffset];
-                    } else {
-                        // use heater1 location, which we don't know right now
-                        HPWH.ControlSensor1Height = -1.0;
-                    }
-
-                    // Control Sensor 1 Weight
-                    HPWH.ControlSensor1Weight = hpwhNumericBlank[9 + nNumericOffset] ? 1.0 : hpwhNumeric[9 + nNumericOffset];
-
-                    // Control Sensor 2 Location In Stratified Tank
-                    if (!hpwhNumericBlank[10 + nNumericOffset]) {
-                        HPWH.ControlSensor2Height = hpwhNumeric[10 + nNumericOffset];
-                    } else {
-                        HPWH.ControlSensor2Height = -1.0;
-                    }
-
-                    // Control Sensor 2 Weight
-                    HPWH.ControlSensor2Weight = 1.0 - HPWH.ControlSensor1Weight;
-
-                } // DO HPWaterHeaterNum = 1, NumHeatPumpWaterHeater
-
-            } // IF (NumHeatPumpWaterHeater > 0) THEN
+                ErrorsFound |= getHPWaterHeaterInput();
+            }
 
             //  =======   Get WATER HEATER:MIXED ===================================================================================
             if (modNumWaterHeaterMixed > 0) {
