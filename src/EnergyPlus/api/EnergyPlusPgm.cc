@@ -308,6 +308,67 @@ int initializeEnergyPlus(std::string const & filepath) {
     return 0;
 }
 
+
+int initializeAsLibrary() {
+    using namespace EnergyPlus;
+
+    // Disable C++ i/o synching with C methods for speed
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+
+// Enable floating point exceptions
+#ifndef NDEBUG
+#ifdef __unix__
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
+
+#ifdef _MSC_VER
+    #ifndef _DEBUG
+    // If _MSC_VER and not debug then prevent dialogs on error
+    SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
+#endif
+
+    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
+#ifdef EP_Detailed_Timings
+    epStartTime("EntireRun=");
+#endif
+
+    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+
+    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
+
+    DataSystemVariables::processEnvironmentVariables();
+
+    int errStatus = initErrorFile();
+    if (errStatus) {
+        return errStatus;
+    }
+
+    DataSystemVariables::TestAllPaths = true;
+
+    DisplayString("EnergyPlus Starting");
+    DisplayString(DataStringGlobals::VerString);
+
+    try {
+        EnergyPlus::inputProcessor = InputProcessor::factory();
+        EnergyPlus::inputProcessor->processInput();
+        ResultsFramework::OutputSchema->setupOutputOptions();
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        ShowSevereError(e.what());
+        return AbortEnergyPlus();
+    }
+    return 0;
+}
+
 int wrapUpEnergyPlus() {
     using namespace EnergyPlus;
 
@@ -357,6 +418,44 @@ int RunEnergyPlus(std::string const & filepath)
     // as possible and contain all "simulation" code in other modules and files.
 
     int status = initializeEnergyPlus(filepath);
+    if (status) return status;
+    try {
+        EnergyPlus::SimulationManager::ManageSimulation();
+    } catch (const EnergyPlus::FatalError &e) {
+        return EnergyPlus::AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        EnergyPlus::ShowSevereError(e.what());
+        return EnergyPlus::AbortEnergyPlus();
+    }
+    return wrapUpEnergyPlus();
+}
+
+int runEnergyPlusAsLibrary(int argc, const char *argv[])
+{
+    // PROGRAM INFORMATION:
+    //       AUTHOR         Linda K. Lawrie, et al
+    //       DATE WRITTEN   January 1997.....
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS PROGRAM:
+    // This program implements the calls for EnergyPlus (originally configured
+    // as the merger of BLAST/IBLAST and DOE-2 energy analysis programs).
+
+    // METHODOLOGY EMPLOYED:
+    // The method used in EnergyPlus is to simplify the main program as much
+    // as possible and contain all "simulation" code in other modules and files.
+
+    EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
+
+    // clean out any stdin, stderr, stdout flags from a prior call
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+
+    EnergyPlus::CommandLineInterface::ProcessArgs( argc, argv );
+
+    int status = initializeAsLibrary();
     if (status) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation();

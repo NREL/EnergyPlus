@@ -59,7 +59,7 @@ ENERGYPLUSLIB_API void cClearAllStates();
 ENERGYPLUSLIB_API void cRuntimeNoOp();
 
     // Program level functions
-ENERGYPLUSLIB_API int energyplus(const char* filepath);
+ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
 
 ENERGYPLUSLIB_API void registerCallbackFromBeginNewEnvironment(void (*f)());
 ENERGYPLUSLIB_API void registerCallbackFromAfterNewEnvironmentWarmupComplete(void (*f)());
