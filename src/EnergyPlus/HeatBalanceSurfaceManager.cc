@@ -6945,10 +6945,14 @@ namespace HeatBalanceSurfaceManager {
                 IsNotSource(SurfNum) = 1;
             }
             if (Surface(SurfNum).IsPool) {
-                IsPoolSurf(SurfNum) = 1;
-                IsNotPoolSurf(SurfNum) = 0;
-            }
-            else {
+                if ((std::abs(QPoolSurfNumerator(SurfNum)) >= SmallNumber) || (std::abs(PoolHeatTransCoefs(SurfNum)) >= SmallNumber)) {
+                    IsPoolSurf(SurfNum) = 1;
+                    IsNotPoolSurf(SurfNum) = 0;
+                } else {
+                    IsPoolSurf(SurfNum) = 0;
+                    IsNotPoolSurf(SurfNum) = 1;
+                }
+            } else {
                 IsPoolSurf(SurfNum) = 0;
                 IsNotPoolSurf(SurfNum) = 1;
             }
@@ -7033,6 +7037,14 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int SurfNum : HTNonWindowSurfs) {
+                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_AirBoundaryNoHT) {
+                    // This is a temporary band-aid to get the same results with airboundary surfaces
+                    // 1. Air boundary surfaces shouldn't be part of HT surf lists, I don't think
+                    // 2. And even if it is, it shouldn't be impacting other surface temps, but it is somehow
+                    // 3. So, once that's fixed in develop, this can go away here.
+                    TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum) = 23.0;
+                    continue;
+                }
                 HMovInsul = 0.0;
                 if (Surface(SurfNum).MaterialMovInsulInt > 0) HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
 
