@@ -21,8 +21,8 @@ class Runtime:
 
     def __init__(self, api: cdll):
         self.api = api
-        self.api.cRunEnergyPlus.argtypes = [c_char_p]
-        self.api.cRunEnergyPlus.restype = c_int
+        self.api.energyplus.argtypes = [c_char_p]
+        self.api.energyplus.restype = c_int
         self.py_callback_type = CFUNCTYPE(c_void_p)
         self.api.registerCallbackFromBeginNewEnvironment.argtypes = [self.py_callback_type]
         self.api.registerCallbackFromBeginNewEnvironment.restype = c_void_p
@@ -72,7 +72,7 @@ class Runtime:
         :param path_to_dir: Path to a directory containing the in.idf (and possibly in.epw) to be run
         :return: An integer exit code from the simulation, zero is success, non-zero is failure
         """
-        return self.api.cRunEnergyPlus(path_to_dir)
+        return self.api.energyplus(path_to_dir)
 
     def register_callback_begin_new_environment(self, f) -> None:
         """

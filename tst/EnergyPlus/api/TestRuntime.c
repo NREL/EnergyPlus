@@ -48,13 +48,19 @@
 #include <stdio.h>
 #include <EnergyPlus/api/runtime.h>
 
-void newEnvrnHandler()
-{
+void timeStepHandler() {
     printf("Finishing another zone time step\n");
 }
 
+void newEnvrnHandler() {
+    printf("Starting a new environment\n");
+}
+
 int main() {
-    registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(newEnvrnHandler);
-    cRunEnergyPlus("/tmp/epdll");
+    registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(timeStepHandler);
+    energyplus("/tmp/epdll");
+    cClearAllStates();
+    registerCallbackFromAfterNewEnvironmentWarmupComplete(newEnvrnHandler);
+    energyplus("/tmp/epdll");
     return 0;
 }

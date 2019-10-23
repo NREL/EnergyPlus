@@ -96,6 +96,6 @@ void afterZoneTimeStepHandler()
 
 int main() {
     registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-    cRunEnergyPlus("/tmp/epdll");
+    energyplus("/tmp/epdll");
     return 0;
 }

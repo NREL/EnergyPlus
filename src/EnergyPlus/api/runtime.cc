@@ -57,7 +57,12 @@ void cClearAllStates() {
     EnergyPlus::clearAllStates();
 }
 
-int cRunEnergyPlus(const char* filepath) {
+int energyplus(const char* filepath) {
+    // clean out any stdin, stderr, stdout flags from a prior call
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+
     std::string path(filepath);
     EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
     return RunEnergyPlus(path);
