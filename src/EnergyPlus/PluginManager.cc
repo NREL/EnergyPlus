@@ -167,7 +167,6 @@ namespace PluginManager {
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                // This is a unique object, so we should have one, but this is fine
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
@@ -182,6 +181,38 @@ namespace PluginManager {
                 int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
                 plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
             }
+        }
+
+        std::string const sGlobals = "PythonPlugin:GlobalVariables";
+        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
+        if (globalVarInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sGlobals);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(                                                                          // LCOV_EXCL_LINE
+                        "PythonPlugin:GlobalVariables: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                if (fields.find("global_variable_name_1") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("global_variable_name_1"));
+                }
+                if (fields.find("search_path_2") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("global_variable_name_2"));
+                }
+                if (fields.find("search_path_3") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("global_variable_name_3"));
+                }
+                if (fields.find("search_path_4") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("global_variable_name_4"));
+                }
+                if (fields.find("search_path_5") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("global_variable_name_5"));
+                }
+            }
+
         }
 
     }
@@ -342,6 +373,55 @@ namespace PluginManager {
             // DEBUGGING PATHS: PyRun_SimpleString("print(' EPS : ' + str(sys.path))");
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
+        }
+    }
+
+    void PluginManager::addGlobalVariable(const std::string &name) {
+        std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
+        this->globalVariableNames.push_back(varNameUC);
+        this->globalVariableValues.push_back(Real64());
+    }
+
+    int PluginManager::getGlobalVariableHandle(const std::string& name) { // note zero is a valid handle
+        std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
+        auto const it = std::find(this->globalVariableNames.begin(), this->globalVariableNames.end(), varNameUC);
+        if (it != this->globalVariableNames.end()) {
+            return std::distance(this->globalVariableNames.begin(), it);
+        } else {
+            EnergyPlus::ShowSevereError("Tried to retrieve handle for a nonexistent plugin global variable");
+            EnergyPlus::ShowContinueError("Name looked up: \"" + varNameUC + "\", available names: ");
+            for (auto const & gvName : this->globalVariableNames) {
+                EnergyPlus::ShowContinueError("    \"" + gvName + "\"");
+            }
+            EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
+        }
+        return -1;
+    }
+
+    Real64 PluginManager::getGlobalVariableValue(int handle) {
+        if (this->globalVariableValues.empty()) {
+            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
+        }
+        try {
+            return this->globalVariableValues[handle];
+        } catch (...) {
+            EnergyPlus::ShowSevereError("Tried to access plugin global variable value at index " + std::to_string(handle));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
+        }
+        return 0;
+    }
+
+    void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
+        if (this->globalVariableValues.empty()) {
+            EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
+        }
+        try {
+            this->globalVariableValues[handle] = value;
+        } catch (...) {
+            EnergyPlus::ShowSevereError("Tried to set plugin global variable value at index " + std::to_string(handle));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
     }
 

@@ -94,6 +94,13 @@ namespace PluginManager {
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static int calledFromFromString(std::string const &calledFrom);
+
+        void addGlobalVariable(const std::string& name);
+        int getGlobalVariableHandle(const std::string& name);
+        Real64 getGlobalVariableValue(int handle);
+        void setGlobalVariableValue(int handle, Real64 value);
+        std::vector<std::string> globalVariableNames;
+        std::vector<Real64> globalVariableValues;
     };
 
     extern std::unique_ptr<PluginManager> pluginManager;

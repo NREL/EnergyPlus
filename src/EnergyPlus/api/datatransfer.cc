@@ -50,6 +50,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 
 void dataTransferNoOp() {}
 
@@ -111,4 +112,17 @@ int setActuatorValue(const int handle, const double value) {
 // These are extra things which need a pattern to be figured out
 int simDataGetKindOfSim() {
     return EnergyPlus::DataGlobals::KindOfSim;
+}
+
+
+int getPluginGlobalVariableHandle(const char* name) {
+    return EnergyPlus::PluginManager::pluginManager->getGlobalVariableHandle(name);
+}
+
+Real64 getPluginGlobalVariableValue(int handle) {
+    return EnergyPlus::PluginManager::pluginManager->getGlobalVariableValue(handle);
+}
+
+void setPluginGlobalVariableValue(int handle, Real64 value) {
+    EnergyPlus::PluginManager::pluginManager->setGlobalVariableValue(handle, value);
 }

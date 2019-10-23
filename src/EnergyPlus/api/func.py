@@ -48,6 +48,39 @@ class Refrigerant:
     def __init__(self, api: cdll, refrigerant_name: bytes):
         self.refrigerant_name = refrigerant_name
         self.api = api
+        self.api.refrigerantNew.argtypes = [c_char_p]
+        self.api.refrigerantNew.restype = c_void_p
+        self.api.refrigerantDelete.argtypes = [c_void_p]
+        self.api.refrigerantDelete.restype = c_void_p
+        self.api.refrigerantSaturationPressure.argtypes = [c_void_p, RealEP]
+        self.api.refrigerantSaturationPressure.restype = RealEP
+        self.api.refrigerantSaturationTemperature.argtypes = [c_void_p, RealEP]
+        self.api.refrigerantSaturationTemperature.restype = RealEP
+        self.api.refrigerantSaturatedEnthalpy.argtypes = [c_void_p, RealEP, RealEP]
+        self.api.refrigerantSaturatedEnthalpy.restype = RealEP
+        self.api.refrigerantSaturatedDensity.argtypes = [c_void_p, RealEP, RealEP]
+        self.api.refrigerantSaturatedDensity.restype = RealEP
+        self.api.refrigerantSaturatedSpecificHeat.argtypes = [c_void_p, RealEP, RealEP]
+        self.api.refrigerantSaturatedSpecificHeat.restype = RealEP
+        self.instance = self.api.refrigerantNew(refrigerant_name)
+
+    def __del__(self):
+        self.api.refrigerantDelete(self.instance)
+
+    def saturation_pressure(self, temperature: float) -> float:
+        return self.api.refrigerantSaturationPressure(temperature)
+
+    def saturation_temperature(self, pressure: float) -> float:
+        return self.api.refrigerantSaturationTemperature(pressure)
+
+    def saturated_enthalpy(self, temperature: float, quality: float):
+        return self.api.refrigerantSaturatedEnthalpy(temperature, quality)
+
+    def saturated_density(self, temperature: float, quality: float):
+        return self.api.refrigerantSaturatedDensity(temperature, quality)
+
+    def saturated_specific_heat(self, temperature: float, quality: float):
+        return self.api.refrigerantSaturatedSpecificHeat(temperature, quality)
 
 
 class Psychrometrics:

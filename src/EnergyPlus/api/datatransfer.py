@@ -1,4 +1,4 @@
-from ctypes import cdll, c_int, c_char_p
+from ctypes import cdll, c_int, c_char_p, c_void_p
 from pyenergyplus.common import RealEP
 from typing import Union
 
@@ -36,6 +36,13 @@ class DataTransfer:
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_int
+        # these are only meaningful for Python Plugins, so they are declared here, but no Python functions wrap them
+        self.api.getPluginGlobalVariableHandle.argtypes = [c_char_p]
+        self.api.getPluginGlobalVariableHandle.restype = c_int
+        self.api.getPluginGlobalVariableValue.argtypes = [c_int]
+        self.api.getPluginGlobalVariableValue.restype = RealEP
+        self.api.setPluginGlobalVariableValue.argtypes = [c_int, RealEP]
+        self.api.setPluginGlobalVariableValue.restype = c_void_p
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """

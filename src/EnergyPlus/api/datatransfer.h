@@ -59,11 +59,17 @@ ENERGYPLUSLIB_API void dataTransferNoOp();
 ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 ENERGYPLUSLIB_API int getActuatorHandle(const char* type, const char* key);
-ENERGYPLUSLIB_API double getVariableValue(int handle);
-ENERGYPLUSLIB_API double getMeterValue(int handle);
-ENERGYPLUSLIB_API int setActuatorValue(int handle, double value);
+ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
+ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
+ENERGYPLUSLIB_API int setActuatorValue(int handle, Real64 value);
 
 ENERGYPLUSLIB_API int simDataGetKindOfSim();
+
+// There are also a couple API points for Python Plugins specifically.  It is expected these will only
+// be exposed through the plugin base class, not through the regular Python bindings.
+ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
+ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
+ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
 
 #ifdef __cplusplus
 }

@@ -96,10 +96,21 @@
 
   PythonPlugin:Instance,
     MyPlugin1,         !- Name
-    No,               !- Run During Warmup Days
+    No,                !- Run During Warmup Days
     1ZoneUncontrolledWithPlugin, !- Python Module Name
     MyPlugin,          !- Plugin Class Name
     EndOfZoneTimestepBeforeZoneReporting;         !- Calling Point
+
+  PythonPlugin:Instance,
+    MyPlugin2,         !- Name
+    No,                !- Run During Warmup Days
+    1ZoneUncontrolledWithPlugin, !- Python Module Name
+    MyPlugin2,          !- Plugin Class Name
+    EndOfZoneTimestepAfterZoneReporting;         !- Calling Point
+
+  PythonPlugin:GlobalVariables,
+    MyGlobalVariables, !- Name
+    WaterCpAtOutdoorDBTemp;
 
   Version,9.2;
 

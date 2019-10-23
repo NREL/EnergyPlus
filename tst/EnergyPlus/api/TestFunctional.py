@@ -13,6 +13,21 @@ for t in [5.0, 15.0, 25.0]:
     print("Python API Test: Calculated properties at T=%s: %f, %f, %f, %f" % (t, cp, rho, k, visc))
 
 refrigerant = functional_api.refrigerant("steam")
+temperature = 100.0
+satPress = refrigerant.saturation_pressure(temperature)  # expecting about 101325 Pa
+thisPress = 100000
+satTemp = refrigerant.saturation_temperature(thisPress)  # expecting about 100 degC
+print("Python API Test: Saturated Properties: At 100C, Psat=%8.4f; at 100000Pa, Tsat=%8.4f" % (satPress, satTemp))
+satLiqDens = refrigerant.saturated_density(temperature, 0.0)  # // liq = 958 kg/m3
+satLiqCp = refrigerant.saturated_specific_heat(temperature, 0.0)  # liq = 4,216 J/kgK
+satLiqEnth = refrigerant.saturated_enthalpy(temperature, 0.0)
+print("C API Test: Sat Liq at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f" % (satLiqDens, satLiqCp, satLiqEnth))
+satVapDens = refrigerant.saturated_density(temperature, 1.0)  # vap = 1/1.6718 ~~ 0.59 kg/m3
+satVapCp = refrigerant.saturated_specific_heat(temperature, 1.0)  # vap = 2,080 J/kgK
+satVapEnth = refrigerant.saturated_enthalpy(temperature, 1.0)
+print("C API Test: Sat Vap at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f" % (satVapDens, satVapCp, satVapEnth))
+enthDifference = satVapEnth - satLiqEnth  # vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+
 
 psychrometrics = functional_api.psychrometrics()
 # // PSYCHROMETRICS
@@ -65,4 +80,4 @@ print("Python API Test: Expected Cp ~ 1007 J/kgK Calculated: %8.4f" % cp)
 energy = psychrometrics.latent_energy_of_air(24)
 print("Python API Test: Calculated energy?: %8.4f" % energy)
 moisture_energy = psychrometrics.latent_energy_of_moisture_in_air(24)
-print("Python API Test: Calculated energy of moisture: %8.4f\n" % moisture_energy)
+print("Python API Test: Calculated energy of moisture: %8.4f" % moisture_energy)
