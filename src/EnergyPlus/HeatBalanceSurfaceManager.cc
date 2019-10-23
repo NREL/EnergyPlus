@@ -762,6 +762,8 @@ namespace HeatBalanceSurfaceManager {
         IsNotSource = 0;
         IsPoolSurf = 0;
         IsNotPoolSurf = 0;
+        TempTermSurf = 0.0;
+        TempDivSurf = 0.0;
         if (AnyConstructInternalSourceInInput) {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
@@ -1373,6 +1375,8 @@ namespace HeatBalanceSurfaceManager {
         IsNotSource.dimension(TotSurfaces, 0);
         IsPoolSurf.dimension(TotSurfaces, 0);
         IsNotPoolSurf.dimension(TotSurfaces, 0);
+        TempTermSurf.dimension(TotSurfaces, 0);
+        TempDivSurf.dimension(TotSurfaces, 0);
         if (AnyConstructInternalSourceInInput) {
             CTFTsrcConstPart.dimension(TotSurfaces, 0.0);
             CTFTuserConstPart.dimension(TotSurfaces, 0.0);
@@ -6920,7 +6924,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        // Set up coefficient arrays prior to calculations
+        // Set up coefficient arrays prior to calculations and precalc terms that do no change during iteration
         for (int SurfNum : HTNonWindowSurfs) {
             int const ConstrNum = Surface(SurfNum).Construction;
             auto const& construct(Construct(ConstrNum));
@@ -6957,6 +6961,14 @@ namespace HeatBalanceSurfaceManager {
                 IsNotPoolSurf(SurfNum) = 1;
             }
 
+            // Pre-calculate a few terms
+            TempTermSurf(SurfNum) = CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
+                QAdditionalHeatSourceInside(SurfNum) + HConvIn(SurfNum) * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
+                QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                QElecBaseboardSurf(SurfNum) +
+                (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec);
+            TempDivSurf(SurfNum) = 1.0 / (CTFInside0(SurfNum) - IsAdiabatic(SurfNum) * CTFCross0(SurfNum) +
+                IsPoolSurf(SurfNum) * PoolHeatTransCoefs(SurfNum) + IsNotPoolSurf(SurfNum) * HConvIn(SurfNum) + IterDampConst);
         }
         Converged = false;
         while (!Converged) { // Start of main inside heat balance DO loop...
@@ -7010,21 +7022,12 @@ namespace HeatBalanceSurfaceManager {
                 //              TempSurfInTmp(SurfNum) = (IsNotPoolSurf*TempTerm + IsSource*construct.CTFSourceIn(0) * QsrcHist(SurfNum, 1) + IsPoolSurf*CTFConstInPart(SurfNum) + IsPoolSurf*QPoolSurfNumerator(SurfNum)
                 //                                        + IterDampConst * TempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0) * TH11) * TempDiv;
 
-                // Pre-calculate a few terms
-                Real64 const TempTerm(CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
-                    QAdditionalHeatSourceInside(SurfNum) + HConvIn(SurfNum) * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
-                    QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
-                    QElecBaseboardSurf(SurfNum) + NetLWRadToSurf(SurfNum) +
-                    (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec));
-                Real64 const TempDiv(1.0 / (CTFInside0(SurfNum) - IsAdiabatic(SurfNum) * CTFCross0(SurfNum) +
-                    IsPoolSurf(SurfNum) * PoolHeatTransCoefs(SurfNum) + IsNotPoolSurf(SurfNum) * HConvIn(SurfNum) + IterDampConst));
-
                 // Calculate the current inside surface temperature
-                TempSurfInTmp(SurfNum) = (IsNotPoolSurf(SurfNum) * TempTerm +
+                TempSurfInTmp(SurfNum) = (IsNotPoolSurf(SurfNum) * (TempTermSurf(SurfNum) + NetLWRadToSurf(SurfNum)) +
                     IsSource(SurfNum) * CTFSourceIn0(SurfNum) * QsrcHistSurf1(SurfNum) + IsPoolSurf(SurfNum) * CTFConstInPart(SurfNum) +
                     IsPoolSurf(SurfNum) * QPoolSurfNumerator(SurfNum) + IterDampConst * TempInsOld(SurfNum) +
                     IsNotAdiabatic(SurfNum) * CTFCross0(SurfNum) * TH11Surf(SurfNum)) *
-                    TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
+                    TempDivSurf(SurfNum); // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
                             // radiation from internal sources | Convection from surface to zone air | Net radiant
                             // exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there
                             // is one present) | Radiant flux from high temp radiant heater | Radiant flux from a hot

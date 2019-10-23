@@ -91,6 +91,8 @@ namespace DataHeatBalSurface {
     extern Array1D_int IsNotSource;               // 1 no internal source/sink, 0 has internal source/sing
     extern Array1D_int IsPoolSurf;                // 0 not pool, 1 is pool
     extern Array1D_int IsNotPoolSurf;             // 1 not pool, 0 is pool
+    extern Array1D<Real64> TempTermSurf;          // TempTerm for heatbalance equation
+    extern Array1D<Real64> TempDivSurf;           // Divisor for heatbalance equation
     extern Array1D<Real64> TempSurfIn;            // Temperature of the Inside Surface for each heat transfer surface
     extern Array1D<Real64> TempSurfInTmp;         // Inside Surface Temperature Of Each Heat Transfer Surface
     extern Array1D<Real64> HcExtSurf;             // Outside Convection Coefficient
