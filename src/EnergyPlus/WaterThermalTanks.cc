@@ -809,6 +809,297 @@ namespace WaterThermalTanks {
         }
     }
 
+    void getDesuperHtrInput()
+    {
+        bool ErrorsFound = false;
+        std::string const RoutineName = "getDesuperHtrInput";
+
+        DataIPShortCuts::cCurrentModuleObject = cCoilDesuperheater;
+        for (int DesuperheaterNum = 1; DesuperheaterNum <= modNumWaterHeaterDesuperheater; ++DesuperheaterNum) {
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          DesuperheaterNum,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          NumAlphas,
+                                          DataIPShortCuts::rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          DataIPShortCuts::lNumericFieldBlanks,
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            GlobalNames::VerifyUniqueCoilName(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
+
+            WaterHeaterDesuperheater(DesuperheaterNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            WaterHeaterDesuperheater(DesuperheaterNum).Type = DataIPShortCuts::cCurrentModuleObject;
+
+            //       convert availability schedule name to pointer
+            if (!DataIPShortCuts::lAlphaFieldBlanks(2)) {
+                WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
+                if (WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr == 0) {
+                    ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
+                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                    ErrorsFound = true;
+                }
+            } else {
+                WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+            }
+
+            //       convert schedule name to pointer
+            WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
+            if (WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule == 0) {
+                ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ErrorsFound = true;
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff = DataIPShortCuts::rNumericArgs(1);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff <= 0.0 ||
+                WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff > 20.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(1) + " must be > 0 and <= 20. " + DataIPShortCuts::cNumericFieldNames(1) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(1), 1));
+                ErrorsFound = true;
+            }
+
+            // WaterHeaterDesuperheater(DesuperheaterNum)%HeatReclaimRecoveryEff       = DataIPShortCuts::rNumericArgs(2)
+            // Error limits on heat reclaim efficiency applied after source type identified
+
+            WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp = DataIPShortCuts::rNumericArgs(3);
+            WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp = DataIPShortCuts::rNumericArgs(4);
+            WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp = DataIPShortCuts::rNumericArgs(5);
+
+            if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
+                WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+                if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ":  " +
+                                    DataIPShortCuts::cAlphaFieldNames(4) + " not found = " + DataIPShortCuts::cAlphaArgs(4));
+                    ErrorsFound = true;
+                } else {
+                    ErrorsFound |= CurveManager::CheckCurveDims(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
+                                                                {2},                                                  // Valid dimensions
+                                                                RoutineName,                                          // Routine name
+                                                                DataIPShortCuts::cCurrentModuleObject,                                 // Object Type
+                                                                WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
+                                                                DataIPShortCuts::cAlphaFieldNames(4));                                 // Field Name
+                    if (!ErrorsFound) {
+                        if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
+                            Real64 HEffFTemp = min(1.0,
+                                                   max(0.0,
+                                                       CurveManager::CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
+                                                                                WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
+                                                                                WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
+                            if (std::abs(HEffFTemp - 1.0) > 0.05) {
+                                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name + "\":");
+                                ShowContinueError("The " + DataIPShortCuts::cAlphaFieldNames(4) + " should be normalized ");
+                                ShowContinueError(" to 1.0 at the rating point. Curve output at the rating point = " +
+                                                  General::TrimSigDigits(HEffFTemp, 3));
+                                ShowContinueError(" The simulation continues using the user-specified curve.");
+                            }
+                        }
+                    }
+                }
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode = NodeInputManager::GetOnlySingleNode(
+                    DataIPShortCuts::cAlphaArgs(5), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsParent);
+
+            WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
+                                                                                                             ErrorsFound,
+                                                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                                                             DataLoopNode::NodeType_Water,
+                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                             1,
+                                                                                                             DataLoopNode::ObjectIsParent);
+
+            WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(5);
+            WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(6);
+
+            WaterHeaterDesuperheater(DesuperheaterNum).TankType = DataIPShortCuts::cAlphaArgs(7);
+
+            if (!UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cMixedWHModuleObj) &&
+                !UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cStratifiedWHModuleObj)) {
+
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWaterHeater(DesuperheaterNum).Name + ':');
+                ShowContinueError("Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.');
+                ErrorsFound = true;
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).TankName = DataIPShortCuts::cAlphaArgs(8);
+
+            //       Set up comp set for water side nodes (reverse inlet/outlet for water heater)
+            BranchNodeConnections::SetUpCompSets(WaterHeaterDesuperheater(DesuperheaterNum).Type,
+                                                 WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                                 WaterHeaterDesuperheater(DesuperheaterNum).TankType,
+                                                 WaterHeaterDesuperheater(DesuperheaterNum).TankName,
+                                                 DataIPShortCuts::cAlphaArgs(6),
+                                                 DataIPShortCuts::cAlphaArgs(5));
+
+            //       Find the Refrigeration equipment index associated with the desuperheater heating coil.
+            bool errFlag = false;
+            WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = DataIPShortCuts::cAlphaArgs(9);
+            WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName = DataIPShortCuts::cAlphaArgs(10);
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:CompressorRack")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CompressorRackRefrigeratedCase;
+                for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
+                    if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
+                    WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = RackNum;
+                    if (allocated(DataHeatBalance::HeatReclaimRefrigeratedRack)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+                    break;
+                }
+            } else if ((UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
+                       (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
+                       (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CondenserRefrigeration;
+                for (int CondNum = 1; CondNum <= DataHeatBalance::NumRefrigCondensers; ++CondNum) {
+                    if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
+                    WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
+                    if (allocated(DataHeatBalance::HeatReclaimRefrigCondenser)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+                    break;
+                }
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXCooling;
+                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiSpeed;
+                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiMode;
+                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXVariableCooling;
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
+                if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+            } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::AirWaterHeatPumpEQ;
+                WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
+                if (allocated(DataHeatBalance::HeatReclaimSimple_WAHPCoil)) {
+                    DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                    if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
+                        HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(modNumWaterHeaterDesuperheater);
+                        for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                    }
+                    WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
+                }
+            } else {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
+                ShowContinueError(" desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
+                ShowContinueError(
+                        " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:VariableSpeed, "
+                        "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
+                ShowContinueError(" Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
+                ShowContinueError(" or Refrigeration:Condenser:WaterCooled.");
+                ShowContinueError(" Invalid desuperheater heat source object: " + DataIPShortCuts::cAlphaArgs(9) + " \"" + DataIPShortCuts::cAlphaArgs(10) + "\"");
+                ErrorsFound = true;
+            }
+            if (errFlag) {
+                ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + '=' + WaterHeaterDesuperheater(DesuperheaterNum).Name);
+                ErrorsFound = true;
+            }
+
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum == 0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                "\" desuperheater heat source object not found: " + DataIPShortCuts::cAlphaArgs(9) + " \"" + DataIPShortCuts::cAlphaArgs(10) + "\"");
+                ErrorsFound = true;
+            }
+
+            // Now have source type, so set limits on heat recovery efficiency
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
+                if (DataIPShortCuts::lNumericFieldBlanks(2)) {
+                    WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
+                } else {
+                    WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = DataIPShortCuts::rNumericArgs(2);
+                    if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
+                        WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.9) {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                        DataIPShortCuts::cNumericFieldNames(2) + " must be > 0.0 and <= 0.9, Efficiency = " +
+                                        General::TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
+                        ErrorsFound = true;
+                    }
+                }    // Blank Num(2)
+            } else { // max is 0.3 for all other sources
+                if (DataIPShortCuts::lNumericFieldBlanks(2)) {
+                    WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.25;
+                } else {
+                    WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = DataIPShortCuts::rNumericArgs(2);
+                    if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
+                        WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.3) {
+                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                        DataIPShortCuts::cNumericFieldNames(2) + " must be > 0.0 and <= 0.3, " + DataIPShortCuts::cNumericFieldNames(2) + " = " +
+                                        General::TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
+                        ErrorsFound = true;
+                    }
+                } // Blank Num(2)
+            }     // setting limits on heat recovery efficiency
+
+            WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate = DataIPShortCuts::rNumericArgs(6);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate <= 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(6) + " must be greater than 0. " + DataIPShortCuts::cNumericFieldNames(6) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(6), 6));
+                ErrorsFound = true;
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower = DataIPShortCuts::rNumericArgs(7);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower < 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(7) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(7) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(7), 2));
+                ErrorsFound = true;
+            }
+
+            if ((WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
+                 WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate) > 7.9264e6) {
+                ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                 DataIPShortCuts::cNumericFieldNames(7) + " to " + DataIPShortCuts::cNumericFieldNames(6) + " ratio > 7.9264E6. " + DataIPShortCuts::cNumericFieldNames(7) +
+                                 " to " + DataIPShortCuts::cNumericFieldNames(6) + " = " +
+                                 General::TrimSigDigits((WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
+                                                         WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate),
+                                                        3));
+                ShowContinueError(" Suggest reducing " + DataIPShortCuts::cNumericFieldNames(7) + " or increasing " + DataIPShortCuts::cNumericFieldNames(6) + '.');
+                ShowContinueError(" The simulation will continue using the user defined values.");
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater = DataIPShortCuts::rNumericArgs(8);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater < 0.0 ||
+                WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater > 1.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(8) + " must be >= 0 or <= 1. " + DataIPShortCuts::cNumericFieldNames(8) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(8), 3));
+                ErrorsFound = true;
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad = DataIPShortCuts::rNumericArgs(9);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad < 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(9) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(9) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(9), 2));
+                ErrorsFound = true;
+            }
+
+            WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad = DataIPShortCuts::rNumericArgs(10);
+            if (WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad < 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                DataIPShortCuts::cNumericFieldNames(10) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(10) + " = " +
+                                General::TrimSigDigits(DataIPShortCuts::rNumericArgs(10), 2));
+                ErrorsFound = true;
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("Errors found in getting " + DataIPShortCuts::cCurrentModuleObject + " input. Preceding condition causes termination.");
+        }
+    }
+
     bool GetWaterThermalTankInput()
     {
 
@@ -878,290 +1169,7 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (modNumWaterHeaterDesuperheater > 0) {
-                DataIPShortCuts::cCurrentModuleObject = cCoilDesuperheater;
-                for (int DesuperheaterNum = 1; DesuperheaterNum <= modNumWaterHeaterDesuperheater; ++DesuperheaterNum) {
-                    int NumAlphas;
-                    int NumNums;
-                    int IOStat;
-                    inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                                  DesuperheaterNum,
-                                                  DataIPShortCuts::cAlphaArgs,
-                                                  NumAlphas,
-                                                  DataIPShortCuts::rNumericArgs,
-                                                  NumNums,
-                                                  IOStat,
-                                                  DataIPShortCuts::lNumericFieldBlanks,
-                                                  DataIPShortCuts::lAlphaFieldBlanks,
-                                                  DataIPShortCuts::cAlphaFieldNames,
-                                                  DataIPShortCuts::cNumericFieldNames);
-                    UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
-
-                    // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                    GlobalNames::VerifyUniqueCoilName(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                    WaterHeaterDesuperheater(DesuperheaterNum).Type = DataIPShortCuts::cCurrentModuleObject;
-
-                    //       convert availability schedule name to pointer
-                    if (!DataIPShortCuts::lAlphaFieldBlanks(2)) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(2));
-                        if (WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr == 0) {
-                            ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
-                            ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
-                    }
-
-                    //       convert schedule name to pointer
-                    WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule == 0) {
-                        ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
-                        ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
-                        ErrorsFound = true;
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff = DataIPShortCuts::rNumericArgs(1);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff <= 0.0 ||
-                        WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff > 20.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(1) + " must be > 0 and <= 20. " + DataIPShortCuts::cNumericFieldNames(1) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(1), 1));
-                        ErrorsFound = true;
-                    }
-
-                    // WaterHeaterDesuperheater(DesuperheaterNum)%HeatReclaimRecoveryEff       = DataIPShortCuts::rNumericArgs(2)
-                    // Error limits on heat reclaim efficiency applied after source type identified
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp = DataIPShortCuts::rNumericArgs(3);
-                    WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp = DataIPShortCuts::rNumericArgs(4);
-                    WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp = DataIPShortCuts::rNumericArgs(5);
-
-                    if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
-                        if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp == 0) {
-                            ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ":  " +
-                                            DataIPShortCuts::cAlphaFieldNames(4) + " not found = " + DataIPShortCuts::cAlphaArgs(4));
-                            ErrorsFound = true;
-                        } else {
-                            ErrorsFound |= CurveManager::CheckCurveDims(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
-                                                                        {2},                                                  // Valid dimensions
-                                                                        RoutineName,                                          // Routine name
-                                                                        DataIPShortCuts::cCurrentModuleObject,                                 // Object Type
-                                                                        WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
-                                                                        DataIPShortCuts::cAlphaFieldNames(4));                                 // Field Name
-                            if (!ErrorsFound) {
-                                if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
-                                    Real64 HEffFTemp = min(1.0,
-                                                    max(0.0,
-                                                        CurveManager::CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
-                                                                   WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
-                                                                   WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
-                                    if (std::abs(HEffFTemp - 1.0) > 0.05) {
-                                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name + "\":");
-                                        ShowContinueError("The " + DataIPShortCuts::cAlphaFieldNames(4) + " should be normalized ");
-                                        ShowContinueError(" to 1.0 at the rating point. Curve output at the rating point = " +
-                                                          General::TrimSigDigits(HEffFTemp, 3));
-                                        ShowContinueError(" The simulation continues using the user-specified curve.");
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode = NodeInputManager::GetOnlySingleNode(
-                        DataIPShortCuts::cAlphaArgs(5), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsParent);
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
-                                                                                                   ErrorsFound,
-                                                                                                   DataIPShortCuts::cCurrentModuleObject,
-                                                                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                                                                   DataLoopNode::NodeType_Water,
-                                                                                                   DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                   1,
-                                                                                                   DataLoopNode::ObjectIsParent);
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 = DataIPShortCuts::cAlphaArgs(5);
-                    WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1 = DataIPShortCuts::cAlphaArgs(6);
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).TankType = DataIPShortCuts::cAlphaArgs(7);
-
-                    if (!UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cMixedWHModuleObj) &&
-                        !UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cStratifiedWHModuleObj)) {
-
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWaterHeater(DesuperheaterNum).Name + ':');
-                        ShowContinueError("Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.');
-                        ErrorsFound = true;
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).TankName = DataIPShortCuts::cAlphaArgs(8);
-
-                    //       Set up comp set for water side nodes (reverse inlet/outlet for water heater)
-                    BranchNodeConnections::SetUpCompSets(WaterHeaterDesuperheater(DesuperheaterNum).Type,
-                                  WaterHeaterDesuperheater(DesuperheaterNum).Name,
-                                  WaterHeaterDesuperheater(DesuperheaterNum).TankType,
-                                  WaterHeaterDesuperheater(DesuperheaterNum).TankName,
-                                  DataIPShortCuts::cAlphaArgs(6),
-                                  DataIPShortCuts::cAlphaArgs(5));
-
-                    //       Find the Refrigeration equipment index associated with the desuperheater heating coil.
-                    bool errFlag = false;
-                    WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = DataIPShortCuts::cAlphaArgs(9);
-                    WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName = DataIPShortCuts::cAlphaArgs(10);
-                    if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:CompressorRack")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CompressorRackRefrigeratedCase;
-                        for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
-                            if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
-                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = RackNum;
-                            if (allocated(DataHeatBalance::HeatReclaimRefrigeratedRack)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                            break;
-                        }
-                    } else if ((UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
-                               (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
-                               (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CondenserRefrigeration;
-                        for (int CondNum = 1; CondNum <= DataHeatBalance::NumRefrigCondensers; ++CondNum) {
-                            if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
-                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
-                            if (allocated(DataHeatBalance::HeatReclaimRefrigCondenser)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                            break;
-                        }
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXCooling;
-                        DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
-                        if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiSpeed;
-                        DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
-                        if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiMode;
-                        DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
-                        if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXVariableCooling;
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
-                        if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::AirWaterHeatPumpEQ;
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
-                        if (allocated(DataHeatBalance::HeatReclaimSimple_WAHPCoil)) {
-                            DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
-                            if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
-                            HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(modNumWaterHeaterDesuperheater);
-                            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
-                            }
-                            WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                        }
-                    } else {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
-                        ShowContinueError(" desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
-                        ShowContinueError(
-                            " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:VariableSpeed, "
-                            "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
-                        ShowContinueError(" Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
-                        ShowContinueError(" or Refrigeration:Condenser:WaterCooled.");
-                        ShowContinueError(" Invalid desuperheater heat source object: " + DataIPShortCuts::cAlphaArgs(9) + " \"" + DataIPShortCuts::cAlphaArgs(10) + "\"");
-                        ErrorsFound = true;
-                    }
-                    if (errFlag) {
-                        ShowContinueError("...occurs in " + DataIPShortCuts::cCurrentModuleObject + '=' + WaterHeaterDesuperheater(DesuperheaterNum).Name);
-                        ErrorsFound = true;
-                    }
-
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum == 0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                        "\" desuperheater heat source object not found: " + DataIPShortCuts::cAlphaArgs(9) + " \"" + DataIPShortCuts::cAlphaArgs(10) + "\"");
-                        ErrorsFound = true;
-                    }
-
-                    // Now have source type, so set limits on heat recovery efficiency
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
-                        if (DataIPShortCuts::lNumericFieldBlanks(2)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
-                        } else {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = DataIPShortCuts::rNumericArgs(2);
-                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.9) {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                                DataIPShortCuts::cNumericFieldNames(2) + " must be > 0.0 and <= 0.9, Efficiency = " +
-                                                General::TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
-                                ErrorsFound = true;
-                            }
-                        }    // Blank Num(2)
-                    } else { // max is 0.3 for all other sources
-                        if (DataIPShortCuts::lNumericFieldBlanks(2)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.25;
-                        } else {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = DataIPShortCuts::rNumericArgs(2);
-                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.3) {
-                                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                                DataIPShortCuts::cNumericFieldNames(2) + " must be > 0.0 and <= 0.3, " + DataIPShortCuts::cNumericFieldNames(2) + " = " +
-                                                General::TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
-                                ErrorsFound = true;
-                            }
-                        } // Blank Num(2)
-                    }     // setting limits on heat recovery efficiency
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate = DataIPShortCuts::rNumericArgs(6);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate <= 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(6) + " must be greater than 0. " + DataIPShortCuts::cNumericFieldNames(6) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(6), 6));
-                        ErrorsFound = true;
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower = DataIPShortCuts::rNumericArgs(7);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower < 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(7) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(7) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(7), 2));
-                        ErrorsFound = true;
-                    }
-
-                    if ((WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
-                         WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate) > 7.9264e6) {
-                        ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                         DataIPShortCuts::cNumericFieldNames(7) + " to " + DataIPShortCuts::cNumericFieldNames(6) + " ratio > 7.9264E6. " + DataIPShortCuts::cNumericFieldNames(7) +
-                                         " to " + DataIPShortCuts::cNumericFieldNames(6) + " = " +
-                                         General::TrimSigDigits((WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
-                                                        WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate),
-                                                       3));
-                        ShowContinueError(" Suggest reducing " + DataIPShortCuts::cNumericFieldNames(7) + " or increasing " + DataIPShortCuts::cNumericFieldNames(6) + '.');
-                        ShowContinueError(" The simulation will continue using the user defined values.");
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater = DataIPShortCuts::rNumericArgs(8);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater < 0.0 ||
-                        WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater > 1.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(8) + " must be >= 0 or <= 1. " + DataIPShortCuts::cNumericFieldNames(8) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(8), 3));
-                        ErrorsFound = true;
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad = DataIPShortCuts::rNumericArgs(9);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad < 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(9) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(9) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(9), 2));
-                        ErrorsFound = true;
-                    }
-
-                    WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad = DataIPShortCuts::rNumericArgs(10);
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad < 0.0) {
-                        ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                        DataIPShortCuts::cNumericFieldNames(10) + " must be >= 0. " + DataIPShortCuts::cNumericFieldNames(10) + " = " +
-                                        General::TrimSigDigits(DataIPShortCuts::rNumericArgs(10), 2));
-                        ErrorsFound = true;
-                    }
-                }
-
-                if (ErrorsFound) {
-                    ShowFatalError("Errors found in getting " + DataIPShortCuts::cCurrentModuleObject + " input. Preceding condition causes termination.");
-                }
+                getDesuperHtrInput();
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
