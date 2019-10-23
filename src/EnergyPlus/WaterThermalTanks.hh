@@ -840,6 +840,8 @@ namespace WaterThermalTanks {
 
     bool getWaterHeaterStratifiedInput();
 
+    bool getWaterTankMixedInput();
+
     bool GetWaterThermalTankInput();
 
     void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
