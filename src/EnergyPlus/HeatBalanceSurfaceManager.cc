@@ -6986,6 +6986,16 @@ namespace HeatBalanceSurfaceManager {
             // times before the iteration limit is hit.
             if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
                 InitInteriorConvectionCoeffs(TempSurfIn, ZoneToResimulate);
+                // Since HConvIn has changed re-calculate a few terms
+                for (int SurfNum : HTNonWindowSurfs) {
+                    TempTermSurf(SurfNum) = CTFConstInPart(SurfNum) + QRadThermInAbs(SurfNum) + QRadSWInAbs(SurfNum) +
+                        QAdditionalHeatSourceInside(SurfNum) + HConvIn(SurfNum) * RefAirTemp(SurfNum) + QHTRadSysSurf(SurfNum) +
+                        QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) +
+                        QElecBaseboardSurf(SurfNum) +
+                        (QRadSurfAFNDuct(SurfNum) / TimeStepZoneSec);
+                    TempDivSurf(SurfNum) = 1.0 / (CTFInside0(SurfNum) - IsAdiabatic(SurfNum) * CTFCross0(SurfNum) +
+                        IsPoolSurf(SurfNum) * PoolHeatTransCoefs(SurfNum) + IsNotPoolSurf(SurfNum) * HConvIn(SurfNum) + IterDampConst);
+                }
             }
 
             for (int SurfNum : HTNonWindowSurfs) {
@@ -7037,6 +7047,7 @@ namespace HeatBalanceSurfaceManager {
                             // Convection and damping term | Radiation from AFN ducts
 
                 TempSurfIn(SurfNum) = TempSurfInTmp(SurfNum);
+                //ShowContinueError("CalcHeatBalanceInsideSurf2: InsideSurfIterations=" + RoundSigDigits(InsideSurfIterations) + "  TempTerm=" + RoundSigDigits((TempTermSurf(SurfNum) + NetLWRadToSurf(SurfNum)), 8) + "  TempDiv=" + RoundSigDigits(TempDivSurf(SurfNum), 8));
             }
 
             for (int SurfNum : HTNonWindowSurfs) {
