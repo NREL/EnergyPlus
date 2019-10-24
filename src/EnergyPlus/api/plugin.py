@@ -41,7 +41,7 @@ class EnergyPlusPlugin(object):
         api = EnergyPlusAPI()
         self.functional = api.functional(False)
         self.exchange = api.data_transfer()
-        self.helpers = PluginSpecificAPI(api)
+        self.helpers = PluginSpecificAPI(self.exchange)
 
     def main(self) -> int:
         """
