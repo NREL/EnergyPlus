@@ -51,31 +51,31 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataDaylighting.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataLoopNode.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEquipment.hh>
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <HeatBalanceAirManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <ScheduleManager.hh>
-#include <SimulationManager.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <ZoneEquipmentManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1788,13 +1788,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
         "IRTSurface,              !- Radiant Exchange Method",
         "SimpleMixing,            !- Air Exchange Method",
         ",                        !- Simple Mixing Air Changes per Hour {1 / hr}",
-        ";                        !- Simple Mixing Schedule Name"
+        ";                        !- Simple Mixing Schedule Name",
+
+        "Construction:AirBoundary,",
+        "Air Boundary with Good Mixing Schedule, !- Name",
+        "InteriorWindow,          !- Solar and Daylighting Method",
+        "IRTSurface,              !- Radiant Exchange Method",
+        "SimpleMixing,            !- Air Exchange Method",
+        "0.4,                     !- Simple Mixing Air Changes per Hour {1 / hr}",
+        "Always2;                 !- Simple Mixing Schedule Name",
+
+        "Schedule:Constant,Always2,,2.0;",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
+    ProcessScheduleInput();
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
@@ -1818,14 +1829,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     ErrorsFound = false;
     GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(DataHeatBalance::TotConstructs, 2);
+
+    EXPECT_EQ(DataHeatBalance::TotConstructs, 3);
 
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Non-Grouped Air Boundary"), DataHeatBalance::Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Non-Grouped Air Boundary"));
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    // InteriorWindow option currently disabled
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1848,6 +1863,82 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+
+    constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), DataHeatBalance::Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    // InteriorWindow option currently disabled
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.4);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 1);
+    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
+
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "Construction:AirBoundary,",
+        "Air Boundary with Bad Mixing Schedule, !- Name",
+        "GroupedZones,            !- Solar and Daylighting Method",
+        "GroupedZones,            !- Radiant Exchange Method",
+        "SimpleMixing,            !- Air Exchange Method",
+        "0.1,                     !- Simple Mixing Air Changes per Hour {1 / hr}",
+        "xyz;                     !- Simple Mixing Schedule Name",
+
+        "Schedule:Constant,Always2,,2.0;",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    ProcessScheduleInput();
+
+    // skip call to get material data since this doesn't use IRT
+    ErrorsFound = false;
+    EXPECT_EQ(DataHeatBalance::TotMaterials, 0);
+
+    // get constructions
+    ErrorsFound = false;
+    GetConstructData(ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** CreateAirBoundaryConstructionsConstruction:AirBoundary=\"AIR BOUNDARY WITH BAD MIXING SCHEDULE\", invalid (not found) Simple Mixing Schedule Name=\"xyz\".",
+    "   ** Severe  ** Errors found in creating the constructions defined with Construction:AirBoundary.",
+    "   ** Warning ** This building has no thermal mass which can cause an unstable solution.",
+    "   **   ~~~   ** Use Material object for all opaque material definitions except very light insulation layers." 
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataHeatBalance::TotConstructs, 1);
+
+    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), DataHeatBalance::Construct);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.1);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)

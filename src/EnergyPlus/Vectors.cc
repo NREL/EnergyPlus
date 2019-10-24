@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <Vectors.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
 

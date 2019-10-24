@@ -59,43 +59,43 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataDaylighting.hh>
-#include <DataDaylightingDevices.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataShadowingCombinations.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DaylightingDevices.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <ScheduleManager.hh>
-#include <SolarReflectionManager.hh>
-#include <SolarShading.hh>
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataDaylightingDevices.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarReflectionManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
 #include <WCEMultiLayerOptics.hpp>
-#include <WindowComplexManager.hh>
-#include <WindowEquivalentLayer.hh>
-#include <WindowManager.hh>
-#include <WindowManagerExteriorData.hh>
-#include <WindowModel.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -3094,9 +3094,10 @@ namespace SolarShading {
 
             AreaSum = 0.0;
             TestFractSum = 0.0;
-            for (int SurfNum : thisEnclosure.SurfacePtr) {
-                int surfZoneNum = Surface(SurfNum).Zone;
-                if (Zone(surfZoneNum).OfType == StandardZone && Surface(SurfNum).CosTilt < -0.5) AreaSum += Surface(SurfNum).Area;
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                if (Zone(Surface(SurfNum).Zone).OfType == StandardZone && Surface(SurfNum).CosTilt < -0.5) {
+                    AreaSum += Surface(SurfNum).Area;
+                }
             }
 
             HorizAreaSum = AreaSum;
@@ -3111,13 +3112,12 @@ namespace SolarShading {
 
             // Compute ISABSF
 
-            for (int SurfNum : thisEnclosure.SurfacePtr) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
 
                 // only horizontal surfaces. !      !CR 8229, relaxed from -0.99 to -0.5  (Tilt > 154)
                 // only horizontal surfaces. !      !CR8769 use ASHRAE std of >120, -0.9 to -0.5  (Tilt > 120)
-                int surfZoneNum = Surface(SurfNum).Zone;
-                if ((Zone(surfZoneNum).OfType != StandardZone || Surface(SurfNum).CosTilt < -0.5) &&
-                    (Zone(surfZoneNum).OfType == StandardZone || Surface(SurfNum).ExtBoundCond > 0)) {
+                if ((Zone(Surface(SurfNum).Zone).OfType != StandardZone || Surface(SurfNum).CosTilt < -0.5) &&
+                    (Zone(Surface(SurfNum).Zone).OfType == StandardZone || Surface(SurfNum).ExtBoundCond > 0)) {
 
                     int ConstrNum = Surface(SurfNum).Construction;
                     // last minute V3.1
@@ -3163,7 +3163,7 @@ namespace SolarShading {
                         AreaSum += Surface(SurfNum).Area;
                     }
 
-                    for (int SurfNum : thisEnclosure.SurfacePtr) {
+                    for (int const SurfNum : thisEnclosure.SurfacePtr) {
                         int ConstrNum = Surface(SurfNum).Construction;
                         if (Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                             if (AreaSum > 0.0) ISABSF(SurfNum) = Surface(SurfNum).Area * Construct(ConstrNum).InsideAbsorpSolar / AreaSum;
@@ -5870,7 +5870,6 @@ namespace SolarShading {
         int ConstrNumSh;                                    // Shaded construction number
         int ConstrNumBack;                                  // Construction number of back surface
         int ConstrNumBackSh;                                // Shaded construction number of back surface
-        int FlConstrNum;                                    // Construction number of floor surface
         int ShadeFlag;                                      // Shading flag for a window
         int ShadeFlagBack;                                  // Shading flag for a window that is a back surface
         int Lay;                                            // Glass layer number
@@ -6215,7 +6214,7 @@ namespace SolarShading {
             // Loop over exterior surfaces in this zone
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
 
-            for (int SurfNum : thisEnclosure.SurfacePtr) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                     SurfaceWindow(SurfNum).OriginalClass != SurfaceClass_TDD_Diffuser)
                     continue;
@@ -7959,10 +7958,10 @@ namespace SolarShading {
                     } else { // Simple interior solar distribution. All beam from exterior windows falls on floor;
                         // some of this is absorbed/transmitted, rest is reflected to other surfaces.
 
-                        for (int FloorNum : thisEnclosure.SurfacePtr) {
+                        for (int const FloorNum : thisEnclosure.SurfacePtr) {
                             // In following, ISABSF is zero except for nominal floor surfaces
                             if (ISABSF(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
-                            FlConstrNum = Surface(FloorNum).Construction;
+                            int FlConstrNum = Surface(FloorNum).Construction;
 
                             BTOTWinZone = TBm * SunLitFract * Surface(SurfNum).Area * CosInc * InOutProjSLFracMult; //[m2]
 
@@ -8042,7 +8041,7 @@ namespace SolarShading {
             }
 
             // Variables for reporting
-            for (int SurfNum : thisEnclosure.SurfacePtr) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (SolarDistribution == FullInteriorExterior) {
                     BmIncInsSurfAmountRep(SurfNum) *= BeamSolarRad;
                     BmIncInsSurfAmountRepEnergy(SurfNum) = BmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
@@ -8304,7 +8303,7 @@ namespace SolarShading {
             ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = 0;
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
 
-            for (int SurfNum : thisEnclosure.SurfacePtr) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
                 int SurfNum2 = 0;
                 if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
@@ -8425,7 +8424,7 @@ namespace SolarShading {
                 if (SolarDistribution == FullInteriorExterior) {
                     for (int IBack = 1; IBack <= NumOfBackSurf; ++IBack) {
 
-                        int BackSurfNum = BackSurfaces(TimeStep, HourOfDay, IBack, SurfNum);
+                        int const BackSurfNum = BackSurfaces(TimeStep, HourOfDay, IBack, SurfNum);
 
                         if (BackSurfNum == 0) break; // No more irradiated back surfaces for this exterior window
                         int ConstrNumBack = Surface(BackSurfNum).Construction;
@@ -8461,15 +8460,14 @@ namespace SolarShading {
                         }
                     }
                 } else {
-                    for (int FloorNum : thisEnclosure.SurfacePtr) {
+                    for (int const FloorNum : thisEnclosure.SurfacePtr) {
                         // In following, ISABSF is zero except for nominal floor surfaces
                         if (!Surface(FloorNum).HeatTransSurf) continue;
                         if (ISABSF(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
-                        int FlConstrNum = Surface(FloorNum).Construction;
 
                         Real64 BTOTWinZone = TBm * SunLitFract * Surface(SurfNum).Area * CosInc * window.InOutProjSLFracMult(HourOfDay); //[m2]
 
-                        if (Construct(FlConstrNum).TransDiff <= 0.0) {
+                        if (Construct(Surface(FloorNum).Construction).TransDiff <= 0.0) {
                             // Opaque surface
 
                             AISurf(FloorNum) += BTOTWinZone * ISABSF(FloorNum) / Surface(FloorNum).Area; //[-]
@@ -11262,7 +11260,7 @@ namespace SolarShading {
             ZoneDifSolarDistTransmittedTotl = 0.0;
 
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
-            for (int DifTransSurfNum : thisEnclosure.SurfacePtr) {
+            for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
                 if (((Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                      (Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
@@ -11293,15 +11291,15 @@ namespace SolarShading {
                 WinDifSolarDistTransmittedTotl = 0.0;
 
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-                for (int HeatTransSurfNum : thisEnclosure.SurfacePtr) {
+                for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
                     // Skip surfaces that are not heat transfer surfaces
                     // Skip tubular daylighting device domes
                     if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
 
                     // View factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
-                    int HTenclosureSurfNum = Surface(HeatTransSurfNum).SolarEnclSurfIndex; // HT surface index for ZoneSolarInfo.SurfacePtr and F arrays
-                    int enclosureNum = Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
-                    int DTenclSurfNum = Surface(DifTransSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
+                    int const HTenclosureSurfNum = Surface(HeatTransSurfNum).SolarEnclSurfIndex; // HT surface index for ZoneSolarInfo.SurfacePtr and F arrays
+                    int const enclosureNum = Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
+                    int const DTenclSurfNum = Surface(DifTransSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
 
                     ViewFactor = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
                     // debug ViewFactorTotal
@@ -11448,7 +11446,7 @@ namespace SolarShading {
                                     //                                * Construct(AdjConstrNum)%TransDiff
 
                                     // Get the adjacent zone index
-                                    int adjEnclosureNum = Surface(AdjSurfNum).SolarEnclIndex;
+                                    int const adjEnclosureNum = Surface(AdjSurfNum).SolarEnclIndex;
 
                                     // Call routine to distribute diffuse solar transmitted through this interior window into adjacent zone
                                     CalcInteriorWinTransDifSolInitialDistribution(adjEnclosureNum, AdjSurfNum, DifSolarTransW);
@@ -11654,7 +11652,7 @@ namespace SolarShading {
                             // NOTE: This calc is here because interior windows are currently assumed to have no shading
 
                             // Get the adjacent surface number for this receiving window surface
-                            int AdjSurfNum = Surface(HeatTransSurfNum).ExtBoundCond;
+                            int const AdjSurfNum = Surface(HeatTransSurfNum).ExtBoundCond;
                             // If the adjacent surface number is > 0, this is an interior window
                             if (AdjSurfNum > 0) { // this is an interior window surface
 
@@ -11838,7 +11836,7 @@ namespace SolarShading {
         auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(IntWinEnclosureNum));
         // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
         Real64 InitialZoneDifSolReflW_zone(0.0);
-        for (int HeatTransSurfNum : thisEnclosure.SurfacePtr) {
+        for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
             // Skip surfaces that are not heat transfer surfaces
             if (!Surface(HeatTransSurfNum).HeatTransSurf) continue;
             // Skip tubular daylighting device domes
@@ -11979,16 +11977,14 @@ namespace SolarShading {
                     // NOTE: This calc is here because interior windows are currently assumed to have no shading
 
                     // Get the adjacent surface number for this receiving window surface
-                    int AdjSurfNum = Surface(HeatTransSurfNum).ExtBoundCond;
+                    int const AdjSurfNum = Surface(HeatTransSurfNum).ExtBoundCond;
                     // If the adjacent surface number is > 0, this is an interior window
                     if (AdjSurfNum > 0) { // this is an interior window surface
 
-                        // Get the adjacent zone index
-                        int adjEnclosureNum = Surface(AdjSurfNum).SolarEnclIndex;
-
+                        // Get the adjacent zone/enclosure index
                         // Add transmitted diffuse solar to total reflected distributed diffuse solar for each zone
                         // for subsequent interreflection calcs
-                        InitialZoneDifSolReflW(adjEnclosureNum) += DifSolarTransW; // [W]
+                        InitialZoneDifSolReflW(Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
                     }
 
                 } else if (ShadeFlag == IntShadeOn || ShadeFlag >= 3) {

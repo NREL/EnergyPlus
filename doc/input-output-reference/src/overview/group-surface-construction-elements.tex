@@ -4082,37 +4082,28 @@ The name of the construction.
 
 This field controls how the surface is modeled for solar distribution and daylighting calculations. There are two
 choices:
-\begin{itemize}
-  \item
-  \textbf{GroupedZones} - The two zones separated by this air boundary will be grouped together into a combined zone for solar distribution and daylighting. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air  boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone.
-  
-  \item
-  \textbf{InteriorWindow} - The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows, all direct solar passing through the interior window will be diffuse in the adjacent zone.
-\end{itemize}
+\begin{description}
+  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for solar distribution and daylighting. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air  boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone.
+  \item[InteriorWindow] The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows, all direct solar passing through the interior window will be diffuse in the adjacent zone.
+\end{description}
 
 \paragraph{Field: Radiant Exchange Method}\label{field-radiant-exchange-method}
 
 This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
 
-\begin{itemize}
-  \item
-  \textbf{GroupedZones} - The two zones separated by this air boundary will be grouped together into a combined zone for radiant exchange between surfaces and distribution of radiant internal gains. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:bySurfaceName}.
-  
-  \item
-  \textbf{IRTSurface} - The air boundary will be modeled as blackbody surface between the adjacent zones (similar to, but not exactly the same as, \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}. The surface participates in the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
-\end{itemize}
+\begin{description}
+  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for radiant exchange between surfaces and distribution of radiant internal gains. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:bySurfaceName}.
+  \item[IRTSurface] The air boundary will be modeled as blackbody surface between the adjacent zones (similar to, but not exactly the same as, \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}. The surface participates in the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
+\end{description}
 
 \paragraph{Field: Air Exchange Method}\label{field-air-exchange-method}
 
 This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
 
-\begin{itemize}
-  \item
-  \textbf{None} - There will be no air exchange modeled across this surface. Other objects, such as \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing} or AirflowNetwork openings may be specified if desired.
-  \item
-  \textbf{SimpleMixing} - For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically. These mixing objects may be automatically adjusted to balance HVAC system flows using the \hyperref[zoneairmassflowconservation]{ZoneAirMassFlowConservation} object.
-
-\end{itemize}
+\begin{description}
+  \item[None] There will be no air exchange modeled across this surface. Other objects, such as \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing} or AirflowNetwork openings may be specified if desired.
+  \item[SimpleMixing] For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically. These mixing objects may be automatically adjusted to balance HVAC system flows using the \hyperref[zoneairmassflowconservation]{ZoneAirMassFlowConservation} object.
+\end{description}
 
 \paragraph{Field: Simple Mixing Air Changes per Hour}\label{field-simple-mixing-air-changes-per-hour}
 

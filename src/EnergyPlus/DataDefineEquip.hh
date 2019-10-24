@@ -54,9 +54,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <AirTerminalUnit.hh>
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

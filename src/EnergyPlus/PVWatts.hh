@@ -56,9 +56,9 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <EnergyPlus.hh>
-#include <PVWattsSSC.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PVWattsSSC.hh>
 
 namespace EnergyPlus {
 

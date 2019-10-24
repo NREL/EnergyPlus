@@ -51,10 +51,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <EnergyPlus.hh>
-#include <HybridEvapCoolingModel.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 
 namespace EnergyPlus {
 

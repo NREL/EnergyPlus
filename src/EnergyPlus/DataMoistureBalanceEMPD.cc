@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataMoistureBalanceEMPD.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

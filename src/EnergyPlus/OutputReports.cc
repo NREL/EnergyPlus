@@ -56,20 +56,20 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DXFEarClipping.hh>
-#include <DataDaylighting.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaceColors.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <OutputReports.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DXFEarClipping.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaceColors.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1977,8 +1977,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         AlgoName = "Tubular Daylighting Device";
                     } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryIntWin) {
-                        AlgoName = "Air Boundary - Interior Window";
                     }
                 }
                 // Default Convection Coefficient Calculation Algorithms
@@ -2226,8 +2224,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         AlgoName = "Tubular Daylighting Device";
                     } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryNoHT) {
                         AlgoName = "Air Boundary - No Heat Transfer";
-                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundaryIntWin) {
-                        AlgoName = "Air Boundary - Interior Window";
                     }
                 }
                 *eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << ","
@@ -2508,9 +2504,8 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     //  Do all detached shading surfaces first
     for (surf = 1; surf <= TotSurfaces; ++surf) {
         if (Surface(surf).HeatTransSurf) continue;
-        int constrNum = Surface(surf).Construction;
-        if (constrNum > 0) {
-            if (DataHeatBalance::Construct(constrNum).TypeIsAirBoundary) continue;
+        if (Surface(surf).Construction > 0) {
+            if (DataHeatBalance::Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;

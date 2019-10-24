@@ -56,23 +56,23 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DataViewFactorInformation.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceMovableInsulation.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Timer.h>
-#include <UtilityRoutines.hh>
-#include <WindowEquivalentLayer.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Timer.h>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
@@ -177,24 +177,12 @@ namespace HeatBalanceIntRadExchange {
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
-        // Argument array dimensioning
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        int RecSurfNum;  // Counter within DO loop (refers to main surface derived type index) RECEIVING SURFACE
-        int SendSurfNum; // Counter within DO loop (refers to main surface derived type index) SENDING SURFACE
-
-        int ConstrNumRec;                  // Receiving surface construction number
-        int ConstrNumSend;                 // Sending surface construction number
         Real64 RecSurfTemp;                // Receiving surface temperature (C)
         Real64 SendSurfTemp;               // Sending surface temperature (C)
         Real64 RecSurfEmiss;               // Inside surface emissivity
-        int SurfNum;                       // Surface number
-        int ConstrNum;                     // Construction number
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
         int ShadeFlag;     // Window shading status current time step
@@ -244,7 +232,6 @@ namespace HeatBalanceIntRadExchange {
         }
 #endif
 
-        ConstrNumRec = 0;
         int startEnclosure = 1;
         int endEnclosure = DataViewFactorInformation::NumOfRadiantEnclosures;
         if (PartialResimulate) {
@@ -294,12 +281,10 @@ namespace HeatBalanceIntRadExchange {
                 IntMovInsulChanged = false;
 
                 if (!BeginEnvrnFlag) { // Check for change in shade/blind status
-                    for (int surfCounter = 1; surfCounter <= zone_info.NumOfSurfaces; ++surfCounter) {
-                        SurfNum = zone_info.SurfacePtr(surfCounter);
+                    for (int const SurfNum : zone_SurfacePtr) {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
-                        ConstrNum = Surface(SurfNum).Construction;
-                        if (Construct(ConstrNum).TypeIsWindow) {
+                        if (Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                             ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
                             ShadeFlagPrev = SurfaceWindow(SurfNum).ExtIntShadePrevTS;
                             if ((ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn) ||
@@ -307,7 +292,7 @@ namespace HeatBalanceIntRadExchange {
                                 (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
                                 IntShadeOrBlindStatusChanged = true;
                             if (SurfaceWindow(SurfNum).WindowModelType == WindowEQLModel &&
-                                DataWindowEquivalentLayer::CFS(Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                                DataWindowEquivalentLayer::CFS(Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
@@ -318,8 +303,8 @@ namespace HeatBalanceIntRadExchange {
 
                 if (IntShadeOrBlindStatusChanged || IntMovInsulChanged || BeginEnvrnFlag) { // Calc inside surface emissivities for this time step
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
-                        SurfNum = zone_SurfacePtr(ZoneSurfNum);
-                        ConstrNum = Surface(SurfNum).Construction;
+                        int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
+                        int const ConstrNum = Surface(SurfNum).Construction;
                         zone_info.Emissivity(ZoneSurfNum) = Construct(ConstrNum).InsideAbsorpThermal;
                         auto const &surface_window(SurfaceWindow(SurfNum));
                         if (Construct(ConstrNum).TypeIsWindow &&
@@ -347,9 +332,9 @@ namespace HeatBalanceIntRadExchange {
 
             // precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
             for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
-                SendSurfNum = zone_SurfacePtr[SendZoneSurfNum];
+                int const SendSurfNum = zone_SurfacePtr[SendZoneSurfNum];
                 auto const &surface_window(SurfaceWindow(SendSurfNum));
-                ConstrNumSend = Surface(SendSurfNum).Construction;
+                int const ConstrNumSend = Surface(SendSurfNum).Construction;
                 auto const &construct(Construct(ConstrNumSend));
                 if (construct.WindowTypeEQL || construct.WindowTypeBSDF) {
                     SendSurfTemp = surface_window.EffInsSurfTemp;
@@ -374,8 +359,8 @@ namespace HeatBalanceIntRadExchange {
             // These are the money loops
             size_type lSR(0u);
             for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
-                RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
-                ConstrNumRec = Surface(RecSurfNum).Construction;
+                int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
+                int const ConstrNumRec = Surface(RecSurfNum).Construction;
                 auto const &construct(Construct(ConstrNumRec));
                 auto &surface_window(SurfaceWindow(RecSurfNum));
                 auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
@@ -581,7 +566,7 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int zoneNum : thisEnclosure.ZoneNums) {
+            for (int const zoneNum : thisEnclosure.ZoneNums) {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
@@ -826,7 +811,15 @@ namespace HeatBalanceIntRadExchange {
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
+                    // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
+                    if (Surface(surfNum).Construction > 0) {
+                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                            continue;
+                        }
+                    } else if (!Surface(surfNum).HeatTransSurf) {
+                        continue;
+                    }
+                    ++numEnclosureSurfaces;
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
@@ -842,10 +835,16 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int zoneNum : thisEnclosure.ZoneNums) {
+            for (int const zoneNum : thisEnclosure.ZoneNums) {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
-                    if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) continue;
+                    if (Surface(surfNum).Construction > 0) {
+                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                            continue;
+                        }
+                    } else if (!Surface(surfNum).HeatTransSurf) {
+                        continue;
+                    }
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here

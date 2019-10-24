@@ -50,7 +50,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
-#include <PlantComponent.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

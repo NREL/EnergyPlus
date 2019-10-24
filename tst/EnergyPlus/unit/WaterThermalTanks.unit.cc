@@ -69,10 +69,10 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
-#include <DataPlant.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
@@ -1992,7 +1992,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
     }
-
+    
     // Verify there are no temperature inversions.
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
@@ -2205,7 +2205,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck){
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 55.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 50.0;",
+        "Schedule:Constant, WH Setpoint Temp, , 50.0;",        
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -2426,7 +2426,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck){
     Tank.SavedTankTemp = 52; // previous time step temperature
     Tank.AmbientTemp = 50.0; // Assume no loss
     Tank.UseInletTemp = 10;
-    Tank.UseMassFlowRate = 0.0;
+    Tank.UseMassFlowRate = 0.0; 
     Tank.SourceOutletTemp = 50;
     Tank.SavedSourceOutletTemp = 52;
     Tank.TimeElapsed = 0.0;
@@ -2494,7 +2494,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 60.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 45.0;",
+        "Schedule:Constant, WH Setpoint Temp, , 45.0;",        
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -2590,7 +2590,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    ,                        !- Water Pump Power {W}",
         "    0.2;                     !- Fraction of Pump Heat to Water",
 
-
+            
         "Coil:Cooling:WaterToAirHeatPump:EquationFit,",
         "    GSHP_COIL1,       !- Name",
         "    Node 42,                 !- Water Inlet Node Name",
@@ -2709,7 +2709,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Desuperheater.SetPointTemp = 60.0;
     Desuperheater.Mode = 1;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
-
+    
     HourOfDay = 0;
     TimeStep = 1;
     TimeStepZone = 1. / 60.;
@@ -2721,7 +2721,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum, true);
-    // If there's no demand in water thermal tank, no heat is reclaimed
+    // If there's no demand in water thermal tank, no heat is reclaimed 
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
@@ -2765,7 +2765,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 60.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 45.0;",
+        "Schedule:Constant, WH Setpoint Temp, , 45.0;",        
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -3124,6 +3124,132 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(Desuperheater.Mode, 0);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
     EXPECT_EQ(Tank.SourceRate, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule){
+    using DataGlobals::HourOfDay;
+    using DataGlobals::TimeStep;
+    using DataGlobals::TimeStepZone;
+    using DataGlobals::SecInHour;
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+    using WaterThermalTanks::WaterThermalTank;
+    using FluidProperties::GetDensityGlycol;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant, Inlet Water Temperature, , 10.0;",
+        "Schedule:Constant, Water Heater Setpoint Temperature, ,55.0;",
+        "Schedule:Constant, Water Heater AltSetpoint Temperature, ,70.0;",
+        "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
+
+        "WaterHeater:Mixed,",
+        "    IndirectWaterTank,       !- Name",
+        "    0.07,                    !- Tank Volume {m3}",
+        "    Water Heater Setpoint Temperature,  !- Setpoint Temperature Schedule Name",
+        "    2,                       !- Deadband Temperature Difference {deltaC}",
+        "    99,                      !- Maximum Temperature Limit {C}",
+        "    Cycle,                   !- Heater Control Type",
+        "    0,                       !- Heater Maximum Capacity {W}",
+        "    ,                        !- Heater Minimum Capacity {W}",
+        "    0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "    0,                       !- Heater Ignition Delay {s}",
+        "    Electricity,             !- Heater Fuel Type",
+        "    0.8,                     !- Heater Thermal Efficiency",
+        "    ,                        !- Part Load Factor Curve Name",
+        "    0,                       !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- Off Cycle Parasitic Fuel Type",
+        "    0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
+        "    0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- On Cycle Parasitic Fuel Type",
+        "    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+        "    SCHEDULE,                !- Ambient Temperature Indicator",
+        "    Ambient Temp Schedule,   !- Ambient Temperature Schedule Name",
+        "    ,                        !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    1,                       !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- Off Cycle Loss Fraction to Zone",
+        "    6,                       !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- On Cycle Loss Fraction to Zone",
+        "    ,                        !- Peak Use Flow Rate {m3/s}",
+        "    ,                        !- Use Flow Rate Fraction Schedule Name",
+        "    ,                        !- Cold Water Supply Temperature Schedule Name",
+        "    ,                        !- Use Side Inlet Node Name",
+        "    ,                        !- Use Side Outlet Node Name",
+        "    1,                       !- Use Side Effectiveness",
+        "    DemandIn,                !- Source Side Inlet Node Name",
+        "    DemandOut,               !- Source Side Outlet Node Name",
+        "    1,                       !- Source Side Effectiveness",
+        "    Autosize,                !- Use Side Design Flow Rate {m3/s}",
+        "    0.0005,                  !- Source Side Design Flow Rate {m3/s}",
+        "    1.5,                     !- Indirect Water Heating Recovery Time {hr}",
+        "    IndirectHeatAlternateSetpoint,  !- Source Side Flow Control Mode",
+        "    Water Heater AltSetpoint Temperature,      !- Indirect Alternate Setpoint Temperature Schedule Name",
+        "    General;                 !- End-Use Subcategory",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    //Schedules setup
+    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ScheduleInputProcessed = true;
+
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::Month = 7;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues();
+
+    //Get tank input data
+    ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    int TankNum(1);
+    int DemandSide(1);
+    Real64 rho; 
+    int WaterIndex(1);
+    bool NeedsHeatOrCool;
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
+
+    //set tank temp to be alternate setpoint
+    Tank.TankTemp = 70.0;
+    Tank.SetPointTemp = 55.0;
+
+    //Source side is in the demand side of the plant loop
+    Tank.SourceSidePlantLoopSide = DemandSide;
+    Tank.SavedSourceOutletTemp = 60.0;
+    rho = GetDensityGlycol("Water", Tank.TankTemp, WaterIndex , "MixedTankAlternateSchedule");
+
+    //Set the available max flow rates for tank and node
+    Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
+    DataLoopNode::Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
+    DataLoopNode::Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
+
+    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    EXPECT_FALSE(NeedsHeatOrCool);
+
+    //set tank temp between 55 to 70 to enable alternate setpoint control
+    Tank.TankTemp = 60.0;
+    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    EXPECT_TRUE(NeedsHeatOrCool);
+
+    //plant mass flow rate logic for firstHVAC mode not crashed
+    WaterThermalTanks::InitWaterThermalTank(TankNum,true);
+    EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005* rho);
+
+    //plant mass flow rate logic added to other iterations run
+    WaterThermalTanks::InitWaterThermalTank(TankNum,false);
+    EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005* rho);
+
 }
 
 TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)

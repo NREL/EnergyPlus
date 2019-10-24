@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

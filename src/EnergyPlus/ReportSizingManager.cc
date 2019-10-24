@@ -52,33 +52,33 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <AirLoopHVACDOAS.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DesiccantDehumidifiers.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACFan.hh>
-#include <OutputReportPredefined.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <SQLiteProcedures.hh>
-#include <SimAirServingZones.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -443,8 +443,10 @@ namespace ReportSizingManager {
         SizingDesValueFromParent = false;
         TotCapTempModFac = 1.0;
         CoilOutTemp = -999.0;
+        CoilOutHumRat = -999.0;
         DesVolFlow = 0.0;
-        CoilInTemp = 0.0;
+        CoilInTemp = -999.0;
+        CoilInHumRat = -999.0;
 
         if (SysSizingRunDone || ZoneSizingRunDone) {
             HardSizeNoDesRun = false;
@@ -2172,8 +2174,10 @@ namespace ReportSizingManager {
                                 setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
+                            CoilInHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                            CoilInHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
                         } else {
                             if (DesVolFlow > 0.0) {
                                 DesMassFlow = DesVolFlow * StdRhoAir;
@@ -2284,7 +2288,7 @@ namespace ReportSizingManager {
                         ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);
                         ShowContinueError("...Rated Total Heating Capacity = " + TrimSigDigits(AutosizeDes, 2) + " [W]");
                         ShowContinueError("...Air flow rate used for sizing = " + TrimSigDigits(DesMassFlow / StdRhoAir, 5) + " [m3/s]");
-                        if (TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil) {
+                        if (TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil || ZoneEqUnitHeater) {
                             ShowContinueError("...Air flow rate used for sizing = " + TrimSigDigits(DesMassFlow / StdRhoAir, 5) + " [m3/s]");
                             ShowContinueError("...Plant loop temperature difference = " + TrimSigDigits(DataWaterCoilSizHeatDeltaT, 2) + " [C]");
                         } else {
@@ -3130,6 +3134,12 @@ namespace ReportSizingManager {
                         CoilOutHumRat = DataSizing::DataCoilSizingAirOutHumRat;
                         FanCoolLoad = DataSizing::DataCoilSizingFanCoolLoad;
                         TotCapTempModFac = DataSizing::DataCoilSizingCapFT;
+                        if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
+                            coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
+                            coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
+                            coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, CoilOutTemp);
+                            coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, CoilOutHumRat);
+                        }
                     } else if (CurOASysNum > 0 && DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
                         DesVolFlow = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].SizingMassFlow / StdRhoAir;
                         if (AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].DXCoilFlag) {
@@ -3383,6 +3393,8 @@ namespace ReportSizingManager {
                     // coil inlet temperature
                     if (CurOASysNum == 0 && PrimaryAirSystem(CurSysNum).NumOAHeatCoils > 0) {
                         CoilInTemp = OutAirFrac * FinalSysSizing(CurSysNum).PreheatTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
+                        CoilInHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PreheatHumRat +
+                                       (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetHumRat; // include humrat for coil sizing reports
                     } else if (CurOASysNum > 0 && DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum > -1) {
                         CoilInTemp = AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].HeatOutTemp;
                         if (AirLoopHVACDOAS::airloopDOAS[DataAirLoop::OutsideAirSys(CurOASysNum).AirLoopDOASNum].m_FanIndex > -1 &&
@@ -3395,12 +3407,14 @@ namespace ReportSizingManager {
                         }
                     } else {
                         CoilInTemp = OutAirFrac * FinalSysSizing(CurSysNum).HeatOutTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetTemp;
+                        CoilInHumRat = OutAirFrac * FinalSysSizing(CurSysNum).HeatOutHumRat +
+                                       (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).HeatRetHumRat; // include humrat for coil sizing reports
                     }
                     // coil load
                     if (CurOASysNum > 0) {
                         if (OASysEqSizing(CurOASysNum).HeatingCapacity) {
                             DesCoilLoad = OASysEqSizing(CurOASysNum).DesHeatingLoad;
-                            CoilOutTemp = -999.0;
+                            // CoilOutTemp = -999.0; // , initialized at top
                         } else if (DataDesicRegCoil) {
                             DesCoilLoad = CpAirStd * DesMassFlow * (DataDesOutletAirTemp - DataDesInletAirTemp);
                             CoilOutTemp = DataDesOutletAirTemp;
@@ -3412,17 +3426,21 @@ namespace ReportSizingManager {
                         } else {
                             DesCoilLoad = CpAirStd * DesMassFlow * (FinalSysSizing(CurSysNum).PreheatTemp - CoilInTemp);
                             CoilOutTemp = FinalSysSizing(CurSysNum).PreheatTemp;
+                            CoilOutHumRat = FinalSysSizing(CurSysNum).PreheatHumRat;
                         }
                     } else {
                         if (UnitarySysEqSizing(CurSysNum).HeatingCapacity) {
                             DesCoilLoad = UnitarySysEqSizing(CurSysNum).DesHeatingLoad;
-                            CoilOutTemp = -999.0;
+                            // CoilOutTemp = -999.0; // initialized at top
+                            CoilOutTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
+                            CoilOutHumRat = FinalSysSizing(CurSysNum).HeatSupHumRat;
                         } else if (DataDesicRegCoil) {
                             DesCoilLoad = CpAirStd * DesMassFlow * (DataDesOutletAirTemp - DataDesInletAirTemp);
                             CoilOutTemp = DataDesOutletAirTemp;
                         } else {
                             DesCoilLoad = CpAirStd * DesMassFlow * (FinalSysSizing(CurSysNum).HeatSupTemp - CoilInTemp);
                             CoilOutTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
+                            CoilOutHumRat = FinalSysSizing(CurSysNum).HeatSupHumRat;
                         }
                     }
                     if (CurSysNum <= NumPrimaryAirSys && AirLoopControlInfo(CurSysNum).UnitarySys) {
@@ -3445,14 +3463,11 @@ namespace ReportSizingManager {
                             }
                         }
                         DesCoilLoad = NominalCapacityDes;
-                        CoilOutTemp = -999.0;
                     } else if (CurSysNum <= NumPrimaryAirSys && FinalSysSizing(CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NominalCapacityDes = FinalSysSizing(CurSysNum).HeatingTotalCapacity;
-                        CoilOutTemp = -999.0;
                     } else if (CurSysNum <= NumPrimaryAirSys && FinalSysSizing(CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
                                FinalSysSizing(CurSysNum).HeatingTotalCapacity > 0.0) {
                         NominalCapacityDes = FinalSysSizing(CurSysNum).HeatingTotalCapacity;
-                        CoilOutTemp = -999.0;
                     } else {
                         if (DataCoolCoilCap > 0.0) {
                             NominalCapacityDes = DataCoolCoilCap;
@@ -3461,7 +3476,6 @@ namespace ReportSizingManager {
                         } else {
                             NominalCapacityDes = 0.0;
                         }
-                        CoilOutTemp = -999.0;
                     }
                     AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
@@ -4097,11 +4111,11 @@ namespace ReportSizingManager {
 
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == CoolingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
-                if (CoilInTemp > 0.0) { // set inlet air properties used during capacity sizing if available
+                if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
                     coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
                     coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
                 }
-                if (CoilOutTemp > 0.0) { // set outlet air properties used during capacity sizing if available
+                if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
                     coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, CoilOutTemp);
                     coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, CoilOutHumRat);
                 }
@@ -4119,6 +4133,14 @@ namespace ReportSizingManager {
             }
         } else if (CurSysNum <= NumPrimaryAirSys && SizingType == HeatingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
+                if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
+                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
+                }
+                if (CoilOutTemp > -999.0) { // set outlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilLvgAirTemp(CompName, CompType, CoilOutTemp);
+                    coilSelectionReportObj->setCoilLvgAirHumRat(CompName, CompType, CoilOutHumRat);
+                }
                 coilSelectionReportObj->setCoilHeatingCapacity(CompName,
                                                                CompType,
                                                                SizingResult,

@@ -53,7 +53,7 @@
 
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <DataEnvironment.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -61,11 +61,11 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DirectAirManager.hh>
-#include <DXCoils.hh>
-#include <Fans.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -1319,6 +1319,12 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_DOUBLE_EQ(1000.0, MSHeatPump(1).TotCoolEnergyRate);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotHeatEnergyRate);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotCoolEnergyRate);
+
+    // verify min OAT from coil inputs
+    EXPECT_EQ(MSHeatPump(1).MinOATCompressorCooling, -25.0);
+    EXPECT_EQ(MSHeatPump(1).MinOATCompressorHeating, -8.0);
+    EXPECT_EQ(MSHeatPump(2).MinOATCompressorCooling, -25.0);
+    EXPECT_EQ(MSHeatPump(2).MinOATCompressorHeating, -8.0);
 
     DataLoopNode::Node(9).Temp = 24.0;
     DataLoopNode::Node(9).HumRat = 0.008;

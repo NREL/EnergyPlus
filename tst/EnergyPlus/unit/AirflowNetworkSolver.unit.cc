@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/UtilityRoutines.hh>
