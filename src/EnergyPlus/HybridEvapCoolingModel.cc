@@ -920,11 +920,11 @@ namespace HybridEvapCoolingModel {
           InletTemp(0.0), InletWetBulbTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletRH(0.0),
           OutletVolumetricFlowRate(0.0), OutletMassFlowRate(0.0), OutletTemp(0.0), OutletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0),
           OutletPressure(0.0), OutletRH(0.0), SecInletMassFlowRate(0.0), SecInletTemp(0.0), SecInletWetBulbTemp(0.0), SecInletHumRat(0.0),
-          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0), SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0),
-          SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0), Wsa(0.0), SupplyVentilationAir(0.0),
-          SupplyVentilationVolume(0.0), ModelNormalizationReference(0.0), OutdoorAir(false), MinOA_Msa(0.0), OARequirementsPtr(0), Tsa(0.0),
-          ModeCounter(0), CoolingRequested(false), HeatingRequested(false), VentilationRequested(false), DehumidificationRequested(false),
-          HumidificationRequested(false)
+          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletVolumetricFlowRate(0.0), SecOutletMassFlowRate(0.0),
+          SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0), SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0),
+          Wsa(0.0), SupplyVentilationAir(0.0), SupplyVentilationVolume(0.0), ModelNormalizationReference(0.0), OutdoorAir(false), MinOA_Msa(0.0),
+          OARequirementsPtr(0), Tsa(0.0), ModeCounter(0), CoolingRequested(false), HeatingRequested(false), VentilationRequested(false),
+          DehumidificationRequested(false), HumidificationRequested(false)
     {
         WarnOnceFlag = false;
         count_EnvironmentConditionsMetOnce = 0;
@@ -1918,15 +1918,15 @@ namespace HybridEvapCoolingModel {
         // na
 
         // set requested loads to output variables
-        RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
-        RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
+        RequestedLoadToHeatingSetpoint = RequestedHeatingLoad;
+        RequestedLoadToCoolingSetpoint = RequestedCoolingLoad;
         Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
         RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa / 1000;                      // [kW];
         RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
-        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa;                             // [kW];
+        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa / 1000;                      // [kW];
         RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
@@ -2010,10 +2010,15 @@ namespace HybridEvapCoolingModel {
         OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // consider if inlet and outlet presures are different
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
-        if (StdRhoAir > 1) {
+        if (StdRhoAir > 1)
+        {
             OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
-        } else {
+            SecOutletVolumetricFlowRate = SecOutletMassFlowRate / StdRhoAir;
+        }
+        else
+        {
             OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
+            SecOutletVolumetricFlowRate = SecOutletMassFlowRate / 1.225;
         }
 
         if (!StandBy) {
