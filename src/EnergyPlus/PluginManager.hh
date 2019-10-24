@@ -96,7 +96,7 @@ namespace PluginManager {
         static int calledFromFromString(std::string const &calledFrom);
 
         void addGlobalVariable(const std::string& name);
-        int getGlobalVariableHandle(const std::string& name);
+        int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         Real64 getGlobalVariableValue(int handle);
         void setGlobalVariableValue(int handle, Real64 value);
         std::vector<std::string> globalVariableNames;

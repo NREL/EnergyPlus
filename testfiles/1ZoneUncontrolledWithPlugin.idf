@@ -105,12 +105,24 @@
     MyPlugin2,         !- Name
     No,                !- Run During Warmup Days
     1ZoneUncontrolledWithPlugin, !- Python Module Name
-    MyPlugin2,          !- Plugin Class Name
+    MyPlugin2,         !- Plugin Class Name
     EndOfZoneTimestepAfterZoneReporting;         !- Calling Point
 
-  PythonPlugin:GlobalVariables,
+  PythonPlugin:Variables,
     MyGlobalVariables, !- Name
-    WaterCpAtOutdoorDBTemp;
+    WaterCpAtOutdoorDBTemp; !- Variable Name 1
+
+  PythonPlugin:OutputVariable,
+    MyOutputVariable,  !- Name
+    WaterCpAtOutdoorDBTemp, !- PythonPlugin:Variable Name
+    Averaged,          !- Type of Data in Variable
+    ZoneTimestep,      !- Update Frequency
+    C;                 !- Units
+
+  Output:Variable,
+    MyOutputVariable,
+    PythonPlugin:OutputVariable,
+    Hourly;
 
   Version,9.2;
 
@@ -144,8 +156,8 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    1,                      !- End Month
+    3,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -386,10 +398,6 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Site Daylight Saving Time Status,daily;
-
-  Output:Variable,*,Site Day Type Index,daily;
-
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
   Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
@@ -399,18 +407,6 @@
   Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,hourly;
 
   Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,hourly;
-
-  Output:Variable,*,Surface Inside Face Temperature,daily;
-
-  Output:Variable,*,Surface Outside Face Temperature,daily;
-
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
-
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
-
-  Output:Variable,*,Other Equipment Total Heating Energy,monthly;
-
-  Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
 
   Output:VariableDictionary,IDF;
 

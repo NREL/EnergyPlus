@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -183,36 +184,103 @@ namespace PluginManager {
             }
         }
 
-        std::string const sGlobals = "PythonPlugin:GlobalVariables";
+        std::string const sGlobals = "PythonPlugin:Variables";
         int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
         if (globalVarInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sGlobals);
             if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(                                                                          // LCOV_EXCL_LINE
-                        "PythonPlugin:GlobalVariables: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                ShowSevereError(sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-                if (fields.find("global_variable_name_1") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("global_variable_name_1"));
+                if (fields.find("variable_name_1") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
                 }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("global_variable_name_2"));
+                if (fields.find("variable_name_2") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
                 }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("global_variable_name_3"));
+                if (fields.find("variable_name_3") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
                 }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("global_variable_name_4"));
+                if (fields.find("variable_name_4") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
                 }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("global_variable_name_5"));
+                if (fields.find("variable_name_5") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
                 }
             }
 
+        }
+
+        // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
+        std::string const sOutputVariable = "PythonPlugin:OutputVariable";
+        int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
+        if (outputVarInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sOutputVariable);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(sOutputVariable + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
+                std::string varName = fields.at("python_plugin_variable_name");
+                std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable"));
+                std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency"));
+                std::string units;
+                if (fields.find("units") != fields.end()) {
+                    units = fields.at("units");
+                }
+                // get the index of the global variable, fatal if it doesn't mach one
+                // validate type of data, update frequency, and look up units enum value
+                // call setup output variable - variable TYPE is "PythonPlugin:OutputVariable"
+                int variableHandle = this->getGlobalVariableHandle(varName);
+                if (variableHandle == -1) {
+                    EnergyPlus::ShowSevereError("Failed to match Python Plugin Output Variable");
+                    EnergyPlus::ShowContinueError("Trying to create output instance for variable name \"" + varName + "\"");
+                    EnergyPlus::ShowContinueError("No match found, make sure variable is listed in PythonPlugin:Variables object");
+                    EnergyPlus::ShowFatalError("Python Plugin Output Variable problem causes program termination");
+                }
+                std::string sAvgOrSum = "Average";
+                if (avgOrSum == "SUMMED") {
+                    sAvgOrSum = "Sum";
+                }
+                std::string sUpdateFreq = "Zone";
+                if (updateFreq == "SYSTEMTIMESTEP") {
+                    sUpdateFreq = "System";
+                }
+                OutputProcessor::Unit thisUnit = OutputProcessor::Unit::None;
+                if (!units.empty()) {
+                    thisUnit = OutputProcessor::unitStringToEnum(units);
+                    if (thisUnit == OutputProcessor::Unit::unknown) {
+                        thisUnit = OutputProcessor::Unit::customEMS;
+                    }
+                }
+                if (thisUnit != OutputProcessor::Unit::customEMS) {
+                    SetupOutputVariable(sOutputVariable, thisUnit, this->globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                } else {
+                    SetupOutputVariable(sOutputVariable,
+                                        thisUnit,
+                                        this->globalVariableValues[variableHandle],
+                                        sUpdateFreq,
+                                        sAvgOrSum,
+                                        thisObjectName,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        units);
+                }
+            }
         }
 
     }
@@ -382,20 +450,24 @@ namespace PluginManager {
         this->globalVariableValues.push_back(Real64());
     }
 
-    int PluginManager::getGlobalVariableHandle(const std::string& name) { // note zero is a valid handle
+    int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         auto const it = std::find(this->globalVariableNames.begin(), this->globalVariableNames.end(), varNameUC);
         if (it != this->globalVariableNames.end()) {
             return std::distance(this->globalVariableNames.begin(), it);
         } else {
-            EnergyPlus::ShowSevereError("Tried to retrieve handle for a nonexistent plugin global variable");
-            EnergyPlus::ShowContinueError("Name looked up: \"" + varNameUC + "\", available names: ");
-            for (auto const & gvName : this->globalVariableNames) {
-                EnergyPlus::ShowContinueError("    \"" + gvName + "\"");
+            if (suppress_warning) {
+                return -1;
+            } else {
+                EnergyPlus::ShowSevereError("Tried to retrieve handle for a nonexistent plugin global variable");
+                EnergyPlus::ShowContinueError("Name looked up: \"" + varNameUC + "\", available names: ");
+                for (auto const &gvName : this->globalVariableNames) {
+                    EnergyPlus::ShowContinueError("    \"" + gvName + "\"");
+                }
+                EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
+                return -1; // hush the compiler warning
             }
-            EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
-        return -1;
     }
 
     Real64 PluginManager::getGlobalVariableValue(int handle) {
