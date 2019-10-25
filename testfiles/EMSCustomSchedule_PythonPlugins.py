@@ -43,7 +43,7 @@ class CoolingSetPoint(EnergyPlusPlugin):
         elif holiday == 3 and day_of_month == 21 and month == 1:
             self.exchange.set_actuator_value(handle, 30)
         elif hour < 6:
-            self.exchange.set_actuator_value(30)
+            self.exchange.set_actuator_value(handle, 30)
         elif (6 <= hour < 22) and 2 <= day <= 6:
             self.exchange.set_actuator_value(handle, 24)
         elif 6 <= hour < 18 and day == 7:

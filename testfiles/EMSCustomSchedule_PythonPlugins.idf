@@ -6019,12 +6019,12 @@
     CoolingSetPoint,          !- Plugin Class Name
     BeginTimestepBeforePredictor;         !- Calling Point
 
-  PythonPlugin:Instance,
-    Average Zone Temp Calculation,         !- Name
-    Yes,                !- Run During Warmup Days
-    EMSCustomSchedule_PythonPlugins, !- Python Module Name
-    AverageZoneTemps,          !- Plugin Class Name
-    EndOfZoneTimestepBeforeZoneReporting;         !- Calling Point
+!  PythonPlugin:Instance,
+!    Average Zone Temp Calculation,         !- Name
+!    Yes,                !- Run During Warmup Days
+!    EMSCustomSchedule_PythonPlugins, !- Python Module Name
+!    AverageZoneTemps,          !- Plugin Class Name
+!    EndOfZoneTimestepBeforeZoneReporting;         !- Calling Point
 
   PythonPlugin:Variables,
     MyGlobalVariables, !- Name
