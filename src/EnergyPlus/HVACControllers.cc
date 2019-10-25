@@ -1154,6 +1154,8 @@ namespace HVACControllers {
 
             // Check to make sure that the Minimum Flow rate is less than the max.
             if (ControllerProps(ControlNum).MaxVolFlowActuated == 0.0) {
+                ShowWarningError("Controller:WaterCoil, Maximum Actuated Flow is zero; " +
+                                 ControllerProps(ControlNum).ControllerName);
                 ControllerProps(ControlNum).MinVolFlowActuated = 0.0;
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
                 ShowFatalError("Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " +

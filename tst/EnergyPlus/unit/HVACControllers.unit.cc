@@ -843,6 +843,183 @@ TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
     ASSERT_EQ(ControllerProps.size(), 1u);
     EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
     EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
+{
+    std::string const idf_objects = delimited_string({
+        " Coil:Cooling:Water,",
+        "   Chilled Water Coil, !- Name",
+        "   AvailSched,         !- Availability Schedule Name",
+        "   0.00,               !- Design Water Flow Rate { m3 / s }",
+        "   1.0,                !- Design Air Flow Rate { m3 / s }",
+        "   7.2,                !- Design Inlet Water Temperature { C }",
+        "   32.0,               !- Design Inlet Air Temperature { C }",
+        "   12.0,               !- Design Outlet Air Temperature { C }",
+        "   0.01,               !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   0.07,               !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   Water Inlet Node,   !- Water Inlet Node Name",
+        "   Water Outlet Node,  !- Water Outlet Node Name",
+        "   Air Inlet Node,     !- Air Inlet Node Name",
+        "   Air Outlet Node,    !- Air Outlet Node Name",
+        "   SimpleAnalysis,     !- Type of Analysis",
+        "   CrossFlow;          !- Heat Exchanger Configuration",
+
+        " Controller:WaterCoil,",
+        "   CW Coil Controller, !- Name",
+        "   HumidityRatio,      !- Control Variable",
+        "   Reverse,            !- Action",
+        "   FLOW,               !- Actuator Variable",
+        "   Air Outlet Node,    !- Sensor Node Name",
+        "   Water Inlet Node,   !- Actuator Node Name",
+        "   ,                   !- Controller Convergence Tolerance { deltaC }",
+        "   ,                   !- Maximum Actuated Flow { m3 / s }",
+        "   ;                   !- Minimum Actuated Flow { m3 / s }",
+
+        " SetpointManager:Scheduled,",
+        "   HumRatSPManager,    !- Name",
+        "   MaximumHumidityRatio, !- Control Variable",
+        "   HumRatioSched,      !- Schedule Name",
+        "   Air Outlet Node;    !- Setpoint Node or NodeList Name",
+
+        " Schedule:Compact,",
+        "   HumRatioSched,      !- Name",
+        "   Fraction,           !- Schedule Type Limits Name",
+        "   Through: 12/31,     !- Field 1",
+        "   For: AllDays,       !- Field 2",
+        "   Until: 24:00, 0.015; !- Field 3",
+
+        " Schedule:Compact,",
+        "   AvailSched,         !- Name",
+        "   Fraction,           !- Schedule Type Limits Name",
+        "   Through: 12/31,     !- Field 1",
+        "   For: AllDays,       !- Field 2",
+        "   Until: 24:00, 1.0;  !- Field 3",
+
+        " ScheduleTypeLimits,",
+        "   Fraction,         !- Name",
+        "   0.0,              !- Lower Limit Value",
+        "   1.0,              !- Upper Limit Value",
+        "   CONTINUOUS;       !- Numeric Type",
+
+        " AirLoopHVAC:ControllerList,",
+        "   CW Coil Controller, !- Name",
+        "   Controller:WaterCoil, !- Controller 1 Object Type",
+        "   CW Coil Controller; !- Controller 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetSetPointManagerInputs();
+
+    GetControllerInput();
+
+    ASSERT_EQ(ControllerProps.size(), 1u);
+    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+
+    // test index for air loop controllers
+    // before controllers are simulated, AirLoopControllerIndex = 0
+    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+
+    OutputReportPredefined::SetPredefinedTables();
+    SimAirServingZones::GetAirLoopInputFlag = false;
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataAirLoop::PriAirSysAvailMgr.allocate(1);
+    DataAirLoop::AirLoopControlInfo.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).NumSupplyNodes = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
+    DataConvergParams::AirLoopConvergence.allocate(1);
+    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).NumControllers = 1;
+    DataAirSystems::PrimaryAirSystem(1).ControllerIndex.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1) = 0;
+    DataAirSystems::PrimaryAirSystem(1).ControllerName.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).ControllerName(1) = "CW COIL CONTROLLER";
+    DataAirSystems::PrimaryAirSystem(1).ControlConverged.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = 4;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalNodes = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop(1).Name = "CHW LOOP";
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+
+    DataSizing::NumPltSizInput = 1;
+    DataSizing::PlantSizData.allocate(1);
+    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    DataSizing::PlantSizData(1).ExitTemp = 6.0;
+    DataSizing::PlantSizData(1).PlantLoopName = "CHW LOOP";
+    DataSizing::PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFinalSizesOkayToReport = true;
+
+    DataSizing::UnitarySysEqSizing.allocate(1);
+    DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
+    DataSizing::UnitarySysEqSizing(1).HeatingCapacity = false;
+    DataSizing::UnitarySysEqSizing.deallocate();
+
+    bool SimZoneEquipment(false);
+    // compare_err_stream("", true); // reset error stream
+
+    // This will call ManageController, which calls SizeController which should autosize the controller max actuated flow rate to zero
+    // and issue a warning
+    SimAirServingZones::SimAirLoops(true, SimZoneEquipment);
+
+    // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
+    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).NumControllers);
+    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1));
+    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+
+    // This should have been autosized to zero
+    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, 0.0);
+    // This should have been reset to zero
+    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+
+    Real64 expectedOffset = (0.001 / (2100.0 * DataHVACGlobals::SmallWaterVolFlow)) * (DataConvergParams::HVACEnergyToler / 10.0);
+    // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
+    expectedOffset = min(0.1 * DataConvergParams::HVACTemperatureToler, expectedOffset);
+    EXPECT_EQ(expectedOffset, 0.1 * DataConvergParams::HVACTemperatureToler);
+    EXPECT_EQ(ControllerProps(1).Offset, expectedOffset);
+
+    std::string const error_string = delimited_string({
+      "   ** Warning ** Controller:WaterCoil, Maximum Actuated Flow is zero; CW COIL CONTROLLER",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 } // namespace EnergyPlus
