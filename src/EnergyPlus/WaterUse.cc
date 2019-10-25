@@ -221,12 +221,13 @@ namespace WaterUse {
 
             UpdateWaterConnections(WaterConnNum);
 
-            ReportWaterUse(WaterConnNum);
+             ReportWaterUse(WaterConnNum);
 
         } // WaterConnNum
     }
 
-    void SimulateWaterUseConnection(int EP_UNUSED(EquipTypeNum), std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration)
+    void SimulateWaterUseConnection(
+        int EP_UNUSED(EquipTypeNum), std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:

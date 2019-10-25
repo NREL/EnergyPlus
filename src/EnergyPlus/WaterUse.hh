@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -139,7 +140,7 @@ namespace WaterUse {
         {
         }
 
-        // Reset Some Values to Zeros
+
         void reset()
         {
             SensibleRate = 0.0;
@@ -150,9 +151,10 @@ namespace WaterUse {
             TotalMassFlowRate = 0.0;
             DrainTemp = 0.0;
         }
+
     };
 
-    struct WaterConnectionsType
+    struct WaterConnectionsType 
     {
         // Members
         std::string Name; // Name of DHW
@@ -220,6 +222,7 @@ namespace WaterUse {
         int PlantLoopSide;
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
+       
 
         // Default Constructor
         WaterConnectionsType()
@@ -235,30 +238,23 @@ namespace WaterUse {
               PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
         {
         }
+
+
     };
 
-    // Object Data
-    extern Array1D<WaterEquipmentType> WaterEquipment;
-    extern Array1D<WaterConnectionsType> WaterConnections;
+ 
 
     // Functions
 
     void clear_state();
 
-    void SimulateWaterUse(bool FirstHVACIteration);
-
-    void SimulateWaterUseConnection(
-        int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
-
     void GetWaterUseInput();
-    
+
     void SetupOutputVars();
 
     void CalcEquipmentFlowRates(int WaterEquipNum);
 
     void CalcEquipmentDrainTemp(int WaterEquipNum);
-
-    void InitConnections(int WaterConnNum);
 
     void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration);
 
@@ -267,12 +263,23 @@ namespace WaterUse {
     void CalcConnectionsHeatRecovery(int WaterConnNum);
 
     void UpdateWaterConnections(int WaterConnNum);
+  
+    void InitConnections(int WaterConnNum);
 
-    void ReportStandAloneWaterUse();
+    void SimulateWaterUse(bool FirstHVACIteration);
 
     void ReportWaterUse(int WaterConnNum);
 
     void CalcWaterUseZoneGains();
+
+    void SimulateWaterUseConnection(int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
+
+    void ReportStandAloneWaterUse();
+
+       // Object Data
+    extern Array1D<WaterEquipmentType> WaterEquipment;
+    extern Array1D<WaterConnectionsType> WaterConnections;
+
 
 } // namespace WaterUse
 
