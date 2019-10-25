@@ -751,19 +751,6 @@ namespace HeatBalanceSurfaceManager {
 
         CTFConstOutPart = 0.0;
         CTFConstInPart = 0.0;
-        CTFCross0 = 0.0;
-        CTFInside0 = 0.0;
-        CTFSourceIn0 = 0.0;
-        QsrcHistSurf1 = 0.0;
-        TH11Surf = 0.0;
-        IsAdiabatic = 0;
-        IsNotAdiabatic = 0;
-        IsSource = 0;
-        IsNotSource = 0;
-        IsPoolSurf = 0;
-        IsNotPoolSurf = 0;
-        TempTermSurf = 0.0;
-        TempDivSurf = 0.0;
         if (AnyConstructInternalSourceInInput) {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
