@@ -1511,6 +1511,9 @@ namespace HVACControllers {
         // Intialize root finder
         if (ControllerProps(ControlNum).NumCalcCalls == 1) {
             // Set min/max boundaries for root finder on first iteration
+
+            // There's no real point doing it if MaxAvailActuated is zero is there?
+
             InitializeRootFinder(RootFinders(ControlNum),
                                  ControllerProps(ControlNum).MinAvailActuated,
                                  ControllerProps(ControlNum).MaxAvailActuated); // XMin | XMax
@@ -1724,10 +1727,22 @@ namespace HVACControllers {
                 if (RootFinders(ControlNum).LowerPoint.DefinedFlag) {
                     ShowContinueError(" Lower bracket is x=" + TrimSigDigits(RootFinders(ControlNum).LowerPoint.X, NumSigDigits));
                 }
+                bool fatalOut = true;
                 if (RootFinders(ControlNum).UpperPoint.DefinedFlag) {
                     ShowContinueError(" Upper bracket is x=" + TrimSigDigits(RootFinders(ControlNum).UpperPoint.X, NumSigDigits));
+                    // If the upper bracket was zero, just use zero
+                    if (RootFinders(ControlNum).UpperPoint.X == 0) {
+                        fatalOut = false;
+                        ControllerProps(ControlNum).ActuatedValue = 0;
+                        ShowContinueError(" Resetting candidate x=" + TrimSigDigits(RootFinders(ControlNum).UpperPoint.X, NumSigDigits));
+                        // Indicate convergence with max value
+                        // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
+                        ExitCalcController(ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+                    }
                 }
-                ShowFatalError("Preceding error causes program termination.");
+                if (fatalOut) {
+                    ShowFatalError("Preceding error causes program termination.");
+                }
 
                 // Detected control function with wrong action between the min and max points.
                 // Should never happen: probably indicative of some serious problems in IDFs
