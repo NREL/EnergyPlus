@@ -71,6 +71,31 @@ ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
 ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
 ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
 
+ENERGYPLUSLIB_API int year();
+ENERGYPLUSLIB_API int month();
+ENERGYPLUSLIB_API int dayOfMonth();
+ENERGYPLUSLIB_API int dayOfWeek();
+ENERGYPLUSLIB_API int dayOfYear();
+ENERGYPLUSLIB_API int daylightSavingsTimeIndicator();
+ENERGYPLUSLIB_API int hour();
+ENERGYPLUSLIB_API int currentTime();
+ENERGYPLUSLIB_API int minutes();
+ENERGYPLUSLIB_API int holidayIndex();
+ENERGYPLUSLIB_API int sunIsUp();
+ENERGYPLUSLIB_API int isRaining();
+ENERGYPLUSLIB_API int systemTimeStep();
+ENERGYPLUSLIB_API int currentEnvironmentNum();
+ENERGYPLUSLIB_API int warmupFlag();
+
+// EMS exposed some data that is static throughout a simulation, but requires a simulation to be in process
+// For example zone volume and other properties
+// These must be exposed on this data transfer API, not functional, because it requires a simulation to be going
+ENERGYPLUSLIB_API int getZoneIndex(const char* zoneName);
+ENERGYPLUSLIB_API Real64 getZoneFloorArea(int zoneHandle);
+ENERGYPLUSLIB_API Real64 getZoneAirVolume(int zoneHandle);
+ENERGYPLUSLIB_API Real64 getZoneMultiplier(int zoneHandle);
+ENERGYPLUSLIB_API Real64 getZoneListMultiplier(int zoneHandle);
+
 #ifdef __cplusplus
 }
 #endif

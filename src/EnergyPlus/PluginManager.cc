@@ -227,6 +227,8 @@ namespace PluginManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
+                auto const objNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(thisObjectName);
+                // no need to validate name, the JSON will validate that.
                 inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
                 std::string varName = fields.at("python_plugin_variable_name");
                 std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable"));
@@ -245,9 +247,13 @@ namespace PluginManager {
                     EnergyPlus::ShowContinueError("No match found, make sure variable is listed in PythonPlugin:Variables object");
                     EnergyPlus::ShowFatalError("Python Plugin Output Variable problem causes program termination");
                 }
+                bool isMetered = false;
                 std::string sAvgOrSum = "Average";
                 if (avgOrSum == "SUMMED") {
                     sAvgOrSum = "Sum";
+                } else if (avgOrSum == "METERED") {
+                    sAvgOrSum = "Sum";
+                    isMetered = true;
                 }
                 std::string sUpdateFreq = "Zone";
                 if (updateFreq == "SYSTEMTIMESTEP") {
@@ -260,25 +266,213 @@ namespace PluginManager {
                         thisUnit = OutputProcessor::Unit::customEMS;
                     }
                 }
-                if (thisUnit != OutputProcessor::Unit::customEMS) {
-                    SetupOutputVariable(sOutputVariable, thisUnit, this->globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                if (!isMetered) {
+                    // regular output variable, ignore the meter/resource stuff and register the variable
+                    if (thisUnit != OutputProcessor::Unit::customEMS) {
+                        SetupOutputVariable(sOutputVariable, thisUnit, this->globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                    } else {
+                        SetupOutputVariable(sOutputVariable,
+                                            thisUnit,
+                                            this->globalVariableValues[variableHandle],
+                                            sUpdateFreq,
+                                            sAvgOrSum,
+                                            thisObjectName,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            units);
+                    }
                 } else {
-                    SetupOutputVariable(sOutputVariable,
-                                        thisUnit,
-                                        this->globalVariableValues[variableHandle],
-                                        sUpdateFreq,
-                                        sAvgOrSum,
-                                        thisObjectName,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        units);
+                    // We are doing a metered type, we need to get the extra stuff
+                    // Resource Type
+                    if (fields.find("resource_type") == fields.end()) {
+                        EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
+                        EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a resource type");
+                        EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                    }
+                    std::string const resourceType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("resource_type"));
+                    std::string sResourceType;
+                    if (resourceType == "ELECTRICITY") {
+                        sResourceType = "Electricity";
+                    } else if (resourceType == "NATURALGAS") {
+                        sResourceType = "NaturalGas";
+                    } else if (resourceType == "GASOLINE") {
+                        sResourceType = "Gasoline";
+                    } else if (resourceType == "DIESEL") {
+                        sResourceType = "Diesel";
+                    } else if (resourceType == "COAL") {
+                        sResourceType = "Coal";
+                    } else if (resourceType == "FUELOIL#1") {
+                        sResourceType = "FuelOil#1";
+                    } else if (resourceType == "FUELOIL#2") {
+                        sResourceType = "FuelOil#2";
+                    } else if (resourceType == "OTHERFUEL1") {
+                        sResourceType = "OtherFuel1";
+                    } else if (resourceType == "OTHERFUEL2") {
+                        sResourceType = "OtherFuel2";
+                    } else if (resourceType == "PROPANE") {
+                        sResourceType = "Propane";
+                    } else if (resourceType == "WATERUSE") {
+                        sResourceType = "Water";
+                    } else if (resourceType == "ONSITEWATERPRODUCED") {
+                        sResourceType = "OnSiteWater";
+                    } else if (resourceType == "MAINSWATERSUPPLY") {
+                        sResourceType = "MainsWater";
+                    } else if (resourceType == "RAINWATERCOLLECTED") {
+                        sResourceType = "RainWater";
+                    } else if (resourceType == "WELLWATERDRAWN") {
+                        sResourceType = "WellWater";
+                    } else if (resourceType == "CONDENSATEWATERCOLLECTED") {
+                        sResourceType = "Condensate";
+                    } else if (resourceType == "ENERGYTRANSFER") {
+                        sResourceType = "EnergyTransfer";
+                    } else if (resourceType == "STEAM") {
+                        sResourceType = "Steam";
+                    } else if (resourceType == "DISTRICTCOOLING") {
+                        sResourceType = "DistrictCooling";
+                    } else if (resourceType == "DISTRICTHEATING") {
+                        sResourceType = "DistrictHeating";
+                    } else if (resourceType == "ELECTRICITYPRODUCEDONSITE") {
+                        sResourceType = "ElectricityProduced";
+                    } else if (resourceType == "SOLARWATERHEATING") {
+                        sResourceType = "SolarWater";
+                    } else if (resourceType == "SOLARAIRHEATING") {
+                        sResourceType = "SolarAir";
+                    } else {
+                        ShowSevereError("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = " + resourceType);
+                        ShowFatalError("Python plugin output variable input problem causes program termination");
+                    }
+
+                    // Group Type
+                    if (fields.find("group_type") == fields.end()) {
+                        EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
+                        EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a group type");
+                        EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                    }
+                    std::string const groupType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("group_type"));
+                    std::string sGroupType;
+                    if (groupType == "BUILDING") {
+                        sGroupType = "Building";
+                    } else if (groupType == "HVAC") {
+                        sGroupType = "HVAC";
+                    } else if (groupType == "PLANT") {
+                        sGroupType = "Plant";
+                    } else if (groupType == "SYSTEM") {
+                        sGroupType = "System";
+                    } else {
+                        ShowSevereError("Invalid input for PythonPlugin:OutputVariable, unexpected Group Type = " + groupType);
+                        ShowFatalError("Python plugin output variable input problem causes program termination");
+                    }
+
+                    // End Use Type
+                    if (fields.find("end_use_category") == fields.end()) {
+                        EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
+                        EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define an end-use category");
+                        EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                    }
+                    std::string const endUse = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("end_use_category"));
+                    std::string sEndUse;
+                    if (endUse == "HEATING") {
+                        sEndUse = "Heating";
+                    } else if (endUse == "COOLING") {
+                        sEndUse = "Cooling";
+                    } else if (endUse == "INTERIORLIGHTS") {
+                        sEndUse = "InteriorLights";
+                    } else if (endUse == "EXTERIORLIGHTS") {
+                        sEndUse = "ExteriorLights";
+                    } else if (endUse == "INTERIOREQUIPMENT") {
+                        sEndUse = "InteriorEquipment";
+                    } else if (endUse == "EXTERIOREQUIPMENT") {
+                        sEndUse = "ExteriorEquipment";
+                    } else if (endUse == "FANS") {
+                        sEndUse = "Fans";
+                    } else if (endUse == "PUMPS") {
+                        sEndUse = "Pumps";
+                    } else if (endUse == "HEATREJECTION") {
+                        sEndUse = "HeatRejection";
+                    } else if (endUse == "HUMIDIFIER") {
+                        sEndUse = "Humidifier";
+                    } else if (endUse == "HEATRECOVERY") {
+                        sEndUse = "HeatRecovery";
+                    } else if (endUse == "WATERSYSTEMS") {
+                        sEndUse = "WaterSystems";
+                    } else if (endUse == "REFRIGERATION") {
+                        sEndUse = "Refrigeration";
+                    } else if (endUse == "ONSITEGENERATION") {
+                        sEndUse = "Cogeneration";
+                    } else if (endUse == "HEATINGCOILS") {
+                        sEndUse = "HeatingCoils";
+                    } else if (endUse == "COOLINGCOILS") {
+                        sEndUse = "CoolingCoils";
+                    } else if (endUse == "CHILLERS") {
+                        sEndUse = "Chillers";
+                    } else if (endUse == "BOILERS") {
+                        sEndUse = "Boilers";
+                    } else if (endUse == "BASEBOARD") {
+                        sEndUse = "Baseboard";
+                    } else if (endUse == "HEATRECOVERYFORCOOLING") {
+                        sEndUse = "HeatRecoveryForCooling";
+                    } else if (endUse == "HEATRECOVERYFORHEATING") {
+                        sEndUse = "HeatRecoveryForHeating";
+                    } else {
+                        ShowSevereError(
+                                "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
+                                groupType);
+                        ShowFatalError("Python plugin output variable input problem causes program termination");
+                    }
+
+                    // Additional End Use Types Only Used for EnergyTransfer
+                    if ((sResourceType != "EnergyTransfer") &&
+                        (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" ||
+                                sEndUse == "Chillers" ||
+                                sEndUse == "Boilers" || sEndUse == "Baseboard" ||
+                                sEndUse == "HeatRecoveryForCooling" ||
+                                sEndUse == "HeatRecoveryForHeating")) {
+                        ShowWarningError("Inconsistent resource type input for PythonPlugin:OutputVariable = " + thisObjectName);
+                        ShowContinueError("For end use subcategory = " + sEndUse + ", resource type must be EnergyTransfer");
+                        ShowContinueError("Resource type is being reset to EnergyTransfer and the simulation continues...");
+                        sResourceType = "EnergyTransfer";
+                    }
+
+                    std::string sEndUseSubcategory;
+                    if (fields.find("end_use_subcategory") != fields.end()) {
+                        sEndUseSubcategory = fields.at("end_use_subcategory");
+                    }
+
+                    if (sEndUseSubcategory.empty()) { // no subcategory
+                        SetupOutputVariable(sOutputVariable,
+                                            thisUnit,
+                                            this->globalVariableValues[variableHandle],
+                                            sUpdateFreq,
+                                            sAvgOrSum,
+                                            thisObjectName,
+                                            _,
+                                            sResourceType,
+                                            sEndUse,
+                                            _,
+                                            sGroupType);
+                    } else { // has subcategory
+                        SetupOutputVariable(sOutputVariable,
+                                            thisUnit,
+                                            this->globalVariableValues[variableHandle],
+                                            sUpdateFreq,
+                                            sAvgOrSum,
+                                            thisObjectName,
+                                            _,
+                                            sResourceType,
+                                            sEndUse,
+                                            sEndUseSubcategory,
+                                            sGroupType);
+                    }
                 }
             }
         }

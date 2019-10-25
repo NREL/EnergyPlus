@@ -46,6 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -125,4 +128,91 @@ Real64 getPluginGlobalVariableValue(int handle) {
 
 void setPluginGlobalVariableValue(int handle, Real64 value) {
     EnergyPlus::PluginManager::pluginManager->setGlobalVariableValue(handle, value);
+}
+
+
+int year() {
+    return EnergyPlus::DataEnvironment::Year;
+}
+int month() {
+    return EnergyPlus::DataEnvironment::Month;
+}
+int dayOfMonth() {
+    return EnergyPlus::DataEnvironment::DayOfMonth;
+}
+int dayOfWeek() {
+    return EnergyPlus::DataEnvironment::DayOfWeek;
+}
+int dayOfYear() {
+    return EnergyPlus::DataEnvironment::DayOfYear;
+}
+int daylightSavingsTimeIndicator() {
+    return EnergyPlus::DataEnvironment::DSTIndicator;
+}
+int hour() {
+    return EnergyPlus::DataGlobals::HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
+}
+int currentTime() {
+    if (EnergyPlus::DataHVACGlobals::TimeStepSys < EnergyPlus::DataGlobals::TimeStepZone) {
+    // CurrentTime is for end of zone timestep, need to account for system timestep
+        return EnergyPlus::DataGlobals::CurrentTime - EnergyPlus::DataGlobals::TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
+    } else {
+        return EnergyPlus::DataGlobals::CurrentTime;
+    }
+}
+int minutes() {
+    return (currentTime() - EnergyPlus::DataGlobals::HourOfDay - 1) * 60.0; // -1.0 // off by 1
+}
+int holidayIndex() {
+    return EnergyPlus::DataEnvironment::HolidayIndex;
+}
+int sunIsUp() { // maintain response convention from previous (EMS) implementation
+    if (EnergyPlus::DataEnvironment::SunIsUp) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+int isRaining() {
+    if (EnergyPlus::DataEnvironment::IsRain) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+int systemTimeStep() {
+    return EnergyPlus::DataHVACGlobals::TimeStepSys;
+}
+int currentEnvironmentNum() {
+    return EnergyPlus::DataEnvironment::CurEnvirNum;
+}
+int warmupFlag() {
+    return EnergyPlus::DataGlobals::WarmupFlag;
+}
+
+int getZoneIndex(const char* zoneName) {
+    std::string searchNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(zoneName);
+    for (int zoneNum = 1; zoneNum <= EnergyPlus::DataGlobals::NumOfZones; ++zoneNum) {
+        std::string thisZoneNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(EnergyPlus::DataHeatBalance::Zone(zoneNum).Name);
+        if (thisZoneNameUC == searchNameUC) {
+            return zoneNum;
+        }
+    }
+    return -1;
+}
+Real64 getZoneFloorArea(int const zoneHandle) {
+    // add error handling
+    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).FloorArea;
+}
+Real64 getZoneAirVolume(int const zoneHandle) {
+// add error handling
+    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).Volume;
+}
+Real64 getZoneMultiplier(int const zoneHandle) {
+// add error handling
+    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).Multiplier;
+}
+Real64 getZoneListMultiplier(int const zoneHandle) {
+// add error handling
+    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).ListMultiplier;
 }

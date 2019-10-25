@@ -36,6 +36,48 @@ class DataTransfer:
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_int
+        # some simulation data values are available for plugins or regular runtime calls
+        self.api.year.argtypes = []
+        self.api.year.restype = c_int
+        self.api.month.argtypes = []
+        self.api.month.restype = c_int
+        self.api.dayOfMonth.argtypes = []
+        self.api.dayOfMonth.restype = c_int
+        self.api.dayOfWeek.argtypes = []
+        self.api.dayOfWeek.restype = c_int
+        self.api.dayOfYear.argtypes = []
+        self.api.dayOfYear.restype = c_int
+        self.api.daylightSavingsTimeIndicator.argtypes = []
+        self.api.daylightSavingsTimeIndicator.restype = c_int
+        self.api.hour.argtypes = []
+        self.api.hour.restype = c_int
+        self.api.currentTime.argtypes = []
+        self.api.currentTime.restype = c_int
+        self.api.minutes.argtypes = []
+        self.api.minutes.restype = c_int
+        self.api.holidayIndex.argtypes = []
+        self.api.holidayIndex.restype = c_int
+        self.api.sunIsUp.argtypes = []
+        self.api.sunIsUp.restype = c_int
+        self.api.isRaining.argtypes = []
+        self.api.isRaining.restype = c_int
+        self.api.systemTimeStep.argtypes = []
+        self.api.systemTimeStep.restype = c_int
+        self.api.currentEnvironmentNum.argtypes = []
+        self.api.currentEnvironmentNum.restype = c_int
+        self.api.warmupFlag.argtypes = []
+        self.api.warmupFlag.restype = c_int
+        # there is also some special things that EMS exposed for convenience
+        self.api.getZoneIndex.argtypes = [c_char_p]
+        self.api.getZoneIndex.restype = c_int
+        self.api.getZoneFloorArea.argtypes = [c_int]
+        self.api.getZoneFloorArea.restype = RealEP
+        self.api.getZoneAirVolume.argtypes = [c_int]
+        self.api.getZoneAirVolume.restype = RealEP
+        self.api.getZoneMultiplier.argtypes = [c_int]
+        self.api.getZoneMultiplier.restype = RealEP
+        self.api.getZoneListMultiplier.argtypes = [c_int]
+        self.api.getZoneListMultiplier.restype = RealEP
         # these are only meaningful for Python Plugins, so they are declared here, but no Python functions wrap them
         self.api.getPluginGlobalVariableHandle.argtypes = [c_char_p]
         self.api.getPluginGlobalVariableHandle.restype = c_int
@@ -46,8 +88,7 @@ class DataTransfer:
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
-        Get a handle to an output variable in a running simulation.  For now, this variable *must* be defined as an
-        output variable in the input file being run.  In a future version, this restriction may be lifted.
+        Get a handle to an output variable in a running simulation.
 
         The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
         automatically converts values to upper-case when finding matches to internal variables in the simulation.
@@ -86,10 +127,7 @@ class DataTransfer:
 
     def get_actuator_handle(self, actuator_name: Union[str, bytes], actuator_key: Union[str, bytes]) -> int:
         """
-        Get a handle to an available actuator in a running simulation.  For now, there *must* be at least one EMS
-        related object in the IDF, even just an unused EMS global variable.  This is because the simulation skips much
-        EMS code for efficiency if no EMS objects are found in the IDF.  In a future version, this restriction may be
-        lifted.
+        Get a handle to an available actuator in a running simulation.
 
         The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
         automatically converts values to upper-case when finding matches to internal variables in the simulation.
@@ -143,3 +181,65 @@ class DataTransfer:
         :return: An integer response value for success of setting the actuator value, 0 is success, failure otherwise
         """
         return self.api.setActuatorValue(actuator_handle, actuator_value)
+
+    def year(self) -> int:
+        return self.api.year()
+
+    def month(self) -> int:
+        return self.api.month()
+
+    def day_of_month(self) -> int:
+        return self.api.dayOfMonth()
+
+    def day_of_week(self) -> int:
+        return self.api.dayOfWeek()
+
+    def day_of_year(self) -> int:
+        return self.api.dayOfYear()
+
+    def daylight_savings_time_indicator(self) -> int:
+        return self.api.daylightSavingsTimeIndicator()
+
+    def hour(self) -> int:
+        return self.api.hour()
+
+    def current_time(self) -> int:
+        return self.api.currentTime()
+
+    def minutes(self) -> int:
+        return self.api.minutes()
+
+    def holiday_index(self) -> int:
+        return self.api.holidayIndex()
+
+    def sun_is_up(self) -> int:
+        return self.api.sunIsUp()
+
+    def is_raining(self) -> int:
+        return self.api.isRaining()
+
+    def system_time_step(self) -> int:
+        return self.api.systemTimeStep()
+
+    def current_environment_num(self) -> int:
+        return self.api.currentEnvironmentNum()
+
+    def warmup_flag(self) -> int:
+        return self.api.warmupFlag()
+
+    def get_zone_index(self, zone_name: Union[str, bytes]) -> int:
+        if isinstance(zone_name, str):
+            zone_name = zone_name.encode('utf-8')
+        return self.get_zone_index(zone_name)
+
+    def get_zone_floor_area(self, zone_handle: int) -> float:
+        return self.api.getZoneFloorArea(zone_handle)
+
+    def get_zone_volume(self, zone_handle: int) -> float:
+        return self.api.getZoneAirVolume(zone_handle)
+
+    def get_zone_multiplier(self, zone_handle: int) -> float:
+        return self.api.getZoneMultiplier(zone_handle)
+
+    def get_zone_list_multiplier(self, zone_handle: int) -> float:
+        return self.api.getZoneListMultiplier(zone_handle)
