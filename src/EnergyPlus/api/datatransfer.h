@@ -83,7 +83,7 @@ ENERGYPLUSLIB_API int minutes();
 ENERGYPLUSLIB_API int holidayIndex();
 ENERGYPLUSLIB_API int sunIsUp();
 ENERGYPLUSLIB_API int isRaining();
-ENERGYPLUSLIB_API int systemTimeStep();
+ENERGYPLUSLIB_API Real64 systemTimeStep();
 ENERGYPLUSLIB_API int currentEnvironmentNum();
 ENERGYPLUSLIB_API int warmupFlag();
 

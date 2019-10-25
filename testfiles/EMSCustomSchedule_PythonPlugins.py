@@ -4,54 +4,39 @@ from pyenergyplus.plugin import EnergyPlusPlugin
 
 class HeatingSetPoint(EnergyPlusPlugin):
 
+    def __init__(self):
+        super().__init__()
+        self.handle = None
+
     def main(self) -> int:
-        handle = self.exchange.get_actuator_handle("Schedule Value", "HTGSETP_SCH")
+        if not self.handle:
+            self.handle = self.exchange.get_actuator_handle("Schedule Value", "HTGSETP_SCH")
         hour = self.exchange.hour()
-        day = self.exchange.day_of_week()
-        holiday = self.exchange.holiday_index()
-        day_of_year = self.exchange.day_of_year()
-        if day == 1:
-            self.exchange.set_actuator_value(handle, 15.6)
-        elif holiday == 3 and day_of_year == 21:
-            self.exchange.set_actuator_value(handle, 21)
-        elif hour < 5:
-            self.exchange.set_actuator_value(handle, 15.6)
-        elif 5 <= hour < 19 and 2 <= day <= 6:
-            self.exchange.set_actuator_value(handle, 21)
-        elif hour < 6 and day == 7:
-            self.exchange.set_actuator_value(handle, 15.6)
-        elif 6 <= hour < 17 and day == 7:
-            self.exchange.set_actuator_value(handle, 21)
-        elif 6 <= hour < 17 and day == 7:
-            self.exchange.set_actuator_value(handle, 15.6)
-        elif hour >= 19:
-            self.exchange.set_actuator_value(handle, 15.6)
+        if hour < 7:
+            self.exchange.set_actuator_value(self.handle, 15)
+        elif hour < 18:
+            self.exchange.set_actuator_value(self.handle, 23)
+        else:
+            self.exchange.set_actuator_value(self.handle, 15)
         return 0
 
 
 class CoolingSetPoint(EnergyPlusPlugin):
 
+    def __init__(self):
+        super().__init__()
+        self.handle = None
+
     def main(self) -> int:
-        handle = self.exchange.get_actuator_handle("Schedule Value", "CLGSETP_SCH")
+        if not self.handle:
+            self.handle = self.exchange.get_actuator_handle("Schedule Value", "CLGSETP_SCH")
         hour = self.exchange.hour()
-        day = self.exchange.day_of_week()
-        month = self.exchange.month()
-        day_of_month = self.exchange.day_of_month()
-        holiday = self.exchange.holiday_index()
-        if day == 1:
-            self.exchange.set_actuator_value(handle, 30)
-        elif holiday == 3 and day_of_month == 21 and month == 1:
-            self.exchange.set_actuator_value(handle, 30)
-        elif hour < 6:
-            self.exchange.set_actuator_value(handle, 30)
-        elif (6 <= hour < 22) and 2 <= day <= 6:
-            self.exchange.set_actuator_value(handle, 24)
-        elif 6 <= hour < 18 and day == 7:
-            self.exchange.set_actuator_value(handle, 24)
-        elif hour >= 6 and hour >= 18 and day == 7:
-            self.exchange.set_actuator_value(handle, 30)
-        elif hour > 22:
-            self.exchange.set_actuator_value(handle, 30)
+        if hour < 7:
+            self.exchange.set_actuator_value(self.handle, 29)
+        elif hour < 18:
+            self.exchange.set_actuator_value(self.handle, 25)
+        else:
+            self.exchange.set_actuator_value(self.handle, 29)
         return 0
 
 

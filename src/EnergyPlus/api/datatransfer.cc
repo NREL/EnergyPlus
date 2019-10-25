@@ -85,7 +85,7 @@ int getActuatorHandle(const char* type, const char* key) {
         handle++;
         std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
         std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
-        if (type == actuatorTypeUC && key == actuatorIDUC) {
+        if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC) {
             return handle;
         }
     }
@@ -180,7 +180,7 @@ int isRaining() {
         return 0;
     }
 }
-int systemTimeStep() {
+Real64 systemTimeStep() {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
 int currentEnvironmentNum() {

@@ -62,7 +62,7 @@ class DataTransfer:
         self.api.isRaining.argtypes = []
         self.api.isRaining.restype = c_int
         self.api.systemTimeStep.argtypes = []
-        self.api.systemTimeStep.restype = c_int
+        self.api.systemTimeStep.restype = RealEP
         self.api.currentEnvironmentNum.argtypes = []
         self.api.currentEnvironmentNum.restype = c_int
         self.api.warmupFlag.argtypes = []
@@ -218,7 +218,7 @@ class DataTransfer:
     def is_raining(self) -> int:
         return self.api.isRaining()
 
-    def system_time_step(self) -> int:
+    def system_time_step(self) -> float:
         return self.api.systemTimeStep()
 
     def current_environment_num(self) -> int:
@@ -230,7 +230,7 @@ class DataTransfer:
     def get_zone_index(self, zone_name: Union[str, bytes]) -> int:
         if isinstance(zone_name, str):
             zone_name = zone_name.encode('utf-8')
-        return self.get_zone_index(zone_name)
+        return self.api.getZoneIndex(zone_name)
 
     def get_zone_floor_area(self, zone_handle: int) -> float:
         return self.api.getZoneFloorArea(zone_handle)
