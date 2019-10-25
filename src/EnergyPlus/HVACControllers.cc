@@ -1322,6 +1322,31 @@ namespace HVACControllers {
                     // (i.e., reset MinAvailActuated based on Node%MassFlowRateMaxAvail)
                     ControllerProps(ControlNum).MinAvailActuated =
                         min(ControllerProps(ControlNum).MinAvailActuated, ControllerProps(ControlNum).MaxAvailActuated);
+
+                    // If the Node flow rate is zero (or just < MinAvail?), we override the min value to zero
+                    if (ControllerProps(ControlNum).ActuatedValue < ControllerProps(ControlNum).MinAvailActuated) {
+
+                        if (!WarmupFlag) {
+                            if (ControllerProps(ControlNum).MinFlowOverrideErrorIndex == 0) {
+                                ShowWarningError("Controller:WaterCoil '" + ControllerProps(ControlNum).ControllerName
+                                               + "', Minimum control flow is greater than requested flow rate:");
+                                ShowContinueError(" Minimum avail actuated=" + General::TrimSigDigits(ControllerProps(ControlNum).MinAvailActuated, NumSigDigits));
+                                ShowContinueError(" Node Mass Flow Rate=" + General::TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, NumSigDigits));
+                                ShowContinueError(" Resetting Mininimum Available Actuated to Node Flow. Check Inputs in Controller:WaterCoil.");
+                                ShowContinueErrorTimeStamp("");
+                            }
+                            ShowRecurringWarningErrorAtEnd("Controller:WaterCoil '" + ControllerProps(ControlNum).ControllerName
+                                    + "', Minimum control flow is greater than requested flow rate hand has been reset.",
+                                    ControllerProps(ControlNum).MinFlowOverrideErrorIndex,
+                                    ControllerProps(ControlNum).MinAvailActuated, // Report Max
+                                    ControllerProps(ControlNum).MinAvailActuated, // Report Min
+                                    _,             // Don't report Sum
+                                    "{kg/s}",         // Max Unit
+                                    "{kg/s}");        // Min Unit
+                        }
+
+                        ControllerProps(ControlNum).MinAvailActuated = ControllerProps(ControlNum).ActuatedValue;
+                    }
                 }
 
             } else {
