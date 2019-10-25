@@ -777,6 +777,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     EXPECT_EQ(thisController.NumCalcCalls, 5);
 
 }
+
 TEST_F(EnergyPlusFixture, HVACControllers_MinFlowNotZero)
 {
     std::string const idf_objects = delimited_string({
@@ -946,5 +947,41 @@ TEST_F(EnergyPlusFixture, HVACControllers_MinFlowNotZero)
       "   ** Warning ** Controller:WaterCoil, Minimum control flow is greater than zero which isn't recommended; CW COIL CONTROLLER",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+
+    int sensedNode = 1;
+    ControllerProps(1).SensedNode = sensedNode;
+    DataLoopNode::Node.allocate(20);
+    DataLoopNode::Node(sensedNode).Temp = 21.2;
+    DataLoopNode::Node(sensedNode).HumRatMax = 0.001;
+
+    // TODO: I am trying to trigger an iStatusErrorBracket in RootFinder but not managing to...
+    // Set a mass flow rate of that's isn't zero on the node, but which is below our controller's Min actuated flow
+    DataLoopNode::Node(sensedNode).MassFlowRate = 0.00001;
+
+    DataGlobals::WarmupFlag = false;
+
+    bool IsConvergedFlag = false;
+    ControllerProps(1).NumCalcCalls = 0;
+    InitController(1, IsConvergedFlag);
+
+    bool FirstHVACIteration = true;
+    bool IsUpToDateFlag = false;
+
+    CalcSimpleController(1, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerProps(1).ControllerName);
+    CalcSimpleController(1, FirstHVACIteration, IsConvergedFlag, IsUpToDateFlag, ControllerProps(1).ControllerName);
+
+    // SimAirServingZones::SimAirLoops(true, SimZoneEquipment);
+
+    const std::string error_string2 = delimited_string({
+      "   ** Warning ** Controller:WaterCoil 'CW COIL CONTROLLER', Minimum control flow is greater than requested flow rate:",
+      "   **   ~~~   **  Minimum avail actuated=9.998980000000000E-005",
+      "   **   ~~~   **  Node Mass Flow Rate=0.000000000000000",
+      "   **   ~~~   **  Resetting Mininimum Available Actuated to Node Flow. Check Inputs in Controller:WaterCoil.",
+      "   **   ~~~   **  Environment=RUN PERIOD 1, at Simulation time=01/01 00:00 - 00:15",
+      "   ** Warning ** Controller:WaterCoil, Minimum control flow is greater than zero which isn't recommended; CW COIL CONTROLLER",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
 }
+
 } // namespace EnergyPlus
