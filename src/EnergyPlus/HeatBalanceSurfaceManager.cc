@@ -6829,6 +6829,31 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
             }
+            // Set up coefficient arrays that never change
+            for (int SurfNum : HTNonWindowSurfs) {
+                int const ConstrNum = Surface(SurfNum).Construction;
+                auto const &construct(Construct(ConstrNum));
+                if (Surface(SurfNum).ExtBoundCond == SurfNum) {
+                    IsAdiabatic(SurfNum) = 1;
+                    IsNotAdiabatic(SurfNum) = 0;
+                } else {
+                    IsAdiabatic(SurfNum) = 0;
+                    IsNotAdiabatic(SurfNum) = 1;
+                }
+                if (construct.SourceSinkPresent) {
+                    IsSource(SurfNum) = 1;
+                    IsNotSource(SurfNum) = 0;
+                } else {
+                    QsrcHistSurf1(SurfNum) = 0.0;
+                    IsSource(SurfNum) = 0;
+                    IsNotSource(SurfNum) = 1;
+                }
+                if (!Surface(SurfNum).IsPool) {
+                    IsPoolSurf(SurfNum) = 0;
+                    IsNotPoolSurf(SurfNum) = 1;
+                }
+            }
+
             calcHeatBalanceInsideSurfFirstTime = false;
         }
         if (BeginEnvrnFlag && MyEnvrnFlag) {
@@ -6932,21 +6957,8 @@ namespace HeatBalanceSurfaceManager {
             CTFInside0(SurfNum) = construct.CTFInside(0);
             CTFSourceIn0(SurfNum) = construct.CTFSourceIn(0);
             TH11Surf(SurfNum) = TH(1, 1, SurfNum);
-            if (Surface(SurfNum).ExtBoundCond == SurfNum) {
-                IsAdiabatic(SurfNum) = 1;
-                IsNotAdiabatic(SurfNum) = 0;
-            } else { 
-                IsAdiabatic(SurfNum) = 0;
-                IsNotAdiabatic(SurfNum) = 1;
-            }
             if (construct.SourceSinkPresent) {
                 QsrcHistSurf1(SurfNum) = QsrcHist(SurfNum, 1);
-                IsSource(SurfNum) = 1;
-                IsNotSource(SurfNum) = 0;
-            } else {
-                QsrcHistSurf1(SurfNum) = 0.0;
-                IsSource(SurfNum) = 0;
-                IsNotSource(SurfNum) = 1;
             }
             if (Surface(SurfNum).IsPool) {
                 if ((std::abs(QPoolSurfNumerator(SurfNum)) >= SmallNumber) || (std::abs(PoolHeatTransCoefs(SurfNum)) >= SmallNumber)) {
@@ -6956,9 +6968,6 @@ namespace HeatBalanceSurfaceManager {
                     IsPoolSurf(SurfNum) = 0;
                     IsNotPoolSurf(SurfNum) = 1;
                 }
-            } else {
-                IsPoolSurf(SurfNum) = 0;
-                IsNotPoolSurf(SurfNum) = 1;
             }
 
             // Pre-calculate a few terms
