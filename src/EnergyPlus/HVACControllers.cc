@@ -1158,6 +1158,9 @@ namespace HVACControllers {
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
                 ShowFatalError("Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " +
                                ControllerProps(ControlNum).ControllerName);
+            } else if (ControllerProps(ControlNum).MinVolFlowActuated > 0) {
+                ShowWarningError("Controller:WaterCoil, Minimum control flow is greater than zero which isn't recommended; " +
+                                 ControllerProps(ControlNum).ControllerName);
             }
 
             // Setup root finder after sizing calculation
