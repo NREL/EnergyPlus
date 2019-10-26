@@ -444,14 +444,6 @@
     For: Sunday Holidays AllOtherDays, !- Field 16
     Until: 24:00,0.0;        !- Field 17
 
-  Schedule:Constant,HTGSETP_SCH,Temperature,21.0;
-
-  Output:Variable,HTGSETP_SCH,Schedule Value,hourly;
-
-  Output:Variable,CLGSETP_SCH,Schedule Value,hourly;
-
-  Schedule:Constant,CLGSETP_SCH,Temperature,24.0;
-
   Schedule:Compact,
     MinOA_Sched,             !- Name
     fraction,                !- Schedule Type Limits Name
@@ -4361,6 +4353,29 @@
     AstronomicalClock,       !- Control Option
     Exterior Facade Lighting;!- End-Use Subcategory
 
+  Schedule:Constant,HTGSETP_SCH,Temperature,21.0;
+
+  Schedule:Constant,CLGSETP_SCH,Temperature,24.0;
+
+  PythonPlugin:SearchPaths,
+    MySearchPaths,           !- Name
+    No,                      !- Add Current Working Directory to Search Path
+    Yes;                     !- Add Input File Directory to Search Path
+
+  PythonPlugin:Instance,
+    Heating Setpoint Override,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginCustomSchedule,  !- Python Module Name
+    HeatingSetPoint,         !- Plugin Class Name
+    BeginTimestepBeforePredictor;  !- Calling Point
+
+  PythonPlugin:Instance,
+    Cooling Setpoint Override,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginCustomSchedule,  !- Python Module Name
+    CoolingSetPoint,         !- Plugin Class Name
+    BeginTimestepBeforePredictor;         !- Calling Point
+
   Output:Surfaces:Drawing,DXF;
 
   Output:Surfaces:List,Details;
@@ -4384,44 +4399,6 @@
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
-  PythonPlugin:SearchPaths,
-    MySearchPaths,     !- Name
-    No,                !- Add Current Working Directory to Search Path
-    Yes;               !- Add Input File Directory to Search Path
+  Output:Variable,HTGSETP_SCH,Schedule Value,hourly;
 
-  PythonPlugin:Instance,
-    Heating Setpoint Override,         !- Name
-    Yes,                !- Run During Warmup Days
-    EMSCustomSchedule_PythonPlugins, !- Python Module Name
-    HeatingSetPoint,          !- Plugin Class Name
-    BeginTimestepBeforePredictor;         !- Calling Point
-
-  PythonPlugin:Instance,
-    Cooling Setpoint Override,         !- Name
-    Yes,                !- Run During Warmup Days
-    EMSCustomSchedule_PythonPlugins, !- Python Module Name
-    CoolingSetPoint,          !- Plugin Class Name
-    BeginTimestepBeforePredictor;         !- Calling Point
-
-  PythonPlugin:Instance,
-    Average Zone Temp Calculation,         !- Name
-    Yes,                !- Run During Warmup Days
-    EMSCustomSchedule_PythonPlugins, !- Python Module Name
-    AverageZoneTemps,          !- Plugin Class Name
-    EndOfZoneTimestepBeforeZoneReporting;         !- Calling Point
-
-  PythonPlugin:Variables,
-    MyGlobalVariables, !- Name
-    AverageBuildingTemp; !- Variable Name 1
-
-  PythonPlugin:OutputVariable,
-    Averaged Building Temperature,  !- Name
-    AverageBuildingTemp, !- PythonPlugin:Variable Name
-    Averaged,          !- Type of Data in Variable
-    ZoneTimestep,      !- Update Frequency
-    C;                 !- Units
-
-  Output:Variable,
-    Averaged Building Temperature,
-    PythonPlugin:OutputVariable,
-    Hourly;
+  Output:Variable,CLGSETP_SCH,Schedule Value,hourly;
