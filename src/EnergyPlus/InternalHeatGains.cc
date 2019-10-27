@@ -6422,7 +6422,7 @@ namespace InternalHeatGains {
             ZoneITEq(Loop).AirMassFlow = AirMassFlowRate;
             ZoneITEq(Loop).AirInletDryBulbT = TAirIn;
             ZoneITEq(Loop).AirInletDewpointT = TDPAirIn;
-            ZoneITEq(Loop).AirInletRelHum = RHAirIn;
+            ZoneITEq(Loop).AirInletRelHum = RHAirIn * 100.0;
             ZoneITEq(Loop).AirOutletDryBulbT = TAirOut;
             ZoneITEq(Loop).SHI = SupplyHeatIndex;
 
