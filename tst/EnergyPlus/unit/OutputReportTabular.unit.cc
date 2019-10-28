@@ -7667,14 +7667,14 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     OutputReportTabular::WriteTabularFiles = true;
 
     SetupUnitConversions();
-    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleJtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     SetPredefinedTables();
 
-    Real64 extLitUse;
+    Real64 extLitUse = 1e8;
 
     SetupOutputVariable("Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
@@ -7722,39 +7722,37 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     GetInputOutputTableSummaryReports();
 
-    extLitUse = 1.01;
-
     DataEnvironment::Month = 12;
 
     UpdateMeterReporting();
     UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights));
+    EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
     // General
-    EXPECT_EQ(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_EQ(extLitUse * 1, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 1, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
     UpdateMeterReporting();
     UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights));
+    EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
     // General
-    EXPECT_EQ(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_EQ(extLitUse * 2, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
     UpdateMeterReporting();
     UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    EXPECT_EQ(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights));
+    EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
     // General
-    EXPECT_EQ(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_EQ(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1));
+    EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
     OutputReportTabular::WriteBEPSTable();
     OutputReportTabular::WriteDemandEndUseSummary();
@@ -7764,6 +7762,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
 
+    std::string endUseName = "Exterior Lighting";
+    std::string endUseSubCategoryName = "AnotherEndUseSubCat";
 
     for (auto& reportName: testReportNames) {
 
@@ -7771,13 +7771,89 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  WHERE TableName = 'End Uses By Subcategory'"
                           "  AND ColumnName = 'Subcategory'"
                           "  AND ReportName = '" + reportName + "'"
-                          "  AND Value = 'AnotherEndUseSubCat'");
+                          "  AND Value = '" + endUseSubCategoryName + "'");
 
         auto result = queryResult(query, "TabularDataWithStrings");
 
         ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
 
         // Add informative message if failed
-        EXPECT_EQ("Exterior Lighting", result[0][0]) << "Failed for reportName=" << reportName;
+        EXPECT_EQ(endUseName, result[0][0]) << "Failed for reportName=" << reportName;
     }
+
+    // Here's a demonstration of how the new format of the table could help in querying for a specific end use only, which was impossible before
+    // Here I'm returning ALL entries that belong to a specific end use (one row for each resource (fuel) type)
+
+    {
+        auto result = queryResult(
+                "SELECT * FROM TabularDataWithStrings"
+                "  WHERE TableName = 'End Uses By Subcategory'"
+                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "  AND RowName = '" + endUseName + "'"
+                "  AND (TabularDataIndex - (SELECT TabularDataIndex FROM TabularDataWithStrings"
+                "                              WHERE TableName = 'End Uses By Subcategory'"
+                "                              AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "                              AND ColumnName = 'Subcategory'"
+                "                              AND RowName = '" + endUseName + "'"
+                "                              AND Value = '" + endUseSubCategoryName + "'))"
+                "       % (SELECT COUNT(Value) FROM TabularDataWithStrings"
+                "            WHERE TableName = 'End Uses By Subcategory'"
+                "            AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "            AND ColumnName = 'Subcategory') = 0",
+                "TabularDataWithStrings");
+        ASSERT_EQ(7u, result.size());
+    }
+
+    {
+        // Since the above is a bit dense, let's break it down
+        // We get the First TabularDataIndex for our end use subcategory
+        // We also get the number of subcategories
+        // We seek (TabularDataIndex - startIndex) % nCats == 0
+        std::string startIndexQuery(
+            "SELECT TabularDataIndex FROM TabularDataWithStrings"
+            "  WHERE TableName = 'End Uses By Subcategory'"
+            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+            "  AND ColumnName = 'Subcategory'"
+            "  AND RowName = '" + endUseName + "'"
+            "  AND Value = '" + endUseSubCategoryName + "'"
+        );
+
+        Real64 return_val = execAndReturnFirstDouble(startIndexQuery);
+        int startIndex = static_cast<int>(return_val);
+
+        std::string nEndUseSubCatsQuery(
+            "SELECT COUNT(Value) FROM TabularDataWithStrings"
+            "  WHERE TableName = 'End Uses By Subcategory'"
+            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+            "  AND ColumnName = 'Subcategory'"
+        );
+        return_val = execAndReturnFirstDouble(nEndUseSubCatsQuery);
+        int nEndUseSubCats = static_cast<int>(return_val);
+
+        std::string query(
+            "SELECT * FROM TabularDataWithStrings"
+            "  WHERE TableName = 'End Uses By Subcategory'"
+            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+            "  AND RowName = '" + endUseName + "'" // Purely optional here...
+            "  AND (TabularDataIndex - " + std::to_string(startIndex) + ") % " + std::to_string(nEndUseSubCats) + " = 0"
+        );
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(7u, result.size()) << "Failed for query: " << query;
+
+        // Now specifically get the electricity one, and make sure it's the right number that's returned
+        query = (
+            "SELECT Value FROM TabularDataWithStrings"
+            "  WHERE TableName = 'End Uses By Subcategory'"
+            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+            "  AND RowName = '" + endUseName + "'"
+            "  AND ColumnName = 'Electricity'"
+            "  AND (TabularDataIndex - " + std::to_string(startIndex) + ") % " + std::to_string(nEndUseSubCats) + " = 0"
+        );
+        return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+
+
+    }
+
 }
