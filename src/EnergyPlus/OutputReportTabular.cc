@@ -8565,6 +8565,11 @@ namespace OutputReportTabular {
             if (displayTabularBEPS) {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
+
+                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // for better sql queries
+                FillRowHead(rowHead);
+
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
@@ -9893,6 +9898,9 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+
+            // Forward-Fill the blanks in the rowHead for better sql queries
+            FillRowHead(rowHead);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
@@ -15147,6 +15155,20 @@ namespace OutputReportTabular {
                 if (Zone(iZone).SystemZoneNodeNumber > 0) {
                     buildingConditionedFloorArea += curZoneArea;
                 }
+            }
+        }
+    }
+
+    void FillRowHead(Array1D_string & rowHead)
+    {
+        // Forward fill the blanks in rowHead (eg End use column)
+        std::string currentEndUseName;
+        for (size_t i = 1; i <= rowHead.size(); ++i) {
+            std::string thisEndUseName = rowHead(i);
+            if (thisEndUseName.empty()) {
+                rowHead(i) = currentEndUseName;
+            } else {
+                currentEndUseName = thisEndUseName;
             }
         }
     }

@@ -890,6 +890,10 @@ namespace OutputReportTabular {
 
     void DetermineBuildingFloorArea();
 
+    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+     * This routine will fill up the blanks for output to Sql in particular */
+    void FillRowHead(Array1D_string & rowHead);
+
     //======================================================================================================================
     //======================================================================================================================
 
