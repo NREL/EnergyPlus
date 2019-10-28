@@ -14,11 +14,11 @@ a) change "Gas" or "Natural Gas" to "NaturalGas"
 
 b) change "Electric" or "Elec" to "Electricity"
 
-c) change "Fuel Oil #1" or "Fuel Oil" or "Distillate Oil" to "FuelOil#1"
+c) change "FuelOil#1" or "Fuel Oil #1" or "Fuel Oil" or "Distillate Oil" to "FuelOil1"
 
-d) change "Fuel Oil #2" or "Residual Oil" to "FuelOil#2"
+d) change "FuelOil#2" or "Fuel Oil #2" or "Residual Oil" to "FuelOil2"
 
-e) change "Propane" or "LPG" or "Propane Gas" to "PropaneGas"
+e) change "PropaneGas" or "LPG" or "Propane Gas" to "Propane"
 
 *EXCEPT for FuelFactors, change to "Propane" (for now, until 5941 is done)*
 

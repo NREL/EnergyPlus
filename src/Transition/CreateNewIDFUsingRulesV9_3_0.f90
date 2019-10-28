@@ -1204,25 +1204,29 @@ SUBROUTINE FixFuelTypes(InOutArg)
     InOutArg = 'NaturalGas'
   ELSE IF (SameString( InOutArg, 'Natural Gas' )) THEN
     InOutArg = 'NaturalGas'
-  ELSE IF (SameString( InOutArg, 'Propane' )) THEN
-    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'PropaneGas' )) THEN
+    InOutArg = 'Propane'
   ELSE IF (SameString( InOutArg, 'LPG' )) THEN
-    InOutArg = 'PropaneGas'
+    InOutArg = 'Propane'
   ELSE IF (SameString( InOutArg, 'Propane Gas' )) THEN
-    InOutArg = 'PropaneGas'
+    InOutArg = 'Propane'
+  ELSE IF (SameString( InOutArg, 'FUELOIL#1' )) THEN
+    InOutArg = 'FuelOil1'
   ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
-    InOutArg = 'FuelOil#1'
+    InOutArg = 'FuelOil1'
   ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
-    InOutArg = 'FuelOil#1'
+    InOutArg = 'FuelOil1'
   ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
-    InOutArg = 'FuelOil#1'
+    InOutArg = 'FuelOil1'
   ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
-    InOutArg = 'FuelOil#1'
+    InOutArg = 'FuelOil1'
+  ELSE IF (SameString( InOutArg, 'FUELOIL#2' )) THEN
+    InOutArg = 'FuelOil2'
   ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
-    InOutArg = 'FuelOil#2'
+    InOutArg = 'FuelOil2'
   ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
-    InOutArg = 'FuelOil#2'
+    InOutArg = 'FuelOil2'
   ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
-    InOutArg = 'FuelOil#2'
+    InOutArg = 'FuelOil2'
   END IF
 END SUBROUTINE
