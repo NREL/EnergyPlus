@@ -28,7 +28,7 @@
 ! People:                         None
 ! Lights(Exterior only):          Exterior Lights and Equipment, always "on".
 !                                 Lights configured in two ways: by schedule and by astronomical clock.
-! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOil#1, FuelOil#2, Coal,
+! Exterior Equipment              Lights (2000W), Fuel (1 of each kind, NaturalGas, FuelOil1, FuelOil2, Coal,
 !                                                 LPG, Water, always "on", 1000 units).
 !                                 Also Water Eq 10000 units, always "on"
 ! Windows:                        None
@@ -212,19 +212,19 @@
 
   Exterior:FuelEquipment,
     OutsideFuelOil1Eq,       !- Name
-    FuelOil#1,               !- Fuel Use Type
+    FuelOil1,                !- Fuel Use Type
     ON,                      !- Schedule Name
     1000;                    !- Design Level {W}
 
   Exterior:FuelEquipment,
     OutsideFuelOil2Eq,       !- Name
-    FuelOil#2,               !- Fuel Use Type
+    FuelOil2,                !- Fuel Use Type
     ON,                      !- Schedule Name
     1000;                    !- Design Level {W}
 
   Exterior:FuelEquipment,
     OutsideLPGEq,            !- Name
-    PropaneGas,              !- Fuel Use Type
+    Propane,                 !- Fuel Use Type
     ON,                      !- Schedule Name
     1000;                    !- Design Level {W}
 
