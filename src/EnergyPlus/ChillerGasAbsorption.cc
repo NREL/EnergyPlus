@@ -492,13 +492,13 @@ namespace ChillerGasAbsorption {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     GasAbsorber(AbsorberNum).FuelType = "Gasoline";
 
-                } else if (SELECT_CASE_var == "FUELOIL#1") {
+                } else if (SELECT_CASE_var == "FUELOIL1") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#1";
 
-                } else if (SELECT_CASE_var == "FUELOIL#2") {
+                } else if (SELECT_CASE_var == "FUELOIL2") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#2";
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     GasAbsorber(AbsorberNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -511,7 +511,7 @@ namespace ChillerGasAbsorption {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                     ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
                     ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil1, FuelOil2,OtherFuel1 or OtherFuel2");
                     Get_ErrorsFound = true;
                 }
             }

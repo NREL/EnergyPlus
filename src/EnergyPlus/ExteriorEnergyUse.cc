@@ -549,10 +549,10 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
             FuelTypeNumber = CoalUse;
             FuelTypeString = "Coal";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil#1")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil1")) {
             FuelTypeNumber = FuelOil1Use;
             FuelTypeString = "FuelOil#1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "PropaneGas")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
             FuelTypeNumber = PropaneUse;
             FuelTypeString = "Propane";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
@@ -561,7 +561,7 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
             FuelTypeNumber = DieselUse;
             FuelTypeString = "Diesel";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil#2")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil2")) {
             FuelTypeNumber = FuelOil2Use;
             FuelTypeString = "FuelOil#2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {

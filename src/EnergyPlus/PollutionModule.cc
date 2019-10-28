@@ -841,7 +841,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if (SELECT_CASE_var == "FUELOIL#2") {
+                } else if (SELECT_CASE_var == "FUELOIL2") {
                     if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -935,7 +935,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
                     }
 
-                } else if (SELECT_CASE_var == "FUELOIL#1") {
+                } else if (SELECT_CASE_var == "FUELOIL1") {
                     if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");

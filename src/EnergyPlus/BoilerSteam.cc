@@ -228,15 +228,15 @@ namespace BoilerSteam {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
-                } else if (SELECT_CASE_var == "FUELOIL#1") {
+                } else if (SELECT_CASE_var == "FUELOIL1") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
-                } else if (SELECT_CASE_var == "FUELOIL#2") {
+                } else if (SELECT_CASE_var == "FUELOIL2") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 

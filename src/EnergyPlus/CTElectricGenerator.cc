@@ -390,13 +390,13 @@ namespace CTElectricGenerator {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     CTGenerator(GeneratorNum).FuelType = "Gasoline";
 
-                } else if (SELECT_CASE_var == "FUELOIL#1") {
+                } else if (SELECT_CASE_var == "FUELOIL1") {
                     CTGenerator(GeneratorNum).FuelType = "FuelOil#1";
 
-                } else if (SELECT_CASE_var == "FUELOIL#2") {
+                } else if (SELECT_CASE_var == "FUELOIL2") {
                     CTGenerator(GeneratorNum).FuelType = "FuelOil#2";
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     CTGenerator(GeneratorNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
