@@ -252,7 +252,7 @@
 !
 
   FuelFactors,
-    FuelOil#1,               !- Existing Fuel Resource Name
+    FuelOil1,                !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
@@ -297,7 +297,7 @@
 !
 
   FuelFactors,
-    FuelOil#2,               !- Existing Fuel Resource Name
+    FuelOil2,                !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
