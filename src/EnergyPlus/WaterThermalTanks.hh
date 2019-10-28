@@ -448,6 +448,8 @@ namespace WaterThermalTanks {
         std::string InletNodeName2;
         std::string OutletNodeName2;
 
+        bool myOneTimeInitFlag;
+
         // Default Constructor
         WaterThermalTankData()
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
@@ -481,11 +483,13 @@ namespace WaterThermalTanks {
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
               ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0), FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true),
               MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), MyOneTimeSetupFlag(true), AlreadyReported(false), AlreadyRated(false),
-              MyHPSizeFlag(true), CheckWTTEquipName(true)
+              MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true)
         {
         }
 
         static PlantComponent *factory(std::string const &objectName);
+
+        void setupOutputVariables();
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -678,6 +682,8 @@ namespace WaterThermalTanks {
         std::string InletNodeName2;
         std::string OutletNodeName2;
 
+        bool myOneTimeInitFlag;
+
         // end of variables for variable-speed HPWH
 
         // Default Constructor
@@ -702,7 +708,7 @@ namespace WaterThermalTanks {
                   AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
                   HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
                   MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false),
-                  MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true)
+                  MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
 
