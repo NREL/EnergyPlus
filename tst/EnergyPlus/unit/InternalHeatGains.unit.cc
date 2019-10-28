@@ -51,21 +51,21 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplacementVentMgr.hh>
-#include <ExteriorEnergyUse.hh>
-#include <HVACManager.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HeatBalanceManager.hh>
-#include <InternalHeatGains.hh>
-#include <OutputReportTabular.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

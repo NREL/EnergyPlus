@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -71,7 +71,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <General.hh>
+#include <EnergyPlus/General.hh>
 #include <ObjexxFCL/gio.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

@@ -58,7 +58,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
-#include <DataPlant.hh>
+#include <EnergyPlus/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;

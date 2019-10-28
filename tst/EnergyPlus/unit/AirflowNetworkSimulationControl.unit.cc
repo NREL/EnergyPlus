@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <AirflowNetwork/Elements.hpp>
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>

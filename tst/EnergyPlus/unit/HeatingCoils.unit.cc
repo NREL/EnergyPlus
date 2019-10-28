@@ -53,11 +53,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <Psychrometrics.hh>
-#include <DataEnvironment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <gtest/gtest.h>
 
 namespace EnergyPlus {

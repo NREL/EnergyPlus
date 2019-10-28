@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

@@ -56,14 +56,14 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <ConductionTransferFunctionCalc.hh>
-#include <DataConversions.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/DataConversions.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

@@ -52,7 +52,7 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
