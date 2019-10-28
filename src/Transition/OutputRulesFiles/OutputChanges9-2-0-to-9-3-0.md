@@ -12,3 +12,29 @@ This will eventually become a more structured file, but currently it isn't clear
 A new column "Peak Load Type to Size On" has been added to the `Coil Sizing Details:Coils` report
 
 See [7397](https://github.com/NREL/EnergyPlus/pull/7397)
+
+### End Use By Subcategory in SQL
+
+In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
+the tables `TableName = "End Uses by Subcategory"` no longer have blank `RowName` corresponding to the End Use (eg: Heating, Interior Lighting, etc) for additional End Use Subcategories.
+This will allow querying a specific End Use Subcategory in the SQL file.
+
+Example SQL Query to return all rows (one row per fuel type) for End Use "Interior Lighting", Sucategory "GeneralLights":
+```
+SELECT * FROM TabularDataWithStrings
+  WHERE TableName = "End Uses By Subcategory"
+  AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
+  AND RowName = "Interior Lighting"
+  AND (TabularDataIndex - (SELECT TabularDataIndex FROM TabularDataWithStrings
+                              WHERE TableName = "End Uses By Subcategory"
+                              AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
+                              AND ColumnName = "Subcategory"
+                              AND RowName = "Interior Lighting"
+                              AND Value = "GeneralLights"))
+      % (SELECT COUNT(Value) FROM TabularDataWithStrings
+                              WHERE TableName = "End Uses By Subcategory"
+                              AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
+                              AND ColumnName = "Subcategory")
+```
+
+See [PR#7584](https://github.com/NREL/EnergyPlus/pull/7584).
