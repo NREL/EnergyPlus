@@ -13,32 +13,19 @@ class AverageZoneTemps(EnergyPlusPlugin):
 
     def main(self) -> int:
         if self.one_time:
-            perimeter_zone_1_handle = self.exchange.get_zone_index("perimeter_zn_1")
-            self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_1_handle))
-            perimeter_zone_2_handle = self.exchange.get_zone_index("perimeter_zn_2")
-            self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_2_handle))
-            perimeter_zone_3_handle = self.exchange.get_zone_index("perimeter_zn_3")
-            self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_3_handle))
-            perimeter_zone_4_handle = self.exchange.get_zone_index("perimeter_zn_4")
-            self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_4_handle))
-            core_zone = self.exchange.get_zone_index("core_zn")
-            self.zone_volumes.append(self.exchange.get_zone_volume(core_zone))
-            self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_zn_1"))
-            self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_zn_2"))
-            self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_zn_3"))
-            self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", "Perimeter_zn_4"))
-            self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", "Core_Zn"))
+            zone_names = ["perimeter_zn_" + str(i) for i in range(1, 5)] + ["core_zn"]
+            for zone_name in zone_names:
+                handle = self.exchange.get_zone_index(zone_name)
+                self.zone_volumes.append(self.exchange.get_zone_volume(handle))
+                self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", zone_name))
             self.avg_temp_variable_handle = self.helpers.get_global_handle("AverageBuildingTemp")
             self.one_time = False
         zone_temps = list()
-        zone_temps.append(self.exchange.get_variable_value(self.t_handles[0]))
-        zone_temps.append(self.exchange.get_variable_value(self.t_handles[1]))
-        zone_temps.append(self.exchange.get_variable_value(self.t_handles[2]))
-        zone_temps.append(self.exchange.get_variable_value(self.t_handles[3]))
-        zone_temps.append(self.exchange.get_variable_value(self.t_handles[4]))
+        for t_handle in self.t_handles:
+            zone_temps.append(self.exchange.get_variable_value(t_handle))
         numerator = 0.0
         denominator = 0.0
-        for i in [0, 1, 2, 3, 4]:
+        for i in range(5):
             numerator += self.zone_volumes[i] * zone_temps[i]
             denominator += self.zone_volumes[i]
         average_temp = numerator / denominator
