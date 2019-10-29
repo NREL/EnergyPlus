@@ -15,7 +15,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
         if self.one_time:
             zone_names = ["perimeter_zn_" + str(i) for i in range(1, 5)] + ["core_zn"]
             for zone_name in zone_names:
-                handle = self.exchange.get_zone_index(zone_name)
+                handle = self.exchange.get_internal_variable_handle("Zone Floor Area", zone_name)
                 self.zone_volumes.append(self.exchange.get_zone_volume(handle))
                 self.t_handles.append(self.exchange.get_variable_handle("Zone Mean Air Temperature", zone_name))
             self.avg_temp_variable_handle = self.helpers.get_global_handle("AverageBuildingTemp")

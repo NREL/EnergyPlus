@@ -67,17 +67,10 @@ class DataTransfer:
         self.api.currentEnvironmentNum.restype = c_int
         self.api.warmupFlag.argtypes = []
         self.api.warmupFlag.restype = c_int
-        # there is also some special things that EMS exposed for convenience
-        self.api.getZoneIndex.argtypes = [c_char_p]
-        self.api.getZoneIndex.restype = c_int
-        self.api.getZoneFloorArea.argtypes = [c_int]
-        self.api.getZoneFloorArea.restype = RealEP
-        self.api.getZoneAirVolume.argtypes = [c_int]
-        self.api.getZoneAirVolume.restype = RealEP
-        self.api.getZoneMultiplier.argtypes = [c_int]
-        self.api.getZoneMultiplier.restype = RealEP
-        self.api.getZoneListMultiplier.argtypes = [c_int]
-        self.api.getZoneListMultiplier.restype = RealEP
+        self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
+        self.api.getInternalVariableHandle.restype = c_int
+        self.api.getInternalVariableValue.argtypes = [c_int]
+        self.api.getInternalVariableValue.restype = RealEP
         # these are only meaningful for Python Plugins, so they are declared here, but no Python functions wrap them
         self.api.getPluginGlobalVariableHandle.argtypes = [c_char_p]
         self.api.getPluginGlobalVariableHandle.restype = c_int
@@ -182,6 +175,16 @@ class DataTransfer:
         """
         return self.api.setActuatorValue(actuator_handle, actuator_value)
 
+    def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+        if isinstance(variable_type, str):
+            variable_type = variable_type.encode('utf-8')
+        if isinstance(variable_key, str):
+            variable_key = variable_key.encode('utf-8')
+        return self.api.getActuatorHandle(variable_type, variable_key)
+
+    def get_internal_variable_value(self, variable_handle: int):
+        return self.api.getInternalVariableValue(variable_handle)
+
     def year(self) -> int:
         return self.api.year()
 
@@ -226,20 +229,3 @@ class DataTransfer:
 
     def warmup_flag(self) -> int:
         return self.api.warmupFlag()
-
-    def get_zone_index(self, zone_name: Union[str, bytes]) -> int:
-        if isinstance(zone_name, str):
-            zone_name = zone_name.encode('utf-8')
-        return self.api.getZoneIndex(zone_name)
-
-    def get_zone_floor_area(self, zone_handle: int) -> float:
-        return self.api.getZoneFloorArea(zone_handle)
-
-    def get_zone_volume(self, zone_handle: int) -> float:
-        return self.api.getZoneAirVolume(zone_handle)
-
-    def get_zone_multiplier(self, zone_handle: int) -> float:
-        return self.api.getZoneMultiplier(zone_handle)
-
-    def get_zone_list_multiplier(self, zone_handle: int) -> float:
-        return self.api.getZoneListMultiplier(zone_handle)

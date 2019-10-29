@@ -131,6 +131,35 @@ void setPluginGlobalVariableValue(int handle, Real64 value) {
 }
 
 
+int getInternalVariableHandle(const char* type, const char* key) {
+    int handle;
+    handle = 0;
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) {
+        handle++;
+        std::string const variableTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.DataTypeName);
+        std::string const variableIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.UniqueIDName);
+        if (typeUC == variableTypeUC && keyUC == variableIDUC) {
+            return handle;
+        }
+    }
+    return 0;
+}
+
+Real64 getInternalVariableValue(int handle) {
+    if (handle == 0) {
+        return 1;
+    }
+    auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
+    if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
+        return thisVar.RealValue();
+    } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrInteger) {
+        return (Real64)thisVar.IntValue();
+    } // Doesn't look like this struct actually has a logical member type, so skipping that
+    return 1;
+}
+
 int year() {
     return EnergyPlus::DataEnvironment::Year;
 }
@@ -188,31 +217,4 @@ int currentEnvironmentNum() {
 }
 int warmupFlag() {
     return EnergyPlus::DataGlobals::WarmupFlag;
-}
-
-int getZoneIndex(const char* zoneName) {
-    std::string searchNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(zoneName);
-    for (int zoneNum = 1; zoneNum <= EnergyPlus::DataGlobals::NumOfZones; ++zoneNum) {
-        std::string thisZoneNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(EnergyPlus::DataHeatBalance::Zone(zoneNum).Name);
-        if (thisZoneNameUC == searchNameUC) {
-            return zoneNum;
-        }
-    }
-    return -1;
-}
-Real64 getZoneFloorArea(int const zoneHandle) {
-    // add error handling
-    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).FloorArea;
-}
-Real64 getZoneAirVolume(int const zoneHandle) {
-// add error handling
-    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).Volume;
-}
-Real64 getZoneMultiplier(int const zoneHandle) {
-// add error handling
-    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).Multiplier;
-}
-Real64 getZoneListMultiplier(int const zoneHandle) {
-// add error handling
-    return EnergyPlus::DataHeatBalance::Zone(zoneHandle).ListMultiplier;
 }
