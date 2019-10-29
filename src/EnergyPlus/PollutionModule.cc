@@ -2038,7 +2038,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if (SELECT_CASE_var == "FUELOIL#2") {
+                } else if (SELECT_CASE_var == "FUELOIL2") {
                     // Pollutants from FuelOil#2
                     SetupOutputVariable("Environmental Impact Fuel Oil #2 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2228,7 +2228,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if (SELECT_CASE_var == "FUELOIL#1") {
+                } else if (SELECT_CASE_var == "FUELOIL1") {
                     // Pollutants from FuelOil#1
                     SetupOutputVariable("Environmental Impact Fuel Oil #1 Source Energy",
                                         OutputProcessor::Unit::J,
