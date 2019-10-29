@@ -3,7 +3,6 @@ from pyenergyplus.api import EnergyPlusAPI
 
 
 api = EnergyPlusAPI()
-runtime = api.runtime()
 
 
 def hour_handler():
@@ -11,5 +10,5 @@ def hour_handler():
     sys.stdout.flush()
 
 
-runtime.register_callback_end_zone_timestep_after_zone_reporting(hour_handler)
-runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
+api.runtime.callback_end_zone_timestep_after_zone_reporting(hour_handler)
+api.runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))

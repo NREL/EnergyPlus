@@ -9,7 +9,10 @@ class DataExchange:
     "sensor" data.  A client should get a handle (integer) using one of the worker methods then make calls to get data
     using that handle.  Some specific variables in EnergyPlus are controllable as actuators.  These work the same way,
     in that a client should get an integer handle to an actuator and then use the workers to set the value on the
-    actuator.
+    actuator.  There are also some static data members in EnergyPlus that are exposed as "internal" variables.  These
+    variables hold static data such as zone floor area and volume, so they do not change during a simulation, but are
+    constant once they are assigned.  Even with this difference, the variables are still handled the same way, by
+    getting an integer handle and then accessing the data using that handle.
 
     This data transfer class is used in one of two workflows:
 
@@ -20,6 +23,10 @@ class DataExchange:
       this case, the plugin may need access to state data to make control decisions, and this class enables that.  The
       plugin base class automatically creates an instance of this class, so client plugins that inherit that class will
       have a `self.transfer` instance of this class available, and should *not* attempt to create another one.
+
+    In the Python Plugin case, the client Python code may make use of the methods to get/set plugin global variables,
+    but only in the Python Plugin cases.  For the outside tool API usage, plugin global variables are not available, and
+    data should be shared in the outside calling code.
     """
 
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):

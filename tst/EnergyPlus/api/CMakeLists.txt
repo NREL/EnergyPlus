@@ -18,17 +18,17 @@ set(API_TEST_TARGET_DIR "${CMAKE_BINARY_DIR}/Products")
 # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
 if (NOT MSVC)
 configure_file( "${API_TEST_SRC_DIR}/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py" )
-add_test(NAME "API.TestFunctionalPy"
+add_test(NAME "API.TestFunctionalPython"
         COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
         WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
 configure_file( "${API_TEST_SRC_DIR}/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
-add_test(NAME "API.TestRuntimePy"
+add_test(NAME "API.TestRuntimePython"
         COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py"
         WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
 configure_file( "${API_TEST_SRC_DIR}/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
-add_test(NAME "API.TestDataTransferPy"
+add_test(NAME "API.TestDataTransferPython"
         COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py"
         WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 endif()

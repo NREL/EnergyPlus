@@ -54,8 +54,8 @@
 void afterZoneTimeStepHandler()
 {
     printf("STARTING A NEW ENVIRONMENT\n");
-    int kindOfSim = simDataGetKindOfSim();
-    switch (kindOfSim) {
+    int thisKindOfSim = kindOfSim();
+    switch (thisKindOfSim) {
     case 1:
         // design day
         printf("ITS A DESIGN DAY!\n");
@@ -78,7 +78,7 @@ void afterZoneTimeStepHandler()
         printf("UNKNOWN ENVIRONMENT\n");
         // what?
     }
-    if (kindOfSim == 2 || kindOfSim == 3) {
+    if (thisKindOfSim == 2 || thisKindOfSim == 3) {
         int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
         int response = setActuatorValue(outdoorDewPointActuator, -25);
         if (response != 0) {
@@ -95,7 +95,15 @@ void afterZoneTimeStepHandler()
 
 
 int main() {
-    registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-    energyplus("/tmp/epdll");
+    callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
+    const int argc = 6;
+    const char * argv[argc];
+    argv[0] = "energyplus";
+    argv[1] = "-d";
+    argv[2] = "/tmp/epdll";
+    argv[3] = "-w";
+    argv[4] = "/tmp/epdll/in.epw";
+    argv[5] = "/tmp/epdll/in.idf";
+    energyplus(argc, argv);
     return 0;
 }

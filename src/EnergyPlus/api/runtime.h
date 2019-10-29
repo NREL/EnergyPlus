@@ -61,23 +61,23 @@ ENERGYPLUSLIB_API void cRuntimeNoOp();
     // Program level functions
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
 
-ENERGYPLUSLIB_API void registerCallbackFromBeginNewEnvironment(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromAfterNewEnvironmentWarmupComplete(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromBeginZoneTimeStepBeforeInitHeatBalance(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromBeginZoneTimeStepAfterInitHeatBalance(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromBeginTimeStepBeforePredictor(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromAfterPredictorBeforeHVACManagers(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromAfterPredictorAfterHVACManagers(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromInsideSystemIterationLoop(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneTimeStepBeforeZoneReporting(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneTimeStepAfterZoneReporting(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemTimeStepBeforeHVACReporting(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemTimeStepAfterHVACReporting(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfZoneSizing(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfSystemSizing(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromEndOfAfterComponentGetInput(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromUserDefinedComponentModel(void (*f)());
-ENERGYPLUSLIB_API void registerCallbackFromUnitarySystemSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(void (*f)());
+ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(void (*f)());
+ENERGYPLUSLIB_API void callbackUnitarySystemSizing(void (*f)());
 
 #ifdef __cplusplus
 }

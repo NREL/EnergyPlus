@@ -4,11 +4,11 @@ from pyenergyplus.common import RealEP
 
 class Glycol:
     """
-    This class is a Python representation of the glycol properties calculations inside EnergyPlus.
+    This class provides access to the glycol property calculations inside EnergyPlus.
     For now, the only glycol name allowed is plain water.  This is because other fluids are only
-    initialized when they are declared in the input file.  When calling this way, through the API,
+    initialized when they are declared in the input file.  When calling through the API,
     there is no input file, so no other fluids are declared.  This is ripe for a refactor to enable
-    additional fluids, but water will suffice for now as an example.
+    additional fluids, but water will suffice for now.
     """
 
     def __init__(self, api: cdll, glycol_name: bytes):
@@ -44,6 +44,13 @@ class Glycol:
 
 
 class Refrigerant:
+    """
+    This class provides access to the refrigerant property calculations inside EnergyPlus.
+    For now, the only refrigerant  name allowed is steam.  This is because other refrigerants are only
+    initialized when they are declared in the input file.  When calling through the API, there is no
+    input file, so no other refrigerants are declared.  This should be improved through later enhancements,
+    but steam will provide a suitable use case for now.
+    """
 
     def __init__(self, api: cdll, refrigerant_name: bytes):
         self.refrigerant_name = refrigerant_name
@@ -68,24 +75,26 @@ class Refrigerant:
         self.api.refrigerantDelete(self.instance)
 
     def saturation_pressure(self, temperature: float) -> float:
-        return self.api.refrigerantSaturationPressure(temperature)
+        return self.api.refrigerantSaturationPressure(self.instance, temperature)
 
     def saturation_temperature(self, pressure: float) -> float:
-        return self.api.refrigerantSaturationTemperature(pressure)
+        return self.api.refrigerantSaturationTemperature(self.instance, pressure)
 
     def saturated_enthalpy(self, temperature: float, quality: float):
-        return self.api.refrigerantSaturatedEnthalpy(temperature, quality)
+        return self.api.refrigerantSaturatedEnthalpy(self.instance, temperature, quality)
 
     def saturated_density(self, temperature: float, quality: float):
-        return self.api.refrigerantSaturatedDensity(temperature, quality)
+        return self.api.refrigerantSaturatedDensity(self.instance, temperature, quality)
 
     def saturated_specific_heat(self, temperature: float, quality: float):
-        return self.api.refrigerantSaturatedSpecificHeat(temperature, quality)
+        return self.api.refrigerantSaturatedSpecificHeat(self.instance, temperature, quality)
 
 
 class Psychrometrics:
     """
-
+    This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are
+    available as functions of different independent variables, and so there are functions with suffixes like
+    `vapor_density_b` and `relative_humidity_c`.
     """
     def __init__(self, api: cdll):
         self.api = api

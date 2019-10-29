@@ -2,8 +2,7 @@ from pyenergyplus.api import EnergyPlusAPI
 
 
 api = EnergyPlusAPI()
-functional_api = api.functional()
-glycol = functional_api.glycol(u"water")
+glycol = api.functional.glycol(u"water")
 
 for t in [5.0, 15.0, 25.0]:
     cp = glycol.specific_heat(t)
@@ -12,7 +11,7 @@ for t in [5.0, 15.0, 25.0]:
     visc = glycol.viscosity(t)
     print("Python API Test: Calculated properties at T=%s: %f, %f, %f, %f" % (t, cp, rho, k, visc))
 
-refrigerant = functional_api.refrigerant("steam")
+refrigerant = api.functional.refrigerant("steam")
 temperature = 100.0
 satPress = refrigerant.saturation_pressure(temperature)  # expecting about 101325 Pa
 thisPress = 100000
@@ -29,7 +28,7 @@ print("C API Test: Sat Vap at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f" % (satVapDens,
 enthDifference = satVapEnth - satLiqEnth  # vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
 
 
-psychrometrics = functional_api.psychrometrics()
+psychrometrics = api.functional.psychrometrics()
 # // PSYCHROMETRICS
 # // test point is:
 # //   Barometric Pressure: 101325 Pa
