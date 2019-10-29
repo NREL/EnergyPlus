@@ -13,7 +13,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
 
     def main(self) -> int:
         if self.one_time:
-            perimeter_zone_1_handle = self.exchange.get_zone_index("perimeter_zn_1")
+            perimeter_zone_1_handle = self.exchange.get_internal_variable_handle("Zone Floor Area", "perimeter_zn_1")
             self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_1_handle))
             perimeter_zone_2_handle = self.exchange.get_zone_index("perimeter_zn_2")
             self.zone_volumes.append(self.exchange.get_zone_volume(perimeter_zone_2_handle))
