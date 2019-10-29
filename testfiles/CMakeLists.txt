@@ -407,6 +407,7 @@ ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDaylightingAndShadeControl.idf EPW_FILE
 ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDaylightingAngleFac.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDoubleFacadeDaylighting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomOutputVariable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomTrendVariable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCustomSchedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE QTFtest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RadHiTempElecTermReheat.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
