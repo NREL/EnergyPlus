@@ -112,11 +112,6 @@ int setActuatorValue(const int handle, const double value) {
 }
 
 
-// These are extra things which need a pattern to be figured out
-int simDataGetKindOfSim() {
-    return EnergyPlus::DataGlobals::KindOfSim;
-}
-
 
 int getPluginGlobalVariableHandle(const char* name) {
     return EnergyPlus::PluginManager::pluginManager->getGlobalVariableHandle(name);
@@ -181,16 +176,18 @@ int daylightSavingsTimeIndicator() {
 int hour() {
     return EnergyPlus::DataGlobals::HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
 }
-int currentTime() {
+Real64 currentTime() {
     if (EnergyPlus::DataHVACGlobals::TimeStepSys < EnergyPlus::DataGlobals::TimeStepZone) {
-    // CurrentTime is for end of zone timestep, need to account for system timestep
+        // CurrentTime is for end of zone timestep, need to account for system timestep
         return EnergyPlus::DataGlobals::CurrentTime - EnergyPlus::DataGlobals::TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
     } else {
         return EnergyPlus::DataGlobals::CurrentTime;
     }
 }
 int minutes() {
-    return (currentTime() - EnergyPlus::DataGlobals::HourOfDay - 1) * 60.0; // -1.0 // off by 1
+    // the -1 is to push us to the right minute, but this should be handled cautiously because if we are inside the HVAC iteration loop,
+    // currentTime() returns a floating point fractional hour, so truncation could put this a few seconds from the expected minute.
+    return ((int)std::round(currentTime()) - EnergyPlus::DataGlobals::HourOfDay - 1) * 60;
 }
 int holidayIndex() {
     return EnergyPlus::DataEnvironment::HolidayIndex;
@@ -209,12 +206,19 @@ int isRaining() {
         return 0;
     }
 }
+int warmupFlag() {
+    if (EnergyPlus::DataGlobals::WarmupFlag) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 Real64 systemTimeStep() {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
 int currentEnvironmentNum() {
     return EnergyPlus::DataEnvironment::CurEnvirNum;
 }
-int warmupFlag() {
-    return EnergyPlus::DataGlobals::WarmupFlag;
+int kindOfSim() {
+    return EnergyPlus::DataGlobals::KindOfSim;
 }

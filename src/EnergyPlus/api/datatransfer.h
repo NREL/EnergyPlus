@@ -62,17 +62,17 @@ ENERGYPLUSLIB_API int getActuatorHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
 ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
 ENERGYPLUSLIB_API int setActuatorValue(int handle, Real64 value);
-
-ENERGYPLUSLIB_API int simDataGetKindOfSim();
+ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
 // There are also a couple API points for Python Plugins specifically.  It is expected these will only
 // be exposed through the plugin base class, not through the regular Python bindings.
 ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
 ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
 ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
-ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
-ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
+// Then there are a plethora of specialty one-off EMSVariable values that need to be accessible
+// We could certainly add to this list
 ENERGYPLUSLIB_API int year();
 ENERGYPLUSLIB_API int month();
 ENERGYPLUSLIB_API int dayOfMonth();
@@ -80,7 +80,7 @@ ENERGYPLUSLIB_API int dayOfWeek();
 ENERGYPLUSLIB_API int dayOfYear();
 ENERGYPLUSLIB_API int daylightSavingsTimeIndicator();
 ENERGYPLUSLIB_API int hour();
-ENERGYPLUSLIB_API int currentTime();
+ENERGYPLUSLIB_API Real64 currentTime();
 ENERGYPLUSLIB_API int minutes();
 ENERGYPLUSLIB_API int holidayIndex();
 ENERGYPLUSLIB_API int sunIsUp();
@@ -88,6 +88,7 @@ ENERGYPLUSLIB_API int isRaining();
 ENERGYPLUSLIB_API Real64 systemTimeStep();
 ENERGYPLUSLIB_API int currentEnvironmentNum();
 ENERGYPLUSLIB_API int warmupFlag();
+ENERGYPLUSLIB_API int kindOfSim();
 
 #ifdef __cplusplus
 }

@@ -3,7 +3,7 @@ import os
 import sys
 
 from pyenergyplus.func import Functional
-from pyenergyplus.datatransfer import DataTransfer
+from pyenergyplus.datatransfer import DataExchange
 from pyenergyplus.runtime import Runtime
 
 
@@ -13,7 +13,7 @@ def api_path() -> str:
     depends on the Python API build script, so you shouldn't be able to generate the EnergyPlus dynamic library without
     these scripts being successfully set up in the build tree by CMake.
 
-    :return:
+    :return: A string absolute path to the EnergyPlus DLL.
     """
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     api_dll_dir = os.path.dirname(os.path.normpath(this_script_dir))
@@ -28,21 +28,24 @@ def api_path() -> str:
 class EnergyPlusAPI:
     """
     This class exposes the EnergyPlus C Library API to Python.  The API is split into three categories, and this class
-    exposes each API category.
+    exposes each API category through member variables.  If an instance of this class is created as
+    `api = EnergyPlusAPI()`, then the following members are available:
 
-    - The functional API provides access to static API calls, such as calculation methods
-      and version information.
-    - The runtime API allows a user to provide Python functions as callbacks, which are then
+    - `api.functional`: The functional API provides access to static API calls, such as thermophysical property methods.
+    - `api.runtime`: The runtime API allows a user to provide Python functions as callbacks, which are then
       called from within EnergyPlus at specific points in the simulation.
-    - The data_transfer API allows a user to exchange data (get sensor values, set actuator values)
-      from within runtime callback methods, during a simulation.
+    - `api.exchange` The data_exchange API allows a user to exchange data (get sensor values, set actuator values)
+      from within runtime callback methods, during a simulation.  When this class is instantiated for Python Plugin use,
+      this also exposes the plugin global data members to allow sharing data between plugins.
 
-    Inside of a build folder, the API library (dll) should be in Products.  For example, in a makefile-style build, this
-    will be /path_to_build/Products.  I'm not yet sure what it is in a Visual Studio build.  The Python API files are
-    placed inside of the Products directory in a pyenergyplus directory, so the dynamic library will simply be in the
-    current script's parent directory. In an installation, the binary will be in the installation root.  The Python API
-    files are in a pyenergyplus directory inside that install root, so the binary will again just be in this script's
-    parent directory.
+    In a makefile-style build, the API library (dll) should be in Products; for example: `/path_to_build/Products`.
+    For Visual Studio, the DLL is inside of a Debug or Release folder inside that Products directory.  At build time,
+    the cmake/SetPythonAPI.cmake script is executed (the energyplusapi target depends on it).  At build time, the
+    Python API files are placed inside of the Products directory on Makefile builds, and copied into *both* the Release
+    and Debug folders on Visual Studio builds.  The API scripts are put into a pyenergyplus directory, so in all cases,
+    the dynamic library will simply be in the current script's parent directory. In an installation, the library will be
+    in the installation root, and the Python API files will be in a pyenergyplus directory inside that install root as
+    well, so the binary will again just be in this script's parent directory.
 
     For either case, utilizing the Python API wrappers is straightforward: if executing from directly from the
     build or install folder, scripts can be imported as `from pyenergyplus.foo import bar`.  If executing from a totally
@@ -52,10 +55,17 @@ class EnergyPlusAPI:
     To reference this in an IDE to allow writing scripts using autocomplete, etc., most IDEs allow you to add third-
     party library directories.  The directory to add would be the build or install folder, as appropriate, so that
     the `from pyenergyplus` import statements can find a pyenergyplus package inside that third-party directory.
-
     """
 
-    def __init__(self):
+    def __init__(self, running_as_python_plugin: bool = False):
+        """
+        Create a new API instance with child API classes set up as members on this class.
+
+        :param running_as_python_plugin: If running as a python plugin, pass True, and this will do two things: 1)
+                                         Instantiate the plugin "global" variable methods which are meaningless in
+                                         other API calling structures, and 2) Avoid re-instantiating the functional API
+                                         as this is already instantiated for Plugin workflows.
+        """
         self.api = cdll.LoadLibrary(api_path())
         self.api.apiVersionFromEPlus.argtypes = []
         self.api.apiVersionFromEPlus.restype = c_char_p
@@ -65,38 +75,12 @@ class EnergyPlusAPI:
             raise Exception("API version does not match, this API version: %s; E+ is expecting version: %s" % (
                 api_version_defined_here, api_version_from_ep
             ))
-
-    def functional(self, init_ep: bool = True) -> Functional:
-        """
-        Returns a new instance of a Functional API class.  In most cases, this should be called once, and the script
-        should keep a reference to the new instance.  All functional API calls can then be made on this one instance,
-        rather than making multiple instances by calling this function multiple times.
-
-        :param init_ep: If E+ should be initialized, this should be True.  In the case of Python Plugins, EnergyPlus is
-                        already running, and so this should be set to False when calling from the Plugin base class.
-        :return: A "Functional" API class instance.
-        """
-        return Functional(self.api, init_ep)
-
-    def data_transfer(self) -> DataTransfer:
-        """
-        Returns a new instance of a DataTransfer API class.  In most cases, this should be called once, and the script
-        should keep a reference to the new instance.  All functional API calls can then be made on this one instance,
-        rather than making multiple instances by calling this function multiple times.
-
-        :return: A "DataTransfer" API class instance.
-        """
-        return DataTransfer(self.api)
-
-    def runtime(self) -> Runtime:
-        """
-        Returns a new instance of a Runtime API class.  In most cases, this should be called once, and the script
-        should keep a reference to the new instance.  All functional API calls can then be made on this one instance,
-        rather than making multiple instances by calling this function multiple times.
-
-        :return: A "Runtime" API class instance.
-        """
-        return Runtime(self.api)
+        # self.functional provides access to a functional API class, instantiated and ready to go
+        self.functional = Functional(self.api, running_as_python_plugin)
+        # self.exchange provides access to a data exchange API class, instantiated and ready to go
+        self.exchange = DataExchange(self.api, running_as_python_plugin)
+        # self.runtime provides access to a runtime API class, instantiated and ready to go
+        self.runtime = Runtime(self.api)
 
     @staticmethod
     def api_version() -> str:

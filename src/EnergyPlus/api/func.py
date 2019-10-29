@@ -227,11 +227,11 @@ class Functional:
     member variable.  Clients should use that directly when needing to make functional calls into the library.
     """
 
-    def __init__(self, api: cdll, init_ep: bool = True):
+    def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         self.api = api
         self.api.initializeFunctionalAPI.argtypes = []
         self.api.initializeFunctionalAPI.restype = c_void_p
-        if init_ep:
+        if not running_as_python_plugin:
             self.api.initializeFunctionalAPI()
 
     def glycol(self, glycol_name: str) -> Glycol:

@@ -1,9 +1,9 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p
-from pyenergyplus.common import RealEP
+from pyenergyplus.common import RealEP, EnergyPlusException
 from typing import Union
 
 
-class DataTransfer:
+class DataExchange:
     """
     This API class enables data transfer between EnergyPlus and a client.  Output variables and meters are treated as
     "sensor" data.  A client should get a handle (integer) using one of the worker methods then make calls to get data
@@ -22,8 +22,9 @@ class DataTransfer:
       have a `self.transfer` instance of this class available, and should *not* attempt to create another one.
     """
 
-    def __init__(self, api: cdll):
+    def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         self.api = api
+        self.running_as_python_plugin = running_as_python_plugin
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getVariableHandle.restype = c_int
         self.api.getMeterHandle.argtypes = [c_char_p]
@@ -36,6 +37,10 @@ class DataTransfer:
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_int
+        self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
+        self.api.getInternalVariableHandle.restype = c_int
+        self.api.getInternalVariableValue.argtypes = [c_int]
+        self.api.getInternalVariableValue.restype = RealEP
         # some simulation data values are available for plugins or regular runtime calls
         self.api.year.argtypes = []
         self.api.year.restype = c_int
@@ -67,11 +72,6 @@ class DataTransfer:
         self.api.currentEnvironmentNum.restype = c_int
         self.api.warmupFlag.argtypes = []
         self.api.warmupFlag.restype = c_int
-        self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
-        self.api.getInternalVariableHandle.restype = c_int
-        self.api.getInternalVariableValue.argtypes = [c_int]
-        self.api.getInternalVariableValue.restype = RealEP
-        # these are only meaningful for Python Plugins, so they are declared here, but no Python functions wrap them
         self.api.getPluginGlobalVariableHandle.argtypes = [c_char_p]
         self.api.getPluginGlobalVariableHandle.restype = c_int
         self.api.getPluginGlobalVariableValue.argtypes = [c_int]
@@ -176,6 +176,19 @@ class DataTransfer:
         return self.api.setActuatorValue(actuator_handle, actuator_value)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+        """
+        Get a handle to an internal variable in a running simulation.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param variable_type: The name of the variable to retrieve, e.g. "Zone Air Volume", or "Zone Floor Area"
+        :param variable_key: The instance of the variable to retrieve, e.g. "Zone 1"
+        :return: An integer ID for this output variable, or zero if one could not be found.
+        """
         if isinstance(variable_type, str):
             variable_type = variable_type.encode('utf-8')
         if isinstance(variable_key, str):
@@ -183,49 +196,214 @@ class DataTransfer:
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
     def get_internal_variable_value(self, variable_handle: int):
+        """
+        Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is
+        first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
+        function to then get the value of the variable.
+
+        :param variable_handle: An integer returned from the `get_internal_variable_handle` function.
+        :return: Floating point representation of the internal variable value
+        """
         return self.api.getInternalVariableValue(variable_handle)
 
+    def get_global_handle(self, var_name: Union[str, bytes]) -> int:
+        """
+        Get a handle to a global variable in a running simulation.  This is only used for Python Plugin applications!
+
+        Global variables are used as a way to share data between running Python Plugins.  First a global variable must
+        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it
+        can be accessed in the Plugin by getting a handle to the variable using this get_global_handle function, then
+        using the get_global_value and set_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param var_name: The name of the global variable to retrieve, this name must be listed in the IDF object:
+                         `PythonPlugin:GlobalVariables`
+        :return: An integer ID for this global variable, or zero if one could not be found.
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+        if isinstance(var_name, str):
+            var_name = var_name.encode('utf-8')
+        return self.api.getPluginGlobalVariableHandle(var_name)
+
+    def get_global_value(self, handle: int) -> float:
+        """
+        Get the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin
+        applications!
+
+        Global variables are used as a way to share data between running Python Plugins.  First a global variable must
+        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it
+        can be accessed in the Plugin by getting a handle to the variable using the get_global_handle function, then
+        using this get_global_value and the set_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param handle: An integer returned from the `get_global_handle` function.
+        :return: Floating point representation of the global variable value
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+        return self.api.getPluginGlobalVariableValue(handle)
+
+    def set_global_value(self, handle: int, value: float) -> None:
+        """
+        Set the current value of a plugin global variable in a running simulation.  This is only used for Python Plugin
+        applications!
+
+        Global variables are used as a way to share data between running Python Plugins.  First a global variable must
+        be declared in the input file using the PythonPlugin:GlobalVariables object.  Once a name has been declared, it
+        can be accessed in the Plugin by getting a handle to the variable using the get_global_handle function, then
+        using the get_global_value and this set_global_value functions as needed.  Note all global variables are
+        floating point values.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param handle: An integer returned from the `get_global_handle` function.
+        :param value: Floating point value to assign to the global variable
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+        self.api.setPluginGlobalVariableValue(handle, value)
+
     def year(self) -> int:
+        """
+        Get the current year of the simulation.
+
+        :return: An integer year
+        """
         return self.api.year()
 
     def month(self) -> int:
+        """
+        Get the current month of the simulation (1-12)
+
+        :return: An integer month (1-12)
+        """
         return self.api.month()
 
     def day_of_month(self) -> int:
+        """
+        Get the current day of month (1-31)
+
+        :return: An integer day of the month (1-31)
+        """
         return self.api.dayOfMonth()
 
-    def day_of_week(self) -> int:
-        return self.api.dayOfWeek()
-
-    def day_of_year(self) -> int:
-        return self.api.dayOfYear()
-
-    def daylight_savings_time_indicator(self) -> int:
-        return self.api.daylightSavingsTimeIndicator()
-
     def hour(self) -> int:
+        """
+        Get the current hour of the simulation (1-24) TODO: VERIFY THIS
+
+        :return: An integer hour of the day (1-24)
+        """
         return self.api.hour()
 
-    def current_time(self) -> int:
+    def current_time(self) -> float:
+        """
+        Get the current time of day in hours TODO: IM NOT SURE WHAT THIS GETS
+
+        :return: A floating point representation of the current time -- fractional hours?
+        """
         return self.api.currentTime()
 
     def minutes(self) -> int:
+        """
+        Get the current minutes into the hour TODO: VERIFY THIS
+
+        :return: An integer number of minutes into the current hour (1-60) # TODO VERIFY THIS
+        """
         return self.api.minutes()
 
+    def day_of_week(self) -> int:
+        """
+        Get the current day of the week (0-6) TODO: VERIFY THIS
+
+        :return: An integer day of week (0-6)
+        """
+        return self.api.dayOfWeek()
+
+    def day_of_year(self) -> int:
+        """
+        Get the current day of the year (1-366) TODO: VERIFY THIS
+
+        :return: AN integer day of the year (1-366)
+        """
+        return self.api.dayOfYear()
+
+    def daylight_savings_time_indicator(self) -> bool:
+        """
+        Get the current daylight savings time indicator as a logical value.  The C API returns an integer where 1 is
+        yes and 0 is no, this simply wraps that with a bool conversion.
+
+        :return: A boolean DST indicator for the current time.
+        """
+        return self.api.daylightSavingsTimeIndicator() == 1
+
     def holiday_index(self) -> int:
+        """
+        Gets a flag for the current day holiday type: 0 is no holiday, 1 is holiday type #1, etc.
+
+        :return: An integer indicator for current day holiday type.
+        """
         return self.api.holidayIndex()
 
-    def sun_is_up(self) -> int:
-        return self.api.sunIsUp()
+    def sun_is_up(self) -> bool:
+        """
+        Gets a flag for whether the sun is currently up.  The C API returns an integer where 1 is yes and 0 is no, this
+        simply wraps that with a bool conversion.
 
-    def is_raining(self) -> int:
-        return self.api.isRaining()
+        :return: A boolean indicating whether the sun is currently up.
+        """
+        return self.api.sunIsUp() == 1
+
+    def is_raining(self) -> bool:
+        """
+        Gets a flag for whether the it is currently raining.  The C API returns an integer where 1 is yes and 0 is no,
+        this simply wraps that with a bool conversion.
+
+        :return: A boolean indicating whether it is currently raining.
+        """
+        return self.api.isRaining() == 1
+
+    def warmup_flag(self) -> bool:
+        """
+        Gets a flag for whether the warmup flag is currently on, signaling that EnergyPlus is still in the process of
+        converging on warmup days.  The C API returns an integer where 1 is yes and 0 is no, this simply wraps that
+        with a bool conversion.
+
+        :return: A boolean indicating whether the warmup flag is on.
+        """
+        return self.api.warmupFlag() == 1
 
     def system_time_step(self) -> float:
+        """
+        Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
+        during the simulation.
+
+        :return: The current system time step in fractional hours.
+        """
         return self.api.systemTimeStep()
 
     def current_environment_num(self) -> int:
-        return self.api.currentEnvironmentNum()
+        """
+        Gets the current environment index.  EnergyPlus environments are design days, run periods, etc.  This function
+        is only expected to be useful in very specialized applications where you control the environment order
+        carefully.
 
-    def warmup_flag(self) -> int:
-        return self.api.warmupFlag()
+        :return: The current environment number.
+        """
+        return self.api.currentEnvironmentNum()
