@@ -180,7 +180,7 @@ class DataTransfer:
             variable_type = variable_type.encode('utf-8')
         if isinstance(variable_key, str):
             variable_key = variable_key.encode('utf-8')
-        return self.api.getActuatorHandle(variable_type, variable_key)
+        return self.api.getInternalVariableHandle(variable_type, variable_key)
 
     def get_internal_variable_value(self, variable_handle: int):
         return self.api.getInternalVariableValue(variable_handle)
