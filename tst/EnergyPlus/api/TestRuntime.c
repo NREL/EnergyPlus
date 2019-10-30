@@ -58,14 +58,13 @@ void newEnvrnHandler() {
 
 int main() {
     callbackEndOfZoneTimeStepAfterZoneReporting(timeStepHandler);
-    const int argc = 6;
+    const int argc = 5;
     const char * argv[argc];
-    argv[0] = "energyplus";
-    argv[1] = "-d";
-    argv[2] = "/tmp/epdll";
-    argv[3] = "-w";
-    argv[4] = "/tmp/epdll/in.epw";
-    argv[5] = "/tmp/epdll/in.idf";
+    argv[0] = "-d";
+    argv[1] = "/tmp/epdll";
+    argv[2] = "-w";
+    argv[3] = "/tmp/epdll/in.epw";
+    argv[4] = "/tmp/epdll/in.idf";
     energyplus(argc, argv);
     cClearAllStates();
     callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);

@@ -21,7 +21,7 @@ class EnergyPlusPlugin(object):
         - self.api.exchange provides access to a data exchange API class, instantiated and ready to go
         """
         super().__init__()
-        self.api = EnergyPlusAPI(False)
+        self.api = EnergyPlusAPI(True)
 
     def main(self) -> int:
         """

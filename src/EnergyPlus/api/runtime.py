@@ -1,5 +1,5 @@
-from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
-from typing import Union
+from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE, POINTER
+from typing import Union, List
 
 
 # CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it
@@ -21,7 +21,7 @@ class Runtime:
 
     def __init__(self, api: cdll):
         self.api = api
-        self.api.energyplus.argtypes = [c_char_p]
+        # self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call
         self.api.energyplus.restype = c_int
         self.py_callback_type = CFUNCTYPE(c_void_p)
         self.api.callbackBeginNewEnvironment.argtypes = [self.py_callback_type]
@@ -59,20 +59,51 @@ class Runtime:
         self.api.callbackUnitarySystemSizing.argtypes = [self.py_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
 
-    def run_energyplus(self, path_to_dir: Union[str, bytes]) -> int:
+    def run_energyplus(self, command_line_args: List[Union[str, bytes]]) -> int:
         """
-        This function enables EnergyPlus to run a simulation.  Currently this API method expects a directory name
-        to be passed in.  This directory must contain an in.idf file, and if the file is running a weather file run
-        period, there must also be an in.epw file.
+        This function calls EnergyPlus to run a simulation.  The C API expects to find arguments matching the command
+        line string when executing EnergyPlus.  When calling the C API directly, the client must create a list of char
+        arguments starting with the program name, followed by all the command line options.  For this Python API, the
+        program name is not passed in as an argument, rather only the command line options.
 
-        NOTE that currently EnergyPlus does not completely clean up the global state, so calling run_energyplus
-        multiple times in a single thread is not advised.  Effort is currently underway to ensure EnergyPlus is fully
-        cleaned up after a call to run, but until then, only call this once per thread.
+        An example call:
+        run_energyplus(
+            [
+                '-d',
+                '/path/to/output/directory',
+                '-w',
+                '/path/to/weather.epw',
+                '/path/to/input.idf'
+            ]
+        )
 
-        :param path_to_dir: Path to a directory containing the in.idf (and possibly in.epw) to be run
+        :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
+                                  from the EnergyPlus executable.
         :return: An integer exit code from the simulation, zero is success, non-zero is failure
         """
-        return self.api.energyplus(path_to_dir)
+        args_with_program_name = [b"energyplus"]  # don't require the program name argument, just add it here
+        for cla in command_line_args:
+            if isinstance(cla, str):
+                prepped_cla = cla.encode('utf-8')
+            else:
+                prepped_cla = cla
+            args_with_program_name.append(prepped_cla)
+        # Passing an array arg is a smidge tricky, as you need to cast to a fixed size array.
+        # Thus we must dynamically create the argument "type" based on the current number of arguments.
+        # The Python type checker may be complaining that c_char_p is actually needing to be an integer;
+        # this is something to do with the dynamic nature of the ctypes "type" objects.
+        # For now I'm adding this noinspection marker to get it to hush
+        # noinspection PyTypeChecker
+        cli_arg_type = (c_char_p * len(args_with_program_name))
+        # OK, so now that we have the argument "type" set as a fixed length array of char*, we assign it to the
+        # DLL function call.  This must be done here because the arg count may change with each call.
+        self.api.energyplus.argtypes = [c_int, cli_arg_type]
+        # Now cast the actual Python list instance into that dynamically created ctype "type".  This is another
+        # line where the type checker is complaining because it things cli_arg_type is actually an "int", and as such,
+        # it wouldn't be a callable item.  cli_arg_type is actually a callable type, so I'm muting this warning.
+        # noinspection PyCallingNonCallable
+        cli_args = cli_arg_type(*args_with_program_name)
+        return self.api.energyplus(len(args_with_program_name), cli_args)
 
     def callback_begin_new_environment(self, f) -> None:
         """
