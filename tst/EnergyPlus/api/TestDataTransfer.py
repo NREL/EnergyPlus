@@ -1,8 +1,6 @@
 import sys
 from pyenergyplus.api import EnergyPlusAPI
 
-
-api = EnergyPlusAPI()
 env_count = 0
 
 
@@ -32,6 +30,7 @@ def time_step_handler():
     print("Actuated Dew Point temp value is: %s" % dp_temp)
 
 
+api = EnergyPlusAPI()
 api.runtime.callback_end_zone_timestep_after_zone_reporting(time_step_handler)
 argv = [
     "-d",

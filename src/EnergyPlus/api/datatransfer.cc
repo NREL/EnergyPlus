@@ -47,7 +47,6 @@
 
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>

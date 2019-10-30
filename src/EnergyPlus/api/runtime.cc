@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>

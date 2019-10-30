@@ -48,36 +48,12 @@
 #include <stdio.h>
 
 #include <EnergyPlus/api/datatransfer.h>
-#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
 
 void afterZoneTimeStepHandler()
 {
-    printf("STARTING A NEW ENVIRONMENT\n");
+    printf("STARTING A NEW TIME STEP\n");
     int thisKindOfSim = kindOfSim();
-    switch (thisKindOfSim) {
-    case 1:
-        // design day
-        printf("ITS A DESIGN DAY!\n");
-        break;
-    case 2:
-    case 3:
-        // run periods, either weather file or design
-        printf("ITS A RUN PERIOD!\n");
-        break;
-    case 4:
-    case 5:
-        // hvac sizing
-        printf("ITS AN HVAC SIZING RUN\n");
-        break;
-    case 6:
-        // read weather data
-        printf("ITS A READ WEATHER DATA RUN\n");
-        break;
-    default:
-        printf("UNKNOWN ENVIRONMENT\n");
-        // what?
-    }
     if (thisKindOfSim == 2 || thisKindOfSim == 3) {
         int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
         int response = setActuatorValue(outdoorDewPointActuator, -25);
