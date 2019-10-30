@@ -5,6 +5,10 @@ Condenser hot gas reheat model for DX Cooling Coil System
 
 **Florida Solar Energy Center**
 
+
+ - Foruth Edition
+ - Add design document
+ - Revision Date: 10/29/19
  - Third Draft
  - Discussed in the sizing conference call. No more comments
  - Revision Date: 10/24/19
@@ -669,4 +673,128 @@ No transition is needed.
 [Carrier-1, HUMIDI-MIZER® ADAPTIVE DEHUMIDIFICATION SYSTEM FOR APPLIED ROOFTOP UNITS](https://www.utcccs-cdn.com/hvac/docs/1001/Public/01/04-581048-01.pdf)
 
 [Carrier-2, Humid-Mizer Adaptive Dehumidification System](https://www.utcccs-cdn.com/hvac/docs/1001/Public/02/04-811-70007.pdf)
+
+## Design Document ##
+
+The new feature will revise several modules, listed below: 
+
+HVACDXSystem
+
+DataHVACGlobals
+
+UnitarySystem
+
+DXCoils
+
+### HVACDXSystem ###
+
+The modifiacation is to add a new coil type as a choice. 
+
+####A new parameter will be created to represent a new coil type
+
+    int const DehumidControl_SubCoolReheat(3);
+
+####Modify GetDXCoolingSystemInput 
+
+The function of GetDXCoolingSystemInput will be modified to read a new coil type
+
+####ControlDXSystem
+
+Call a new function GetSenCapacityfromHumidimizer to get full sensible capacity
+
+If (CoilSenCap > SensibleLoad) Then
+
+	Call a new function CalcHumidimizerDXCoilCooling in DXCoils to get system outputs based on given PartLoadFrac for a single speed coil via iteration 
+
+Else
+
+	Full sensible capacity to be delivered
+	Return
+
+End If
+
+### DataHVACGlobals ###
+
+Add a new parameter to represent a new coil type
+
+    int const CoilDX_SubcoolReheat(33);
+
+Note: This new coil type will be used in UnitarySystem. Although the new parameter can be used in HVACDXSystem, it is better for HVACDXSystem to use its own coil type, to be consistent with others.  
+
+### UnitarySystem ###
+
+The modification consists of reading inputs and calling a new coil type for coil simulations.
+
+####Modify GetDXCoolingSystemInput 
+
+The function of GetDXCoolingSystemInput will be modified to read a new coil type
+
+Asign a new coil type as 
+thisSys.m_CoolingCoilType_Num = CoilDX_SubcoolReheat
+
+#### controlUnitarySystemOutput
+
+Modify the code to call a new coil function in DXCoils. 
+
+### DXCoils ###
+
+The following modifications will be performed:
+
+Add more variable in the DXCoil struct to handle a new coil inputs
+Modify GetDXCoil to read new coil inputs
+Create a new function to calculate output based on either PartLoadRatio or SpeedRatio
+Create a new function to output coil sensible full capacity with given sensible and latent load
+
+####Add more variables in the DXCoil struct to handle new coil
+
+CoilPerfType_Normal: Hold performance object type at Normal operation
+
+CoilPerfNum_Normal: Performance object number at Normal operation
+
+CoilPerfType_Subcool: Hold performance object type at Subcool operation
+
+CoilPerfNum_Subcool: Performance object number at Subcool operation
+
+CoilPerfType_Reheat: Hold performance object type at Rehat operation
+
+CoilPerfNum_Reheat: Performance object number at Reheat operation
+
+MaxReheatOBD: Maximum Outdoor Dry-Bulb Temperature for Reheat Mode Operation 
+
+The existing variables can be used to cover other inputs.
+
+####GetDXCoils####
+
+Modify the function to read a new coil object and assign inputs to existing and new variables for simulation use.
+
+####Create a new function CalcHumidimizerDXCoilCooling
+
+A new function will be created to perform coil simulations with possible arguments. 
+
+    void CalcHumidimizerDXCoilCooling(int const DXCoilNum,     // the number of the DX heating coil to be simulated
+                                     Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
+                                     Real64 const CycRatio,   // cycling part load ratio
+                                     int const SpeedNum,      // Speed number
+                                     int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
+                                     int const CompOp        // Compressor on/off; 1=on, 0=off
+                                    )
+
+It should be pointed out that this function will handle both single speed and multispeed DX cooling coils. The trigger is SpeedNum. If SoeedNum = 1, the function treats the coil as a single speed or the first speed of the multispeed coling coil. When the SpeedNum is greater than 1, the function will handle it as a multispeed coil. The algorithms for single speed and multispeed coils are provided above. The code will be written in the same way.
+
+####Create a new function GetCapacityfromHumidimizer
+
+    void GetSenCapacityfromHumidimizer(int const DXCoilNum,     // the number of the DX heating coil to be simulated
+                                     Real64 const SensibleLoad, 
+                                     Real64 const LatentLoad,   // cycling part load ratio
+                                     int const SpeedNum,      // Speed number
+                                     int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
+                                     int const CompOp        // Compressor on/off; 1=on, 0=off
+                                    )
+
+The function outputs coil capacity based on sensible and latent loads, and SpeedNum. Here is a possible calculation procedure:
+
+1. Determines operation mode with given load ratio as SHR
+2. Calculate either subcooling ratio or reheat ratio (mode ratio) based on operation mode
+3. Calculate coil capacity with the mode ratio
+4. Output sensible capacity 
 
