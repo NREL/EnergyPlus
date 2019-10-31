@@ -173,7 +173,7 @@ namespace PluginManagement {
 
         // Now read all the actual plugins and interpret them
         std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(sPaths);
+        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
         if (pluginInstances > 0) {
             auto const instances = inputProcessor->epJSON.find(sPlugins);
             if (instances == inputProcessor->epJSON.end()) {
@@ -562,6 +562,7 @@ namespace PluginManagement {
         if (!pFullPath) {
             // something went really wrong, this should only happen if you do some *weird* python stuff like
             // import from database or something
+            ShowFatalError("Could not get full path");
         } else {
             PyObject* pStrObj = PyUnicode_AsUTF8String(pFullPath);
             char* zStr = PyBytes_AsString(pStrObj);
