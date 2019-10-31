@@ -68,7 +68,7 @@
 #endif
 
 namespace EnergyPlus {
-namespace PluginManager {
+namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
     std::map<int, std::vector<void (*)()>> callbacks;
@@ -86,6 +86,14 @@ namespace PluginManager {
         }
         for (auto &plugin : plugins[iCalledFrom]) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
+        }
+    }
+
+    void PluginManager::initAllRegisteredPlugins() {
+        for (auto &pair : plugins) {
+            for (auto &plugin: pair.second) {
+                plugin.init();
+            }
         }
     }
 
@@ -511,7 +519,7 @@ namespace PluginManager {
         PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
         PyObject* str_exc_value = PyObject_Repr(exc_value); //Now a unicode object
         PyObject* pyStr2 = PyUnicode_AsEncodedString(str_exc_value, "utf-8", "Error ~");
-        char *strExcValue =  PyBytes_AS_STRING(pyStr2);
+        char *strExcValue =  PyBytes_AS_STRING(pyStr2); // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
     }
@@ -585,7 +593,7 @@ namespace PluginManager {
         // so I don't intend on decrementing it, at least not until the manager destructor
         // In any case, it will be an **extremely** tiny memory use if we hold onto it a bit too long
 
-        // now grab the function pointers to the main call function
+        // now grab the function pointer to the main call function
         std::string const mainFunctionName = "main";
         this->pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
         if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
@@ -596,6 +604,19 @@ namespace PluginManager {
                 EnergyPlus::ShowContinueError("Make sure the plugin class overrides the main() function, and does not require arguments.");
             }
             EnergyPlus::ShowFatalError("Python main() function error causes program termination");
+        }
+
+        // and grab the initialize function pointer
+        std::string const initFunctionName = "initialize";
+        this->pPluginInitFunction = PyObject_GetAttrString(pClassInstance, initFunctionName.c_str());
+        if (!this->pPluginInitFunction || !PyCallable_Check(this->pPluginInitFunction)) {
+            EnergyPlus::ShowSevereError("Could not find or call function \"" + initFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("The base class defines an empty initialize() function, so this should not occur.  Make sure the class inherits the EnergyPlusPlugin base class.");
+            }
+            EnergyPlus::ShowFatalError("Python initialize() function error causes program termination");
         }
 
         // update the rest of the plugin call instance and store it
@@ -609,15 +630,15 @@ namespace PluginManager {
         // then call the main function
         PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginMainFunction, nullptr);
         if (!pFunctionResponse) {
-            EnergyPlus::ShowSevereError("Call to " + this->stringIdentifier + " failed!");
+            EnergyPlus::ShowSevereError("Call to main() on " + this->stringIdentifier + " failed!");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
             }
-            EnergyPlus::ShowFatalError("Program terminates after call to " + this->stringIdentifier + " failed!");
+            EnergyPlus::ShowFatalError("Program terminates after call to main() on " + this->stringIdentifier + " failed!");
         }
-        if (PyLong_Check(pFunctionResponse)) {
+        if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
             int exitCode = (int)PyLong_AsLong(pFunctionResponse);
             if (exitCode == 0) {
                 // success
@@ -627,6 +648,21 @@ namespace PluginManager {
         } else {
             EnergyPlus::ShowFatalError("Invalid return from main() on class \"" + this->stringIdentifier +
                                        ", make sure it returns an integer exit code");
+        }
+        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+    }
+
+    void PluginInstance::init() {
+        // then call the main function
+        PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginInitFunction, nullptr);
+        if (!pFunctionResponse) {
+            EnergyPlus::ShowSevereError("Call to initialize() on " + this->stringIdentifier + " failed!");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
+            }
+            EnergyPlus::ShowFatalError("Program terminates after call to initialize() on " + this->stringIdentifier + " failed!");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
     }
@@ -738,5 +774,5 @@ namespace PluginManager {
         }
     }
 
-} // namespace PluginManager
+} // namespace PluginManagement
 } // namespace EnergyPlus

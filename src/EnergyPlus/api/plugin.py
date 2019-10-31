@@ -22,6 +22,19 @@ class EnergyPlusPlugin(object):
         """
         super().__init__()
         self.api = EnergyPlusAPI(True)
+        self.handles = {}
+
+    def initialize(self) -> None:
+        """
+        Provides a base class function that can be overridden to do some script initialization.  This function is called
+        at a point in the EnergyPlus simulation when structures have been populated and so EMS actuators and variables
+        can be accessed to get handles.  This function does not need to be overridden, users can still achieve the same
+        behavior by looking up handles at later, regular calling points in the simulation.  This is merely a
+        convenience.
+
+        :return: Does not return anything
+        """
+        pass
 
     def main(self) -> int:
         """

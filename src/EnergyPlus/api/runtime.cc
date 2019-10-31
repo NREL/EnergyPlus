@@ -70,69 +70,69 @@ int energyplus(int argc, const char *argv[]) {
 }
 
 void callbackBeginNewEnvironment(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);
 }
 
 void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, f);
 }
 
 void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, f);
 }
 
 void callbackBeginTimeStepBeforePredictor(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor, f);
 }
 
 void callbackAfterPredictorBeforeHVACManagers(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers, f);
 }
 
 void callbackAfterPredictorAfterHVACManagers(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers, f);
 }
 
 void callbackInsideSystemIterationLoop(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop, f);
 }
 
 void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting, f);
 }
 
 void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting, f);
 }
 
 void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting, f);
 }
 
 void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting, f);
 }
 
 void callbackEndOfZoneSizing(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromZoneSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromZoneSizing, f);
 }
 
 void callbackEndOfSystemSizing(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromSystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromSystemSizing, f);
 }
 
 void callbackEndOfAfterComponentGetInput(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromComponentGetInput, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromComponentGetInput, f);
 }
 
 void callbackUserDefinedComponentModel(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
 }
 
 void callbackUnitarySystemSizing(void (*f)()) {
-    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
 }

@@ -308,7 +308,7 @@ namespace EMSManager {
         InitEMS(iCalledFrom);
 
         // also call plugins and callbacks here for convenience
-        PluginManager::runAnyRegisteredCallbacks(iCalledFrom);
+        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom);
 
         if (iCalledFrom == emsCallFromSetupSimulation) {
             ProcessEMSInput(true);

@@ -460,9 +460,10 @@ namespace SimulationManager {
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         if (!eplusRunningViaAPI) {
-            EnergyPlus::PluginManager::pluginManager =
-                    std::unique_ptr<EnergyPlus::PluginManager::PluginManager>(new EnergyPlus::PluginManager::PluginManager);
+            EnergyPlus::PluginManagement::pluginManager =
+                    std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
         }
+        EnergyPlus::PluginManagement::PluginManager::initAllRegisteredPlugins();
 
         GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 

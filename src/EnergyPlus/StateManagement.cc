@@ -360,7 +360,7 @@ void EnergyPlus::clearAllStates()
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
     PlantValves::clear_state();
-    PluginManager::clear_state();
+    PluginManagement::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();

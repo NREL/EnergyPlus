@@ -65,7 +65,7 @@
 
 namespace EnergyPlus {
 
-namespace PluginManager {
+namespace PluginManagement {
 
     void registerNewCallback(int iCalledFrom, void (*f)());
 
@@ -81,8 +81,10 @@ namespace PluginManager {
         std::string stringIdentifier; // for diagnostic reporting
         bool runDuringWarmup;
         std::string emsAlias;
-        PyObject *pPluginMainFunction = nullptr;  // pointer to the main EMS function
-        void run();
+        PyObject *pPluginMainFunction = nullptr;  // pointer to the main plugin function
+        PyObject *pPluginInitFunction = nullptr;  // pointer to the init plugin function
+        void run(); // calls main() on this plugin instance
+        void init(); // calls initialize() on this plugin instance
     };
 
     class PluginManager {
@@ -94,7 +96,7 @@ namespace PluginManager {
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static int calledFromFromString(std::string const &calledFrom);
-
+        static void initAllRegisteredPlugins();
         void addGlobalVariable(const std::string& name);
         int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         Real64 getGlobalVariableValue(int handle);
