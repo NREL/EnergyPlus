@@ -1455,10 +1455,10 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     EngineDrivenChiller(ChillerNum).FuelType = "Gasoline";
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     EngineDrivenChiller(ChillerNum).FuelType = "FuelOil#1";
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     EngineDrivenChiller(ChillerNum).FuelType = "FuelOil#2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
@@ -1474,7 +1474,7 @@ namespace PlantChillers {
                     ShowSevereError("Invalid " + cAlphaFieldNames(12) + '=' + cAlphaArgs(12));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOil1, FuelOil2,OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }
@@ -2184,10 +2184,10 @@ namespace PlantChillers {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     GTChiller(ChillerNum).FuelType = "Gasoline";
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     GTChiller(ChillerNum).FuelType = "FuelOil#1";
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     GTChiller(ChillerNum).FuelType = "FuelOil#2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
@@ -2203,7 +2203,7 @@ namespace PlantChillers {
                     ShowSevereError("Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOil1, FuelOil2,OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }

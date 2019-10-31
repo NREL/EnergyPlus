@@ -447,10 +447,10 @@ namespace ICEngineElectricGenerator {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     ICEngineGenerator(GeneratorNum).FuelType = "Gasoline";
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     ICEngineGenerator(GeneratorNum).FuelType = "FuelOil#1";
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     ICEngineGenerator(GeneratorNum).FuelType = "FuelOil#2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {

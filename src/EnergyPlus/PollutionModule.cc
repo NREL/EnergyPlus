@@ -841,7 +841,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -935,7 +935,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
                     }
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -2038,7 +2038,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     // Pollutants from FuelOil#2
                     SetupOutputVariable("Environmental Impact Fuel Oil #2 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2228,7 +2228,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     // Pollutants from FuelOil#1
                     SetupOutputVariable("Environmental Impact Fuel Oil #1 Source Energy",
                                         OutputProcessor::Unit::J,

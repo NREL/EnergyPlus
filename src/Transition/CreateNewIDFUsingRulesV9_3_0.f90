@@ -1357,31 +1357,31 @@ SUBROUTINE FixFuelTypes(InOutArg)
     InOutArg = 'Propane'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'FUELOIL#1' )) THEN
-    InOutArg = 'FuelOil1'
+    InOutArg = 'FuelOilNo1'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
-    InOutArg = 'FuelOil1'
+    InOutArg = 'FuelOilNo1'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
-    InOutArg = 'FuelOil1'
+    InOutArg = 'FuelOilNo1'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
-    InOutArg = 'FuelOil1'
+    InOutArg = 'FuelOilNo1'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
-    InOutArg = 'FuelOil1'
+    InOutArg = 'FuelOilNo1'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'FUELOIL#2' )) THEN
-    InOutArg = 'FuelOil2'
+    InOutArg = 'FuelOilNo2'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
-    InOutArg = 'FuelOil2'
+    InOutArg = 'FuelOilNo2'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
-    InOutArg = 'FuelOil2'
+    InOutArg = 'FuelOilNo2'
     NoDiff=.false.
   ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
-    InOutArg = 'FuelOil2'
+    InOutArg = 'FuelOilNo2'
     NoDiff=.false.
   END IF
 END SUBROUTINE

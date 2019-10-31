@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
         "OtherEquipment,",
         "  OtherEq1,",
-        "  FuelOil1,",
+        "  FuelOilNo1,",
         "  Zone1,",
         "  Schedule1,",
         "  EquipmentLevel,",

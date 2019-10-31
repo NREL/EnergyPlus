@@ -258,11 +258,11 @@ namespace Boilers {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
-                } else if (SELECT_CASE_var == "FUELOIL1") {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
-                } else if (SELECT_CASE_var == "FUELOIL2") {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
