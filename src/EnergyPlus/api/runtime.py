@@ -23,6 +23,12 @@ class Runtime:
         self.api = api
         # self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call
         self.api.energyplus.restype = c_int
+        self.api.issueWarning.argtypes = [c_char_p]
+        self.api.issueWarning.restype = c_void_p
+        self.api.issueSevere.argtypes = [c_char_p]
+        self.api.issueSevere.restype = c_void_p
+        self.api.issueText.argtypes = [c_char_p]
+        self.api.issueText.restype = c_void_p
         self.py_callback_type = CFUNCTYPE(c_void_p)
         self.api.callbackBeginNewEnvironment.argtypes = [self.py_callback_type]
         self.api.callbackBeginNewEnvironment.restype = c_void_p
@@ -104,6 +110,21 @@ class Runtime:
         # noinspection PyCallingNonCallable
         cli_args = cli_arg_type(*args_with_program_name)
         return self.api.energyplus(len(args_with_program_name), cli_args)
+
+    def issue_warning(self, message: Union[str, bytes]) -> None:
+        if isinstance(message, str):
+            message = message.encode('utf-8')
+        self.api.issueWarning(message)
+
+    def issue_severe(self, message: Union[str, bytes]) -> None:
+        if isinstance(message, str):
+            message = message.encode('utf-8')
+        self.api.issueSevere(message)
+
+    def issue_text(self, message: Union[str, bytes]) -> None:
+        if isinstance(message, str):
+            message = message.encode('utf-8')
+        self.api.issueText(message)
 
     def callback_begin_new_environment(self, f) -> None:
         """

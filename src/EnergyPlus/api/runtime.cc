@@ -50,6 +50,7 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 void cRuntimeNoOp() {}
 
@@ -67,6 +68,16 @@ int energyplus(int argc, const char *argv[]) {
 //    argv[6] = epcomp->iddPath.c_str();
 //    argv[7] = epcomp->idfInputPath.c_str();
     return runEnergyPlusAsLibrary(argc, argv);
+}
+
+void issueWarning(const char * message) {
+    EnergyPlus::ShowWarningError(message);
+}
+void issueSevere(const char * message) {
+    EnergyPlus::ShowSevereError(message);
+}
+void issueText(const char * message) {
+    EnergyPlus::ShowContinueError(message);
 }
 
 void callbackBeginNewEnvironment(void (*f)()) {

@@ -58,8 +58,16 @@ extern "C" {
 ENERGYPLUSLIB_API void cClearAllStates();
 ENERGYPLUSLIB_API void cRuntimeNoOp();
 
-    // Program level functions
+// Program level functions
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
+
+// There are a few things here to provide a way for plugins to issue messages
+// I don't see how these are really useful in API applications, but I'm not going to
+// try to isolate them.  Also, we don't have a fatal, because the plugin can just
+// return 1 from main() to signal that E+ should clean up and fatal out.
+ENERGYPLUSLIB_API void issueWarning(const char * message); // Issue the warning text to the err file
+ENERGYPLUSLIB_API void issueSevere(const char * message); // Issue the severe text to the err file
+ENERGYPLUSLIB_API void issueText(const char * message); // Issue additional supporting text to the err file
 
 ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
