@@ -6024,11 +6024,6 @@
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  PythonPlugin:SearchPaths,
-    MySearchPaths,           !- Name
-    No,                      !- Add Current Working Directory to Search Path
-    Yes;                     !- Add Input File Directory to Search Path
-
   PythonPlugin:Instance,
     Average Zone Temp Calculation,  !- Name
     Yes,                     !- Run During Warmup Days

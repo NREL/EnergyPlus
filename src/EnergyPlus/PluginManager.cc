@@ -118,6 +118,12 @@ namespace PluginManager {
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";
         int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
+        if (searchPaths == 0) {
+            // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
+            PluginManager::addToPythonPath(".", false);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            PluginManager::addToPythonPath(sanitizedInputFileDir, false);
+        }
         if (searchPaths > 0) {
             auto const instances = inputProcessor->epJSON.find(sPaths);
             if (instances == inputProcessor->epJSON.end()) {
