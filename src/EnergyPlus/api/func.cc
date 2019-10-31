@@ -53,7 +53,6 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
 
 void functionalNoOp() {}
 
