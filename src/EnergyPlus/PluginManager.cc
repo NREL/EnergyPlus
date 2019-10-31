@@ -543,6 +543,18 @@ namespace PluginManager {
             }
             EnergyPlus::ShowFatalError("Python module error causes program termination");
         }
+        std::string fileVarName = "__file__";
+        PyObject *pFullPath = PyDict_GetItemString(pModuleDict, fileVarName.c_str());
+        if (!pFullPath) {
+            // something went really wrong, this should only happen if you do some *weird* python stuff like
+            // import from database or something
+        } else {
+            PyObject* pStrObj = PyUnicode_AsUTF8String(pFullPath);
+            char* zStr = PyBytes_AsString(pStrObj);
+            std::string s(zStr);
+            Py_DECREF(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
+            ShowMessage("PythonPlugin: Class " + className + " imported from: " + s);
+        }
         PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
         // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
         if (!pClass) {
