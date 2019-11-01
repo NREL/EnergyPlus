@@ -55,7 +55,7 @@ void afterZoneTimeStepHandler()
     printf("STARTING A NEW TIME STEP\n");
     int thisKindOfSim = kindOfSim();
     if (thisKindOfSim == 2 || thisKindOfSim == 3) {
-        int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
+        int outdoorDewPointActuator = getActuatorHandle("Environment", "Weather Data", "Outdoor Dew Point");
         int response = setActuatorValue(outdoorDewPointActuator, -25);
         if (response != 0) {
             printf("Could not set actuator...\n");

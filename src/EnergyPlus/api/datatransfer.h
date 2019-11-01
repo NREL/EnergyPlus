@@ -59,7 +59,7 @@ ENERGYPLUSLIB_API void dataTransferNoOp();
 ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
 ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
-ENERGYPLUSLIB_API int getActuatorHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
 ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
 ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
 ENERGYPLUSLIB_API int setActuatorValue(int handle, Real64 value);
@@ -90,6 +90,7 @@ ENERGYPLUSLIB_API Real64 systemTimeStep();
 ENERGYPLUSLIB_API int currentEnvironmentNum();
 ENERGYPLUSLIB_API int warmupFlag();
 ENERGYPLUSLIB_API int kindOfSim();
+ENERGYPLUSLIB_API int getConstructionHandle(const char* constructionName);
 
 #ifdef __cplusplus
 }

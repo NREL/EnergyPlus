@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -84,16 +85,18 @@ int getMeterHandle(const char* meterName) {
     return EnergyPlus::GetMeterIndex(meterNameUC);
 }
 
-int getActuatorHandle(const char* type, const char* key) {
+int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType) {
     int handle;
     handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
+    std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
         handle++;
-        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
         std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
-        if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC) {
+        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
             return handle;
         }
     }
@@ -229,4 +232,17 @@ int currentEnvironmentNum() {
 }
 int kindOfSim() {
     return EnergyPlus::DataGlobals::KindOfSim;
+}
+int getConstructionHandle(const char* constructionName) {
+    int handle;
+    handle = 0;
+    std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
+    for (auto const & construct : EnergyPlus::DataHeatBalance::Construct) {
+        handle++;
+        std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);
+        if (nameUC == thisNameUC) {
+            return handle;
+        }
+    }
+    return 0;
 }

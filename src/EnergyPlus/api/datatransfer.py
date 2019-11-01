@@ -38,7 +38,7 @@ class DataExchange:
         self.api.getVariableHandle.restype = c_int
         self.api.getMeterHandle.argtypes = [c_char_p]
         self.api.getMeterHandle.restype = c_int
-        self.api.getActuatorHandle.argtypes = [c_char_p, c_char_p]
+        self.api.getActuatorHandle.argtypes = [c_char_p, c_char_p, c_char_p]
         self.api.getActuatorHandle.restype = c_int
         self.api.getVariableValue.argtypes = [c_int]
         self.api.getVariableValue.restype = RealEP
@@ -149,7 +149,12 @@ class DataExchange:
             meter_name = meter_name.encode('utf-8')
         return self.api.getMeterHandle(meter_name)
 
-    def get_actuator_handle(self, actuator_name: Union[str, bytes], actuator_key: Union[str, bytes]) -> int:
+    def get_actuator_handle(
+            self,
+            actuator_key: Union[str, bytes],
+            component_type: Union[str, bytes],
+            control_type: Union[str, bytes]
+    ) -> int:
         """
         Get a handle to an available actuator in a running simulation.
 
@@ -159,15 +164,18 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
-        :param actuator_name: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
         :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
+        :param component_type: The actuator category, e.g. "Weather Data"
+        :param control_type: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
         :return: An integer ID for this output variable, or zero if one could not be found.
         """
-        if isinstance(actuator_name, str):
-            actuator_name = actuator_name.encode('utf-8')
         if isinstance(actuator_key, str):
             actuator_key = actuator_key.encode('utf-8')
-        return self.api.getActuatorHandle(actuator_name, actuator_key)
+        if isinstance(component_type, str):
+            component_type = component_type.encode('utf-8')
+        if isinstance(control_type, str):
+            control_type = control_type.encode('utf-8')
+        return self.api.getActuatorHandle(actuator_key, component_type, control_type)
 
     def get_variable_value(self, variable_handle: int) -> float:
         """

@@ -10,7 +10,7 @@ class HeatingSetPoint(EnergyPlusPlugin):
 
     def main(self) -> int:
         if not self.handle:
-            self.handle = self.api.exchange.get_actuator_handle("Schedule Value", "HTGSETP_SCH")
+            self.handle = self.api.exchange.get_actuator_handle("HTGSETP_SCH", "Schedule:Constant", "Schedule Value")
         hour = self.api.exchange.hour()
         if hour < 7:
             self.api.exchange.set_actuator_value(self.handle, 15)
@@ -29,7 +29,7 @@ class CoolingSetPoint(EnergyPlusPlugin):
 
     def main(self) -> int:
         if not self.handle:
-            self.handle = self.api.exchange.get_actuator_handle("Schedule Value", "CLGSETP_SCH")
+            self.handle = self.api.exchange.get_actuator_handle("CLGSETP_SCH", "Schedule:Constant", "Schedule Value")
         hour = self.api.exchange.hour()
         if hour < 7:
             self.api.exchange.set_actuator_value(self.handle, 29)

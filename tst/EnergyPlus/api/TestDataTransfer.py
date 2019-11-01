@@ -18,7 +18,7 @@ def time_step_handler():
     )
     if env_count > 1:
         outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
-            "Outdoor Dew Point", "Environment"
+            "Environment", "Weather Data", "Outdoor Dew Point"
         )
         print("Handle IDs: %s, %s, %s" % (outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator))
         response = api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
