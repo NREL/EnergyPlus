@@ -1,5 +1,14 @@
-from ctypes import cdll, c_char_p, c_void_p
+from ctypes import cdll, c_char_p, c_void_p, CFUNCTYPE
+from types import FunctionType
 from pyenergyplus.common import RealEP
+
+
+# CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it
+# This causes undefined behavior but generally segfaults and illegal access violations
+# Keeping them referenced in a global array here suffices to keep GC away from it
+# And while we _could_ clean up after ourselves, I would imagine users aren't making *so* many callbacks that
+# We have anything to worry about here
+error_callbacks = []
 
 
 class Glycol:
@@ -242,6 +251,9 @@ class Functional:
         self.api.initializeFunctionalAPI.restype = c_void_p
         if not running_as_python_plugin:
             self.api.initializeFunctionalAPI()
+        self.py_error_callback_type = CFUNCTYPE(c_void_p, c_char_p)
+        self.api.registerErrorCallback.argtypes = [self.py_error_callback_type]
+        self.api.registerErrorCallback.restype = c_void_p
 
     def glycol(self, glycol_name: str) -> Glycol:
         """
@@ -276,3 +288,27 @@ class Functional:
     @staticmethod
     def ep_version() -> EnergyPlusVersion:
         return EnergyPlusVersion()
+
+    def callback_error(self, f: FunctionType) -> None:
+        """
+        This function allows a client to register a function to be called back by EnergyPlus when an error message
+        is added to the error file.  The user can then detect specific error messages or whatever.
+
+        :param f: A python function which takes a string (bytes) argument and returns nothing
+        :return: Nothing
+        """
+        cb_ptr = self.py_error_callback_type(f)
+        error_callbacks.append(cb_ptr)
+        self.api.registerErrorCallback(cb_ptr)
+
+    @staticmethod
+    def clear_callbacks():
+        """
+        This function is only used if you are running this script continually making many calls into the E+ library in
+        one thread, each with many new and different error handler callbacks, and you need to clean up.
+
+        Note this will affect all current instances in this thread, so use carefully!
+
+        :return: Nothing
+        """
+        error_callbacks.clear()

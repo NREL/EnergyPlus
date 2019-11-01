@@ -66,6 +66,10 @@ const char * apiVersionFromEPlus() {
     return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
 }
 
+void registerErrorCallback(void (*f)(const char * errorMessage)) {
+    EnergyPlus::DataGlobals::errorCallback = f;
+}
+
 Glycol glycolNew(const char* glycolName) {
     auto glycol = new EnergyPlus::FluidProperties::GlycolAPI(glycolName);
     return reinterpret_cast<Glycol>(glycol);

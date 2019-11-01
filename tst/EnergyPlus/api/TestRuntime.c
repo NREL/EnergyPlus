@@ -47,6 +47,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
 
 int numWarnings = 0;
@@ -71,8 +72,8 @@ void errorHandler(const char * message) {
 }
 
 int main(int argc, const char * argv[]) {
-    callbackProgress(progressHandler);
-    callbackError(errorHandler);
+    registerProgressCallback(progressHandler);
+    registerErrorCallback(errorHandler);
     energyplus(argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);

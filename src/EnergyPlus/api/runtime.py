@@ -1,4 +1,4 @@
-from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE, POINTER
+from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
 from typing import Union, List
 from types import FunctionType
 
@@ -31,14 +31,11 @@ class Runtime:
         self.api.issueText.argtypes = [c_char_p]
         self.api.issueText.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
-        self.api.callbackProgress.argtypes = [self.py_progress_callback_type]
-        self.api.callbackProgress.restype = c_void_p
+        self.api.registerProgressCallback.argtypes = [self.py_progress_callback_type]
+        self.api.registerProgressCallback.restype = c_void_p
         self.py_message_callback_type = CFUNCTYPE(c_void_p, c_char_p)
-        self.api.callbackStdOut.argtypes = [self.py_message_callback_type]
-        self.api.callbackStdOut.restype = c_void_p
-        self.py_error_callback_type = CFUNCTYPE(c_void_p, c_char_p)
-        self.api.callbackError.argtypes = [self.py_error_callback_type]
-        self.api.callbackError.restype = c_void_p
+        self.api.registerStdOutCallback.argtypes = [self.py_message_callback_type]
+        self.api.registerStdOutCallback.restype = c_void_p
         self.py_empty_callback_type = CFUNCTYPE(c_void_p)
         self.api.callbackBeginNewEnvironment.argtypes = [self.py_empty_callback_type]
         self.api.callbackBeginNewEnvironment.restype = c_void_p
@@ -146,7 +143,7 @@ class Runtime:
         """
         cb_ptr = self.py_progress_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackProgress(cb_ptr)
+        self.api.registerProgressCallback(cb_ptr)
 
     def callback_message(self, f: FunctionType) -> None:
         """
@@ -160,19 +157,7 @@ class Runtime:
         """
         cb_ptr = self.py_message_callback_type(f)
         all_callbacks.append(cb_ptr)
-        self.api.callbackStdOut(cb_ptr)
-
-    def callback_error(self, f: FunctionType) -> None:
-        """
-        This function allows a client to register a function to be called back by EnergyPlus when an error message
-        is added to the error file.  The user can then detect specific error messages or whatever.
-
-        :param f: A python function which takes a string (bytes) argument and returns nothing
-        :return: Nothing
-        """
-        cb_ptr = self.py_error_callback_type(f)
-        all_callbacks.append(cb_ptr)
-        self.api.callbackError(cb_ptr)
+        self.api.registerStdOutCallback(cb_ptr)
 
     def callback_begin_new_environment(self, f: FunctionType) -> None:
         """
@@ -381,8 +366,7 @@ class Runtime:
     def clear_callbacks():
         """
         This function is only used if you are running this script continually making many calls into the E+ library in
-        one thread, and you need to clean up.  Since E+ is currently not able to reliably re-run, this function
-        shouldn't be necessary anytime soon, but it's here just in case.
+        one thread, each with new and different callbacks, and you need to clean up.
 
         Note this will affect all current Runtime instances in this thread, so use carefully!
 

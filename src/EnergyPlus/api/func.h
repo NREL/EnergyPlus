@@ -61,6 +61,7 @@ void functionalNoOp();
 
 ENERGYPLUSLIB_API void initializeFunctionalAPI();
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus();
+ENERGYPLUSLIB_API void registerErrorCallback(void (*f)(const char * errorMessage));
 
 // Glycol("WATER")
 ENERGYPLUSLIB_API typedef void * Glycol;

@@ -71,9 +71,8 @@ ENERGYPLUSLIB_API void issueText(const char * message); // Issue additional supp
 
 // We can also provide a way for EnergyPlus to callback during an API run
 // These are not useful in Python Plugin applications, just during API calls
-ENERGYPLUSLIB_API void callbackProgress(void (*f)(int const));
-ENERGYPLUSLIB_API void callbackStdOut(void (*f)(const char * message));
-ENERGYPLUSLIB_API void callbackError(void (*f)(const char * errorMessage));
+ENERGYPLUSLIB_API void registerProgressCallback(void (*f)(int const));
+ENERGYPLUSLIB_API void registerStdOutCallback(void (*f)(const char * message));
 
 ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
