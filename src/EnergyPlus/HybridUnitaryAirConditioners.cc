@@ -299,8 +299,6 @@ namespace HybridUnitaryAirConditioners {
                                                                          "InitZoneHybridUnitaryAirConditioners");
 
         // Set default outlet state to inlet states, just to be safe
-        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Temp;
-        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;   // Supply Air Node
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
@@ -423,9 +421,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNodeNum;
-
-        ZoneNodeNum = ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum;
 
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
 
