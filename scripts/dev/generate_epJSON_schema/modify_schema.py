@@ -283,3 +283,4 @@ def change_89_release_issues(schema):
 
     get_schema_object(schema, 'Schedule:Week:Compact')['properties']['data']['items']['properties']['daytype_list'].pop('enum')
 
+
