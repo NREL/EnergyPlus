@@ -70,16 +70,8 @@ void afterZoneTimeStepHandler()
 }
 
 
-int main() {
+int main(int argc, const char * argv[]) {
     callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-    const int argc = 6;
-    const char * argv[argc];
-    argv[0] = "energyplus";
-    argv[1] = "-d";
-    argv[2] = "/tmp/epdll";
-    argv[3] = "-w";
-    argv[4] = "/tmp/epdll/in.epw";
-    argv[5] = "/tmp/epdll/in.idf";
     energyplus(argc, argv);
     return 0;
 }

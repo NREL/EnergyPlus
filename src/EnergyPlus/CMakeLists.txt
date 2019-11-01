@@ -734,13 +734,60 @@ if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
   target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
-  add_test(NAME "integration.TestEnergyPlusCallbacks"
+  add_test(NAME "API.LegacyCallbackTest"
            COMMAND ${CMAKE_COMMAND}
            -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
            -DBINARY_DIR=${CMAKE_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
            -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
+
+  set(EPW_FILE "${CMAKE_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+  set(IDF_FILE "${CMAKE_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
+
+  add_executable( TestAPI_Functional_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c )
+  target_link_libraries( TestAPI_Functional_C energyplusapi )
+  add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
+
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tst/api/)
+
+  set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/runtime")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable( TestAPI_Runtime_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c )
+  target_link_libraries( TestAPI_Runtime_C energyplusapi )
+  add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
+  set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/exchange")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_executable( TestAPI_DataTransfer_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c )
+  target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
+  add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
+  # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
+  # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
+  if (NOT MSVC)
+    set(API_TEST_TARGET_DIR "${CMAKE_BINARY_DIR}/Products")
+
+    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
+    add_test(NAME "API.TestFunctionalPython"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/runtime_python")
+    file(MAKE_DIRECTORY ${TEST_DIR})
+    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py" )
+    add_test(NAME "API.TestRuntimePython"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/exchange_python")
+    file(MAKE_DIRECTORY ${TEST_DIR})
+    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
+    add_test(NAME "API.TestDataTransferPython"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+  endif()
+
 endif()
 
 if(UNIX AND NOT APPLE)

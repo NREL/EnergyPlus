@@ -56,15 +56,8 @@ void newEnvrnHandler() {
     printf("Starting a new environment\n");
 }
 
-int main() {
+int main(int argc, const char * argv[]) {
     callbackEndOfZoneTimeStepAfterZoneReporting(timeStepHandler);
-    const int argc = 5;
-    const char * argv[argc];
-    argv[0] = "-d";
-    argv[1] = "/tmp/epdll";
-    argv[2] = "-w";
-    argv[3] = "/tmp/epdll/in.epw";
-    argv[4] = "/tmp/epdll/in.idf";
     energyplus(argc, argv);
     cClearAllStates();
     callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);

@@ -9,11 +9,4 @@ def hour_handler():
 
 api = EnergyPlusAPI()
 api.runtime.callback_end_zone_timestep_after_zone_reporting(hour_handler)
-argv = [
-    "-d",
-    "/tmp/epdll",
-    "-w",
-    "/tmp/epdll/in.epw",
-    "/tmp/epdll/in.idf"
-]
-api.runtime.run_energyplus(argv)
+api.runtime.run_energyplus(sys.argv[1:])

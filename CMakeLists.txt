@@ -217,7 +217,6 @@ ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
-  ADD_SUBDIRECTORY(tst/EnergyPlus/api)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
   option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
   if (BUILD_PERFORMANCE_TESTS)
