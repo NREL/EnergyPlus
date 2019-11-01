@@ -1941,6 +1941,8 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     if (present(OutUnit2)) {
         ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
     }
+    std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+    if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
 }
 
 void SummarizeErrors()

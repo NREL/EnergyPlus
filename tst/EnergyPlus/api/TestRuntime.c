@@ -46,21 +46,45 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
+#include <string.h>
 #include <EnergyPlus/api/runtime.h>
 
-void timeStepHandler() {
-    printf("Finishing another zone time step\n");
-}
+int numWarnings = 0;
+int oneTimeHalfway = 0;
 
 void newEnvrnHandler() {
     printf("Starting a new environment\n");
 }
 
+void progressHandler(int const progress) {
+    if (oneTimeHalfway == 0 && progress > 50) {
+        printf("Were halfway there!\n");
+        oneTimeHalfway = 1;
+    }
+}
+
+void errorHandler(const char * message) {
+    char * warning = strstr(message, "Warning");
+    if (warning) {
+        numWarnings++;
+    }
+}
+
 int main(int argc, const char * argv[]) {
-    callbackEndOfZoneTimeStepAfterZoneReporting(timeStepHandler);
+    callbackProgress(progressHandler);
+    callbackError(errorHandler);
     energyplus(argc, argv);
-    cClearAllStates();
+    if (numWarnings > 0) {
+        printf("There were %d warnings!\n", numWarnings);
+        numWarnings = 0;
+    }
+    oneTimeHalfway = 0;
+    cClearAllStates(); // note previous callbacks are cleared here
     callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);
     energyplus(argc, argv);
+    if (numWarnings > 0) {
+        printf("There were %d warnings!\n", numWarnings);
+        numWarnings = 0;
+    }
     return 0;
 }

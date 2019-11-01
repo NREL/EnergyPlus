@@ -295,9 +295,15 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+
     extern int Progress;
+    // these are the old ones
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
+    // these are the new ones
+    extern void (*progressCallback)(int const);
+    extern void (*messageCallback)(const char * message);
+    extern void (*errorCallback)(const char * errorMessage);
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
 
     // Clears the global data in DataGlobals.

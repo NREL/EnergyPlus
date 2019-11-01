@@ -80,6 +80,16 @@ void issueText(const char * message) {
     EnergyPlus::ShowContinueError(message);
 }
 
+void callbackProgress(void (*f)(int const)) {
+    EnergyPlus::DataGlobals::progressCallback = f;
+}
+void callbackStdOut(void (*f)(const char * message)) {
+    EnergyPlus::DataGlobals::messageCallback = f;
+}
+void callbackError(void (*f)(const char * errorMessage)) {
+    EnergyPlus::DataGlobals::errorCallback = f;
+}
+
 void callbackBeginNewEnvironment(void (*f)()) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }

@@ -69,6 +69,12 @@ ENERGYPLUSLIB_API void issueWarning(const char * message); // Issue the warning 
 ENERGYPLUSLIB_API void issueSevere(const char * message); // Issue the severe text to the err file
 ENERGYPLUSLIB_API void issueText(const char * message); // Issue additional supporting text to the err file
 
+// We can also provide a way for EnergyPlus to callback during an API run
+// These are not useful in Python Plugin applications, just during API calls
+ENERGYPLUSLIB_API void callbackProgress(void (*f)(int const));
+ENERGYPLUSLIB_API void callbackStdOut(void (*f)(const char * message));
+ENERGYPLUSLIB_API void callbackError(void (*f)(const char * errorMessage));
+
 ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
 ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)());
