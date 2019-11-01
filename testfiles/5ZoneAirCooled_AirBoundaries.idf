@@ -3494,8 +3494,6 @@
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 22
     BACK-1,                  !- Extended Field
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB35,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
     F3-1,                    !- Extended Field
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
     C3-1,                    !- Extended Field
@@ -3577,8 +3575,6 @@
     WB-1,                    !- Extended Field
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
     DB-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB35,                    !- Extended Field
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
     F3-1,                    !- Extended Field
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field

@@ -24,8 +24,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_PICOJSON_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_PICOJSON_ADAPTER_HPP
 
 #include <string>
 
@@ -723,5 +721,3 @@ inline PicoJsonObjectMemberIterator PicoJsonObject::find(
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif

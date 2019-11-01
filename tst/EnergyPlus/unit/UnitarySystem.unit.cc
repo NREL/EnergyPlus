@@ -86,7 +86,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <General.hh>
+#include <EnergyPlus/General.hh>
 
 using namespace EnergyPlus;
 using namespace UnitarySystems;

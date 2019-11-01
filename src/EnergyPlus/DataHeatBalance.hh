@@ -57,14 +57,14 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataComplexFenestration.hh>
-#include <DataGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <EnergyPlus.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -344,12 +344,13 @@ namespace DataHeatBalance {
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
  
    // Flags for HeatTransfer Algorithms Used
-    extern bool AnyCTF;         // CTF used
-    extern bool AnyEMPD;        // EMPD used
-    extern bool AnyCondFD;      // CondFD used
-    extern bool AnyHAMT;        // HAMT used
-    extern bool AnyKiva;        // Kiva used
-    extern bool AnyAirBoundary; // Construction:AirBoundary used
+    extern bool AnyCTF;                     // CTF used
+    extern bool AnyEMPD;                    // EMPD used
+    extern bool AnyCondFD;                  // CondFD used
+    extern bool AnyHAMT;                    // HAMT used
+    extern bool AnyKiva;                    // Kiva used
+    extern bool AnyAirBoundary;             // Construction:AirBoundary used
+    extern bool AnyAirBoundaryGroupedSolar; // Construction:AirBoundary with GroupedZones for solar used somewhere
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
@@ -436,6 +437,7 @@ namespace DataHeatBalance {
 
     extern bool NoFfactorConstructionsUsed;
     extern bool NoCfactorConstructionsUsed;
+    extern bool NoRegularMaterialsUsed;
 
     extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
     extern int NumRefrigSystems;     // Total number of detailed refrigeration systems in input

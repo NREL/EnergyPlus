@@ -55,7 +55,7 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <DataErrorTracking.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -65,7 +65,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <OutputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <HeatBalanceKivaManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
 #include <map>
@@ -389,6 +389,12 @@ namespace SurfaceGeometry {
     bool isRectangle(int const ThisSurf // Current surface number
     );
 
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    );
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

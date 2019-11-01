@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -368,6 +368,7 @@ namespace OutputReportPredefined {
     extern int pdchCoilDateTimeTotIdealPeak;
     extern int pdchCoilDDnameAirFlowIdealPeak;
     extern int pdchCoilDateTimeAirFlowIdealPeak;
+    extern int pdchCoilPeakLoadTypeToSizeOn;
     extern int pdchCoilTotalCapIdealPeak;
     extern int pdchCoilSensCapIdealPeak;
     extern int pdchCoilOffRatingCapacityModifierIdealPeak;

@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -76,14 +76,15 @@ namespace DataViewFactorInformation {
         Array1D<Real64> Emissivity;         // Surface emissivity
         Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
         Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
-        Array1D_int SurfacePtr;             // Surface ALLOCATABLE (to Surface derived type)
-        Real64 FloorArea;                   // Floor area of zone(s) in radiant enclosure
+        Array1D_int SurfacePtr;             // Surface number for surfaces in this enclosure
+        Real64 FloorArea;                   // Floor area of zone(s) in enclosure
         Real64 ExtWindowArea;               // Exterior window area
         Real64 TotalSurfArea;               // Total surface area
         Array1D<Real64> SolAbsorptance;     // Surface solar absorptance
+        int TotalEnclosureDaylRefPoints;    // Total number of daylighting reference points in enclosure
 
         // Default Constructor
-        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0)
+        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
         {
         }
     };

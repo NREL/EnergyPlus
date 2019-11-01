@@ -1,6 +1,4 @@
 #pragma once
-#ifndef VALIJSON_POCO_JSON_UTILS_HPP
-#define VALIJSON_POCO_JSON_UTILS_HPP
 
 #include <iostream>
 
@@ -13,7 +11,8 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, Poco::Dynamic::Var &document) {
+inline bool loadDocument(const std::string &path, Poco::Dynamic::Var &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
@@ -36,5 +35,3 @@ inline bool loadDocument(const std::string &path, Poco::Dynamic::Var &document) 
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif //VALIJSON_POCO_JSON_UTILS_HPP

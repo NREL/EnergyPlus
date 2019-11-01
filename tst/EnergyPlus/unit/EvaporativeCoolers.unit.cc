@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <SimAirServingZones.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
