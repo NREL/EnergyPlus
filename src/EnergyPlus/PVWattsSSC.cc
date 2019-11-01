@@ -51,8 +51,8 @@
 // C++ Headers
 #include <math.h>
 
-#include <General.hh>
-#include <PVWattsSSC.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/PVWattsSSC.hh>
 
 namespace EnergyPlus {
 
