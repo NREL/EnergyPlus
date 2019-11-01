@@ -2820,10 +2820,10 @@ namespace WaterThermalTanks {
                         } else if (SELECT_CASE_var == "COAL") {
                             WaterThermalTank(WaterThermalTankNum).OnCycParaFuelType = "Coal";
 
-                        } else if (SELECT_CASE_var == "FUELOIL#1") {
+                        } else if (SELECT_CASE_var == "FUELOILNO1") {
                             WaterThermalTank(WaterThermalTankNum).OnCycParaFuelType = "FuelOil#1";
 
-                        } else if (SELECT_CASE_var == "FUELOIL#2") {
+                        } else if (SELECT_CASE_var == "FUELOILNO2") {
                             WaterThermalTank(WaterThermalTankNum).OnCycParaFuelType = "FuelOil#2";
 
                         } else if (SELECT_CASE_var == "PROPANEGAS") {
