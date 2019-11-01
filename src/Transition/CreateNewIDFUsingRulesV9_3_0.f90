@@ -405,7 +405,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 67) THEN
-                   CALL FixFuelTypes(OutArgs(67))
+                   CALL FixFuelTypes(OutArgs(67), NoDiff)
                  END IF
 
               ! If your original object starts with B, insert the rules here
@@ -415,7 +415,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
              CASE('BOILER:STEAM')
@@ -423,7 +423,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
               ! If your original object starts with C, insert the rules here
@@ -433,7 +433,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 36) THEN
-                   CALL FixFuelTypes(OutArgs(36))
+                   CALL FixFuelTypes(OutArgs(36), NoDiff)
                  END IF
 
              CASE('CHILLER:COMBUSTIONTURBINE')
@@ -441,7 +441,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 55) THEN
-                   CALL FixFuelTypes(OutArgs(55))
+                   CALL FixFuelTypes(OutArgs(55), NoDiff)
                  END IF
 
              CASE('CHILLERHEATER:ABSORPTION:DIRECTFIRED')
@@ -449,7 +449,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 33) THEN
-                   CALL FixFuelTypes(OutArgs(33))
+                   CALL FixFuelTypes(OutArgs(33), NoDiff)
                  END IF
 
              CASE('COIL:COOLING:DX:MULTISPEED')
@@ -457,7 +457,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 17) THEN
-                   CALL FixFuelTypes(OutArgs(17))
+                   CALL FixFuelTypes(OutArgs(17), NoDiff)
                  END IF
 
              CASE('COIL:HEATING:FUEL')
@@ -465,7 +465,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 3) THEN
-                   CALL FixFuelTypes(OutArgs(3))
+                   CALL FixFuelTypes(OutArgs(3), NoDiff)
                  END IF
 
              CASE('COIL:HEATING:DX:MULTISPEED')
@@ -473,7 +473,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 16) THEN
-                   CALL FixFuelTypes(OutArgs(16))
+                   CALL FixFuelTypes(OutArgs(16), NoDiff)
                  END IF
 
               ! If your original object starts with D, insert the rules here
@@ -485,7 +485,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 5) THEN
-                   CALL FixFuelTypes(OutArgs(5))
+                   CALL FixFuelTypes(OutArgs(5), NoDiff)
                  END IF
 
              CASE('EXTERIOR:FUELEQUIPMENT')
@@ -493,7 +493,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
               ! If your original object starts with F, insert the rules here
@@ -503,7 +503,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 1) THEN
-                   CALL FixFuelTypes(OutArgs(1))
+                   CALL FixFuelTypes(OutArgs(1), NoDiff)
                    ! For fuelfactors, the current IDD choice is Propane, so override that here until #5941 is resolved (standardize fuel types)
                    IF (SameString(OutArgs(1), "PropaneGas")) OutArgs(1) = "Propane"
                  END IF
@@ -515,7 +515,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 22) THEN
-                   CALL FixFuelTypes(OutArgs(22))
+                   CALL FixFuelTypes(OutArgs(22), NoDiff)
                  END IF
 
              CASE('GENERATOR:INTERNALCOMBUSTIONENGINE')
@@ -523,7 +523,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 20) THEN
-                   CALL FixFuelTypes(OutArgs(20))
+                   CALL FixFuelTypes(OutArgs(20), NoDiff)
                  END IF
 
              CASE('GENERATOR:MICROTURBINE')
@@ -531,7 +531,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 12) THEN
-                   CALL FixFuelTypes(OutArgs(12))
+                   CALL FixFuelTypes(OutArgs(12), NoDiff)
                  END IF
 
              CASE('GLOBALGEOMETRYRULES')
@@ -617,7 +617,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 37) THEN
-                   CALL FixFuelTypes(OutArgs(37))
+                   CALL FixFuelTypes(OutArgs(37), NoDiff)
                  END IF
 
              CASE('HVACTEMPLATE:PLANT:BOILER')
@@ -625,7 +625,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 5) THEN
-                   CALL FixFuelTypes(OutArgs(5))
+                   CALL FixFuelTypes(OutArgs(5), NoDiff)
                  END IF
 
               ! If your original object starts with I, insert the rules here
@@ -637,7 +637,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
              CASE('LIFECYCLECOST:USEADJUSTMENT')
@@ -645,7 +645,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
               ! If your original object starts with M, insert the rules here
@@ -655,7 +655,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
              !    ! FixFuelTypes will set NoDiff = .false. if it makes a change
              !    OutArgs(1:CurArgs)=InArgs(1:CurArgs)
              !    IF (CurArgs .GE. 2) THEN
-             !      CALL FixFuelTypes(OutArgs(2))
+             !      CALL FixFuelTypes(OutArgs(2), NoDiff)
              !    END IF
 
              !CASE('METER:CUSTOMDECREMENT') - resource type cleanup done below along with variable name changes 
@@ -663,7 +663,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
              !    ! FixFuelTypes will set NoDiff = .false. if it makes a change
              !    OutArgs(1:CurArgs)=InArgs(1:CurArgs)
              !    IF (CurArgs .GE. 2) THEN
-             !      CALL FixFuelTypes(OutArgs(2))
+             !      CALL FixFuelTypes(OutArgs(2), NoDiff)
              !    END IF
 
               ! If your original object starts with N, insert the rules here
@@ -675,7 +675,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 2) THEN
-                   CALL FixFuelTypes(OutArgs(2))
+                   CALL FixFuelTypes(OutArgs(2), NoDiff)
                  END IF
 
              CASE('OUTPUT:TABLE:SUMMARYREPORTS')
@@ -716,13 +716,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 11) THEN
-                   CALL FixFuelTypes(OutArgs(11))
+                   CALL FixFuelTypes(OutArgs(11), NoDiff)
                  END IF
                  IF (CurArgs .GE. 15) THEN
-                   CALL FixFuelTypes(OutArgs(15))
+                   CALL FixFuelTypes(OutArgs(15), NoDiff)
                  END IF
                  IF (CurArgs .GE. 18) THEN
-                   CALL FixFuelTypes(OutArgs(18))
+                   CALL FixFuelTypes(OutArgs(18), NoDiff)
                  END IF
 
              CASE('WATERHEATER:STRATIFIED')
@@ -730,13 +730,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 17) THEN
-                   CALL FixFuelTypes(OutArgs(17))
+                   CALL FixFuelTypes(OutArgs(17), NoDiff)
                  END IF
                  IF (CurArgs .GE. 20) THEN
-                   CALL FixFuelTypes(OutArgs(20))
+                   CALL FixFuelTypes(OutArgs(20), NoDiff)
                  END IF
                  IF (CurArgs .GE. 24) THEN
-                   CALL FixFuelTypes(OutArgs(24))
+                   CALL FixFuelTypes(OutArgs(24), NoDiff)
                  END IF
 
               ! If your original object starts with Z, insert the rules here
@@ -745,13 +745,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 18) THEN
-                   CALL FixFuelTypes(OutArgs(18))
+                   CALL FixFuelTypes(OutArgs(18), NoDiff)
                  END IF
                  IF (CurArgs .GE. 19) THEN
-                   CALL FixFuelTypes(OutArgs(19))
+                   CALL FixFuelTypes(OutArgs(19), NoDiff)
                  END IF
                  IF (CurArgs .GE. 20) THEN
-                   CALL FixFuelTypes(OutArgs(20))
+                   CALL FixFuelTypes(OutArgs(20), NoDiff)
                  END IF
 
 
@@ -977,7 +977,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! FixFuelTypes will set NoDiff = .false. if it makes a change
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 IF (CurArgs .GE. 2) THEN
-                  CALL FixFuelTypes(OutArgs(2))
+                  CALL FixFuelTypes(OutArgs(2), NoDiff)
                 END IF
                 ! end of Fix resource type
                 CurVar=4
@@ -1092,7 +1092,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! FixFuelTypes will set NoDiff = .false. if it makes a change
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 IF (CurArgs .GE. 2) THEN
-                  CALL FixFuelTypes(OutArgs(2))
+                  CALL FixFuelTypes(OutArgs(2), NoDiff)
                 END IF
                 ! end of Fix resource type
                 CurVar=4   ! In case Source Meter would change
@@ -1331,57 +1331,57 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
 END SUBROUTINE CreateNewIDFUsingRules
 
-SUBROUTINE FixFuelTypes(InOutArg)
+SUBROUTINE FixFuelTypes(InOutArg, NoDiffArg)
   USE InputProcessor, ONLY: SameString
   CHARACTER(len=*), INTENT(INOUT) :: InOutArg
-      
+  LOGICAL, INTENT(INOUT) :: NoDiffArg
   IF (SameString( InOutArg, 'Electric' )) THEN
     InOutArg = 'Electricity'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'Elec' )) THEN
     InOutArg = 'Electricity'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'Gas' )) THEN
     InOutArg = 'NaturalGas'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'Natural Gas' )) THEN
     InOutArg = 'NaturalGas'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'PropaneGas' )) THEN
     InOutArg = 'Propane'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'LPG' )) THEN
     InOutArg = 'Propane'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'Propane Gas' )) THEN
     InOutArg = 'Propane'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'FUELOIL#1' )) THEN
     InOutArg = 'FuelOilNo1'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
     InOutArg = 'FuelOilNo1'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
     InOutArg = 'FuelOilNo1'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
     InOutArg = 'FuelOilNo1'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
     InOutArg = 'FuelOilNo1'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'FUELOIL#2' )) THEN
     InOutArg = 'FuelOilNo2'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
     InOutArg = 'FuelOilNo2'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
     InOutArg = 'FuelOilNo2'
-    NoDiff=.false.
+    NoDiffArg=.false.
   ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
     InOutArg = 'FuelOilNo2'
-    NoDiff=.false.
+    NoDiffArg=.false.
   END IF
 END SUBROUTINE
