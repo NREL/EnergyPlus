@@ -48,6 +48,11 @@
 #include <stdio.h>
 #include <EnergyPlus/api/func.h>
 
+int errorsOccurred = 0;
+void errorHandler(const char * message) {
+    errorsOccurred++;
+}
+
 int main() {
     initializeFunctionalAPI();
 
@@ -139,6 +144,17 @@ int main() {
     printf("C API Test: Calculated energy?: %8.4f\n", energy);
     Real64 moisture_energy = psyHgAirFnWTdb(24);
     printf("C API Test: Calculated energy of moisture: %8.4f\n", moisture_energy);
+
+    // check that we get error messages back:
+    registerErrorCallback(errorHandler);
+    Real64 dpErroneous = psyTdpFnTdbTwbPb(16, 17, 101325);
+    printf("C API Test: Got back erroneous value of dew point: %8.4f\n", dpErroneous);
+    if (errorsOccurred > 0) {
+        printf("C API Test: Errors were caught during dew point calculation, good!\n");
+    } else {
+        printf("C API Test: Errors were NOT caught during dew point calculation, bad!\n");
+        return 1;
+    }
 
     return 0;
 }

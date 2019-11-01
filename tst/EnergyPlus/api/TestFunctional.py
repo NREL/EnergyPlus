@@ -1,3 +1,5 @@
+import sys
+
 from pyenergyplus.api import EnergyPlusAPI
 
 api = EnergyPlusAPI()
@@ -81,3 +83,21 @@ energy = psychrometrics.latent_energy_of_air(24)
 print("Python API Test: Calculated energy?: %8.4f" % energy)
 moisture_energy = psychrometrics.latent_energy_of_moisture_in_air(24)
 print("Python API Test: Calculated energy of moisture: %8.4f" % moisture_energy)
+
+# check that we get error messages back:
+error_count = 0
+
+
+def error_handler(message: bytes) -> None:
+    global error_count
+    error_count += 1
+
+
+api.functional.callback_error(error_handler)
+erroneous_dew_point = psychrometrics.dew_point_b(16, 17, 101325)
+print("Python API Test: Got back erroneous value of dew point: %8.4f\n" % erroneous_dew_point)
+if error_count > 0:
+    print("Python API Test: Errors were caught during dew point calculation, good!")
+else:
+    print("Python API Test: Errors were NOT caught during dew point calculation, bad!")
+    sys.exit(1)
