@@ -490,7 +490,7 @@ namespace MicroturbineElectricGenerator {
                 } else if (SELECT_CASE_var == "NATURALGAS") {
                     FuelType = "Gas";
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     FuelType = "Propane";
 
                 } else {

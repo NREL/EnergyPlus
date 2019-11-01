@@ -2826,7 +2826,7 @@ namespace WaterThermalTanks {
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
                             WaterThermalTank(WaterThermalTankNum).OnCycParaFuelType = "FuelOil#2";
 
-                        } else if (SELECT_CASE_var == "PROPANEGAS") {
+                        } else if (SELECT_CASE_var == "PROPANE") {
                             WaterThermalTank(WaterThermalTankNum).OnCycParaFuelType = "Propane";
 
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {

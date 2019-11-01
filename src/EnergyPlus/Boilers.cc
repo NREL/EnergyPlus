@@ -266,7 +266,7 @@ namespace Boilers {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 

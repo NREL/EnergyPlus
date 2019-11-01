@@ -511,7 +511,7 @@ namespace ChillerGasAbsorption {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                     ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
                     ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                     Get_ErrorsFound = true;
                 }
             }
