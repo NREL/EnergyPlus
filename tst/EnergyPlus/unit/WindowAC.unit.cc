@@ -48,18 +48,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "DataGlobals.hh"
-#include "DataHVACGlobals.hh"
-#include "DataZoneEnergyDemands.hh"
-#include "ElectricPowerServiceManager.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "HeatBalanceManager.hh"
-#include "OutputProcessor.hh"
-#include "OutputReportPredefined.hh"
-#include "ScheduleManager.hh"
-#include "SimulationManager.hh"
-#include "SizingManager.hh"
-#include "WindowAC.hh"
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WindowAC.hh>
 
 using namespace EnergyPlus;
 

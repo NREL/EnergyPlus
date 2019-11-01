@@ -56,8 +56,8 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 // SSC Headers
 #include <lib_irradproc.h>

@@ -60,33 +60,33 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DataZoneEquipment.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <ScheduleManager.hh>
-#include <SurfaceGeometry.hh>
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -871,7 +871,6 @@ namespace SurfaceGeometry {
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
         static bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int Lay;                      // Layer number
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
         static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
         int Loop;
@@ -1084,6 +1083,10 @@ namespace SurfaceGeometry {
         if (CalcSolRefl) GetShadingSurfReflectanceData(ErrorsFound);
 
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
+
+        if (ErrorsFound) {
+            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+        }
 
         // Have to make room for added surfaces, if needed
         FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
@@ -1435,17 +1438,13 @@ namespace SurfaceGeometry {
                                 // check layers as number of layers is the same
                                 izConstDiff = false;
                                 // ok if same nominal U
-                                for (Lay = 1; Lay <= TotLay; ++Lay) {
-                                    if (Construct(ConstrNum).LayerPoint(Lay) != Construct(ConstrNumFound).LayerPoint(TotLay - Lay + 1)) {
-                                        izConstDiff = true;
-                                        break; // exit when diff
-                                    }
-                                }
+                                CheckForReversedLayers(izConstDiff, ConstrNum, ConstrNumFound, TotLay);
                                 if (izConstDiff && std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     if (!Construct(ConstrNum).ReverseConstructionLayersOrderWarning ||
                                         !Construct(ConstrNumFound).ReverseConstructionLayersOrderWarning) {
                                         ShowContinueError("...this problem for this pair will not be reported again.");
@@ -1458,6 +1457,7 @@ namespace SurfaceGeometry {
                                                      Surface(SurfNum).Name +
                                                      " does not have the same materials in the reverse order as the construction " +
                                                      Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     ShowContinueError("...but Nominal U values are similar, diff=[" +
                                                       RoundSigDigits(std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)), 4) +
                                                       "] ... simulation proceeds.");
@@ -1992,7 +1992,9 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) continue;
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
+                    continue;
+                }
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {
@@ -7051,19 +7053,6 @@ namespace SurfaceGeometry {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
                 DataHeatBalance::AnyKiva = true;
             }
-            // if (surf.HeatTransSurf) {
-            //    if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
-            //        // IRT air boundaries use CTF algorithm
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_CTF;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryInteriorWindow) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryIntWin;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryNoHT;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    }
-            //}
         }
 
         // Setup Kiva instances
@@ -12748,11 +12737,9 @@ namespace SurfaceGeometry {
 
     void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound)
     {
-        bool anySolarGroupedZones = false;
         int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             std::string RoutineName = "SetupSolarEnclosuresAndAirBoundaries";
-            int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
                 if (surf.Construction == 0) continue;
@@ -12768,7 +12755,7 @@ namespace SurfaceGeometry {
                     // Solar distribution
                     if (constr.TypeIsAirBoundarySolar) {
                         // Boundary is grouped - assign solar enclosure
-                        anySolarGroupedZones = true;
+                        DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
                         auto &thisSideEnclosureNum(Zone(surf.Zone).SolarEnclosureNum);
                         auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum);
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
@@ -12839,13 +12826,8 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            if (errorCount > 0) {
-                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
-                                " surfaces use Construction:AirBoundary in non-interzone surfaces.");
-                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
-            }
         }
-        if (anySolarGroupedZones) {
+        if (DataHeatBalance::AnyAirBoundaryGroupedSolar) {
             // All grouped solar zones have been assigned to an enclosure, now assign remaining zones
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 if (Zone(zoneNum).SolarEnclosureNum == 0) {
@@ -13280,6 +13262,88 @@ namespace SurfaceGeometry {
         Surface(SurfNum).Width = WidthEff;
         Surface(SurfNum).Height = HeightEff;
     }
+    
+
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    )
+    {
+        
+        RevLayerDiffs = false;
+        
+        for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
+            auto &thisConstLayer(Construct(ConstrNum).LayerPoint(LayerNo));
+            auto &revConstLayer(Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
+            auto &thisMatLay(Material(thisConstLayer));
+            auto &revMatLay(Material(revConstLayer));
+            if ((thisConstLayer != revConstLayer) ||    // Not pointing to the same layer
+                (thisMatLay.Group == WindowGlass) ||    // Not window glass or glass equivalent layer which have
+                (revMatLay.Group == WindowGlass) ||     // to have certain properties flipped from front to back
+                (thisMatLay.Group == GlassEquivalentLayer) ||
+                (revMatLay.Group == GlassEquivalentLayer)) {
+                // If not point to the same layer, check to see if this is window glass which might need to have
+                // front and back material properties reversed.
+                Real64 const SmallDiff = 0.0001;
+                if ((thisMatLay.Group == WindowGlass) && (revMatLay.Group == WindowGlass)) {
+                    // Both layers are window glass, so need to check to see if the properties are reversed
+                    if ((abs(thisMatLay.Thickness - revMatLay.Thickness) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamBack - revMatLay.ReflectSolBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamFront - revMatLay.ReflectSolBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransVis - revMatLay.TransVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamBack - revMatLay.ReflectVisBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamFront - revMatLay.ReflectVisBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransThermal - revMatLay.TransThermal) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalBack - revMatLay.AbsorpThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalFront - revMatLay.AbsorpThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Conductivity - revMatLay.Conductivity) > SmallDiff) ||
+                        (abs(thisMatLay.GlassTransDirtFactor - revMatLay.GlassTransDirtFactor) > SmallDiff) ||
+                        (thisMatLay.SolarDiffusing != revMatLay.SolarDiffusing) ||
+                        (abs(thisMatLay.YoungModulus - revMatLay.YoungModulus) > SmallDiff) ||
+                        (abs(thisMatLay.PoissonsRatio - revMatLay.PoissonsRatio) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
+                    if ((abs(thisMatLay.TausBackBeamBeam - revMatLay.TausFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeam - revMatLay.TausBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeam - revMatLay.ReflFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeam - revMatLay.ReflBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamBeamVis - revMatLay.TausFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeamVis - revMatLay.TausBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeamVis - revMatLay.ReflFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeamVis - revMatLay.ReflBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiff - revMatLay.TausFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiff - revMatLay.TausBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiff - revMatLay.ReflFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiff - revMatLay.ReflBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiffVis - revMatLay.TausFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiffVis - revMatLay.TausBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiffVis - revMatLay.ReflFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiffVis - revMatLay.ReflBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiff - revMatLay.TausDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiff - revMatLay.ReflFrontDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiff - revMatLay.ReflBackDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiffVis - revMatLay.TausDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiffVis - revMatLay.ReflFrontDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiffVis - revMatLay.ReflBackDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausThermal - revMatLay.TausThermal) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalBack - revMatLay.EmissThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalFront - revMatLay.EmissThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Resistance - revMatLay.Resistance) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else {
+                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem (RevLayersDiffs = true)
+                    RevLayerDiffs = true;
+                    break; // exit when diff
+                }       // End check of whether or not these are WindowGlass
+            }           // else: thisConstLayer is the same as revConstLayer--so there is no problem (RevLayersDiffs = false)
+        }
+    }
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

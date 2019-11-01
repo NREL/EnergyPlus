@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataReportingFlags.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
 
 namespace EnergyPlus {
 

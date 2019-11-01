@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
 
 namespace EnergyPlus {
 

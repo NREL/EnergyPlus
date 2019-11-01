@@ -53,12 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -489,18 +489,20 @@ namespace DataHeatBalance {
     int SolarDistribution(0);                                                 // Solar Distribution Algorithm
     int InsideSurfIterations(0);                                              // Counts inside surface iterations
     int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
-                                                                              // Flags for HeatTransfer Algorithms Used
-    bool AnyCTF(false);                                                       // CTF used
-    bool AnyEMPD(false);                                                      // EMPD used
-    bool AnyCondFD(false);                                                    // CondFD used
-    bool AnyHAMT(false);                                                      // HAMT used
-    bool AnyKiva(false);                                                      // Kiva used
-    bool AnyAirBoundary(false);                                               // Construction:AirBoundary used
-    int MaxNumberOfWarmupDays(25);                                            // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(6);                                             // Minimum number of warmup days allowed
-    Real64 CondFDRelaxFactor(1.0);                                            // Relaxation factor, for looping across all the surfaces.
+
+    // Flags for HeatTransfer Algorithms Used
+    bool AnyCTF(false);                     // CTF used
+    bool AnyEMPD(false);                    // EMPD used
+    bool AnyCondFD(false);                  // CondFD used
+    bool AnyHAMT(false);                    // HAMT used
+    bool AnyKiva(false);                    // Kiva used
+    bool AnyAirBoundary(false);             // Construction:AirBoundary used
+    bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
+
+    int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
+    int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
+    Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
-    // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
     int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
     Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
@@ -582,6 +584,7 @@ namespace DataHeatBalance {
 
     bool NoFfactorConstructionsUsed(true);
     bool NoCfactorConstructionsUsed(true);
+    bool NoRegularMaterialsUsed(true);
 
     int NumRefrigeratedRacks(0); // Total number of refrigerated case compressor racks in input
     int NumRefrigSystems(0);     // Total number of detailed refrigeration systems in input
@@ -725,7 +728,7 @@ namespace DataHeatBalance {
     Array1D<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
 
     Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
-    //     radiation absorbed on inside surfaces of zone
+    //     radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
 
     Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
@@ -867,6 +870,7 @@ namespace DataHeatBalance {
         AnyHAMT = false;
         AnyKiva = false;
         AnyAirBoundary = false;
+        AnyAirBoundaryGroupedSolar = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 6;
         CondFDRelaxFactor = 1.0;
@@ -942,6 +946,7 @@ namespace DataHeatBalance {
         AdaptiveComfortRequested_ASH55 = false;
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
+        NoRegularMaterialsUsed = true;
         NumRefrigeratedRacks = 0;
         NumRefrigSystems = 0;
         NumRefrigCondensers = 0;

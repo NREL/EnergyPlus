@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <UnitVentilator.hh>
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <DataHVACGlobals.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 

@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <CommandLineInterface.hh>
-#include <EnergyPlusPgm.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/public/EnergyPlusPgm.hh>
 using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int main(int argc, const char *argv[])

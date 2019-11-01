@@ -48,7 +48,7 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
-#include <DataGlobals.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -59,7 +59,7 @@ class PlantComponent
 {
 
 public:
-    virtual void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
+    virtual void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) = 0;
 
     virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                      Real64 &EP_UNUSED(MaxLoad),
@@ -80,9 +80,7 @@ public:
     {
     }
 
-    ~PlantComponent()
-    {
-    }
+    ~PlantComponent() = default;
 };
 
 } // namespace EnergyPlus

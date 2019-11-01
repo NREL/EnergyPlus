@@ -54,12 +54,12 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DXFEarClipping.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DXFEarClipping.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

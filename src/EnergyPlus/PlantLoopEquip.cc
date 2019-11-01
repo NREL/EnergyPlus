@@ -51,42 +51,42 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <BaseboardRadiator.hh>
-#include <CTElectricGenerator.hh>
-#include <ChillerAbsorption.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerExhaustAbsorption.hh>
-#include <ChillerGasAbsorption.hh>
-#include <ChillerIndirectAbsorption.hh>
-#include <ChillerReformulatedEIR.hh>
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <EvaporativeFluidCoolers.hh>
-#include <FuelCellElectricGenerator.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HWBaseboardRadiator.hh>
-#include <ICEngineElectricGenerator.hh>
-#include <IceThermalStorage.hh>
-#include <MicroCHPElectricGenerator.hh>
-#include <MicroturbineElectricGenerator.hh>
-#include <PhotovoltaicThermalCollectors.hh>
-#include <Plant/PlantLocation.hh>
-#include <PlantCentralGSHP.hh>
-#include <PlantChillers.hh>
-#include <PlantComponentTemperatureSources.hh>
-#include <PlantHeatExchangerFluidToFluid.hh>
-#include <Pumps.hh>
-#include <RefrigeratedCase.hh>
-#include <ScheduleManager.hh>
-#include <SolarCollectors.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
+#include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
 
 namespace EnergyPlus {
 
@@ -204,7 +204,6 @@ namespace PlantLoopEquip {
         using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
-        using PlantComponentTemperatureSources::SimWaterSource;
         using RefrigeratedCase::SimRefrigCondenser;
         using SolarCollectors::SimSolarCollector;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
@@ -679,12 +678,6 @@ namespace PlantLoopEquip {
                 ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);
                 ShowFatalError("Preceding condition causes termination.");
             }
-
-            //            if (InitLoopEquip && EquipNum == 0) {
-            //                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
-            //                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-            //                ShowFatalError("Previous condition causes termination.");
-            //            }
 
             // WATER HEATER
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
@@ -1189,26 +1182,7 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_WaterSource) {
-
-                SimWaterSource(sim_component.Name,
-                               EquipFlowCtrl,
-                               EquipNum,
-                               RunFlag,
-                               FirstHVACIteration,
-                               InitLoopEquip,
-                               CurLoad,
-                               MaxLoad,
-                               MinLoad,
-                               OptLoad,
-                               GetCompSizFac,
-                               SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else {
                 //        CALL ShowSevereError('SimPlantEquip: Invalid Component Equipment Type='//TRIM(EquipType))
                 //        CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))

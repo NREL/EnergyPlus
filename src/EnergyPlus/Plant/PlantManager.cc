@@ -55,49 +55,50 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <Boilers.hh>
-#include <BoilerSteam.hh>
-#include <BranchInputManager.hh>
-#include <CondenserLoopTowers.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataConvergParams.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FluidCoolers.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GroundHeatExchangers.hh>
-#include <HVACInterfaceManager.hh>
-#include <HeatPumpWaterToWaterSimple.hh>
-#include <HeatPumpWaterToWaterCOOLING.hh>
-#include <HeatPumpWaterToWaterHEATING.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutsideEnergySources.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
-#include <Plant/PlantLoopSolver.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantLoadProfile.hh>
-#include <PlantLoopEquip.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <PlantUtilities.hh>
-#include <PlantValves.hh>
-#include <PondGroundHeatExchanger.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SurfaceGroundHeatExchanger.hh>
-#include <SystemAvailabilityManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantLoopEquip.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/PondGroundHeatExchanger.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
 
@@ -1423,11 +1424,11 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "PlantComponent:TemperatureSource")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type,"PlantComponent:TemperatureSource")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterSource;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
