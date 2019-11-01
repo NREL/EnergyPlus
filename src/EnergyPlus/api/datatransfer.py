@@ -32,6 +32,8 @@ class DataExchange:
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
+        self.api.requestVariable.argtypes = [c_char_p, c_char_p]
+        self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getVariableHandle.restype = c_int
         self.api.getMeterHandle.argtypes = [c_char_p]
@@ -85,6 +87,28 @@ class DataExchange:
         self.api.getPluginGlobalVariableValue.restype = RealEP
         self.api.setPluginGlobalVariableValue.argtypes = [c_int, RealEP]
         self.api.setPluginGlobalVariableValue.restype = c_void_p
+
+    def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
+        """
+        Request output variables so they can be accessed during a simulation.
+
+        In EnergyPlus, not all variables are available by default.  If they were all available, there would be a
+        terrible memory impact.  Instead, only requested and necessary variables are kept in memory.  When running
+        EnergyPlus as a program, including when using Python Plugins, variables are requested through input objects.
+        When running EnergyPlus as a library, variables can also be requested through this function call.  This
+        function has the same signature as the get_variable_handle function, which is used to then request the ID
+        of a variable once the simulation has begun.
+
+        :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
+                              "Fan Air Mass Flow Rate"
+        :param variable_key: The instance of the variable to retrieve, e.g. "Environment", or "Main System Fan"
+        :return: Nothing
+        """
+        if isinstance(variable_name, str):
+            variable_name = variable_name.encode('utf-8')
+        if isinstance(variable_key, str):
+            variable_key = variable_key.encode('utf-8')
+        self.api.requestVariable(variable_name, variable_key)
 
     def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """

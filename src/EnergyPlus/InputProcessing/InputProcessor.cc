@@ -69,6 +69,7 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
@@ -1425,6 +1426,9 @@ void InputProcessor::preScanReportingVariables()
     // consider those variables for output.  (At this time, all metered variables are
     // allowed to pass through).
 
+    // This routine also scans any variables requested by API call for library usage.
+    // These variables are stored in a vector in output processor, and the values are added before E+ begins.
+
     // METHODOLOGY EMPLOYED:
     // Uses internal records and structures.
     // Looks at:
@@ -1532,6 +1536,10 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             addRecordToOutputVariableStructure("*", obj.key());
         }
+    }
+
+    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
     }
 
     epJSON_objects = epJSON.find(OutputTableTimeBins);

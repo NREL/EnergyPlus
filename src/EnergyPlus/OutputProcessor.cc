@@ -257,6 +257,7 @@ namespace OutputProcessor {
     bool GetOutputInputFlag(true);
 
     ReportingFrequency minimumReportFrequency(ReportingFrequency::EachCall);
+    std::vector<APIOutputVariableRequest> apiVarRequests;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -5669,7 +5670,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         }
         ++NumTotalRVariable;
 
-        if (!OnMeter && !ThisOneOnTheList & !DataGlobals::eplusRunningViaAPI) continue;
+        if (!OnMeter && !ThisOneOnTheList) continue;
 
         ++NumOfRVariable;
         if (Loop == 1 && VariableType == StoreType::Summed) {

@@ -32,4 +32,8 @@ def time_step_handler():
 
 api = EnergyPlusAPI()
 api.runtime.callback_end_zone_timestep_after_zone_reporting(time_step_handler)
+api.exchange.request_variable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
+api.exchange.request_variable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT")
+# trim off this python script name when calling the run_energyplus function so you end up with just
+# the E+ args, like: -d /output/dir -D /path/to/input.idf
 api.runtime.run_energyplus(sys.argv[1:])

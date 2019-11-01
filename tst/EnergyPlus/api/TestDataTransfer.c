@@ -72,6 +72,8 @@ void afterZoneTimeStepHandler()
 
 int main(int argc, const char * argv[]) {
     callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
+    requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+    requestVariable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
     energyplus(argc, argv);
     return 0;
 }

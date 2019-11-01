@@ -56,6 +56,15 @@
 
 void dataTransferNoOp() {}
 
+void requestVariable(const char* type, const char* key) {
+    // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
+    // should be called before energyplus is run!
+    EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
+    request.varName = type;
+    request.varKey = key;
+    EnergyPlus::OutputProcessor::apiVarRequests.push_back(request);
+}
+
 int getVariableHandle(const char* type, const char* key) {
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);

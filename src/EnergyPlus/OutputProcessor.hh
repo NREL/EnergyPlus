@@ -880,6 +880,12 @@ namespace OutputProcessor {
 
     std::string timeStepTypeEnumToString(OutputProcessor::TimeStepType const &t_timeStepType);
 
+    struct APIOutputVariableRequest {
+        std::string varName = "";
+        std::string varKey = "";
+    };
+    extern std::vector<APIOutputVariableRequest> apiVarRequests;
+
 } // namespace OutputProcessor
 
 //==============================================================================================

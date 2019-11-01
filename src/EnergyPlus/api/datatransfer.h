@@ -56,6 +56,7 @@ extern "C" {
 #endif
 
 ENERGYPLUSLIB_API void dataTransferNoOp();
+ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
 ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 ENERGYPLUSLIB_API int getActuatorHandle(const char* type, const char* key);
