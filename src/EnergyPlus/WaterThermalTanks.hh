@@ -549,7 +549,6 @@ namespace WaterThermalTanks {
                                       Real64 DeadBandTemp,
                                       Real64 SetPointTemp);
 
-        void SetupChilledWaterTankOutputs();
     };
 
     struct HeatPumpWaterHeaterData : PlantComponent
