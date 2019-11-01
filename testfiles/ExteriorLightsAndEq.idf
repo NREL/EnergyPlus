@@ -211,13 +211,13 @@
     1000;                    !- Design Level {W}
 
   Exterior:FuelEquipment,
-    OutsideFuelOilNo1Eq,       !- Name
+    OutsideFuelOil1Eq,       !- Name
     FuelOilNo1,                !- Fuel Use Type
     ON,                      !- Schedule Name
     1000;                    !- Design Level {W}
 
   Exterior:FuelEquipment,
-    OutsideFuelOilNo2Eq,       !- Name
+    OutsideFuelOil2Eq,       !- Name
     FuelOilNo2,                !- Fuel Use Type
     ON,                      !- Schedule Name
     1000;                    !- Design Level {W}
