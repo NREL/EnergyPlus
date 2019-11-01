@@ -787,5 +787,20 @@ namespace PluginManagement {
         }
     }
 
+    std::pair<int, int> PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
+        for (auto &pair : plugins) {
+            for (size_t handle = 0; handle < pair.second.size(); handle++) {
+                auto const thisPlugin = pair.second[handle];
+                if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
+                    return {pair.first, handle};
+                }
+            }
+        }
+        return {-1, -1};
+    }
+    void PluginManager::runSingleUserDefinedPlugin(int callingPoint, int index) {
+        plugins[callingPoint][index].run();
+    }
+
 } // namespace PluginManagement
 } // namespace EnergyPlus

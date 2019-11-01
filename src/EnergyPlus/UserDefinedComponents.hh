@@ -92,6 +92,8 @@ namespace UserDefinedComponents {
         // Members
         int ErlInitProgramMngr;      // points to an EMS:ProgramManager to run for setup and sizing
         int ErlSimProgramMngr;       // points to an EMS:ProgramManager to run only when this connection is called
+        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
         int LoopNum;                 // plant loop connection index
         int LoopSideNum;             // plant loop side connection index
         int BranchNum;               // plant loop branch connection index
@@ -194,6 +196,7 @@ namespace UserDefinedComponents {
         // Members
         std::string Name;                    // user identifier
         int ErlSimProgramMngr;               // EMS:ProgramManager to always run when this model is called
+        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         int NumPlantConnections;             // count of how many plant loop connections there are
         Array1D<PlantConnectionStruct> Loop; // collect data for each plant loop connection
         AirConnectionStruct Air;
@@ -212,6 +215,8 @@ namespace UserDefinedComponents {
         std::string Name;       // user identifier
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
+        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         int NumAirConnections;  // count of how many air connectiosn there are
         bool PlantIsConnected;
         Array1D<AirConnectionStruct> Air;
@@ -231,6 +236,8 @@ namespace UserDefinedComponents {
         std::string Name;       // user identifier
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
+        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct ZoneAir;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
@@ -258,6 +265,8 @@ namespace UserDefinedComponents {
         int ADUNum;             // index of corresponding air distribution unit
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
+        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct AirLoop;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
