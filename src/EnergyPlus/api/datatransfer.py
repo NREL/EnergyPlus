@@ -45,7 +45,7 @@ class DataExchange:
         self.api.getMeterValue.argtypes = [c_int]
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
-        self.api.setActuatorValue.restype = c_int
+        self.api.setActuatorValue.restype = c_void_p
         self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getInternalVariableHandle.restype = c_int
         self.api.getInternalVariableValue.argtypes = [c_int]
@@ -123,7 +123,7 @@ class DataExchange:
         :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
                               "Fan Air Mass Flow Rate"
         :param variable_key: The instance of the variable to retrieve, e.g. "Environment", or "Main System Fan"
-        :return: An integer ID for this output variable, or zero if one could not be found.
+        :return: An integer ID for this output variable, or -1 if one could not be found.
         """
         if isinstance(variable_name, str):
             variable_name = variable_name.encode('utf-8')
@@ -142,7 +142,7 @@ class DataExchange:
         as needed.
 
         :param meter_name: The name of the variable to retrieve, e.g. "Electricity:Facility", or "Fans:Electricity"
-        :return: An integer ID for this meter, or zero if one could not be found.
+        :return: An integer ID for this meter, or -1 if one could not be found.
         """
         meter_name = meter_name.upper()
         if isinstance(meter_name, str):
@@ -167,7 +167,7 @@ class DataExchange:
         :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
         :param component_type: The actuator category, e.g. "Weather Data"
         :param control_type: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
-        :return: An integer ID for this output variable, or zero if one could not be found.
+        :return: An integer ID for this output variable, or -1 if one could not be found.
         """
         if isinstance(actuator_key, str):
             actuator_key = actuator_key.encode('utf-8')
@@ -202,7 +202,7 @@ class DataExchange:
         """
         return self.api.getMeterValue(meter_handle)
 
-    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> int:
+    def set_actuator_value(self, actuator_handle: int, actuator_value: RealEP) -> None:
         """
         Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
         to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
@@ -210,9 +210,9 @@ class DataExchange:
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :param actuator_value: The value to assign to the actuator
-        :return: An integer response value for success of setting the actuator value, 0 is success, failure otherwise
+        :return: Nothing
         """
-        return self.api.setActuatorValue(actuator_handle, actuator_value)
+        self.api.setActuatorValue(actuator_handle, actuator_value)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """

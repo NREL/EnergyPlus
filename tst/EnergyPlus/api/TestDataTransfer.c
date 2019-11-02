@@ -46,23 +46,27 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
+int outdoorDewPointActuator = -1;
+int outdoorTempSensor = -1;
+int outdoorDewPointSensor = -1;
+
 void afterZoneTimeStepHandler()
 {
     printf("STARTING A NEW TIME STEP\n");
-    int thisKindOfSim = kindOfSim();
-    if (thisKindOfSim == 2 || thisKindOfSim == 3) {
-        int outdoorDewPointActuator = getActuatorHandle("Environment", "Weather Data", "Outdoor Dew Point");
-        int response = setActuatorValue(outdoorDewPointActuator, -25);
-        if (response != 0) {
-            printf("Could not set actuator...\n");
+    if (outdoorDewPointActuator == -1) {
+        outdoorDewPointActuator = getActuatorHandle("Environment", "Weather Data", "Outdoor Dew Point");
+        outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+        outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
+            exit(1);
         }
     }
-    int outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-    int outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+    setActuatorValue(outdoorDewPointActuator, -25);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
     Real64 dp_temp = getVariableValue(outdoorDewPointSensor);

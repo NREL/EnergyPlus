@@ -21,9 +21,7 @@ def time_step_handler():
             "Environment", "Weather Data", "Outdoor Dew Point"
         )
         print("Handle IDs: %s, %s, %s" % (outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator))
-        response = api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
-        if response != 0:
-            print("Could not set actuator...")
+        api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
     oa_temp = api.exchange.get_variable_value(outdoor_temp_sensor)
     print("Reading outdoor temp via getVariable, value is: %s" % oa_temp)
     dp_temp = api.exchange.get_variable_value(outdoor_dew_point_sensor)

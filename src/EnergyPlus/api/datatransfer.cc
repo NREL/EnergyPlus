@@ -77,12 +77,18 @@ int getVariableHandle(const char* type, const char* key) {
             return handle;
         }
     }
-    return 0;
+    return -1;
 }
 
 int getMeterHandle(const char* meterName) {
     std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
-    return EnergyPlus::GetMeterIndex(meterNameUC);
+    auto i = EnergyPlus::GetMeterIndex(meterNameUC);
+    if (i == 0) {
+        // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
+        return -1;
+    } else {
+        return i;
+    }
 }
 
 int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType) {
@@ -100,7 +106,7 @@ int getActuatorHandle(const char* uniqueKey, const char* componentType, const ch
             return handle;
         }
     }
-    return 0;
+    return -1;
 }
 
 double getVariableValue(const int handle) {
@@ -111,15 +117,11 @@ double getMeterValue(int handle) {
     return EnergyPlus::GetCurrentMeterValue(handle);
 }
 
-int setActuatorValue(const int handle, const double value) {
-    if (handle == 0) {
-        return 1;
-    }
+void setActuatorValue(const int handle, const double value) {
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
     theActuator.RealValue = value;
     theActuator.Actuated = true;
-    return 0;
 }
 
 

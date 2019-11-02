@@ -62,7 +62,7 @@ ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
 ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
 ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
-ENERGYPLUSLIB_API int setActuatorValue(int handle, Real64 value);
+ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
 ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
