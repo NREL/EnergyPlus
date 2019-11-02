@@ -1,5 +1,5 @@
-9.1.0,9.2.0,Transition notes
-0,0,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
-old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete
+9.2.0,9.3.0,Transition notes - some of these are EMS variable names
+2,2,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
 AirTerminal:SingleDuct:Uncontrolled,AirTerminal:SingleDuct:ConstantVolume:NoReheat,
 AirTerminal:SingleDuct:Uncontrolled Maximum Mass Flow Rate,AirTerminal:SingleDuct:ConstantVolume:NoReheat Maximum Mass Flow Rate,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete
