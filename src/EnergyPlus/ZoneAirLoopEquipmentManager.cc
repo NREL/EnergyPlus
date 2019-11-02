@@ -542,13 +542,13 @@ namespace ZoneAirLoopEquipmentManager {
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).HeatRate,
                                     "System",
-                                    "Sum",
+                                    "Average",
                                     AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable("Zone Air Terminal Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
                                     AirDistUnit(AirDistUnitNum).CoolRate,
                                     "System",
-                                    "Sum",
+                                    "Average",
                                     AirDistUnit(AirDistUnitNum).Name);
             }
         }
