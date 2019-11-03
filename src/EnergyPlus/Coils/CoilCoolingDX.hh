@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <Coils/CoilCoolingDXCurveFitPerformance.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

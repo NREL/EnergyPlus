@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

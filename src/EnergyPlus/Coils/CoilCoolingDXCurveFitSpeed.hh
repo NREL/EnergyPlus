@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

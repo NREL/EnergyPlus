@@ -1,12 +1,12 @@
-#include <Coils/CoilCoolingDXCurveFitOperatingMode.hh>
-#include <Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataSizing.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
