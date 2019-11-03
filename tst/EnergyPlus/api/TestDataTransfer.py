@@ -1,27 +1,30 @@
 import sys
 from pyenergyplus.api import EnergyPlusAPI
 
-env_count = 0
+one_time = True
+outdoor_temp_sensor = 0
+outdoor_dew_point_sensor = 0
+outdoor_dew_point_actuator = 0
 
 
 def time_step_handler():
-    global env_count
-    env_count += 1
+    global one_time, outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator
     print("OH HAI NEW TIMESTEP")
     sys.stdout.flush()
-    outdoor_temp_sensor = api.exchange.get_variable_handle(
-        u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
-    )
-    print("Got OA sensor handle = " + str(outdoor_temp_sensor))
-    outdoor_dew_point_sensor = api.exchange.get_variable_handle(
-        u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT"
-    )
-    if env_count > 1:
+    if one_time:
+        outdoor_temp_sensor = api.exchange.get_variable_handle(
+            u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
+        )
+        outdoor_dew_point_sensor = api.exchange.get_variable_handle(
+            u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT"
+        )
         outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
             "Environment", "Weather Data", "Outdoor Dew Point"
         )
-        print("Handle IDs: %s, %s, %s" % (outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator))
-        api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
+        if outdoor_temp_sensor == -1 or outdoor_dew_point_sensor == -1 or outdoor_dew_point_actuator == -1:
+            sys.exit(1)
+        one_time = False
+    api.exchange.set_actuator_value(outdoor_dew_point_actuator, -25)
     oa_temp = api.exchange.get_variable_value(outdoor_temp_sensor)
     print("Reading outdoor temp via getVariable, value is: %s" % oa_temp)
     dp_temp = api.exchange.get_variable_value(outdoor_dew_point_sensor)
