@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <ConfiguredFunctions.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -2911,8 +2911,8 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
-        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
-        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
 
     });
 
@@ -2990,14 +2990,14 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
                                   cAlphaFields2,
                                   cNumericFields2);
 
-    EXPECT_EQ(4, NumAlphas2);
+    EXPECT_EQ(6, NumAlphas2);
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
+        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1", "", ""}), Alphas2));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks2));
 
-    EXPECT_EQ(4, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, true, true}), lNumericBlanks2));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1, 1, 1}), Numbers2));
+    EXPECT_EQ(2, NumNumbers2);
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false}), lNumericBlanks2));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1}), Numbers2));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3865,6 +3865,48 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
 
+}
+
+TEST_F(InputProcessorFixture, clean_epjson)
+{
+    std::string const input("{\"Building\":{"
+                            "\"Zone1\":{"
+                            "\"idf_max_extensible_fields\":0,"
+                            "\"idf_max_fields\":8,"
+                            "\"idf_order\":1"
+                            "}"
+                            "},"
+                            "\"GlobalGeometryRules\":{"
+                            "\"\":{"
+                            "\"coordinate_system\":\"Relative\","
+                            "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                            "\"idf_order\":0,"
+                            "\"rectangular_surface_coordinate_system\":\"Relative\","
+                            "\"starting_vertex_position\":\"UpperLeftCorner\","
+                            "\"vertex_entry_direction\":\"Counterclockwise\""
+                            "}"
+                            "}}");
+
+    std::string const expected("{\"Building\":{"
+                               "\"Zone1\":{"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "}}");
+
+    json cleanInput = json::parse(input);
+
+    cleanEPJSON(cleanInput);
+    std::string cleanstring = cleanInput.dump();
+
+    EXPECT_EQ(expected, cleanstring);
 }
 
 /*

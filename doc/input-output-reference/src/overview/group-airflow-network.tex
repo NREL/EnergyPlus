@@ -2,7 +2,7 @@
 
 \subsection{Overview}\label{overview}
 
-The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by forced air distribution systems. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling air distribution systems, the current version of the Airflow Network model is allowed to simulate multiple forced air systems (i.e., \hyperref[airloophvac]{AirLoopHVAC} object) with a constant volume supply air fan (\hyperref[fanconstantvolume]{Fan:ConstantVolume} or \hyperref[fanonoff]{Fan:OnOff}) and a VAV supply air fan (\hyperref[fanvariablevolume]{Fan:VariableVolume}). The capabilities of the model are to:
+The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by forced air distribution systems. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling air distribution systems, the current version of the Airflow Network model is allowed to simulate multiple forced air systems (i.e., \hyperref[airloophvac]{AirLoopHVAC} object). Each forced air system allows a constant volume supply air fan (\hyperref[fanconstantvolume]{Fan:ConstantVolume} or \hyperref[fanonoff]{Fan:OnOff}), a VAV supply air fan (\hyperref[fanvariablevolume]{Fan:VariableVolume}), or a fan system model \hyperref[fansystemmodel]({Fan:SystemMode}). The capabilities of the model are to:
 
 \begin{itemize}
 \item
@@ -101,7 +101,15 @@ The Airflow Network input objects are:
 \item
   The \textbf{\hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone}} object specifies the ventilation control that applies to all of the openable exterior and interior windows and doors in the corresponding thermal zone. Surface-level ventilation control can be used to override the zone-level ventilation control if required (see AirflowNetwork: MultiZone:Surface object below).
 \item
-  \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an \textbf{\hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}, \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}, \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}, \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening}, \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening} or \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:MultiZone:Component:ZoneExhaustFan}} object that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
+  \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an object in the list below that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
+\begin{itemize}
+\item \textbf{\hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}
+\item \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:Multi-Zone:Surface:EffectiveLeakageArea}
+\item \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}
+\item \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:Multi-Zone:Component:DetailedOpening}
+\item \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening}
+\item \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:Multi-Zone:Component:ZoneExhaustFan}}
+\end{itemize}
 \item
   \textbf{\hyperref[airflownetworkmultizonereferencecrackconditions]{AirflowNetwork:MultiZone:ReferenceCrackConditions}} is used to normalize crack information that is based on measurements of crack air flow.
 \item
@@ -112,7 +120,7 @@ The Airflow Network input objects are:
   \textbf{\hyperref[airflownetworkdistributionlinkage]{AirflowNetwork:Distribution:Linkage}} object represents a connection between two node objects and an AirflowNetwork component. The node objects can be an \hyperref[airflownetworkdistributionnode]{AirflowNetwork:Distribution:Node}, \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} or \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone}.
 \end{itemize}
 
-If you input wind pressure coefficients, \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} also has an associated \textbf{\hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode}}, that, via the \textbf{\hyperref[airflownetworkmultizonewindpressurecoefficientarray]{AirflowNetwork:MultiZone:WindPressureCoefficientArray}} and \textbf{\hyperref[airflownetworkmultizonewindpressurecoefficientvalues]{AirflowNetwork:MultiZone:WindPressureCoefficientValues}} objects, gives the wind pressure distribution vs.~wind direction for that node and, implicitly, for the cracks and openings in the exterior surfaces associated with that node.
+If you input wind pressure coefficients, \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} also has an associated \textbf{\hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode}}, that, via the \textbf{\hyperref[airflownetworkmultizonewindpressurecoefficientarray]{AirflowNetwork:MultiZone:Wind-PressureCoefficientArray}} and \textbf{\hyperref[airflownetworkmultizonewindpressurecoefficientvalues]{AirflowNetwork:MultiZone:WindPressureCoefficientValues}} objects, gives the wind pressure distribution vs.~wind direction for that node and, implicitly, for the cracks and openings in the exterior surfaces associated with that node.
 
 Figure~\ref{fig:relationships-among-airflownetwork-objects} shows the relationships among AirflowNetwork:MultiZone objects and between AirflowNetwork:MultiZone objects and regular EnergyPlus objects. In this figure an arrow from object A to object B means A references B, i.e., one of the inputs in A is the name of object B. For example, one input for AirflowNetwork: MultiZone:Surface is the name of a heat transfer surface, and another is the name of a crack or opening object. The arrow between \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} and \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} is shown dashed to indicate that this reference is not used when wind pressure coefficients are calculated by the program rather than being input by the user.
 
@@ -1997,17 +2005,17 @@ AirflowNetwork:Distribution:Component:Duct,
 
 \subsection{AirflowNetwork:Distribution:Component:Fan}\label{airflownetworkdistributioncomponentfan}
 
-This component represents a constant volume fan in the air distribution system (\hyperref[airloophvac]{AirLoopHVAC}). The air flow rate and air conditions (temperature and humidity) are obtained from the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanvariablevolume]{Fan:VariableVolume} object.
+This component represents a constant or variable volume fan in the air distribution system (\hyperref[airloophvac]{AirLoopHVAC}). The air flow rate and air conditions (temperature and humidity) are obtained from the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, or \hyperref[fansystemmodel]{Fan:SystemModel} object.
 
 \subsubsection{Inputs}\label{inputs-16-001}
 
 \paragraph{Field: Fan Name}\label{field-fan-name-000}
 
-The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume},~ \hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanvariablevolume]{Fan:VariableVolume} object. This name will be referenced by an \hyperref[airflownetworkdistributionlinkage]{AirflowNetwork:Distribution:Linkage} object to represent a component.
+The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume},~ \hyperref[fanonoff]{Fan:OnOff}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, or \hyperref[fansystemmodel]{Fan:SystemModel} object. This name will be referenced by an \hyperref[airflownetworkdistributionlinkage]{AirflowNetwork:Distribution:Linkage} object to represent a component.
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type}
 
-This choice field defines the type of fan. The only valid choices are \hyperref[fanonoff]{Fan:OnOff},~ \hyperref[fanconstantvolume]{Fan:ConstantVolume}, and \hyperref[fanvariablevolume]{Fan:VariableVolume}, with the default being \hyperref[fanconstantvolume]{Fan:ConstantVolume}. Both cycling and continuous fan operating modes are allowed for \hyperref[fanonoff]{Fan:OnOff}. Only the continuous fan operating mode is allowed for \hyperref[fanconstantvolume]{Fan:ConstantVolume}. The variable airflow rate is allowed for \hyperref[fanvariablevolume]{Fan:VariableVolume}.
+This choice field defines the type of fan. The only valid choices are \hyperref[fanonoff]{Fan:OnOff},~ \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, and  \hyperref[fansystemmodel]{Fan:SystemModel} with the default being \hyperref[fanconstantvolume]{Fan:ConstantVolume}. Both cycling and continuous fan operating modes are allowed for \hyperref[fanonoff]{Fan:OnOff}. Only the continuous fan operating mode is allowed for \hyperref[fanconstantvolume]{Fan:ConstantVolume} with constant volume and \hyperref[fanvariablevolume]{Fan:VariableVolume} with variable volume, respectively. An advanced fan model for \hyperref[fansystemmodel]{Fan:SystemModel} is also allowed.
 
 Note: Make sure that the volumetric air flow rates for the fan, coils, and parent components (e.g., unitary system or furnace) are the same so that fan energy and air distribution system losses/gains are properly calculated.
 

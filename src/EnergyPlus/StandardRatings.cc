@@ -53,19 +53,19 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <OutputReportPredefined.hh>
-#include <Psychrometrics.hh>
-#include <StandardRatings.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -226,6 +226,7 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,           // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,            // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,              // Minimum unloading ratio
+                         Real64 &IPLV,
                          Optional<Real64 const> EvapVolFlowRate, // Reference water volumetric flow rate through the evaporator [m3/s]
                          Optional_int_const CondLoopNum,         // condenser water plant loop index number
                          Optional<Real64 const> OpenMotorEff     // Open chiller motor efficiency [fraction, 0 to 1]
@@ -308,7 +309,6 @@ namespace StandardRatings {
         // to EnteringWaterTempReduced above [C]
         static Real64 Cp(0.0);         // Water specific heat [J/(kg*C)]
         static Real64 Rho(0.0);        // Water density [kg/m3]
-        static Real64 IPLV(0.0);       // Integerated Part Load Value in SI [W/W]
         static Real64 EIR(0.0);        // Inverse of COP at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         static Real64 Power(0.0);      // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         static Real64 COPReduced(0.0); // COP at reduced capacity test conditions (100%, 75%, 50%, and 25%)
@@ -380,9 +380,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;
@@ -428,9 +429,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;

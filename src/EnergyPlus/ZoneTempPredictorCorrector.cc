@@ -56,41 +56,42 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <EMSManager.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <Psychrometrics.hh>
-#include <RoomAirModelAirflowNetwork.hh>
-#include <RoomAirModelManager.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -5204,10 +5205,9 @@ namespace ZoneTempPredictorCorrector {
                                       ZnAirRpt(ZoneNum).SumMCpDTsystem,
                                       ZnAirRpt(ZoneNum).SumNonAirSystem,
                                       ZnAirRpt(ZoneNum).CzdTdt,
-                                      ZnAirRpt(ZoneNum).imBalance); // convection part of internal gains | surface convection heat transfer |
-                                                                    // interzone mixing | OA of various kinds except via system | air system | non air
-                                                                    // system | air mass energy storage term | measure of imbalance in zone air heat
-                                                                    // balance
+                                      ZnAirRpt(ZoneNum).imBalance,
+                                      ZnAirRpt(ZoneNum).SumEnthalpyM,
+                                      ZnAirRpt(ZoneNum).SumEnthalpyH);
 
         } // ZoneNum
     }
@@ -6487,7 +6487,9 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumMCpDTsystem,   // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
                                    Real64 &SumNonAirSystem,  // Zone sum of non air system convective heat gains
                                    Real64 &CzdTdt,           // Zone air energy storage term.
-                                   Real64 &imBalance         // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &imBalance,        // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &SumEnthalpyM,     // Zone sum of phase change material melting enthlpy
+                                   Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
     )
     {
 
@@ -6569,6 +6571,8 @@ namespace ZoneTempPredictorCorrector {
         SumNonAirSystem = 0.0;
         CzdTdt = 0.0;
         imBalance = 0.0;
+        SumEnthalpyM = 0.0;
+        SumEnthalpyH = 0.0;
         SumSysMCp = 0.0;
         SumSysMCpT = 0.0;
         ADUHeatAddRate = 0.0;
@@ -6788,6 +6792,11 @@ namespace ZoneTempPredictorCorrector {
 
             SumHADTsurfs += HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
 
+            // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
+            if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+                ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
+                ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
+            }
         } // SurfNum
 
         // now calculate air energy storage source term.

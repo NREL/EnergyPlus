@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataPlant.hh>
-#include <Pipes.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Pipes.hh>
 
 namespace EnergyPlus {
 

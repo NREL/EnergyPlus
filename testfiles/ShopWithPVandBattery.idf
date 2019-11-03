@@ -1306,8 +1306,8 @@
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Name
@@ -1668,8 +1668,8 @@
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Name
@@ -2030,8 +2030,8 @@
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Name
@@ -2392,8 +2392,8 @@
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Name
@@ -2739,8 +2739,8 @@
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Name
@@ -4987,27 +4987,27 @@
     PV:ZN_1_FLR_1_SEC_1_Ceiling,  !- Generator 1 Name
     Generator:Photovoltaic,  !- Generator 1 Object Type
     9000.0,                  !- Generator 1 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Availability Schedule Name
     ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_2_Ceiling,  !- Generator 2 Name
     Generator:Photovoltaic,  !- Generator 2 Object Type
     6000.0,                  !- Generator 2 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Availability Schedule Name
     ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_3_Ceiling,  !- Generator 3 Name
     Generator:Photovoltaic,  !- Generator 3 Object Type
     9000.0,                  !- Generator 3 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 3 Availability Schedule Name
+    ,                        !- Generator 3 Availability Schedule Name
     ,                        !- Generator 3 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_4_Ceiling,  !- Generator 4 Name
     Generator:Photovoltaic,  !- Generator 4 Object Type
     6000.0,                  !- Generator 4 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 4 Availability Schedule Name
+    ,                        !- Generator 4 Availability Schedule Name
     ,                        !- Generator 4 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_5_Ceiling,  !- Generator 5 Name
     Generator:Photovoltaic,  !- Generator 5 Object Type
     9000.0,                  !- Generator 5 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 5 Availability Schedule Name
+    ,                        !- Generator 5 Availability Schedule Name
     ;                        !- Generator 5 Rated Thermal to Electrical Power Ratio
 
   Generator:Photovoltaic,

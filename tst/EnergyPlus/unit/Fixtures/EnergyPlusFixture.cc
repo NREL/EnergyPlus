@@ -93,6 +93,7 @@
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -102,6 +103,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -152,6 +154,7 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -271,6 +274,7 @@ void EnergyPlusFixture::SetUp()
     UtilityRoutines::outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines();
+    FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj();
 }
 
@@ -337,6 +341,7 @@ void EnergyPlusFixture::clear_all_states()
     DataMoistureBalance::clear_state();
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
+    DataPhotovoltaics::clear_state();
     DataPlant::clear_state();
     DataRoomAirModel::clear_state();
     DataRuntimeLanguage::clear_state();
@@ -346,6 +351,7 @@ void EnergyPlusFixture::clear_all_states()
     DataSurfaces::clear_state();
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
+    DataViewFactorInformation::clear_state();
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
@@ -397,6 +403,7 @@ void EnergyPlusFixture::clear_all_states()
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     EnergyPlus::inputProcessor->clear_state();
+    IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();

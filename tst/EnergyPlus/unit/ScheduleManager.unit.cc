@@ -83,6 +83,97 @@ TEST_F(EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep)
     EXPECT_FALSE(isMinuteMultipleOfTimestep(53, 12));
 }
 
+TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
+{
+
+    ScheduleInputProcessed = true;
+    DataEnvironment::DSTIndicator = 0;
+    ScheduleManager::NumSchedules = 1;
+    ScheduleManager::Schedule.allocate(1);
+    Schedule(1).WeekSchedulePointer.allocate(367);
+    WeekSchedule.allocate(3);
+    WeekSchedule(1).DaySchedulePointer.allocate(12);
+    WeekSchedule(2).DaySchedulePointer.allocate(12);
+    WeekSchedule(3).DaySchedulePointer.allocate(12);
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DaySchedule.allocate(3);
+    DaySchedule(1).TSValue.allocate(1, 24);
+    DaySchedule(2).TSValue.allocate(1, 24);
+    DaySchedule(3).TSValue.allocate(1, 24);
+
+    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+        for (int i = 1; i <= 366; i++) {
+            int x = 1;
+            if (i > 250) {
+                x = 3;
+            } else if (i > 249) {
+                x = 2;
+            }
+            Schedule(ScheduleIndex).WeekSchedulePointer(i) = x;
+        }
+    }
+    for (int WeekSchedulePointer = 1; WeekSchedulePointer <= 3; WeekSchedulePointer++) {
+        for (int dayOfWeek = 1; dayOfWeek <= 12; dayOfWeek++) {
+            int y = 1;
+            if (WeekSchedulePointer == 2) y = 2;
+            if (WeekSchedulePointer == 3) y = 3;
+            WeekSchedule(WeekSchedulePointer).DaySchedulePointer(dayOfWeek) = y;
+        }
+    }
+    for (int daySchedulePointer = 1; daySchedulePointer <= 3; daySchedulePointer++) {
+        for (int whichHour = 1; whichHour <= 24; whichHour++) {
+            Real64 schVal = 1.0;
+            if (daySchedulePointer == 2) schVal = 2.0;
+            if (daySchedulePointer == 3) schVal = 3.0;
+            DaySchedule(daySchedulePointer).TSValue(1, whichHour) = schVal;
+        }
+    }
+
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfWeek = 1;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+
+    // check day schedules
+    EXPECT_EQ(DaySchedule(1).TSValue(1, 1), 1.0); // day < 250 points to this schedule
+    EXPECT_EQ(DaySchedule(1).TSValue(1, 24), 1.0);
+
+    EXPECT_EQ(DaySchedule(2).TSValue(1, 1), 2.0); // day = 250 points to this schedule
+    EXPECT_EQ(DaySchedule(2).TSValue(1, 24), 2.0);
+
+    EXPECT_EQ(DaySchedule(3).TSValue(1, 1), 3.0); // day > 250 points to this schedule
+    EXPECT_EQ(DaySchedule(3).TSValue(1, 24), 3.0);
+
+    // schedule values are 1 through day 249, 2 for day 250, and 3 for remainder of year
+    DataEnvironment::DayOfYear_Schedule = 1;
+    UpdateScheduleValues();
+    // expect 1.0 on day 1
+    EXPECT_EQ(Schedule(1).CurrentValue, 1.0);
+
+    DataEnvironment::DayOfYear_Schedule = 250;
+    UpdateScheduleValues();
+    // expect 2.0 on day 250
+    EXPECT_EQ(Schedule(1).CurrentValue, 2.0);
+
+    // test end of day 250 with daylight savings time active
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DSTIndicator = 1;
+    UpdateScheduleValues();
+    // expect a 3 on day 251, which on day 250 at midnight with DST of hour 1 of day 251
+    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+
+    DataGlobals::HourOfDay = 2;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfYear_Schedule = 251;
+    UpdateScheduleValues();
+    // expect 3.0 for remainder of year regardless of DST
+    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+    DataGlobals::HourOfDay = 24;
+    DataEnvironment::DSTIndicator = 1;
+    UpdateScheduleValues();
+    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+}
+
 TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
 {
     // J.Glazer - August 2017
@@ -645,5 +736,23 @@ TEST_F(EnergyPlusFixture, ScheduleYearMaxItems)
     ASSERT_FALSE(process_idf(idf_objects, false));
 
     EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** <root>[Schedule:Year][SchYr_A][schedule_weeks] - Array should contain no more than 53 elements."})));
+
+}
+
+TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  nofile.txt,              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Space,                   !- Column Separator",
+        "  No;                      !- Interpolate to Timestep"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
 
 }

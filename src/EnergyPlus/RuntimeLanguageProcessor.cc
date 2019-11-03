@@ -61,20 +61,20 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <RuntimeLanguageProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1069,7 +1069,7 @@ namespace RuntimeLanguageProcessor {
 
         if (!MyOneTimeFlag) {
             ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurance timing information ... >";
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
             MyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
