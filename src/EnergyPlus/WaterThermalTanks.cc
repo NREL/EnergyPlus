@@ -408,7 +408,10 @@ namespace WaterThermalTanks {
         auto Tank = &WaterThermalTank(HPWH->WaterHeaterTankNum);
 
         if (HPWH->myOneTimeInitFlag) {
-            Tank->setupOutputVariables();
+            if (Tank->myOneTimeInitFlag) {
+                Tank->setupOutputVariables();
+                Tank->myOneTimeInitFlag = false;
+            }
             HPWH->myOneTimeInitFlag = false;
         }
 
@@ -4780,6 +4783,137 @@ namespace WaterThermalTanks {
                     if ((WaterThermalTank(WaterThermalTankNum).TypeNum != DataPlant::TypeOf_ChilledWaterTankMixed) &&
                         (WaterThermalTank(WaterThermalTankNum).TypeNum != DataPlant::TypeOf_ChilledWaterTankStratified)) {
                         SetupWaterHeaterOutputs(WaterThermalTankNum);
+                    } else if ((WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+                        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
+
+//                        // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
+//                        SetupOutputVariable("Chilled Water Thermal Storage Tank Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).TankTempAvg,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Final Tank Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).TankTemp,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Rate",
+//                                            OutputProcessor::Unit::W,
+//                                            WaterThermalTank(WaterThermalTankNum).LossRate,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//                        SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Energy",
+//                                            OutputProcessor::Unit::J,
+//                                            WaterThermalTank(WaterThermalTankNum).LossEnergy,
+//                                            "System",
+//                                            "Sum",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Use Side Mass Flow Rate",
+//                                            OutputProcessor::Unit::kg_s,
+//                                            WaterThermalTank(WaterThermalTankNum).UseMassFlowRate,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Use Side Inlet Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).UseInletTemp,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Use Side Outlet Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).UseOutletTemp,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Rate",
+//                                            OutputProcessor::Unit::W,
+//                                            WaterThermalTank(WaterThermalTankNum).UseRate,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//                        SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Energy",
+//                                            OutputProcessor::Unit::J,
+//                                            WaterThermalTank(WaterThermalTankNum).UseEnergy,
+//                                            "System",
+//                                            "Sum",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Source Side Mass Flow Rate",
+//                                            OutputProcessor::Unit::kg_s,
+//                                            WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Source Side Inlet Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).SourceInletTemp,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Source Side Outlet Temperature",
+//                                            OutputProcessor::Unit::C,
+//                                            WaterThermalTank(WaterThermalTankNum).SourceOutletTemp,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Rate",
+//                                            OutputProcessor::Unit::W,
+//                                            WaterThermalTank(WaterThermalTankNum).SourceRate,
+//                                            "System",
+//                                            "Average",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//                        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Energy",
+//                                            OutputProcessor::Unit::J,
+//                                            WaterThermalTank(WaterThermalTankNum).SourceEnergy,
+//                                            "System",
+//                                            "Sum",
+//                                            WaterThermalTank(WaterThermalTankNum).Name);
+//
+//                        if (WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
+//
+//                            for (int NodeNum = 1; NodeNum <= WaterThermalTank(WaterThermalTankNum).Nodes; ++NodeNum) {
+//                                SetupOutputVariable("Chilled Water Thermal Storage Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+//                                                    OutputProcessor::Unit::C,
+//                                                    WaterThermalTank(WaterThermalTankNum).Node(NodeNum).TempAvg,
+//                                                    "System",
+//                                                    "Average",
+//                                                    WaterThermalTank(WaterThermalTankNum).Name);
+//                            }
+//
+//                            for (int NodeNum = 1; NodeNum <= WaterThermalTank(WaterThermalTankNum).Nodes; ++NodeNum) {
+//                                SetupOutputVariable("Chilled Water Thermal Storage Final Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+//                                                    OutputProcessor::Unit::C,
+//                                                    WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Temp,
+//                                                    "System",
+//                                                    "Average",
+//                                                    WaterThermalTank(WaterThermalTankNum).Name);
+//                            }
+//                        }
+//
+//                        if (WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
+//
+//                            for (int NodeNum = 1; NodeNum <= WaterThermalTank(WaterThermalTankNum).Nodes; ++NodeNum) {
+//                                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_724)
+//                                        << General::TrimSigDigits(NodeNum) << General::TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Height, 4)
+//                                        << General::TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Volume, 4)
+//                                        << General::TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).OffCycLossCoeff, 4)
+//                                        << General::TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Inlets)
+//                                        << General::TrimSigDigits(WaterThermalTank(WaterThermalTankNum).Node(NodeNum).Outlets);
+//                            }
+//                        }
                     }
 
                     // set up internal gains if tank is in a thermal zone
@@ -4825,8 +4959,8 @@ namespace WaterThermalTanks {
 
     void WaterThermalTankData::setupOutputVariables()
     {
-        if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            //            WaterThermalTank(WaterThermalTankNum).SetupChilledWaterTankOutputs();
+        if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) ||
+        (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
 
             static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
 
@@ -12260,6 +12394,7 @@ namespace WaterThermalTanks {
         static ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
 
         if (this->MyOneTimeSetupFlag) {
+            this->setupOutputVariables();
             this->MyOneTimeSetupFlag = false;
         }
 
