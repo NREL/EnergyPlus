@@ -157,11 +157,6 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     std::string CompName = this->name;
     bool PrintFlag = true;
 
-    // Set speed objects parent pointer (this is kind of a test - probably needs to be a separate init function)
-    for (auto &curSpeed : this->speeds) {
-        curSpeed.parentMode = this;
-    }
-
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Evaporator Air Flow Rate";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
@@ -182,6 +177,12 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
+
+    for (auto &curSpeed : this->speeds) {
+        curSpeed.ratedGrossTotalCap = this->ratedGrossTotalCap;
+        curSpeed.ratedGrossTotalCap = this->ratedEvapAirFlowRate;
+        curSpeed.ratedGrossTotalCap = this->ratedCondAirFlowRate;
+    }
 }
 
 void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::NodeData &inletNode,

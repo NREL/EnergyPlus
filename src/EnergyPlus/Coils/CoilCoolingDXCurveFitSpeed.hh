@@ -96,7 +96,6 @@ public:
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
-    CoilCoolingDXCurveFitOperatingMode *parentMode = nullptr;
     std::string name;
 
     int indexCapFT = 0;
@@ -125,9 +124,12 @@ public:
     Real64 AirMassFlow = 0.0;              // coil inlet air mass flow rate {kg/s}
     int FanOpMode = 0;                   // fan operating mode, constant or cycling fan
 
-    // speed class outputs
+    // speed class objects
     Real64 FullLoadPower = 0.0; // full load power at speed {W}
     Real64 RTF = 0.0;           // coil runtime fraction at speed
+    Real64 ratedGrossTotalCap = 0.0;
+    Real64 ratedEvapAirFlowRate = 0.0;
+    Real64 ratedCondAirFlowRate = 0.0;
 
     // other data members
     Real64 rated_total_capacity = 0.0;

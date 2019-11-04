@@ -310,9 +310,9 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 
     std::string RoutineName = "sizeSpeed";
 
-    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
-    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
-    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
+    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->ratedGrossTotalCap;
+    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->ratedEvapAirFlowRate;
+    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->ratedCondAirFlowRate;
     this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(
