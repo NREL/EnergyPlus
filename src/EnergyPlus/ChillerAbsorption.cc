@@ -748,7 +748,8 @@ namespace ChillerAbsorption {
         Real64 SteamDeltaT;     // amount of sub-cooling of steam condensate
         int GeneratorInletNode; // generator inlet node number, steam/water side
         Real64 SteamOutletTemp;
-        static int DummyWaterIndex(1);
+        //static int DummyWaterIndex(1);
+        int DummyWaterIndex;
         Real64 mdotEvap; // local fluid mass flow rate thru evaporator
         Real64 mdotCond; // local fluid mass flow rate thru condenser
         Real64 mdotGen;  // local fluid mass flow rate thru generator
@@ -1092,8 +1093,8 @@ namespace ChillerAbsorption {
         Real64 tmpEvapVolFlowRate;      // local evaporator design volume flow rate
         Real64 tmpCondVolFlowRate;      // local condenser design volume flow rate
         Real64 tmpGeneratorVolFlowRate; // local generator design volume flow rate
-        static int DummWaterIndex(1);
-
+        //static int DummWaterIndex(1);
+        int DummWaterIndex;
         Real64 NomCapUser(0.0);               // Hardsized nominal capacity for reporting
         Real64 NomPumpPowerUser(0.0);         // Hardsized nominal pump power for reporting
         Real64 EvapVolFlowRateUser(0.0);      // Hardsized evaporator volume flow rate for reporting
@@ -1658,8 +1659,8 @@ namespace ChillerAbsorption {
         Real64 EnthSteamOutDry;                // enthalpy of dry steam at generator inlet
         Real64 EnthSteamOutWet;                // enthalpy of wet steam at generator inlet
         Real64 HfgSteam;                       // heat of vaporization of steam
-        static Array1D_bool MyEnvironFlag;
-        static Array1D_bool MyEnvironSteamFlag;
+        //static Array1D_bool MyEnvironFlag;
+        //static Array1D_bool MyEnvironSteamFlag;
         Real64 FRAC;
         //  LOGICAL,SAVE           :: PossibleSubcooling
         Real64 CpFluid; // local specific heat of fluid
@@ -1667,8 +1668,8 @@ namespace ChillerAbsorption {
         Real64 SteamOutletTemp;
         int LoopNum;
         int LoopSideNum;
-        static int DummyWaterIndex(1);
-
+        //static int DummyWaterIndex(1);
+        int DummyWaterIndex;
         // set module level inlet and outlet nodes
         EvapMassFlowRate = 0.0;
         CondMassFlowRate = 0.0;
