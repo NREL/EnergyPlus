@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "../Fixtures/EnergyPlusFixture.hh"
 
 class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture
 {
