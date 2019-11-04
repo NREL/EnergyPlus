@@ -148,11 +148,12 @@ public:
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 	bool mySizeFlag = true;
+	int supplyFanIndex = -1;
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
     void sizeSpeed();
-
+    void calcStandardRatings();
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:

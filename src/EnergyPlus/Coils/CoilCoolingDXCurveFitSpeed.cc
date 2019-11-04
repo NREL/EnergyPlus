@@ -339,6 +339,18 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 
+    SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    SizingString = "Rated Air Flow Rate [m3/s]";
+    TempSize = this->evap_air_flow_rate;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = TempSize;
+
+    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    SizingString = "Gross Cooling Capacity [W]";
+    TempSize = this->rated_total_capacity;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->rated_total_capacity = TempSize;
+
     // Psychrometrics::PsychState in;
     // in.tdb = RatedInletAirTemp;
     // in.w = RatedInletAirHumRat;
@@ -350,6 +362,26 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
+}
+
+void calcStandardRatings() {
+    static ObjexxFCL::gio::Fmt Format_890(
+            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
+            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
+            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
+            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
+            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
+    static ObjexxFCL::gio::Fmt Format_891(
+            "(' VAV DX Cooling Coil Standard Rating Information, "
+            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
+            ",',A)");
+    // Get fan index and name if not already available
+    if (DXCoil(DXCoilNum).SupplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
+        DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = false;
+        ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" +
+                         DXCoil(DXCoilNum).Name + "\". Standard Ratings will not be calculated.");
+        return;
+    }
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
