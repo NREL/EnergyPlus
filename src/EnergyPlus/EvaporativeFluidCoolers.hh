@@ -286,7 +286,7 @@ namespace EvaporativeFluidCoolers {
     void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
 
     void SimSimpleEvapFluidCooler(
-        int EvapFluidCoolerNum, Real64 WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &OutletWaterTemp);
+            int EvapFluidCoolerNum, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
     Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA,          // UA of evaporative fluid cooler
                                            Array1<Real64> const &Par // par(1) = design evaporative fluid cooler load [W]
