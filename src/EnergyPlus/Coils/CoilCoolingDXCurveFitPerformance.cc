@@ -48,6 +48,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -74,7 +75,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
         this->capControlMethod = CapControlMethod::MULTISPEED;
     } else {
-        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, CapControlMethod> instead?
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Capacity Control Method=\"" + input_data.capacity_control + "\":");
         ShowContinueError("...must be Staged, VariableSpeed or MultiSpeed.");
@@ -91,16 +91,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name +
                           "\".");
-        errorsFound = true;
-    }
-
-    // TODO: Hookup no fuel type member for this class yet.
-    if (UtilityRoutines::SameString(input_data.compressor_fuel_type, "ELECTRICITY")) {
-    } else {
-        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, FuelType> instead?
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\":");
-        ShowContinueError("...must be ...");
         errorsFound = true;
     }
 
@@ -126,7 +116,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -143,10 +133,12 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
         input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
-        input_specs.compressor_fuel_type = cAlphaArgs(4);
+        input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
-        // TODO: Check for blank here
-        input_specs.alternate_operating_mode_name = cAlphaArgs(6);
+        if (lAlphaFieldBlanks(6)) {
+            input_specs.alternate_operating_mode_name = cAlphaArgs(6);
+        }
+
         this->instantiateFromInputSpec(input_specs);
         break;
     }

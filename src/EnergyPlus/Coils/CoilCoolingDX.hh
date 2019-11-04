@@ -95,7 +95,7 @@ public:
     //int condZoneIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
-    CoilCoolingDXCurveFitPerformance performance; // TODO: Change to unique pointer when we have base class for performance object
+    CoilCoolingDXCurveFitPerformance performance;
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;
     Real64 condensateVolumeFlow = 0.0;
