@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -195,7 +196,7 @@ void CoilCoolingDX::oneTimeInit(){
                         "Sum",
                         this->name,
                         _,
-                        "Electric",
+                        DataGlobalConstants::GetResourceTypeChar(this->performance.original_input_specs.compressor_fuel_type),
                         "COOLING",
                         _,
                         "System");
@@ -340,8 +341,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
     // update condensate collection tank
-    // TODO: This looks properly implemented, my only concern is that we are grabbing state from the nodes, whereas in DXCoils.cc, they are
-    //       grabbing stuff from the DXCoil structure.  Could mass flow somehow be different between them at this point to account for RTF, etc.?
     if (this->condensateTankIndex > 0) {
         if (speedNum > 0) {
             // calculate and report condensation rates  (how much water extracted from the air stream)
@@ -361,7 +360,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     }
 
     // update requests for evaporative condenser tank
-    // TODO: This also looks pretty well implemented except that I am grabbing data off the nodes directly...which may be fine
     if (this->evaporativeCondSupplyTankIndex > 0) {
         if (speedNum > 0) {
             Real64 condInletTemp =
@@ -422,31 +420,3 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMaxAvail = in.MassFlowRateMaxAvail;
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
-
-//int CoilCoolingDX::getDXCoilCapFTCurveIndex()
-//{
-//    auto &performance = this->performance;
-//    if (performance.hasAlternateMode) {
-//        // Per IDD note - Operating Mode 1 is always used as the base design operating mode
-//        auto &mode = performance.normalMode; // TODO: Yeah, what?
-//        if (mode.speeds.size()) {
-//            auto &firstSpeed = mode.speeds[0];
-//            return firstSpeed.indexCapFT;
-//        }
-//        return -1;
-//    } else {
-//        auto &mode = performance.normalMode; // TODO: Like, what?
-//        if (mode.speeds.size()) {
-//            auto &firstSpeed = mode.speeds[0];
-//            return firstSpeed.indexCapFT;
-//        }
-//        return -1;
-//    }
-//}
-//
-//Real64 CoilCoolingDX::getRatedGrossTotalCapacity()
-//{
-//    // **should** we be checking if performance.hasAlternateMode before looking up the value?
-//    return this->performance.normalMode.ratedGrossTotalCap;
-//}
-

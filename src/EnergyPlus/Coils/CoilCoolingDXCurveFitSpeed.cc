@@ -120,8 +120,6 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
                                       "Sensible Heat Ratio Modifier Function of Air Flow Fraction Curve Name",
                                       1.0);
 
-    // TODO: Warn if only one of SHRFT and SHRFFF are defined (curves won't be used)
-
     errorsFound |= this->processCurve(input_data.waste_heat_function_of_temperature_curve_name,
                                       this->indexWHFT,
                                       {2},
@@ -310,9 +308,9 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 
     std::string RoutineName = "sizeSpeed";
 
-    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * parentMode->ratedGrossTotalCap;
-    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * parentMode->ratedEvapAirFlowRate;
-    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * parentMode->ratedCondAirFlowRate;
+    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->ratedGrossTotalCap;
+    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->ratedEvapAirFlowRate;
+    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->ratedCondAirFlowRate;
     this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(
@@ -418,9 +416,17 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         TotCap = this->rated_total_capacity * TotCapFlowModFac * TotCapTempModFac;
         hDelta = TotCap / AirMassFlow;
 
-        if (indexSHRFT > 0 && indexSHRFFF > 0) { // TODO: Do we want to allow either of these curves to default to 1.0?
-            Real64 SHRTempModFrac = max(CurveManager::CurveValue(indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
-            Real64 SHRFlowModFrac = max(CurveManager::CurveValue(indexSHRFFF, AirFF), 0.0);
+        if (indexSHRFT > 0 && indexSHRFFF > 0) {
+            Real64 SHRTempModFrac = 1.0;
+            if (indexSHRFT > 0) {
+                SHRTempModFrac = max(CurveManager::CurveValue(indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
+            }
+
+            Real64 SHRFlowModFrac = 1.0;
+            if (indexSHRFFF > 0) {
+                SHRFlowModFrac = max(CurveManager::CurveValue(indexSHRFFF, AirFF), 0.0);
+            }
+
             SHR = this->RatedSHR * SHRTempModFrac * SHRFlowModFrac;
             SHR = max(min(SHR, 1.0), 0.0);
             break;
