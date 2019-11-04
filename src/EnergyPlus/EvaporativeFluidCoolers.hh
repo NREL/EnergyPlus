@@ -59,11 +59,6 @@ namespace EnergyPlus {
 
 namespace EvaporativeFluidCoolers {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     extern std::string const cEvapFluidCooler_SingleSpeed;
     extern std::string const cEvapFluidCooler_TwoSpeed;
 
@@ -80,9 +75,6 @@ namespace EvaporativeFluidCoolers {
     extern int const EvapFluidCooler_SingleSpeed;
     extern int const EvapFluidCooler_TwoSpeed;
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
 
     // The following block of variables are used to carry model results for a evaporative fluid cooler instance
@@ -94,30 +86,12 @@ namespace EvaporativeFluidCoolers {
     extern int WaterInletNode;       // Node number at evaporative fluid cooler inlet
     extern int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
     extern Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
-    // DSU this is plant level stuff now REAL(r64)   :: EvapFluidCoolerMassFlowRateMax     = 0.0d0    ! Max Hardware Mass Flow Rate
-    // DSU this is plant level stuff now REAL(r64)   :: EvapFluidCoolerMassFlowRateMin     = 0.0d0    ! Min Hardware Mass Flow Rate
-    // DSU this is plant level stuff now REAL(r64)   :: LoopMassFlowRateMaxAvail = 0.0d0    ! Max Loop Mass Flow Rate available
-    // DSU this is plant level stuff now REAL(r64)   :: LoopMassFlowRateMinAvail = 0.0d0    ! Min Loop Mass Flow Rate available
     extern Real64 Qactual;          // Evaporative fluid cooler heat transfer
     extern Real64 FanPower;         // Evaporative fluid cooler fan power used
     extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
-    // to design air flow rate
     extern Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE EvaporativeFluidCoolers
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-    // also, calculates UA based on Standard Design Capacity input(s)
-
-    // Update routines to check convergence and update nodes
-
-    // Types
 
     struct EvapFluidCoolerspecs
     {
@@ -235,14 +209,12 @@ namespace EvaporativeFluidCoolers {
 
     struct EvapFluidCoolerInletConds
     {
-        // Members
         Real64 WaterTemp;  // Evaporative fluid cooler water inlet temperature (C)
         Real64 AirTemp;    // Evaporative fluid cooler air inlet dry-bulb temperature (C)
         Real64 AirWetBulb; // Evaporative fluid cooler air inlet wet-bulb temperature (C)
         Real64 AirPress;   // Evaporative fluid cooler air barometric pressure
         Real64 AirHumRat;  // Evaporative fluid cooler air inlet humidity ratio (kg/kg)
 
-        // Default Constructor
         EvapFluidCoolerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
         {
         }
@@ -273,7 +245,6 @@ namespace EvaporativeFluidCoolers {
         Real64 StarvedMakeUpVol;
         Real64 BypassFraction; // Added for fluid bypass
 
-        // Default Constructor
         ReportVars()
             : InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
               WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0),
@@ -288,78 +259,45 @@ namespace EvaporativeFluidCoolers {
     extern Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
     extern Array1D<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
 
-    // Functions
-
     void SimEvapFluidCoolers(std::string const &EvapFluidCoolerType,
                              std::string const &EvapFluidCoolerName,
                              int &CompIndex,
                              bool &RunFlag,
-                             bool const InitLoopEquip,
+                             bool InitLoopEquip,
                              Real64 &MaxCap,
                              Real64 &MinCap,
                              Real64 &OptCap,
-                             bool const GetSizingFactor, // TRUE when just the sizing factor is requested
+                             bool GetSizingFactor, // TRUE when just the sizing factor is requested
                              Real64 &SizingFactor        // sizing factor
     );
 
-    // End EvaporativeFluidCoolers Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of EvaporativeFluidCoolers Module Get Input subroutines
-    //******************************************************************************
-
     void GetEvapFluidCoolerInput();
-
-    // End of Get Input subroutines for the Evaporative Fluid Cooler Module
-    //******************************************************************************
-
-    // Beginning Initialization Section for the Evaporative Fluid Coolers Module
-    //******************************************************************************
 
     void InitSimVars();
 
-    void InitEvapFluidCooler(int const EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
-                             bool const RunFlag            // Indication of
+    void InitEvapFluidCooler(int EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
+                             bool RunFlag            // Indication of
     );
 
-    void SizeEvapFluidCooler(int const EvapFluidCoolerNum);
-
-    // End Initialization Section for the EvaporativeFluidCoolers Module
-    //******************************************************************************
-
-    // Beginning of the EvaporativeFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
+    void SizeEvapFluidCooler(int EvapFluidCoolerNum);
 
     void CalcSingleSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
 
     void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
 
     void SimSimpleEvapFluidCooler(
-        int const EvapFluidCoolerNum, Real64 const WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &OutletWaterTemp);
+        int EvapFluidCoolerNum, Real64 WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &OutletWaterTemp);
 
-    Real64 SimpleEvapFluidCoolerUAResidual(Real64 const UA,          // UA of evaporative fluid cooler
+    Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA,          // UA of evaporative fluid cooler
                                            Array1<Real64> const &Par // par(1) = design evaporative fluid cooler load [W]
     );
 
-    // End of the EvaporativeFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
+    void CalculateWaterUseage(int EvapFluidCoolerNum);
 
-    void CalculateWaterUseage(int const EvapFluidCoolerNum);
+    void UpdateEvapFluidCooler(int EvapFluidCoolerNum);
 
-    // Beginning of Record Keeping subroutines for the EvaporativeFluidCooler Module
-    // *****************************************************************************
+    void ReportEvapFluidCooler(bool RunFlag, int EvapFluidCoolerNum);
 
-    void UpdateEvapFluidCooler(int const EvapFluidCoolerNum);
-
-    // End of Record Keeping subroutines for the EvaporativeFluidCooler Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the EvaporativeFluidCooler Module
-    // *****************************************************************************
-
-    void ReportEvapFluidCooler(bool const RunFlag, int const EvapFluidCoolerNum);
-
-    // Used for clearing global data between Unit Tests, should not be normally called
     void clear_state();
 
 } // namespace EvaporativeFluidCoolers
