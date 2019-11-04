@@ -161,7 +161,7 @@ private:
                       std::vector<int> validDims,
                       const std::string& routineName,
                       const std::string& fieldName,
-                      Real64 const Var1,               // required 1st independent variable
+                      Real64 Var1,               // required 1st independent variable
                       Optional<Real64 const> Var2 = _, // 2nd independent variable
                       Optional<Real64 const> Var3 = _, // 3rd independent variable
                       Optional<Real64 const> Var4 = _, // 4th independent variable

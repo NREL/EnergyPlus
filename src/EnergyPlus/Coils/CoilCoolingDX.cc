@@ -277,7 +277,7 @@ CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
 {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(CoilCoolingDX::object_name);
     if (numCoolingCoilDXs <= 0) {
-        // error
+        ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
     }
     bool found_it = false;
     for (int coilNum = 1; coilNum <= numCoolingCoilDXs; ++coilNum) {
@@ -307,7 +307,7 @@ CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
     }
 
     if (!found_it) {
-        // error
+        ShowFatalError("Coil:Cooling:DX " + name_to_find + " not found.");
     }
 }
 
