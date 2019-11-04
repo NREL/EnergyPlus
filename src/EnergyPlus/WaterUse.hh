@@ -154,7 +154,7 @@ namespace WaterUse {
 
     };
 
-    struct WaterConnectionsType 
+    struct WaterConnectionsType : PlantComponent
     {
         // Members
         std::string Name; // Name of DHW
@@ -217,12 +217,12 @@ namespace WaterUse {
         Real64 AvailableFraction;
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
-        Array1D_int WaterEquipment;
+        Array1D_int WaterEquipment_intArr;
         int PlantLoopNum;
         int PlantLoopSide;
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
-       
+        bool SetLoopIndexFlag;
 
         // Default Constructor
         WaterConnectionsType()
@@ -235,11 +235,24 @@ namespace WaterUse {
               HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0), MainsVolume(0.0), TankVolume(0.0),
               ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), CapacityRatio(0.0), MinCapacityRate(0.0),
               HXCapacityRate(0.0), DrainCapacityRate(0.0), NTU(0.0), ExpVal(0.0), AvailableFraction(0.0), NumWaterEquipment(0), MaxIterationsErrorIndex(0),
-              PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
+            PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), SetLoopIndexFlag(true)
         {
         }
 
+            void InitConnections( );
 
+            void UpdateWaterConnections( );
+
+            void CalcConnectionsHeatRecovery(  );
+            
+            void CalcConnectionsFlowRates( bool FirstHVACIteration);
+
+            void CalcConnectionsDrainTemp( );
+
+            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+            void ReportWaterUse( );
+            
     };
 
  
@@ -256,19 +269,7 @@ namespace WaterUse {
 
     void CalcEquipmentDrainTemp(int WaterEquipNum);
 
-    void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration);
-
-    void CalcConnectionsDrainTemp(int WaterConnNum);
-
-    void CalcConnectionsHeatRecovery(int WaterConnNum);
-
-    void UpdateWaterConnections(int WaterConnNum);
-  
-    void InitConnections(int WaterConnNum);
-
     void SimulateWaterUse(bool FirstHVACIteration);
-
-    void ReportWaterUse(int WaterConnNum);
 
     void CalcWaterUseZoneGains();
 
