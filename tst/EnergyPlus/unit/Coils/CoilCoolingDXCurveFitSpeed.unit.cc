@@ -77,7 +77,6 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     thisMode.ratedGrossTotalCap = 12000;
     thisMode.ratedEvapAirFlowRate = 100;
     thisMode.ratedCondAirFlowRate = 200;
-    thisSpeed.parentMode = &thisMode;
 
     DataLoopNode::NodeData inletNode;
     inletNode.Temp = 20.0;
