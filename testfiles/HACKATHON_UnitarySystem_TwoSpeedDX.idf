@@ -2849,13 +2849,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
@@ -2869,10 +2868,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 2 Name
-    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 1 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 1 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
@@ -3304,13 +3302,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Sys 2 Furnace DX Cool Cooling Coil Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Sys 2 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 2 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
@@ -3324,10 +3321,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 2 Name
-    Sys 2 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 2 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 2 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name
@@ -3746,13 +3742,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Sys 3 Heat Pump Air Source Cooling Coil Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Sys 3 Heat Pump Air Source Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 3 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
@@ -3766,10 +3761,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 2 Name
-    Sys 3 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 3 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 3 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
@@ -4269,13 +4263,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Sys 4 Heat Pump Air Source Cooling Coil Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Sys 4 Heat Pump Air Source Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 4 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
@@ -4289,10 +4282,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 2 Name
-    Sys 4 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 4 Heat Pump Air Source Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 4 Heat Pump Air Source Cooling Coil Speed 1 Performance,  !- Name
@@ -4792,13 +4784,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    MultiSpeed,              !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Sys 5 Furnace DX Cool Cooling Coil Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Sys 5 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 5 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
@@ -4812,10 +4803,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    MultiSpeed,              !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 2 Name
-    Sys 5 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name
+    Sys 5 Furnace DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Sys 5 Furnace DX Cool Cooling Coil Speed 1 Performance,  !- Name

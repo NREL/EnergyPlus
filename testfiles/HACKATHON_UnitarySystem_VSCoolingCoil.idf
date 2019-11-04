@@ -1613,13 +1613,12 @@
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
+    VariableSpeed,           !- Capacity Control Method
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Heat Pump ACDXCoil 1 Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Heat Pump ACDXCoil 1 Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Heat Pump ACDXCoil 1 Operating Mode,  !- Name
@@ -1633,10 +1632,9 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     AirCooled,               !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    VariableSpeed,           !- Nominal Speed Number
-    2,                       !- Speed 1 Name
-    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Speed 2 Name
-    Heat Pump ACDXCoil 1 Speed 2 Performance;  !- Speed 3 Name
+    2,                       !- Nominal Speed Number
+    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Speed 1 Name
+    Heat Pump ACDXCoil 1 Speed 2 Performance;  !- Speed 2 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Name

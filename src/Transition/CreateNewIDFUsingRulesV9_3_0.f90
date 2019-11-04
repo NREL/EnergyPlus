@@ -571,14 +571,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(15) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
                                 OutArgs(4)=TempArgs(26) ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
                                 !OutArgs(5)='' ! Unit Internal Static Air Pressure - Only defined for Coil:Cooling:DX:TwoSpeed previously
-                                !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControlMode previously
-                                !OutArgs(7)='' ! Operating Mode Number Schedule Name
-                                OutArgs(8)=TempArgs(29) ! Evaporative Condenser Basin Heater Capacity
-                                OutArgs(9)=TempArgs(30) ! Evaporative Condenser Basin Heater Setpoint Temperature
-                                OutArgs(10)=TempArgs(31) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                                OutArgs(11)='Electricity' ! Compressor Fuel Type
-                                OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                                CurArgs=12
+                                OutArgs(6)='' ! Capacity Control Method
+                                OutArgs(7)=TempArgs(29) ! Evaporative Condenser Basin Heater Capacity
+                                OutArgs(8)=TempArgs(30) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                                OutArgs(9)=TempArgs(31) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                                OutArgs(10)='Electricity' ! Compressor Fuel Type
+                                OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                                CurArgs=11
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Operating Mode object
@@ -596,10 +595,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 !OutArgs(9)='' ! Apply Latent Degradation to Speeds Greater than 1 - Only defined for Coil:Cooling:DX:MultiSpeed previously
                                 OutArgs(10)=TempArgs(21) ! Condenser Type
                                 OutArgs(11)=TempArgs(24) ! Nominal Evaporative Condenser Pump Power
-                                !OutArgs(12)='' ! Capacity Control Method
-                                OutArgs(13)='1' ! Nominal Speed Number
-                                OutArgs(14)=TRIM(TempArgs(1)) // TRIM(' Speed 1 Performance') ! Speed 1 Name
-                                CurArgs=14
+                                OutArgs(12)='1' ! Nominal Speed Number
+                                OutArgs(13)=TRIM(TempArgs(1)) // TRIM(' Speed 1 Performance') ! Speed 1 Name
+                                CurArgs=13
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Speed Performance object
@@ -662,14 +660,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(23) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
                                 !OutArgs(4)='' ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation - Coil:Cooling:DX:TwoSpeed never had this
                                 !OutArgs(5)=TempArgs(7) ! Unit Internal Static Air Pressure
-                                !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControl previously
-                                !OutArgs(7)='' ! Operating Mode Number Schedule Name
-                                OutArgs(8)=TempArgs(32) ! Evaporative Condenser Basin Heater Capacity
-                                OutArgs(9)=TempArgs(33) ! Evaporative Condenser Basin Heater Setpoint Temperature
-                                OutArgs(10)=TempArgs(34) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                                OutArgs(11)='Electricity' ! Compressor Fuel Type
-                                OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                                CurArgs=12
+                                OutArgs(6)='MultiSpeed' ! Capacity Control Method
+                                OutArgs(7)=TempArgs(32) ! Evaporative Condenser Basin Heater Capacity
+                                OutArgs(8)=TempArgs(33) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                                OutArgs(9)=TempArgs(34) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                                OutArgs(10)='Electricity' ! Compressor Fuel Type
+                                OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                                CurArgs=11
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Operating Mode object
@@ -687,13 +684,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 !OutArgs(9)='' ! Apply Latent Degradation to Speeds Greater than 1 - Only defined for Coil:Cooling:DX:MultiSpeed previously
                                 OutArgs(10)=TempArgs(22) ! Condenser Type
                                 OutArgs(11)=TempArgs(26) ! Nominal Evaporative Condenser Pump Power
-                                OutArgs(12)='MultiSpeed' ! Capacity Control Method
 
                                 ErrFlag=.false.
                                 NumberOfSpeeds=2
 
-                                OutArgs(13)='2' ! Nominal Speed Number
-                                CurArgs=13
+                                OutArgs(12)='2' ! Nominal Speed Number
+                                CurArgs=12
                                 DO SpeedNum=1,NumberOfSpeeds
                                     CurArgs=CurArgs+1
                                     SpeedNumChar=RoundSigDigits(SpeedNum,0)
@@ -901,14 +897,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(7) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
                                 OutArgs(4)=TempArgs(13) ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
                                 !OutArgs(5)='' ! Unit Internal Static Air Pressure - Only defined for Coil:Cooling:DX:TwoSpeed previously
-                                !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControl previously
-                                !OutArgs(7)='' ! Operating Mode Number Schedule Name
-                                OutArgs(8)=TempArgs(14) ! Evaporative Condenser Basin Heater Capacity
-                                OutArgs(9)=TempArgs(15) ! Evaporative Condenser Basin Heater Setpoint Temperature
-                                OutArgs(10)=TempArgs(16) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                                OutArgs(11)=TempArgs(17) ! Compressor Fuel Type
-                                OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                                CurArgs=12
+                                OutArgs(6)='MultiSpeed' ! Capacity Control Method
+                                OutArgs(7)=TempArgs(14) ! Evaporative Condenser Basin Heater Capacity
+                                OutArgs(8)=TempArgs(15) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                                OutArgs(9)=TempArgs(16) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                                OutArgs(10)=TempArgs(17) ! Compressor Fuel Type
+                                OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                                CurArgs=11
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Operating Mode object
@@ -941,11 +936,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
                                 OutArgs(10)=TempArgs(6) ! Condenser Type
                                 OutArgs(11)=TempArgs(DXNomSpeedStartArgNum+18) ! Nominal Evaporative Condenser Pump Power
-                                OutArgs(12)='MultiSpeed' ! Capacity Control Method
 
 
-                                OutArgs(13)=TempArgs(18) ! Nominal Speed Number - For Coil:Cooling:DX:Multispeed this is same as number of speeds
-                                CurArgs=13
+                                OutArgs(12)=TempArgs(18) ! Nominal Speed Number - For Coil:Cooling:DX:Multispeed this is same as number of speeds
+                                CurArgs=12
                                 DO SpeedNum=1,NumberOfSpeeds
                                     CurArgs=CurArgs+1
                                     SpeedNumChar=RoundSigDigits(SpeedNum,0)
@@ -1139,14 +1133,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(16) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
                                 OutArgs(4)=TempArgs(15) ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
                                 !OutArgs(5)='' ! Unit Internal Static Air Pressure - Only defined for Coil:Cooling:DX:TwoSpeed previously
-                                !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControl previously
-                                !OutArgs(7)='' ! Operating Mode Number Schedule Name
-                                OutArgs(8)=TempArgs(19) ! Evaporative Condenser Basin Heater Capacity
-                                OutArgs(9)=TempArgs(20) ! Evaporative Condenser Basin Heater Setpoint Temperature
-                                OutArgs(10)=TempArgs(21) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                                OutArgs(11)='Electricity' ! Compressor Fuel Type
-                                OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                                CurArgs=12
+                                OutArgs(6)='VariableSpeed' ! Capacity Control Method
+                                OutArgs(7)=TempArgs(19) ! Evaporative Condenser Basin Heater Capacity
+                                OutArgs(8)=TempArgs(20) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                                OutArgs(9)=TempArgs(21) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                                OutArgs(10)='Electricity' ! Compressor Fuel Type
+                                OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                                CurArgs=11
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Operating Mode object
@@ -1164,7 +1157,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 !OutArgs(9)='' ! Apply Latent Degradation to Speeds Greater than 1 - Only defined for Coil:Cooling:DX:MultiSpeed previously
                                 OutArgs(10)=TempArgs(12) ! Condenser Type
                                 OutArgs(11)=TempArgs(13) ! Nominal Evaporative Condenser Pump Power
-                                OutArgs(12)='VariableSpeed' ! Capacity Control Method
 
                                 ErrFlag=.false.
                                 NumberOfSpeeds=ProcessNumber(TempArgs(4),ErrFlag)
@@ -1173,7 +1165,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                             trim(TempArgs(4))//'], Name='//TRIM(TempArgs(1)),Auditf)
                                 ENDIF
 
-                                OutArgs(13)=TempArgs(5) ! Nominal Speed Number
+                                OutArgs(12)=TempArgs(5) ! Nominal Speed Number
                                 ! Save starting position of nominal speed values for scaling later
                                 ErrFlag=.false.
                                 DXNomSpeedStartArgNum = 22 + 10*(ProcessNumber(TempArgs(5),ErrFlag)-1)
@@ -1182,7 +1174,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                             trim(TempArgs(5))//'], Name='//TRIM(TempArgs(1)),Auditf)
                                 ENDIF
 
-                                CurArgs=13
+                                CurArgs=12
                                 DO SpeedNum=1,NumberOfSpeeds
                                     CurArgs=CurArgs+1
                                     SpeedNumChar=RoundSigDigits(SpeedNum,0)
@@ -1311,14 +1303,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(19) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
                                 OutArgs(4)=TempArgs(6) ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
                                 !OutArgs(5)='' ! Unit Internal Static Air Pressure - Only defined for Coil:Cooling:DX:TwoSpeed previously
-                                OutArgs(6)='HumidityControl' ! Method for Switching Operating Modes
-                                !OutArgs(7)='' ! Operating Mode Number Schedule Name
-                                OutArgs(8)=TempArgs(20) ! Evaporative Condenser Basin Heater Capacity
-                                OutArgs(9)=TempArgs(21) ! Evaporative Condenser Basin Heater Setpoint Temperature
-                                OutArgs(10)=TempArgs(22) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                                OutArgs(11)='Electricity' ! Compressor Fuel Type
-                                OutArgs(12)=TRIM(TempArgs(1))// TRIM(' Normal Operating Mode ') ! Operating Mode 1 Name
-                                CurArgs=12
+                                OutArgs(6)='MultiSpeed' ! Capacity Control Method
+                                OutArgs(7)=TempArgs(20) ! Evaporative Condenser Basin Heater Capacity
+                                OutArgs(8)=TempArgs(21) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                                OutArgs(9)=TempArgs(22) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                                OutArgs(10)='Electricity' ! Compressor Fuel Type
+                                OutArgs(11)=TRIM(TempArgs(1))// TRIM(' Normal Operating Mode ') ! Operating Mode 1 Name
+                                CurArgs=11
                                 IF (TempArgs(8) == blank) THEN
                                     NumberOfModes = 1
                                 ELSE
@@ -1330,8 +1321,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                     ENDIF
                                 ENDIF
                                 IF (NumberOfModes == 2) THEN
-                                    OutArgs(13)=TRIM(TempArgs(1))// TRIM(' Dehumidification Operating Mode') ! Operating Mode 1 Name
-                                    CurArgs=13
+                                    OutArgs(12)=TRIM(TempArgs(1))// TRIM(' Dehumidification Operating Mode') ! Operating Mode 1 Name
+                                    CurArgs=12
                                 ENDIF
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
@@ -1396,11 +1387,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
                                     OutArgs(10)=MultiStageDXPerformance(iDXStg1Perf)%CondType ! Condenser Type
                                     OutArgs(11)=MultiStageDXPerformance(iDXStg1Perf)%EvapCondPumpPower ! Nominal Evaporative Condenser Pump Power
-                                    OutArgs(12)='MultiSpeed' ! Capacity Control Method
 
 
-                                    OutArgs(13)=RoundSigDigits(NumberOfSpeeds,0) ! Nominal Speed Number - For Coil:Cooling:DX:TwoStageWithHumidityControlMode this is same as number of speeds
-                                    CurArgs=13
+                                    OutArgs(12)=RoundSigDigits(NumberOfSpeeds,0) ! Nominal Speed Number - For Coil:Cooling:DX:TwoStageWithHumidityControlMode this is same as number of speeds
+                                    CurArgs=12
                                     DO SpeedNum=1,NumberOfSpeeds
                                         CurArgs=CurArgs+1
                                         SpeedNumChar=RoundSigDigits(SpeedNum,0)

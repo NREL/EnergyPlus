@@ -1617,9 +1617,8 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    ,                        !- Compressor Fuel Type
-    Electricity,             !- Base Operating Mode
-    Heat Pump ACDXCoil 1 Operating Mode;  !- Alternative Operating Mode
+    Electricity,             !- Compressor Fuel Type
+    Heat Pump ACDXCoil 1 Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Heat Pump ACDXCoil 1 Operating Mode,  !- Name
@@ -1633,9 +1632,8 @@
     ,                        !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    ,                        !- Nominal Speed Number
-    1,                       !- Speed 1 Name
-    Heat Pump ACDXCoil 1 Speed 1 Performance;  !- Speed 2 Name
+    1,                       !- Nominal Speed Number
+    Heat Pump ACDXCoil 1 Speed 1 Performance;  !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Name
