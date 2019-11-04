@@ -48,7 +48,7 @@
 #ifndef PlantOperationCallingOrder_hh_INCLUDED
 #define PlantOperationCallingOrder_hh_INCLUDED
 
-#include <Plant/MeterData.hh>
+#include <EnergyPlus/Plant/MeterData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

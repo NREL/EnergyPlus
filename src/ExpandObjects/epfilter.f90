@@ -8847,21 +8847,23 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + vzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + vzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
 !AIR DISTRIBUTION UNIT ~ line 72
   IF (reheatCoilType .EQ. ctNone) THEN
     CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
@@ -9071,7 +9073,7 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjFld('Component Inlet Node Name', base + vzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -9303,7 +9305,7 @@ DO iZone = 1, numCompactZoneFPVAV
     END IF
     CALL AddToObjFld('Inlet Node Name', base + fpvzNameOff,' Zone Return Plenum Inlet',.TRUE.)
   END IF
-  !ZONE EQUIPMENT LIST ~ line 61 of FPVAV tab
+  !ZONE EQUIPMENT LIST ~ line 61 of FPVAV tab 
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + fpvzNameOff,' Equipment')
   CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
@@ -9315,21 +9317,24 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      ! fix for 7377
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + fpvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + fpvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !AIR DISTRIBUTION UNIT ~ line 69 of FPVAV tab
   CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
   CALL AddToObjFld('Name', base + fpvzNameOff,' ATU')
@@ -9563,7 +9568,7 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjFld('Component Inlet Node Name', base + fpvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fpvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -9792,21 +9797,23 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + hcvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + hcvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !AIR DISTRIBUTION UNIT ~ line 72
   IF (reheatCoilType .EQ. ctNone) THEN
     CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
@@ -9990,7 +9997,7 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjFld('Component Inlet Node Name', base + hcvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + hcvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -13366,21 +13373,23 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + uzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + uzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !DIRECT AIR
   CALL CreateNewObj('AirTerminal:SingleDuct:Uncontrolled')
   CALL AddToObjFld('Name', base +  uzNameOff,' Air Terminal')
@@ -13421,7 +13430,7 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjFld('Component Inlet Node Name', base + uzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + uzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -18611,21 +18620,23 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + cvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + cvzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !AIR DISTRIBUTION UNIT ~ line 72
   IF (reheatCoilType .EQ. ctNone) THEN
     CALL CreateNewObj('AirTerminal:SingleDuct:Uncontrolled')
@@ -18783,7 +18794,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + cvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -20557,21 +20568,23 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
     CASE (baseboardHotWater)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
       CALL AddToObjFld('Zone Equipment Name', base + ddzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
     CASE (baseboardElectric)
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
+      CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+      CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
       CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Zone Equipment Name', base + ddzNameOff,' Baseboard Heat')
       CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
       CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
   END SELECT
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !AIR DISTRIBUTION UNIT
   IF (isSystemVAV) THEN
     CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
@@ -20648,7 +20661,7 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjFld('Component Inlet Node Name', base + ddzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ddzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -22632,16 +22645,16 @@ DO iZone = 1, numCompactZoneVRF
     CALL AddToObjFld('Zone Equipment Name', base + vrfzNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber))
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
   NextSequenceNumber = '2'
   END IF
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:TerminalUnit:VariableRefrigerantFlow')
   CALL AddToObjFld('Zone Equipment Name', base + vrfzNameOff,' VRF Terminal Unit')
   CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',isBaseboardNone)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',isBaseboardNone)
   IF (.NOT. isBaseboardNone) THEN
     IF (isDedOutAirNameBlank) THEN
       NextSequenceNumber = '2'
@@ -22657,8 +22670,8 @@ DO iZone = 1, numCompactZoneVRF
         CALL AddToObjFld('Zone Equipment Name', base + vrfzNameOff,' Baseboard Heat')
         CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
         CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
     END IF
 
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -22916,7 +22929,7 @@ DO iZone = 1, numCompactZoneVRF
       CALL AddToObjFld('Component Inlet Node Name', base + vrfzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vrfzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -23640,16 +23653,16 @@ DO iZone = 1, numCompactFanCoil
     CALL AddToObjFld('Zone Equipment Name', base + fczNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber))
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
   NextSequenceNumber = '2'
   END IF
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:FourPipeFanCoil')
   CALL AddToObjFld('Zone Equipment Name', base + fczNameOff,' Fan Coil')
   CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',isBaseboardNone)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',isBaseboardNone)
 IF (.NOT. isBaseboardNone) THEN
     IF (isDedOutAirNameBlank) THEN
       NextSequenceNumber = '2'
@@ -23665,8 +23678,8 @@ IF (.NOT. isBaseboardNone) THEN
         CALL AddToObjFld('Zone Equipment Name', base + fczNameOff,' Baseboard Heat')
         CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
         CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   END IF
 
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -24007,7 +24020,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Component Inlet Node Name', base + fczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -24314,8 +24327,8 @@ DO iPurchAir = 1, numCompactPurchAir
   CALL AddToObjFld('Zone Equipment Name', base +  pazNameOff,' Ideal Loads Air System')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
 !PURCHASED AIR
   CALL CreateNewObj('ZoneHVAC:IdealLoadsAirSystem')
   CALL AddToObjFld('Name', base +  pazNameOff,' Ideal Loads Air System')
@@ -24510,15 +24523,15 @@ DO iZone = 1, numCompactBaseboard
     CALL AddToObjFld('Zone Equipment Name', base + uzNameOff,' Baseboard Heat')
     CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
 ELSE
     CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
     CALL AddToObjFld('Zone Equipment Name', base + bbzNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','1')
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
   SELECT CASE (baseboardKind)
       CASE (baseboardHotWater)
         CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:Baseboard:RadiantConvective:Water')
@@ -24528,8 +24541,8 @@ ELSE
     CALL AddToObjFld('Zone Equipment Name', base + uzNameOff,' Baseboard Heat')
     CALL AddToObjStr('Zone Equipment Cooling Sequence','2')
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence','2',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   !***ZoneHVAC:AirDistributionUnit
     CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
     CALL AddToObjFld('Name', base + bbzNameOff,' DOAS ATU')
@@ -24577,7 +24590,7 @@ ELSE
       CALL AddToObjFld('Component Inlet Node Name', base + bbzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + bbzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -24832,16 +24845,16 @@ DO iZone = 1, numCompactPTAC
     CALL AddToObjFld('Zone Equipment Name', base + ptaczNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber))
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
     NextSequenceNumber = '2'
   END IF
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:PackagedTerminalAirConditioner')
   CALL AddToObjFld('Zone Equipment Name', base + ptaczNameOff,' PTAC')
   CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',isBaseboardNone)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',isBaseboardNone)
 IF (.NOT. isBaseboardNone) THEN
     IF (isDedOutAirNameBlank) THEN
       NextSequenceNumber = '2'
@@ -24857,8 +24870,8 @@ IF (.NOT. isBaseboardNone) THEN
         CALL AddToObjFld('Zone Equipment Name', base + ptaczNameOff,' Baseboard Heat')
         CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
         CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
       END IF
 
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -25179,7 +25192,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Component Inlet Node Name', base + ptaczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ptaczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -25433,16 +25446,16 @@ DO iZone = 1, numCompactPTHP
     CALL AddToObjFld('Zone Equipment Name', base + pthpzNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber))
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
     NextSequenceNumber = '2'
   END IF
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:PackagedTerminalHeatPump')
   CALL AddToObjFld('Zone Equipment Name', base + pthpzNameOff,' PTHP')
   CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',isBaseboardNone)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',isBaseboardNone)
   IF (.NOT. isBaseboardNone) THEN
     IF (isDedOutAirNameBlank) THEN
       NextSequenceNumber = '2'
@@ -25458,8 +25471,8 @@ DO iZone = 1, numCompactPTHP
         CALL AddToObjFld('Zone Equipment Name', base + pthpzNameOff,' Baseboard Heat')
         CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
         CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   END IF
 
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -25879,7 +25892,7 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjFld('Component Inlet Node Name', base + pthpzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + pthpzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -29813,16 +29826,16 @@ DO iZone = 1, numCompactWaterAirHP
     CALL AddToObjFld('Zone Equipment Name', base + wahpNameOff,' DOAS ATU')
     CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
     CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber))
-    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+    CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.FALSE.)
     NextSequenceNumber = '2'
   END IF
   CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:WaterToAirHeatPump')
   CALL AddToObjFld('Zone Equipment Name', base + wahpNameOff,' WAHP')
   CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
   CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber), .FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',isBaseboardNone)
+  CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+  CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',isBaseboardNone)
   IF (.NOT. isBaseboardNone) THEN
     IF (isDedOutAirNameBlank) THEN
       NextSequenceNumber = '2'
@@ -29838,8 +29851,8 @@ DO iZone = 1, numCompactWaterAirHP
         CALL AddToObjFld('Zone Equipment Name', base + wahpNameOff,' Baseboard Heat')
         CALL AddToObjStr('Zone Equipment Cooling Sequence',trim(NextSequenceNumber))
         CALL AddToObjStr('Zone Equipment Heating or No-Load Sequence',trim(NextSequenceNumber),.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction','1',.FALSE.)
-        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction','1',.TRUE.)
+        CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
+        CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
   END IF
 
   IF (.NOT. isDedOutAirNameBlank) THEN
@@ -30133,7 +30146,7 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF

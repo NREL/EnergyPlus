@@ -194,28 +194,28 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DisplayRoutines.hh>
-#include <EnergyPlusPgm.hh>
-#include <FileSystem.hh>
-#include <FluidProperties.hh>
-#include <InputProcessing/DataStorage.hh>
-#include <InputProcessing/IdfParser.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InputProcessing/InputValidation.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ResultsSchema.hh>
-#include <ScheduleManager.hh>
-#include <SimulationManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -543,9 +543,12 @@ int RunEnergyPlus(std::string const & filepath)
                 ObjexxFCL::gio::close(fileUnitNumber);
             }
 
-            std::string const readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
-            std::string const readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+            // We quote the paths in case we have spaces
+            // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
+            std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
+            std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
 
+            // systemCall will be responsible to handle to above command on Windows versus Unix
             systemCall(readVarsRviCommand);
             systemCall(readVarsMviCommand);
 

@@ -433,7 +433,7 @@ SetpointManager:SingleZone:Cooling,
 
 The Single Zone Minimum Humidity Setpoint Manager allows the control of a single zone minimum humidity level. This setpoint manager detects the humidity level in a control zone and, using air and moisture mass balance, calculates the supply air humidity ratio needed to maintain the zone relative humidity at or above a given setpoint. The calculated supply air humidity ratio is then used as the setpoint for the designated setpoint node. A humidifier component placed upstream of the setpoint node can then use the humidity ratio setpoint to control its moisture addition rate.
 
-The use of this object requires that a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object be specified with a humidifying relative humidity schedule for the controlling zone. The humidistat s controlling zone must correspond with the control zone air node name specified in this setpoint manager.
+The use of this object requires that a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object be specified with a humidifying relative humidity schedule for the controlling zone. The humidistat's controlling zone must correspond with the control zone air node name specified in this setpoint manager.
 
 \subsubsection{Inputs}\label{inputs-6-024}
 
@@ -471,7 +471,7 @@ The Single Zone Maximum Humidity Setpoint Manager allows the control of a single
 
 In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a \hyperref[controllerwatercoil]{Controller:WaterCoil} object to determine the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone. See object \hyperref[controllerwatercoil]{Controller:WaterCoil} in the EnergyPlus Engineering Reference for a detailed discussion of how this is achieved.
 
-The use of this object requires that a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object be specified with a relative humidity setpoint schedule for the controlling zone. The humidistat s controlling zone must correspond with the control zone air node name specified in this setpoint manager..
+The use of this object requires that a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object be specified with a relative humidity setpoint schedule for the controlling zone. The humidistat's controlling zone must correspond with the control zone air node name specified in this setpoint manager..
 
 \subsubsection{Inputs}\label{inputs-7-024}
 

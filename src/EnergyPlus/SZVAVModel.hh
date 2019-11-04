@@ -60,11 +60,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <FanCoilUnits.hh>
-#include <General.hh>
-#include <PackagedTerminalHeatPump.hh>
-#include <UnitarySystem.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 

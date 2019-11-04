@@ -53,11 +53,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <DataGlobals.hh>
-#include <DataHVACControllers.hh>
-#include <DataRootFinder.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -414,7 +414,7 @@ namespace HVACControllers {
     void CheckControllerListOrder();
 
     void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
-                                 bool &NodeNotFound           // true if matching actuator node not found
+                                 bool &NodeNotFound           // true if matching actuator node not found, false if found
     );
 
     void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
@@ -425,7 +425,7 @@ namespace HVACControllers {
 
     void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
-                                      bool &NodeNotFound                 // true if matching actuator node not found
+                                      bool &NodeNotFound                 // true if matching actuator node not found, false if found
     );
 
     int GetControllerIndex(std::string const &ControllerName // name of coil controller

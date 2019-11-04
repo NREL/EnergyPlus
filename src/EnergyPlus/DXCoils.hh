@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -966,6 +966,8 @@ namespace DXCoils {
 
     void SetDXCoilAirLoopNumber(std::string const &CoilName,
                                 int const AirLoopNum); // must match coil names for the coil type
+
+    void DisableLatentDegradation(int const DXCoilNum);
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.

@@ -1837,7 +1837,7 @@ The name of a biquadratic performance curve (ref: Performance Curves) that param
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-1}
 
-The name of the Electric Input to Cooling Output Ratio Function of Temperature Curve. Valid curve object types are \hyperref[curvequadratic]{Curve:Quadratic} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}. The performance curve (ref: Performance Curves) parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve or the \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
+The name of the Electric Input to Cooling Output Ratio Function of Temperature Curve. Valid curve object types are \hyperref[curvequadratic]{Curve:Quadratic} or \hyperref[tablelookup]{Table:Lookup}. The performance curve (ref: Performance Curves) parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve or the \hyperref[tablelookup]{Table:Lookup} should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-type}
 
@@ -1847,10 +1847,10 @@ This choice field determines which type of the Electric Input to Cooling Output 
 
 The name of performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the leaving condenser water temperature and the part-load ratio (EIRfTPLR). The form of this curve is based on the input for Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type.
 
-For the type of LeavingCondenserWaterTemperature, the curve object type should be \hyperref[curvebicubic]{Curve:Bicubic} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} that parameterizes
+For the type of LeavingCondenserWaterTemperature, the curve object type should be \hyperref[curvebicubic]{Curve:Bicubic} or \hyperref[tablelookup]{Table:Lookup} that parameterizes
 the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature.
 
-For the type of Lift, the curve object type should be \hyperref[curvechillerpartloadwithlift]{Curve:ChillerPartLoadWithLift} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} that parameterizes the variation of EIR
+For the type of Lift, the curve object type should be \hyperref[curvechillerpartloadwithlift]{Curve:ChillerPartLoadWithLift} or \hyperref[tablelookup]{Table:Lookup} that parameterizes the variation of EIR
 as a function of the normalized fractional Lift, normalized Tdev and the PLR. Tdev is the difference between Leaving Chilled Water Temperature and Reference Chilled Water Temperature.
 Lift is the difference between the Leaving Condenser Water Temperature and Leaving Chilled Water Temperature.
 The EIR is the inverse of the COP, and the part-load ratio is the actual cooling load divided by the chiller's available cooling capacity.
@@ -3899,7 +3899,7 @@ Linear \to Eff = {A_0} + {A_1}\cdot PLR
 
 \paragraph{Field: Nominal Thermal Efficiency}\label{field-nominal-thermal-efficiency}
 
-This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0 and the temperature entered for the Design Boiler Water Outlet Temp. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
+This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
 
 \paragraph{Field: Efficiency Curve Temperature Evaluation Variable}\label{field-efficiency-curve-temperature-evaluation-variable}
 
@@ -3946,7 +3946,7 @@ T\(_{w}\) = boiler water temperature {[}ºC{]} {]}, this can be either entering 
 
 \paragraph{Field: Design Water Flow Rate}\label{field-design-water-flow-rate-001}
 
-This numeric field contains the maximum design water volumetric flow rate in m\(^{3}\)/sec.~This should be the largest flow rate than can be heated to the design outlet temperature. This field is autosizable.
+This numeric field contains the maximum design water volumetric flow rate in m\(^{3}\)/sec.~This should be the largest flow rate than can be heated. This field is autosizable.
 
 \paragraph{Field: Minimum Part Load Ratio}\label{field-minimum-part-load-ratio-9}
 
@@ -3999,7 +3999,6 @@ An example of this statement in an IDF is:
       EnteringBoiler       !- Efficiency Curve Temperature Evaluation Variable
       0.89,                !- Nominal Thermal Efficiency
       CondensingBoilerEff, !- Boiler Efficiency Curve Name
-      75,                  !- Design Boiler Water Outlet Temp {C}
       0.0021,              !- Max Design Boiler Water Flow Rate {m3/s}
       0.10,                !- Minimum Part Load Ratio
       1.00,                !- Maximum Part Load Ratio
@@ -6150,7 +6149,7 @@ Other considerations for applying cold thermal storage objects include:
 
 \subsection{ThermalStorage:Ice:Simple}\label{thermalstorageicesimple}
 
-This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount if charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
+This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount of charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
 
 The input fields for the object are described in detail below:
 
@@ -6275,21 +6274,48 @@ This is the name of the node that connects the ice storage system to the plant l
 
 This is the name of the other node that connects the ice storage system to the plant loop. It is the outlet node to the ice storage component.
 
-\paragraph{Field: Discharging Curve Object Type}\label{field-discharging-curve-object-type}
+\paragraph{Field: Discharging Curve Variable Specifications}\label{field-discharging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program. Currently, the only two allowed curve fit types for the detailed ice storage model are the QuadraticLinear and the CubicLinear curves. More information on this curve can be found in the section on Curves.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The discharging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during discharging. There are four different independent variable specifications:
+
+\begin{itemize}
+\item
+FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
+\item 
+FractionDischargedLMTD (where Fraction Discharged is the first independent variable and LMTD is the second independent variable)
+\item
+LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
+\item
+LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
+\end{itemize}
+
+More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Discharging Curve Name}\label{field-discharging-curve-name}
 
-This field specifies the name of the actual curve fit to be used to model the discharging process of the detailed ice storage system.
+This field specifies the name of the actual curve fit to be used to model the discharging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
 
-\paragraph{Field: Charging Curve Object Type}\label{field-charging-curve-object-type}
+\paragraph{Field: Charging Curve Variable Specifications}\label{field-charging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program. Currently, the only two allowed curve fit types for the detailed ice storage model are the QuadraticLinear and the CubicLinear curves. More information on this curve can be found in the section on Curves.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The charging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during charging. There are four different independent variable specifications:
+
+
+\begin{itemize}
+\item
+FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
+\item 
+FractionDischargedLMTD (where Fraction Discharged is the first independent variable and LMTD is the second independent variable)
+\item
+LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
+\item
+LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
+\end{itemize}
+
+More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Charging Curve Name}\label{field-charging-curve-name}
 
-This field specifies the name of the actual curve fit to be used to model the charging process of the detailed ice storage system.
+This field specifies the name of the actual curve fit to be used to model the charging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
 
 \paragraph{Field: Timestep of the Curve Data}\label{field-timestep-of-the-curve-data}
 
@@ -6325,9 +6351,9 @@ ThermalStorage:Ice:Detailed,
       0.5,                     !- Ice Storage Capacity {GJ}
       Ice Tank Inlet Node,     !- Plant Loop Inlet Node
       Ice Tank Outlet Node,    !- Plant Loop Outlet Node
-      QuadraticLinear,         !- Discharging Curve Fit Type
+      FractionDischargedLMTD,   !- Discharging Curve Fit Type
       DischargeCurve,          !- Discharging Curve Name
-      QuadraticLinear,         !- Charging Curve Fit Type
+      FractionChargedLMTD,      !- Charging Curve Fit Type
       ChargeCurve,             !- Charging Curve Name
       1.0,                     !- Timestep of Curve Fit Data
       0.0001,                  !- Parasitic electric load during discharging

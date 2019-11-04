@@ -54,38 +54,38 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DesiccantDehumidifiers.hh>
-#include <EMSManager.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <HeatRecovery.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SteamCoils.hh>
-#include <UtilityRoutines.hh>
-#include <VariableSpeedCoils.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -3478,6 +3478,151 @@ namespace DesiccantDehumidifiers {
         InitDesiccantDehumidifierOneTimeFlag = true;
         DesicDehum.deallocate();
         UniqueDesicDehumNames.clear();
+    }
+
+    int GetProcAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the process air inlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                                // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).ProcAirInNode;
+        } else {
+            ShowSevereError("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }        
+
+        return NodeNum;
+    }
+
+    int GetProcAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the process air outlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).ProcAirOutNode;
+        } else {
+            ShowSevereError("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetRegAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air inlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).RegenAirInNode;
+        } else {
+            ShowSevereError("GetRegAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetRegAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air outlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).RegenAirOutNode;
+        } else {
+            ShowSevereError("GetRegAirOutletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
     }
 
     //        End of Reporting subroutines for the SimAir Module

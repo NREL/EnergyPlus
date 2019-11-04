@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -263,19 +263,19 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             }
             u64toa(root[obj_name].size() + 1, s);
             std::string name = obj_name + " " + s;
+
             if (!obj.is_null()) {
                 auto const &name_iter = obj.find("name");
+                // If you find a name field, use that
                 if (name_iter != obj.end()) {
                     name = name_iter.value();
                     obj.erase(name_iter);
                 } else {
-                    auto const it = obj_loc.find("name");
+                    // Otherwise, see if it should have a name field
+                    auto const &it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        if (obj_name == "RunPeriod") {
-                            name = obj_name + " " + s;
-                        } else {
-                            name = "";
-                        }
+                        // Let it slide, as a blank string, to be handled in the appropriate GetInput routine
+                        name = "";
                     }
                 }
             }
@@ -307,8 +307,17 @@ json IdfParser::parse_object(
     auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
 
     auto const &schema_patternProperties = schema_obj_loc["patternProperties"];
-    auto const &schema_dot_star = schema_patternProperties[".*"];
-    auto const &schema_obj_props = schema_dot_star["properties"];
+    std::string patternProperty;
+    int dot_star_present = schema_patternProperties.count(".*");
+    int no_whitespace_present = schema_patternProperties.count(R"(^.*\S.*$)");
+    if (dot_star_present) {
+        patternProperty = ".*";
+    } else if (no_whitespace_present) {
+        patternProperty = R"(^.*\S.*$)";
+    } else {
+        throw std::runtime_error(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+    }
+    auto const &schema_obj_props = schema_patternProperties[patternProperty]["properties"];
     auto key = legacy_idd.find("extension");
 
     json const *schema_obj_extensions = nullptr;
@@ -386,6 +395,7 @@ json IdfParser::parse_object(
             auto const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size];
             auto const val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
+            if (!success) return root;
             extensible[field_name] = std::move(val);
             was_value_parsed = true;
             extensible_index++;
@@ -406,6 +416,7 @@ json IdfParser::parse_object(
                 }
             } else {
                 auto const val = parse_value(idf, index, success, find_field_iter.value());
+                if (!success) return root;
                 root[field] = std::move(val);
             }
             if (!success) return root;
@@ -488,24 +499,19 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
 
 json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)
 {
+    Token token;
     auto const &field_type = field_loc.find("type");
     if (field_type != field_loc.end()) {
         if (field_type.value() == "number" || field_type.value() == "integer") {
-            return parse_number(idf, index, success);
+            token = Token::NUMBER;
         } else {
-            auto const parsed_string = parse_string(idf, index, success);
-            auto const &enum_it = field_loc.find("enum");
-            if (enum_it == field_loc.end()) return parsed_string;
-            for (auto const &s : enum_it.value()) {
-                auto const &str = s.get<std::string>();
-                if (icompare(str, parsed_string)) {
-                    return str;
-                }
-            }
-            return parsed_string;
+            token = Token::STRING;
         }
     } else {
-        switch (look_ahead(idf, index)) {
+        token = look_ahead(idf, index);
+    }
+
+    switch (token) {
         case Token::STRING: {
             auto const parsed_string = parse_string(idf, index, success);
             auto const &enum_it = field_loc.find("enum");
@@ -545,11 +551,11 @@ json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success
         case Token::EXCLAMATION:
         case Token::COMMA:
         case Token::SEMICOLON:
+        default:
             break;
-        }
-        success = false;
-        return nullptr;
     }
+    success = false;
+    return nullptr;
 }
 
 std::string IdfParser::parse_string(std::string const &idf, size_t &index, bool &success)

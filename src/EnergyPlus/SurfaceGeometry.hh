@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <HeatBalanceKivaManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
 #include <map>
@@ -233,10 +233,11 @@ namespace SurfaceGeometry {
                                  int const TotFinsProjection       // Number of Fins (projection) to obtain
     );
 
-    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
-                               int &SurfNum,        // Count of Current SurfaceNumber
-                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    void GetIntMassSurfaceData(bool &ErrorsFound, // Error flag indicator (true if errors found)
+                               int &SurfNum       // Count of Current SurfaceNumber
     );
+
+    int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
@@ -254,7 +255,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction = -1;  // hush up cppcheck
+            double exposedFraction = -1; // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };
@@ -377,6 +378,10 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
+    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+
+    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
@@ -384,6 +389,12 @@ namespace SurfaceGeometry {
     bool isRectangle(int const ThisSurf // Current surface number
     );
 
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    );
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

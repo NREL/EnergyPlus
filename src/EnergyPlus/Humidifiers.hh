@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -189,6 +189,14 @@ namespace Humidifiers {
     );
 
     void GetHumidifierInput();
+
+    int GetAirInletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    );
+
+    int GetAirOutletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    );
 
 } // namespace Humidifiers
 

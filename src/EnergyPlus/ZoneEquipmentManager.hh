@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -100,7 +100,10 @@ namespace ZoneEquipmentManager {
     // Functions
     void clear_state();
 
-    void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir);
+    void ManageZoneEquipment(bool const FirstHVACIteration,
+                             bool &SimZone,                     // Set to false at the end of the routine
+                             bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
+    );
 
     void GetZoneEquipment();
 

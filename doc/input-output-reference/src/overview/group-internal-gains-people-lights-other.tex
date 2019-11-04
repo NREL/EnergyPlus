@@ -274,7 +274,19 @@ People,
   ,                     !- Zone Floor Area per Person {m2/person}
   0.3,                  !- Fraction Radiant
   ,                     !- Sensible Heat Fraction
-  ActSchd;              !- Activity Level Schedule Name
+  ActSchd,              !- Activity Level Schedule Name
+  3.82E-8,              !- Carbon Dioxide Generation Rate {m3/s-W}
+  No,                   !- Enable ASHRAE 55 Comfort Warnings
+  surfaceweighted,      !- Mean Radiant Temperature Calculation Type
+  Zn001:Wall001,        !- Surface Name/Angle Factor List Name
+  Work Eff Sch,         !- Work Efficiency Schedule Name
+  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+  ,                     !- Clothing Insulation Calculation Method Schedule Name
+  Clothing Sch,         !- Clothing Insulation Schedule Name
+  Air Velo Sch,         !- Air Velocity Schedule Name
+  FANGER,               !- Thermal Comfort Model 1 Type
+  PIERCE,               !- Thermal Comfort Model 2 Type
+  KSU;                  !- Thermal Comfort Model 3 Type
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-017}
@@ -351,6 +363,8 @@ People specific outputs include:
 \item
   Zone,Average,Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}
 \item
+  Zone,Average,Zone Thermal Comfort Pierce Model Standard Effective Temperature {[C]}
+\item
   Zone,Average,Zone Thermal Comfort KSU Model Thermal Sensation Index {[]}
 \item
   Zone,Average,Zone Thermal Comfort ASHRAE 55 Adaptive Model 80\% Acceptability Status {[]}
@@ -371,6 +385,8 @@ People specific outputs include:
 \item
   Zone,Average,Zone Thermal Comfort CEN 15251 Adaptive Model Temperature {[}C{]}
 \end{itemize}
+
+It should be noted that if a user is trying to output the Standard Effective Temperature (SET) that the Pierce two-node model must be selected.  This variable is calculated as part of the Pierce model and can be seen in the output by requesting Zone Thermal Comfort Pierce Model Standard Effective Temperature.
 
 \paragraph{People Occupant Count {[]}}\label{people-occupant-count}
 
@@ -408,7 +424,7 @@ These output variables are the total amount of heat gain for this People object 
 
 \paragraph{People Air Temperature {[}C{]}}\label{people-air-temperature-c}
 
-This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort hat satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
+This output variable represents the zone air temperature based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Temperature'' is determined based on the thermal comfort that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is set to average zone air temperature.
 
 \paragraph{People Air Relative Humidity {[}\%{]}}\label{people-air-relative-humidity}
 
@@ -460,11 +476,11 @@ Note for all Thermal Comfort reporting:~ Though the published values for thermal
 
 \paragraph{Zone Thermal Comfort Fanger Model PMV {[]}}\label{zone-thermal-comfort-fanger-model-pmv}
 
-This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model.
+This field is the ``predicted mean vote'' (PMV) calculated using the Fanger thermal comfort model. Details on the equations used to calculate the Fanger PMV are shown in the EnergyPlus Engineering Reference. If the zone in question is currently being controlled using a thermostat object, then the value of the PMV is determined by using the air temperature and humidity that is calculated at the system time step; otherwise, if the zone is uncontrolled, the PMV is determined using the zone air temperature and humidity that is averaged over the zone time step.
 
 \paragraph{Zone Thermal Comfort Fanger Model PPD {[}\%{]}}\label{zone-thermal-comfort-fanger-model-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger thermal comfort model.
+This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger thermal comfort model.  Details on the equations used to calculate the Fanger PPD are shown in the EnergyPlus Engineering Reference. If the zone in question is currently being controlled using a thermostat object, then the value of the PPD is determined by using the air temperature and humidity that is calculated at the system time step; otherwise, if the zone is uncontrolled, the PPD is determined using the zone air temperature and humidity that is averaged over the zone time step.
 
 \paragraph{Zone Thermal Comfort Clothing Surface Temperature {[}C{]}}\label{zone-thermal-comfort-clothing-surface-temperature-c}
 
@@ -485,6 +501,10 @@ This field is the ``discomfort index'' calculated using the the Pierce two-node 
 \paragraph{Zone Thermal Comfort Pierce Model Thermal Sensation Index {[]}}\label{zone-thermal-comfort-pierce-model-thermal-sensation-index}
 
 This field is the ``thermal sensation index'' (PMV) calculated using the Pierce two-node thermal comfort model.
+
+\paragraph{Zone Thermal Comfort Pierce Model Standard Effective Temperature {[C]}}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature}
+
+This field is the ``standard effective temperature'' (SET) calculated using the Pierce two-node thermal comfort model.  Note that if a user wishes to report the Pierce Model SET that it must be done using the Pierce two-node model and the user must select "Pierce" as one of the Thermal Comfort model types as shown above in the input syntax for the People statement.
 
 \paragraph{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
 
@@ -2338,19 +2358,19 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
-The difference of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
 
-The difference schedule of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the actual AHU return air temperature to the IT equipment outlet temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 An IDF example:
 

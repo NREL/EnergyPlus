@@ -48,7 +48,7 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <EnergyPlusAPI.hh>
+#include <EnergyPlus/public/EnergyPlusAPI.hh>
 #include <string>
 
 namespace EnergyPlus {

@@ -53,16 +53,16 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <TARCOGArgs.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGGasses90.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGOutput.hh>
-#include <TARCOGParams.hh>
-#include <TarcogShading.hh>
-#include <ThermalISO15099Calc.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/TARCOGArgs.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/TarcogShading.hh>
+#include <EnergyPlus/ThermalISO15099Calc.hh>
 
 namespace EnergyPlus {
 

@@ -59,10 +59,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -939,6 +939,13 @@ namespace EnergyPlus {
         void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
 
         void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        
+        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+                                            int const MaterialNum);
+        
+        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+                                            std::string const &UserInputField,
+                                            std::string const &ObjectName);
 
         void ReadPipeCircuitInputs(bool &ErrorsFound);
 

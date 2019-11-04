@@ -53,8 +53,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -679,8 +683,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
-    HeatTransferAlgosUsed.allocate(1);
-    HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
@@ -3326,7 +3329,6 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     WindowShadingControl(3).FenestrationName(1) = "Fene-08";
     WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-
     TotSurfaces = 12;
     Surface.allocate(TotSurfaces);
 
@@ -3366,7 +3368,6 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     Surface(12).Name = "Fene-06";
     Surface(12).WindowShadingControlPtr = 2;
 
-
     bool Err = false;
 
     FinalAssociateWindowShadingControlFenestration(Err);
@@ -3383,14 +3384,16 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 
     EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(1), 3);
     EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
-
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 {
+    // Test surface heat transfer algorithms and heat balance surface lists
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
+        "  HeatBalanceAlgorithm,",
+        "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
         "Material,",
         "    Gypsum Board,            !- Name",
         "    MediumSmooth,            !- Roughness",
@@ -3481,10 +3484,66 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
         "    3.499104;                !- Vertex 4 Z-coordinate {m}",
 
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_20000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    23.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    23.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_30000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    23.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    23.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
         "SurfaceProperty:HeatTransferAlgorithm:Construction,",
-        "    Ceilings,                !- Name",
-        "    ConductionFiniteDifference,  !- Algorithm",
+        "    Ceilings CondFD,               !- Name",
+        "    ConductionFiniteDifference,    !- Algorithm",
         "    Project semi-exposed ceiling;  !- Construction Name",
+
+        "SurfaceProperty:HeatTransferAlgorithm,",
+        "    Zone1_Floor_4_0_20000,       !- Surface Name",
+        "    CombinedHeatAndMoistureFiniteElement;  !- Algorithm",
+
+        "SurfaceProperty:HeatTransferAlgorithm,",
+        "    Zone1_Floor_4_0_30000,       !- Surface Name",
+        "    ConductionTransferFunction;  !- Algorithm",
 
         "Zone,",
         "    DATATELCOM,       !- Name",
@@ -3511,7 +3570,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    454.1032,                !- Floor Area {m2}",
         "    TARP;                    !- Zone Inside Convection Algorithm",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3540,18 +3599,51 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    EXPECT_EQ(5, Surface(1).HeatTransferAlgorithm);
-    EXPECT_EQ(5, Surface(2).HeatTransferAlgorithm);
+    int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
-        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions should be same.",
+        "   ** Warning ** The moisture penetration depth conduction transfer function algorithm is used but the input file includes no "
+        "MaterialProperty:MoisturePenetrationDepth:Settings objects.",
+        "   ** Warning ** The combined heat and moisture finite element algorithm is used but the input file includes no "
+        "MaterialProperty:HeatAndMoistureTransfer:* objects.",
+        "   **   ~~~   ** Certain materials objects are necessary to achieve proper results with the heat transfer algorithm(s) selected.",
+        "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions "
+        "should be same.",
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: DATATELCOM_CEILING_1_0_0, is CondFD - ConductionFiniteDifference",
-        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is CTF - ConductionTransferFunction",
-        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. Simulation continues.",
-        });
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. "
+        "Simulation continues.",
+    });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
+    // Check heat balance surface lists
+    // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
+    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
+
+    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+
+    zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -3629,8 +3721,1420 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     EXPECT_EQ(1, SurfNum);
     EXPECT_TRUE(ErrorsFound);
 
-    std::string const error_string =
-        delimited_string({"   ** Severe  ** RoofCeiling:Detailed=\"SURFACE A\" references an outside boundary surface that cannot be found:SURFACE B"
-                        });
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** RoofCeiling:Detailed=\"SURFACE A\" references an outside boundary surface that cannot be found:SURFACE B"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    G SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    Office,                  !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G Corridor,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Construction,",
+        "    InteriorFurnishings,     !- Name",
+        "    Std Wood 6inch;          !- Outside Layer",
+
+        "  Material,",
+        "    Std Wood 6inch,          !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.15,                    !- Thickness {m}",
+        "    0.12,                    !- Conductivity {W/m-K}",
+        "    540.0000,                !- Density {kg/m3}",
+        "    1210,                    !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  InternalMass,",
+        "    GFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_GF,      !- Name",
+        "    G SW Apartment,          !- Zone 1 Name",
+        "    G NW Apartment,          !- Zone 2 Name",
+        "    Office,                  !- Zone 3 Name",
+        "    G NE Apartment,          !- Zone 4 Name",
+        "    G N1 Apartment,          !- Zone 5 Name",
+        "    G N2 Apartment,          !- Zone 6 Name",
+        "    G S1 Apartment,          !- Zone 7 Name",
+        "    G S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    MFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    176.498545342438;        !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_MF,      !- Name",
+        "    M SW Apartment,          !- Zone 1 Name",
+        "    M NW Apartment,          !- Zone 2 Name",
+        "    M SE Apartment,          !- Zone 3 Name",
+        "    M NE Apartment,          !- Zone 4 Name",
+        "    M N1 Apartment,          !- Zone 5 Name",
+        "    M N2 Apartment,          !- Zone 6 Name",
+        "    M S1 Apartment,          !- Zone 7 Name",
+        "    M S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    TFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_TF,      !- Name",
+        "    T SW Apartment,          !- Zone 1 Name",
+        "    T NW Apartment,          !- Zone 2 Name",
+        "    T SE Apartment,          !- Zone 3 Name",
+        "    T NE Apartment,          !- Zone 4 Name",
+        "    T N1 Apartment,          !- Zone 5 Name",
+        "    T N2 Apartment,          !- Zone 6 Name",
+        "    T S1 Apartment,          !- Zone 7 Name",
+        "    T S2 Apartment;          !- Zone 8 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Read Materials
+    GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Construction
+    GetConstructData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Read Zones
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // Read InternalMass Object Count
+    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    // check the three internal mass objects
+    EXPECT_EQ(3, TotIntMass);
+
+    // Read InternalMass Surfaces Count
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    // check the 24 internal mass surfaces created from the three zoneLists
+    EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
+}
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    G SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    Office,                  !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NW Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T SE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T NE Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    34.7455054899131,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T N2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    9.29594664423115,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S1 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    11.5818351633044,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T S2 Apartment,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    23.1636703266088,        !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    T Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    9.14355407629293,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    G Corridor,              !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Zone,",
+        "    M Corridor,              !- Name",
+        "    ,                        !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    7.61962839691078,        !- Y Origin {m}",
+        "    3.04785135876431,        !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1;                       !- Multiplier",
+
+        "  Construction,",
+        "    InteriorFurnishings,     !- Name",
+        "    Std Wood 6inch;          !- Outside Layer",
+
+        "  Material,",
+        "    Std Wood 6inch,          !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.15,                    !- Thickness {m}",
+        "    0.12,                    !- Conductivity {W/m-K}",
+        "    540.0000,                !- Density {kg/m3}",
+        "    1210,                    !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  InternalMass,",
+        "    GFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_GF,      !- Name",
+        "    G SW Apartment,          !- Zone 1 Name",
+        "    G NW Apartment,          !- Zone 2 Name",
+        "    Office,                  !- Zone 3 Name",
+        "    G NE Apartment,          !- Zone 4 Name",
+        "    G N1 Apartment,          !- Zone 5 Name",
+        "    G N2 Apartment,          !- Zone 6 Name",
+        "    G S1 Apartment,          !- Zone 7 Name",
+        "    G S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    MFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    176.498545342438;        !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_MF,      !- Name",
+        "    M SW Apartment,          !- Zone 1 Name",
+        "    M NW Apartment,          !- Zone 2 Name",
+        "    M SE Apartment,          !- Zone 3 Name",
+        "    M NE Apartment,          !- Zone 4 Name",
+        "    M N1 Apartment,          !- Zone 5 Name",
+        "    M N2 Apartment,          !- Zone 6 Name",
+        "    M S1 Apartment,          !- Zone 7 Name",
+        "    M S2 Apartment;          !- Zone 8 Name",
+
+        "  InternalMass,",
+        "    TFloorZonesIntMass,      !- Name",
+        "    InteriorFurnishings,     !- Construction Name",
+        "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    88.249272671219;         !- Surface Area {m2}",
+
+        "  ZoneList,",
+        "    IntMassZoneList_TF,      !- Name",
+        "    T SW Apartment,          !- Zone 1 Name",
+        "    T NW Apartment,          !- Zone 2 Name",
+        "    T SE Apartment,          !- Zone 3 Name",
+        "    T NE Apartment,          !- Zone 4 Name",
+        "    T N1 Apartment,          !- Zone 5 Name",
+        "    T N2 Apartment,          !- Zone 6 Name",
+        "    T S1 Apartment,          !- Zone 7 Name",
+        "    T S2 Apartment;          !- Zone 8 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Read Materials
+    GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Construction
+    GetConstructData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Read Zones
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    // Read InternalMass Object Count
+    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    EXPECT_EQ(3, TotIntMass);
+
+    // Read InternalMass Surfaces Count
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
+
+    DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
+    SurfaceTmp.allocate(TotSurfaces);
+
+    int SurfNum = 0;
+    GetIntMassSurfaceData(ErrorsFound, SurfNum);
+    ASSERT_FALSE(ErrorsFound);
+
+    // check internal mass surface count and object names
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(1).NumOfZones);
+    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(2).NumOfZones);
+    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
+    EXPECT_EQ(8, DataSurfaces::IntMassObjects(3).NumOfZones);
+    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
+    // check total count of internal surfaces created
+    EXPECT_EQ(24, TotSurfaces);
+
+    // check unique internal surface name created created from a combination
+    // of zone name and internal mass object name represented in the zone
+    // first zone in the ground floor ZoneList
+    EXPECT_EQ("G SW APARTMENT", Zone(1).Name);
+    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
+    EXPECT_EQ("G SW APARTMENT GFLOORZONESINTMASS", SurfaceTmp(1).Name);
+    // first zone in the middle floor ZoneList
+    EXPECT_EQ("M SW APARTMENT", Zone(9).Name);
+    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
+    EXPECT_EQ("M SW APARTMENT MFLOORZONESINTMASS", SurfaceTmp(9).Name);
+    // first zone in the top floor ZoneList
+    EXPECT_EQ("T SW APARTMENT", Zone(17).Name);
+    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
+    EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
+{
+    // Case 1) NOT world coordinate system (Relative) - No error
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
+{
+    // Case 2) World coordinate system & All zero zone origins - No error
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
+{
+    // Case 3) World coordinate system & Relative Rect. surf, coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+     
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+    
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
+{
+    // Case 4) World coordinate system & Defalut Rect. surf, coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
+{
+    bool RevLayerDiffs;
+    Construct.allocate(6);
+    Material.allocate(7);
+    
+    // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
+    Construct(1).TotLayers = 3;
+    Construct(1).LayerPoint(1) = 1;
+    Construct(1).LayerPoint(2) = 2;
+    Construct(1).LayerPoint(3) = 3;
+    Construct(2).TotLayers = 3;
+    Construct(2).LayerPoint(1) = 3;
+    Construct(2).LayerPoint(2) = 2;
+    Construct(2).LayerPoint(3) = 1;
+    RevLayerDiffs = true;
+    // ExpectResult = false;
+    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    EXPECT_FALSE(RevLayerDiffs);
+
+    // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
+    Construct(2).LayerPoint(1) = 1;
+    Construct(2).LayerPoint(3) = 3;
+    Material(1).Group = RegularMaterial;
+    Material(2).Group = RegularMaterial;
+    Material(3).Group = RegularMaterial;
+    RevLayerDiffs = false;
+    // ExpectResult = true;
+    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    EXPECT_TRUE(RevLayerDiffs);
+
+    // Case 2a: Constructs are reverse of each other using WindowGlass, front/back properties properly switched (should get a "false" answer)
+    Construct(3).TotLayers = 3;
+    Construct(3).LayerPoint(1) = 4;
+    Construct(3).LayerPoint(2) = 2;
+    Construct(3).LayerPoint(3) = 5;
+    Construct(4).TotLayers = 3;
+    Construct(4).LayerPoint(1) = 4;
+    Construct(4).LayerPoint(2) = 2;
+    Construct(4).LayerPoint(3) = 5;
+    Material(4).Group = WindowGlass;
+    Material(4).Thickness = 0.15;
+    Material(4).ReflectSolBeamFront = 0.35;
+    Material(4).ReflectSolBeamBack = 0.25;
+    Material(4).TransVis = 0.45;
+    Material(4).ReflectVisBeamFront = 0.34;
+    Material(4).ReflectVisBeamBack = 0.24;
+    Material(4).TransThermal = 0.44;
+    Material(4).AbsorpThermalFront = 0.33;
+    Material(4).AbsorpThermalBack = 0.23;
+    Material(4).Conductivity = 0.43;
+    Material(4).GlassTransDirtFactor = 0.67;
+    Material(4).SolarDiffusing = true;
+    Material(4).YoungModulus = 0.89;
+    Material(4).PoissonsRatio = 1.11;
+    Material(5).Group = WindowGlass;
+    Material(5).Thickness = 0.15;
+    Material(5).ReflectSolBeamFront = 0.25;
+    Material(5).ReflectSolBeamBack = 0.35;
+    Material(5).TransVis = 0.45;
+    Material(5).ReflectVisBeamFront = 0.24;
+    Material(5).ReflectVisBeamBack = 0.34;
+    Material(5).TransThermal = 0.44;
+    Material(5).AbsorpThermalFront = 0.23;
+    Material(5).AbsorpThermalBack = 0.33;
+    Material(5).Conductivity = 0.43;
+    Material(5).GlassTransDirtFactor = 0.67;
+    Material(5).SolarDiffusing = true;
+    Material(5).YoungModulus = 0.89;
+    Material(5).PoissonsRatio = 1.11;
+    RevLayerDiffs = true;
+    // ExpectResult = false;
+    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    EXPECT_FALSE(RevLayerDiffs);
+
+    // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
+    Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
+    Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
+    RevLayerDiffs = false;
+    // ExpectResult = true;
+    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    EXPECT_TRUE(RevLayerDiffs);
+
+    // Case 3a: Single layer constructs using Equivalent Glass, front/back properties properly switched (should get a "false" answer)
+    Construct(5).TotLayers = 1;
+    Construct(5).LayerPoint(1) = 6;
+    Construct(6).TotLayers = 1;
+    Construct(6).LayerPoint(1) = 7;
+    Material(6).Group = GlassEquivalentLayer;
+    Material(6).TausFrontBeamBeam = 0.39;
+    Material(6).TausBackBeamBeam = 0.29;
+    Material(6).ReflFrontBeamBeam = 0.38;
+    Material(6).ReflBackBeamBeam = 0.28;
+    Material(6).TausFrontBeamBeamVis = 0.37;
+    Material(6).TausBackBeamBeamVis = 0.27;
+    Material(6).ReflFrontBeamBeamVis = 0.36;
+    Material(6).ReflBackBeamBeamVis = 0.26;
+    Material(6).TausFrontBeamDiff = 0.35;
+    Material(6).TausBackBeamDiff = 0.25;
+    Material(6).ReflFrontBeamDiff = 0.34;
+    Material(6).ReflBackBeamDiff = 0.24;
+    Material(6).TausFrontBeamDiffVis = 0.33;
+    Material(6).TausBackBeamDiffVis = 0.23;
+    Material(6).ReflFrontBeamDiffVis = 0.32;
+    Material(6).ReflBackBeamDiffVis = 0.22;
+    Material(6).TausDiffDiff = 0.456;
+    Material(6).ReflFrontDiffDiff = 0.31;
+    Material(6).ReflBackDiffDiff = 0.21;
+    Material(6).TausDiffDiffVis = 0.345;
+    Material(6).ReflFrontDiffDiffVis = 0.30;
+    Material(6).ReflBackDiffDiffVis = 0.20;
+    Material(6).TausThermal = 0.234;
+    Material(6).EmissThermalFront = 0.888;
+    Material(6).EmissThermalBack = 0.777;
+    Material(6).Resistance = 1.234;
+    Material(7).Group = GlassEquivalentLayer;
+    Material(7).TausFrontBeamBeam = 0.29;
+    Material(7).TausBackBeamBeam = 0.39;
+    Material(7).ReflFrontBeamBeam = 0.28;
+    Material(7).ReflBackBeamBeam = 0.38;
+    Material(7).TausFrontBeamBeamVis = 0.27;
+    Material(7).TausBackBeamBeamVis = 0.37;
+    Material(7).ReflFrontBeamBeamVis = 0.26;
+    Material(7).ReflBackBeamBeamVis = 0.36;
+    Material(7).TausFrontBeamDiff = 0.25;
+    Material(7).TausBackBeamDiff = 0.35;
+    Material(7).ReflFrontBeamDiff = 0.24;
+    Material(7).ReflBackBeamDiff = 0.34;
+    Material(7).TausFrontBeamDiffVis = 0.23;
+    Material(7).TausBackBeamDiffVis = 0.33;
+    Material(7).ReflFrontBeamDiffVis = 0.22;
+    Material(7).ReflBackBeamDiffVis = 0.32;
+    Material(7).TausDiffDiff = 0.456;
+    Material(7).ReflFrontDiffDiff = 0.21;
+    Material(7).ReflBackDiffDiff = 0.31;
+    Material(7).TausDiffDiffVis = 0.345;
+    Material(7).ReflFrontDiffDiffVis = 0.20;
+    Material(7).ReflBackDiffDiffVis = 0.30;
+    Material(7).TausThermal = 0.234;
+    Material(7).EmissThermalFront = 0.777;
+    Material(7).EmissThermalBack = 0.888;
+    Material(7).Resistance = 1.234;
+    RevLayerDiffs = true;
+    // ExpectResult = false;
+    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    EXPECT_FALSE(RevLayerDiffs);
+
+    // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
+    Material(7).EmissThermalFront = 0.888;
+    RevLayerDiffs = false;
+    // ExpectResult = true;
+    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    EXPECT_TRUE(RevLayerDiffs);
+
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundaries)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Material,",
+        "    Some Material,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Some Construction,  !- Name",
+        "    Some Material;        !- Outside Layer",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone3-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    SetupZoneGeometry(ErrorsFound); 
+    // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
+    // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
+    // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 3);
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 3);
+
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Material,",
+        "    Some Material,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Some Construction,  !- Name",
+        "    Some Material;        !- Outside Layer",
+        "Construction:AirBoundary,",
+        "Grouped Air Boundary, !- Name",
+        "GroupedZones,            !- Solar and Daylighting Method",
+        "GroupedZones,            !- Radiant Exchange Method",
+        "None;                    !- Air Exchange Method",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone3-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Air Boundary,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    SetupZoneGeometry(ErrorsFound);
+    // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
+    // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
+    // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Material,",
+        "    Some Material,         !- Name",
+        "    VeryRough,               !- Roughness",
+        "    0.006,                   !- Thickness {m}",
+        "    0.815,                   !- Conductivity {W/m-K}",
+        "    929,                     !- Density {kg/m3}",
+        "    3140,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.7,                     !- Solar Absorptance",
+        "    0.7;                     !- Visible Absorptance",
+        "Construction,",
+        "    Some Construction,  !- Name",
+        "    Some Material;        !- Outside Layer",
+
+        "Construction:AirBoundary,",
+        "Grouped Radiant Air Boundary, !- Name",
+        "InteriorWindow,            !- Solar and Daylighting Method",
+        "GroupedZones,            !- Radiant Exchange Method",
+        "None;                    !- Air Exchange Method",
+
+        "Construction:AirBoundary,",
+        "Grouped Solar Air Boundary, !- Name",
+        "GroupedZones,            !- Solar and Daylighting Method",
+        "IRTSurface,            !- Radiant Exchange Method",
+        "None;                    !- Air Exchange Method",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Surface2,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone3-Surface1,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Surface1,  !- Name",
+        "    Wall,                 !- Surface Type",
+        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zone1-Surface2,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 1",
+        "    0,1,1,              !- Vertex 1",
+        "    0,0,1;              !- Vertex 1",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    GetMaterialData(ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);    // expect no errors
+
+    GetConstructData(ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);     // expect no errors
+
+    GetZoneData(ErrorsFound);  // read zone data
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    SetupZoneGeometry(ErrorsFound);
+    // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
+    // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
+    // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    ErrorsFound = false;
+
+    // For this test case, Zones 1 and 2 share a radiant enclosure and Zone 1 and 3 share a solar enclosure
+    // While InteriorWindow is disabled, Zones 1, 2, and 3 share a solar enclosure
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 2);
+
+    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
+    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
+    //EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
+    //EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+
 }

@@ -54,18 +54,18 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <OutputProcessor.hh>
-#include <PlantPressureSystem.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -552,6 +552,9 @@ namespace PlantPressureSystem {
                 if (allocated(ParallelBranchInletPressures)) ParallelBranchInletPressures.deallocate();
                 ParallelBranchInletPressures.allocate(NumBranches - 2);
                 ParallelBranchCounter = 0;
+
+                // Reset Pump found flag to false, to check if actually found on one of the parallel branches
+                FoundAPumpOnBranch = false;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
                     DistributePressureOnBranch(
@@ -687,7 +690,6 @@ namespace PlantPressureSystem {
         // Initialize
         TempBranchPressureDrop = 0.0;
         BranchPressureDrop = 0.0;
-        PumpFound = false;
         NumCompsOnBranch = size(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp);
 
         // Retrieve temporary branch pressure drop

@@ -51,21 +51,21 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplacementVentMgr.hh>
-#include <ExteriorEnergyUse.hh>
-#include <HVACManager.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HeatBalanceManager.hh>
-#include <InternalHeatGains.hh>
-#include <OutputReportTabular.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
                           "ElectricEquipment:ITE:AirCooled,",
                           "  Data Center Servers,     !- Name",
                           "  Zone1,                   !- Zone Name",
-                          "  ,",
+                          "  ,                        !- Air Flow Calculation Method",
                           "  Watts/Unit,              !- Design Power Input Calculation Method",
                           "  500,                     !- Watts per Unit {W}",
                           "  100,                     !- Number of Units",
@@ -676,8 +676,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
                           "  ,                        !- Air Outlet Room Air Model Node Name",
                           "  Main Zone Inlet Node,    !- Supply Air Node Name",
                           "  0.1,                     !- Design Recirculation Fraction",
+                          // This one should be assumed to always 1
                           "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
                           "  0.9,                     !- Design Electric Power Supply Efficiency",
+                          // This one should be assumed to always 1
                           "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
                           "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
                           "  ITE-CPU,                 !- CPU End-Use Subcategory",
@@ -745,10 +747,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     InternalHeatGains::GetInternalHeatGainsInput();
     InternalHeatGains::CalcZoneITEq();
+
+    // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
     Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
                              max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
     ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
+
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)

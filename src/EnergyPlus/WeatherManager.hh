@@ -59,8 +59,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -741,7 +741,7 @@ namespace WeatherManager {
     );
 
     void InterpretWeatherDataLine(std::string &Line,
-                                  bool &ErrorFound,
+                                  bool &ErrorFound,      // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
                                   int &WDay,
@@ -878,7 +878,10 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 const Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(std::string const &HeaderString,
+                          std::string &Line,
+                          bool &ErrorsFound         // Set to true when errors were found, unchanged otherwise
+    );
 
     void SkipEPlusWFHeader();
 

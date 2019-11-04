@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

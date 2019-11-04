@@ -54,9 +54,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "DataHeatBalance.hh"
-#include "DataRoomAirModel.hh"
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 #include <sqlite3.h>
 
@@ -225,6 +225,7 @@ public:
                                       Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,
+                                 int const year,
                                  int const month,
                                  int const dayOfMonth,
                                  int const hourOfDay,

@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -193,6 +193,14 @@ namespace TranspiredCollector {
     void GetTranspiredCollectorIndex(int const SurfacePtr, int &UTSCIndex);
 
     void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
+
+    int GetAirInletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    );
+
+    int GetAirOutletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    );
 
 } // namespace TranspiredCollector
 
