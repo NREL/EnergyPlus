@@ -157,8 +157,6 @@ namespace ChillerAbsorption {
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
     Array1D<ReportVars> BLASTAbsorberReport;
 
-    // MODULE SUBROUTINES:
-
     // Beginning of Absorption Chiller Module Driver Subroutines
     //*************************************************************************
 
@@ -252,7 +250,6 @@ namespace ChillerAbsorption {
 
         if (LoopNum == BLASTAbsorber(ChillNum).CWLoopNum) {
             // called from dominant chilled water connection loop side
-
             // Calculate Load
             InitBLASTAbsorberModel(ChillNum, RunFlag, MyLoad);
             CalcBLASTAbsorberModel(ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
@@ -709,7 +706,7 @@ namespace ChillerAbsorption {
     // End of Get Input subroutines for the Absorption Chiller Module
     //******************************************************************************
 
-    void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
+    void InitBLASTAbsorberModel(int const ChillNum, // number of the current absorption chiller being simulated
                                 bool const RunFlag, // TRUE when chiller operating
                                 Real64 const MyLoad)
     {
@@ -721,7 +718,7 @@ namespace ChillerAbsorption {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the Electric Chiller components
+        // This subroutine is for initializations of the Absorption Chiller components
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
@@ -2082,8 +2079,7 @@ namespace ChillerAbsorption {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
+        // PURPOSE OF THIS SUBROUTINE: reporting
 
         // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
