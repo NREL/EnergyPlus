@@ -1862,6 +1862,8 @@ namespace ChillerElectricEIR {
         if (ErrorsFound) {
             ShowFatalError("Preceding sizing errors cause program termination");
         }
+
+        std::cout << "Chiller " << ElectricEIRChiller(EIRChillNum).RefCap << "\n";
     }
 
     void CalcElectricEIRChillerModel(int &EIRChillNum,                     // Chiller number

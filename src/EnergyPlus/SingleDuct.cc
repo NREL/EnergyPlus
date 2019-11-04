@@ -91,6 +91,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include "DataGlobals.hh"
 
 namespace EnergyPlus {
 
@@ -3238,8 +3239,14 @@ namespace SingleDuct {
             (GetCurrentScheduleValue(Sys(SysNum).SchedPtr) > 0.0)) {
             // Calculate the flow required for cooling
             DeltaTemp = CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp);
+
             if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
                 DeltaTemp = CpAirAvg * (SysInlet(SysNum).AirTemp - DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE);
+//                if (DataGlobals::DoingSizing) {
+//                    std::cout << "Sizing !!!!!!!!!!!!!!!!!!!! " << SysInlet(SysNum).AirTemp << ", " << DeltaTemp << "\n";
+//                } else {
+//                    std::cout << "Not Sizing !!!!!!!!!!!!!!!!!!!! " << SysInlet(SysNum).AirTemp << ", " << DeltaTemp << "\n";
+//                }
             }
 
             // Need to check DeltaTemp and ensure that it is not zero
@@ -3247,6 +3254,12 @@ namespace SingleDuct {
                 MassFlow = QTotLoad / DeltaTemp;
             } else {
                 MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+            }
+
+            if (DataGlobals::DoingSizing) {
+                std::cout << "Sizing !!!!!!!!!!!!!!!!!!!! " << SysInlet(SysNum).AirTemp << ", " << DeltaTemp / CpAirAvg << ", " << MassFlow << "\n";
+            } else {
+                std::cout << "Not Sizing !!!!!!!!!!!!!!!!!!!! " << SysInlet(SysNum).AirTemp << ", " << DeltaTemp / CpAirAvg << ", " << MassFlow << "\n";
             }
 
             // Apply the zone maximum outdoor air fraction FOR VAV boxes - a TRACE feature

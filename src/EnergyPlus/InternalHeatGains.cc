@@ -93,6 +93,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -3929,6 +3930,63 @@ namespace InternalHeatGains {
                         }
                     }
                 }
+//                std::cout << "\nZoneITEq(Loop).DesignTAirIn " << ZoneITEq(Loop).DesignTAirIn << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignTotalPower " << ZoneITEq(Loop).DesignTotalPower << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignAirVolFlowRate " << ZoneITEq(Loop).DesignAirVolFlowRate << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignFanPower " << ZoneITEq(Loop).DesignFanPower << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignCPUPower " << ZoneITEq(Loop).DesignCPUPower << "\n";
+
+                if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                    Real64 TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+                    SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+                    for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                        if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
+                            TAirInDesign = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp; // Set the maximun setpoint
+                        }
+                    }
+                    if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
+                        TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
+                    } else {
+                        TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
+                    }
+                    Real64 OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
+                    Real64 CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
+
+                    Real64 CPUPowerAtDesign =
+                            max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+
+                    Real64 AirVolFlowFracDesignT = max(CurveManager::CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+
+                    Real64 FanPowerAtDesign =
+                            max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
+
+                    if (FanPowerAtDesign + CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
+                        ZoneITEq(Loop).DesignTotalPower = FanPowerAtDesign + CPUPowerAtDesign;
+                    }
+
+//                    SchMin = GetScheduleMinValue(ZoneITEq(Loop).CPULoadSchedPtr);
+//                    SchMax = GetScheduleMaxValue(ZoneITEq(Loop).CPULoadSchedPtr);
+//
+//                    ZoneITEq(Loop).NomMinDesignLevel = ZoneITEq(Loop).DesignTotalPower * SchMin;
+//                    ZoneITEq(Loop).NomMaxDesignLevel = ZoneITEq(Loop).DesignTotalPower * SchMax;
+
+//                    ZoneITEq(Loop).DesignFanPower = ZoneITEq(Loop).DesignFanPowerFrac * ZoneITEq(Loop).DesignTotalPower;
+//                    ZoneITEq(Loop).DesignCPUPower = (1.0 - ZoneITEq(Loop).DesignFanPowerFrac) * ZoneITEq(Loop).DesignTotalPower;
+//
+                    ZoneITEq(Loop).DesignAirVolFlowRate = IHGNumbers(5) * ZoneITEq(Loop).DesignTotalPower;
+//                    std::cout << "Actual: \nTAirInDesign " << TAirInDesign << "\n";
+//                    std::cout << "\nFanPowerAtDesign " << FanPowerAtDesign << "\n";
+//                    std::cout << "\nFanPowerAtDesign " << CPUPowerAtDesign << "\n";
+                }
+
+
+
+//                std::cout << "Report:\nZoneITEq(Loop).DesignTAirIn " << ZoneITEq(Loop).DesignTAirIn << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignFanPower " << ZoneITEq(Loop).DesignFanPower << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignCPUPower  " << ZoneITEq(Loop).DesignCPUPower << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignTotalPower" << ZoneITEq(Loop).DesignTotalPower << "\n";
+//                std::cout << "\nZoneITEq(Loop).DesignAirVolFlowRate" << ZoneITEq(Loop).DesignAirVolFlowRate << "\n";
+
 
                 // Object report variables
                 SetupOutputVariable(
@@ -6070,6 +6128,13 @@ namespace InternalHeatGains {
                 radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
             }
         }
+
+
+        std::cout << "\nAfter InitInternalHeatGains:";
+        std::cout << "\nZone(Loop).InternalHeatGains " << Zone(Loop).InternalHeatGains << "\n";
+        for (int i = 1; i <= ZoneIntGain(Loop).NumberOfDevices; ++i) {
+            std::cout << "ZoneIntGain(Loop).Device(Loop).ConvectGainRate " << ZoneIntGain(Loop).Device(i).ConvectGainRate << "\n";
+        }
     }
 
     void CheckReturnAirHeatGain()
@@ -6289,6 +6354,7 @@ namespace InternalHeatGains {
                     TAirIn = TSupply + ZoneITEq(Loop).SupplyApproachTemp;
                 }
                 WAirIn = Node(SupplyNodeNum).HumRat;
+                std::cout << "TSupply: " << TSupply << "\n";
             } else {
                 if (AirConnection == ITEInletAdjustedSupply) {
                     if (SupplyNodeNum != 0) {
@@ -6322,6 +6388,40 @@ namespace InternalHeatGains {
 
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+            Real64 DesignTotalPower = ZoneITEq(Loop).DesignTotalPower;
+
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                Real64 TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+                SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+                for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                    if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
+                        TAirInDesign = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp; // Set the maximun setpoint
+                    }
+                }
+                if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
+                    TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
+                } else {
+                    TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
+                }
+                Real64 OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
+                Real64 CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
+
+                Real64 CPUPowerAtDesign =
+                        max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+
+                Real64 AirVolFlowFracDesignT = max(CurveManager::CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+
+                Real64 FanPowerAtDesign =
+                        max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
+
+
+                if (FanPowerAtDesign + CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
+                    DesignTotalPower = FanPowerAtDesign + CPUPowerAtDesign;
+                }
+                std::cout << "After CalcZoneITEq DesignTotalPower " << DesignTotalPower << "\n";
+
+            }
+
 
             CPUPower =
                 max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
@@ -6375,6 +6475,19 @@ namespace InternalHeatGains {
             if (AirConnection == ITEInletAdjustedSupply || AirConnection == ITEInletZoneAirNode) {
                 // If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
                 ZoneITEq(Loop).ConGainRateToZone = CPUPower + FanPower + UPSHeatGain;
+                if (!DoingSizing) {
+                    std::cout << "DayOfSim: " << DayOfSim << "\n";
+                    std::cout << "HourOfDay: " << HourOfDay << "\n";
+                    std::cout << "TimeStep: " << TimeStep << "\n";
+                    std::cout << "WarmupFlag: " << WarmupFlag << "\n";
+                    std::cout << "TAirIn: " << TAirIn << "\n";
+                    std::cout << "CPUPower: " << CPUPower << "\n";
+                    std::cout << "FanPower: " << FanPower << "\n";
+                    std::cout << "UPSHeatGain: " << UPSHeatGain << "\n";
+                    std::cout << "ZoneITEq(Loop).ConGainRateToZone: " << ZoneITEq(Loop).ConGainRateToZone << "\n";
+                    std::cout << "AirMassFlowRate " << AirMassFlowRate << "\n";
+                }
+
             } else if (AirConnection == ITEInletRoomAirModel) {
                 // Room air model option not implemented yet - set room air model outlet node conditions here
                 // If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
@@ -6382,6 +6495,12 @@ namespace InternalHeatGains {
             }
             if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
+            }
+
+            if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
+                ZoneITEq(Loop).ConGainRateToZone = DesignTotalPower;
+                std::cout << "Sizing: ZoneITEq(Loop).ConGainRateToZone: " << ZoneITEq(Loop).ConGainRateToZone << "\n";
+                std::cout << "Sizing: AirMassFlowRate " << AirMassFlowRate << "\n";
             }
 
             // Object report variables
