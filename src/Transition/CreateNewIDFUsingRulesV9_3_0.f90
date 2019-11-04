@@ -8,7 +8,7 @@ MODULE SetVersion
 CONTAINS
 
     SUBROUTINE SetThisVersionVariables()
-        VerString='Conversion 9.1 => 9.2'
+        VerString='Conversion 9.2 => 9.3'
         VersionNum=9.3
         sVersionNum='9.3'
         IDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-0-Energy+.idd'
