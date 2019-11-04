@@ -775,8 +775,7 @@ namespace HVACCooledBeam {
 
                     if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                         DesAirVolFlow = CoolBeam(CBNum).MaxAirVolFlow;
-                        CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat,
-                                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesTemp);
+                        CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat);
                         // the design cooling coil load is the zone load minus whatever the central system does. Note that
                         // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
                         if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
@@ -981,8 +980,8 @@ namespace HVACCooledBeam {
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        CpAirSys = PsyCpAirFnWTdb(Node(InAirNode).HumRat, Node(InAirNode).Temp);
+        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat);
+        CpAirSys = PsyCpAirFnWTdb(Node(InAirNode).HumRat);
         MaxColdWaterFlow = CoolBeam(CBNum).MaxCoolWaterMassFlow;
         SetComponentFlowRate(MaxColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,

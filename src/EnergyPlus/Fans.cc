@@ -3117,7 +3117,7 @@ namespace Fans {
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
             RhoAir = StdRhoAir;
-            CpAir = PsyCpAirFnWTdb(constant_zero, constant_twenty);
+            CpAir = PsyCpAirFnWTdb(constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {
             DesignDeltaT = 0.0;

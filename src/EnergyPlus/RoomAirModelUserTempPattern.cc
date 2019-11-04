@@ -1047,7 +1047,7 @@ namespace RoomAirModelUserTempPattern {
             // Add sensible heat gain from refrigerated cases with under case returns
             SumAllReturnAirConvectionGains(ZoneNum, QRetAir, ReturnNode);
 
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added

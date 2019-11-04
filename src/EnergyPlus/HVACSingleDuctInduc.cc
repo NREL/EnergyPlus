@@ -879,8 +879,7 @@ namespace HVACSingleDuctInduc {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
                                 DesPriVolFlow = IndUnit(IUNum).MaxTotAirVolFlow / (1.0 + IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat,
-                                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp);
+                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat);
                                 // the design heating coil load is the zone load minus whatever the central system does. Note that
                                 // DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak > 0.0) {
@@ -983,8 +982,7 @@ namespace HVACSingleDuctInduc {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                                 DesPriVolFlow = IndUnit(IUNum).MaxTotAirVolFlow / (1.0 + IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat,
-                                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesTemp);
+                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat);
                                 // the design cooling coil load is the zone load minus whatever the central system does. Note that
                                 // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
@@ -1395,7 +1393,7 @@ namespace HVACSingleDuctInduc {
         OutletNode = IndUnit(IUNum).OutAirNode;
         PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
         InducRat = IndUnit(IUNum).InducRatio;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNode).HumRat);
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;

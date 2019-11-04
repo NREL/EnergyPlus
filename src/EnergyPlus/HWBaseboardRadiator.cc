@@ -1321,7 +1321,7 @@ namespace HWBaseboardRadiator {
             (WaterMassFlowRate > 0.0)) {
             // Calculate air mass flow rate
             AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
-            CapacitanceAir = PsyCpAirFnWTdb(HWBaseboard(BaseboardNum).AirInletHumRat, AirInletTemp) * AirMassFlowRate;
+            CapacitanceAir = PsyCpAirFnWTdb(HWBaseboard(BaseboardNum).AirInletHumRat) * AirMassFlowRate;
             Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
                                        WaterInletTemp,
                                        PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,

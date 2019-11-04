@@ -1116,13 +1116,12 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    RefrigCase(CaseNum).LatCapCurvePtr,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    RefrigCase(CaseNum).Name,   // Object Name
-                    cAlphaFieldNames(5));               // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(RefrigCase(CaseNum).LatCapCurvePtr, // Curve index
+                                                            {1},                                // Valid dimensions
+                                                            RoutineName,                        // Routine name
+                                                            CurrentModuleObject,                // Object Type
+                                                            RefrigCase(CaseNum).Name,           // Object Name
+                                                            cAlphaFieldNames(5));               // Field Name
 
                 NumNum = 8;
                 if (!lNumericBlanks(NumNum)) {
@@ -1442,13 +1441,12 @@ namespace RefrigeratedCase {
                 }
 
                 if (RefrigCase(CaseNum).DefCapCurvePtr > 0) {
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        RefrigCase(CaseNum).DefCapCurvePtr,   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        RefrigCase(CaseNum).Name,   // Object Name
-                        cAlphaFieldNames(12));               // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(RefrigCase(CaseNum).DefCapCurvePtr, // Curve index
+                                                                {1},                                // Valid dimensions
+                                                                RoutineName,                        // Routine name
+                                                                CurrentModuleObject,                // Object Type
+                                                                RefrigCase(CaseNum).Name,           // Object Name
+                                                                cAlphaFieldNames(12));              // Field Name
                 }
 
                 //  warn user if defrost energy curve is entered that it is only used for temperature termination types
@@ -2411,13 +2409,12 @@ namespace RefrigeratedCase {
                             ErrorsFound = true;
                         }
                         // error checks for curve type entered and curve name
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr,   // Curve index
-                            {1},                            // Valid dimensions
-                            RoutineName,                    // Routine name
-                            CurrentModuleObject,            // Object Type
-                            WarehouseCoil(CoilID).Name,     // Object Name
-                            cAlphaFieldNames(AlphaNum));    // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                                                                    {1},                                         // Valid dimensions
+                                                                    RoutineName,                                 // Routine name
+                                                                    CurrentModuleObject,                         // Object Type
+                                                                    WarehouseCoil(CoilID).Name,                  // Object Name
+                                                                    cAlphaFieldNames(AlphaNum));                 // Field Name
                     } else if (SELECT_CASE_var == TabularRH_DT1_TRoom) {
                         WarehouseCoil(CoilID).SHRCorrectionCurvePtr = GetCurveIndex(Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
@@ -2429,13 +2426,12 @@ namespace RefrigeratedCase {
                             ShowContinueError("...invalid curve " + cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
                             ErrorsFound = true;
                         }
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            WarehouseCoil(CoilID).SHRCorrectionCurvePtr,   // Curve index
-                            {3},                            // Valid dimensions
-                            RoutineName,                    // Routine name
-                            CurrentModuleObject,            // Object Type
-                            WarehouseCoil(CoilID).Name,     // Object Name
-                            cAlphaFieldNames(AlphaNum));    // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(WarehouseCoil(CoilID).SHRCorrectionCurvePtr, // Curve index
+                                                                    {3},                                         // Valid dimensions
+                                                                    RoutineName,                                 // Routine name
+                                                                    CurrentModuleObject,                         // Object Type
+                                                                    WarehouseCoil(CoilID).Name,                  // Object Name
+                                                                    cAlphaFieldNames(AlphaNum));                 // Field Name
                         //        IF(WarehouseCoil(CoilID)%SHRCorrectionCurvePtr == 0) THEN
                         //          CALL ShowSevereError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(WarehouseCoil(CoilID)%Name)//&
                         //                           '", not found  '//TRIM(cAlphaFieldNames(AlphaNum)))
@@ -2864,13 +2860,12 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    RefrigRack(RackNum).COPFTempPtr,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    RefrigRack(RackNum).Name,     // Object Name
-                    cAlphaFieldNames(3));    // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(RefrigRack(RackNum).COPFTempPtr, // Curve index
+                                                            {1},                             // Valid dimensions
+                                                            RoutineName,                     // Routine name
+                                                            CurrentModuleObject,             // Object Type
+                                                            RefrigRack(RackNum).Name,        // Object Name
+                                                            cAlphaFieldNames(3));            // Field Name
 
                 RefrigRack(RackNum).CondenserFanPower = Numbers(2);
                 if (Numbers(2) < 0.0) {
@@ -2887,13 +2882,12 @@ namespace RefrigeratedCase {
                 }
 
                 if (!lAlphaBlanks(4)) {
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        RefrigRack(RackNum).TotCondFTempPtr,   // Curve index
-                        {1},                            // Valid dimensions
-                        RoutineName,                    // Routine name
-                        CurrentModuleObject,            // Object Type
-                        RefrigRack(RackNum).Name,     // Object Name
-                        cAlphaFieldNames(4));    // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(RefrigRack(RackNum).TotCondFTempPtr, // Curve index
+                                                                {1},                                 // Valid dimensions
+                                                                RoutineName,                         // Routine name
+                                                                CurrentModuleObject,                 // Object Type
+                                                                RefrigRack(RackNum).Name,            // Object Name
+                                                                cAlphaFieldNames(4));                // Field Name
                 }
 
                 if (UtilityRoutines::SameString(Alphas(5), "EvaporativelyCooled")) {
@@ -4380,13 +4374,12 @@ namespace RefrigeratedCase {
                                             cAlphaFieldNames(AlphaNum) + " not found:" + Alphas(AlphaNum));
                             ErrorsFound = true;
                         }
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            Secondary(SecondaryNum).VarSpeedCurvePtr,   // Curve index
-                            {1},                            // Valid dimensions
-                            RoutineName,                    // Routine name
-                            CurrentModuleObject,            // Object Type
-                            Secondary(SecondaryNum).Name,     // Object Name
-                            cAlphaFieldNames(AlphaNum));    // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(Secondary(SecondaryNum).VarSpeedCurvePtr, // Curve index
+                                                                    {1},                                      // Valid dimensions
+                                                                    RoutineName,                              // Routine name
+                                                                    CurrentModuleObject,                      // Object Type
+                                                                    Secondary(SecondaryNum).Name,             // Object Name
+                                                                    cAlphaFieldNames(AlphaNum));              // Field Name
                     } // input power conditions/levels for constant or variable speed pump drives
 
                     // Default non-hermetic motor eff at 85% and all shaft power goes to heat in fluid
@@ -13462,59 +13455,76 @@ namespace RefrigeratedCase {
         static ObjexxFCL::gio::Fmt Format_101("(A)");
         static ObjexxFCL::gio::Fmt Format_102("(4X,A)");
         static ObjexxFCL::gio::Fmt Format_103("(2X,A)");
-        static ObjexxFCL::gio::Fmt Format_104("('! <Refrigeration Compressor Rack>,Compressor Rack Name,',' # Refrigerated Cases Connected,# WalkIn Coolers "
-                                   "Connected, Heat Rejection Location, ','Condenser Type, COP')");
-        static ObjexxFCL::gio::Fmt Format_105("('!',2x,'<Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,','Zone Node #,Zone "
-                                   "Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),','Installed Lighting (W/m),Anti-Sweat "
-                                   "(W/m),Defrost (W/m)')");
+        static ObjexxFCL::gio::Fmt Format_104(
+            "('! <Refrigeration Compressor Rack>,Compressor Rack Name,',' # Refrigerated Cases Connected,# WalkIn Coolers "
+            "Connected, Heat Rejection Location, ','Condenser Type, COP')");
+        static ObjexxFCL::gio::Fmt Format_105(
+            "('!',2x,'<Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,','Zone Node #,Zone "
+            "Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),','Installed Lighting (W/m),Anti-Sweat "
+            "(W/m),Defrost (W/m)')");
         static ObjexxFCL::gio::Fmt Format_108("('!',2x,'<Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)')");
         static ObjexxFCL::gio::Fmt Format_109("('! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks')");
         static ObjexxFCL::gio::Fmt Format_114("(',',1X,F7.1)");
         static ObjexxFCL::gio::Fmt Format_117("('! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems')");
-        static ObjexxFCL::gio::Fmt Format_118("('! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used',', # Refrigerated Cases "
-                                   "Connected, # WalkInCoolers Connected, #Air Chillers Connected',', # Secondary Loops Served, # Cascade Condensers "
-                                   "Served',', # Mechanical Subcoolers Served, # Compressors Connected',', # Compression Stages, Intercooler Type, "
-                                   "Intercooler Effectiveness',', # Subcoolers Connected, Minimum Condensing Temperature (C)')");
-        static ObjexxFCL::gio::Fmt Format_119("('!',2x,'<Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,','Capacity (W),Temperature (C),Coil Fan "
-                                   "(W), Circulating Fan (W), ','Lighting (W),Heaters (W),Defrost (W), # Zones')");
-        static ObjexxFCL::gio::Fmt Format_120("('! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems')");
-        static ObjexxFCL::gio::Fmt Format_121("('! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used',', # "
-                                   "Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected',', # Medium "
-                                   "Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected',', # High Pressure Compressors "
-                                   "Connected, # Low Pressure Compressors Connected',', Minimum Condensing Temperature (C)')");
+        static ObjexxFCL::gio::Fmt Format_118(
+            "('! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used',', # Refrigerated Cases "
+            "Connected, # WalkInCoolers Connected, #Air Chillers Connected',', # Secondary Loops Served, # Cascade Condensers "
+            "Served',', # Mechanical Subcoolers Served, # Compressors Connected',', # Compression Stages, Intercooler Type, "
+            "Intercooler Effectiveness',', # Subcoolers Connected, Minimum Condensing Temperature (C)')");
+        static ObjexxFCL::gio::Fmt Format_119(
+            "('!',2x,'<Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,','Capacity (W),Temperature (C),Coil Fan "
+            "(W), Circulating Fan (W), ','Lighting (W),Heaters (W),Defrost (W), # Zones')");
+        static ObjexxFCL::gio::Fmt Format_120(
+            "('! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems')");
+        static ObjexxFCL::gio::Fmt Format_121(
+            "('! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used',', # "
+            "Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected',', # Medium "
+            "Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected',', # High Pressure Compressors "
+            "Connected, # Low Pressure Compressors Connected',', Minimum Condensing Temperature (C)')");
         static ObjexxFCL::gio::Fmt Format_123("('!',2x,'<Secondary Load>, Secondary System Served Name, Secondary Number')");
-        static ObjexxFCL::gio::Fmt Format_126("('!',2x,'<Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, ','Name of System Providing "
-                                   "Cooling, Design Outlet Temperature (C)')");
-        static ObjexxFCL::gio::Fmt Format_127("('!',2x,'<Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, ','Design Subcooling "
-                                   "(DeltaC),','Design liquid inlet temperature (C), Design vapor inlet temperature (C)')");
+        static ObjexxFCL::gio::Fmt Format_126(
+            "('!',2x,'<Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, ','Name of System Providing "
+            "Cooling, Design Outlet Temperature (C)')");
+        static ObjexxFCL::gio::Fmt Format_127(
+            "('!',2x,'<Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, ','Design Subcooling "
+            "(DeltaC),','Design liquid inlet temperature (C), Design vapor inlet temperature (C)')");
         static ObjexxFCL::gio::Fmt Format_128("('!',2x,'<Cascade Load>, System Name Connected, Condenser Number, Condenser Name')");
-        static ObjexxFCL::gio::Fmt Format_129("('!',2x,'<Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
-                                   "(C),','Rated Capacity (W), Rated Fan Power (W)')");
-        static ObjexxFCL::gio::Fmt Format_130("('!',2x,'<Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
-                                   "(C),','Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)')");
+        static ObjexxFCL::gio::Fmt Format_129(
+            "('!',2x,'<Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
+            "(C),','Rated Capacity (W), Rated Fan Power (W)')");
+        static ObjexxFCL::gio::Fmt Format_130(
+            "('!',2x,'<Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
+            "(C),','Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)')");
         static ObjexxFCL::gio::Fmt Format_131(
             "('!',2x,'<Refrigeration Condenser:Evaporative-Cooled>,Condenser Number,Condenser Name,','Rated Capacity (W), Rated Fan Power (W)')");
-        static ObjexxFCL::gio::Fmt Format_132("('!',2x,'<Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name,',' Condensing Temperature Control "
-                                   "Type, Rated Condensing Temperature (C),',' Capacity (W), Approach Temperature Difference (DeltaC)')");
-        static ObjexxFCL::gio::Fmt Format_133("('! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name,',' # Refrigerated "
-                                   "Cases Connected, # WalkIn Coolers Connected,',' Fluid Name, Capacity (W),Evap Temperature in Secondary "
-                                   "Evaporator (C),',' Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)')");
-        static ObjexxFCL::gio::Fmt Format_134("('!',6x,'<Walk-In Surfaces Facing Zone>, ZoneName,',' Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors "
-                                   "(m2), HeightStockDoors,',' UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m), ',' "
-                                   "UValueGlassDoors (W/m2-C)')");
+        static ObjexxFCL::gio::Fmt Format_132(
+            "('!',2x,'<Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name,',' Condensing Temperature Control "
+            "Type, Rated Condensing Temperature (C),',' Capacity (W), Approach Temperature Difference (DeltaC)')");
+        static ObjexxFCL::gio::Fmt Format_133(
+            "('! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name,',' # Refrigerated "
+            "Cases Connected, # WalkIn Coolers Connected,',' Fluid Name, Capacity (W),Evap Temperature in Secondary "
+            "Evaporator (C),',' Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)')");
+        static ObjexxFCL::gio::Fmt Format_134(
+            "('!',6x,'<Walk-In Surfaces Facing Zone>, ZoneName,',' Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors "
+            "(m2), HeightStockDoors,',' UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m), ',' "
+            "UValueGlassDoors (W/m2-C)')");
         static ObjexxFCL::gio::Fmt Format_141("('!',2x,'<Mechanical Subcooler Load>, Subcooler Number, Subcooler Name')");
         static ObjexxFCL::gio::Fmt Format_142("('! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems')");
-        static ObjexxFCL::gio::Fmt Format_146("('! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name,',' # Refrigerated Cases "
-                                   "Connected, # WalkIn Coolers Connected, #Air Coils Connected',' Fluid Name, Capacity (W),Evap Temperature in "
-                                   "Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)')");
+        static ObjexxFCL::gio::Fmt Format_146(
+            "('! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name,',' # Refrigerated Cases "
+            "Connected, # WalkIn Coolers Connected, #Air Coils Connected',' Fluid Name, Capacity (W),Evap Temperature in "
+            "Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)')");
         static ObjexxFCL::gio::Fmt Format_148("('! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets')");
-        static ObjexxFCL::gio::Fmt Format_149("('! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name,',' # Air Chillers Connected, Zone Location')");
-        static ObjexxFCL::gio::Fmt Format_151("('!',2x,'<Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,','Zone "
-                                   "Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),','Fan "
-                                   "Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)')");
+        static ObjexxFCL::gio::Fmt Format_149(
+            "('! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name,',' # Air Chillers Connected, Zone Location')");
+        static ObjexxFCL::gio::Fmt Format_151(
+            "('!',2x,'<Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,','Zone "
+            "Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),','Fan "
+            "Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)')");
         static ObjexxFCL::gio::Fmt Format_152("('!',2x,'<Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,')");
-        static ObjexxFCL::gio::Fmt Format_160("('!',2x,'<Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
-                                   "(Pa),','Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)')");
+        static ObjexxFCL::gio::Fmt Format_160(
+            "('!',2x,'<Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
+            "(Pa),','Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)')");
 
         // 111 FORMAT(',',1X,F6.3) ! compressor rack output line
         // 112 FORMAT(',',1X,F16.0)! compressor output line
@@ -13535,12 +13545,12 @@ namespace RefrigeratedCase {
         if (NumRefrigeratedRacks > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_109); // Intro to refrigeration case racks
             ObjexxFCL::gio::write(OutputFileInits, Format_104); // Refrigeration Rack header
-        }                                            //(NumRefrigeratedRacks > 0)
+        }                                                       //(NumRefrigeratedRacks > 0)
         if (NumRefrigSystems > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_117); // Intro to detailed systems
             ObjexxFCL::gio::write(OutputFileInits, Format_118); // Detailed system header
             ObjexxFCL::gio::write(OutputFileInits, Format_108); // Compressor header (Always have compressor if have detailed system)
-        }                                            //(NumRefrigSystems > 0)
+        }                                                       //(NumRefrigSystems > 0)
         if (NumSimulationSecondarySystems > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_142); // Intro to Secondary systems
             CountSecPhase = 0;
@@ -13556,56 +13566,56 @@ namespace RefrigeratedCase {
                 }
             }
             ObjexxFCL::gio::write(OutputFileInits, Format_123); //  Secondary system load header
-        }                                            //(NumSimulationSecondarySystems > 0)
+        }                                                       //(NumSimulationSecondarySystems > 0)
         if (NumRefrigChillerSets > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_148); // Intro to Chiller set
             ObjexxFCL::gio::write(OutputFileInits, Format_149); // Chiller set header
             ObjexxFCL::gio::write(OutputFileInits, Format_151); // Intro to Air Chiller
             ObjexxFCL::gio::write(OutputFileInits, Format_152); // Air chiller header
-        }                                            //(NumRefrigSystems > 0)
+        }                                                       //(NumRefrigSystems > 0)
         if (NumSimulationCases > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_105); //  Case header
-        }                                            //(NumSimulationCases > 0)
+        }                                                       //(NumSimulationCases > 0)
         if (NumSimulationWalkIns > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_119); //  Walk-in header
             ObjexxFCL::gio::write(OutputFileInits, Format_134); //  Walk-in zone-specific header
-        }                                            //(NumSimulationWalkIns > 0)
+        }                                                       //(NumSimulationWalkIns > 0)
         if (NumSimulationCondAir > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_129); //  Condenser, Air-Cooled header
-        }                                            //(NumSimulationCondAir > 0)
+        }                                                       //(NumSimulationCondAir > 0)
         if (NumSimulationCondEvap > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_131); //  Condenser, Evaporative-Cooled header
-        }                                            //(NumSimulationCondEvap > 0)
+        }                                                       //(NumSimulationCondEvap > 0)
         if (NumSimulationCondWater > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_130); //  Condenser, Water-Cooled header
-        }                                            //(NumSimulationCondWater > 0)
+        }                                                       //(NumSimulationCondWater > 0)
         if (NumSimulationCascadeCondensers > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_132); //  Condenser, Cascade header
             ObjexxFCL::gio::write(OutputFileInits, Format_128); //  Cascade Load header
-        }                                            //(NumSimulationCascadeCondensers > 0)
+        }                                                       //(NumSimulationCascadeCondensers > 0)
         if (NumSimulationMechSubcoolers > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_141); //  Mech subcooler loads served header
             ObjexxFCL::gio::write(OutputFileInits, Format_126); //  Mechanical Subcooler header
-        }                                            //(NumSimulationMechSubcoolers > 0)
+        }                                                       //(NumSimulationMechSubcoolers > 0)
         if ((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_127); //  LSHX Subcooler header
-        }                                            //((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0)
+        }                                                       //((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0)
 
         if (NumTransRefrigSystems > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_120); // Intro to detailed transcriticial refrigeration system
             ObjexxFCL::gio::write(OutputFileInits, Format_121); // Detailed system header
             if (NumSimulationCases > 0) {
                 ObjexxFCL::gio::write(OutputFileInits, Format_105); //  Case header
-            }                                            //(NumSimulationCases > 0)
+            }                                                       //(NumSimulationCases > 0)
             if (NumSimulationWalkIns > 0) {
                 ObjexxFCL::gio::write(OutputFileInits, Format_119); //  Walk-in header
                 ObjexxFCL::gio::write(OutputFileInits, Format_134); //  Walk-in zone-specific header
-            }                                            //(NumSimulationWalkIns > 0)
+            }                                                       //(NumSimulationWalkIns > 0)
             ObjexxFCL::gio::write(OutputFileInits, Format_108);     // Compressor header (Always have compressor if have detailed system)
             if (NumSimulationGasCooler > 0) {
                 ObjexxFCL::gio::write(OutputFileInits, Format_160); //  Gas Cooler, Air-Cooled header
-            }                                            //(NumSimulationGasCooler > 0)
-        }                                                //(NumTransRefrigSystems > 0)
+            }                                                       //(NumSimulationGasCooler > 0)
+        }                                                           //(NumTransRefrigSystems > 0)
 
         if (NumRefrigeratedRacks > 0) {
             ObjexxFCL::gio::write(OutputFileInits, Format_101) << "#Refrigeration Compressor Racks, " + RoundSigDigits(NumRefrigeratedRacks);
@@ -13626,9 +13636,9 @@ namespace RefrigeratedCase {
                     }
                 }
                 ObjexxFCL::gio::write(OutputFileInits, Format_101) << " Refrigeration Compressor Rack," + RefrigRack(RackNum).Name + ',' +
-                                                               RoundSigDigits(RefrigRack(RackNum).NumCases) + ',' +
-                                                               RoundSigDigits(RefrigRack(RackNum).NumWalkIns) + ',' + ChrOut + ',' + ChrOut2 + ',' +
-                                                               RoundSigDigits(RefrigRack(RackNum).RatedCOP, 3);
+                                                                          RoundSigDigits(RefrigRack(RackNum).NumCases) + ',' +
+                                                                          RoundSigDigits(RefrigRack(RackNum).NumWalkIns) + ',' + ChrOut + ',' +
+                                                                          ChrOut2 + ',' + RoundSigDigits(RefrigRack(RackNum).RatedCOP, 3);
                 for (CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
                     CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
@@ -13653,15 +13663,15 @@ namespace RefrigeratedCase {
                                RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' +
                                RoundSigDigits(WalkIn(WalkInID).NumZones);
                     for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // zones for walk ins on rack
                 }     // walk ins on rack
 
@@ -13708,15 +13718,15 @@ namespace RefrigeratedCase {
                                RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).NumZones);
                     for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // Num zones for each walk in on system
                 }     // NumWalkIns on system
 
@@ -13728,13 +13738,15 @@ namespace RefrigeratedCase {
 
                 for (CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
                     CascadeLoadID = System(SystemNum).CascadeLoadNum(CascadeLoadNum);
-                    ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Cascade Load," + System(Condenser(CascadeLoadID).CascadeSysID).Name + ',' +
-                                                                   RoundSigDigits(CascadeLoadID) + ',' + Condenser(CascadeLoadID).Name;
+                    ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Cascade Load," + System(Condenser(CascadeLoadID).CascadeSysID).Name +
+                                                                              ',' + RoundSigDigits(CascadeLoadID) + ',' +
+                                                                              Condenser(CascadeLoadID).Name;
                 } // cascade load on detailed system
 
                 for (SecondaryNum = 1; SecondaryNum <= System(SystemNum).NumSecondarys; ++SecondaryNum) {
                     SecondaryID = System(SystemNum).SecondaryNum(SecondaryNum);
-                    ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Secondary Load," + Secondary(SecondaryID).Name + ',' + RoundSigDigits(SecondaryID);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_103)
+                        << " Secondary Load," + Secondary(SecondaryID).Name + ',' + RoundSigDigits(SecondaryID);
                 } // secondary load on detailed system
 
                 for (SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
@@ -13747,20 +13759,23 @@ namespace RefrigeratedCase {
                     for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         CompID = System(SystemNum).CompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Refrigeration Compressor," + RoundSigDigits(CompID) + ',' +
-                                                                       Compressor(CompID).Name + ',' + RoundSigDigits(Compressor(CompID).NomCap, 0);
+                                                                                  Compressor(CompID).Name + ',' +
+                                                                                  RoundSigDigits(Compressor(CompID).NomCap, 0);
                     }                                          // NumCompressors
                 } else if (System(SystemNum).NumStages == 2) { // Two-stage compression system
                     // Low-stage compressors
                     for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         CompID = System(SystemNum).CompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Refrigeration Low-Stage Compressor," + RoundSigDigits(CompID) + ',' +
-                                                                       Compressor(CompID).Name + ',' + RoundSigDigits(Compressor(CompID).NomCap, 0);
+                                                                                  Compressor(CompID).Name + ',' +
+                                                                                  RoundSigDigits(Compressor(CompID).NomCap, 0);
                     } // NumCompressors
                     // High-stage compressors
                     for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumHiStageCompressors; ++CompressorNum) {
                         CompID = System(SystemNum).HiStageCompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Refrigeration High-Stage Compressor," + RoundSigDigits(CompID) + ',' +
-                                                                       Compressor(CompID).Name + ',' + RoundSigDigits(Compressor(CompID).NomCap, 0);
+                                                                                  Compressor(CompID).Name + ',' +
+                                                                                  RoundSigDigits(Compressor(CompID).NomCap, 0);
                     } // NumHiStageCompressors
                 }     // NumStages
 
@@ -13803,15 +13818,15 @@ namespace RefrigeratedCase {
                     {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
                         if (SELECT_CASE_var == LiquidSuction) {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Refrigeration Liquid Suction Subcooler," + RoundSigDigits(SubcoolerID) +
-                                                                           ',' + Subcooler(SubcoolerID).Name + ',' +
-                                                                           RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignDelT, 1) + ',' +
-                                                                           RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignTliqIn, 1) + ',' +
-                                                                           RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignTvapIn, 1);
+                            ObjexxFCL::gio::write(OutputFileInits, Format_103)
+                                << " Refrigeration Liquid Suction Subcooler," + RoundSigDigits(SubcoolerID) + ',' + Subcooler(SubcoolerID).Name +
+                                       ',' + RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignDelT, 1) + ',' +
+                                       RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignTliqIn, 1) + ',' +
+                                       RoundSigDigits(Subcooler(SubcoolerID).LiqSuctDesignTvapIn, 1);
                         } else if (SELECT_CASE_var == Mechanical) {
-                            ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Refrigeration Mechanical Subcooler," + RoundSigDigits(SubcoolerID) + ',' +
-                                                                           Subcooler(SubcoolerID).Name + ',' + Subcooler(SubcoolerID).MechSourceSys +
-                                                                           ',' + RoundSigDigits(Subcooler(SubcoolerID).MechControlTliqOut, 1);
+                            ObjexxFCL::gio::write(OutputFileInits, Format_103)
+                                << " Refrigeration Mechanical Subcooler," + RoundSigDigits(SubcoolerID) + ',' + Subcooler(SubcoolerID).Name + ',' +
+                                       Subcooler(SubcoolerID).MechSourceSys + ',' + RoundSigDigits(Subcooler(SubcoolerID).MechControlTliqOut, 1);
                         }
                     }
                 } // NumSubcoolers
@@ -13820,7 +13835,8 @@ namespace RefrigeratedCase {
         }     //(NumRefrigSystems > 0)
 
         if (NumTransRefrigSystems > 0) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_101) << "#Detailed Transcritical Refrigeration Systems," + RoundSigDigits(NumTransRefrigSystems);
+            ObjexxFCL::gio::write(OutputFileInits, Format_101)
+                << "#Detailed Transcritical Refrigeration Systems," + RoundSigDigits(NumTransRefrigSystems);
             for (TransSystemNum = 1; TransSystemNum <= NumTransRefrigSystems; ++TransSystemNum) {
                 ObjexxFCL::gio::write(OutputFileInits, Format_101)
                     << " Detailed Transcritical Refrigeration System," + TransSystem(TransSystemNum).Name + ',' +
@@ -13866,15 +13882,15 @@ namespace RefrigeratedCase {
                                RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).NumZones);
                     for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // Num zones for each walk in on system
                 }     // NumWalkInsMT on system
                 for (WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsLT; ++WalkInNum) {
@@ -13886,27 +13902,29 @@ namespace RefrigeratedCase {
                                RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).NumZones);
                     for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // Num zones for each walk in on system
                 }     // NumWalkInsLT on system
 
                 for (CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsHP; ++CompressorNum) {
                     CompID = TransSystem(TransSystemNum).CompressorNumHP(CompressorNum);
                     ObjexxFCL::gio::write(OutputFileInits, Format_103) << " High Pressure Refrigeration Compressor," + RoundSigDigits(CompID) + ',' +
-                                                                   Compressor(CompID).Name + ',' + RoundSigDigits(Compressor(CompID).NomCap, 0);
+                                                                              Compressor(CompID).Name + ',' +
+                                                                              RoundSigDigits(Compressor(CompID).NomCap, 0);
                 } // NumCompressorsHP
                 for (CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsLP; ++CompressorNum) {
                     CompID = TransSystem(TransSystemNum).CompressorNumLP(CompressorNum);
                     ObjexxFCL::gio::write(OutputFileInits, Format_103) << " Low Pressure Refrigeration Compressor," + RoundSigDigits(CompID) + ',' +
-                                                                   Compressor(CompID).Name + ',' + RoundSigDigits(Compressor(CompID).NomCap, 0);
+                                                                              Compressor(CompID).Name + ',' +
+                                                                              RoundSigDigits(Compressor(CompID).NomCap, 0);
                 } // NumCompressorsLP
 
                 if (TransSystem(TransSystemNum).NumGasCoolers >= 1) {
@@ -13971,15 +13989,15 @@ namespace RefrigeratedCase {
                                RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1);
                     for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "Walk In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
-                                                                       RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_102) << "Walk In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) +
+                                                                                  ',' + RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightStockDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueStockDr(ZoneID), 4) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).AreaGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).HeightGlassDr(ZoneID), 2) + ',' +
+                                                                                  RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // zones for walk ins on secondary
                 }     // walk ins on secondary
 
@@ -15422,7 +15440,7 @@ namespace RefrigeratedCase {
                 ZoneMixedAirEnthalpy = PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, OutBaroPress, TrackMessage);
                 ZoneMixedAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
                 ZoneDryAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
-                ZoneMixedAirCp = PsyCpAirFnWTdb(ZoneMixedAirHumRatio, ZoneMixedAirDryBulb);
+                ZoneMixedAirCp = PsyCpAirFnWTdb(ZoneMixedAirHumRatio);
                 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -15441,7 +15459,7 @@ namespace RefrigeratedCase {
                     CoilInletCp = ZoneMixedAirCp;
                     CoilInletHumRatio = ZoneMixedAirHumRatio;
                     CoilInletDryAirDensity = ZoneDryAirDensity;
-                    CoilInletDryAirCp = PsyCpAirFnWTdb(0.0, CoilInletTemp);
+                    CoilInletDryAirCp = PsyCpAirFnWTdb(0.0);
                     break;
                 }
                 AirVolumeFlowMax = AirVolumeFlowRated * (1.0 - DefrostDripDownSchedule) * CoilSchedule;

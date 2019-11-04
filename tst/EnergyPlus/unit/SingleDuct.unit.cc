@@ -2476,8 +2476,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     Real64 ZoneDesTemp = FinalZoneSizing(1).ZoneTempAtHeatPeak;
     Real64 ZoneDesHumRat = FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
 
-    Real64 DesCoilLoad =
-        DesZoneHeatLoad + Psychrometrics::PsyCpAirFnWTdb(ZoneDesHumRat, 0.5 * (CoilInTemp + ZoneDesTemp)) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
+    Real64 DesCoilLoad = DesZoneHeatLoad + Psychrometrics::PsyCpAirFnWTdb(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
 
     EXPECT_EQ(CoilInTemp, 16.0);
     EXPECT_EQ(DesZoneHeatLoad, 0.0);

@@ -2210,8 +2210,7 @@ namespace UserDefinedComponents {
         if (UserPlantComp(CompNum).Air.InletNodeNum > 0) {
             UserPlantComp(CompNum).Air.InletRho = PsyRhoAirFnPbTdbW(
                 OutBaroPress, Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp, Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat, RoutineName);
-            UserPlantComp(CompNum).Air.InletCp =
-                PsyCpAirFnWTdb(Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat, Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp);
+            UserPlantComp(CompNum).Air.InletCp = PsyCpAirFnWTdb(Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat);
             UserPlantComp(CompNum).Air.InletTemp = Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp;
             UserPlantComp(CompNum).Air.InletMassFlowRate = Node(UserPlantComp(CompNum).Air.InletNodeNum).MassFlowRate;
             UserPlantComp(CompNum).Air.InletHumRat = Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat;
@@ -2303,8 +2302,7 @@ namespace UserDefinedComponents {
                                                                      Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat,
                                                                      RoutineName);
 
-            UserCoil(CompNum).Air(Loop).InletCp =
-                PsyCpAirFnWTdb(Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat, Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp);
+            UserCoil(CompNum).Air(Loop).InletCp = PsyCpAirFnWTdb(Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat);
             UserCoil(CompNum).Air(Loop).InletTemp = Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp;
             UserCoil(CompNum).Air(Loop).InletMassFlowRate = Node(UserCoil(CompNum).Air(Loop).InletNodeNum).MassFlowRate;
             UserCoil(CompNum).Air(Loop).InletHumRat = Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat;
@@ -2418,8 +2416,7 @@ namespace UserDefinedComponents {
                                                                       Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp,
                                                                       Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat,
                                                                       RoutineName);
-        UserZoneAirHVAC(CompNum).ZoneAir.InletCp =
-            PsyCpAirFnWTdb(Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat, Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp);
+        UserZoneAirHVAC(CompNum).ZoneAir.InletCp = PsyCpAirFnWTdb(Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat);
         UserZoneAirHVAC(CompNum).ZoneAir.InletTemp = Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp;
         UserZoneAirHVAC(CompNum).ZoneAir.InletHumRat = Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
 
@@ -2428,8 +2425,7 @@ namespace UserDefinedComponents {
                                                                             Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp,
                                                                             Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat,
                                                                             RoutineName);
-            UserZoneAirHVAC(CompNum).SourceAir.InletCp = PsyCpAirFnWTdb(Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat,
-                                                                        Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp);
+            UserZoneAirHVAC(CompNum).SourceAir.InletCp = PsyCpAirFnWTdb(Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat);
             UserZoneAirHVAC(CompNum).SourceAir.InletTemp = Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp;
             UserZoneAirHVAC(CompNum).SourceAir.InletHumRat = Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat;
         }
@@ -2544,8 +2540,7 @@ namespace UserDefinedComponents {
                                                                       Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp,
                                                                       Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat,
                                                                       RoutineName);
-        UserAirTerminal(CompNum).AirLoop.InletCp =
-            PsyCpAirFnWTdb(Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat, Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp);
+        UserAirTerminal(CompNum).AirLoop.InletCp = PsyCpAirFnWTdb(Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat);
         UserAirTerminal(CompNum).AirLoop.InletTemp = Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp;
         UserAirTerminal(CompNum).AirLoop.InletHumRat = Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat;
 
@@ -2554,8 +2549,7 @@ namespace UserDefinedComponents {
                                                                             Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp,
                                                                             Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat,
                                                                             RoutineName);
-            UserAirTerminal(CompNum).SourceAir.InletCp = PsyCpAirFnWTdb(Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat,
-                                                                        Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp);
+            UserAirTerminal(CompNum).SourceAir.InletCp = PsyCpAirFnWTdb(Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat);
             UserAirTerminal(CompNum).SourceAir.InletTemp = Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp;
             UserAirTerminal(CompNum).SourceAir.InletHumRat = Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat;
         }

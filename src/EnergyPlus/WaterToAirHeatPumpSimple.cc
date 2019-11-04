@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -76,9 +77,8 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 
 namespace EnergyPlus {
 
@@ -120,6 +120,7 @@ namespace WaterToAirHeatPumpSimple {
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
+    using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::Cooling;
     using DataHVACGlobals::CycFanCycCoil;
@@ -130,7 +131,6 @@ namespace WaterToAirHeatPumpSimple {
     using DataHVACGlobals::WaterCycling;
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
-    using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -1408,7 +1408,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
                             if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
@@ -1497,7 +1497,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
                             if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
@@ -1601,7 +1601,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
                             if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
@@ -1688,7 +1688,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
                             if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
@@ -2221,7 +2221,7 @@ namespace WaterToAirHeatPumpSimple {
             LoadSideInletDBTemp_Init = 26.7;
             LoadSideInletHumRat_Init = 0.0111;
             LoadSideInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
-            CpAir_Init = PsyCpAirFnWTdb(LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init);
+            CpAir_Init = PsyCpAirFnWTdb(LoadSideInletHumRat_Init);
             firstTime = false;
         }
         LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName);
@@ -2293,7 +2293,7 @@ namespace WaterToAirHeatPumpSimple {
         LoadSideInletHumRat_Unit = SimpleWatertoAirHP(HPNum).InletAirHumRat;
         LoadSideInletWBTemp_Unit = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit, OutBaroPress, RoutineName);
         LoadSideInletEnth_Unit = SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
-        CpAir_Unit = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir_Unit = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit);
 
         while (true) {
             ++NumIteration;
@@ -2385,7 +2385,7 @@ namespace WaterToAirHeatPumpSimple {
         Winput *= RuntimeFrac;
         QSource = QSource_fullload * PartLoadRatio;
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = QSource;
-        
+
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = Winput;
 
@@ -2393,7 +2393,8 @@ namespace WaterToAirHeatPumpSimple {
         DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
         if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
-            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
+            for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
+                HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
         }
         QSource -= HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal;
 
@@ -2563,7 +2564,7 @@ namespace WaterToAirHeatPumpSimple {
 
         LoadSideInletWBTemp = PsyTwbFnTdbWPb(LoadSideInletDBTemp, LoadSideInletHumRat, OutBaroPress, RoutineName);
         LoadSideInletEnth = SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat);
         SourceSideMassFlowRate = SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
         SourceSideInletTemp = SimpleWatertoAirHP(HPNum).InletWaterTemp;
         SourceSideInletEnth = SimpleWatertoAirHP(HPNum).InletWaterEnthalpy;

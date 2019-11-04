@@ -2424,7 +2424,7 @@ namespace HVACManager {
 
         // Reports zone exhaust loss by exhaust fans
         for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
-            CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            CpAir = PsyCpAirFnWTdb(OutHumRat);
             H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
@@ -2491,7 +2491,7 @@ namespace HVACManager {
                 ZnAirRpt(ZoneLoop).InfilHeatLoss = 0.0;
             }
             // Report infiltration latent gains and losses
-            CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            CpAir = PsyCpAirFnWTdb(OutHumRat);
             H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
 
@@ -2517,7 +2517,7 @@ namespace HVACManager {
             }
 
             // first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-            CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            CpAir = PsyCpAirFnWTdb(OutHumRat);
             ZnAirRpt(ZoneLoop).InfilMass = (MCPI(ZoneLoop) / CpAir) * TimeStepSys * SecInHour * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).InfilMdot = (MCPI(ZoneLoop) / CpAir) * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).VentilMass = (MCPV(ZoneLoop) / CpAir) * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2624,8 +2624,7 @@ namespace HVACManager {
                                                    (MAT(ZoneLoop) + MAT(Mixing(MixNum).FromZone)) / 2.0,
                                                    (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
                                                    BlankString);
-                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
-                                           (MAT(ZoneLoop) + MAT(Mixing(MixNum).FromZone)) / 2.0);
+                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += Mixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixVdotCurDensity += Mixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixMass += Mixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2650,8 +2649,7 @@ namespace HVACManager {
                                                    (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).FromZone)) / 2.0,
                                                    (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
                                                    BlankString);
-                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
-                                           (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).FromZone)) / 2.0);
+                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixVdotCurDensity += CrossMixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixMass += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2671,8 +2669,7 @@ namespace HVACManager {
                                                    (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0,
                                                    (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
                                                    BlankString);
-                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
-                                           (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0);
+                    CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0);
                     ZnAirRpt(ZoneLoop).MixVolume += CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * SecInHour * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixVdotCurDensity += CrossMixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
                     ZnAirRpt(ZoneLoop).MixMass += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2703,7 +2700,7 @@ namespace HVACManager {
                                                                (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0,
                                                                (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0,
                                                                BlankString);
-                                CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0, (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0);
+                                CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0);
                                 H2OHtOfVap =
                                     PsyHgAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneB)) / 2.0, (MAT(ZoneLoop) + MAT(ZoneB)) / 2.0);
                                 ZnAirRpt(ZoneLoop).MixVolume +=
@@ -2732,8 +2729,7 @@ namespace HVACManager {
                                                                        (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0,
                                                                        (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,
                                                                        BlankString);
-                                        CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,
-                                                               (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0);
+                                        CpAir = PsyCpAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0);
                                         H2OHtOfVap = PsyHgAirFnWTdb((ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(ZoneA)) / 2.0,
                                                                     (MAT(ZoneLoop) + MAT(ZoneA)) / 2.0);
                                         ZnAirRpt(ZoneLoop).MixVolume +=

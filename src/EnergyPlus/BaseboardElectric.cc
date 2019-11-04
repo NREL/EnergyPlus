@@ -675,7 +675,7 @@ namespace BaseboardElectric {
 
         AirInletTemp = Baseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
         // currently only the efficiency is used to calculate the electric consumption.  There could be some

@@ -391,16 +391,14 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,   // Curve index
-                    {2},                            // Valid dimensions
-                    "GetMTGeneratorInput: ",         // Routine name
-                    cCurrentModuleObject,           // Object Type
-                    MTGenerator(GeneratorNum).Name,        // Object Name
-                    cAlphaFieldNames(2));           // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum, // Curve index
+                                                            {2},                                                // Valid dimensions
+                                                            "GetMTGeneratorInput: ",                            // Routine name
+                                                            cCurrentModuleObject,                               // Object Type
+                                                            MTGenerator(GeneratorNum).Name,                     // Object Name
+                                                            cAlphaFieldNames(2));                               // Field Name
 
-                if (!ErrorsFound)
-                {
+                if (!ErrorsFound) {
                     // Check electrical power output at reference combustion inlet temp and elevation
                     ElectOutFTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
                                                          MTGenerator(GeneratorNum).RefCombustAirInletTemp,
@@ -425,16 +423,14 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    MTGenerator(GeneratorNum).ElecEffFTempCurveNum,   // Curve index
-                    {1},                            // Valid dimensions
-                    "GetMTGeneratorInput: ",         // Routine name
-                    cCurrentModuleObject,           // Object Type
-                    MTGenerator(GeneratorNum).Name,        // Object Name
-                    cAlphaFieldNames(3));           // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, // Curve index
+                                                            {1},                                            // Valid dimensions
+                                                            "GetMTGeneratorInput: ",                        // Routine name
+                                                            cCurrentModuleObject,                           // Object Type
+                                                            MTGenerator(GeneratorNum).Name,                 // Object Name
+                                                            cAlphaFieldNames(3));                           // Field Name
 
-                if (!ErrorsFound)
-                {
+                if (!ErrorsFound) {
                     // Check electrical efficiency at reference combustion inlet temp
                     ElecEfficFTempOutput =
                         CurveValue(MTGenerator(GeneratorNum).ElecEffFTempCurveNum, MTGenerator(GeneratorNum).RefCombustAirInletTemp);
@@ -456,16 +452,14 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else {
                 // Verify curve object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    MTGenerator(GeneratorNum).ElecEffFPLRCurveNum,   // Curve index
-                    {1},                            // Valid dimensions
-                    "GetMTGeneratorInput: ",         // Routine name
-                    cCurrentModuleObject,           // Object Type
-                    MTGenerator(GeneratorNum).Name,        // Object Name
-                    cAlphaFieldNames(4));           // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, // Curve index
+                                                            {1},                                           // Valid dimensions
+                                                            "GetMTGeneratorInput: ",                       // Routine name
+                                                            cCurrentModuleObject,                          // Object Type
+                                                            MTGenerator(GeneratorNum).Name,                // Object Name
+                                                            cAlphaFieldNames(4));                          // Field Name
 
-                if (!ErrorsFound)
-                {
+                if (!ErrorsFound) {
                     // Check electrical efficiency at PLR = 1
                     ElecEfficFPLROutput = CurveValue(MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
                     if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
@@ -570,13 +564,12 @@ namespace MicroturbineElectricGenerator {
                 ErrorsFound = true;
             } else if (MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum > 0) {
                 // Verify curve object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum,   // Curve index
-                    {1},                            // Valid dimensions
-                    "GetMTGeneratorInput: ",         // Routine name
-                    cCurrentModuleObject,           // Object Type
-                    MTGenerator(GeneratorNum).Name,        // Object Name
-                    cAlphaFieldNames(6));           // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, // Curve index
+                                                            {1},                                                  // Valid dimensions
+                                                            "GetMTGeneratorInput: ",                              // Routine name
+                                                            cCurrentModuleObject,                                 // Object Type
+                                                            MTGenerator(GeneratorNum).Name,                       // Object Name
+                                                            cAlphaFieldNames(6));                                 // Field Name
 
                 if (!ErrorsFound) {
                     RefFuelUseMdot = (MTGenerator(GeneratorNum).RefElecPowerOutput / MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
@@ -684,13 +677,12 @@ namespace MicroturbineElectricGenerator {
                     MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = GetCurveIndex(AlphArray(10));
                     if (MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum != 0) {
                         // Verify curve object, only legal type is BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(
-                            MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum,   // Curve index
-                            {2},                            // Valid dimensions
-                            "GetMTGeneratorInput: ",         // Routine name
-                            cCurrentModuleObject,           // Object Type
-                            MTGenerator(GeneratorNum).Name,        // Object Name
-                            cAlphaFieldNames(10));           // Field Name
+                        ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum, // Curve index
+                                                                    {2},                                                   // Valid dimensions
+                                                                    "GetMTGeneratorInput: ",                               // Routine name
+                                                                    cCurrentModuleObject,                                  // Object Type
+                                                                    MTGenerator(GeneratorNum).Name,                        // Object Name
+                                                                    cAlphaFieldNames(10));                                 // Field Name
                         //          NEED TO FIGURE OUT WHAT TO USE FOR Pnet............Shirey
                         //    HeatRecFlowFTempPowCurveOutput = CurveValue(MTGenerator(GeneratorNum)%HeatRecFlowFTempPowCurveNum, Pnet)
                         //    IF(ABS(HeatRecFlowFTempPowCurveOutput-1.0d0) .GT. 0.1d0)THEN !
@@ -707,13 +699,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum = GetCurveIndex(AlphArray(11)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum != 0) {
                     // Verify curve object, only legal types are BiQuadratic and BiCubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,   // Curve index
-                        {2},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(11));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum, // Curve index
+                                                                {2},                                                 // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                             // Routine name
+                                                                cCurrentModuleObject,                                // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                      // Object Name
+                                                                cAlphaFieldNames(11));                               // Field Name
 
                     if (!ErrorsFound) {
                         ThermalEffTempElevOutput = CurveValue(MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
@@ -728,8 +719,7 @@ namespace MicroturbineElectricGenerator {
                                               TrimSigDigits(MTGenerator(GeneratorNum).RefCombustAirInletTemp, 4) + " C");
                             ShowContinueError("... Reference elevation                             = " +
                                               TrimSigDigits(MTGenerator(GeneratorNum).RefElevation, 4) + " m");
-                            ShowContinueError("... Curve output                                    = " +
-                                              TrimSigDigits(ThermalEffTempElevOutput, 4));
+                            ShowContinueError("... Curve output                                    = " + TrimSigDigits(ThermalEffTempElevOutput, 4));
                         }
                     }
                 }
@@ -737,13 +727,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum = GetCurveIndex(AlphArray(12)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(12));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, // Curve index
+                                                                {1},                                               // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                           // Routine name
+                                                                cCurrentModuleObject,                              // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                    // Object Name
+                                                                cAlphaFieldNames(12));                             // Field Name
 
                     if (!ErrorsFound) {
                         HeatRecRateFPLROutput = CurveValue(MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
@@ -760,13 +749,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum = GetCurveIndex(AlphArray(13)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(13));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum, // Curve index
+                                                                {1},                                                // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                            // Routine name
+                                                                cCurrentModuleObject,                               // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                     // Object Name
+                                                                cAlphaFieldNames(13));                              // Field Name
 
                     if (!ErrorsFound) {
                         HeatRecRateFTempOutput =
@@ -786,13 +774,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = GetCurveIndex(AlphArray(14));
                 if (MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum != 0) {
                     // Verify curve object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(14));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum, // Curve index
+                                                                {1},                                                     // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                                 // Routine name
+                                                                cCurrentModuleObject,                                    // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                          // Object Name
+                                                                cAlphaFieldNames(14));                                   // Field Name
 
                     if (!ErrorsFound) {
                         HeatRecRateFFlowOutput =
@@ -894,13 +881,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = GetCurveIndex(AlphArray(17));
                 if (MTGenerator(GeneratorNum).ExhFlowFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(17));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhFlowFTempCurveNum, // Curve index
+                                                                {1},                                            // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                        // Routine name
+                                                                cCurrentModuleObject,                           // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                 // Object Name
+                                                                cAlphaFieldNames(17));                          // Field Name
 
                     if (!ErrorsFound) {
                         ExhFlowFTempOutput =
@@ -920,13 +906,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum = GetCurveIndex(AlphArray(18)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(18));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, // Curve index
+                                                                {1},                                           // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                       // Routine name
+                                                                cCurrentModuleObject,                          // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                // Object Name
+                                                                cAlphaFieldNames(18));                         // Field Name
 
                     if (!ErrorsFound) {
                         ExhFlowFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
@@ -945,13 +930,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = GetCurveIndex(AlphArray(19));
                 if (MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum != 0) {
                     // Verify curve object, only legal types are Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(19));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum, // Curve index
+                                                                {1},                                               // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                           // Routine name
+                                                                cCurrentModuleObject,                              // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                    // Object Name
+                                                                cAlphaFieldNames(19));                             // Field Name
 
                     if (!ErrorsFound) {
                         ExhAirTempFTempOutput =
@@ -971,13 +955,12 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum = GetCurveIndex(AlphArray(20)); // convert curve name to number
                 if (MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum != 0) {
                     // Verify curve object, legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(
-                        MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum,   // Curve index
-                        {1},                            // Valid dimensions
-                        "GetMTGeneratorInput: ",         // Routine name
-                        cCurrentModuleObject,           // Object Type
-                        MTGenerator(GeneratorNum).Name,        // Object Name
-                        cAlphaFieldNames(20));           // Field Name
+                    ErrorsFound |= CurveManager::CheckCurveDims(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, // Curve index
+                                                                {1},                                              // Valid dimensions
+                                                                "GetMTGeneratorInput: ",                          // Routine name
+                                                                cCurrentModuleObject,                             // Object Type
+                                                                MTGenerator(GeneratorNum).Name,                   // Object Name
+                                                                cAlphaFieldNames(20));                            // Field Name
 
                     if (!ErrorsFound) {
                         ExhOutAirTempFPLROutput = CurveValue(MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
@@ -2033,7 +2016,7 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhaustAirTemperature = ExhaustAirTemp;
                 //       Adjust exhaust air temperature if heat recovery to water is being done
                 if (QHeatRecToWater > 0.0) {
-                    CpAir = PsyCpAirFnWTdb(CombustionAirInletW, CombustionAirInletTemp);
+                    CpAir = PsyCpAirFnWTdb(CombustionAirInletW);
                     if (CpAir > 0.0) {
                         MTGenerator(GeneratorNum).ExhaustAirTemperature = ExhaustAirTemp - QHeatRecToWater / (CpAir * ExhAirMassFlowRate);
                     }

@@ -1252,9 +1252,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
-            
+
             EngineDrivenChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             EngineDrivenChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -1942,9 +1942,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
-            
+
             GTChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             GTChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -2562,9 +2562,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
-            
+
             ConstCOPChiller(ChillerNum).Base.Name = cAlphaArgs(1);
             ConstCOPChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
             if (ConstCOPChiller(ChillerNum).Base.NomCap == AutoSize) {
@@ -6249,7 +6249,7 @@ namespace PlantChillers {
             if (ElectricChiller(ChillNum).HeatRecActive)
                 CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered);
             if (CondMassFlowRate > 0.0) {
-                CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat, CondInletTemp);
+                CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat);
                 CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
             } else {
                 CondOutletTemp = CondInletTemp;
@@ -8561,7 +8561,7 @@ namespace PlantChillers {
                                            PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                            RoutineName);
         } else {
-            CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat, CondInletTemp);
+            CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat);
         }
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot

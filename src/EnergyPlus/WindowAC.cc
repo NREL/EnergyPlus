@@ -1256,7 +1256,7 @@ namespace WindowAC {
         InletNode = WindAC(WindACNum).AirInNode;
         AirMassFlow = Node(InletNode).MassFlowRate;
         Test = AirMassFlow;
-        CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+        CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat);
         OpMode = WindAC(WindACNum).OpMode;
 
         // set the on/off flags

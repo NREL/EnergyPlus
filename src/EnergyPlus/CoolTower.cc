@@ -716,7 +716,7 @@ namespace CoolTower {
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
                 RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
-                AirSpecHeat = PsyCpAirFnWTdb(OutletHumRat, OutletTemp);
+                AirSpecHeat = PsyCpAirFnWTdb(OutletHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;

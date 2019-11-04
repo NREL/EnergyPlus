@@ -5709,7 +5709,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -7650,7 +7650,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 

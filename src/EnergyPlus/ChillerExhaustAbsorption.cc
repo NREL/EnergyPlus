@@ -1883,7 +1883,7 @@ namespace ChillerExhaustAbsorption {
 
             lExhaustInTemp = Node(lExhaustAirInletNodeNum).Temp;
             lExhaustInFlow = Node(lExhaustAirInletNodeNum).MassFlowRate;
-            CpAir = PsyCpAirFnWTdb(lExhaustAirHumRat, lExhaustInTemp);
+            CpAir = PsyCpAirFnWTdb(lExhaustAirHumRat);
             lExhHeatRecPotentialCool = lExhaustInFlow * CpAir * (lExhaustInTemp - AbsLeavingTemp);
             // If Microturbine Exhaust temperature and flow rate is not sufficient to run the chiller, then chiller will not run
             // lCoolThermalEnergyUseRate , lTowerLoad and  lCoolElectricPower will be set to 0.0
@@ -2209,7 +2209,7 @@ namespace ChillerExhaustAbsorption {
 
             lExhaustInTemp = Node(lExhaustAirInletNodeNum).Temp;
             lExhaustInFlow = Node(lExhaustAirInletNodeNum).MassFlowRate;
-            CpAir = PsyCpAirFnWTdb(lExhaustAirHumRat, lExhaustInTemp);
+            CpAir = PsyCpAirFnWTdb(lExhaustAirHumRat);
             lExhHeatRecPotentialHeat = lExhaustInFlow * CpAir * (lExhaustInTemp - AbsLeavingTemp);
             if (lExhHeatRecPotentialHeat < lHeatThermalEnergyUseRate) {
                 if (ExhaustAbsorber(ChillNum).ExhTempLTAbsLeavingHeatingTempIndex == 0) {

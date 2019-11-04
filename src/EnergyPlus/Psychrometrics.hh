@@ -376,8 +376,7 @@ namespace Psychrometrics {
         return 1.00484e3 * TDB + dW * (2.50094e6 + 1.85895e3 * TDB); // enthalpy {J/kg}
     }
 
-    inline Real64 PsyCpAirFnWTdb(Real64 const dw,          // humidity ratio {kgWater/kgDryAir}
-                                 Real64 const EP_UNUSED(T) // input temperature {Celsius}
+    inline Real64 PsyCpAirFnWTdb(Real64 const dw // humidity ratio {kgWater/kgDryAir}
     )
     {
         // FUNCTION INFORMATION:
@@ -414,8 +413,7 @@ namespace Psychrometrics {
         return cpa;
     }
 
-    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw,          // humidity ratio {kgWater/kgDryAir}
-                                      Real64 const EP_UNUSED(T) // input temperature {Celsius}
+    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw // humidity ratio {kgWater/kgDryAir}
     )
     {
         // Faster version with humidity ratio already adjusted
@@ -741,18 +739,16 @@ namespace Psychrometrics {
 
 #endif
 
-
 #ifdef EP_cache_PsyTsatFnHPb
     Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
                             Real64 const PB,                             // barometric pressure {Pascals}
                             std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
     inline Real64 PsyTsatFnHPb(Real64 const H,
-                               Real64 const Pb,              // barometric pressure {Pascals}
+                               Real64 const Pb,                             // barometric pressure {Pascals}
                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 

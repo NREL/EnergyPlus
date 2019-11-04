@@ -1097,8 +1097,8 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' +
-                                                          TimeString;
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
+                << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
@@ -2346,9 +2346,9 @@ namespace RuntimeLanguageProcessor {
                                                                                                 // (Pa) | drybulb (C) | Humidity ratio (kg water
                                                                                                 // vapor/kg dry air) | called from
                     } else if (SELECT_CASE_var == FuncCpAirFnWTdb) {
-                        ReturnValue = SetErlValueNumber(PsyCpAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat capacity of air
-                                                                                                               // {J/kg-C} | Humidity ratio (kg water
-                                                                                                               // vapor/kg dry air) | drybulb (C)
+                        ReturnValue = SetErlValueNumber(PsyCpAirFnWTdb(Operand(1).Number)); // result =>   heat capacity of air
+                                                                                            // {J/kg-C} | Humidity ratio (kg water
+                                                                                            // vapor/kg dry air) | drybulb (C)
                     } else if (SELECT_CASE_var == FuncHfgAirFnWTdb) {
                         // BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
                         ReturnValue = SetErlValueNumber(PsyHfgAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat of vaporization

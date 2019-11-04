@@ -1287,7 +1287,7 @@ namespace WaterToAirHeatPump {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit);
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
@@ -1920,7 +1920,7 @@ namespace WaterToAirHeatPump {
         LoadSideMassFlowRate = WatertoAirHP(HPNum).InletAirMassFlowRate;
         LoadSideInletDBTemp = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = WatertoAirHP(HPNum).InletWaterEnthalpy;

@@ -1173,7 +1173,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
                     Winlet = Node(InletNode).HumRat;
-                    CpInlet = PsyCpAirFnWTdb(Winlet, Tinlet);
+                    CpInlet = PsyCpAirFnWTdb(Winlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                     } else {
@@ -1189,7 +1189,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                         BypassFraction = max(0.0, BypassFraction);
                         PotentialOutletTemp = Node(PVT(PVTnum).HVACOutletNodeNum).TempSetPoint;
-                        PotentialHeatGain = mdot * PsyCpAirFnWTdb(Winlet, Tinlet) * (PotentialOutletTemp - Tinlet);
+                        PotentialHeatGain = mdot * PsyCpAirFnWTdb(Winlet) * (PotentialOutletTemp - Tinlet);
 
                     } else {
                         BypassFraction = 0.0;
@@ -1222,7 +1222,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
                     Winlet = Node(InletNode).HumRat;
-                    CpInlet = PsyCpAirFnWTdb(Winlet, Tinlet);
+                    CpInlet = PsyCpAirFnWTdb(Winlet);
                     WetBulbInlet = PsyTwbFnTdbWPb(Tinlet, Winlet, OutBaroPress, RoutineName);
                     DewPointInlet = PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, OutBaroPress, RoutineName);
                 } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
@@ -1411,9 +1411,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    int GetAirInletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    )
+    int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1447,9 +1445,7 @@ namespace PhotovoltaicThermalCollectors {
 
         return NodeNum;
     }
-    int GetAirOutletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    )
+    int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu

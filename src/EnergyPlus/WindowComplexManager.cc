@@ -3319,7 +3319,7 @@ namespace WindowComplexManager {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -3364,7 +3364,7 @@ namespace WindowComplexManager {
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj), NodeTemp);
+                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -3930,8 +3930,8 @@ namespace WindowComplexManager {
                         InletAirHumRat = OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
-                    CpAirOutlet = PsyCpAirFnWTdb(InletAirHumRat, TAirflowGapOutletC);
-                    CpAirZone = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZoneTemp);
+                    CpAirOutlet = PsyCpAirFnWTdb(InletAirHumRat);
+                    CpAirZone = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir) {
                         SurfaceWindow(SurfNum).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;

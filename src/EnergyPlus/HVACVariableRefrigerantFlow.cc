@@ -8056,7 +8056,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
-                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = Node(VRFTUOutletNodeNum).Temp;
@@ -8072,7 +8072,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgH2O/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
@@ -11085,7 +11085,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
-                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = Node(VRFTUOutletNodeNum).Temp;
@@ -11101,7 +11101,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgH2O/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
@@ -13823,10 +13823,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
         Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
-        Real64 CpAirIn =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        Real64 CpAirOut =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
+        Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
+        Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
         Real64 CpAirAvg = (CpAirIn + CpAirOut) / 2;
         Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
         HeatCoilCapacityAllowed = MDotAir * CpAirAvg * HCDeltaT;

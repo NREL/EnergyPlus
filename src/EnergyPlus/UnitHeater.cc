@@ -1762,7 +1762,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
@@ -1775,7 +1775,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
@@ -1812,7 +1812,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                         mdot = UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
@@ -1833,7 +1833,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                         mdot = UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
@@ -1854,7 +1854,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }

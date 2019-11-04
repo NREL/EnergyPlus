@@ -749,7 +749,7 @@ namespace SteamCoils {
         DesVolFlow = 0.0;
         CpWater = 0.0;
         RhoAirStd = PsyRhoAirFnPbTdbW(StdBaroPress, 20.0, 0.0);
-        CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+        CpAirStd = PsyCpAirFnWTdb(0.0);
         bool coilWasAutosized(false); // coil report
 
         // If this is a steam coil
@@ -917,7 +917,7 @@ namespace SteamCoils {
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         DesVolFlow = DesMassFlow / RhoAirStd;
-                        DesCoilLoad = PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp)) * DesMassFlow * (CoilOutTemp - CoilInTemp);
+                        DesCoilLoad = PsyCpAirFnWTdb(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                         if (DesCoilLoad >= SmallLoad) {
                             TempSteamIn = 100.0;
                             // RefrigIndex is set during GetInput for this module
@@ -1129,7 +1129,7 @@ namespace SteamCoils {
         }
 
         if (AirMassFlow > 0.0) { // If the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
         } else {
             CapacitanceAir = 0.0;
         }
@@ -1197,7 +1197,7 @@ namespace SteamCoils {
                     HeatingCoilLoad = QCoilCap;
 
                     // Temperature of air at outlet
-                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win));
 
                     SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
                     SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
@@ -1307,7 +1307,7 @@ namespace SteamCoils {
                         QCoilCap = QSteamCoilMaxHT;
 
                         // Temperature of air at outlet
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win));
 
                         // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
                         // This is required for outlet water temperature, otherwise it will be saturation temperature.
@@ -1329,7 +1329,7 @@ namespace SteamCoils {
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win));
 
                         // Total Heat Transfer to air
                         HeatingCoilLoad = QCoilCap;
@@ -1363,7 +1363,7 @@ namespace SteamCoils {
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win));
 
                         // Total Heat Transfer to air
                         HeatingCoilLoad = QCoilCap;

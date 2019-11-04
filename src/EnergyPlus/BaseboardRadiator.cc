@@ -1156,7 +1156,7 @@ namespace BaseboardRadiator {
 
         CpWater = GetSpecificHeatGlycol(
             PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp, PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat);
 
         if (Baseboard(BaseboardNum).DesAirMassFlowRate > 0.0) { // If UA is autosized, assign design condition
             AirMassFlowRate = Baseboard(BaseboardNum).DesAirMassFlowRate;

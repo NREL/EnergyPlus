@@ -67,10 +67,10 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -294,9 +294,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum)));
     HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(RAFN(ZoneNum));
