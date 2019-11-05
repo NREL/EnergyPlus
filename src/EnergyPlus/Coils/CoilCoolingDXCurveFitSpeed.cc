@@ -75,6 +75,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
+    this->ratedCOP = input_data.gross_rated_cooling_COP;
     errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
                                       {1, 2},
@@ -322,26 +323,12 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
-    int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
     std::string CompType = this->object_name;
     std::string CompName = this->name;
-    std::string SizingString = "Gross Sensible Heat Ratio";
-    DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
-    DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
-    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-    Real64 TempSize = this->gross_shr;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->RatedSHR = TempSize;
-    this->gross_shr = TempSize;
-    DataSizing::DataFlowUsedForSizing = 0.0;
-    DataSizing::DataCapacityUsedForSizing = 0.0;
-    //  DataSizing::DataEMSOverrideON = false;
-    //  DataSizing::DataEMSOverride = 0.0;
 
-    SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    SizingString = "Rated Air Flow Rate [m3/s]";
-    TempSize = this->evap_air_flow_rate;
+    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    std::string SizingString = "Rated Air Flow Rate [m3/s]";
+    Real64 TempSize = this->evap_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->evap_air_flow_rate = TempSize;
 
@@ -351,37 +338,26 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->rated_total_capacity = TempSize;
 
-    // Psychrometrics::PsychState in;
-    // in.tdb = RatedInletAirTemp;
-    // in.w = RatedInletAirHumRat;
-    // in.h = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
-    // in.p = DataEnvironment::StdPressureSeaLevel;
+     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+    SizingMethod = DataHVACGlobals::CoolingSHRSizing;
+    SizingString = "Gross Sensible Heat Ratio";
+    DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
+    DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
+    TempSize = this->gross_shr;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->RatedSHR = TempSize;
+    this->gross_shr = TempSize;
+    DataSizing::DataFlowUsedForSizing = 0.0;
+    DataSizing::DataCapacityUsedForSizing = 0.0;
+    //  DataSizing::DataEMSOverrideON = false;
+    //  DataSizing::DataEMSOverride = 0.0;
 
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
-}
-
-void calcStandardRatings() {
-    static ObjexxFCL::gio::Fmt Format_890(
-            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
-            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
-            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
-            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
-            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-    static ObjexxFCL::gio::Fmt Format_891(
-            "(' VAV DX Cooling Coil Standard Rating Information, "
-            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-            ",',A)");
-    // Get fan index and name if not already available
-    if (DXCoil(DXCoilNum).SupplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
-        DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = false;
-        ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" +
-                         DXCoil(DXCoilNum).Name + "\". Standard Ratings will not be calculated.");
-        return;
-    }
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(

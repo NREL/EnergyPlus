@@ -107,6 +107,7 @@ public:
 	Real64 evapCondPumpElecPower = 0.0;
 	Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
+    int supplyFanIndex = 0;
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;

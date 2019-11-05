@@ -103,6 +103,8 @@ public:
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
 
+    void calcStandardRatings(int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
+    Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
     CoilCoolingDXCurveFitPerformance() = default;
