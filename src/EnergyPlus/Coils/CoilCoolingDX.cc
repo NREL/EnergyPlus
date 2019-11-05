@@ -317,6 +317,33 @@ CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
     }
 }
 
+void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
+    this->supplyFanIndex = fanIndex;
+    this->supplyFanName = fanName;
+    this->supplyFanType = fanType;
+    this->airLoopNum = _airLoopNum;
+}
+
+void CoilCoolingDX::getData(
+        int &_evapInletNodeIndex, int &_evapOutletNodeIndex, int &_condInletNodeIndex, Real64 &_normalModeRatedCapacity,
+        int &_normalModeNumSpeeds, std::vector<Real64> &_normalModeFlowRates, std::vector<Real64> &_normalModeRatedCapacities,
+        CoilCoolingDXCurveFitPerformance::CapControlMethod &_capacityControlMethod, int &_minOutdoorDryBulb
+) {
+    _evapInletNodeIndex = this->evapInletNodeIndex;
+    _evapOutletNodeIndex = this->evapOutletNodeIndex;
+    _condInletNodeIndex = this->condInletNodeIndex;
+    _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
+    _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size();
+    _normalModeFlowRates.clear();
+    _normalModeRatedCapacities.clear();
+    for (auto const & thisSpeed : this->performance.normalMode.speeds) {
+        _normalModeFlowRates.push_back(thisSpeed.evap_air_flow_rate);
+        _normalModeRatedCapacities.push_back(thisSpeed.rated_total_capacity);
+    }
+    _capacityControlMethod = this->performance.capControlMethod;
+    _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
+}
+
 void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
 {
     if (this->myOneTimeInitFlag) {
