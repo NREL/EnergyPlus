@@ -157,6 +157,10 @@ namespace ChillerAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
+        bool MyOneTimeFlag;
+        //Array1D_bool MyFlag;
+        //Array1D_bool MyEnvrnFlag;
+        
 
         // Default Constructor
         BLASTAbsorberSpecs()
@@ -169,7 +173,8 @@ namespace ChillerAbsorption {
               GenHeatSourceType(0), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false), GeneratorSubcool(0.0), SteamFluidIndex(0),
               GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false)
+              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), MyOneTimeFlag(true) 
+              
         {
         }
     };
@@ -234,6 +239,8 @@ namespace ChillerAbsorption {
     //******************************************************************************
 
     void GetBLASTAbsorberInput();
+
+    void SetupOutputVars(Array1D_bool GenInputOutputNodesUsed);
 
     // End of Get Input subroutines for the Absorption Chiller Module
     //******************************************************************************
