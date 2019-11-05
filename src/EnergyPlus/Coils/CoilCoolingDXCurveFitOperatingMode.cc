@@ -179,8 +179,8 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.ratedGrossTotalCap = this->ratedGrossTotalCap;
-        curSpeed.ratedGrossTotalCap = this->ratedEvapAirFlowRate;
-        curSpeed.ratedGrossTotalCap = this->ratedCondAirFlowRate;
+        curSpeed.ratedEvapAirFlowRate = this->ratedEvapAirFlowRate;
+        curSpeed.ratedCondAirFlowRate = this->ratedCondAirFlowRate;
     }
 }
 
