@@ -264,8 +264,8 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       RatedInletWetBulbTemp(19.44),      // 19.44 or 67F
       RatedInletAirHumRat(0.01125),      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
       RatedOutdoorAirTemp(35.0),         // 35 C or 95F
-      DryCoilOutletHumRatioMin(0.00001), // dry coil outlet minimum hum ratio kgH2O/kgdry air
-      mySizeFlag(true)
+      DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
+
 {
     int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
@@ -313,7 +313,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::sizeSpeed()
+void CoilCoolingDXCurveFitSpeed::size()
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -373,11 +373,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("CalcSpeedOutput: ");
-
-    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        this->sizeSpeed();
-        this->mySizeFlag = false;
-    }
 
     if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;

@@ -178,6 +178,18 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
+void CoilCoolingDXCurveFitPerformance::size(bool useEnhancedMode)
+{
+    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
+        if (useEnhancedMode) {
+            this->alternateMode.sizeOperatingMode();
+        } else {
+            this->normalMode.sizeOperatingMode();
+        }
+        this->mySizeFlag = false;
+    }
+}
+
 void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
@@ -188,11 +200,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
                                                  DataLoopNode::NodeData &condInletNode,
                                                  DataLoopNode::NodeData &condOutletNode)
 {
-    // size if needed
-    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        currentMode.sizeOperatingMode();
-        this->mySizeFlag = false;
-    }
 
     // calculate the performance at this mode/speed
     currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);

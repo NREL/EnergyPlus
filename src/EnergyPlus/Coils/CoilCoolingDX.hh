@@ -91,8 +91,8 @@ struct CoilCoolingDX
     void getSpeedData(Real64 &normalModeRatedEvapAirFlowRate, 
                       std::vector<Real64> &normalModeFlowRates, 
                       std::vector<Real64> &normalModeRatedCapacities);
-
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
+    void size();
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
