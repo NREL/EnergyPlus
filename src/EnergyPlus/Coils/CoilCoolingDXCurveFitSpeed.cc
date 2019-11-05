@@ -230,25 +230,36 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0), indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
-      PLR(0.0),                  // coil operating part load ratio
-      ambPressure(0.0),          // outdoor pressure {Pa]
-      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
-                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
       RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
+      RatedCondAirMassFlowRate(0.0), // condenser air mass flow rate at speed {kg/s}
       RatedSHR(0.0),             // rated sensible heat ratio at speed
       RatedCBF(0.0),             // rated coil bypass factor at speed
       RatedEIR(0.0),             // rated energy input ratio at speed {W/W}
-      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
-      FanOpMode(0),              // fan operating mode, constant or cycling fan
+      ratedCOP(0.0),
+      rated_total_capacity(0.0),
+      rated_evap_fan_power_per_volume_flow_rate(0.0),
+      rated_waste_heat_fraction_of_power_input(0.0),
+      evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
 
-      // speed class outputs
+      FanOpMode(0),              // fan operating mode, constant or cycling fan
+      parentModeRatedGrossTotalCap(0.0),
+      parentModeRatedEvapAirFlowRate(0.0),
+      parentModeRatedCondAirFlowRate(0.0),
+      
+      ambPressure(0.0),          // outdoor pressure {Pa}
+      PLR(0.0),                  // coil operating part load ratio
+      CondInletTemp(0.0),        // condenser inlet temperature {C}
+      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
+                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+
       FullLoadPower(0.0), // full load power at speed {W}
       RTF(0.0),           // coil runtime fraction at speed
+      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
 
-      // other data members
-      rated_total_capacity(0.0), evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
-      rated_evap_fan_power_per_volume_flow_rate(0.0), evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
-      rated_waste_heat_fraction_of_power_input(0.0),
+        // other data members
+      evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
+
+
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
@@ -309,9 +320,9 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 
     std::string RoutineName = "sizeSpeed";
 
-    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->ratedGrossTotalCap;
-    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->ratedEvapAirFlowRate;
-    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->ratedCondAirFlowRate;
+    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->parentModeRatedGrossTotalCap;
+    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->parentModeRatedEvapAirFlowRate;
+    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->parentModeRatedCondAirFlowRate;
     this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(

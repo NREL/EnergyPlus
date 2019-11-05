@@ -95,6 +95,11 @@ int CoilCoolingDX::factory(std::string const & coilName) {
     return -1;
 }
 
+void CoilCoolingDX::clear_state() {
+    coilCoolingDXs.clear();
+    coilCoolingDXGetInputFlag = true;
+}
+
 void CoilCoolingDX::getInput() {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {

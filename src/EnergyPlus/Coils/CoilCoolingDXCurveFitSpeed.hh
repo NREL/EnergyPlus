@@ -57,12 +57,8 @@
 
 namespace EnergyPlus {
 
-class CoilCoolingDXCurveFitOperatingMode;
-
-class CoilCoolingDXCurveFitSpeedInputSpecification
+struct CoilCoolingDXCurveFitSpeedInputSpecification
 {
-
-public:
     std::string name;
     Real64 gross_rated_total_cooling_capacity_ratio_to_nominal;
     Real64 gross_rated_sensible_heat_ratio;
@@ -84,20 +80,17 @@ public:
     std::string sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name;
 };
 
-class CoilCoolingDXCurveFitSpeed
+struct CoilCoolingDXCurveFitSpeed
 {
     std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
 
-public:
     CoilCoolingDXCurveFitSpeed() = default;
-
     explicit CoilCoolingDXCurveFitSpeed(const std::string& name);
-
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data);
 
     CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
-    std::string name;
 
+    // curve IDs
     int indexCapFT = 0;
     int indexCapFFF = 0;
     int indexEIRFT = 0;
@@ -108,40 +101,39 @@ public:
     int indexSHRFT = 0;
     int indexSHRFFF = 0;
 
-    // speed class inputs
-    Real64 PLR = 0.0;
-
-    Real64 CondInletTemp = 0.0;            // condenser inlet node temp or outdoor temp if no condenser node {C}
-    Real64 ambPressure = 0.0;              // outdoor pressure {Pa]
-    Real64 AirFF = 0.0;                    // ratio of air mass flow rate to rated air mass flow rate
-
-                                     //        Real64 RatedTotCap; // rated total capacity at speed {W}
+    // fixed values
+    std::string name;
     Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
     Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
     Real64 RatedSHR = 0.0;                 // rated sensible heat ratio at speed
     Real64 RatedCBF = 0.0;                 // rated coil bypass factor at speed
     Real64 RatedEIR = 0.0;                 // rated energy input ratio at speed {W/W}
-    Real64 AirMassFlow = 0.0;              // coil inlet air mass flow rate {kg/s}
+    Real64 ratedCOP = 0.0;
+    Real64 rated_total_capacity = 0.0;
+    Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
+    Real64 rated_waste_heat_fraction_of_power_input = 0.0;
+    Real64 evap_condenser_pump_power_fraction = 0.0;
+    Real64 evap_condenser_effectiveness = 0.0;
+
     int FanOpMode = 0;                   // fan operating mode, constant or cycling fan
 
+    // stuff getting assigned by the parent mode
+    Real64 parentModeRatedGrossTotalCap = 0.0;
+    Real64 parentModeRatedEvapAirFlowRate = 0.0;
+    Real64 parentModeRatedCondAirFlowRate = 0.0;
+
     // speed class objects
+    Real64 ambPressure = 0.0;              // outdoor pressure {Pa]
+    Real64 PLR = 0.0;
+    Real64 CondInletTemp = 0.0;            // condenser inlet node temp or outdoor temp if no condenser node {C}
+    Real64 AirFF = 0.0;                    // ratio of air mass flow rate to rated air mass flow rate
     Real64 FullLoadPower = 0.0; // full load power at speed {W}
     Real64 RTF = 0.0;           // coil runtime fraction at speed
-    Real64 ratedGrossTotalCap = 0.0;
-    Real64 ratedEvapAirFlowRate = 0.0;
-    Real64 ratedCondAirFlowRate = 0.0;
-    Real64 ratedCOP = 0.0;
-
-    // other data members
-    Real64 rated_total_capacity = 0.0;
+    Real64 AirMassFlow = 0.0;              // coil inlet air mass flow rate {kg/s}
     Real64 evap_air_flow_rate = 0.0;
     Real64 condenser_air_flow_rate = 0.0;
     Real64 gross_shr = 0.0;
     Real64 active_fraction_of_face_coil_area = 0.0;
-    Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
-    Real64 evap_condenser_pump_power_fraction = 0.0;
-    Real64 evap_condenser_effectiveness = 0.0;
-    Real64 rated_waste_heat_fraction_of_power_input = 0.0;
 
     // rating data
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
@@ -150,6 +142,7 @@ public:
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
+    // flags
 	bool mySizeFlag = true;
 
     void CalcSpeedOutput(

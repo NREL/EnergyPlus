@@ -182,9 +182,9 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     this->ratedCondAirFlowRate = TempSize;
 
     for (auto &curSpeed : this->speeds) {
-        curSpeed.ratedGrossTotalCap = this->ratedGrossTotalCap;
-        curSpeed.ratedEvapAirFlowRate = this->ratedEvapAirFlowRate;
-        curSpeed.ratedCondAirFlowRate = this->ratedCondAirFlowRate;
+        curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
+        curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
+        curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
     }
 }
 

@@ -730,11 +730,11 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
 
     TotCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
     TotCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
-    HighSpeedNetCoolingCap = this->normalMode.speeds.back().ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
+    HighSpeedNetCoolingCap = this->normalMode.speeds.back().parentModeRatedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
     TotCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
     TotCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
-    LowSpeedNetCoolingCap = this->normalMode.speeds[0].ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
+    LowSpeedNetCoolingCap = this->normalMode.speeds[0].parentModeRatedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
     if (LowSpeedNetCoolingCap <= TargetNetCapacity) {
         CycRatio = 1.0;
