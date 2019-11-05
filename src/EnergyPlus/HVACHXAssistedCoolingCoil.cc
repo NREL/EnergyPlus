@@ -441,8 +441,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 } else {
                     //                    // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
-                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
+                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = CoilCoolingDX::factory(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
                     HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds = coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].performance.normalMode.nominalSpeedNum;
                 }
             } else {

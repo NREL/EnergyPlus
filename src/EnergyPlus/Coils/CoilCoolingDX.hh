@@ -76,12 +76,12 @@ public:
 class CoilCoolingDX
 {
 
-    std::string const object_name = "Coil:Cooling:DX";
     CoilCoolingDXInputSpecification original_input_specs;
 
 public:
-    explicit CoilCoolingDX(const std::string& name);
-
+    CoilCoolingDX() = default;
+    static int factory(std::string const & coilName);
+    static void getInput();
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
@@ -132,6 +132,8 @@ public:
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
+extern bool coilCoolingDXGetInputFlag;
+extern std::string const coilCoolingDXObjectName;
 
 } // namespace EnergyPlus
 
