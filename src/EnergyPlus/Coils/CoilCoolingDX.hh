@@ -57,10 +57,8 @@
 
 namespace EnergyPlus {
 
-class CoilCoolingDXInputSpecification
+struct CoilCoolingDXInputSpecification
 {
-
-public:
     std::string name;
     std::string evaporator_inlet_node_name;
     std::string evaporator_outlet_node_name;
@@ -73,15 +71,12 @@ public:
     std::string evaporative_condenser_supply_water_storage_tank_name;
 };
 
-class CoilCoolingDX
+struct CoilCoolingDX
 {
-
-    CoilCoolingDXInputSpecification original_input_specs;
-
-public:
     CoilCoolingDX() = default;
     static int factory(std::string const & coilName);
     static void getInput();
+    static void clear_state();
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
@@ -93,6 +88,7 @@ public:
             );
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 
+    CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
     bool myOneTimeInitFlag = true;
     int evapInletNodeIndex = 0;

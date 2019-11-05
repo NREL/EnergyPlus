@@ -58,10 +58,8 @@
 
 namespace EnergyPlus {
 
-class CoilCoolingDXCurveFitPerformanceInputSpecification
+struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
-
-public:
     std::string name;
     Real64 crankcase_heater_capacity;
     Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
@@ -76,12 +74,9 @@ public:
     std::string capacity_control;
 };
 
-class CoilCoolingDXCurveFitPerformance
+struct CoilCoolingDXCurveFitPerformance
 {
-
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
-
-public:
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
@@ -102,13 +97,10 @@ public:
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-
     void calcStandardRatings(int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
     Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
-
     CoilCoolingDXCurveFitPerformance() = default;
-
 	explicit CoilCoolingDXCurveFitPerformance(const std::string& name);
 
     std::string name;
