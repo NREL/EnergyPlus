@@ -2461,7 +2461,7 @@ namespace WindowManager {
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         // unused0909  USE DataEnvironment, ONLY: CurMnDyHr
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2680,7 +2680,7 @@ namespace WindowManager {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -2902,7 +2902,7 @@ namespace WindowManager {
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj));
+                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -3273,7 +3273,7 @@ namespace WindowManager {
         using General::InterpSw;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -3935,8 +3935,8 @@ namespace WindowManager {
                         InletAirHumRat = OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
-                    CpAirOutlet = PsyCpAirFnWTdb(InletAirHumRat);
-                    CpAirZone = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
+                    CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
+                    CpAirZone = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir) {
                         SurfaceWindow(SurfNum).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;

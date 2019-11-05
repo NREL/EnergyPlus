@@ -476,7 +476,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -628,7 +628,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -785,7 +785,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -1110,7 +1110,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -1211,7 +1211,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     Real64 DesMassFlow(0.0);
     Real64 DesCoilHeatingLoad(0.0);
 
-    CpAirStd = PsyCpAirFnWTdb(0.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = DesMassFlow * CpAirStd * (40.0 - 5.0);
 

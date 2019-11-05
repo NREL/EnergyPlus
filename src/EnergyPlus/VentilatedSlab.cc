@@ -2961,7 +2961,7 @@ namespace VentilatedSlab {
                             VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
-                    CpFan = PsyCpAirFnWTdb(Node(FanOutletNode).HumRat);
+                    CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
                     QZnReq = (Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - Node(FanOutletNode).Temp);
 
                     // Setup the coil configuration
@@ -3214,7 +3214,7 @@ namespace VentilatedSlab {
                             VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
-                    CpFan = PsyCpAirFnWTdb(Node(FanOutletNode).HumRat);
+                    CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
                     QZnReq = (Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - Node(FanOutletNode).Temp);
 
                     ControlCompOutput(VentSlab(Item).Name,
@@ -3362,7 +3362,7 @@ namespace VentilatedSlab {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = VentSlab(Item).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(HCoilInAirNode).HumRat);
+                        CpAirZn = PsyCpAirFnW(Node(HCoilInAirNode).HumRat);
                         QCoilReq = Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(VentSlab(Item).RadInNode).Temp) - (Node(HCoilInAirNode).Temp);
                     }
 
@@ -3377,7 +3377,7 @@ namespace VentilatedSlab {
                     } else {
                         HCoilInAirTemp = Node(VentSlab(Item).FanOutletNode).Temp;
                         HCoilOutAirTemp = Node(VentSlab(Item).RadInNode).Temp;
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                         QCoilReq = Node(VentSlab(Item).FanOutletNode).MassFlowRate * CpAirZn * (HCoilOutAirTemp - HCoilInAirTemp);
                     }
 
@@ -3679,7 +3679,7 @@ namespace VentilatedSlab {
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
                     Mdot = AirMassFlow * VentSlab(Item).SurfaceFlowFrac(RadSurfNum);
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                     QRadSysSource(SurfNum) =
                         VentSlab(Item).CoreNumbers * EpsMdotCpAirZn * (AirTempIn - Ck) / (1.0 + (EpsMdotCpAirZn * Cl / Surface(SurfNum).Area));
@@ -3818,7 +3818,7 @@ namespace VentilatedSlab {
                 // Return Air temp Check
                 if (VentSlab(Item).SysConfg == SlabOnly) {
                     if (AirMassFlow > 0.0) {
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                         Node(ReturnAirNode).Temp = Node(SlabInNode).Temp - (TotalVentSlabRadPower / (AirMassFlow * CpAirZn));
                         if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
@@ -3935,7 +3935,7 @@ namespace VentilatedSlab {
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
                     Mdot = AirMassFlow * FlowFrac;
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                     QRadSysSource(SurfNum) = CNumDS * EpsMdotCpAirZn * (AirTempIn - Ck) / (1.0 + (EpsMdotCpAirZn * Cl / Surface(SurfNum).Area));
 
@@ -4082,7 +4082,7 @@ namespace VentilatedSlab {
 
                     if (AirMassFlow > 0.0) {
 
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                         Node(MSlabInletNode).Temp = MSlabAirInTemp;
                         Node(MSlabOutletNode).Temp = Node(MSlabInletNode).Temp - (QRadSysSource(SurfNum) / (AirMassFlow * CpAirZn));
@@ -4096,7 +4096,7 @@ namespace VentilatedSlab {
                 // Return Air temp Check
                 if (AirMassFlow > 0.0) {
 
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                     Node(ReturnAirNode).Temp = Node(SlabInNode).Temp - (TotalVentSlabRadPower / (AirMassFlow * CpAirZn));
 
                     if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
@@ -4314,7 +4314,7 @@ namespace VentilatedSlab {
         FanOutNode = VentSlab(Item).FanOutletNode;
         AirMassFlow = Node(AirOutletNode).MassFlowRate;
         ZoneInletNode = VentSlab(Item).ZoneAirInNode;
-        CpAppAir = PsyCpAirFnWTdb(Node(AirOutletNode).HumRat);
+        CpAppAir = PsyCpAirFnW(Node(AirOutletNode).HumRat);
         AirInletNode = VentSlab(Item).ReturnAirNode;
 
         for (RadSurfNum = 1; RadSurfNum <= TotRadSurfaces; ++RadSurfNum) {
@@ -4512,7 +4512,7 @@ namespace VentilatedSlab {
             PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
         }
         // arguments are glycol name, temperature, and concentration
-        CpAppAir = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat);
+        CpAppAir = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
         SysAirMassFlow = AirMassFlow / CoreNumbers;
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)

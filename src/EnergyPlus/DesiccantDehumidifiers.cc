@@ -2679,7 +2679,7 @@ namespace DesiccantDehumidifiers {
                     DataHeatBalance::HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
                 }
 
-                CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);
 
                 if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
                     if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -2761,7 +2761,7 @@ namespace DesiccantDehumidifiers {
 
                 if (RegenCoilIndex > 0) {
                     if (NewRegenInTemp < RegenSetPointTemp) {
-                        CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                        CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
                     }
                     QRegen = max(0.0,
                                  (CpAir * Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
@@ -2847,7 +2847,7 @@ namespace DesiccantDehumidifiers {
                     }
 
                     if (RegenCoilIndex > 0) {
-                        CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
+                        CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
                         QRegen = max(0.0,
                                      (CpAir * Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
                                       (RegenSetPointTemp - Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));

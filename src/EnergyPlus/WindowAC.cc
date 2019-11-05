@@ -140,7 +140,7 @@ namespace WindowAC {
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -1256,7 +1256,7 @@ namespace WindowAC {
         InletNode = WindAC(WindACNum).AirInNode;
         AirMassFlow = Node(InletNode).MassFlowRate;
         Test = AirMassFlow;
-        CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat);
+        CpAir = PsyCpAirFnW(Node(InletNode).HumRat);
         OpMode = WindAC(WindACNum).OpMode;
 
         // set the on/off flags

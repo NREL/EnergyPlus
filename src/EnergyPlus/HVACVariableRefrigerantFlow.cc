@@ -13820,7 +13820,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
         Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
-        Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
+        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
         Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
         HeatCoilCapacityAllowed = MDotAir * CpAirIn * HCDeltaT;
 

@@ -15270,7 +15270,7 @@ namespace RefrigeratedCase {
         using CurveManager::CurveValue;
         using namespace DataLoopNode;
         using General::CreateSysTimeIntervalString;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbRhPb;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -15440,7 +15440,7 @@ namespace RefrigeratedCase {
                 ZoneMixedAirEnthalpy = PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, OutBaroPress, TrackMessage);
                 ZoneMixedAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
                 ZoneDryAirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
-                ZoneMixedAirCp = PsyCpAirFnWTdb(ZoneMixedAirHumRatio);
+                ZoneMixedAirCp = PsyCpAirFnW(ZoneMixedAirHumRatio);
                 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -15459,7 +15459,7 @@ namespace RefrigeratedCase {
                     CoilInletCp = ZoneMixedAirCp;
                     CoilInletHumRatio = ZoneMixedAirHumRatio;
                     CoilInletDryAirDensity = ZoneDryAirDensity;
-                    CoilInletDryAirCp = PsyCpAirFnWTdb(0.0);
+                    CoilInletDryAirCp = PsyCpAirFnW(0.0);
                     break;
                 }
                 AirVolumeFlowMax = AirVolumeFlowRated * (1.0 - DefrostDripDownSchedule) * CoilSchedule;

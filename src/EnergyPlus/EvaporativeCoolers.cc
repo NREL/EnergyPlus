@@ -1859,7 +1859,7 @@ namespace EvaporativeCoolers {
             //                  CALCULATE THE TLDB FROM HX EQUATIONS GIVEN AN EFFICIENCY
             //***************************************************************************
             EffHX = EvapCond(EvapCoolNum).IndirectHXEffectiveness;
-            CpAir = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat);
+            CpAir = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             CFMAir = EvapCond(EvapCoolNum).VolFlowRate;         // Volume Flow Rate Primary Side
             CFMSec = EvapCond(EvapCoolNum).IndirectVolFlowRate; // Volume Flolw Rate Secondary Side
@@ -3047,10 +3047,10 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 CapFlowSec = AirMassFlowSec * CpAirSec;
                 OutletTempSec = EDBTSec + QHXRate / CapFlowSec;
                 if (OutletTempSec >= EvapCond(EvapCoolNum).InletTemp) {
@@ -3071,7 +3071,7 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
                 SecOutletEnthalpy = EvapCond(EvapCoolNum).SecInletEnthalpy + QHXRate / AirMassFlowSec;
@@ -3120,7 +3120,7 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -3147,7 +3147,7 @@ namespace EvaporativeCoolers {
         if (AirMassFlowSec > 0.0) {
             if ((OperatingMode == DryModulated || OperatingMode == DryFull)) {
                 EvapCond(EvapCoolNum).SecOutletHumRat = EHumRatSec;
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec);
                 EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, OutBaroPress);

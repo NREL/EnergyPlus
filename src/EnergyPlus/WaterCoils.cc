@@ -127,7 +127,7 @@ namespace WaterCoils {
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbRhPb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1199,7 +1199,7 @@ namespace WaterCoils {
             WaterInletNode = WaterCoil(CoilNum).WaterInletNodeNum;
             WaterOutletNode = WaterCoil(CoilNum).WaterOutletNodeNum;
 
-            DesCpAir(CoilNum) = PsyCpAirFnWTdb(0.0);
+            DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
             DesUARangeCheck(CoilNum) = (-1568.6 * WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
 
             if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling) { // 'Cooling'
@@ -1230,7 +1230,7 @@ namespace WaterCoils {
                 Node(WaterInletNode).HumRat = 0.0;
                 MyUAAndFlowCalcFlag(CoilNum) = false;
                 // fill values for variable UA
-                CpAirStd = PsyCpAirFnWTdb(0.0);
+                CpAirStd = PsyCpAirFnW(0.0);
                 WaterCoil(CoilNum).DesAirMassFlowRate = StdRhoAir * WaterCoil(CoilNum).DesAirVolFlowRate;
                 WaterCoil(CoilNum).LiquidSideNominalConvect = WaterCoil(CoilNum).UACoil * (WaterCoil(CoilNum).RatioAirSideToWaterSideConvect + 1) /
                                                               WaterCoil(CoilNum).RatioAirSideToWaterSideConvect;
@@ -1523,7 +1523,7 @@ namespace WaterCoils {
                             LogMeanEnthDiff = 2000.0; // UA will be 1/2 the design coil load
                         }
                         DesUACoilExternalEnth = WaterCoil(CoilNum).DesTotWaterCoilLoad / LogMeanEnthDiff;
-                        WaterCoil(CoilNum).UACoilExternal = DesUACoilExternalEnth * PsyCpAirFnWTdb(WaterCoil(CoilNum).DesInletAirHumRat);
+                        WaterCoil(CoilNum).UACoilExternal = DesUACoilExternalEnth * PsyCpAirFnW(WaterCoil(CoilNum).DesInletAirHumRat);
 
                         if (Ipass == 1 && (NoSatCurveIntersect || CBFTooLarge || BelowInletWaterTemp)) {
                             // reset outlet conditions to 90% relative humidity at the same outlet enthalpy
@@ -1653,7 +1653,7 @@ namespace WaterCoils {
             WaterCoil(CoilNum).InletAirEnthalpy = PsyHFnTdbW(WaterCoil(CoilNum).InletAirTemp, WaterCoil(CoilNum).InletAirHumRat);
             WaterCoil(CoilNum).InletWaterMassFlowRate = WaterCoil(CoilNum).MaxWaterMassFlowRate;
             WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * WaterCoil(CoilNum).DesAirVolFlowRate;
-            CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat);
+            CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
 
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        WaterCoil(CoilNum).InletWaterTemp,
@@ -2096,7 +2096,7 @@ namespace WaterCoils {
         DesCoilAirFlow = 0.0;
         DesCoilExitTemp = 0.0;
         LoopErrorsFound = false;
-        CpAirStd = PsyCpAirFnWTdb(0.0);
+        CpAirStd = PsyCpAirFnW(0.0);
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2764,7 +2764,7 @@ namespace WaterCoils {
         }
 
         if (WaterMassFlowRate > MassFlowTolerance) { // If the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
                                        PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
@@ -3044,8 +3044,8 @@ namespace WaterCoils {
             //        known thermodynamic functions
             // All coil calcs are done in KJoules.  Convert to KJ here and then convert
             //  back to Joules at the end of the Subroutine.
-            DryAirSpecHeat = PsyCpAirFnWTdb(zero) * ConvK;
-            MoistAirSpecificHeat = PsyCpAirFnWTdb(InletAirHumRat) * ConvK;
+            DryAirSpecHeat = PsyCpAirFnW(zero) * ConvK;
+            MoistAirSpecificHeat = PsyCpAirFnW(InletAirHumRat) * ConvK;
             InletAirEnthalpy = WaterCoil(CoilNum).InletAirEnthalpy * ConvK;
 
             EnterAirDewPoint = PsyTdpFnWPb(InletAirHumRat, OutBaroPress, RoutineName);
@@ -3449,7 +3449,7 @@ namespace WaterCoils {
                 //       Implementation of epsilon*NTU method
                 TempAirOut = AirExitCoilSurfTemp + (AirWetDryInterfcTemp - AirExitCoilSurfTemp) * y;
                 OutletAirHumRat = PsyWFnTdbH(TempAirOut, 1000.0 * OutletAirEnthalpy, RoutineName);
-                SenWaterCoilLoad = AirMassFlow * (PsyCpAirFnWTdb(InletAirHumRat) * TempAirIn - PsyCpAirFnWTdb(OutletAirHumRat) * TempAirOut) * ConvK;
+                SenWaterCoilLoad = AirMassFlow * (PsyCpAirFnW(InletAirHumRat) * TempAirIn - PsyCpAirFnW(OutletAirHumRat) * TempAirOut) * ConvK;
             }
 
             if (FanOpMode == CycFanCycCoil) {
@@ -3794,7 +3794,7 @@ namespace WaterCoils {
         }
 
         // Calculate air and water capacity rates
-        CapacitanceAir = AirMassFlow * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat);
+        CapacitanceAir = AirMassFlow * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
         // Water Capacity Rate
         Cp = GetSpecificHeatGlycol(
             PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
@@ -3935,7 +3935,7 @@ namespace WaterCoils {
 
         // Determine air and water enthalpy outlet conditions by modeling
         // coil as counterflow enthalpy heat exchanger
-        UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnWTdb(0.0));
+        UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
         CapacityRateAirWet = AirMassFlow;
         Cp = GetSpecificHeatGlycol(
             PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
@@ -3951,7 +3951,7 @@ namespace WaterCoils {
 
         // Calculate entering and leaving external surface conditions from
         // air and water conditions and the ratio of resistances
-        ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnWTdb(0.0) / IntermediateCpSat * AirSideResist);
+        ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnW(0.0) / IntermediateCpSat * AirSideResist);
         EnthSatAirCoilSurfaceEntryTemp = EnthSatAirOutletWaterTemp + ResistRatio * (EnthAirInlet - EnthSatAirOutletWaterTemp);
         EnthSatAirCoilSurfaceExitTemp = EnthSatAirInletWaterTemp + ResistRatio * (EnthAirOutlet - EnthSatAirInletWaterTemp);
 
@@ -4527,7 +4527,7 @@ namespace WaterCoils {
         // Determine the temperature effectiveness, assuming the temperature
         // of the condensate is constant (MinimumCapacityStream/MaximumCapacityStream = 0) and the specific heat
         // of moist air is constant
-        CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat);
+        CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
 
         // Calculating NTU from UA and Capacitance.
         // del      NTU = UACoilExternal/MAX(CapacitanceAir,SmallNo)
@@ -6676,7 +6676,7 @@ namespace WaterCoils {
             WaterMassFlowRate = WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
         if (WaterMassFlowRate > MassFlowTolerance) { // if the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
                                        PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,

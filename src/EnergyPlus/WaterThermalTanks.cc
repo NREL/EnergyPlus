@@ -9292,7 +9292,7 @@ namespace WaterThermalTanks {
         using IntegratedHeatPump::IntegratedHeatPumps;
         using IntegratedHeatPump::SimIHP;
         using Psychrometrics::CPHW; // , PsyWFnTdbTwbPb
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::RhoH2O;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -10412,7 +10412,7 @@ namespace WaterThermalTanks {
 
                 //   calculate sensible capacity to zone for inlet air configuration equals Zone Only or Zone And Outdoor Air configurations
             } else {
-                CpAir = PsyCpAirFnWTdb(Node(HPAirInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(HPAirInletNode).HumRat);
 
                 //     add parasitics to zone heat balance if parasitic heat load is to zone otherwise neglect parasitics
                 if (HeatPump.ParasiticTempIndicator == AmbientTempZone) {

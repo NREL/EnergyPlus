@@ -125,7 +125,7 @@ namespace HeatingCoils {
     using DataHeatBalance::RefrigCondenserTypeWater;
     using DataHeatBalance::RefrigSystemTypeDetailed;
     using DataHeatBalance::RefrigSystemTypeRack;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace ScheduleManager;
@@ -1632,7 +1632,7 @@ namespace HeatingCoils {
             AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         }
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If the coil is operating there should be some heating capacitance
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -2001,7 +2001,7 @@ namespace HeatingCoils {
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
@@ -2494,7 +2494,7 @@ namespace HeatingCoils {
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         TempAirIn = HeatingCoil(CoilNum).InletAirTemp;
         Win = HeatingCoil(CoilNum).InletAirHumRat;
-        CapacitanceAir = PsyCpAirFnWTdb(Win) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)

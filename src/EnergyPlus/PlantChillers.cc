@@ -5633,7 +5633,7 @@ namespace PlantChillers {
         using General::RoundSigDigits;
         using PlantUtilities::PullCompInterconnectTrigger;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyWFnTdbTwbPb;
 
         // Locals
@@ -6249,7 +6249,7 @@ namespace PlantChillers {
             if (ElectricChiller(ChillNum).HeatRecActive)
                 CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered);
             if (CondMassFlowRate > 0.0) {
-                CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat);
+                CpCond = PsyCpAirFnW(Node(CondInletNode).HumRat);
                 CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
             } else {
                 CondOutletTemp = CondInletTemp;
@@ -8513,7 +8513,7 @@ namespace PlantChillers {
         using DataPlant::PlantLoop;
         using DataPlant::SingleSetPoint;
         using FluidProperties::GetSpecificHeatGlycol;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -8561,7 +8561,7 @@ namespace PlantChillers {
                                            PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                            RoutineName);
         } else {
-            CpCond = PsyCpAirFnWTdb(Node(CondInletNode).HumRat);
+            CpCond = PsyCpAirFnW(Node(CondInletNode).HumRat);
         }
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot
@@ -8635,7 +8635,7 @@ namespace PlantChillers {
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -198,7 +198,7 @@ namespace AirflowNetworkBalanceManager {
     using Fans::GetFanType;
     using Fans::GetFanVolFlow;
     using General::RoundSigDigits;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -6820,9 +6820,9 @@ namespace AirflowNetworkBalanceManager {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
             CompName = AirflowNetworkCompData(CompNum).EPlusName;
-            CpAir = PsyCpAirFnWTdb((AirflowNetworkNodeSimu(AirflowNetworkLinkageData(i).NodeNums[0]).WZ +
-                                    AirflowNetworkNodeSimu(AirflowNetworkLinkageData(i).NodeNums[1]).WZ) /
-                                   2.0);
+            CpAir = PsyCpAirFnW((AirflowNetworkNodeSimu(AirflowNetworkLinkageData(i).NodeNums[0]).WZ +
+                                 AirflowNetworkNodeSimu(AirflowNetworkLinkageData(i).NodeNums[1]).WZ) /
+                                2.0);
             // Calculate duct conduction loss
             if (CompTypeNum == CompTypeNum_DWC && CompName == BlankString) { // Duct element only
                 TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
@@ -7164,7 +7164,7 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     load = Node(NF).Temp - Node(NT).Temp;
                 }
-                CpAir = PsyCpAirFnWTdb(Node(NT).HumRat);
+                CpAir = PsyCpAirFnW(Node(NT).HumRat);
                 MV(LT) += AirflowNetworkLinkSimu(i).FLOW * CpAir * load;
             }
         }
@@ -8286,11 +8286,11 @@ namespace AirflowNetworkBalanceManager {
                 if (ZN1 > 0 && ZN2 == 0) {
                     if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
                         Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(
-                            Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
+                        CpAir =
+                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
                     } else {
                         Tamb = Zone(ZN1).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(OutHumRat);
+                        CpAir = PsyCpAirFnW(OutHumRat);
                     }
                     hfg = Psychrometrics::PsyHfgAirFnWTdb(ZoneAirHumRat(ZN1), (MAT(ZN1) + Tamb) / 2.0);
 
@@ -8318,11 +8318,11 @@ namespace AirflowNetworkBalanceManager {
                 if (ZN1 == 0 && ZN2 > 0) {
                     if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
                         Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(
-                            Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
+                        CpAir =
+                            PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress));
                     } else {
                         Tamb = Zone(ZN2).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(OutHumRat);
+                        CpAir = PsyCpAirFnW(OutHumRat);
                     }
                     hfg = Psychrometrics::PsyHfgAirFnWTdb(ZoneAirHumRat(ZN2), (MAT(ZN2) + Tamb) / 2.0);
 
@@ -8349,7 +8349,7 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZN1));
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN1));
                     hfg = Psychrometrics::PsyHfgAirFnWTdb((ZoneAirHumRat(ZN1) + ZoneAirHumRat(ZN2)) / 2.0, (MAT(ZN1) + MAT(ZN2)) / 2.0);
                     if (MAT(ZN1) > MAT(ZN2)) {
                         AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (MAT(ZN1) - MAT(ZN2)));
@@ -8371,7 +8371,7 @@ namespace AirflowNetworkBalanceManager {
                         AirflowNetworkReportData(ZN2).MultiZoneMixLatLossJ +=
                             (AirflowNetworkLinkSimu(i).FLOW * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * hfg * ReportingConstant;
                     }
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZN2));
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN2));
                     if (MAT(ZN2) > MAT(ZN1)) {
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (MAT(ZN2) - MAT(ZN1)));
                         AirflowNetworkReportData(ZN1).MultiZoneMixSenGainJ +=
@@ -8519,7 +8519,7 @@ namespace AirflowNetworkBalanceManager {
                         if (AirflowNetworkNodeData(n).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
                         Tamb = Zone(ZN1).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(OutHumRat);
+                        CpAir = PsyCpAirFnW(OutHumRat);
                         if (Tamb > MAT(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (Tamb - MAT(ZN1))) * (1.0 - RepOnOffFanRunTimeFraction);
@@ -8557,7 +8557,7 @@ namespace AirflowNetworkBalanceManager {
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
                         Tamb = Zone(ZN2).OutDryBulbTemp;
-                        CpAir = PsyCpAirFnWTdb(OutHumRat);
+                        CpAir = PsyCpAirFnW(OutHumRat);
                         if (Tamb > MAT(ZN2)) {
                             AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOWOFF * CpAir * (Tamb - MAT(ZN2))) * ReportingFraction;
@@ -8587,7 +8587,7 @@ namespace AirflowNetworkBalanceManager {
 
                     if (ZN1 > 0 && ZN2 > 0) {
                         ReportingFraction = (1.0 - MaxOnOffFanRunTimeFraction);
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZN1));
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN1));
                         if (MAT(ZN1) > MAT(ZN2)) {
                             AirflowNetworkReportData(ZN2).MultiZoneMixSenGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOWOFF * CpAir * (MAT(ZN1) - MAT(ZN2))) * ReportingFraction;
@@ -8612,7 +8612,7 @@ namespace AirflowNetworkBalanceManager {
                                 (AirflowNetworkLinkReport1(i).FLOWOFF * (ZoneAirHumRat(ZN2) - ZoneAirHumRat(ZN1))) * ReportingConstant *
                                 ReportingFraction;
                         }
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZN2));
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZN2));
                         if (MAT(ZN2) > MAT(ZN1)) {
                             AirflowNetworkReportData(ZN1).MultiZoneMixSenGainW +=
                                 (AirflowNetworkLinkReport1(i).FLOW2OFF * CpAir * (MAT(ZN2) - MAT(ZN1))) * ReportingFraction;
@@ -8647,7 +8647,7 @@ namespace AirflowNetworkBalanceManager {
 
         for (i = 1; i <= NumOfZones; ++i) { // Start of zone loads report variable update loop ...
             Tamb = Zone(i).OutDryBulbTemp;
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRatAvg(i));
+            CpAir = PsyCpAirFnW(ZoneAirHumRatAvg(i));
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
 
             AirflowNetworkZnRpt(i).InfilVolume = (AirflowNetworkExchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
@@ -8832,7 +8832,7 @@ namespace AirflowNetworkBalanceManager {
                 if (ZN1 > 0 && ZN2 == 0) {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN1).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat);
+                    CpAir = PsyCpAirFnW(OutHumRat);
                     AirflowNetworkExchangeData(ZN1).SumMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
                     AirflowNetworkExchangeData(ZN1).SumMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
                     AirflowNetworkExchangeData(ZN1).SumMHr += AirflowNetworkLinkSimu(i).FLOW2;
@@ -8847,7 +8847,7 @@ namespace AirflowNetworkBalanceManager {
                 if (ZN1 == 0 && ZN2 > 0) {
                     // Find a linkage from outdoors to this zone
                     Tamb = Zone(ZN2).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat);
+                    CpAir = PsyCpAirFnW(OutHumRat);
                     AirflowNetworkExchangeData(ZN2).SumMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
                     AirflowNetworkExchangeData(ZN2).SumMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
                     AirflowNetworkExchangeData(ZN2).SumMHr += AirflowNetworkLinkSimu(i).FLOW;
@@ -8861,7 +8861,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (ZN1 > 0 && ZN2 > 0) {
                     // Find a linkage from outdoors to this zone
-                    CpAir = PsyCpAirFnWTdb(ANZW(ZN1));
+                    CpAir = PsyCpAirFnW(ANZW(ZN1));
                     AirflowNetworkExchangeData(ZN2).SumMMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
                     AirflowNetworkExchangeData(ZN2).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * ANZT(ZN1);
                     AirflowNetworkExchangeData(ZN2).SumMMHr += AirflowNetworkLinkSimu(i).FLOW;
@@ -8872,7 +8872,7 @@ namespace AirflowNetworkBalanceManager {
                     if (Contaminant.GenericContamSimulation) {
                         AirflowNetworkExchangeData(ZN2).SumMMHrGC += AirflowNetworkLinkSimu(i).FLOW * ANGC(ZN1);
                     }
-                    CpAir = PsyCpAirFnWTdb(ANZW(ZN2));
+                    CpAir = PsyCpAirFnW(ANZW(ZN2));
                     AirflowNetworkExchangeData(ZN1).SumMMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
                     AirflowNetworkExchangeData(ZN1).SumMMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * ANZT(ZN2);
                     AirflowNetworkExchangeData(ZN1).SumMMHr += AirflowNetworkLinkSimu(i).FLOW2;
@@ -8972,37 +8972,37 @@ namespace AirflowNetworkBalanceManager {
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
                     Tamb = Zone(ZN1).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat);
+                    CpAir = PsyCpAirFnW(OutHumRat);
                     AirflowNetworkExchangeData(ZN1).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - ANZT(ZN1));
                     AirflowNetworkExchangeData(ZN1).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW2 * (OutHumRat - ANZW(ZN1));
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     Tamb = Zone(ZN2).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat);
+                    CpAir = PsyCpAirFnW(OutHumRat);
                     AirflowNetworkExchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - ANZT(ZN2));
                     AirflowNetworkExchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (OutHumRat - ANZW(ZN2));
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
                     if (AirflowNetworkLinkSimu(i).FLOW > 0) { // Flow from ZN1 to ZN2
-                        CpAir = PsyCpAirFnWTdb(ANZW(ZN1));
+                        CpAir = PsyCpAirFnW(ANZW(ZN1));
                         AirflowNetworkExchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (ANZT(ZN1) - ANZT(ZN2));
                         AirflowNetworkExchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (ANZW(ZN1) - ANZW(ZN2));
-                        CpAir = PsyCpAirFnWTdb(ANZW(ZN2));
+                        CpAir = PsyCpAirFnW(ANZW(ZN2));
                         AirflowNetworkExchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
                         AirflowNetworkExchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
                     } else {
-                        //          CpAir   = PsyCpAirFnWTdb(ZoneAirHumRat(ZN2), MAT(ZN2))
+                        //          CpAir   = PsyCpAirFnW(ZoneAirHumRat(ZN2), MAT(ZN2))
                         //          AirflowNetworkExchangeData(ZN1)%MultiZoneSen = AirflowNetworkExchangeData(ZN1)%MultiZoneSen + &
                         //            AirflowNetworkLinkSimu(i)%FLOW*CpAir*(MAT(ZN1)-MAT(ZN2))
                         //          AirflowNetworkExchangeData(ZN1)%MultiZoneLat = AirflowNetworkExchangeData(ZN1)%MultiZoneLat + &
                         //            AirflowNetworkLinkSimu(i)%FLOW*(ZoneAirHumRat(ZN1)-ZoneAirHumRat(ZN2))
-                        //          CpAir   = PsyCpAirFnWTdb(ZoneAirHumRat(ZN1), MAT(ZN1))
+                        //          CpAir   = PsyCpAirFnW(ZoneAirHumRat(ZN1), MAT(ZN1))
                         //          AirflowNetworkExchangeData(ZN2)%MultiZoneSen = AirflowNetworkExchangeData(ZN2)%MultiZoneSen + &
                         //            ABS(AirflowNetworkLinkSimu(i)%FLOW2)*CpAir*(MAT(ZN1)-MAT(ZN2))
                         //          AirflowNetworkExchangeData(ZN2)%MultiZoneLat = AirflowNetworkExchangeData(ZN2)%MultiZoneLat + &
                         //            ABS(AirflowNetworkLinkSimu(i)%FLOW2)*(ZoneAirHumRat(ZN1)-ZoneAirHumRat(ZN2))
-                        CpAir = PsyCpAirFnWTdb(ANZW(ZN2));
+                        CpAir = PsyCpAirFnW(ANZW(ZN2));
                         AirflowNetworkExchangeData(ZN1).MultiZoneSen += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * (ANZT(ZN2) - ANZT(ZN1));
                         AirflowNetworkExchangeData(ZN1).MultiZoneLat += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * (ANZW(ZN2) - ANZW(ZN1));
                     }
@@ -9180,7 +9180,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             Node1 = AirflowNetworkLinkageData(i).NodeNums[0];
             Node2 = AirflowNetworkLinkageData(i).NodeNums[1];
-            CpAir = PsyCpAirFnWTdb((AirflowNetworkNodeSimu(Node1).WZ + AirflowNetworkNodeSimu(Node2).WZ) / 2.0);
+            CpAir = PsyCpAirFnW((AirflowNetworkNodeSimu(Node1).WZ + AirflowNetworkNodeSimu(Node2).WZ) / 2.0);
             // Calculate sensible loads from duct conduction losses and loads from duct radiation
             if (AirflowNetworkLinkageData(i).ZoneNum > 0 &&
                 AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_DWC) {
@@ -11072,7 +11072,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 RhoAir;      // Zone air density [kg/m3]
         Real64 CpAir;       // Zone air specific heat
 
-        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
+        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
         InfilVolume = (AirflowNetworkExchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * SecInHour;
         ACH = InfilVolume / (TimeStepSys * Zone(ZoneNum).Volume);

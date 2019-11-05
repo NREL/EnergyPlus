@@ -1240,7 +1240,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     Real64 CpAir(0.0);
     Real64 ZoneSetPointTemp(0.0);
 
-    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(2).HumRat);
+    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(2).HumRat);
     ZoneSetPointTemp = DataLoopNode::Node(5).Temp +
                        DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr

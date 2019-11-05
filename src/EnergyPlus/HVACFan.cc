@@ -1088,7 +1088,7 @@ namespace HVACFan {
     Real64 FanSystem::getFanDesignTemperatureRise() const
     {
         if (!m_objSizingFlag) {
-            Real64 cpAir = Psychrometrics::PsyCpAirFnWTdb(DataPrecisionGlobals::constant_zero);
+            Real64 cpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             Real64 designDeltaT = (deltaPress / (m_rhoAirStdInit * cpAir * m_fanTotalEff)) * (m_motorEff + m_motorInAirFrac * (1.0 - m_motorEff));
             return designDeltaT;
         } else {

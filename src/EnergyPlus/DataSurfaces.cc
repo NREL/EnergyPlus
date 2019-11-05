@@ -760,7 +760,7 @@ namespace DataSurfaces {
                 for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
                     Real64 NodeTemp = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
                     Real64 MassFlowRate = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                    Real64 CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(Zone));
+                    Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(Zone));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }

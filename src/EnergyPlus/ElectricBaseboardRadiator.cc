@@ -770,7 +770,7 @@ namespace ElectricBaseboardRadiator {
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEquipment::ZoneEquipConfig;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -794,7 +794,7 @@ namespace ElectricBaseboardRadiator {
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = ElecBaseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(ElecBaseboard(BaseboardNum).AirInletHumRat);
+        CpAir = PsyCpAirFnW(ElecBaseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
 

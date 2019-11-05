@@ -969,7 +969,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 DesCoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
     Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
     // DesVolFlow = DesMassFlow / RhoAirStd;
-    Real64 CpAirAvg = PsyCpAirFnWTdb(DesCoilOutHumRat);
+    Real64 CpAirAvg = PsyCpAirFnW(DesCoilOutHumRat);
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
     // do steam flow rate sizing calculation

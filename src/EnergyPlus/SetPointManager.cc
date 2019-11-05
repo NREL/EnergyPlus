@@ -151,7 +151,7 @@ namespace SetPointManager {
     using namespace CurveManager;
 
     // USE STATEMENTS
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
 
     // Data
@@ -5509,7 +5509,7 @@ namespace SetPointManager {
             FanDeltaT = 0.0;
         }
         TSupNoHC = TMixAtMinOA + FanDeltaT;
-        CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+        CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
         ExtrRateNoHC = CpAir * ZoneMassFlow * (TSupNoHC - ZoneTemp);
         if (ZoneMassFlow <= SmallMassFlow) {
             TSetPt = TSupNoHC;
@@ -5602,7 +5602,7 @@ namespace SetPointManager {
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MinSetTemp;
         } else {
-            CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+            CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
             this->SetPt = ZoneTemp + ZoneLoadtoHeatSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
@@ -5644,7 +5644,7 @@ namespace SetPointManager {
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MaxSetTemp;
         } else {
-            CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+            CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
             this->SetPt = ZoneTemp + ZoneLoadtoCoolSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
@@ -6165,7 +6165,7 @@ namespace SetPointManager {
             ZoneSetPointTemp = this->MaxSetTemp;
             if (ZoneLoad < 0.0) {
                 TotCoolLoad += std::abs(ZoneLoad);
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 if (ZoneMassFlowMax > SmallMassFlow) {
                     ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                 }
@@ -6248,7 +6248,7 @@ namespace SetPointManager {
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
-                    CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                    CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                     if (ZoneMassFlowMax > SmallMassFlow) {
                         ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                     }
@@ -6268,7 +6268,7 @@ namespace SetPointManager {
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
-                    CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                    CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                     if (ZoneMassFlowMax > SmallMassFlow) {
                         ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                     }
@@ -6369,7 +6369,7 @@ namespace SetPointManager {
             ZoneFracFlow = MinFracFlow;
             if (ZoneLoad < 0.0) {
                 TotCoolLoad += std::abs(ZoneLoad);
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 if (ZoneMassFlowMax > SmallMassFlow) {
                     if (ControlStrategy == TempFirst) {
                         // First find supply air temperature required to meet the load at minimum flow. If this is
@@ -6569,11 +6569,11 @@ namespace SetPointManager {
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
             SumProductMdotCpTZoneTot += ZoneMassFlowRate * CpAir * ZoneTemp;
             if (ZoneLoad > 0.0) {
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 SumHeatLoad += ZoneLoad;
                 SumProductMdotCp += ZoneMassFlowRate * CpAir;
             }
@@ -6659,11 +6659,11 @@ namespace SetPointManager {
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
             SumProductMdotCpTZoneTot += ZoneMassFlowRate * CpAir * ZoneTemp;
             if (ZoneLoad < 0.0) {
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 SumCoolLoad += ZoneLoad;
                 SumProductMdotCp += ZoneMassFlowRate * CpAir;
             }

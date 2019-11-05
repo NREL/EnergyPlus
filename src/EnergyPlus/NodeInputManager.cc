@@ -1153,7 +1153,7 @@ namespace NodeInputManager {
         using OutputProcessor::ReqReportVariables;
         using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1314,7 +1314,7 @@ namespace NodeInputManager {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
                 if (ReportSpecificHeat) { // only call psych routine if needed.
-                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat);
+                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                 } else {
                     MoreNodeInfo(iNode).SpecificHeat = 0.0;
                 }
@@ -1368,7 +1368,7 @@ namespace NodeInputManager {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }
                     if (ReportSpecificHeat) {
-                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat);
+                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                     } else {
                         MoreNodeInfo(iNode).SpecificHeat = 0.0;
                     }

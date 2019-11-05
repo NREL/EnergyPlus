@@ -787,7 +787,7 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -998,7 +998,7 @@ namespace ZoneDehumidifier {
 
             Node(AirInletNodeNum).MassFlowRate = ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * PLR;
             AirMassFlowRate = Node(AirInletNodeNum).MassFlowRate; // Average air mass flow for this timestep
-            Cp = PsyCpAirFnWTdb(InletAirHumRat);                  // Heat capacity of air
+            Cp = PsyCpAirFnW(InletAirHumRat);                     // Heat capacity of air
             if (AirMassFlowRate > 0.0 && Cp > 0.0) {
                 OutletAirTemp =
                     InletAirTemp + (ElectricPowerOnCycle + (WaterRemovalMassRate * hfg)) / (ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * Cp);

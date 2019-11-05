@@ -111,7 +111,7 @@ namespace PlantCentralGSHP {
     using DataPlant::PlantLoop;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data

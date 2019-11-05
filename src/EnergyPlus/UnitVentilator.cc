@@ -3381,7 +3381,7 @@ namespace UnitVentilator {
                             QCoilReq = 0.0;
                         } else {
                             HCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
-                            CpAirZn = PsyCpAirFnWTdb(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
+                            CpAirZn = PsyCpAirFnW(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
                             QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                         }
@@ -3396,7 +3396,7 @@ namespace UnitVentilator {
                             QCoilReq = 0.0;
                         } else {
                             HCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
-                            CpAirZn = PsyCpAirFnWTdb(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
+                            CpAirZn = PsyCpAirFnW(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
                             QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                         }
@@ -3468,7 +3468,7 @@ namespace UnitVentilator {
                             mdot = 0.0;
                         } else {
                             HCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
-                            CpAirZn = PsyCpAirFnWTdb(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
+                            CpAirZn = PsyCpAirFnW(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
                             QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                             mdot = UnitVent(UnitVentNum).MaxHotWaterFlow * PartLoadRatio;
@@ -3496,7 +3496,7 @@ namespace UnitVentilator {
                             mdot = 0.0;
                         } else {
                             HCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
-                            CpAirZn = PsyCpAirFnWTdb(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
+                            CpAirZn = PsyCpAirFnW(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
                             QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                             mdot = UnitVent(UnitVentNum).MaxHotSteamFlow * PartLoadFrac;
@@ -3524,7 +3524,7 @@ namespace UnitVentilator {
                             QCoilReq = 0.0;
                         } else {
                             HCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
-                            CpAirZn = PsyCpAirFnWTdb(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
+                            CpAirZn = PsyCpAirFnW(Node(UnitVent(UnitVentNum).AirInNode).HumRat);
                             QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                         }
@@ -4023,8 +4023,8 @@ namespace UnitVentilator {
                 }
             }
 
-            ActualOAMassFlowRate = (std::abs(QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) /
-                                   (PsyCpAirFnWTdb(DataEnvironment::OutHumRat) * (Tinlet - Toutdoor));
+            ActualOAMassFlowRate =
+                (std::abs(QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnW(DataEnvironment::OutHumRat) * (Tinlet - Toutdoor));
 
             ActualOAMassFlowRate = max(ActualOAMassFlowRate, (MinOAFrac * MassFlowRate));
             ActualOAMassFlowRate = min(ActualOAMassFlowRate, (MaxOAFrac * MassFlowRate));
@@ -4051,7 +4051,7 @@ namespace UnitVentilator {
         int CCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
         int AirInNode = UnitVent(UnitVentNum).AirInNode;
         Real64 const SmallLoad = -1.0; // Watts
-        Real64 CpAirZn = PsyCpAirFnWTdb(Node(AirInNode).HumRat);
+        Real64 CpAirZn = PsyCpAirFnW(Node(AirInNode).HumRat);
         QCoilReq = QZnReq - Node(CCoilInAirNode).MassFlowRate * CpAirZn * (Node(CCoilInAirNode).Temp - Node(AirInNode).Temp);
         if (QCoilReq > SmallLoad) {
             QCoilReq = 0.0;

@@ -1097,7 +1097,7 @@ namespace PhotovoltaicThermalCollectors {
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using Psychrometrics::CPHW;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnTdbTwbPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1173,7 +1173,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
                     Winlet = Node(InletNode).HumRat;
-                    CpInlet = PsyCpAirFnWTdb(Winlet);
+                    CpInlet = PsyCpAirFnW(Winlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                     } else {
@@ -1189,7 +1189,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                         BypassFraction = max(0.0, BypassFraction);
                         PotentialOutletTemp = Node(PVT(PVTnum).HVACOutletNodeNum).TempSetPoint;
-                        PotentialHeatGain = mdot * PsyCpAirFnWTdb(Winlet) * (PotentialOutletTemp - Tinlet);
+                        PotentialHeatGain = mdot * PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                     } else {
                         BypassFraction = 0.0;
@@ -1222,7 +1222,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
                     Winlet = Node(InletNode).HumRat;
-                    CpInlet = PsyCpAirFnWTdb(Winlet);
+                    CpInlet = PsyCpAirFnW(Winlet);
                     WetBulbInlet = PsyTwbFnTdbWPb(Tinlet, Winlet, OutBaroPress, RoutineName);
                     DewPointInlet = PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, OutBaroPress, RoutineName);
                 } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {

@@ -4694,7 +4694,7 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
@@ -4742,7 +4742,7 @@ namespace ConvectionCoefficients {
         lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
         mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin;     // Table B.2 in ISO 15099
 
-        Cp = PsyCpAirFnWTdb(AirHumRat);
+        Cp = PsyCpAirFnW(AirHumRat);
 
         // four cases depending on tilt and DeltaTemp (heat flow direction )
         if (DeltaTemp > 0.0) TiltDeg = 180.0 - TiltDeg; // complement angle if cooling situation

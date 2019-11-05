@@ -652,7 +652,7 @@ namespace PondGroundHeatExchanger {
         using FluidProperties::GetSpecificHeatGlycol;
         using namespace DataGlobals;
         using DataHeatBalance::VeryRough;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbTwbPb;
 
@@ -740,7 +740,7 @@ namespace PondGroundHeatExchanger {
         // get air properties
         HumRatioAir = PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, OutBaroPress);
         HumRatioFilm = PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, OutBaroPress);
-        SpecHeatAir = PsyCpAirFnWTdb(HumRatioAir);
+        SpecHeatAir = PsyCpAirFnW(HumRatioAir);
         LatentHeatAir = PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
 
         FluxEvap = pow_2(PrantlAir / SchmidtAir) / 3.0 * ConvCoef / SpecHeatAir * (HumRatioFilm - HumRatioAir) * LatentHeatAir;

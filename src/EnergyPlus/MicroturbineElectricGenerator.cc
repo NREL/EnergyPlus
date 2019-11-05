@@ -1403,7 +1403,7 @@ namespace MicroturbineElectricGenerator {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using General::TrimSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -2016,7 +2016,7 @@ namespace MicroturbineElectricGenerator {
                 MTGenerator(GeneratorNum).ExhaustAirTemperature = ExhaustAirTemp;
                 //       Adjust exhaust air temperature if heat recovery to water is being done
                 if (QHeatRecToWater > 0.0) {
-                    CpAir = PsyCpAirFnWTdb(CombustionAirInletW);
+                    CpAir = PsyCpAirFnW(CombustionAirInletW);
                     if (CpAir > 0.0) {
                         MTGenerator(GeneratorNum).ExhaustAirTemperature = ExhaustAirTemp - QHeatRecToWater / (CpAir * ExhAirMassFlowRate);
                     }

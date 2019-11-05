@@ -164,7 +164,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
     using HWBaseboardRadiator::CalcHWBaseboard;
     using OutdoorAirUnit::CalcOAUnitCoilComps;
     using PlantUtilities::SetActuatedBranchFlowRate;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using SteamBaseboardRadiator::CalcSteamBaseboard;
     using UnitHeater::CalcUnitHeaterComponents;
     using UnitVentilator::CalcUnitVentilatorComponents;
@@ -502,7 +502,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
                       (Node(TempOutNode).Temp - Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -512,7 +512,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
                       (Node(TempOutNode).Temp - Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -522,7 +522,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // Simulate reheat coil for the VAV system
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(Node(TempOutNode).HumRat);
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat);
             if (present(AirMassFlow)) {
                 LoadMet = AirMassFlow * CpAir * Node(TempOutNode).Temp;
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -1043,7 +1043,7 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
     using SolarCollectors::Collector;
@@ -1128,7 +1128,7 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     LocalOutHumRat = PsyWFnTdbTwbPb(LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
 
     RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
-    CpAir = PsyCpAirFnWTdb(LocalOutHumRat);
+    CpAir = PsyCpAirFnW(LocalOutHumRat);
     if (!IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb

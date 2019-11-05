@@ -176,7 +176,7 @@ namespace Furnaces {
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using namespace DataZoneEquipment;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHfgAirFnWTdb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -6408,7 +6408,7 @@ namespace Furnaces {
         //  OnOffAirFlowRatio = 1.0
 
         // Calculate the Cp Air
-        cpair = PsyCpAirFnWTdb(Node(FurnaceInletNode).HumRat);
+        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
 
         if (FirstHVACIteration) {
             HeatCoilLoad = ZoneLoad;
@@ -6708,7 +6708,7 @@ namespace Furnaces {
         OpMode = Furnace(FurnaceNum).OpMode;
         HumControl = false;
         // Calculate the Cp Air for all conditions
-        cpair = PsyCpAirFnWTdb(Node(FurnaceInletNode).HumRat);
+        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
         NoHeatOutput = 0.0;
         SystemSensibleLoad = 0.0;
         ReheatCoilLoad = 0.0;
@@ -7010,7 +7010,7 @@ namespace Furnaces {
                                 TempOutHeatingCoil = Node(FurnaceOutletNode).Temp;
                             }
                         }
-                        cpair = PsyCpAirFnWTdb(Node(FurnaceInletNode).HumRat);
+                        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
                         // TempOutHeatingCoil = Node(FurnaceOutletNode)%Temp + HeatCoilLoad/(cpair*Furnace(FurnaceNum)%MdotFurnace)
                         if ((TempOutHeatingCoil > Furnace(FurnaceNum).DesignMaxOutletTemp) && (HeatCoilLoad > 0.0)) {
                             // deltaT = Furnace(FurnaceNum)%DesignMaxOutletTemp - Node(FurnaceOutletNode)%Temp
@@ -7997,7 +7997,7 @@ namespace Furnaces {
 
         //*********INITIAL CALCULATIONS****************
         // Calculate the Cp Air for all conditions
-        cpair = PsyCpAirFnWTdb(Node(FurnaceInletNode).HumRat);
+        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
 
         // set the fan part load fraction
         // Note: OnOffFanPartLoadFraction is passed to the
@@ -8867,7 +8867,7 @@ namespace Furnaces {
         if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp > Furnace(FurnaceNum).DesignMaxOutletTemp) {
             Wout = Node(FurnaceOutletNode).HumRat;
             Tout = Furnace(FurnaceNum).DesignMaxOutletTemp;
-            ModifiedHeatCoilLoad = HeatCoilLoad - (AirMassFlow * PsyCpAirFnWTdb(Wout) * (Node(FurnaceOutletNode).Temp - Tout));
+            ModifiedHeatCoilLoad = HeatCoilLoad - (AirMassFlow * PsyCpAirFnW(Wout) * (Node(FurnaceOutletNode).Temp - Tout));
             Node(FurnaceOutletNode).Temp = Tout;
         }
 
@@ -10102,7 +10102,7 @@ namespace Furnaces {
         using IntegratedHeatPump::GetMaxSpeedNumIHP;
         using IntegratedHeatPump::IHPOperationMode;
         using IntegratedHeatPump::IntegratedHeatPumps;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500); // maximum number of iterations
@@ -10451,7 +10451,7 @@ namespace Furnaces {
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
             if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Furnace(FurnaceNum).DesignMaxOutletTemp) {
-                CpAir = PsyCpAirFnWTdb(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat);
+                CpAir = PsyCpAirFnW(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat);
                 SupHeaterLoad = Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate * CpAir *
                                 (Furnace(FurnaceNum).DesignMaxOutletTemp - Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp);
 

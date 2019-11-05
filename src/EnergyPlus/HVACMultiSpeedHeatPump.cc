@@ -2850,7 +2850,7 @@ namespace HVACMultiSpeedHeatPump {
         using General::SolveRoot;
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3301,7 +3301,7 @@ namespace HVACMultiSpeedHeatPump {
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
             if (Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp < MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
-                CpAir = PsyCpAirFnWTdb(Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat);
+                CpAir = PsyCpAirFnW(Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat);
                 SupHeaterLoad = Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate * CpAir *
                                 (MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp - Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp);
 

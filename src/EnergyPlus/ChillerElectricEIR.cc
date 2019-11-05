@@ -2565,7 +2565,7 @@ namespace ChillerElectricEIR {
                 EIRChillerHeatRecovery(EIRChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered);
 
             if (CondMassFlowRate > 0.0) {
-                Cp = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat);
+                Cp = Psychrometrics::PsyCpAirFnW(Node(CondInletNode).HumRat);
                 CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
             } else {
                 CondOutletTemp = CondInletTemp;

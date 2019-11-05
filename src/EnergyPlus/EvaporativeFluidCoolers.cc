@@ -119,7 +119,7 @@ namespace EvaporativeFluidCoolers {
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
     using General::TrimSigDigits;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbRhPb;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyTsatFnHPb;
@@ -2760,7 +2760,7 @@ namespace EvaporativeFluidCoolers {
         AirDensity = PsyRhoAirFnPbTdbW(
             SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress, InletAirTemp, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
         AirMassFlowRate = AirFlowRate * AirDensity;
-        CpAir = PsyCpAirFnWTdb(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
+        CpAir = PsyCpAirFnW(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
         CpWater = GetSpecificHeatGlycol(PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                         InletWaterTemp,
                                         PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,

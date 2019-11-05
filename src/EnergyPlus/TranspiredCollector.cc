@@ -899,7 +899,7 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using General::RoundSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
@@ -1004,7 +1004,7 @@ namespace TranspiredCollector {
 
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
 
-        CpAir = PsyCpAirFnWTdb(OutHumRat);
+        CpAir = PsyCpAirFnW(OutHumRat);
 
         holeArea = UTSC(UTSCNum).ActualArea * UTSC(UTSCNum).Porosity;
 

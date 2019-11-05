@@ -1408,7 +1408,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
+                            Real64 CpAir = PsyCpAirFnW(MixHumRat);
                             if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
@@ -1497,7 +1497,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
+                            Real64 CpAir = PsyCpAirFnW(MixHumRat);
                             if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
@@ -1601,7 +1601,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
+                            Real64 CpAir = PsyCpAirFnW(MixHumRat);
                             if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
@@ -1688,7 +1688,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
-                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat);
+                            Real64 CpAir = PsyCpAirFnW(MixHumRat);
                             if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
@@ -2139,7 +2139,7 @@ namespace WaterToAirHeatPumpSimple {
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -2221,7 +2221,7 @@ namespace WaterToAirHeatPumpSimple {
             LoadSideInletDBTemp_Init = 26.7;
             LoadSideInletHumRat_Init = 0.0111;
             LoadSideInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
-            CpAir_Init = PsyCpAirFnWTdb(LoadSideInletHumRat_Init);
+            CpAir_Init = PsyCpAirFnW(LoadSideInletHumRat_Init);
             firstTime = false;
         }
         LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName);
@@ -2293,7 +2293,7 @@ namespace WaterToAirHeatPumpSimple {
         LoadSideInletHumRat_Unit = SimpleWatertoAirHP(HPNum).InletAirHumRat;
         LoadSideInletWBTemp_Unit = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit, OutBaroPress, RoutineName);
         LoadSideInletEnth_Unit = SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
-        CpAir_Unit = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit);
+        CpAir_Unit = PsyCpAirFnW(LoadSideInletHumRat_Unit);
 
         while (true) {
             ++NumIteration;
@@ -2493,7 +2493,7 @@ namespace WaterToAirHeatPumpSimple {
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTwbFnTdbWPb;
@@ -2564,7 +2564,7 @@ namespace WaterToAirHeatPumpSimple {
 
         LoadSideInletWBTemp = PsyTwbFnTdbWPb(LoadSideInletDBTemp, LoadSideInletHumRat, OutBaroPress, RoutineName);
         LoadSideInletEnth = SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
         SourceSideMassFlowRate = SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
         SourceSideInletTemp = SimpleWatertoAirHP(HPNum).InletWaterTemp;
         SourceSideInletEnth = SimpleWatertoAirHP(HPNum).InletWaterEnthalpy;

@@ -2036,7 +2036,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     EXPECT_NEAR(11.6, WaterCoil(1).OutletAirTemp, 0.01);                      // preheat hot water coil is on and is heating the OA air stream
 
     AirInletNodeNum = WaterCoil(1).AirInletNodeNum;
-    CpAir = PsyCpAirFnWTdb(Node(AirInletNodeNum).HumRat);
+    CpAir = PsyCpAirFnW(Node(AirInletNodeNum).HumRat);
     EXPECT_NEAR(WaterCoil(1).TotWaterHeatingCoilRate,
                 WaterCoil(1).InletAirMassFlowRate * CpAir * (WaterCoil(1).OutletAirTemp - WaterCoil(1).InletAirTemp),
                 1.0);

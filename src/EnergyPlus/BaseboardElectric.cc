@@ -650,7 +650,7 @@ namespace BaseboardElectric {
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -675,7 +675,7 @@ namespace BaseboardElectric {
 
         AirInletTemp = Baseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat);
+        CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
         // currently only the efficiency is used to calculate the electric consumption.  There could be some

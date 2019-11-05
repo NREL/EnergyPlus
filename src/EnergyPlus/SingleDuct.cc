@@ -131,7 +131,7 @@ namespace SingleDuct {
     using DataHVACGlobals::SmallMassFlow;
     using DataHVACGlobals::TurnFansOn;
     using namespace DataSizing;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace FluidProperties;
     using namespace ScheduleManager;
@@ -2930,7 +2930,7 @@ namespace SingleDuct {
                             ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                             ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                             // the coil load is the zone design heating load plus (or minus!) the reheat load
-                            DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
+                            DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
                             if (DesCoilLoad >= SmallLoad) {
 
                                 rho = GetDensityGlycol(PlantLoop(Sys(SysNum).HWLoopNum).FluidName,
@@ -3031,7 +3031,7 @@ namespace SingleDuct {
                             ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                             ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                             // the coil load is the zone design heating load plus (or minus!) the reheat load
-                            DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
+                            DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
                             if (DesCoilLoad >= SmallLoad) {
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(fluidNameSteam, TempSteamIn, 1.0, Sys(SysNum).FluidIndex, RoutineNameFull);
@@ -3162,6 +3162,7 @@ namespace SingleDuct {
         // unused   USE DataAirLoop,       ONLY: AirLoopControlInfo
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetActuatedBranchFlowRate;
+        using Psychrometrics::PsyCpAirFnWTdb;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3221,7 +3222,9 @@ namespace SingleDuct {
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = Sys(SysNum).ReheatAirOutletNode;
         SysInletNode = Sys(SysNum).InletNodeNum;
-        CpAirAvg = PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat));
+        CpAirAvg = PsyCpAirFnW(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat));
+        Real64 CpAirAvg2 =
+            PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp + SysInlet(SysNum).AirTemp));
         MinFlowFrac = Sys(SysNum).ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
         ZoneTemp = Node(ZoneNodeNum).Temp;
@@ -3780,7 +3783,7 @@ namespace SingleDuct {
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = Sys(SysNum).ReheatAirOutletNode;
         SysInletNode = Sys(SysNum).InletNodeNum;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         MinFlowFrac = Sys(SysNum).ZoneMinAirFrac;
         MinMassAirFlow = MinFlowFrac * StdRhoAir * Sys(SysNum).MaxAirVolFlowRate;
         ZoneTemp = Node(ZoneNodeNum).Temp;
@@ -3791,7 +3794,7 @@ namespace SingleDuct {
         // or the Max as specified for the VAV model.
         if (SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) {
             // Calculate the flow required for cooling
-            CpAirSysIn = PsyCpAirFnWTdb(SysInlet(SysNum).AirHumRat);
+            CpAirSysIn = PsyCpAirFnW(SysInlet(SysNum).AirHumRat);
             DeltaTemp = CpAirSysIn * SysInlet(SysNum).AirTemp - CpAirZn * ZoneTemp;
 
             // Need to check DeltaTemp and ensure that it is not zero
@@ -4154,7 +4157,7 @@ namespace SingleDuct {
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         SysOutletNode = Sys(SysNum).ReheatAirOutletNode;
         SysInletNode = Sys(SysNum).InletNodeNum;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         HCType = Sys(SysNum).ReheatComp_Num;
         FanType = Sys(SysNum).Fan_Num;
         MaxCoolMassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
@@ -4548,7 +4551,7 @@ namespace SingleDuct {
         MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;                    // System massflow is set to the Available
         QMax2 = QToHeatSetPt;
         ZoneTemp = Node(ZoneNodeNum).Temp;
-        CpAir = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat); // zone air specific heat
+        CpAir = PsyCpAirFnW(Node(ZoneNodeNum).HumRat); // zone air specific heat
         if (Sys(SysNum).MaxReheatTempSetByUser) {
             TAirMax = Sys(SysNum).MaxReheatTemp;
             QMax = CpAir * MassFlow * (TAirMax - ZoneTemp);
@@ -4737,7 +4740,7 @@ namespace SingleDuct {
         MassFlow = SysInlet(SysNum).AirMassFlowRate; // system air mass flow rate
 
         if (GetCurrentScheduleValue(this->SchedPtr) > 0.0 && MassFlow > SmallMassFlow) {
-            Real64 CpAir = PsyCpAirFnWTdb(0.5 * (Node(this->OutletNodeNum).HumRat + Node(ZoneNodeNum).HumRat));
+            Real64 CpAir = PsyCpAirFnW(0.5 * (Node(this->OutletNodeNum).HumRat + Node(ZoneNodeNum).HumRat));
             SensOutputProvided = MassFlow * CpAir * (Node(this->OutletNodeNum).Temp - Node(ZoneNodeNum).Temp);
         } else {
             SensOutputProvided = 0.0;
@@ -4826,7 +4829,7 @@ namespace SingleDuct {
         HotControlNode = Sys(SysNum).ReheatControlNode;
         AirMassFlow = AirFlow;
         Node(FanInNode).MassFlowRate = AirMassFlow;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNode).HumRat);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
             Fans::SimulateFanComponents(Sys(SysNum).FanName, FirstHVACIteration, Sys(SysNum).Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {

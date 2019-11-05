@@ -51,7 +51,7 @@
 #ifndef AIRDENSITY
 #include "../../../Psychrometrics.hh"
 #define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
-#define AIRCP(W, T) Psychrometrics::PsyCpAirFnWTdb(W)
+#define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
 #else
 // Need a fallback
 #endif

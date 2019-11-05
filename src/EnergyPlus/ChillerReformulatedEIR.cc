@@ -126,7 +126,7 @@ namespace ChillerReformulatedEIR {
     using FluidProperties::GetSpecificHeatGlycol;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Chiller type parameters
@@ -408,7 +408,7 @@ namespace ChillerReformulatedEIR {
                 CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR).NumDims == 2) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
             } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
-                CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR).NumDims == 3) {
+                       CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR).NumDims == 3) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_Lift;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");

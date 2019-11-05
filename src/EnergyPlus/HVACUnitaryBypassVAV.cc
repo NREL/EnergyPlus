@@ -3339,7 +3339,7 @@ namespace HVACUnitaryBypassVAV {
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
                 if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
+                    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
                     QHeater = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
                               (CBVAV(CBVAVNum).CoilTempSetPoint - DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
                 } else {
@@ -3580,7 +3580,7 @@ namespace HVACUnitaryBypassVAV {
                 QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
             }
 
-            Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnWTdb(OutAirHumRat);
+            Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(OutAirHumRat);
 
             // Find the supply air temperature that will force the box to full flow
             if (BoxOutletNodeNum > 0) {
@@ -3797,7 +3797,7 @@ namespace HVACUnitaryBypassVAV {
         int MixerInletAirNode = CBVAV(CBVAVNum).MixerInletAirNode;     // Inlet air node number in OA mixer
 
         Real64 SystemMassFlow = 0.0; // System mass flow rate required for all zones [kg/s]
-        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
+        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
         // Determine zone air flow
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
             int ZoneNodeNum = CBVAV(CBVAVNum).ActualZoneNodeNum(ZoneNum);
@@ -3817,7 +3817,7 @@ namespace HVACUnitaryBypassVAV {
             } else {
                 ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
             }
-            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(ZoneNodeNum).HumRat);
+            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(ZoneNodeNum).HumRat);
             Real64 DeltaCpTemp = CpSupplyAir * DataLoopNode::Node(OutletNode).Temp - CpZoneAir * DataLoopNode::Node(ZoneNodeNum).Temp;
 
             // Need to check DeltaCpTemp and ensure that it is not zero

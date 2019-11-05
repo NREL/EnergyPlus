@@ -1564,9 +1564,9 @@ namespace HybridEvapCoolingModel {
             Hsa = 1.006 * Tsa * (2501 + 1.86 * Tsa);
             Hsa = PsyHFnTdbW(Tsa, Wsa);
 
-            Real64 SupplyAirCp = PsyCpAirFnWTdb(Wsa);   // J/degreesK.kg
-            Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra);   // J/degreesK.kg
-            Real64 OutdoorAirCP = PsyCpAirFnWTdb(Wosa); // J/degreesK.kg
+            Real64 SupplyAirCp = PsyCpAirFnW(Wsa);   // J/degreesK.kg
+            Real64 ReturnAirCP = PsyCpAirFnW(Wra);   // J/degreesK.kg
+            Real64 OutdoorAirCP = PsyCpAirFnW(Wosa); // J/degreesK.kg
 
             // Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is
             // assessed. However its valuable that they are calculated here to at least provide a check.
@@ -2029,9 +2029,9 @@ namespace HybridEvapCoolingModel {
             // Calculate timestep average unit and system
             PrimaryMode = CurrentPrimaryMode();
             PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
-            Real64 Outletcp = PsyCpAirFnWTdb(OutletHumRat); // J/degreesK.kg
-            Real64 Returncp = PsyCpAirFnWTdb(Wra);          // J/degreesK.kg
-            Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa);        // J/degreesK.kg
+            Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
+            Real64 Returncp = PsyCpAirFnW(Wra);          // J/degreesK.kg
+            Real64 Outdoorcp = PsyCpAirFnW(Wosa);        // J/degreesK.kg
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
             // Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
             // Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}

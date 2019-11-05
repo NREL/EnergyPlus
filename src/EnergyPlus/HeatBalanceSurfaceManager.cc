@@ -5252,7 +5252,7 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) /
                             ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp, PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
 
                         HSkyFD(SurfNum) = HSky;
                         HGrndFD(SurfNum) = HGround;
@@ -5269,7 +5269,7 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) /
                             ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTemp, PsyWFnTdbRhPb(GroundTemp, 1.0, OutBaroPress, RoutineNameGroundTemp)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
                         HSkyFD(SurfNum) = HSky;
                         HGrndFD(SurfNum) = HGround;
                         HAirFD(SurfNum) = HAir;
@@ -5293,7 +5293,7 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) /
                             ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC, PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
 
                         HSkyFD(SurfNum) = HSky;
                         HGrndFD(SurfNum) = HGround;
@@ -5309,7 +5309,7 @@ namespace HeatBalanceSurfaceManager {
                             HConvExtFD(SurfNum) /
                             ((PsyRhoAirFnPbTdbW(OutBaroPress, GroundTempFC, PsyWFnTdbRhPb(GroundTempFC, 1.0, OutBaroPress, RoutineNameGroundTempFC)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
                         HSkyFD(SurfNum) = HSky;
                         HGrndFD(SurfNum) = HGround;
                         HAirFD(SurfNum) = HAir;
@@ -5362,7 +5362,7 @@ namespace HeatBalanceSurfaceManager {
                                                 TempOutsideAirFD(SurfNum),
                                                 PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefNoCalcExt)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
                         HSkyFD(SurfNum) = HSky;
                         HGrndFD(SurfNum) = HGround;
                         HAirFD(SurfNum) = HAir;
@@ -5412,7 +5412,7 @@ namespace HeatBalanceSurfaceManager {
                                                 TempOutsideAirFD(SurfNum),
                                                 PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOtherSideCoefCalcExt)) +
                               RhoVaporAirOut(SurfNum)) *
-                             PsyCpAirFnWTdb(OutHumRat));
+                             PsyCpAirFnW(OutHumRat));
                         HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                         HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
                         HAirFD(SurfNum) = HAirExtSurf(SurfNum);
@@ -5457,7 +5457,7 @@ namespace HeatBalanceSurfaceManager {
                                                                       TempOutsideAirFD(SurfNum),
                                                                       PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOSCM)) +
                                                     RhoVaporAirOut(SurfNum)) *
-                                                   PsyCpAirFnWTdb(OutHumRat));
+                                                   PsyCpAirFnW(OutHumRat));
                         HSkyFD(SurfNum) = OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
                         HGrndFD(SurfNum) = 0.0;            // CR 8046, null out and use only sky term for surface to baffle IR
                         HAirFD(SurfNum) = 0.0;             // CR 8046, null out and use only sky term for surface to baffle IR
@@ -5539,7 +5539,7 @@ namespace HeatBalanceSurfaceManager {
                                                         TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                       RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnWTdb(OutHumRat));
+                                     PsyCpAirFnW(OutHumRat));
                                 HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                                 HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
                                 HAirFD(SurfNum) = HAirExtSurf(SurfNum);
@@ -5557,7 +5557,7 @@ namespace HeatBalanceSurfaceManager {
                                                         TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvWetSurf)) +
                                       RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnWTdb(OutHumRat));
+                                     PsyCpAirFnW(OutHumRat));
                                 HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                                 HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
                                 HAirFD(SurfNum) = HAirExtSurf(SurfNum);
@@ -5579,7 +5579,7 @@ namespace HeatBalanceSurfaceManager {
                                                         TempOutsideAirFD(SurfNum),
                                                         PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameExtEnvDrySurf)) +
                                       RhoVaporAirOut(SurfNum)) *
-                                     PsyCpAirFnWTdb(OutHumRat));
+                                     PsyCpAirFnW(OutHumRat));
                                 //  check for saturation conditions of air
                                 RhoVaporSat = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
                                 if (RhoVaporAirOut(SurfNum) > RhoVaporSat) RhoVaporAirOut(SurfNum) = RhoVaporSat;
@@ -5616,7 +5616,7 @@ namespace HeatBalanceSurfaceManager {
                                                     TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameNoWind)) +
                                   RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnWTdb(OutHumRat));
+                                 PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSkyExtSurf(SurfNum);
                             HGrndFD(SurfNum) = HGrdExtSurf(SurfNum);
                             HAirFD(SurfNum) = HAirExtSurf(SurfNum);
@@ -5677,7 +5677,7 @@ namespace HeatBalanceSurfaceManager {
                                                     TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameOther)) +
                                   RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnWTdb(OutHumRat));
+                                 PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = 0.0;
                             HGrndFD(SurfNum) = 0.0;
                             HAirFD(SurfNum) = 0.0;
@@ -5701,7 +5701,7 @@ namespace HeatBalanceSurfaceManager {
                                                     TempOutsideAirFD(SurfNum),
                                                     PsyWFnTdbRhPb(TempOutsideAirFD(SurfNum), 1.0, OutBaroPress, RoutineNameIZPart)) +
                                   RhoVaporAirOut(SurfNum)) *
-                                 PsyCpAirFnWTdb(OutHumRat));
+                                 PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = 0.0;
                             HGrndFD(SurfNum) = 0.0;
                             HAirFD(SurfNum) = 0.0;
@@ -5956,7 +5956,8 @@ namespace HeatBalanceSurfaceManager {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        Real64 CpAir2 = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -6066,7 +6067,7 @@ namespace HeatBalanceSurfaceManager {
                         RhoVaporAirIn(SurfNum) =
                             min(PsyRhovFnTdbWPb_fast(MAT_zone, ZoneAirHumRat_zone, OutBaroPress), PsyRhovFnTdbRh(MAT_zone, 1.0, HBSurfManInsideSurf));
                         HMassConvInFD(SurfNum) = HConvIn_surf / (PsyRhoAirFnPbTdbW_fast(OutBaroPress, MAT_zone, ZoneAirHumRat_zone) *
-                                                                 PsyCpAirFnWTdb_fast(ZoneAirHumRat_zone));
+                                                                 PsyCpAirFnW_fast(ZoneAirHumRat_zone));
                     }
                 }
             }
@@ -7193,7 +7194,7 @@ namespace HeatBalanceSurfaceManager {
         using DataSurfaces::ExtVentedCavity;
         using DataSurfaces::OSCM;
         using DataSurfaces::Surface;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbTwbPb;
         // unused0909  USE DataHVACGlobals , ONLY: TimeStepSys
