@@ -321,6 +321,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
+        this->myOneTimeInitFlag = false;
     }
 
     // get inlet conditions from inlet node
@@ -343,9 +344,9 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 
     // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
     // call that here, and THEN set the one time init flag to false
-    if (this->myOneTimeInitFlag) {
+    if (!DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag && this->doStandardRatingFlag) {
         this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
-        this->myOneTimeInitFlag = false;
+        this->doStandardRatingFlag = false;
     }
 
     // calculate energy conversion factor

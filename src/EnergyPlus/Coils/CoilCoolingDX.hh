@@ -110,6 +110,7 @@ public:
     int supplyFanIndex = 0;
     int supplyFanType = 0;
     std::string supplyFanName = "";
+    bool doStandardRatingFlag = true;
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
