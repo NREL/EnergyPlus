@@ -81,11 +81,17 @@ struct CoilCoolingDX
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
-    void getData(
-            int &evapInletNodeIndex, int &evapOutletNodeIndex, int &condInletNodeIndex, Real64 &normalModeRatedCapacity,
-            int &normalModeNumSpeeds, std::vector<Real64> &normalModeFlowFractions, std::vector<Real64> &normalModeRatedCapacities,
-            CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod, int &minOutdoorDryBulb
-            );
+    void getData(int &evapInletNodeIndex,
+                 int &evapOutletNodeIndex,
+                 int &condInletNodeIndex,
+                 Real64 &normalModeRatedCapacity,
+                 int &normalModeNumSpeeds,
+                 CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
+                 Real64 &minOutdoorDryBulb);
+    void getSpeedData(Real64 &normalModeRatedEvapAirFlowRate, 
+                      std::vector<Real64> &normalModeFlowRates, 
+                      std::vector<Real64> &normalModeRatedCapacities);
+
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 
     CoilCoolingDXInputSpecification original_input_specs;

@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1293,6 +1294,7 @@ namespace DesiccantDehumidifiers {
 
             if (!lAlphaBlanks(12)) {
                 if ((UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) ||
+                    (UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX")) ||
                     (UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) ||
                     (UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED"))) {
                     ErrorsFound2 = false;
@@ -1304,6 +1306,8 @@ namespace DesiccantDehumidifiers {
 
                     if ((UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED"))) {
                         DesicDehum(DesicDehumNum).coolingCoil_TypeNum = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+                    } else if ((UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType, "COIL:COOLING:DX"))) {
+                        DesicDehum(DesicDehumNum).coolingCoil_TypeNum = DataHVACGlobals::CoilDX_Cooling;
                     } else if ((UtilityRoutines::SameString(DesicDehum(DesicDehumNum).CoolingCoilType,
                                                             "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE"))) {
                         DesicDehum(DesicDehumNum).coolingCoil_TypeNum = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
@@ -1336,6 +1340,17 @@ namespace DesiccantDehumidifiers {
                     if (ErrorsFound2)
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName +
                                           "\"");
+                } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_Cooling) {
+                    // call CoilCoolingDX constructor
+                    //coilCoolingDXs.emplace_back(DesicDehum(DesicDehumNum).CoolingCoilName);
+                    //DesicDehum(DesicDehumNum).DXCoilIndex = (int)coilCoolingDXs.size() - 1;
+                    //// mine data from coil object
+                    //auto &newCoil = coilCoolingDXs[DesicDehum(DesicDehumNum).DXCoilIndex];
+                    //DesicDehum(DesicDehumNum).CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
+                    //DesicDehum(DesicDehumNum).CompanionCoilCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                    // if ((int)newCoil.performance.normalMode.speeds.size() > 1) {
+                    //    PTUnit(PTUnitNum).useVSCoilModel = true;
+                    //}
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
                     DesicDehum(DesicDehumNum).CoolingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
