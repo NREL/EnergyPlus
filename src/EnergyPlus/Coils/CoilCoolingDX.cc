@@ -347,8 +347,11 @@ void CoilCoolingDX::getData(int &_evapInletNodeIndex,
     _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
 }
 
-void CoilCoolingDX::getSpeedData(std::vector<Real64> &_normalModeFlowRates, std::vector<Real64> &_normalModeRatedCapacities)
+void CoilCoolingDX::getSpeedData(Real64 &_normalModeRatedEvapAirFlowRate, 
+                                 std::vector<Real64> &_normalModeFlowRates, 
+                                 std::vector<Real64> &_normalModeRatedCapacities)
 {
+    _normalModeRatedEvapAirFlowRate = this->performance.normalMode.ratedEvapAirFlowRate;
     _normalModeFlowRates.clear();
     _normalModeRatedCapacities.clear();
     for (auto const &thisSpeed : this->performance.normalMode.speeds) {

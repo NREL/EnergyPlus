@@ -93,7 +93,10 @@ public:
                  int &normalModeNumSpeeds,
                  CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
                  Real64 &minOutdoorDryBulb);
-    void getSpeedData(std::vector<Real64> &normalModeFlowFractions, std::vector<Real64> &normalModeRatedCapacities);
+    void getSpeedData(Real64 &normalModeRatedEvapAirFlowRate, 
+                      std::vector<Real64> &normalModeFlowRates, 
+                      std::vector<Real64> &normalModeRatedCapacities);
+
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 
     std::string name;
