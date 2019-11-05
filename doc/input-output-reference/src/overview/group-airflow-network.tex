@@ -229,7 +229,7 @@ Here is a list of some of the things that the Airflow Network calculation can an
 \begin{enumerate}
 \item The model is restricted to using a constant volume or variable volume fan (\hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, and \hyperref[fanvariablevolume]{Fan:VariableVolume}).
 \item Air circulation and/or air temperature stratification within a thermal zone. For example, you should not try to divide a high space, such as an atrium, into subzones separated by artificial horizontal surfaces that have cracks or openings with the expectation that AirflowNetwork will give you a realistic temperature in each subzone and/or a realistic air flow between subzones.
-\item The model is restricted to eleven types of coils that can be in the air distribution system (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric},~ \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}, \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}, \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}, \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}, \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}, and \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}).
+\item The model is restricted to eleven types of coils that can be in the air distribution system (\hyperref[coilcoolingdx]{Coil:Cooling:DX}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric},~ \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}, \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}, \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}, and \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}).
 \item The model is restricted to two types of air distribution equipment terminal units (\hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat} and \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}).
 \item Supply and return leaks are not allowed in an \hyperref[airloophvac]{AirLoopHVAC}. They can only be modeled in the Zone Equipment portion of the air loop (i.e., return leaks may be modeled between the zone return node and the zone mixer inlet or the zone mixer outlet and the zone equipment loop outlet; and supply leaks may be modeled between the zone equipment loop inlet and the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} inlet node or the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} outlet node and the zone supply node).
 \item An air distribution system must be located inside the building (i.e., the ducts must pass through zones within the building).
@@ -2044,7 +2044,7 @@ This field requires input of the coil type used in the AirflowNetwork model. The
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
+  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
 \item
   \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
@@ -2057,12 +2057,6 @@ This field requires input of the coil type used in the AirflowNetwork model. The
   \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
   \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
-\item
-  \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
-\item
-  \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}
-\item
-  \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}
 \item
   \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}
 \end{itemize}
@@ -2097,7 +2091,7 @@ An IDF example is provided below:
 
 AirflowNetwork:Distribution:Component:Coil,
       ACDXCoil 1,                            !- Name of Associated EnergyPlus Coil
-      Coil:Cooling:DX:SingleSpeed,           !- EnergyPlus Coil Type
+      Coil:Cooling:DX,           !- EnergyPlus Coil Type
       0.1,                                   !- Air Path Length {m}
       1.00;                                  !- Air Path Hydraulic Diameter {m}
 

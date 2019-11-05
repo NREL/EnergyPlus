@@ -575,7 +575,7 @@ Allowed coil types are:
 
 \textbf{Cooling coils:}
 \begin{itemize}
-\item Coil:Cooling:DX:SingleSpeed
+\item Coil:Cooling:DX
 \end{itemize}
 
 \textbf{Heating coils:}
@@ -1709,7 +1709,7 @@ The following sections describe the performance calculations for cooling-mode an
 
 Zone terminal units meet a zone load as determined by a zone thermostat. The DX coils within a zone terminal unit will operate to meet a sensible zone load and all terminal units are controlled to either meet a zone sensible cooling load or a zone sensible heating load. This model does not provide for simultaneous cooling and heating.
 
-Given a zone load, the model calculates the part-load ratio of the terminal unit such that the terminal unit's ``net'' sensible capacity is equal to the zone load (if sufficient capacity is available). If it is determined that the part-load ratio of the zone terminal unit will be equal to 1, the DX cooling coil's capacity is calculated in the same manner as described for single-speed DX cooling coils (ref: Coil:Cooling:DX:SingleSpeed). When it is determined that the part-load ratio of the zone terminal unit will be less than 1, the DX cooling coil's capacity will be modulated through a reduction in refrigerant flow rate and an iterative solution technique will be used to calculate the performance of the DX cooling coil. For DX heating coils, capacity is calculated in the same manner as described for single-speed DX heating coils (ref: Coil:Heating:DX:SingleSpeed).
+Given a zone load, the model calculates the part-load ratio of the terminal unit such that the terminal unit's ``net'' sensible capacity is equal to the zone load (if sufficient capacity is available). If it is determined that the part-load ratio of the zone terminal unit will be equal to 1, the DX cooling coil's capacity is calculated in the same manner as described for single-speed DX cooling coils (ref: Coil:Cooling:DX). When it is determined that the part-load ratio of the zone terminal unit will be less than 1, the DX cooling coil's capacity will be modulated through a reduction in refrigerant flow rate and an iterative solution technique will be used to calculate the performance of the DX cooling coil. For DX heating coils, capacity is calculated in the same manner as described for single-speed DX heating coils (ref: Coil:Heating:DX:SingleSpeed).
 
 The ``net'' sensible full load cooling capacity is then compared to the zone sensible load. If the ``net'' sensible full load capacity is less than or equal to the absolute value of the zone sensible load, the DX coil operates at the \emph{maximum} available capacity and, as a result, the zone air heat balance adjusts the zone air temperature. If the ``net'' sensible full load capacity is greater than the absolute value of the zone sensible load, an iterative solution technique is used to determine the total capacity required to meet the zone sensible load. This iteration loop entails successive modeling of DX coil performance and the loop iterates on the required total capacity until the operating ``net'' sensible capacity is equal to the zone sensible load.
 
