@@ -501,9 +501,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(12)
+                                CoolingCoilType = InArgs(16)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(12) = "Coil:Cooling:DX"
+                                    OutArgs(16) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('AIRLOOPHVAC:UNITARYHEATCOOL')
@@ -511,9 +511,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(12)
+                                CoolingCoilType = InArgs(16)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(12) = "Coil:Cooling:DX"
+                                    OutArgs(16) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS')
@@ -521,9 +521,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(14)
+                                CoolingCoilType = InArgs(20)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(14) = "Coil:Cooling:DX"
+                                    OutArgs(20) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR')
@@ -531,9 +531,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(10)
+                                CoolingCoilType = InArgs(13)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(10) = "Coil:Cooling:DX"
+                                    OutArgs(13) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED')
@@ -541,9 +541,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(12)
+                                CoolingCoilType = InArgs(13)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(12) = "Coil:Cooling:DX"
+                                    OutArgs(13) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('AIRLOOPHVAC:UNITARYSYSTEM')
@@ -569,9 +569,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(3) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(4) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                OutArgs(5)=TempArgs(95) ! Condenser Zone Name
+                                ! blank condenser zone name
+                                ! OutArgs(5)=TempArgs(5) ! Condenser Zone Name
                                 OutArgs(6)=TempArgs(5) ! Condenser Inlet Node Name
-                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                ! blank condenser outlet node name
+                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(9) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(8) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -805,9 +807,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                OutArgs(5)=TempArgs(35) ! Condenser Zone Name
+                                ! blank condenser zone name
+                                ! OutArgs(5)=TempArgs(35) ! Condenser Zone Name
                                 OutArgs(6)=TempArgs(20) ! Condenser Inlet Node Name
-                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                ! blank condenser oulet node name
+                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(28) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(27) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -894,9 +898,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                OutArgs(5)=TempArgs(39) ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
+                                ! blank condenser zone name
+                                ! OutArgs(5)=TempArgs(39) ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
                                 OutArgs(6)=TempArgs(21) ! Condenser Inlet Node Name
-                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                ! blank condenser outet node name
+                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(31) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(30) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -1131,9 +1137,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(3) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(4) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                OutArgs(5)=TempArgs(95) ! Condenser Zone Name
+                                ! blank condenser zone name
+                                ! OutArgs(5)=TempArgs(95) ! Condenser Zone Name
                                 OutArgs(6)=TempArgs(5) ! Condenser Inlet Node Name
-                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                ! blank condenser outlet node name
+                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(18) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(17) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -1468,7 +1476,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 !OutArgs(4)='' ! Availability Schedule Name - Coil:Cooling:DX:VariableSpeed never had this
                                 !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
                                 OutArgs(6)=TempArgs(11) ! Condenser Inlet Node Name
-                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                ! blank condenser outlet node name
+                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(18) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(17) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -1628,9 +1637,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(5)
+                                CoolingCoilType = InArgs(6)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(5) = "Coil:Cooling:DX"
+                                    OutArgs(6) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('COIL:WATERHEATING:DESUPERHEATER')
@@ -1682,9 +1691,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(11)
+                                CoolingCoilType = InArgs(12)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(11) = "Coil:Cooling:DX"
+                                    OutArgs(12) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER')
@@ -1712,9 +1721,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(9)
+                                CoolingCoilType = InArgs(11)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(9) = "Coil:Cooling:DX"
+                                    OutArgs(11) = "Coil:Cooling:DX"
                                 END IF
 
                                 !!!   Changes for report variables, meters, tables -- update names
