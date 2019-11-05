@@ -144,7 +144,6 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
     actual_result = 20.0;
     Real64 cache_hit_result = PsyTsatFnHPb(H, PB);
     EXPECT_NEAR(actual_result, cache_hit_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
@@ -185,7 +184,6 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
     PB = 101325.0;
     actual_result = 99.974;
     EXPECT_NEAR(actual_result, cache_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
@@ -202,7 +200,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     EXPECT_NEAR(17.5250143, W, 0.0001);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid (PsyWFnTdpPb).",
+        "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid "
+        "(PsyWFnTdpPb).",
         "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 101325.00",
         "   **   ~~~   ** Instead, calculated Humidity Ratio at 99.0 (1 degree less) = 17.5250 will be used. Simulation continues.",
@@ -213,7 +212,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     EXPECT_NEAR(17.5250143, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    // Denver barometric pressure 
+    // Denver barometric pressure
     PB = 81000.0;
     std::string const error_string1 = delimited_string({
         "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid "
@@ -226,5 +225,75 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
     EXPECT_NEAR(20.07942181, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string1, true));
+}
 
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
+{
+
+    InitializePsychRoutines();
+
+    // Test 1: analytical PsyCpAirFnW is independent of temperature
+    Real64 W = 0.0080;
+    Real64 T = 24.0;
+    Real64 local_result = 1.00484e3 + W * 1.85895e3; // PsyCpAirFnW per cp = dh/dT
+    Real64 analytic_result = PsyCpAirFnW(W);         // cp = dh/dT
+    // check analytical function result
+    EXPECT_DOUBLE_EQ(analytic_result, local_result);
+
+    // Test 2: cooling design test condition analytical vs numerical
+    W = 0.0085;
+    T = 26.0;
+    analytic_result = PsyCpAirFnW(W);               // cp = dh/dT
+    Real64 numerical_result = PsyCpAirFnWTdb(W, T); // cp = delta_h / delta_T
+    // check result
+    EXPECT_NEAR(analytic_result, numerical_result, 1.0E-010);
+
+    // Test 3: heating design test condition analytical vs numerical
+    W = 0.007;
+    T = 10.0;
+    analytic_result = PsyCpAirFnW(W);        // cp = dh/dT
+    numerical_result = PsyCpAirFnWTdb(W, T); // cp = delta_h / delta_T
+    // check result
+    EXPECT_NEAR(analytic_result, numerical_result, 1.0E-010);
+
+    // Test 4: dry air test condition analytical vs numerical
+    W = 0.0;
+    T = 20.0;
+    analytic_result = PsyCpAirFnW(W);        // cp = dh/dT
+    numerical_result = PsyCpAirFnWTdb(W, T); // cp = delta_h / delta_T
+    // check result
+    EXPECT_NEAR(analytic_result, numerical_result, 1.0E-010);
+
+    // Test 5: analytical vs numerical cp values for psychomteric chart T and W range
+    Real64 SSE = 0.0;
+    Real64 Error = 0.0;
+    Real64 Error_sum = 0.0;
+    Real64 Error_min = 100.0;
+    Real64 Error_max = -100.0;
+    Real64 Tmax = 50.0;
+    Real64 Wmax = 0.030;
+    analytic_result = 0.0;
+    numerical_result = 0.0;
+    for (int TLoop = 0; TLoop <= 100; TLoop++) {
+        // update temperature
+        T = Tmax - (Tmax / 100.0) * TLoop;
+        for (int WLoop = 0; WLoop <= 100; WLoop++) {
+            // update humidity ratio
+            W = Wmax - (Wmax / 100.0) * WLoop;
+            analytic_result = PsyCpAirFnW(W);
+            numerical_result = PsyCpAirFnWTdb(W, T);
+            Error = numerical_result - analytic_result;
+            Error_min = std::min(Error, Error_min);
+            Error_max = std::max(Error, Error_max);
+            SSE += Error * Error;
+            Error_sum += Error;
+        }
+    }
+    Real64 StdError = std::sqrt(SSE / 100);
+    Real64 Error_avg = Error_sum / 101;
+    // check analytical vs numerical cp values stats
+    EXPECT_DOUBLE_EQ(Error_min, -2.8808244678657502e-10);
+    EXPECT_DOUBLE_EQ(Error_max, 2.5875124265439808e-10);
+    EXPECT_DOUBLE_EQ(Error_avg, 1.5508032789728189e-09);
+    EXPECT_DOUBLE_EQ(StdError, 6.7111413639467468e-10);
 }

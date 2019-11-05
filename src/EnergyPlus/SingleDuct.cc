@@ -3162,7 +3162,7 @@ namespace SingleDuct {
         // unused   USE DataAirLoop,       ONLY: AirLoopControlInfo
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetActuatedBranchFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        // using Psychrometrics::PsyCpAirFnWTdb;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3223,8 +3223,9 @@ namespace SingleDuct {
         SysOutletNode = Sys(SysNum).ReheatAirOutletNode;
         SysInletNode = Sys(SysNum).InletNodeNum;
         CpAirAvg = PsyCpAirFnW(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat));
-        Real64 CpAirAvg2 =
-            PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp + SysInlet(SysNum).AirTemp));
+        // Real64 CpAirAvg2 =
+        //    PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp +
+        //    SysInlet(SysNum).AirTemp));
         MinFlowFrac = Sys(SysNum).ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
         ZoneTemp = Node(ZoneNodeNum).Temp;
