@@ -947,8 +947,7 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
                     // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(PTUnit(PTUnitNum).DXCoolCoilName);
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = (int)coilCoolingDXs.size() - 1;
+                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     // mine data from coil object
                     // TODO: Need to check for autosize on these I guess
                     auto &newCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
@@ -1889,8 +1888,7 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
                     // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(PTUnit(PTUnitNum).DXCoolCoilName);
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = (int)coilCoolingDXs.size() - 1;
+                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     // mine data from coil object
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
                     coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(

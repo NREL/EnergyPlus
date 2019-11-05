@@ -4387,8 +4387,7 @@ namespace UnitarySystems {
 
                         } else {
                             //                    // call CoilCoolingDX constructor
-                            coilCoolingDXs.emplace_back(loc_m_CoolingCoilName);
-                            thisSys.m_CoolingCoilIndex = (int)coilCoolingDXs.size() - 1;
+                            thisSys.m_CoolingCoilIndex = CoilCoolingDX::factory(loc_m_CoolingCoilName);
 
                             // mine data from coil object
                             // TODO: Need to check for autosize on these I guess
