@@ -1342,12 +1342,12 @@ namespace DesiccantDehumidifiers {
                                           "\"");
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_Cooling) {
                     // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(DesicDehum(DesicDehumNum).CoolingCoilName);
-                    DesicDehum(DesicDehumNum).DXCoilIndex = (int)coilCoolingDXs.size() - 1;
-                    // mine data from coil object
-                    auto &newCoil = coilCoolingDXs[DesicDehum(DesicDehumNum).DXCoilIndex];
-                    DesicDehum(DesicDehumNum).CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
-                    DesicDehum(DesicDehumNum).CompanionCoilCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                    //coilCoolingDXs.emplace_back(DesicDehum(DesicDehumNum).CoolingCoilName);
+                    //DesicDehum(DesicDehumNum).DXCoilIndex = (int)coilCoolingDXs.size() - 1;
+                    //// mine data from coil object
+                    //auto &newCoil = coilCoolingDXs[DesicDehum(DesicDehumNum).DXCoilIndex];
+                    //DesicDehum(DesicDehumNum).CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
+                    //DesicDehum(DesicDehumNum).CompanionCoilCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
                     // if ((int)newCoil.performance.normalMode.speeds.size() > 1) {
                     //    PTUnit(PTUnitNum).useVSCoilModel = true;
                     //}
