@@ -121,15 +121,8 @@ namespace EvaporativeFluidCoolers {
 
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
 
-    Real64 InletWaterTemp(0.0);    // CW temperature at evaporative fluid cooler inlet
-    Real64 OutletWaterTemp(0.0);   // CW temperature at evaporative fluid cooler outlet
-    int WaterInletNode(0);         // DataLoopNode::Node number at evaporative fluid cooler inlet
-    int WaterOutletNode(0);        // DataLoopNode::Node number at evaporative fluid cooler outlet
-    Real64 WaterMassFlowRate(0.0); // WaterMassFlowRate through evaporative fluid cooler
-    Real64 Qactual(0.0);          // Evaporative fluid cooler heat transfer
-    Real64 FanPower(0.0);         // Evaporative fluid cooler fan power used
+    // Moving to member variable causes diffs... no idea at this point
     Real64 AirFlowRateRatio(0.0); // Ratio of air flow rate through VS evaporative fluid cooler
-    Real64 WaterUsage(0.0); // Evaporative fluid cooler water usage (m3/s)
 
     Array1D_bool CheckEquipName;
     Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler; // dimension to number of machines
@@ -1181,15 +1174,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize the simulation variables.
 
-        InletWaterTemp = 0.0;    // CW temperature at evaporative fluid cooler inlet
-        OutletWaterTemp = 0.0;   // CW temperature at evaporative fluid cooler outlet
-        WaterInletNode = 0;      // DataLoopNode::Node number at evaporative fluid cooler inlet
-        WaterOutletNode = 0;     // DataLoopNode::Node number at evaporative fluid cooler outlet
-        WaterMassFlowRate = 0.0; // WaterMassFlowRate through evaporative fluid cooler
-        Qactual = 0.0;          // Evaporative fluid cooler heat transfer
-        FanPower = 0.0;         // Evaporative fluid cooler fan power used
         AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS Evaporative fluid cooler to design air flow rate
-        WaterUsage = 0.0;       // Evaporative fluid cooler water usage (m3/s)
     }
 
     void InitEvapFluidCooler(int const EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
@@ -1310,8 +1295,8 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Each time initializations
-        WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
-        SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).WaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
+        SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).WaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutdoorAirInletNodeNum != 0) {
             SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).OutdoorAirInletNodeNum).Temp;
@@ -1331,14 +1316,14 @@ namespace EvaporativeFluidCoolers {
 //        int BranchIndex = SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum;
 //        int CompIndex = SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum;
 
-        WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum,
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum,
                                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum,
                                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum,
                                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum,
                                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).DesWaterMassFlowRate *
                                                                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(WaterMassFlowRate,
+        PlantUtilities::SetComponentFlowRate(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
                              SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum,
                              SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum,
                              SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum,
@@ -2209,12 +2194,12 @@ namespace EvaporativeFluidCoolers {
         int LoopSideNum;
 
         // set inlet and outlet nodes
-        WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
-        WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
-        Qactual = 0.0;
-        FanPower = 0.0;
-        Real64 inletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-        OutletWaterTemp = inletWaterTemp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = 0.0;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = 0.0;
+        Real64 inletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = inletWaterTemp;
         LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
         LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
         AirFlowRate = 0.0;
@@ -2235,7 +2220,7 @@ namespace EvaporativeFluidCoolers {
         CapacityControl = SimpleEvapFluidCooler(EvapFluidCoolerNum).CapacityControl;
 
         //   MassFlowTol is a parameter to indicate a no flow condition
-        if (WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
 
         if (inletWaterTemp > TempSetPoint) {
             //     Turn on evaporative fluid cooler fan
@@ -2243,33 +2228,33 @@ namespace EvaporativeFluidCoolers {
             AirFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
             FanPowerOn = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower;
 
-            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp);
+            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
 
-            if (OutletWaterTemp <= TempSetPoint) {
-                if (CapacityControl == 0 || OutletWaterTemp <= OWTLowerLimit) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp <= TempSetPoint) {
+                if (CapacityControl == 0 || SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp <= OWTLowerLimit) {
                     //         Setpoint was met with pump ON and fan ON, calculate run-time fraction
-                    FanModeFrac = (TempSetPoint - inletWaterTemp) / (OutletWaterTemp - inletWaterTemp);
-                    FanPower = FanModeFrac * FanPowerOn;
-                    OutletWaterTemp = TempSetPoint;
+                    FanModeFrac = (TempSetPoint - inletWaterTemp) / (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp - inletWaterTemp);
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanModeFrac * FanPowerOn;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = TempSetPoint;
                 } else {
                     // FluidBypass, fan runs at full speed for the entire time step
                     FanModeFrac = 1.0;
-                    FanPower = FanPowerOn;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanPowerOn;
                     BypassFlag = 1;
                 }
             } else {
                 //       Setpoint was not met, evaporative fluid cooler ran at full capacity
                 FanModeFrac = 1.0;
-                FanPower = FanPowerOn;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanPowerOn;
             }
         } else if (inletWaterTemp <= TempSetPoint) {
             // Inlet water temperature lower than setpoint, assume 100% bypass, evaporative fluid cooler fan off
             if (CapacityControl == 1) {
                 if (inletWaterTemp > OWTLowerLimit) {
-                    FanPower = 0.0;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = 0.0;
                     BypassFraction = 1.0;
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction = 1.0;
-                    OutletWaterTemp = inletWaterTemp;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = inletWaterTemp;
                 }
             }
         }
@@ -2278,7 +2263,7 @@ namespace EvaporativeFluidCoolers {
         // The iteration ends when the numer of iteration exceeds the limit or the difference
         //  between the new and old bypass fractions is less than the threshold.
         if (BypassFlag == 1) {
-            BypassFraction = (TempSetPoint - OutletWaterTemp) / (inletWaterTemp - OutletWaterTemp);
+            BypassFraction = (TempSetPoint - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / (inletWaterTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
             if (BypassFraction > 1.0 || BypassFraction < 0.0) {
                 // Bypass cannot meet setpoint, assume no bypass
                 BypassFlag = 0;
@@ -2288,34 +2273,34 @@ namespace EvaporativeFluidCoolers {
             } else {
                 NumIteration = 0;
                 BypassFractionPrev = BypassFraction;
-                OutletWaterTempPrev = OutletWaterTemp;
+                OutletWaterTempPrev = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
                 while (NumIteration < MaxIteration) {
                     ++NumIteration;
                     // need to iterate for the new OutletWaterTemp while bypassing evaporative fluid cooler water
-                    SimSimpleEvapFluidCooler(EvapFluidCoolerNum, WaterMassFlowRate * (1.0 - BypassFraction), AirFlowRate, UAdesign, OutletWaterTemp);
+                    SimSimpleEvapFluidCooler(EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * (1.0 - BypassFraction), AirFlowRate, UAdesign, SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
                     // Calc new BypassFraction based on the new OutletWaterTemp
-                    if (std::abs(OutletWaterTemp - OWTLowerLimit) <= 0.01) {
+                    if (std::abs(SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp - OWTLowerLimit) <= 0.01) {
                         BypassFraction2 = BypassFraction;
                         break;
-                    } else if (OutletWaterTemp < OWTLowerLimit) {
+                    } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp < OWTLowerLimit) {
                         // Set OutletWaterTemp = OWTLowerLimit, and use linear interpolation to calculate the bypassFraction
                         BypassFraction2 = BypassFractionPrev - (BypassFractionPrev - BypassFraction) * (OutletWaterTempPrev - OWTLowerLimit) /
-                                                                   (OutletWaterTempPrev - OutletWaterTemp);
+                                                                   (OutletWaterTempPrev - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
                         SimSimpleEvapFluidCooler(
-                            EvapFluidCoolerNum, WaterMassFlowRate * (1.0 - BypassFraction2), AirFlowRate, UAdesign, OutletWaterTemp);
-                        if (OutletWaterTemp < OWTLowerLimit) {
+                            EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * (1.0 - BypassFraction2), AirFlowRate, UAdesign, SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
+                        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp < OWTLowerLimit) {
                             // Use previous iteraction values
                             BypassFraction2 = BypassFractionPrev;
-                            OutletWaterTemp = OutletWaterTempPrev;
+                            SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = OutletWaterTempPrev;
                         }
                         break;
                     } else {
-                        BypassFraction2 = (TempSetPoint - OutletWaterTemp) / (inletWaterTemp - OutletWaterTemp);
+                        BypassFraction2 = (TempSetPoint - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / (inletWaterTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
                     }
                     // Compare two BypassFraction to determine when to stop
                     if (std::abs(BypassFraction2 - BypassFraction) <= BypassFractionThreshold) break;
                     BypassFractionPrev = BypassFraction;
-                    OutletWaterTempPrev = OutletWaterTemp;
+                    OutletWaterTempPrev = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
                     BypassFraction = BypassFraction2;
                 }
                 if (NumIteration > MaxIteration) {
@@ -2324,16 +2309,16 @@ namespace EvaporativeFluidCoolers {
                 }
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction = BypassFraction2;
                 // may not meet TempSetPoint due to limit of evaporative fluid cooler outlet temp to OWTLowerLimit
-                OutletWaterTemp = (1.0 - BypassFraction2) * OutletWaterTemp + BypassFraction2 * inletWaterTemp;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = (1.0 - BypassFraction2) * SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp + BypassFraction2 * inletWaterTemp;
             }
         }
 
         // Should this be water inlet node num?????
         CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
-                                        DataLoopNode::Node(WaterInletNode).Temp,
+                                        DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp,
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
-        Qactual = WaterMassFlowRate * CpWater * (DataLoopNode::Node(WaterInletNode).Temp - OutletWaterTemp);
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
         AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
     }
 
@@ -2388,8 +2373,6 @@ namespace EvaporativeFluidCoolers {
         // Based on TwoSpeedTower by Dan Fisher ,Sept. 1998
         // Dec. 2008. BG. added RunFlag logic per original methodology
 
-        Real64 InletWaterTemp;
-
         std::string const RoutineName("CalcTwoSpeedEvapFluidCooler");
 
         Real64 AirFlowRate;
@@ -2406,15 +2389,15 @@ namespace EvaporativeFluidCoolers {
 
         // set inlet and outlet nodes
 
-        WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
-        WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
-        Qactual = 0.0;
-        FanPower = 0.0;
-        InletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-        OutletWaterTemp = InletWaterTemp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = 0.0;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = 0.0;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
 
-        OutletWaterTemp1stStage = OutletWaterTemp;
-        OutletWaterTemp2ndStage = OutletWaterTemp;
+        OutletWaterTemp1stStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+        OutletWaterTemp2ndStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
         FanModeFrac = 0.0;
         AirFlowRate = 0.0;
         LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
@@ -2429,49 +2412,49 @@ namespace EvaporativeFluidCoolers {
         }
 
         //   MassFlowTol is a parameter to indicate a no flow condition
-        if (WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
 
-        if (InletWaterTemp > TempSetPoint) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp > TempSetPoint) {
             //     Setpoint was not met ,turn on evaporative fluid cooler 1st stage fan
             UAdesign = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA;
             AirFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedAirFlowRate;
             FanPowerLow = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedFanPower;
 
-            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
+            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
             if (OutletWaterTemp1stStage <= TempSetPoint) {
                 //         Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
-                FanModeFrac = (TempSetPoint - InletWaterTemp) / (OutletWaterTemp1stStage - InletWaterTemp);
-                FanPower = FanModeFrac * FanPowerLow;
-                OutletWaterTemp = TempSetPoint;
-                Qactual *= FanModeFrac;
+                FanModeFrac = (TempSetPoint - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp) / (OutletWaterTemp1stStage - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp);
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanModeFrac * FanPowerLow;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = TempSetPoint;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual *= FanModeFrac;
             } else {
                 //         Setpoint was not met, turn on evaporative fluid cooler 2nd stage fan
                 UAdesign = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA;
                 AirFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
                 FanPowerHigh = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower;
 
-                SimSimpleEvapFluidCooler(EvapFluidCoolerNum, WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
+                SimSimpleEvapFluidCooler(EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
                 if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                     //           Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
                     FanModeFrac = (TempSetPoint - OutletWaterTemp1stStage) / (OutletWaterTemp2ndStage - OutletWaterTemp1stStage);
-                    FanPower = (FanModeFrac * FanPowerHigh) + (1.0 - FanModeFrac) * FanPowerLow;
-                    OutletWaterTemp = TempSetPoint;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = (FanModeFrac * FanPowerHigh) + (1.0 - FanModeFrac) * FanPowerLow;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = TempSetPoint;
                 } else {
                     //           Setpoint was not met, evaporative fluid cooler ran at full capacity
-                    OutletWaterTemp = OutletWaterTemp2ndStage;
-                    FanPower = FanPowerHigh;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = OutletWaterTemp2ndStage;
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanPowerHigh;
                 }
             }
         }
 
         // Should this be water inlet node num??
         CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
-                                        DataLoopNode::Node(WaterInletNode).Temp,
+                                        DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp,
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
-        Qactual = WaterMassFlowRate * CpWater * (DataLoopNode::Node(WaterInletNode).Temp - OutletWaterTemp);
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
         AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
     }
 
@@ -2530,15 +2513,15 @@ namespace EvaporativeFluidCoolers {
 
         // set inlet and outlet node numbers, and initialize some local variables
 
-        WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
-        WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
         qactual = 0.0;
         WetBulbError = 1.0;
         DeltaTwb = 1.0;
 
         // set local evaporative fluid cooler inlet and outlet temperature variables
-        InletWaterTemp = SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).WaterTemp;
-        outletWaterTemp = InletWaterTemp;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp = SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).WaterTemp;
+        outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
         InletAirTemp = SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp;
         InletAirWetBulb = SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirWetBulb;
 
@@ -2550,7 +2533,7 @@ namespace EvaporativeFluidCoolers {
         AirMassFlowRate = AirFlowRate * AirDensity;
         CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat, InletAirTemp);
         CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
-                                        InletWaterTemp,
+                                                         SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp,
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
         InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(InletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
@@ -2582,7 +2565,7 @@ namespace EvaporativeFluidCoolers {
                 effectiveness = NumTransferUnits / (1.0 + NumTransferUnits);
             }
             // calculate water to air heat transfer and store last exiting WB temp of air
-            qactual = effectiveness * CapacityRatioMin * (InletWaterTemp - InletAirWetBulb);
+            qactual = effectiveness * CapacityRatioMin * (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - InletAirWetBulb);
             OutletAirWetBulbLast = OutletAirWetBulb;
             // calculate new exiting wet bulb temperature of airstream
             OutletAirWetBulb = InletAirWetBulb + qactual / AirCapacity;
@@ -2594,9 +2577,9 @@ namespace EvaporativeFluidCoolers {
         }
 
         if (qactual >= 0.0) {
-            outletWaterTemp = InletWaterTemp - qactual / MdotCpWater;
+            outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - qactual / MdotCpWater;
         } else {
-            outletWaterTemp = InletWaterTemp;
+            outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
         }
     }
 
@@ -2683,7 +2666,7 @@ namespace EvaporativeFluidCoolers {
         Real64 rho;
         Real64 AverageWaterTemp;
 
-        AverageWaterTemp = (InletWaterTemp + OutletWaterTemp) / 2.0;
+        AverageWaterTemp = (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp + SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / 2.0;
 
         // Set water and air properties
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByMoistTheory) {
@@ -2698,7 +2681,7 @@ namespace EvaporativeFluidCoolers {
             if (AirMassFlowRate > 0.0) {
                 // Calculate outlet air conditions for determining water usage
 
-                OutletAirEnthalpy = InletAirEnthalpy + Qactual / AirMassFlowRate;
+                OutletAirEnthalpy = InletAirEnthalpy + SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual / AirMassFlowRate;
                 OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
                 OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
 
@@ -2726,7 +2709,7 @@ namespace EvaporativeFluidCoolers {
                                    AverageWaterTemp,
                                    DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                    RoutineName);
-            EvapVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).UserEvapLossFactor * (InletWaterTemp - OutletWaterTemp) * (WaterMassFlowRate / rho);
+            EvapVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).UserEvapLossFactor * (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) * (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate / rho);
             if (EvapVdot < 0.0) EvapVdot = 0.0;
         } else {
             // should never come here
@@ -2734,7 +2717,7 @@ namespace EvaporativeFluidCoolers {
 
         //   amount of water lost due to drift
         DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
-                    AirFlowRateRatio;
+                AirFlowRateRatio;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownBySchedule) {
             // Amount of water lost due to blow down (purging contaminants from evaporative fluid cooler basin)
@@ -2824,7 +2807,7 @@ namespace EvaporativeFluidCoolers {
 
         // set node information
 
-        DataLoopNode::Node(WaterOutletNode).Temp = OutletWaterTemp;
+        DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).Temp = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
 
         LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
         LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
@@ -2832,14 +2815,14 @@ namespace EvaporativeFluidCoolers {
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
         // show warning if greater than Design * Mulitplier
-        if (DataLoopNode::Node(WaterOutletNode).MassFlowRate > SimpleEvapFluidCooler(EvapFluidCoolerNum).DesWaterMassFlowRate *
+        if (DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).MassFlowRate > SimpleEvapFluidCooler(EvapFluidCoolerNum).DesWaterMassFlowRate *
                                                      SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerMassFlowRateMultiplier) {
             ++SimpleEvapFluidCooler(EvapFluidCoolerNum).HighMassFlowErrorCount;
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighMassFlowErrorCount < 2) {
                 ShowWarningError(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" +
                                  SimpleEvapFluidCooler(EvapFluidCoolerNum).Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate.");
-                ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(WaterOutletNode).MassFlowRate, 6));
+                ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).MassFlowRate, 6));
                 ShowContinueError(" Evaporative Fluid Cooler Design Mass Flow Rate   = " +
                                   General::TrimSigDigits(SimpleEvapFluidCooler(EvapFluidCoolerNum).DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp("");
@@ -2848,18 +2831,18 @@ namespace EvaporativeFluidCoolers {
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate error",
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).HighMassFlowErrorIndex,
-                    DataLoopNode::Node(WaterOutletNode).MassFlowRate,
-                    DataLoopNode::Node(WaterOutletNode).MassFlowRate);
+                    DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).MassFlowRate,
+                    DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).MassFlowRate);
             }
         }
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
         LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
-        TempDifference = DataPlant::PlantLoop(LoopNum).MinTemp - OutletWaterTemp;
-        if (TempDifference > TempAllowance && WaterMassFlowRate > 0.0) {
+        TempDifference = DataPlant::PlantLoop(LoopNum).MinTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+        if (TempDifference > TempAllowance && SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate > 0.0) {
             ++SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorCount;
             ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << OutletWaterTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
             strip(CharErrOut);
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorCount < 2) {
                 ShowWarningError(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" +
@@ -2872,27 +2855,27 @@ namespace EvaporativeFluidCoolers {
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                         "\" Evaporative fluid cooler water outlet temperature is below the specified minimum condenser loop temp error",
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorIndex,
-                    OutletWaterTemp,
-                    OutletWaterTemp);
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp,
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
             }
         }
 
         // Check if water mass flow rate is small (e.g. no flow) and warn user
-        if (WaterMassFlowRate > 0.0 && WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate > 0.0 && SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             ++SimpleEvapFluidCooler(EvapFluidCoolerNum).SmallWaterMassFlowErrorCount;
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).SmallWaterMassFlowErrorCount < 2) {
                 ShowWarningError(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" +
                                  SimpleEvapFluidCooler(EvapFluidCoolerNum).Name + "\"");
                 ShowContinueError("Evaporative fluid cooler water mass flow rate near zero.");
                 ShowContinueErrorTimeStamp("");
-                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(WaterMassFlowRate, 2));
+                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate, 2));
             } else {
                 ShowRecurringWarningErrorAtEnd(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType + " \"" +
                                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
                                                    "\" Evaporative fluid cooler water mass flow rate near zero error continues...",
                                                SimpleEvapFluidCooler(EvapFluidCoolerNum).SmallWaterMassFlowErrorIndex,
-                                               WaterMassFlowRate,
-                                               WaterMassFlowRate);
+                                               SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
+                                               SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate);
             }
         }
     }
@@ -2914,9 +2897,9 @@ namespace EvaporativeFluidCoolers {
         ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (!RunFlag) {
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = WaterMassFlowRate;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = 0.0;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = 0.0;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = 0.0;
@@ -2924,14 +2907,14 @@ namespace EvaporativeFluidCoolers {
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = 0.0;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = 0.0; // added for fluid bypass
         } else {
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = OutletWaterTemp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = WaterMassFlowRate;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = Qactual;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = FanPower;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = FanPower * ReportingConstant;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower * ReportingConstant;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).AirFlowRatio = AirFlowRateRatio;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = WaterUsage * ReportingConstant;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterUsage * ReportingConstant;
             // added for fluid bypass
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction;
         }

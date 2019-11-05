@@ -81,15 +81,15 @@ namespace EvaporativeFluidCoolers {
     //   across sim, update, and report routines.  Simulation manager must be careful
     //   in models with multiple evaporative fluid coolers.
 
-    extern Real64 InletWaterTemp;    // CW temperature at evaporative fluid cooler inlet
-    extern Real64 OutletWaterTemp;   // CW temperature at evaporative fluid cooler outlet
-    extern int WaterInletNode;       // Node number at evaporative fluid cooler inlet
-    extern int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
-    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
-    extern Real64 Qactual;          // Evaporative fluid cooler heat transfer
-    extern Real64 FanPower;         // Evaporative fluid cooler fan power used
-    extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
-    extern Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
+//    extern Real64 InletWaterTemp;    // CW temperature at evaporative fluid cooler inlet
+//    extern Real64 OutletWaterTemp;   // CW temperature at evaporative fluid cooler outlet
+//    extern int WaterInletNode;       // Node number at evaporative fluid cooler inlet
+//    extern int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
+//    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
+//    extern Real64 Qactual;          // Evaporative fluid cooler heat transfer
+//    extern Real64 FanPower;         // Evaporative fluid cooler fan power used
+//    extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
+//    extern Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
 
     extern Array1D_bool CheckEquipName;
 
@@ -183,6 +183,15 @@ namespace EvaporativeFluidCoolers {
         int LoopSideNum;
         int BranchNum;
         int CompNum;
+        Real64 InletWaterTemp;    // CW temperature at evaporative fluid cooler inlet
+        Real64 OutletWaterTemp;   // CW temperature at evaporative fluid cooler outlet
+        int WaterInletNode;       // Node number at evaporative fluid cooler inlet
+        int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
+        Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
+        Real64 Qactual;          // Evaporative fluid cooler heat transfer
+        Real64 FanPower;         // Evaporative fluid cooler fan power used
+//        Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
+        Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
 
         // Default Constructor
         EvapFluidCoolerspecs()
@@ -202,7 +211,8 @@ namespace EvaporativeFluidCoolers {
               WMFRGreaterThanMaxAvailErrIndex(0), EvapFluidCoolerAFRRFailedCount(0), EvapFluidCoolerAFRRFailedIndex(0), CapacityControl(0),
               BypassFraction(0.0), EvapLossMode(EvapLossByMoistTheory), BlowdownMode(BlowdownByConcentration), SchedIDBlowdown(0), WaterTankID(0),
               WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
-              LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0)
+              LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), WaterUsage(0.0)
         {
         }
     };
