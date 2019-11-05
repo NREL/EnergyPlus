@@ -186,19 +186,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
     CHARACTER(len=MaxNameLength) :: DXNomPerfName=blank
     CHARACTER(len=MaxNameLength) :: DXStg1PerfName=blank
 
-    ! For Defaulting now-required RunPeriod Name
-    INTEGER :: TotRunPeriods = 0
-    INTEGER :: runPeriodNum = 0
-    INTEGER :: iterateRunPeriod = 0
-    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
-    CHARACTER(len=20) :: PotentialRunPeriodName
-
-    ! Only needed for ZoneHVAC:EquipmentList translation
-    INTEGER zeqNum
-    CHARACTER(len=20) :: zeqNumStr
-    CHARACTER(len=7) :: zeqHeatingOrCooling
-    LOGICAL :: writeScheduleTypeObj = .true.
-
     If (FirstTime) THEN  ! do things that might be applicable only to this new version
         FirstTime=.false.
     EndIf
@@ -340,6 +327,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                         ENDIF
                     ENDDO
 
+                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    !                                                    P R E P R O C E S S I N G                                                     !
+                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                     ! PREPROCESSING FOR COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE
                     IF (.NOT. ALLOCATED(MultiStageDXPerformance)) THEN
                         ! count number of CoilPerformance:DX:Cooling objects
@@ -379,26 +370,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                             ENDIF
                         ENDDO
                     ENDIF
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    !                                                    P R E P R O C E S S I N G                                                     !
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    ! Begin Pre-process RunPeriod to avoid having duplicated names. If the user has one named 'RUNPERIOD 1',
-                    ! we do not want to default the first blank to 'RUNPERIOD 1', but rather 'RUNPERIOD 2'
-                    CALL DisplayString('Processing IDF -- RunPeriod preprocessing . . .')
-
-                    ! Clean up from any previous passes, then re-allocate
-                    IF(ALLOCATED(CurrentRunPeriodNames)) DEALLOCATE(CurrentRunPeriodNames)
-                    iterateRunPeriod = 0
-                    TotRunPeriods = GetNumObjectsFound('RUNPERIOD')
-                    ALLOCATE(CurrentRunPeriodNames(TotRunPeriods))
-
-                    ! First pass to get all current run period names, ensure we get unique ones in the end
-                    DO runPeriodNum=1,TotRunPeriods
-                        CALL GetObjectItem('RUNPERIOD',runPeriodNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
-                        CurrentRunPeriodNames(runPeriodNum) = TRIM(Alphas(1));
-                    ENDDO
-                    CALL DisplayString('Processing IDF -- RunPeriod preprocessing complete.')
-                    ! End Pre-process RunPeriod
 
                     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     !                                                       P R O C E S S I N G                                                        !
@@ -524,6 +495,26 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 CoolingCoilType = InArgs(15)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
                                     OutArgs(15) = "Coil:Cooling:DX"
+                                END IF
+
+                            CASE('ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER')
+                                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                                nodiff=.true.
+                                ! replace cooling coil object type name
+                                CoolingCoilType = InArgs(17)
+                                IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
+                                    OutArgs(17) = "Coil:Cooling:DX"
+                                END IF
+
+                            CASE('ZONEHVAC:PACKAGEDTERMINALHEATPUMP')
+                                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                                nodiff=.true.
+                                ! replace cooling coil object type name
+                                CoolingCoilType = InArgs(18)
+                                IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
+                                    OutArgs(18) = "Coil:Cooling:DX"
                                 END IF
 
                                 ! If your original object starts with B, insert the rules here

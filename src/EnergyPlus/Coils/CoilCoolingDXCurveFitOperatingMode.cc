@@ -86,7 +86,6 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = EVAPCOOLED;
     } else {
-        // TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, CondenserType> instead?
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Condenser Type=\"" + input_data.condenser_type + "\":");
         ShowContinueError("...must be AirCooled or EvaporativelyCooled.");
@@ -162,6 +161,10 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = TempSize;
+    Real64 const ratedInletAirTemp(26.6667);        // 26.6667C or 80F
+    Real64 const ratedInletAirHumRat(0.01125);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    this->ratedEvapAirMassFlowRate = this->ratedEvapAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(
+            DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Rated Gross Total Cooling Capacity";
@@ -180,8 +183,8 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.ratedGrossTotalCap = this->ratedGrossTotalCap;
-        curSpeed.ratedGrossTotalCap = this->ratedEvapAirFlowRate;
-        curSpeed.ratedGrossTotalCap = this->ratedCondAirFlowRate;
+        curSpeed.ratedEvapAirFlowRate = this->ratedEvapAirFlowRate;
+        curSpeed.ratedCondAirFlowRate = this->ratedCondAirFlowRate;
     }
 }
 

@@ -222,56 +222,16 @@ ChillerHeaterPerformance:Electric:EIR \tabularnewline
  & Reference Cooling Mode Evaporator Capacity \tabularnewline
  & Design Chilled Water Flow Rate \tabularnewline
  & Design Condenser Water Flow Rate \tabularnewline
-Coil:Cooling:DX:MultiSpeed \tabularnewline
- & Speed 1 Gross Rated Total Cooling Capacity \tabularnewline
- & Speed 1 Gross Rated Sensible Heat Ratio \tabularnewline
- & Speed 1 Rated Air Flow Rate \tabularnewline
- & Speed 1 Evaporative Condenser Air Flow Rate \tabularnewline
- & Speed 1 Rated Evaporative Condenser Pump Power Consumption \tabularnewline
- & Speed 2 Gross Rated Total Cooling Capacity \tabularnewline
- & Speed 2 Gross Rated Sensible Heat Ratio \tabularnewline
- & Speed 2 Rated Air Flow Rate \tabularnewline
- & Speed 2 Evaporative Condenser Air Flow Rate \tabularnewline
- & Speed 2 Rated Evaporative Condenser Pump Power Consumption \tabularnewline
- & Speed 3 Gross Rated Total Cooling Capacity \tabularnewline
- & Speed 3 Gross Rated Sensible Heat Ratio \tabularnewline
- & Speed 3 Rated Air Flow Rate \tabularnewline
- & Speed 3 Evaporative Condenser Air Flow Rate \tabularnewline
- & Speed 3 Rated Evaporative Condenser Pump Power Consumption \tabularnewline
- & Speed 4 Gross Rated Total Cooling Capacity \tabularnewline
- & Speed 4 Gross Rated Sensible Heat Ratio \tabularnewline
- & Speed 4 Rated Air Flow Rate \tabularnewline
- & Speed 4 Evaporative Condenser Air Flow Rate \tabularnewline
- & Speed 4 Rated Evaporative Condenser Pump Power Consumption \tabularnewline
-Coil:Cooling:DX:SingleSpeed \tabularnewline
+Coil:Cooling:DX \tabularnewline
  & Gross Rated Total Cooling Capacity \tabularnewline
- & Gross Rated Sensible Heat Ratio \tabularnewline
- & Rated Air Flow Rate \tabularnewline
- & Evaporative Condenser Air Flow Rate \tabularnewline
- & Evaporative Condenser Pump Rated Power Consumption \tabularnewline
-Coil:Cooling:DX:SingleSpeed:ThermalStorage \tabularnewline
  & Rated Evaporator Air Flow Rate \tabularnewline
- & Cooling Only Mode Rated Total Evaporator Cooling Capacity \tabularnewline
- & Evaporative Condenser Pump Rated Power Consumption \tabularnewline
-Coil:Cooling:DX:TwoSpeed \tabularnewline
- & High Speed Gross Rated Total Cooling Capacity \tabularnewline
- & High Speed Rated Sensible Heat Ratio \tabularnewline
- & High Speed Rated Air Flow Rate \tabularnewline
- & Low Speed Gross Rated Total Cooling Capacity \tabularnewline
- & Low Speed Gross Rated Sensible Heat Ratio \tabularnewline
- & Low Speed Rated Air Flow Rate \tabularnewline
- & High Speed Evaporative Condenser Air Flow Rate \tabularnewline
- & High Speed Evaporative Condenser Pump Rated Power Consumption \tabularnewline
- & Low Speed Evaporative Condenser Air Flow Rate \tabularnewline
- & Low Speed Evaporative Condenser Pump Rated Power Consumption \tabularnewline
+ & Rated Condenser Air Flow Rate \tabularnewline
+Coil:Cooling:DX:CurveFit:Speed \tabularnewline
+ & Gross Sensible Heat Ratio \tabularnewline
 Coil:Cooling:DX:VariableRefrigerantFlow \tabularnewline
  & Gross Rated Total Cooling Capacity \tabularnewline
  & Gross Rated Sensible Heat Ratio \tabularnewline
  & Rated Air Flow Rate \tabularnewline
-Coil:Cooling:DX:VariableSpeed \tabularnewline
- & Gross Rated Total Cooling Capacity At Selected Nominal Speed Level \tabularnewline
- & Rated Air Flow Rate At Selected Nominal Speed Level \tabularnewline
- & Evaporative Condenser Pump Rated Power Consumption \tabularnewline
 Coil:Cooling:Water \tabularnewline
  & Design Water Flow Rate \tabularnewline
  & Design Air Flow Rate \tabularnewline
@@ -347,12 +307,6 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit \tabularnewline
  & Rated Heating Capacity At Selected Nominal Speed Level \tabularnewline
  & Rated Air Flow Rate At Selected Nominal Speed Level \tabularnewline
  & Rated Water Flow Rate At Selected Nominal Speed Level \tabularnewline
-CoilPerformance:DX:Cooling \tabularnewline
- & Gross Rated Total Cooling Capacity \tabularnewline
- & Gross Rated Sensible Heat Ratio \tabularnewline
- & Rated Air Flow Rate \tabularnewline
- & Evaporative Condenser Air Flow Rate \tabularnewline
- & Evaporative Condenser Pump Rated Power Consumption \tabularnewline
 CondenserLoop \tabularnewline
  & Maximum Loop Flow Rate \tabularnewline
 Controller:OutdoorAir \tabularnewline
@@ -785,18 +739,16 @@ Chiller:CombustionTurbine & Chiller:ConstantCOP \tabularnewline
 Chiller:Electric & Chiller:Electric:EIR \tabularnewline
 Chiller:Electric:ReformulatedEIR & Chiller:EngineDriven \tabularnewline
 ChillerHeater:Absorption:DirectFired & ChillerHeater:Absorption:DoubleEffect \tabularnewline
-ChillerHeaterPerformance:Electric:EIR & Coil:Cooling:DX:MultiSpeed \tabularnewline
-Coil:Cooling:DX:SingleSpeed & Coil:Cooling:DX:SingleSpeed:ThermalStorage \tabularnewline
-Coil:Cooling:DX:TwoSpeed & Coil:Cooling:DX:VariableRefrigerantFlow \tabularnewline
-Coil:Cooling:DX:VariableSpeed & Coil:Cooling:Water \tabularnewline
+Coil:Cooling:DX & Coil:Cooling:DX:SingleSpeed:ThermalStorage \tabularnewline
+Coil:Cooling:DX & Coil:Cooling:DX:VariableRefrigerantFlow \tabularnewline
+Coil:Cooling:DX & Coil:Cooling:Water \tabularnewline
 Coil:Cooling:Water:DetailedGeometry & Coil:Cooling:WaterToAirHeatPump:EquationFit \tabularnewline
 Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit & Coil:Heating:DX:MultiSpeed \tabularnewline
-Coil:Heating:DX:SingleSpeed & Coil:Heating:DX:VariableRefrigerantFlow \tabularnewline
-Coil:Heating:DX:VariableSpeed & Coil:Heating:Electric \tabularnewline
+Coil:Heating:DX & Coil:Heating:DX:VariableRefrigerantFlow \tabularnewline
+Coil:Heating:DX & Coil:Heating:Electric \tabularnewline
 Coil:Heating:Electric:MultiStage & Coil:Heating:Fuel \tabularnewline
 Coil:Heating:Gas:MultiStage & Coil:Heating:Steam \tabularnewline
 Coil:Heating:Water & Coil:Heating:WaterToAirHeatPump:EquationFit \tabularnewline
-Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit & CoilPerformance:DX:Cooling \tabularnewline
 CondenserLoop & Controller:OutdoorAir \tabularnewline
 Controller:WaterCoil & CoolingTower:SingleSpeed \tabularnewline
 CoolingTower:TwoSpeed & CoolingTower:VariableSpeed \tabularnewline

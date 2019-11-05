@@ -95,7 +95,7 @@ public:
     //int condZoneIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
-    CoilCoolingDXCurveFitPerformance performance; // TODO: Change to unique pointer when we have base class for performance object
+    CoilCoolingDXCurveFitPerformance performance;
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;
     Real64 condensateVolumeFlow = 0.0;
@@ -108,6 +108,8 @@ public:
 	Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
     int supplyFanIndex = 0;
+    int supplyFanType = 0;
+    std::string supplyFanName = "";
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;

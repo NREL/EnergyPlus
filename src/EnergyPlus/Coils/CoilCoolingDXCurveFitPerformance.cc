@@ -49,8 +49,10 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -79,7 +81,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
         this->capControlMethod = CapControlMethod::MULTISPEED;
     } else {
-        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, CapControlMethod> instead?
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Capacity Control Method=\"" + input_data.capacity_control + "\":");
         ShowContinueError("...must be Staged, VariableSpeed or MultiSpeed.");
@@ -105,16 +106,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         this->unitStatic = input_data.unit_internal_static_air_pressure;
     }
 
-    // TODO: Hookup no fuel type member for this class yet.
-    if (UtilityRoutines::SameString(input_data.compressor_fuel_type, "ELECTRICITY")) {
-    } else {
-        //  TODO: Input processor should address this before we get here...maybe use a static std::map<std::string, FuelType> instead?
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\":");
-        ShowContinueError("...must be ...");
-        errorsFound = true;
-    }
-
     if (!input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = true;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
@@ -137,7 +128,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;
         inputProcessor->getObjectItem(
-            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+            CoilCoolingDXCurveFitPerformance::object_name, perfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks);
         if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
             continue;
         }
@@ -155,10 +146,12 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
         input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
-        input_specs.compressor_fuel_type = cAlphaArgs(4);
+        input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
-        // TODO: Check for blank here
-        input_specs.alternate_operating_mode_name = cAlphaArgs(6);
+        if (lAlphaFieldBlanks(6)) {
+            input_specs.alternate_operating_mode_name = cAlphaArgs(6);
+        }
+
         this->instantiateFromInputSpec(input_specs);
         break;
     }
@@ -346,13 +339,13 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         NetCoolingCapRated = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac - fanHeatCorrection;
     }
 
-    std::vector<Real64> EER_TestPoint_SI(4);      // 0 = A, 1 = B, 2 = C, 3 = D
-    std::vector<Real64> EER_TestPoint_IP(4);      // 0 = A, 1 = B, 2 = C, 3 = D
-    std::vector<Real64> NetCapacity_TestPoint(4); // 0 = A, 1 = B, 2 = C, 3 = D
-    std::vector<Real64> NetPower_TestPoint(4);    // 0 = A, 1 = B, 2 = C, 3 = D
-    std::vector<Real64> SupAirMdot_TestPoint(4);  // 0 = A, 1 = B, 2 = C, 3 = D
+    std::vector<Real64> EER_TestPoint_SI{0, 0, 0, 0};      // 0 = A, 1 = B, 2 = C, 3 = D
+    std::vector<Real64> EER_TestPoint_IP{0, 0, 0, 0};      // 0 = A, 1 = B, 2 = C, 3 = D
+    std::vector<Real64> NetCapacity_TestPoint{0, 0, 0, 0}; // 0 = A, 1 = B, 2 = C, 3 = D
+    std::vector<Real64> NetPower_TestPoint{0, 0, 0, 0};    // 0 = A, 1 = B, 2 = C, 3 = D
+    std::vector<Real64> SupAirMdot_TestPoint{0, 0, 0, 0};  // 0 = A, 1 = B, 2 = C, 3 = D
 
-    SupAirMdot_TestPoint[0] = this->normalMode.ratedEvapAirFlowRate;
+    SupAirMdot_TestPoint[0] = this->normalMode.ratedEvapAirMassFlowRate;
 
     // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
     Real64 EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
@@ -386,8 +379,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     DataLoopNode::NodeData condInlet;
     DataLoopNode::NodeData condOutlet;
     // setup point A
-    evapInlet.MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
-    evapInlet.MassFlowRateMax = this->normalMode.ratedEvapAirFlowRate;
+    evapInlet.MassFlowRate = this->normalMode.ratedEvapAirMassFlowRate;
+    evapInlet.MassFlowRateMax = this->normalMode.ratedEvapAirMassFlowRate;
     evapInlet.Temp = 26.7;
     evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
@@ -396,11 +389,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     this->calculate(this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, speedRatio, fanOpMode, condInlet, condOutlet);
     Real64 TempDryBulb_Leaving_Apoint = evapOutlet.Temp;
 
+    std::vector<Real64> const OutdoorUnitInletAirDryBulbTempPLTestPoint({27.5, 20.0, 18.3});
+    std::vector<Real64> const NetCapacityFactorPLTestPoint({0.75, 0.50, 0.25});
+
     // IEER - part load test points ***************************************************
     for (int PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
         // determine minimum unloading capacity fraction at point B conditions.
-        std::vector<Real64> const OutdoorUnitInletAirDryBulbTempPLTestPoint({27.5, 20.0, 18.3});
-        std::vector<Real64> const NetCapacityFactorPLTestPoint({0.75, 0.50, 0.25});
         if (condInletNodeIndex != 0) {
             DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         } else {
@@ -431,7 +425,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             par.push_back(0.0);
         }
 
-        Real64 LowerBoundMassFlowRate = 0.01 * this->normalMode.ratedEvapAirFlowRate;
+        Real64 LowerBoundMassFlowRate = 0.01 * this->normalMode.ratedEvapAirMassFlowRate;
 
         int SolverFlag = 0;
         Real64 const AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
@@ -444,7 +438,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                   PartLoadAirMassFlowRate,
                   f,
                   LowerBoundMassFlowRate,
-                  this->normalMode.ratedEvapAirFlowRate,
+                  this->normalMode.ratedEvapAirMassFlowRate,
                   par);
 
         if (SolverFlag == -1) {
@@ -464,7 +458,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         } else {
             // now we have the supply air flow rate
             SupAirMdot_TestPoint[PartLoadTestPoint] = PartLoadAirMassFlowRate;
-            Real64 AirMassFlowRatio = PartLoadAirMassFlowRate / this->normalMode.ratedEvapAirFlowRate;
+            Real64 AirMassFlowRatio = PartLoadAirMassFlowRate / this->normalMode.ratedEvapAirMassFlowRate;
             Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
 
             if (this->unitStatic > 0.0) {
@@ -549,7 +543,105 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         }
     } // loop over 3 part load test points
 
+    Real64 const IEER = (0.02 * EER_TestPoint_IP[0]) + (0.617 * EER_TestPoint_IP[1]) + (0.238 * EER_TestPoint_IP[2]) + (0.125 * EER_TestPoint_IP[3]);
+
+    // begin output
+    if (this->oneTimeEIOHeaderWrite) {
+        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_890);
+        this->oneTimeEIOHeaderWrite = false;
+        OutputReportPredefined::pdstVAVDXCoolCoil = OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
+        OutputReportPredefined::pdchVAVDXCoolCoilType = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "DX Cooling Coil Type");
+        OutputReportPredefined::pdchVAVDXFanName = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Assocated Fan");
+        OutputReportPredefined::pdchVAVDXCoolCoilNetCapSI = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEERIP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilIEERIP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotA = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_B = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_B_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotB = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_C = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_C_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotC = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
+        OutputReportPredefined::pdchVAVDXCoolCoilCOP_D = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
+        OutputReportPredefined::pdchVAVDXCoolCoilEER_D_IP = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
+        OutputReportPredefined::pdchVAVDXCoolCoilMdotD = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
+
+        // determine footnote content
+        // TODO: This may be slightly incorrect if all the parent objects haven't created coils yet
+        // Once we move to a factory approach, all the coils should've been interpreted, so this will be "OK"
+        // BUT actually, the performance object can't go get info about the coils so I'm not sure what to do here yet
+    //        int countStaticInputs = 0;
+    //        for (auto & thisCoil : ) {
+    //            if (DXCoil(index).RateWithInternalStaticAndFanObject && DXCoil(index).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
+    //                ++countStaticInputs;
+    //            }
+    //        }
+    //
+    //        if (countStaticInputs == NumDXMulSpeedCoils) {
+    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2");
+    //        } else if (countStaticInputs == 0) {
+    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
+    //                                "Indoor-coil-only unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, with "
+    //                                "supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
+    //        } else { // both
+    //            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstVAVDXCoolCoil,
+    //                                "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, "
+    //                                "indoor-coil-only units with supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
+    //        }
+   }
+
+    if (this->unitStatic > 0) {
+        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
+                << "Coil:Cooling:DX" << this->name << "Fan:VariableVolume" << supplyFanName
+                << General::RoundSigDigits(NetCoolingCapRated, 2) << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << General::RoundSigDigits(IEER, 2)
+                << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2) << General::RoundSigDigits(EER_TestPoint_SI[2], 2)
+                << General::RoundSigDigits(EER_TestPoint_SI[3], 2) << General::RoundSigDigits(EER_TestPoint_IP[0], 2) << General::RoundSigDigits(EER_TestPoint_IP[1], 2)
+                << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2) << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4)
+                << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4)
+                << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
+    } else {
+        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
+                << "Coil:Cooling:DX" << this->name << "N/A"
+                << "N/A" << General::RoundSigDigits(NetCoolingCapRated, 2) << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
+                << General::RoundSigDigits(IEER, 2) << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2)
+                << General::RoundSigDigits(EER_TestPoint_SI[2], 2) << General::RoundSigDigits(EER_TestPoint_SI[3], 2) << General::RoundSigDigits(EER_TestPoint_IP[0], 2)
+                << General::RoundSigDigits(EER_TestPoint_IP[1], 2) << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2)
+                << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4)
+                << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
+    }
+
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, this->name, "Coil:Cooling:DX");
+    // W to tons
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 1);
+    // These will convert with a factor of 1 which is ok
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, this->name, IEER, 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, this->name, "N/A");
+    OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
+
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");
+    if (this->unitStatic > 0) {
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXFanName, this->name, supplyFanName);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXFanName, this->name, "None");
+    }
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilIEERIP, this->name, IEER, 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotA, this->name, SupAirMdot_TestPoint[0], 4);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilCOP_B, this->name, EER_TestPoint_SI[1], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilEER_B_IP, this->name, EER_TestPoint_IP[1], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotB, this->name, SupAirMdot_TestPoint[1], 4);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilCOP_C, this->name, EER_TestPoint_SI[2], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilEER_C_IP, this->name, EER_TestPoint_IP[2], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotC, this->name, SupAirMdot_TestPoint[2], 4);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilCOP_D, this->name, EER_TestPoint_SI[3], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilEER_D_IP, this->name, EER_TestPoint_IP[3], 2);
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
 }
+
 
 Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
         Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)

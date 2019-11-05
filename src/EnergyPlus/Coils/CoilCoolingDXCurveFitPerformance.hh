@@ -70,7 +70,7 @@ public:
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
     std::string basin_heater_operating_shedule_name;
-    std::string compressor_fuel_type;
+    int compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string capacity_control;
@@ -117,7 +117,7 @@ public:
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
-    Real64 unitStatic = 0.0; // TODO: make curve f(flow)?
+    Real64 unitStatic = 0.0;
     bool mySizeFlag = true;
 
 	enum CapControlMethod
@@ -136,6 +136,7 @@ public:
     Real64 powerUse = 0.0;
     Real64 electricityConsumption = 0.0;
     Real64 RTF = 0.0;
+    bool oneTimeEIOHeaderWrite = true;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;

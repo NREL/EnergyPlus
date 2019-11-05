@@ -96,6 +96,7 @@ public:
     Real64 ratedGrossTotalCap = 0.0;
     Real64 ratedEvapAirFlowRate = 0.0;
     Real64 ratedCondAirFlowRate = 0.0;
+    Real64 ratedEvapAirMassFlowRate = 0.0;
 
     // Latent degradation model
     Real64 maxCyclingRate = 0.0;
@@ -110,8 +111,6 @@ public:
     Real64 OpModePower = 0.0;
     Real64 OpModeRTF = 0.0;
 
-    Real64 staticPressure = 0.0;
-    bool rateWithInternalStaticAndFan = false;
     Real64 nominalEvaporativePumpPower = 0.0;
     int nominalSpeedNum = 0;
 

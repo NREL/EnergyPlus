@@ -4401,6 +4401,10 @@ namespace UnitarySystems {
                             thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
                             thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
                             thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                            // also give the new coil object some stuff
+                            newCoil.supplyFanName = thisSys.m_FanName;
+                            newCoil.supplyFanIndex = thisSys.m_FanIndex;
+                            newCoil.supplyFanType = thisSys.m_FanType_Num;
 
                             // Push heating coil PLF curve index to DX coil
                             //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
@@ -4435,6 +4439,7 @@ namespace UnitarySystems {
                                                                                      thisSys.m_FanName,
                                                                                      DataAirSystems::objectVectorOOFanSystemModel,
                                                                                      thisSys.m_FanIndex);
+
                                     } else {
                                         coilSelectionReportObj->setCoilSupplyFanInfo(thisSys.m_HeatingCoilName,
                                                                                      thisSys.m_HeatingCoilTypeName,
