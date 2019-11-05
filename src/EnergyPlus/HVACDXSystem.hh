@@ -100,15 +100,8 @@ namespace HVACDXSystem {
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
 
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Types
-
     struct DXCoolingConditions
     {
-        // Members
         std::string DXCoolingSystemType; // Type of DXCoolingSystem
         std::string Name;                // Name of the DXCoolingSystem
         int SchedPtr;
@@ -219,8 +212,8 @@ namespace HVACDXSystem {
     void clear_state();
 
     void SimDXCoolingSystem(std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
-                            bool const FirstHVACIteration,             // True when first HVAC iteration
-                            int const AirLoopNum,                      // Primary air loop number
+                            bool FirstHVACIteration,             // True when first HVAC iteration
+                            int AirLoopNum,                      // Primary air loop number
                             int &CompIndex,                            // Index to DXSystem:Airloop object
                             Optional_int_const OAUnitNum = _,          // If the system is an equipment of OutdoorAirUnit
                             Optional<Real64 const> OAUCoilOutTemp = _, // the coil inlet temperature of OutdoorAirUnit
@@ -238,8 +231,8 @@ namespace HVACDXSystem {
     // Beginning of Initialization subroutines for the Module
     // *****************************************************************************
 
-    void InitDXCoolingSystem(int const DXSystemNum,                    // number of the current DX Sys being simulated
-                             int const AirLoopNum,                     // number of the current air loop being simulated
+    void InitDXCoolingSystem(int DXSystemNum,                    // number of the current DX Sys being simulated
+                             int AirLoopNum,                     // number of the current air loop being simulated
                              Optional_int_const OAUnitNum = _,         // number of the current outdoor air unit being simulated
                              Optional<Real64 const> OAUCoilOutTemp = _ // the coil inlet temperature of OutdoorAirUnit
     );
@@ -250,65 +243,65 @@ namespace HVACDXSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXSystem(int const DXSystemNum,         // index to DXSystem
-                         bool const FirstHVACIteration, // First HVAC iteration flag
+    void ControlDXSystem(int DXSystemNum,         // index to DXSystem
+                         bool FirstHVACIteration, // First HVAC iteration flag
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     );
 
-    Real64 DXCoilVarSpeedResidual(Real64 const SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
+    Real64 DXCoilVarSpeedResidual(Real64 SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
                                   Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilVarSpeedHumRatResidual(Real64 const SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
+    Real64 DXCoilVarSpeedHumRatResidual(Real64 SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
                                         Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilCyclingResidual(Real64 const CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DXCoilCyclingResidual(Real64 CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilCyclingHumRatResidual(Real64 const CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DXCoilCyclingHumRatResidual(Real64 CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                        Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DOE2DXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DOE2DXCoilResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                               Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 DOE2DXCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DOE2DXCoilHumRatResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                     Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilHumRatResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilTempResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilTempResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilHRResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilHRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                         Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 TESCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                            Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 TESCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilHumRatResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    void FrostControlSetPointLimit(int const DXSystemNum,      // dx cooling coil system index
+    void FrostControlSetPointLimit(int DXSystemNum,      // dx cooling coil system index
                                    Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                    Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
-                                   Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
-                                   Real64 const TfrostControl, // minimum temperature limit for forst control
-                                   int const ControlMode       // temperature or humidity control mode
+                                   Real64 BaroPress,     // baromtric pressure, Pa [N/m^2]
+                                   Real64 TfrostControl, // minimum temperature limit for forst control
+                                   int ControlMode       // temperature or humidity control mode
     );
 
     void CheckDXCoolingCoilInOASysExists(std::string const &DXCoilSysName);
@@ -318,23 +311,23 @@ namespace HVACDXSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(Real64 SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 VSCoilCyclingHumResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingHumResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                     Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedHumResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedHumResidual(Real64 SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                   Array1<Real64> const &Par // par(1) = DX coil number
     );
 

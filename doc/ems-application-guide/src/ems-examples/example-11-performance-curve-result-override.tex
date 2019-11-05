@@ -8,7 +8,7 @@ A particular manufacturer controls the DX cooling coil such that the capacity of
 
 \subsection{EMS Design Discussion}\label{ems-design-discussion-001}
 
-For this example, we will start with the equation for cooling capacity of the DX coil object (ref. Coil:Cooling:DX:SingleSpeed). From the engineering reference, the equation used to calculate the cooling capacity is:
+For this example, we will start with the equation for cooling capacity of the DX coil object (ref. Coil:Cooling:DX). From the engineering reference, the equation used to calculate the cooling capacity is:
 
 \begin{equation}
 \text{TotCapTempModFac} = a + b \left( T_{wb,i} \right) + c \left( T_{wb,i} \right) + d \left( T_{c,i} \right) + e \left( T_{c,i} \right) + f \left( T_{wb,i} \right)\left( T_{c,i} \right)
@@ -18,7 +18,9 @@ The first term (Twb,i) refers to the cooling coil inlet air wet-bulb temperature
 
 \begin{lstlisting}
 
-  Coil:Cooling:DX:SingleSpeed,
+    <<<Update Coil IO Definition>>>
+
+  Coil:Cooling:DX,
       Zone1PTHPDXCoolCoil,     !- Name
       CoolingCoilAvailSched,   !- Availability Schedule Name
       8750.0,                  !- Rated Total Cooling Capacity {W}

@@ -103,6 +103,8 @@ public:
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
 
+    void calcStandardRatings(int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
+    Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
 
     CoilCoolingDXCurveFitPerformance() = default;
@@ -134,6 +136,7 @@ public:
     Real64 powerUse = 0.0;
     Real64 electricityConsumption = 0.0;
     Real64 RTF = 0.0;
+    bool oneTimeEIOHeaderWrite = true;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;

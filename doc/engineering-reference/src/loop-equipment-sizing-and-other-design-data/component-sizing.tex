@@ -1036,11 +1036,7 @@ The sizing calculations are done in subroutine \emph{SizeDXCoil} in module \emph
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Coil:Cooling:DX:SingleSpeed
-\item
-  Coil:Heating:DX:SingleSpeed
-\item
-  Coil:Cooling:DX:TwoSpeed
+  Coil:Cooling:DX
 \end{enumerate}
 
 \subsubsection{Rated Air Volume Flow Rate}\label{rated-air-volume-flow-rate}
@@ -1334,13 +1330,13 @@ n = Speed Index number from 1 to NumberOfSpeed-1
 
 NumberOfSpeed = The highest speed number
 
-\subsection{Coil:Cooling:DX:VariableSpeed Sizing}\label{coilcoolingdxvariablespeed-sizing}
+\subsection{Coil:Cooling:DX}\label{coilcoolingdx}
 
-For the variable-speed DX cooling coil, we specify a nominal speed level. During the sizing calculation, the Rated Total Cooling Capacity at the Selected Nominal Speed Level is determined in the same way as the Coil:Cooling:DX:SingleSpeed object. If the user chooses to autosize the Rated Air Volume Flow Rate, the flow rate, as compared to the Rated Total Cooling Capacity, is sized to have the same ratio as the air volume flow rate to the total cooling capacity at the nominal speed, of the Reference Unit. The sensible heat transfer rate is not allowed for auto-sizing, instead, it is a function of the rated air flow, rated total cooling capacity and the Reference Unit SHR at the nominal speed level. The default nominal speed level is the highest speed. However, the model allows the user to select a nominal speed level rather than the highest.
+For the variable-speed DX cooling coil, we specify a nominal speed level. During the sizing calculation, the Rated Total Cooling Capacity at the Selected Nominal Speed Level is determined in the same way as the Coil:Cooling:DX object. If the user chooses to autosize the Rated Air Volume Flow Rate, the flow rate, as compared to the Rated Total Cooling Capacity, is sized to have the same ratio as the air volume flow rate to the total cooling capacity at the nominal speed, of the Reference Unit. The sensible heat transfer rate is not allowed for auto-sizing, instead, it is a function of the rated air flow, rated total cooling capacity and the Reference Unit SHR at the nominal speed level. The default nominal speed level is the highest speed. However, the model allows the user to select a nominal speed level rather than the highest.
 
 \textbf{\emph{Rated Total Cooling Capacity}}
 
-The calculation for coil operating temperatures (inlet and outlet) are identical to that done for Coil:Cooling:DX:SingleSpeed. The calculations for air enthalpy are similar to that done for Coil:Cooling:DX:SingleSpeed\emph{.} The difference is in calculating the total cooling capacity temperature modifier function at the selected nominal speed level, as below:
+The calculation for coil operating temperatures (inlet and outlet) are identical to that done for Coil:Cooling:DX. The calculations for air enthalpy are similar to that done for Coil:Cooling:DX\emph{.} The difference is in calculating the total cooling capacity temperature modifier function at the selected nominal speed level, as below:
 
 \begin{equation}
 TotCapTempModFra{c_{NominalSpeed}} = {\rm{a}} + {\rm{b*}}W{B_i} + c*WB_i^2 + {\rm{d*}}D{B_o} + e*D{B_o}{T^2} + f*W{B_i}*D{B_o}
@@ -1382,7 +1378,7 @@ Where:
 \end{itemize}
 
 
-The other sizing procedures, e.g.~evaporative condenser pump, etc., are the same as Coil:Cooling:DX:SingleSpeed.
+The other sizing procedures, e.g.~evaporative condenser pump, etc., are the same as Coil:Cooling:DX.
 
 \subsection{Coil:Heating:DX:VariableSpeed Sizing}\label{coilheatingdxvariablespeed-sizing}
 

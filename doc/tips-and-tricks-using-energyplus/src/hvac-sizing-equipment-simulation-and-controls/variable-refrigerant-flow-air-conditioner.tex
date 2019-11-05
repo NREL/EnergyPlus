@@ -6,7 +6,7 @@
 
 Variable Refrigerant Flow (VRF, or Variable Refrigerant Volume - VRV) air conditioners are available in EnergyPlus V7 and later.
 
-Otherwise, the closest model available would be the multi-speed cooling and heating AC (AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed used with Coil:Cooling:DX:Multispeed and Coil:Heating:DX:Multispeed coils). This model will provide information for cooling-only or heating-only operation (VRF heat pump mode).
+Otherwise, the closest model available would be the multi-speed cooling and heating AC (AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed used with Coil:Cooling:DX and Coil:Heating:DX:Multispeed coils). This model will provide information for cooling-only or heating-only operation (VRF heat pump mode).
 
 Others have attempted to simulate a VRF system with the existing VAV model. This model will only provide valid information when cooling is required. The results will only be as good as the DX cooling coil performance curves allow. The heating side of a VAV system does not use a DX compression system (i.e., uses gas or electric heat) so this part of the VRV system cannot be modeled with a VAV system.
 

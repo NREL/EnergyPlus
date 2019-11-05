@@ -96,6 +96,7 @@ public:
     Real64 ratedGrossTotalCap = 0.0;
     Real64 ratedEvapAirFlowRate = 0.0;
     Real64 ratedCondAirFlowRate = 0.0;
+    Real64 ratedEvapAirMassFlowRate = 0.0;
 
     // Latent degradation model
     Real64 maxCyclingRate = 0.0;

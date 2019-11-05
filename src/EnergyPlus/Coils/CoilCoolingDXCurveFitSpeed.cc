@@ -75,6 +75,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
+    this->ratedCOP = input_data.gross_rated_cooling_COP;
     errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
                                       {1, 2},
@@ -320,15 +321,28 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
-    int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
     std::string CompType = this->object_name;
     std::string CompName = this->name;
-    std::string SizingString = "Gross Sensible Heat Ratio";
+
+    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    std::string SizingString = "Rated Air Flow Rate [m3/s]";
+    Real64 TempSize = this->evap_air_flow_rate;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = TempSize;
+
+    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    SizingString = "Gross Cooling Capacity [W]";
+    TempSize = this->rated_total_capacity;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->rated_total_capacity = TempSize;
+
+     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+    SizingMethod = DataHVACGlobals::CoolingSHRSizing;
+    SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
-    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-    Real64 TempSize = this->gross_shr;
+    TempSize = this->gross_shr;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->RatedSHR = TempSize;
     this->gross_shr = TempSize;
@@ -336,12 +350,6 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
-
-    // Psychrometrics::PsychState in;
-    // in.tdb = RatedInletAirTemp;
-    // in.w = RatedInletAirHumRat;
-    // in.h = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
-    // in.p = DataEnvironment::StdPressureSeaLevel;
 
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,

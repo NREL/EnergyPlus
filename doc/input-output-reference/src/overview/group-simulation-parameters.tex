@@ -834,7 +834,7 @@ OutputFull_{i-1} = System full output at the lower speed
 
 Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
 
-When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
+When coils of Coil:Cooling:DX, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
 
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
 
@@ -876,10 +876,10 @@ System & Allowed Coil \tabularnewline
 \midrule
 \endfirsthead
 
-AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed\tabularnewline
-AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
-CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
-CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
+AirLoopHVAC:UnitarySystem & Coil:Cooling:DX, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed\tabularnewline
+AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage\tabularnewline
+CoilSystem:Cooling:DX & Coil:Cooling:DX \tabularnewline
+CoilSystem:Heating:DX & Coil:Heating:DX, Coil:Heating:DX:VariableSpeed \tabularnewline
 
 \bottomrule
 \end{longtable}

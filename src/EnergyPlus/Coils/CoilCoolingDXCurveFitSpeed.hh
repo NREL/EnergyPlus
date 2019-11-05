@@ -130,6 +130,7 @@ public:
     Real64 ratedGrossTotalCap = 0.0;
     Real64 ratedEvapAirFlowRate = 0.0;
     Real64 ratedCondAirFlowRate = 0.0;
+    Real64 ratedCOP = 0.0;
 
     // other data members
     Real64 rated_total_capacity = 0.0;
@@ -154,7 +155,6 @@ public:
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
     void sizeSpeed();
-
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:

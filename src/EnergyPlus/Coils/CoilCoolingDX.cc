@@ -51,6 +51,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -64,8 +65,11 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -169,7 +173,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     }
 }
 
-void CoilCoolingDX::oneTimeInit(){
+void CoilCoolingDX::oneTimeInit() {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
     SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
@@ -272,6 +276,7 @@ void CoilCoolingDX::oneTimeInit(){
                             _,
                             "System");
     }
+
 }
 
 CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
@@ -316,7 +321,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
-        this->myOneTimeInitFlag = false;
     }
 
     // get inlet conditions from inlet node
@@ -336,6 +340,13 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // call the simulation, which returns useful data
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
+
+    // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
+    // call that here, and THEN set the one time init flag to false
+    if (this->myOneTimeInitFlag) {
+        this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
+        this->myOneTimeInitFlag = false;
+    }
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -406,7 +417,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }
-
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
