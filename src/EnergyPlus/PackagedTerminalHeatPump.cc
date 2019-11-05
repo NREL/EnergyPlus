@@ -4018,7 +4018,6 @@ namespace PackagedTerminalHeatPump {
 
                     for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
                         int speedNum = Iter - 1;
-                        int maxSpeedNum = PTUnit(PTUnitNum).NumOfSpeedCooling - 1;
                         PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) = coolCoil.performance.normalMode.speeds[speedNum].evap_air_flow_rate /
                                                                       coolCoil.performance.normalMode.ratedEvapAirFlowRate;
                         PTUnit(PTUnitNum).CoolVolumeFlowRate(Iter) =

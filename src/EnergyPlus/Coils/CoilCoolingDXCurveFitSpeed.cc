@@ -245,7 +245,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
       parentModeRatedCondAirFlowRate(0.0),
-      
+
       ambPressure(0.0),          // outdoor pressure {Pa}
       PLR(0.0),                  // coil operating part load ratio
       CondInletTemp(0.0),        // condenser inlet temperature {C}
@@ -258,8 +258,6 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
         // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
-
-
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
