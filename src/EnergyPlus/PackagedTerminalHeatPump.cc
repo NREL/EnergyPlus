@@ -1892,11 +1892,13 @@ namespace PackagedTerminalHeatPump {
                     coilCoolingDXs.emplace_back(PTUnit(PTUnitNum).DXCoolCoilName);
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = (int)coilCoolingDXs.size() - 1;
                     // mine data from coil object
+                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
+                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
+                    );
                     // TODO: Need to check for autosize on these I guess
                     auto &coolCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
-                    CoolCoilInletNodeNum = coolCoil.evapInletNodeIndex;
-                    CoolCoilOutletNodeNum = coolCoil.evapOutletNodeIndex;
-                    PTUnit(PTUnitNum).CondenserNodeNum = coolCoil.condInletNodeIndex;
                     if ((int)coolCoil.performance.normalMode.speeds.size() > 1) {
                         PTUnit(PTUnitNum).useVSCoilModel = true;
                         PTUnit(PTUnitNum).DesignCoolingCapacity = coolCoil.performance.normalMode.ratedGrossTotalCap;
@@ -4016,7 +4018,6 @@ namespace PackagedTerminalHeatPump {
                     // Call coil to make sure sizing executes
                     auto &coolCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
                     coolCoil.simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
-                    PTUnit(PTUnitNum).NumOfSpeedCooling = (int)coolCoil.performance.normalMode.speeds.size();
 
                     for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
                         int speedNum = Iter - 1;
@@ -8770,7 +8771,8 @@ namespace PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_Cooling) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].performance.minOutdoorDrybulb;
+            // Retrieved earlier
+            //PTUnit(PTUnitNum).MinOATCompressorCooling = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].performance.minOutdoorDrybulb;
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
