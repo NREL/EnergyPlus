@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -98,7 +99,7 @@ namespace ChillerAbsorption {
 
     // Types
 
-    struct BLASTAbsorberSpecs
+    struct BLASTAbsorberSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // user identifier
@@ -177,6 +178,34 @@ namespace ChillerAbsorption {
               
         {
         }
+
+
+       
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        
+        void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
+                                    bool const RunFlag, // TRUE when chiller operating
+                                    Real64 const MyLoad);
+
+        void SizeAbsorpChiller(int const ChillNum);
+
+        
+        void CalcBLASTAbsorberModel(int &ChillNum,             // Absorber number
+                                    Real64 &MyLoad,            // operating load
+                                    bool const RunFlag,        // TRUE when Absorber operating
+                                    bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
+                                    int const EquipFlowCtrl    // Flow control mode for the equipment
+                                   );
+
+
     };
 
     struct ReportVars
@@ -215,65 +244,36 @@ namespace ChillerAbsorption {
 
     // Functions
 
+
     void SimBLASTAbsorber(std::string const &AbsorberType, // type of Absorber
-                          std::string const &AbsorberName, // user specified name of Absorber
-                          int const EquipFlowCtrl,         // Flow control mode for the equipment
-                          int const LoopNum,               // Plant loop index for where called from
-                          int const LoopSide,              // Plant loop side index for where called from
-                          int &CompIndex,                  // Chiller number pointer
-                          bool const RunFlag,              // simulate Absorber when TRUE
-                          bool const FirstIteration,       // initialize variables when TRUE
-                          bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
-                          Real64 &MyLoad,                  // loop demand component will meet
-                          Real64 &MaxCap,                  // Maximum operating capacity of chiller [W]
-                          Real64 &MinCap,                  // Minimum operating capacity of chiller [W]
-                          Real64 &OptCap,                  // Optimal operating capacity of chiller [W]
-                          bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
-                          Real64 &SizingFactor,            // sizing factor
-                          Real64 &TempCondInDesign);
-
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
+                        std::string const &AbsorberName, // user specified name of Absorber
+                        int const EquipFlowCtrl,         // Flow control mode for the equipment
+                        int const LoopNum,               // Plant loop index for where called from
+                        int const LoopSide,              // Plant loop side index for where called from
+                        int &CompIndex,                  // Chiller number pointer
+                        bool const RunFlag,              // simulate Absorber when TRUE
+                        bool const FirstIteration,       // initialize variables when TRUE
+                        bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
+                        Real64 &MyLoad,                  // loop demand component will meet
+                        Real64 &MaxCap,                  // Maximum operating capacity of chiller [W]
+                        Real64 &MinCap,                  // Minimum operating capacity of chiller [W]
+                        Real64 &OptCap,                  // Optimal operating capacity of chiller [W]
+                        bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
+                        Real64 &SizingFactor,            // sizing factor
+                        Real64 &TempCondInDesign);
 
     void GetBLASTAbsorberInput();
+    
 
     void SetupOutputVars(Array1D_bool GenInputOutputNodesUsed);
 
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
 
-    void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
-                                bool const RunFlag, // TRUE when chiller operating
-                                Real64 const MyLoad);
-
-    void SizeAbsorpChiller(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
-    void CalcBLASTAbsorberModel(int &ChillNum,             // Absorber number
-                                Real64 &MyLoad,            // operating load
-                                bool const RunFlag,        // TRUE when Absorber operating
-                                bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                int const EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
     void UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
                                     bool const RunFlag,  // TRUE if Absorber operating
                                     int const Num        // Absorber number
     );
 
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
 } // namespace ChillerAbsorption
 
