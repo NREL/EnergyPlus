@@ -530,6 +530,13 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     bool cbfErrors = false;
 
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
+    if (slopeAtConds <= 0.0) {
+        // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
+        ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) +
+            " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
+        ShowFatalError("Errors found in calculating coil bypass factors");
+    }
 
     Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
 
