@@ -116,7 +116,7 @@ namespace EvaporativeFluidCoolers {
     int const EvapFluidCooler_SingleSpeed(1);
     int const EvapFluidCooler_TwoSpeed(2);
 
-    static std::string const BlankString;
+    std::string const BlankString;
     bool GetEvapFluidCoolerInputFlag(true);
 
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
@@ -276,7 +276,7 @@ namespace EvaporativeFluidCoolers {
         int NumAlphas;                        // Number of elements in the alpha array
         int NumNums;                          // Number of elements in the numeric array
         int IOStat;                           // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);       // Logical flag set .TRUE. if errors found while getting input data
+        bool ErrorsFound(false);       // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(25);         // Numeric input data array
         Array1D_string AlphArray(13);         // Character string input data array
         std::string FluidName;
@@ -1213,9 +1213,9 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
-        static std::string const RoutineName("InitEvapFluidCooler");
+        std::string const RoutineName("InitEvapFluidCooler");
 
-        static bool ErrorsFound(false); // Flag if input data errors are found
+        bool ErrorsFound(false); // Flag if input data errors are found
         static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool OneTimeFlagForEachEvapFluidCooler;
@@ -1370,7 +1370,7 @@ namespace EvaporativeFluidCoolers {
 
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
-        static std::string const CalledFrom("SizeEvapFluidCooler");
+        std::string const CalledFrom("SizeEvapFluidCooler");
 
         int PltSizCondNum;               // Plant Sizing index for condenser loop
         int SolFla;                      // Flag of solver
@@ -2180,9 +2180,9 @@ namespace EvaporativeFluidCoolers {
         // Based on SingleSpeedTower subroutine by Dan Fisher ,Sept 1998
         // Dec. 2008. BG. added RunFlag logic per original methodology
 
-        static std::string const RoutineName("CalcSingleSpeedEvapFluidCooler");
+        std::string const RoutineName("CalcSingleSpeedEvapFluidCooler");
         int const MaxIteration(100); // Maximum fluid bypass iteration calculations
-        static std::string const MaxItChar("100");
+        std::string const MaxItChar("100");
         Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
         Real64 const OWTLowerLimit(0.0);            // The limit of evaporative fluid cooler exit fluid temperature used
         // in the fluid bypass calculation to avoid fluid freezing. For water,
@@ -2390,7 +2390,7 @@ namespace EvaporativeFluidCoolers {
 
         Real64 InletWaterTemp;
 
-        static std::string const RoutineName("CalcTwoSpeedEvapFluidCooler");
+        std::string const RoutineName("CalcTwoSpeedEvapFluidCooler");
 
         Real64 AirFlowRate;
         Real64 UAdesign; // UA value at design conditions (entered by user) [W/C]
@@ -2502,7 +2502,7 @@ namespace EvaporativeFluidCoolers {
         Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations
         // [delta K/K]
         Real64 const DeltaTwbTolerance(0.001); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
-        static std::string const RoutineName("SimSimpleEvapFluidCooler");
+        std::string const RoutineName("SimSimpleEvapFluidCooler");
 
         int Iter;                    // Number of iterations completed
         Real64 MdotCpWater;          // Water mass flow rate times the heat capacity [W/K]
@@ -2662,14 +2662,14 @@ namespace EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on CalculateWaterUseage subroutine for cooling tower by B. Griffith, August 2006
 
-        static std::string const RoutineName("CalculateWaterUseage");
+        std::string const RoutineName("CalculateWaterUseage");
 
         Real64 AirDensity;
         Real64 AirMassFlowRate;
         Real64 AvailTankVdot;
-        static Real64 BlowDownVdot(0.0);
-        static Real64 DriftVdot(0.0);
-        static Real64 EvapVdot(0.0);
+        Real64 BlowDownVdot(0.0);
+        Real64 DriftVdot(0.0);
+        Real64 EvapVdot(0.0);
         Real64 InletAirEnthalpy;
         Real64 InSpecificHumRat;
         Real64 OutSpecificHumRat;
@@ -2813,7 +2813,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-        static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
+        ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
