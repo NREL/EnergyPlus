@@ -57,10 +57,8 @@
 
 namespace EnergyPlus {
 
-class CoilCoolingDXInputSpecification
+struct CoilCoolingDXInputSpecification
 {
-
-public:
     std::string name;
     std::string evaporator_inlet_node_name;
     std::string evaporator_outlet_node_name;
@@ -73,20 +71,30 @@ public:
     std::string evaporative_condenser_supply_water_storage_tank_name;
 };
 
-class CoilCoolingDX
+struct CoilCoolingDX
 {
-
-    std::string const object_name = "Coil:Cooling:DX";
-    CoilCoolingDXInputSpecification original_input_specs;
-
-public:
-    explicit CoilCoolingDX(const std::string& name);
-
+    CoilCoolingDX() = default;
+    static int factory(std::string const & coilName);
+    static void getInput();
+    static void clear_state();
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
+    void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
+    void getData(int &evapInletNodeIndex,
+                 int &evapOutletNodeIndex,
+                 int &condInletNodeIndex,
+                 Real64 &normalModeRatedCapacity,
+                 int &normalModeNumSpeeds,
+                 CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
+                 Real64 &minOutdoorDryBulb);
+    void getSpeedData(Real64 &normalModeRatedEvapAirFlowRate, 
+                      std::vector<Real64> &normalModeFlowRates, 
+                      std::vector<Real64> &normalModeRatedCapacities);
+
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
 
+    CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
     bool myOneTimeInitFlag = true;
     int evapInletNodeIndex = 0;
@@ -107,6 +115,10 @@ public:
 	Real64 evapCondPumpElecPower = 0.0;
 	Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
+    int supplyFanIndex = 0;
+    int supplyFanType = 0;
+    std::string supplyFanName = "";
+    bool doStandardRatingFlag = true;
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -122,6 +134,8 @@ public:
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
+extern bool coilCoolingDXGetInputFlag;
+extern std::string const coilCoolingDXObjectName;
 
 } // namespace EnergyPlus
 

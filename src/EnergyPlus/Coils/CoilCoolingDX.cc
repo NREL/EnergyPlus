@@ -51,6 +51,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -64,14 +65,66 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
-std::vector<CoilCoolingDX> coilCoolingDXs;
+    std::vector<CoilCoolingDX> coilCoolingDXs;
+    bool coilCoolingDXGetInputFlag = true;
+    std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
+}
+
+int CoilCoolingDX::factory(std::string const & coilName) {
+    if (coilCoolingDXGetInputFlag) {
+        CoilCoolingDX::getInput();
+        coilCoolingDXGetInputFlag = false;
+    }
+    int handle = -1;
+    for (auto const & thisCoil : coilCoolingDXs) {
+        handle++;
+        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(coilName) == EnergyPlus::UtilityRoutines::MakeUPPERCase(thisCoil.name)) {
+            return handle;
+        }
+    }
+    return -1;
+}
+
+void CoilCoolingDX::clear_state() {
+    coilCoolingDXs.clear();
+    coilCoolingDXGetInputFlag = true;
+}
+
+void CoilCoolingDX::getInput() {
+    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
+    if (numCoolingCoilDXs <= 0) {
+        ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
+    }
+    for (int coilNum = 1; coilNum <= numCoolingCoilDXs; ++coilNum) {
+        int NumAlphas;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers; // Number of Numbers for each GetObjectItem call
+        int IOStatus;
+        inputProcessor->getObjectItem(coilCoolingDXObjectName, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
+        CoilCoolingDXInputSpecification input_specs;
+        input_specs.name = cAlphaArgs(1);
+        input_specs.evaporator_inlet_node_name = cAlphaArgs(2);
+        input_specs.evaporator_outlet_node_name = cAlphaArgs(3);
+        input_specs.availability_schedule_name = cAlphaArgs(4);
+        input_specs.condenser_zone_name = cAlphaArgs(5);
+        input_specs.condenser_inlet_node_name = cAlphaArgs(6);
+        input_specs.condenser_outlet_node_name = cAlphaArgs(7);
+        input_specs.performance_object_name = cAlphaArgs(8);
+        input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
+        input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
+        CoilCoolingDX thisCoil;
+        thisCoil.instantiateFromInputSpec(input_specs);
+        coilCoolingDXs.push_back(thisCoil);
+    }
 }
 
 void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
@@ -85,7 +138,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     // other construction below
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_inlet_node_name,
                                                                    errorsFound,
-                                                                   this->object_name,
+                                                                   coilCoolingDXObjectName,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeType_Air,
                                                                    DataLoopNode::NodeConnectionType_Inlet,
@@ -93,7 +146,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.evaporator_outlet_node_name,
                                                                     errorsFound,
-                                                                    this->object_name,
+                                                                    coilCoolingDXObjectName,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeType_Air,
                                                                     DataLoopNode::NodeConnectionType_Outlet,
@@ -102,7 +155,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     if (!input_data.condenser_inlet_node_name.empty()) {
         this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_inlet_node_name,
                                                                        errorsFound,
-                                                                       this->object_name,
+                                                                       coilCoolingDXObjectName,
                                                                        input_data.name,
                                                                        DataLoopNode::NodeType_Air,
                                                                        DataLoopNode::NodeConnectionType_Inlet,
@@ -110,7 +163,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                        DataLoopNode::ObjectIsNotParent);
         // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
         if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
-            ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\", may be invalid");
+            ShowWarningError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
             ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                               "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
             ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
@@ -122,7 +175,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     if (!input_data.condenser_outlet_node_name.empty()) {
         this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_outlet_node_name,
                                                                         errorsFound,
-                                                                        this->object_name,
+                                                                        coilCoolingDXObjectName,
                                                                         input_data.name,
                                                                         DataLoopNode::NodeType_Air,
                                                                         DataLoopNode::NodeConnectionType_Outlet,
@@ -134,7 +187,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(this->name,
-                                 this->object_name,
+                                               coilCoolingDXObjectName,
                                  input_data.condensate_collection_water_storage_tank_name,
                                  errorsFound,
                                  this->condensateTankIndex,
@@ -143,7 +196,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
 
     if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
         WaterManager::SetupTankDemandComponent(this->name,
-                                 this->object_name,
+                                               coilCoolingDXObjectName,
                                  input_data.evaporative_condenser_supply_water_storage_tank_name,
                                  errorsFound,
                                  this->evaporativeCondSupplyTankIndex,
@@ -156,20 +209,20 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
     }
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
+        ShowSevereError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
 
     BranchNodeConnections::TestCompSet(
-        CoilCoolingDX::object_name, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
+            coilCoolingDXObjectName, this->name, input_data.evaporator_inlet_node_name, input_data.evaporator_outlet_node_name, "Air Nodes");
 
     if (errorsFound) {
-        ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(routineName + "Errors found in getting " + coilCoolingDXObjectName + " input. Preceding condition(s) causes termination.");
     }
 }
 
-void CoilCoolingDX::oneTimeInit(){
+void CoilCoolingDX::oneTimeInit() {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
     SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
@@ -272,43 +325,43 @@ void CoilCoolingDX::oneTimeInit(){
                             _,
                             "System");
     }
+
 }
 
-CoilCoolingDX::CoilCoolingDX(const std::string& name_to_find)
+void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
+    this->supplyFanIndex = fanIndex;
+    this->supplyFanName = fanName;
+    this->supplyFanType = fanType;
+    this->airLoopNum = _airLoopNum;
+}
+
+void CoilCoolingDX::getData(int &_evapInletNodeIndex,
+                            int &_evapOutletNodeIndex,
+                            int &_condInletNodeIndex,
+                            Real64 &_normalModeRatedCapacity,
+                            int &_normalModeNumSpeeds,
+                            CoilCoolingDXCurveFitPerformance::CapControlMethod &_capacityControlMethod,
+                            Real64 &_minOutdoorDryBulb)
 {
-    int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(CoilCoolingDX::object_name);
-    if (numCoolingCoilDXs <= 0) {
-        ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
-    }
-    bool found_it = false;
-    for (int coilNum = 1; coilNum <= numCoolingCoilDXs; ++coilNum) {
-        int NumAlphas;  // Number of Alphas for each GetObjectItem call
-        int NumNumbers; // Number of Numbers for each GetObjectItem call
-        int IOStatus;
-        inputProcessor->getObjectItem(CoilCoolingDX::object_name, coilNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus);
-        if (!UtilityRoutines::SameString(name_to_find, cAlphaArgs(1))) {
-            continue;
-        }
-        found_it = true;
+    _evapInletNodeIndex = this->evapInletNodeIndex;
+    _evapOutletNodeIndex = this->evapOutletNodeIndex;
+    _condInletNodeIndex = this->condInletNodeIndex;
+    _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
+    _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size() - 1;
+    _capacityControlMethod = this->performance.capControlMethod;
+    _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
+}
 
-        CoilCoolingDXInputSpecification input_specs;
-        input_specs.name = cAlphaArgs(1);
-        input_specs.evaporator_inlet_node_name = cAlphaArgs(2);
-        input_specs.evaporator_outlet_node_name = cAlphaArgs(3);
-        input_specs.availability_schedule_name = cAlphaArgs(4);
-        input_specs.condenser_zone_name = cAlphaArgs(5);
-        input_specs.condenser_inlet_node_name = cAlphaArgs(6);
-        input_specs.condenser_outlet_node_name = cAlphaArgs(7);
-        input_specs.performance_object_name = cAlphaArgs(8);
-        input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
-        input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
-
-        this->instantiateFromInputSpec(input_specs);
-        break;
-    }
-
-    if (!found_it) {
-        ShowFatalError("Coil:Cooling:DX " + name_to_find + " not found.");
+void CoilCoolingDX::getSpeedData(Real64 &_normalModeRatedEvapAirFlowRate, 
+                                 std::vector<Real64> &_normalModeFlowRates, 
+                                 std::vector<Real64> &_normalModeRatedCapacities)
+{
+    _normalModeRatedEvapAirFlowRate = this->performance.normalMode.ratedEvapAirFlowRate;
+    _normalModeFlowRates.clear();
+    _normalModeRatedCapacities.clear();
+    for (auto const &thisSpeed : this->performance.normalMode.speeds) {
+        _normalModeFlowRates.push_back(thisSpeed.evap_air_flow_rate);
+        _normalModeRatedCapacities.push_back(thisSpeed.rated_total_capacity);
     }
 }
 
@@ -336,6 +389,13 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // call the simulation, which returns useful data
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
+
+    // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
+    // call that here, and THEN set the one time init flag to false
+    if (!DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag && this->doStandardRatingFlag) {
+        this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
+        this->doStandardRatingFlag = false;
+    }
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -406,7 +466,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }
-
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)

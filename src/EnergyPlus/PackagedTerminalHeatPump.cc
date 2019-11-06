@@ -947,15 +947,15 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
                     // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(PTUnit(PTUnitNum).DXCoolCoilName);
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = (int)coilCoolingDXs.size() - 1;
+                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     // mine data from coil object
-                    // TODO: Need to check for autosize on these I guess
-                    auto &newCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
-                    CoolCoilInletNodeNum = newCoil.evapInletNodeIndex;
-                    CoolCoilOutletNodeNum = newCoil.evapOutletNodeIndex;
-                    PTUnit(PTUnitNum).CondenserNodeNum = newCoil.condInletNodeIndex;
-                    if ((int)newCoil.performance.normalMode.speeds.size() > 1) {
+                    // mine data from coil object
+                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
+                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
+                    );
+                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
                         PTUnit(PTUnitNum).useVSCoilModel = true;
                     }
                 }
@@ -1889,17 +1889,15 @@ namespace PackagedTerminalHeatPump {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
                     // call CoilCoolingDX constructor
-                    coilCoolingDXs.emplace_back(PTUnit(PTUnitNum).DXCoolCoilName);
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = (int)coilCoolingDXs.size() - 1;
+                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     // mine data from coil object
-                    // TODO: Need to check for autosize on these I guess
-                    auto &coolCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
-                    CoolCoilInletNodeNum = coolCoil.evapInletNodeIndex;
-                    CoolCoilOutletNodeNum = coolCoil.evapOutletNodeIndex;
-                    PTUnit(PTUnitNum).CondenserNodeNum = coolCoil.condInletNodeIndex;
-                    if ((int)coolCoil.performance.normalMode.speeds.size() > 1) {
+                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
+                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
+                    );
+                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
                         PTUnit(PTUnitNum).useVSCoilModel = true;
-                        PTUnit(PTUnitNum).DesignCoolingCapacity = coolCoil.performance.normalMode.ratedGrossTotalCap;
                     }
                 }
             } else if (UtilityRoutines::SameString(Alphas(11), "COIL:COOLING:DX:VARIABLESPEED")) {
@@ -4014,15 +4012,17 @@ namespace PackagedTerminalHeatPump {
 
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     // Call coil to make sure sizing executes
-                    auto &coolCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
-                    coolCoil.simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
-                    PTUnit(PTUnitNum).NumOfSpeedCooling = (int)coolCoil.performance.normalMode.speeds.size();
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
+                    Real64 normalModeRatedEvapAirFlowRate;
+                    std::vector<Real64> normalModeFlowRates;
+                    std::vector<Real64> normalModeRatedCapacities_notused;
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getSpeedData(
+                        normalModeRatedEvapAirFlowRate, normalModeFlowRates, normalModeRatedCapacities_notused);
 
                     for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
                         int speedNum = Iter - 1;
                         int maxSpeedNum = PTUnit(PTUnitNum).NumOfSpeedCooling - 1;
-                        PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) = coolCoil.performance.normalMode.speeds[speedNum].evap_air_flow_rate /
-                                                                      coolCoil.performance.normalMode.ratedEvapAirFlowRate;
+                        PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) = normalModeFlowRates[speedNum] / normalModeRatedEvapAirFlowRate;
                         PTUnit(PTUnitNum).CoolVolumeFlowRate(Iter) =
                             PTUnit(PTUnitNum).MaxCoolAirVolFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
                         PTUnit(PTUnitNum).CoolMassFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirMassFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
@@ -5101,11 +5101,12 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).useVSCoilModel) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         // Call coil to make sure sizing executes
-                        auto &coolCoil = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum];
-                        coolCoil.simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
-                        int maxSpeedNum = (int)coolCoil.performance.normalMode.speeds.size() - 1;
+                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
+                        std::vector<Real64> normalModeFlowRates_notused;
+                        std::vector<Real64> normalModeRatedCapacities_notused;
+                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getSpeedData(
+                            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, normalModeFlowRates_notused, normalModeRatedCapacities_notused);
                         ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = coolCoil.performance.normalMode.speeds[maxSpeedNum].evap_air_flow_rate;
                     } else {
                         SimVariableSpeedCoils(BlankString,
                                               PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -8770,7 +8771,8 @@ namespace PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_Cooling) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].performance.minOutdoorDrybulb;
+            // Retrieved earlier
+            //PTUnit(PTUnitNum).MinOATCompressorCooling = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].performance.minOutdoorDrybulb;
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {

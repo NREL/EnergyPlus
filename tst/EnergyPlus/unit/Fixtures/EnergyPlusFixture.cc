@@ -67,6 +67,7 @@
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
@@ -316,6 +317,7 @@ void EnergyPlusFixture::clear_all_states()
     ChillerExhaustAbsorption::clear_state();
     ChillerGasAbsorption::clear_state();
     ChillerIndirectAbsorption::clear_state();
+    CoilCoolingDX::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();

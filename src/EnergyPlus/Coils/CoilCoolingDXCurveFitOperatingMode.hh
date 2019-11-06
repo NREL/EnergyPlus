@@ -58,10 +58,8 @@
 
 namespace EnergyPlus {
 
-class CoilCoolingDXCurveFitOperatingModeInputSpecification
+struct CoilCoolingDXCurveFitOperatingModeInputSpecification
 {
-
-public:
     std::string name;
     Real64 gross_rated_total_cooling_capacity;
     Real64 rated_evaporator_air_flow_rate;
@@ -77,25 +75,30 @@ public:
     std::vector<std::string> speed_data_names;
 };
 
-class CoilCoolingDXCurveFitOperatingMode
+struct CoilCoolingDXCurveFitOperatingMode
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
-public:
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
-
     void sizeOperatingMode();
-
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
-
     CoilCoolingDXCurveFitOperatingMode() = default;
-
     explicit CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find);
+    Real64 getCurrentEvapCondPumpPower(int speedNum);
+    void CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
+                           DataLoopNode::NodeData &outletNode,
+                           Real64 &PLR,
+                           int &speedNum,
+                           Real64 &speedRatio,
+                           int &fanOpMode,
+                           DataLoopNode::NodeData &condInletNode,
+                           DataLoopNode::NodeData &condOutletNode);
 
     std::string name;
     Real64 ratedGrossTotalCap = 0.0;
     Real64 ratedEvapAirFlowRate = 0.0;
     Real64 ratedCondAirFlowRate = 0.0;
+    Real64 ratedEvapAirMassFlowRate = 0.0;
 
     // Latent degradation model
     Real64 maxCyclingRate = 0.0;
@@ -104,9 +107,9 @@ public:
     Real64 timeForCondensateRemoval = 0.0;
 
     // results from coil model at speed
-    Real64 OpModeOutletTemp = 0.0;
-    Real64 OpModeOutletHumRat = 0.0;
-    Real64 OpModeOutletEnth = 0.0;
+//    Real64 OpModeOutletTemp = 0.0;
+//    Real64 OpModeOutletHumRat = 0.0;
+//    Real64 OpModeOutletEnth = 0.0;
     Real64 OpModePower = 0.0;
     Real64 OpModeRTF = 0.0;
 
@@ -123,17 +126,6 @@ public:
     Real64 condInletTemp = 0.0; // condenser inlet node temp or outdoor temp if no condenser node {C}
 
     std::vector<CoilCoolingDXCurveFitSpeed> speeds;
-
-    void CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
-                           DataLoopNode::NodeData &outletNode,
-                           Real64 &PLR,
-                           int &speedNum,
-                           Real64 &speedRatio,
-                           int &fanOpMode,
-                           DataLoopNode::NodeData &condInletNode,
-                           DataLoopNode::NodeData &condOutletNode);
-
-    Real64 getCurrentEvapCondPumpPower(int speedNum);
 
 };
 

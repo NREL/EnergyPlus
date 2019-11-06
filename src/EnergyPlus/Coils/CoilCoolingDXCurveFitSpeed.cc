@@ -75,6 +75,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
+    this->ratedCOP = input_data.gross_rated_cooling_COP;
     errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
                                       {1, 2},
@@ -229,25 +230,36 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0), indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
-      PLR(0.0),                  // coil operating part load ratio
-      ambPressure(0.0),          // outdoor pressure {Pa]
-      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
-                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
       RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
+      RatedCondAirMassFlowRate(0.0), // condenser air mass flow rate at speed {kg/s}
       RatedSHR(0.0),             // rated sensible heat ratio at speed
       RatedCBF(0.0),             // rated coil bypass factor at speed
       RatedEIR(0.0),             // rated energy input ratio at speed {W/W}
-      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
-      FanOpMode(0),              // fan operating mode, constant or cycling fan
+      ratedCOP(0.0),
+      rated_total_capacity(0.0),
+      rated_evap_fan_power_per_volume_flow_rate(0.0),
+      rated_waste_heat_fraction_of_power_input(0.0),
+      evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
 
-      // speed class outputs
+      FanOpMode(0),              // fan operating mode, constant or cycling fan
+      parentModeRatedGrossTotalCap(0.0),
+      parentModeRatedEvapAirFlowRate(0.0),
+      parentModeRatedCondAirFlowRate(0.0),
+      
+      ambPressure(0.0),          // outdoor pressure {Pa}
+      PLR(0.0),                  // coil operating part load ratio
+      CondInletTemp(0.0),        // condenser inlet temperature {C}
+      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
+                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+
       FullLoadPower(0.0), // full load power at speed {W}
       RTF(0.0),           // coil runtime fraction at speed
+      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
 
-      // other data members
-      rated_total_capacity(0.0), evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
-      rated_evap_fan_power_per_volume_flow_rate(0.0), evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
-      rated_waste_heat_fraction_of_power_input(0.0),
+        // other data members
+      evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
+
+
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
@@ -308,9 +320,9 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
 
     std::string RoutineName = "sizeSpeed";
 
-    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->ratedGrossTotalCap;
-    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->ratedEvapAirFlowRate;
-    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->ratedCondAirFlowRate;
+    this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->parentModeRatedGrossTotalCap;
+    this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->parentModeRatedEvapAirFlowRate;
+    this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->parentModeRatedCondAirFlowRate;
     this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(
@@ -320,15 +332,28 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
-    int SizingMethod = DataHVACGlobals::CoolingSHRSizing;
     std::string CompType = this->object_name;
     std::string CompName = this->name;
-    std::string SizingString = "Gross Sensible Heat Ratio";
+
+    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    std::string SizingString = "Rated Air Flow Rate [m3/s]";
+    Real64 TempSize = this->evap_air_flow_rate;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = TempSize;
+
+    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    SizingString = "Gross Cooling Capacity [W]";
+    TempSize = this->rated_total_capacity;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    this->rated_total_capacity = TempSize;
+
+     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
+    SizingMethod = DataHVACGlobals::CoolingSHRSizing;
+    SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
-    //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-    Real64 TempSize = this->gross_shr;
+    TempSize = this->gross_shr;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->RatedSHR = TempSize;
     this->gross_shr = TempSize;
@@ -336,12 +361,6 @@ void CoilCoolingDXCurveFitSpeed::sizeSpeed()
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
-
-    // Psychrometrics::PsychState in;
-    // in.tdb = RatedInletAirTemp;
-    // in.w = RatedInletAirHumRat;
-    // in.h = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat);
-    // in.p = DataEnvironment::StdPressureSeaLevel;
 
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
@@ -530,6 +549,13 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     bool cbfErrors = false;
 
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
+    if (slopeAtConds <= 0.0) {
+        // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
+        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
+        ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) +
+            " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
+        ShowFatalError("Errors found in calculating coil bypass factors");
+    }
 
     Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
 
