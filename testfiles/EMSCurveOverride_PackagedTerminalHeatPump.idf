@@ -1729,14 +1729,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    Zone1PTHPDXCoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone1PTHPDXCoolCoil,     !- Name
     Zone1PTHPFanOutletNode,  !- Evaporator Inlet Node Name
     Zone1PTHPDXCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone1PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone1PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone1PTHPDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1790,14 +1793,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    Zone2PTHPDXCoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone2PTHPDXCoolCoil,     !- Name
     Zone2PTHPFanOutletNode,  !- Evaporator Inlet Node Name
     Zone2PTHPCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone2PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone2PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone2PTHPDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1851,14 +1857,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    Zone3PTHPDXCoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone3PTHPDXCoolCoil,     !- Name
     Zone3PTHPOAMixerOutletNode,  !- Evaporator Inlet Node Name
     Zone3PTHPCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone3PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone3PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone3PTHPDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

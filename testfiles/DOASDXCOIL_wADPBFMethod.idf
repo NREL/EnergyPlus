@@ -2418,14 +2418,17 @@
     Yes,                     !- Use Outdoor Air DX Cooling Coil
     2.0;                     !- Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature {C}
 
+  OutdoorAir:Node,
+    DOAS Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     DOAS Cooling Coil,       !- Name
     DOAS Supply Fan Outlet,  !- Evaporator Inlet Node Name
     DOAS Cooling Coil Outlet,!- Evaporator Outlet Node Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DOAS Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    DOAS Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     DOAS Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

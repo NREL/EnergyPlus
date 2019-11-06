@@ -7340,14 +7340,17 @@
 
  !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:COOLINGBYPASSFACTOREMPIRICAL ===========
 
+  OutdoorAir:Node,
+    PSZ-Office Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-Office Cooling Coil, !- Name
     PSZ-Office Heating Coil Outlet,  !- Evaporator Inlet Node Name
     PSZ-Office Air Loop Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-Office Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-Office Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-Office Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -7423,14 +7426,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PSZ-Fine Storage Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-Fine Storage Cooling Coil,  !- Name
     PSZ-Fine Storage Heating Coil Outlet,  !- Evaporator Inlet Node Name
     PSZ-Fine Storage Air Loop Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-Fine Storage Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-Fine Storage Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-Fine Storage Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

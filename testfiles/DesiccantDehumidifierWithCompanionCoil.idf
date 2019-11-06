@@ -91,7 +91,7 @@
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Fuel, Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Fuel, Coil:Cooling:DX
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -2732,7 +2732,7 @@
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Main Cooling Coil 1 Condenser Node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2815,7 +2815,7 @@
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Condenser Inlet Node,    !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Desiccant DXSystem Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Desiccant DXSystem Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

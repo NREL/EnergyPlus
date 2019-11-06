@@ -88,7 +88,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! Coils:                          Coil:Heating:Fuel
-!                                 Coil:Cooling:DX:SingleSpeed
+!                                 Coil:Cooling:DX
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1808,14 +1808,17 @@
     Air Loop Outlet Node,    !- Air Outlet Node Name
     Air Loop Outlet Node;    !- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
     Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     HVACAvailSched,          !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

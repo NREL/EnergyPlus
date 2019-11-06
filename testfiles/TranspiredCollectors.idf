@@ -3390,14 +3390,17 @@
     Heating Coil Air Outlet Node ZN1,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN1;!- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil ZN1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil ZN1,            !- Name
     Mixed Air Node ZN1,      !- Evaporator Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Evaporator Outlet Node Name
     Always_on,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil ZN1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil ZN1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil ZN1 Performance,!- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3728,14 +3731,17 @@
     Heating Coil Air Outlet Node ZN2,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN2;!- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil ZN2 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil ZN2,            !- Name
     Mixed Air Node ZN2,      !- Evaporator Inlet Node Name
     Cooling Coil Air Outlet Node ZN2,  !- Evaporator Outlet Node Name
     Always_on,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil ZN2 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil ZN2 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil ZN2 Performance,!- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4066,14 +4072,17 @@
     Heating Coil Air Outlet Node ZN3,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN3;!- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil ZN3 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil ZN3,            !- Name
     Mixed Air Node ZN3,      !- Evaporator Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Evaporator Outlet Node Name
     Always_on,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil ZN3 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil ZN3 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil ZN3 Performance,!- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4404,14 +4413,17 @@
     Heating Coil Air Outlet Node ZN4,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN4;!- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil ZN4 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil ZN4,            !- Name
     Mixed Air Node ZN4,      !- Evaporator Inlet Node Name
     Cooling Coil Air Outlet Node ZN4,  !- Evaporator Outlet Node Name
     Always_on,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil ZN4 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil ZN4 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil ZN4 Performance,!- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4742,14 +4754,17 @@
     Heating Coil Air Outlet Node ZN5,  !- Air Outlet Node Name
     Air Loop Outlet Node ZN5;!- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil ZN5 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil ZN5,            !- Name
     Mixed Air Node ZN5,      !- Evaporator Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Evaporator Outlet Node Name
     Always_on,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil ZN5 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil ZN5 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil ZN5 Performance,!- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

@@ -186,6 +186,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
     CHARACTER(len=MaxNameLength) :: DXNomPerfName=blank
     CHARACTER(len=MaxNameLength) :: DXStg1PerfName=blank
 
+    CHARACTER(len=MaxNameLength*2), ALLOCATABLE, DIMENSION(:) :: NwFldNames_ODA
+    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: NwFldDefaults_ODA
+    CHARACTER(len=20), ALLOCATABLE, DIMENSION(:) :: NwFldUnits_ODA
+    INTEGER NwObjMinFlds_ODA
+    LOGICAL, ALLOCATABLE, DIMENSION(:) :: NwAOrN_ODA
+    LOGICAL, ALLOCATABLE, DIMENSION(:) :: NwReqFld_ODA
+    INTEGER NwNumArgs_ODA   ! Number of Arguments in a definition
+    INTEGER :: CurArgs_ODA = 1
+    CHARACTER(len=MaxNameLength), DIMENSION(1) :: OutArgs_ODA
+
+    ALLOCATE(NwFldNames_ODA(MaxTotalArgs),NwFldDefaults_ODA(MaxTotalArgs),NwFldUnits_ODA(MaxTotalArgs),NwAOrN_ODA(MaxTotalArgs),NwReqFld_ODA(MaxTotalArgs))
+
     If (FirstTime) THEN  ! do things that might be applicable only to this new version
         FirstTime=.false.
     EndIf
@@ -569,11 +581,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(3) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(4) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                ! blank condenser zone name
-                                ! OutArgs(5)=TempArgs(5) ! Condenser Zone Name
-                                OutArgs(6)=TempArgs(5) ! Condenser Inlet Node Name
-                                ! blank condenser outlet node name
-                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:Multispeed never had this
+                                ! Condenser Inlet Node Name
+                                IF (TempArgs(5) == blank) THEN
+                                    ! make node name and write new OutdoorAir:Node object
+                                    OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL GetNewObjectDefInIDD('OUTDOORAIR:NODE',NwNumArgs_ODA,NwAorN_ODA,NwReqFld_ODA,NwObjMinFlds_ODA,NwFldNames_ODA,NwFldDefaults_ODA,NwFldUnits_ODA)
+                                    OutArgs_ODA=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL WriteOutIDFLines(DifLfn,'OutdoorAir:Node',CurArgs_ODA,OutArgs_ODA,NwFldNames_ODA,NwFldUnits_ODA)
+                                ELSE
+                                    ! pass through
+                                    OutArgs(6)=TempArgs(5)
+                                END IF
+                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(9) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(8) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -807,11 +827,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                ! blank condenser zone name
-                                ! OutArgs(5)=TempArgs(35) ! Condenser Zone Name
-                                OutArgs(6)=TempArgs(20) ! Condenser Inlet Node Name
-                                ! blank condenser oulet node name
-                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:SingleSpeed never had this
+                                IF (TempArgs(20) == blank) THEN
+                                    ! make node name and write new OutdoorAir:Node object
+                                    OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL GetNewObjectDefInIDD('OUTDOORAIR:NODE',NwNumArgs_ODA,NwAorN_ODA,NwReqFld_ODA,NwObjMinFlds_ODA,NwFldNames_ODA,NwFldDefaults_ODA,NwFldUnits_ODA)
+                                    OutArgs_ODA=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL WriteOutIDFLines(DifLfn,'OutdoorAir:Node',CurArgs_ODA,OutArgs_ODA,NwFldNames_ODA,NwFldUnits_ODA)
+                                ELSE
+                                    ! pass through
+                                    OutArgs(6)=TempArgs(20)
+                                END IF
+                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(28) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(27) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -898,11 +925,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
                                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
-                                ! blank condenser zone name
-                                ! OutArgs(5)=TempArgs(39) ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
-                                OutArgs(6)=TempArgs(21) ! Condenser Inlet Node Name
-                                ! blank condenser outet node name
-                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:TwoSpeed never had this
+                                IF (TempArgs(21) == blank) THEN
+                                    ! make node name and write new OutdoorAir:Node object
+                                    OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL GetNewObjectDefInIDD('OUTDOORAIR:NODE',NwNumArgs_ODA,NwAorN_ODA,NwReqFld_ODA,NwObjMinFlds_ODA,NwFldNames_ODA,NwFldDefaults_ODA,NwFldUnits_ODA)
+                                    OutArgs_ODA=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL WriteOutIDFLines(DifLfn,'OutdoorAir:Node',CurArgs_ODA,OutArgs_ODA,NwFldNames_ODA,NwFldUnits_ODA)
+                                ELSE
+                                    ! pass through
+                                    OutArgs(6)=TempArgs(21)
+                                END IF
+                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(31) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(30) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -1138,10 +1172,51 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(4) ! Evaporator Outlet Node Name
                                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
                                 ! blank condenser zone name
-                                ! OutArgs(5)=TempArgs(95) ! Condenser Zone Name
-                                OutArgs(6)=TempArgs(5) ! Condenser Inlet Node Name
-                                ! blank condenser outlet node name
-                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:TwoStageWithHumidityControlMode never had this
+
+                                IF (TempArgs(7) == blank) THEN
+                                    NumberOfSpeeds = 1
+                                ELSE
+                                    ErrFlag=.false.
+                                    NumberOfSpeeds=ProcessNumber(TempArgs(7),ErrFlag)
+                                    IF (ErrFlag) THEN
+                                        CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoStageWithHumidityControlMode field 7, ['//  &
+                                                trim(TempArgs(7))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                                    ENDIF
+                                ENDIF
+
+                                DXStg1PerfName = TempArgs(10)
+                                ModeName = 'Normal'
+                                IF ( NumberOfSpeeds == 1 ) THEN
+                                    DXNomPerfName = TempArgs(10)
+                                ELSE
+                                    DXNomPerfName = TempArgs(12)
+                                ENDIF
+
+                                iDXNomPerf = 0
+                                iDXStg1Perf = 0
+                                DO iDXPerf=1,NumMultiStageDXPerf
+                                    IF ( SameString( DXNomPerfName, MultiStageDXPerformance(iDXPerf)%Name) ) THEN
+                                        iDXNomPerf = iDXPerf
+                                    ENDIF
+                                    IF ( SameString( DXStg1PerfName, MultiStageDXPerformance(iDXPerf)%Name) ) THEN
+                                        iDXStg1Perf = iDXPerf
+                                    ENDIF
+                                ENDDO
+
+                                ! Condenser Inlet Node Name
+                                IF (MultiStageDXPerformance(iDXStg1Perf)%CondInletNode == blank) THEN
+                                    ! make node name and write new OutdoorAir:Node object
+                                    OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL GetNewObjectDefInIDD('OUTDOORAIR:NODE',NwNumArgs_ODA,NwAorN_ODA,NwReqFld_ODA,NwObjMinFlds_ODA,NwFldNames_ODA,NwFldDefaults_ODA,NwFldUnits_ODA)
+                                    OutArgs_ODA=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL WriteOutIDFLines(DifLfn,'OutdoorAir:Node',CurArgs_ODA,OutArgs_ODA,NwFldNames_ODA,NwFldUnits_ODA)
+                                ELSE
+                                    ! pass through
+                                    OutArgs(6)=MultiStageDXPerformance(iDXStg1Perf)%CondInletNode
+                                END IF
+
+                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(18) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(17) ! Evaporative Condenser Supply Water Storage Tank Name
@@ -1181,16 +1256,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                                 ! write the Operating Mode objects
-                                IF (TempArgs(7) == blank) THEN
-                                    NumberOfSpeeds = 1
-                                ELSE
-                                    ErrFlag=.false.
-                                    NumberOfSpeeds=ProcessNumber(TempArgs(7),ErrFlag)
-                                    IF (ErrFlag) THEN
-                                        CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoStageWithHumidityControlMode field 7, ['//  &
-                                                trim(TempArgs(7))//'], Name='//TRIM(TempArgs(1)),Auditf)
-                                    ENDIF
-                                ENDIF
+
                                 DO ModeNum=1,NumberOfModes
                                     OutArgs=Blank
                                     ! Save index of Nominal Performance Object for this mode
@@ -1475,9 +1541,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(3)=TempArgs(3) ! Evaporator Outlet Node Name
                                 !OutArgs(4)='' ! Availability Schedule Name - Coil:Cooling:DX:VariableSpeed never had this
                                 !OutArgs(5)='' ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
-                                OutArgs(6)=TempArgs(11) ! Condenser Inlet Node Name
-                                ! blank condenser outlet node name
-                                ! OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                                IF (TempArgs(11) == blank) THEN
+                                    ! make node name and write new OutdoorAir:Node object
+                                    OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL GetNewObjectDefInIDD('OUTDOORAIR:NODE',NwNumArgs_ODA,NwAorN_ODA,NwReqFld_ODA,NwObjMinFlds_ODA,NwFldNames_ODA,NwFldDefaults_ODA,NwFldUnits_ODA)
+                                    OutArgs_ODA=TRIM(TempArgs(1)) // TRIM(' Condenser Inlet Node')
+                                    CALL WriteOutIDFLines(DifLfn,'OutdoorAir:Node',CurArgs_ODA,OutArgs_ODA,NwFldNames_ODA,NwFldUnits_ODA)
+                                ELSE
+                                    ! pass through
+                                    OutArgs(6)=TempArgs(11)
+                                END IF
+                                OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
                                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                                 OutArgs(9)=TempArgs(18) ! Condensate Collection Water Storage Tank Name
                                 OutArgs(10)=TempArgs(17) ! Evaporative Condenser Supply Water Storage Tank Name

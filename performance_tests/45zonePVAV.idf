@@ -19819,7 +19819,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     PACKAGED VAV WITH REHEAT_CoolC Cond OA node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

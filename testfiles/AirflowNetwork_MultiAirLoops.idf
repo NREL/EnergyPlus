@@ -117,9 +117,9 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          First AirLoop: A heat pump with Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, and
+! Coils:                          First AirLoop: A heat pump with Coil:Cooling:DX, Coil:Heating:DX:SingleSpeed, and
 !                                 Coil:Heating:Electric as a supplemental heating. A terminal has a Coil:Heating:Fuel coil
-!                                 Second AirLoop: A heat pump with Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, and
+!                                 Second AirLoop: A heat pump with Coil:Cooling:DX, Coil:Heating:DX:SingleSpeed, and
 !                                 Coil:Heating:Electric as a supplemental heating.
 ! Pumps:                          None
 ! Boilers:                        None
@@ -3244,14 +3244,17 @@
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
     Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3742,7 +3745,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Heat Pump 1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Heat Pump 1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Heat Pump 1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

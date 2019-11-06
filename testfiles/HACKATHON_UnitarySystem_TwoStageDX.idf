@@ -2844,14 +2844,17 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 1 Furnace DX Cool Cooling Coil,  !- Name
     Sys 1 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3245,14 +3248,17 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 2 Furnace DX Cool Cooling Coil,  !- Name
     Sys 2 Furnace DX Cool Mixed Air Outlet,  !- Evaporator Inlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3633,14 +3639,17 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 3 Heat Pump Air Source Cooling Coil,  !- Name
     Sys 3 Heat Pump Air Source Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4102,14 +4111,17 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 4 Heat Pump Air Source Cooling Coil,  !- Name
     Sys 4 Heat Pump Air Source Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4565,14 +4577,17 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 5 Furnace DX Cool Cooling Coil,  !- Name
     Sys 5 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

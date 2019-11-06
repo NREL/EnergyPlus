@@ -10157,14 +10157,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:MULTISPEED:COOLINGEMPIRICAL ===========
 
+  OutdoorAir:Node,
+    PACU_VAV_bot_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PACU_VAV_bot_CoolC DXCoil,  !- Name
     PACU_VAV_bot_OA-PACU_VAV_bot_CoolCNode,  !- Evaporator Inlet Node Name
     PACU_VAV_bot_CoolC-PACU_VAV_bot_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PACU_VAV_bot_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PACU_VAV_bot_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PACU_VAV_bot_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -10240,14 +10243,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PACU_VAV_mid_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PACU_VAV_mid_CoolC DXCoil,  !- Name
     PACU_VAV_mid_OA-PACU_VAV_mid_CoolCNode,  !- Evaporator Inlet Node Name
     PACU_VAV_mid_CoolC-PACU_VAV_mid_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PACU_VAV_mid_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PACU_VAV_mid_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PACU_VAV_mid_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -10323,14 +10329,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PACU_VAV_top_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PACU_VAV_top_CoolC DXCoil,  !- Name
     PACU_VAV_top_OA-PACU_VAV_top_CoolCNode,  !- Evaporator Inlet Node Name
     PACU_VAV_top_CoolC-PACU_VAV_top_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PACU_VAV_top_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PACU_VAV_top_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PACU_VAV_top_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

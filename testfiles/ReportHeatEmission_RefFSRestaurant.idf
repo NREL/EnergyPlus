@@ -1433,14 +1433,17 @@
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2_FanNode,  !- Air Outlet Node Name
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2_FanNode;  !- Temperature Setpoint Node Name
 
+  OutdoorAir:Node,
+    PSZ-AC_1:1_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC_1:1_CoolC DXCoil, !- Name
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC_1:1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC_1:1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC_1:1_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1516,14 +1519,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PSZ-AC_2:2_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC_2:2_CoolC DXCoil, !- Name
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC_2:2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC_2:2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC_2:2_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

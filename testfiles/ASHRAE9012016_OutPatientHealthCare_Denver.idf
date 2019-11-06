@@ -44117,14 +44117,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:TWOSPEED ===========
 
+  OutdoorAir:Node,
+    AHU-1_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     AHU-1_CoolC DXCoil,      !- Name
     AHU-1_OA-AHU-1_CoolCNode,!- Evaporator Inlet Node Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    AHU-1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    AHU-1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     AHU-1_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -44200,14 +44203,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    AHU-2_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     AHU-2_CoolC DXCoil,      !- Name
     AHU-2_OA-AHU-2_CoolCNode,!- Evaporator Inlet Node Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    AHU-2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    AHU-2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     AHU-2_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

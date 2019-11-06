@@ -1296,14 +1296,17 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_1 PTAC OA node;  !- Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_1 PTAC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_1 PTACDXcool inlet,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_1 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_1 PTAC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1885,14 +1888,17 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_2 PTAC OA node;  !- Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_2 PTAC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_2 PTACDXcool inlet,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_2 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_2 PTAC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2474,14 +2480,17 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_3 PTAC OA node;  !- Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_3 PTAC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_3 PTACDXcool inlet,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_3 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_3 PTAC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3063,14 +3072,17 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_4 PTAC OA node;  !- Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_4 PTAC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_4 PTACDXcool inlet,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_4 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_4 PTAC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3639,14 +3651,17 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_5 PTAC OA node;  !- Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_5 PTAC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_5 PTACDXcool inlet,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_5 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_5 PTAC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

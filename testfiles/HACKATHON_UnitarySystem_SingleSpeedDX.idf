@@ -2840,7 +2840,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet,                        !- Condenser Outlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3217,7 +3217,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Sys 2 Furnace DX Cool Cooling Coil Condenser Outlet,                        !- Condenser Outlet Node Name
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3581,7 +3581,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Sys 3 Furnace DX Cool Cooling Coil Condenser Outlet,                        !- Condenser Outlet Node Name
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4026,7 +4026,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Sys 4 Furnace DX Cool Cooling Coil Condenser Outlet,                        !- Condenser Outlet Node Name
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4471,7 +4471,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Sys 5 Furnace DX Cool Cooling Coil Condenser Outlet,                        !- Condenser Outlet Node Name
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -4689,4 +4689,3 @@
     ;                        !- Mechanical Ventilation Controller Name
 
   Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
-

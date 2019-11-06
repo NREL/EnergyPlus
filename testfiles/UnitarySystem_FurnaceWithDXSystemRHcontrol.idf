@@ -94,7 +94,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
+! Coils:                          Coil:Cooling:DX, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1261,7 +1261,10 @@
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
     0.7;                     !- Fan Total Efficiency
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+
+  OutdoorAir:Node,
+    Furnace ACDXCoil 1 Condenser Inlet Node;  !- Name
 
   Coil:Cooling:DX,
     Furnace ACDXCoil 1,      !- Name
@@ -1269,8 +1272,8 @@
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Furnace ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Furnace ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Furnace ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1361,7 +1364,7 @@
 !    BlowThrough,             !- Fan Placement
 !    Coil:Heating:Fuel,        !- Heating Coil Object Type
 !    Furnace Heating Coil 1,  !- Heating Coil Name
-!    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+!    Coil:Cooling:DX,  !- Cooling Coil Object Type
 !    Furnace ACDXCoil 1,      !- Cooling Coil Name
 !    CoolReheat,              !- Dehumidification Control Type
 !    Coil:Heating:Fuel,        !- Reheat Coil Object Type

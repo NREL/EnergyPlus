@@ -1535,14 +1535,17 @@
     SAT Sch,                 !- Schedule Name
     Air Loop Outlet Node;    !- Setpoint Node or NodeList Name
 
+  OutdoorAir:Node,
+    Main Cooling Coil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Main Cooling Coil 1,     !- Name
     DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

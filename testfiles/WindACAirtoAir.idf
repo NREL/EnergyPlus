@@ -2,7 +2,7 @@
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed.
+! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX.
 !                          derived from WindACAuto.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -81,7 +81,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
-! Coils:                          Coil:Cooling:DX:VariableSpeed
+! Coils:                          Coil:Cooling:DX
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1607,14 +1607,17 @@
     Zone1WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1WindACFanOutletNode;!- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Zone1WindAC_VS_DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone1WindAC_VS_DXCoil,   !- Name
     Zone1WindACFanOutletNode,!- Evaporator Inlet Node Name
     Zone1WindACAirOutletNode,!- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone1WindAC_VS_DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone1WindAC_VS_DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone1WindAC_VS_DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1801,14 +1804,17 @@
     Zone2WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone2WindACFanOutletNode;!- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Zone2WindACDXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone2WindACDXCoil,       !- Name
     Zone2WindACFanOutletNode,!- Evaporator Inlet Node Name
     Zone2WindACAirOutletNode,!- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone2WindACDXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone2WindACDXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone2WindACDXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1942,14 +1948,17 @@
     Zone3WindACDXOutletNode, !- Air Inlet Node Name
     Zone3WindACAirOutletNode;!- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Zone3WindACDXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone3WindACDXCoil,       !- Name
     Zone3WindACOAMixerOutletNode,  !- Evaporator Inlet Node Name
     Zone3WindACDXOutletNode, !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone3WindACDXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone3WindACDXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone3WindACDXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

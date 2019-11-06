@@ -74,7 +74,7 @@
 ! Compact Schedules:              Yes
 !
 ! HVAC:                           the system is a packaged VAV (DX cooling coil and gas heating coils).
-!                                 The input is fully autosized. The input uses Coil:Cooling:DX:VariableSpeed but with just one speed level.
+!                                 The input is fully autosized. The input uses Coil:Cooling:DX but with just one speed level.
 !                                 There is a supplemental heating coil using desuperheat from the cooling coil, for humidity
 !                                 Terminal units are set to provide a minimum amount of outdoor air based
 !                                 on occupancy and floor area.
@@ -84,7 +84,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel, Coil:Heating:Desuperheater
+! Coils:                          Coil:Cooling:DX, Coil:Heating:Fuel, Coil:Heating:Desuperheater
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -2705,14 +2705,17 @@
     Relief Air Outlet Node 1,!- Relief Air Stream Node Name
     VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name
 
+  OutdoorAir:Node,
+    Main Cooling Coil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Main Cooling Coil 1,     !- Name
     Main Cooling Coil 1 Inlet Node,  !- Evaporator Inlet Node Name
     Main Heating Coil 1 Inlet Node,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

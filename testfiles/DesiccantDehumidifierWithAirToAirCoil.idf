@@ -5,7 +5,7 @@
 !                          The perimeter zone air system also has a desiccant dehumidifier to treat outdoor air.
 !
 !                          Desiccant dehumidifier in air loop with companion cooling coil (DXSystem) for interior (core) zone
-!                          Uses the Coil:Cooling:DX:VariableSpeed model with just one speed level.
+!                          Uses the Coil:Cooling:DX model with just one speed level.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods,
 !                          Run Control executes the design days, modify Run Control object to execute an annual simulation.
@@ -90,7 +90,7 @@
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Fuel, Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX:TwoSpeed, Coil:Heating:Fuel, Coil:Cooling:DX
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -2731,7 +2731,7 @@
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Main Cooling Coil 1 Condenser Node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2814,7 +2814,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Condenser Inlet Node,    !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Desiccant DXSystem VS Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Desiccant DXSystem VS Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

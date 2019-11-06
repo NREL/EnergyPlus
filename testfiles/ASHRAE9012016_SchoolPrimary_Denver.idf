@@ -13980,7 +13980,10 @@
     PSZ-AC_2:7_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     ;                        !- End-Use Subcategory
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+
+  OutdoorAir:Node,
+    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
 
   Coil:Cooling:DX,
     PSZ-AC_2:5_Unitary_Package_CoolCoil,  !- Name
@@ -13988,8 +13991,8 @@
     PSZ-AC_2:5 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC_2:5_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14065,14 +14068,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC_1:6_Unitary_Package_CoolCoil,  !- Name
     PSZ-AC_1:6_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     PSZ-AC_1:6 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC_1:6_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14148,14 +14154,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC_2:7_Unitary_Package_CoolCoil,  !- Name
     PSZ-AC_2:7_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     PSZ-AC_2:7 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC_2:7_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14233,14 +14242,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:TWOSPEED ===========
 
+  OutdoorAir:Node,
+    VAV_POD_1_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     VAV_POD_1_CoolC DXCoil,  !- Name
     VAV_POD_1_OA-VAV_POD_1_CoolCNode,  !- Evaporator Inlet Node Name
     VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    VAV_POD_1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    VAV_POD_1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     VAV_POD_1_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14316,14 +14328,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    VAV_POD_2_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     VAV_POD_2_CoolC DXCoil,  !- Name
     VAV_POD_2_OA-VAV_POD_2_CoolCNode,  !- Evaporator Inlet Node Name
     VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    VAV_POD_2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    VAV_POD_2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     VAV_POD_2_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14399,14 +14414,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    VAV_POD_3_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     VAV_POD_3_CoolC DXCoil,  !- Name
     VAV_POD_3_OA-VAV_POD_3_CoolCNode,  !- Evaporator Inlet Node Name
     VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    VAV_POD_3_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    VAV_POD_3_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     VAV_POD_3_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -14482,14 +14500,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    VAV_OTHER_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     VAV_OTHER_CoolC DXCoil,  !- Name
     VAV_OTHER_OA-VAV_OTHER_CoolCNode,  !- Evaporator Inlet Node Name
     VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    VAV_OTHER_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    VAV_OTHER_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     VAV_OTHER_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

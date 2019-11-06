@@ -1930,7 +1930,7 @@
     HVACAvailSched,          !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Outdoor Condenser Air Node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

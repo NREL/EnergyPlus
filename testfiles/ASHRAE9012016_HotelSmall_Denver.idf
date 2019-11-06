@@ -23867,14 +23867,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    101 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     101 PTAC Cooling Coil,   !- Name
     101 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     101 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    101 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    101 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     101 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -23928,14 +23931,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    102 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     102 PTAC Cooling Coil,   !- Name
     102 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     102 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    102 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    102 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     102 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -23989,14 +23995,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    103 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     103 PTAC Cooling Coil,   !- Name
     103 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     103 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    103 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    103 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     103 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24050,14 +24059,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    104 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     104 PTAC Cooling Coil,   !- Name
     104 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     104 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    104 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    104 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     104 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24111,14 +24123,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    105 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     105 PTAC Cooling Coil,   !- Name
     105 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     105 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    105 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    105 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     105 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24172,14 +24187,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    201 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     201 PTAC Cooling Coil,   !- Name
     201 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     201 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    201 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    201 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     201 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24233,14 +24251,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    202_205 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     202_205 PTAC Cooling Coil,  !- Name
     202_205 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     202_205 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    202_205 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    202_205 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     202_205 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24294,14 +24315,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    206_208 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     206_208 PTAC Cooling Coil,  !- Name
     206_208 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     206_208 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    206_208 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    206_208 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     206_208 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24355,14 +24379,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    209_212 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     209_212 PTAC Cooling Coil,  !- Name
     209_212 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     209_212 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    209_212 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    209_212 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     209_212 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24416,14 +24443,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    213 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     213 PTAC Cooling Coil,   !- Name
     213 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     213 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    213 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    213 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     213 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24477,14 +24507,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    214 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     214 PTAC Cooling Coil,   !- Name
     214 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     214 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    214 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    214 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     214 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24538,14 +24571,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    215_218 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     215_218 PTAC Cooling Coil,  !- Name
     215_218 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     215_218 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    215_218 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    215_218 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     215_218 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24599,14 +24635,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    219 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     219 PTAC Cooling Coil,   !- Name
     219 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     219 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    219 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    219 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     219 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24660,14 +24699,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    220_223 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     220_223 PTAC Cooling Coil,  !- Name
     220_223 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     220_223 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    220_223 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    220_223 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     220_223 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24721,14 +24763,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    224 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     224 PTAC Cooling Coil,   !- Name
     224 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     224 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    224 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    224 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     224 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24782,14 +24827,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    301 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     301 PTAC Cooling Coil,   !- Name
     301 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     301 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    301 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    301 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     301 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24843,14 +24891,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    302_305 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     302_305 PTAC Cooling Coil,  !- Name
     302_305 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     302_305 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    302_305 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    302_305 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     302_305 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24904,14 +24955,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    306_308 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     306_308 PTAC Cooling Coil,  !- Name
     306_308 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     306_308 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    306_308 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    306_308 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     306_308 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -24965,14 +25019,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    309_312 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     309_312 PTAC Cooling Coil,  !- Name
     309_312 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     309_312 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    309_312 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    309_312 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     309_312 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25026,14 +25083,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    313 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     313 PTAC Cooling Coil,   !- Name
     313 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     313 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    313 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    313 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     313 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25087,14 +25147,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    314 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     314 PTAC Cooling Coil,   !- Name
     314 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     314 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    314 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    314 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     314 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25148,14 +25211,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    315_318 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     315_318 PTAC Cooling Coil,  !- Name
     315_318 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     315_318 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    315_318 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    315_318 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     315_318 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25209,14 +25275,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    319 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     319 PTAC Cooling Coil,   !- Name
     319 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     319 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    319 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    319 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     319 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25270,14 +25339,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    320_323 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     320_323 PTAC Cooling Coil,  !- Name
     320_323 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     320_323 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    320_323 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    320_323 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     320_323 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25331,14 +25403,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    324 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     324 PTAC Cooling Coil,   !- Name
     324 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     324 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    324 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    324 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     324 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25392,14 +25467,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    401 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     401 PTAC Cooling Coil,   !- Name
     401 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     401 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    401 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    401 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     401 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25453,14 +25531,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    402_405 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     402_405 PTAC Cooling Coil,  !- Name
     402_405 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     402_405 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    402_405 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    402_405 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     402_405 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25514,14 +25595,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    406_408 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     406_408 PTAC Cooling Coil,  !- Name
     406_408 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     406_408 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    406_408 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    406_408 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     406_408 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25575,14 +25659,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    409_412 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     409_412 PTAC Cooling Coil,  !- Name
     409_412 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     409_412 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    409_412 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    409_412 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     409_412 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25636,14 +25723,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    413 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     413 PTAC Cooling Coil,   !- Name
     413 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     413 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    413 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    413 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     413 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25697,14 +25787,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    414 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     414 PTAC Cooling Coil,   !- Name
     414 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     414 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    414 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    414 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     414 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25758,14 +25851,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    415_418 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     415_418 PTAC Cooling Coil,  !- Name
     415_418 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     415_418 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    415_418 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    415_418 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     415_418 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25819,14 +25915,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    419 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     419 PTAC Cooling Coil,   !- Name
     419 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     419 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    419 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    419 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     419 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25880,14 +25979,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    420_423 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     420_423 PTAC Cooling Coil,  !- Name
     420_423 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     420_423 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    420_423 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    420_423 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     420_423 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -25941,14 +26043,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    424 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     424 PTAC Cooling Coil,   !- Name
     424 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     424 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    424 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    424 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     424 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26002,14 +26107,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    CorridorFlr1 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     CorridorFlr1 PTAC Cooling Coil,  !- Name
     CorridorFlr1 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     CorridorFlr1 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    CorridorFlr1 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    CorridorFlr1 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     CorridorFlr1 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26063,14 +26171,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    CorridorFlr2 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     CorridorFlr2 PTAC Cooling Coil,  !- Name
     CorridorFlr2 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     CorridorFlr2 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    CorridorFlr2 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    CorridorFlr2 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     CorridorFlr2 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26124,14 +26235,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    CorridorFlr3 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     CorridorFlr3 PTAC Cooling Coil,  !- Name
     CorridorFlr3 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     CorridorFlr3 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    CorridorFlr3 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    CorridorFlr3 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     CorridorFlr3 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26185,14 +26299,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    CorridorFlr4 PTAC Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     CorridorFlr4 PTAC Cooling Coil,  !- Name
     CorridorFlr4 PTAC Mixed Air Outlet,  !- Evaporator Inlet Node Name
     CorridorFlr4 PTAC Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    CorridorFlr4 PTAC Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    CorridorFlr4 PTAC Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     CorridorFlr4 PTAC Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26246,14 +26363,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    SAC_FrontOffice Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SAC_FrontOffice Cooling Coil,  !- Name
     SAC_FrontOffice Heating Coil Outlet,  !- Evaporator Inlet Node Name
     SAC_FrontOffice Air Loop Outlet,  !- Evaporator Outlet Node Name
     AlwaysOn,                !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SAC_FrontOffice Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SAC_FrontOffice Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SAC_FrontOffice Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26307,14 +26427,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    SAC_FrontLounge Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SAC_FrontLounge Cooling Coil,  !- Name
     SAC_FrontLounge Heating Coil Outlet,  !- Evaporator Inlet Node Name
     SAC_FrontLounge Air Loop Outlet,  !- Evaporator Outlet Node Name
     AlwaysOn,                !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SAC_FrontLounge Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SAC_FrontLounge Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SAC_FrontLounge Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26368,14 +26491,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    SAC_MeetingRoom Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SAC_MeetingRoom Cooling Coil,  !- Name
     SAC_MeetingRoom Heating Coil Outlet,  !- Evaporator Inlet Node Name
     SAC_MeetingRoom Air Loop Outlet,  !- Evaporator Outlet Node Name
     AlwaysOn,                !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SAC_MeetingRoom Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SAC_MeetingRoom Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SAC_MeetingRoom Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -26429,14 +26555,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    SAC_Exc_EmpLge_RestRm Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SAC_Exc_EmpLge_RestRm Cooling Coil,  !- Name
     SAC_Exc_EmpLge_RestRm Heating Coil Outlet,  !- Evaporator Inlet Node Name
     SAC_Exc_EmpLge_RestRm Air Loop Outlet,  !- Evaporator Outlet Node Name
     AlwaysOn,                !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SAC_Exc_EmpLge_RestRm Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SAC_Exc_EmpLge_RestRm Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SAC_Exc_EmpLge_RestRm Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

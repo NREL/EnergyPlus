@@ -1407,14 +1407,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    Furnace ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Furnace ACDXCoil 1,      !- Name
     DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Furnace ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Furnace ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Furnace ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

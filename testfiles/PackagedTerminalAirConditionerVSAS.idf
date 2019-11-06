@@ -112,7 +112,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:VariableSpeed, COIL:ELECTRIC:HEATING, Coil:Heating:Fuel,
+! Coils:                          Coil:Cooling:DX, COIL:ELECTRIC:HEATING, Coil:Heating:Fuel,
 !                                 COIL:STEAM:AIRHEATING
 ! Pumps:                          None
 ! Boilers:                        None
@@ -197,7 +197,10 @@
     DrawThrough,             !- Fan Placement
     AlternateFanOperationSch;!- Supply Air Fan Operating Mode Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLESPEED ===========
+!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+
+  OutdoorAir:Node,
+    Zone1PTACDXCoolCoil Condenser Inlet Node;  !- Name
 
   Coil:Cooling:DX,
     Zone1PTACDXCoolCoil,     !- Name
@@ -205,8 +208,8 @@
     Zone1PTACDXCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone1PTACDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone1PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone1PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -458,14 +461,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    Zone2PTACDXCoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone2PTACDXCoolCoil,     !- Name
     Zone2PTACFanOutletNode,  !- Evaporator Inlet Node Name
     Zone2PTACCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone2PTACDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone2PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone2PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -717,14 +723,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    Zone3PTACDXCoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Zone3PTACDXCoolCoil,     !- Name
     Zone3PTACOAMixerOutletNode,  !- Evaporator Inlet Node Name
     Zone3PTACCoolCoilOutletNode,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Zone3PTACDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Zone3PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Zone3PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

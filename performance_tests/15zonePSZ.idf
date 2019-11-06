@@ -7395,14 +7395,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:1_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:1_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:1_CoolC DXCoil,   !- Name
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:1_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -7725,14 +7728,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:2_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:2_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:2_CoolC DXCoil,   !- Name
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:2_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -8055,14 +8061,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:3_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:3_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:3_CoolC DXCoil,   !- Name
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:3_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:3_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:3_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -8385,14 +8394,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:4_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:4_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:4_CoolC DXCoil,   !- Name
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:4_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:4_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:4_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -8715,14 +8727,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:5_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:5_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:5_CoolC DXCoil,   !- Name
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:5_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:5_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:5_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -9045,14 +9060,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:6_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:6_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:6_CoolC DXCoil,   !- Name
     PSZ-AC:6_OA-PSZ-AC:6_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:6_CoolC-PSZ-AC:6_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:6_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:6_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:6_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -9375,14 +9393,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:7_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:7_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:7_CoolC DXCoil,   !- Name
     PSZ-AC:7_OA-PSZ-AC:7_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:7_CoolC-PSZ-AC:7_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:7_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:7_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:7_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -9705,14 +9726,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:8_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:8_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:8_CoolC DXCoil,   !- Name
     PSZ-AC:8_OA-PSZ-AC:8_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:8_CoolC-PSZ-AC:8_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:8_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:8_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:8_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -10035,14 +10059,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:9_CoolC DXCoil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:9_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:9_CoolC DXCoil,   !- Name
     PSZ-AC:9_OA-PSZ-AC:9_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:9_CoolC-PSZ-AC:9_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:9_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:9_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:9_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -10365,14 +10392,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:10_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:10_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:10_CoolC DXCoil,  !- Name
     PSZ-AC:10_OA-PSZ-AC:10_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:10_CoolC-PSZ-AC:10_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:10_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:10_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:10_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -10695,14 +10725,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:11_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:11_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:11_CoolC DXCoil,  !- Name
     PSZ-AC:11_OA-PSZ-AC:11_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:11_CoolC-PSZ-AC:11_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:11_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:11_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:11_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -11025,14 +11058,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:12_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:12_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:12_CoolC DXCoil,  !- Name
     PSZ-AC:12_OA-PSZ-AC:12_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:12_CoolC-PSZ-AC:12_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:12_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:12_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:12_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -11355,14 +11391,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:13_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:13_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:13_CoolC DXCoil,  !- Name
     PSZ-AC:13_OA-PSZ-AC:13_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:13_CoolC-PSZ-AC:13_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:13_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:13_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:13_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -11685,14 +11724,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:14_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:14_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:14_CoolC DXCoil,  !- Name
     PSZ-AC:14_OA-PSZ-AC:14_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:14_CoolC-PSZ-AC:14_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:14_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:14_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:14_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -12015,14 +12057,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     PSZ-AC:15_CoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    PSZ-AC:15_CoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     PSZ-AC:15_CoolC DXCoil,  !- Name
     PSZ-AC:15_OA-PSZ-AC:15_CoolCNode,  !- Evaporator Inlet Node Name
     PSZ-AC:15_CoolC-PSZ-AC:15_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    PSZ-AC:15_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    PSZ-AC:15_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     PSZ-AC:15_CoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

@@ -86323,14 +86323,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     SYS-1 DX Cooling Coil;   !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    SYS-1 DX Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SYS-1 DX Cooling Coil,   !- Name
     SYS-1 Mixed Air Outlet,  !- Evaporator Inlet Node Name
     SYS-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ALWAYSON,                !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SYS-1 DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SYS-1 DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SYS-1 DX Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
