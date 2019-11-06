@@ -106,7 +106,7 @@
 ! Purchase Heating:            No
 ! Purchased Chilled Water:     No
 ! Purchased Hot Water:         No
-! Coils:                       Coil:Heating:Fuel (heating and reheat), Coil:Cooling:DX:SingleSpeed
+! Coils:                       Coil:Heating:Fuel (heating and reheat), Coil:Cooling:DX
 ! Pumps:                       None
 ! Boilers:                     None
 ! Chillers:                    None
@@ -3147,14 +3147,17 @@
     InletNode_ReheatCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    DXCoolingCoil_SouthZone_1stFloor Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     DXCoolingCoil_SouthZone_1stFloor,  !- Name
     InletNode_DXCoolingCoil_SouthZone_1stFloor,  !- Evaporator Inlet Node Name
     InletNode_HeatingCoil_SouthZone_1stFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DXCoolingCoil_SouthZone_1stFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
+    DXCoolingCoil_SouthZone_1stFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
     DXCoolingCoil_SouthZone_1stFloor Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3208,14 +3211,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    DXCoolingCoil_NorthZone_1stFloor Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     DXCoolingCoil_NorthZone_1stFloor,  !- Name
     InletNode_DXCoolingCoil_NorthZone_1stFloor,  !- Evaporator Inlet Node Name
     InletNode_HeatingCoil_NorthZone_1stFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DXCoolingCoil_NorthZone_1stFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
+    DXCoolingCoil_NorthZone_1stFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
     DXCoolingCoil_NorthZone_1stFloor Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3269,14 +3275,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    DXCoolingCoil_SouthZone_2ndFloor Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     DXCoolingCoil_SouthZone_2ndFloor,  !- Name
     InletNode_DXCoolingCoil_SouthZone_2ndFloor,  !- Evaporator Inlet Node Name
     InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DXCoolingCoil_SouthZone_2ndFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
+    DXCoolingCoil_SouthZone_2ndFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
     DXCoolingCoil_SouthZone_2ndFloor Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3330,14 +3339,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    DXCoolingCoil_NorthZone_2ndFloor Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     DXCoolingCoil_NorthZone_2ndFloor,  !- Name
     InletNode_DXCoolingCoil_NorthZone_2ndFloor,  !- Evaporator Inlet Node Name
     InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DXCoolingCoil_NorthZone_2ndFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
+    DXCoolingCoil_NorthZone_2ndFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
     DXCoolingCoil_NorthZone_2ndFloor Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

@@ -101,7 +101,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:UnitaryHeatPump:AirToAir
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Water
+! Coils:                          Coil:Cooling:DX, Coil:Heating:Water
 ! Pumps:                          Collector Circ Pump,Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1565,7 +1565,10 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+
+  OutdoorAir:Node,
+    HatPump DXCoil 1 Condenser Inlet Node;  !- Name
 
   Coil:Cooling:DX,
     HatPump DXCoil 1,        !- Name
@@ -1573,8 +1576,8 @@
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    HatPump DXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    HatPump DXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     HatPump DXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

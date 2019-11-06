@@ -56,7 +56,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel
+! Coils:                          Coil:Cooling:DX, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -152,14 +152,17 @@
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
+  OutdoorAir:Node,
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Name
     FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -411,14 +414,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Name
     FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -670,14 +676,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Name
     FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -929,14 +938,17 @@
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Name
     FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

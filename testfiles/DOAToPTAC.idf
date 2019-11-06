@@ -2161,14 +2161,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    SPACE1-1 PTAC CCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SPACE1-1 PTAC CCoil,     !- Name
     SPACE1-1 Zone Unit Fan Outlet,  !- Evaporator Inlet Node Name
     SPACE1-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SPACE1-1 PTAC CCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SPACE1-1 PTAC CCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SPACE1-1 PTAC CCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2323,14 +2326,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    SPACE2-1 PTAC CCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SPACE2-1 PTAC CCoil,     !- Name
     SPACE2-1 Zone Unit Fan Outlet,  !- Evaporator Inlet Node Name
     SPACE2-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SPACE2-1 PTAC CCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SPACE2-1 PTAC CCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SPACE2-1 PTAC CCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2408,14 +2414,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    SPACE3-1 PTAC CCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SPACE3-1 PTAC CCoil,     !- Name
     SPACE3-1 Zone Unit Fan Outlet,  !- Evaporator Inlet Node Name
     SPACE3-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SPACE3-1 PTAC CCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SPACE3-1 PTAC CCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SPACE3-1 PTAC CCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2493,14 +2502,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    SPACE4-1 PTAC CCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SPACE4-1 PTAC CCoil,     !- Name
     SPACE4-1 Zone Unit Fan Outlet,  !- Evaporator Inlet Node Name
     SPACE4-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SPACE4-1 PTAC CCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SPACE4-1 PTAC CCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SPACE4-1 PTAC CCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2578,14 +2590,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
+  OutdoorAir:Node,
+    SPACE5-1 PTAC CCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     SPACE5-1 PTAC CCoil,     !- Name
     SPACE5-1 Zone Unit Fan Outlet,  !- Evaporator Inlet Node Name
     SPACE5-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     FanAvailSched,           !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    SPACE5-1 PTAC CCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    SPACE5-1 PTAC CCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     SPACE5-1 PTAC CCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

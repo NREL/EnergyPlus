@@ -14963,7 +14963,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GSW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15024,7 +15024,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GNW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15085,7 +15085,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split Office Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split Office Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split Office Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15146,7 +15146,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GNE Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15207,7 +15207,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GN1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15268,7 +15268,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GN2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15329,7 +15329,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GS1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15390,7 +15390,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split GS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split GS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split GS2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15451,7 +15451,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MSW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15512,7 +15512,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MNW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15573,7 +15573,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MSE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MSE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MSE Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15634,7 +15634,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MNE Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15695,7 +15695,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MN1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15756,7 +15756,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MN2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15817,7 +15817,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MS1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15878,7 +15878,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split MS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split MS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split MS2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -15939,7 +15939,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TSW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16000,7 +16000,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TNW Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16061,7 +16061,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TSE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TSE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TSE Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16122,7 +16122,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TNE Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16183,7 +16183,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TN1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16244,7 +16244,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TN2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16305,7 +16305,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TS1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -16366,7 +16366,7 @@
     All On,                  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Split TS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Split TS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Split TS2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

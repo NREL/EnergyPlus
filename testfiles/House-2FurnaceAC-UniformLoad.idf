@@ -1333,7 +1333,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     FurnaceAC1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FurnaceAC1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FurnaceAC1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1592,7 +1592,7 @@
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     FurnaceAC2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    FurnaceAC2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     FurnaceAC2 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

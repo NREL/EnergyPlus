@@ -374,14 +374,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     Main Cooling Coil 1;     !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    Main Cooling Coil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Main Cooling Coil 1,     !- Name
     Supply Inlet Node,       !- Evaporator Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Evaporator Outlet Node Name
     System Availability Schedule,  !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

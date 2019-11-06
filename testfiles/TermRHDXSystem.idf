@@ -92,7 +92,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:SingleSpeed
+! Coils:                          Coil:Cooling:DX
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1421,14 +1421,17 @@
     Zone 3 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 3 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
     Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Air Loop Outlet Node,    !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

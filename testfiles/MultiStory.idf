@@ -892,14 +892,17 @@
     Gnd West Mixed Node,     !- Air Inlet Node Name
     Gnd West OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Gnd West OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Gnd West OA DX Coil,     !- Name
     Gnd West OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Gnd West AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Gnd West OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Gnd West OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Gnd West OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1200,14 +1203,17 @@
     Gnd Center Mixed Node,   !- Air Inlet Node Name
     Gnd Center OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Gnd Center OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Gnd Center OA DX Coil,   !- Name
     Gnd Center OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Gnd Center AC Outlet Node,  !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Gnd Center OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Gnd Center OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Gnd Center OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1523,14 +1529,17 @@
     Gnd East Mixed Node,     !- Air Inlet Node Name
     Gnd East OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Gnd East OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Gnd East OA DX Coil,     !- Name
     Gnd East OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Gnd East AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Gnd East OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Gnd East OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Gnd East OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1857,14 +1866,17 @@
     Mid West Mixed Node,     !- Air Inlet Node Name
     Mid West OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Mid West OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Mid West OA DX Coil,     !- Name
     Mid West OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Mid West AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Mid West OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Mid West OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Mid West OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2165,14 +2177,17 @@
     Mid Center Mixed Node,   !- Air Inlet Node Name
     Mid Center OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Mid Center OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Mid Center OA DX Coil,   !- Name
     Mid Center OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Mid Center AC Outlet Node,  !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Mid Center OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Mid Center OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Mid Center OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2488,14 +2503,17 @@
     Mid East Mixed Node,     !- Air Inlet Node Name
     Mid East OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Mid East OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Mid East OA DX Coil,     !- Name
     Mid East OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Mid East AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Mid East OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Mid East OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Mid East OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2822,14 +2840,17 @@
     Top West Mixed Node,     !- Air Inlet Node Name
     Top West OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Top West OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Top West OA DX Coil,     !- Name
     Top West OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Top West AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Top West OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Top West OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Top West OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3130,14 +3151,17 @@
     Top Center Mixed Node,   !- Air Inlet Node Name
     Top Center OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Top Center OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Top Center OA DX Coil,   !- Name
     Top Center OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Top Center AC Outlet Node,  !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Top Center OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Top Center OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Top Center OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3453,14 +3477,17 @@
     Top East Mixed Node,     !- Air Inlet Node Name
     Top East OA Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    Top East OA DX Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Top East OA DX Coil,     !- Name
     Top East OA Fan Outlet Node,  !- Evaporator Inlet Node Name
     Top East AC Outlet Node, !- Evaporator Outlet Node Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Top East OA DX Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Top East OA DX Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Top East OA DX Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

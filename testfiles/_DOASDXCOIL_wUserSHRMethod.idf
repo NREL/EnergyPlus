@@ -2425,7 +2425,7 @@
     HVACTemplate-Always 1,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Main Cooling Coil 1 Condenser Node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    DOAS Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     DOAS Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

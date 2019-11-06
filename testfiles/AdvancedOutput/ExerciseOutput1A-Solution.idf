@@ -1323,14 +1323,17 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:COOLINGBYPASSFACTOREMPIRICAL ===========
 
+  OutdoorAir:Node,
+    AHU 1 Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     AHU 1 Cooling Coil,      !- Name
     AHU 1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
     AHU 1 Air Loop Outlet,   !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    AHU 1 Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    AHU 1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     AHU 1 Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

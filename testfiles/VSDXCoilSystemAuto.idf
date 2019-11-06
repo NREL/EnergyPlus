@@ -4,7 +4,7 @@
 !                          No ground contact with floor.
 !
 ! Highlights:              Example of having CoilSystem:Heating:DX and CoilSystem:Cooling:DX to contain
-!      Coil:Heating:DX:VariableSpeed and Coil:Cooling:DX:VariableSpeed
+!      Coil:Heating:DX:VariableSpeed and Coil:Cooling:DX
 !                          This file was modified from DXCoilSystemAuto, with changing the coil objects
 !
 !
@@ -86,7 +86,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:VariableSpeed, Coil:Heating:Fuel
+! Coils:                          Coil:Cooling:DX, Coil:Heating:DX:VariableSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -210,14 +210,17 @@
     ,                        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
+  OutdoorAir:Node,
+    Heat Pump ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Heat Pump ACDXCoil 1,    !- Name
     DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
     Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Heat Pump ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Heat Pump ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Heat Pump ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

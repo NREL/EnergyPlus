@@ -2894,14 +2894,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_1:SysCoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_1:SysCoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_1:SysCoolC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_1:SysCoolC-ZN_1_FLR_1_SEC_1:SysHeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_1:SysCoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_1:SysCoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_1:SysCoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3204,14 +3207,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_2:SysCoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_2:SysCoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_2:SysCoolC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_2:Sys_OA-ZN_1_FLR_1_SEC_2:SysCoolCNode,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_2:SysCoolC-ZN_1_FLR_1_SEC_2:SysHeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_2:SysCoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_2:SysCoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_2:SysCoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3469,14 +3475,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_3:SysCoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_3:SysCoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_3:SysCoolC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_3:Sys_OA-ZN_1_FLR_1_SEC_3:SysCoolCNode,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_3:SysCoolC-ZN_1_FLR_1_SEC_3:SysHeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_3:SysCoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_3:SysCoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_3:SysCoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3734,14 +3743,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_4:SysCoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_4:SysCoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_4:SysCoolC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_4:Sys_OA-ZN_1_FLR_1_SEC_4:SysCoolCNode,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_4:SysCoolC-ZN_1_FLR_1_SEC_4:SysHeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_4:SysCoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_4:SysCoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_4:SysCoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -3999,14 +4011,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_5:SysCoolC DXCoil;  !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ZN_1_FLR_1_SEC_5:SysCoolC DXCoil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ZN_1_FLR_1_SEC_5:SysCoolC DXCoil,  !- Name
     ZN_1_FLR_1_SEC_5:Sys_OA-ZN_1_FLR_1_SEC_5:SysCoolCNode,  !- Evaporator Inlet Node Name
     ZN_1_FLR_1_SEC_5:SysCoolC-ZN_1_FLR_1_SEC_5:SysHeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ZN_1_FLR_1_SEC_5:SysCoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ZN_1_FLR_1_SEC_5:SysCoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
     ZN_1_FLR_1_SEC_5:SysCoolC DXCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

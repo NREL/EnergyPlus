@@ -775,14 +775,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ACDXCoil 5;              !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ACDXCoil 5 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 5,              !- Name
     Heat Recovery Outlet Node,  !- Evaporator Inlet Node Name
     Zone5DESHCoilIn,         !- Evaporator Outlet Node Name
     OAUnitOASched_01,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 5 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 5 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 5 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1149,14 +1152,17 @@
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
     0.50;                    !- Fan Total Efficiency
 
+  OutdoorAir:Node,
+    ACDXCoil 52 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 52,             !- Name
     Zone5OAUOANode2,         !- Evaporator Inlet Node Name
     Zone5DESHCoilIn2,        !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 52 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 52 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 52 Performance, !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1679,14 +1685,17 @@
     Coil:Heating:Water,      !- Component 3 Object Type
     Zone3OAUWaterHCoil;      !- Component 3 Name
 
+  OutdoorAir:Node,
+    ACDXCoil 3 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 3,              !- Name
     Zone3OAUCCoilIn,         !- Evaporator Inlet Node Name
     Zone3OAUHCoilin,         !- Evaporator Outlet Node Name
     OAUnitOASched_01,        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 3 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 3 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 3 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2223,14 +2232,17 @@
     Coil:Cooling:DX,         !- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
     Zone1OAUCCoilin,         !- Evaporator Inlet Node Name
     Zone1OAUHCoilin,         !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

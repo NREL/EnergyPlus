@@ -1600,7 +1600,7 @@
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-!  Coil:Cooling:DX:VariableSpeed,
+!  Coil:Cooling:DX,
 !    Heat Pump ACDXCoil 1,                   !- Name
 !    DX Cooling Coil Air Inlet Node,         !- Air Inlet Node Name
 !    Heating Coil Air Inlet Node,            !- Air Outlet Node Name

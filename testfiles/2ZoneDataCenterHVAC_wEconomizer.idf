@@ -97,7 +97,7 @@
 ! Purchased Hot Water:            No
 ! Air Terminal Unit Type:         AirTerminal:SingleDuct:VAV:NoReheat
 ! Evaporative Cooler:             EvaporativeCooler:Direct:ResearchSpecial, EvaporativeCooler:Indirect:ResearchSpecial
-! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Cooling:Water
+! Coils:                          Coil:Cooling:DX, Coil:Cooling:Water
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       Chiller:Electric,
@@ -1419,14 +1419,17 @@
     Until: 18:00,1.0,        !- Field 5
     Until: 24:00,0.05;       !- Field 7
 
+  OutdoorAir:Node,
+    West DX Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     West DX Cooling Coil,    !- Name
     West Zone IEC Outlet Node,  !- Evaporator Inlet Node Name
     West Zone CCoil Air Outlet Node,  !- Evaporator Outlet Node Name
     WestDXCCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    West DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    West DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     West DX Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1902,14 +1905,17 @@
     East Zone Mixed Air Node,!- Air Inlet Node Name
     East Zone Supply Fan Outlet Node;  !- Air Outlet Node Name
 
+  OutdoorAir:Node,
+    East DX Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     East DX Cooling Coil,    !- Name
     East Zone IEC Outlet Node,  !- Evaporator Inlet Node Name
     East Zone CCoil Air Outlet Node,  !- Evaporator Outlet Node Name
     EastDXCCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    East DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
+    East DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     East DX Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

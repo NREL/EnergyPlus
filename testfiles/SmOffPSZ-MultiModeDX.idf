@@ -53,8 +53,8 @@
 !             dehumidification.
 !           Air Loop 3 (serving zone ZSF2) uses COIL:DX:MultiMode:CoolingEmpirical
 !             to model a 1-stage DX coil with no humidity control (equivalent to
-!             the Coil:Cooling:DX:SingleSpeed model used in SmOffPSZ).
-!           Air Loop 4 (serving zone ZNF2) uses Coil:Cooling:DX:SingleSpeed,
+!             the Coil:Cooling:DX model used in SmOffPSZ).
+!           Air Loop 4 (serving zone ZNF2) uses Coil:Cooling:DX,
 !             the same as in SmOffPSZ.
 !
 
@@ -2357,14 +2357,17 @@
 
 ! 2-stage DX coil with no humidity control
 
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
     Mixed Air 1 Node,        !- Evaporator Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Evaporator Outlet Node Name
     FAN-SCHED,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2448,14 +2451,17 @@
 !  Note that the normal mode performance is different from the other systems in this
 !  example so that it is consistent with the subcool-reheat performance.
 
+  OutdoorAir:Node,
+    ACDXCoil 2 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 2,              !- Name
     Mixed Air 2 Node,        !- Evaporator Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Evaporator Outlet Node Name
     FAN-SCHED,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 2 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 2 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 2 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2689,14 +2695,17 @@
 
 ! 1-stage DX coil with no humidity control
 
+  OutdoorAir:Node,
+    ACDXCoil 3 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 3,              !- Name
     Mixed Air 3 Node,        !- Evaporator Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Evaporator Outlet Node Name
     FAN-SCHED,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 3 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 3 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 3 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2756,14 +2765,17 @@
 
 ! Stage 1, 100% of total capacity
 
+  OutdoorAir:Node,
+    ACDXCoil 4 Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     ACDXCoil 4,              !- Name
     Mixed Air 4 Node,        !- Evaporator Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Evaporator Outlet Node Name
     FAN-SCHED,               !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 4 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 4 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 4 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

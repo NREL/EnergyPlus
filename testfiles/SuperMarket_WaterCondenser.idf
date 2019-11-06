@@ -112,7 +112,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    DXSystem:AirLoop
-! Coils:                          Coil:Cooling:DX:SingleSpeed, COIL:Water:SimpleHeating
+! Coils:                          Coil:Cooling:DX, COIL:Water:SimpleHeating
 ! Pumps:                          Pump:VariableSpeed
 ! Water Heating:            WATER HEATER:MIXED
 ! Boilers:                        None
@@ -1446,7 +1446,10 @@
     DX Coil Air Inlet Node,  !- Air Outlet Node Name
     General;                 !- End-Use Subcategory
 
-!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+
+  OutdoorAir:Node,
+    ACDXCoil 1 Condenser Inlet Node;  !- Name
 
   Coil:Cooling:DX,
     ACDXCoil 1,              !- Name
@@ -1454,8 +1457,8 @@
     DX Coil Air Outlet Node, !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
+    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

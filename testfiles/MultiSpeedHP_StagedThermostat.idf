@@ -85,7 +85,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          Coil:Cooling:DX:MultiSpeed, Coil:Heating:DX:MultiSpeed, Coil:Heating:Fuel
+! Coils:                          Coil:Cooling:DX, Coil:Heating:DX:MultiSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1709,7 +1709,7 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     Outdoor Condenser Air Node,  !- Condenser Inlet Node Name
-    ,                        !- Condenser Outlet Node Name
+    Heat Pump ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
     Heat Pump ACDXCoil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
