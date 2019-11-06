@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -142,7 +143,7 @@ namespace HeatingCoils {
 
     // reclaim heat object types
     int const COMPRESSORRACK_REFRIGERATEDCASE(1);
-    int const COIL_DX_COOLING(2); // single speed DX
+    int const COIL_DX_COOLING(2); // single speed DX and coil:cooling:dx
     int const COIL_DX_MULTISPEED(3);
     int const COIL_DX_MULTIMODE(4);
     int const CONDENSER_REFRIGERATION(5);
@@ -1003,6 +1004,10 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_COOLING;
                 GetDXCoilIndex(Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) ValidSourceType(CoilNum) = true;
+            } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX")) {
+                HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_COOLING;
+                HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = CoilCoolingDX::factory(Alphas(5));
+                if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > -1) ValidSourceType(CoilNum) = true;
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:VariableSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
                 HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum =
@@ -3079,8 +3084,8 @@ namespace HeatingCoils {
         return NodeNumber;
     }
 
-    int GetHeatReclaimSourceIndex(std::string const &CoilType, // must match coil types in this module
-                                  std::string const &CoilName, // must match coil names for the coil type
+    int GetHeatReclaimSourceIndex(int const &CoilType_Num, // must match coil types in this module
+                                  int &CoilIndex, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
     {
@@ -3088,8 +3093,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the heating coil index number if it is a desuperheating coil.
@@ -3099,11 +3102,7 @@ namespace HeatingCoils {
         // Return value
         int CoilFound; // returned index number of matched coil
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        bool GetCoilErrFlag;
-        bool SuppressWarning;
         int NumCoil;
-        int CoilNum(0);
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
@@ -3111,51 +3110,28 @@ namespace HeatingCoils {
             GetCoilsInputFlag = false;
         }
 
-        SuppressWarning = true;
         CoilFound = 0;
 
-        // This function only used for dessicant regeneration and refrigeration desuperheat not a valid source
-        // IF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeRack, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. COMPRESSORRACK_REFRIGERATEDCASE .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeDetailed, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. CONDENSER_REFRIGERATION .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF
-        // note should eventually get rid of this string comparison
-        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
-            GetDXCoilIndex(CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
+        // This function only used for dessicant regeneration
+        if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) ||
+            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTISPEED &&
-                    HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil(NumCoil).ReclaimHeatingCoilName != CoilName)
+                    HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
                     continue;
-                CoilFound = CoilNum;
+                CoilFound = CoilIndex;
                 break;
             }
-        } else if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED")) {
-            CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(CoilType, CoilName, GetCoilErrFlag);
+        } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
-                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingCoilName != CoilName)
+                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
                     continue;
-                CoilFound = CoilNum;
+                CoilFound = CoilIndex;
                 break;
             }
-        }
-
-        if (CoilNum == 0) {
-            ErrorsFound = true;
+        } else {
+            ErrorsFound;
         }
 
         return CoilFound;

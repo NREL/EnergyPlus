@@ -308,9 +308,9 @@ namespace HeatingCoils {
                           bool &ErrorsFound            // set to true if problem
     );
 
-    int GetHeatReclaimSourceIndex(std::string const &CoilType, // must match coil types in this module
-                                  std::string const &CoilName, // must match coil names for the coil type
-                                  bool &ErrorsFound            // set to true if problem
+    int GetHeatReclaimSourceIndex(int const &CoilType_Num, // must match coil types in this module
+                                  int &CoilIndex,          // must match coil names for the coil type
+                                  bool &ErrorsFound        // set to true if problem
     );
 
     int GetCoilControlNodeNum(std::string const &CoilType, // must match coil types in this module
