@@ -116,7 +116,6 @@ namespace EvaporativeFluidCoolers {
     int const EvapFluidCooler_SingleSpeed(1);
     int const EvapFluidCooler_TwoSpeed(2);
 
-    std::string const BlankString;
     bool GetEvapFluidCoolerInputFlag(true);
 
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
@@ -261,11 +260,6 @@ namespace EvaporativeFluidCoolers {
         // B.A. Qureshi and S.M. Zubair , Prediction of evaporation losses in evaporative fluid coolers
         // Applied thermal engineering 27 (2007) 520-527
         
-        int EvapFluidCoolerNum; // Evaporative fluid cooler number,
-        int NumSingleSpeedEvapFluidCoolers;   // Total number of single-speed evaporative fluid coolers
-        int SingleSpeedEvapFluidCoolerNumber; // Specific single-speed evaporative fluid cooler of interest
-        int NumTwoSpeedEvapFluidCoolers;      // Number of two-speed evaporative fluid coolers
-        int TwoSpeedEvapFluidCoolerNumber;    // Specific two-speed evaporative fluid cooler of interest
         int NumAlphas;                        // Number of elements in the alpha array
         int NumNums;                          // Number of elements in the numeric array
         int IOStat;                           // IO Status when calling get input subroutine
@@ -275,8 +269,8 @@ namespace EvaporativeFluidCoolers {
         std::string FluidName;
 
         // Get number of all evaporative fluid coolers specified in the input data file (idf)
-        NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_SingleSpeed);
-        NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_TwoSpeed);
+        int NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_SingleSpeed);
+        int NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound(cEvapFluidCooler_TwoSpeed);
         NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
         if (NumSimpleEvapFluidCoolers <= 0)
@@ -297,9 +291,9 @@ namespace EvaporativeFluidCoolers {
 
         // Load data structures with evaporative fluid cooler input data
         DataIPShortCuts::cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
-        for (SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers;
+        for (int SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers;
              ++SingleSpeedEvapFluidCoolerNumber) {
-            EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
+            int EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           SingleSpeedEvapFluidCoolerNumber,
                                           AlphArray,
@@ -566,8 +560,8 @@ namespace EvaporativeFluidCoolers {
         } // End Single-Speed Evaporative Fluid Cooler Loop
 
         DataIPShortCuts::cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
-        for (TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber) {
-            EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
+        for (int TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber) {
+            int EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           TwoSpeedEvapFluidCoolerNumber,
                                           AlphArray,
@@ -933,7 +927,7 @@ namespace EvaporativeFluidCoolers {
 
         // Set up output variables
         // CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
-        for (EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
+        for (int EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
             SetupOutputVariable("Cooling Tower Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp,
@@ -985,7 +979,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         // CurrentModuleObject='EvaporativeFluidCooler:TwoSpeed'
-        for (EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + 1;
+        for (int EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + 1;
              EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
              ++EvapFluidCoolerNum) {
             SetupOutputVariable("Cooling Tower Inlet Temperature",
@@ -1033,7 +1027,7 @@ namespace EvaporativeFluidCoolers {
 
         // setup common water reporting for all types of evaporative fluid coolers.
         // CurrentModuleObject='EvaporativeFluidCooler:*'
-        for (EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
+        for (int EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).SuppliedByWaterSystem) {
                 SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
@@ -1201,23 +1195,12 @@ namespace EvaporativeFluidCoolers {
         std::string const RoutineName("InitEvapFluidCooler");
 
         bool ErrorsFound(false); // Flag if input data errors are found
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool OneTimeFlagForEachEvapFluidCooler;
-        int TypeOf_Num(0);
-        Real64 rho; // local density of fluid
-        if (MyOneTimeFlag) {
-
-            MyEnvrnFlag.allocate(NumSimpleEvapFluidCoolers);
-            OneTimeFlagForEachEvapFluidCooler.allocate(NumSimpleEvapFluidCoolers);
-
-            OneTimeFlagForEachEvapFluidCooler = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).MyOneTimeFlag) {
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).MyOneTimeFlag = false;
         }
 
-        if (OneTimeFlagForEachEvapFluidCooler(EvapFluidCoolerNum)) {
-
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OneTimeFlagForEachEvapFluidCooler) {
+            int TypeOf_Num = 0;
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
                 TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
             } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
@@ -1268,13 +1251,13 @@ namespace EvaporativeFluidCoolers {
                 ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
             }
 
-            OneTimeFlagForEachEvapFluidCooler(EvapFluidCoolerNum) = false;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).OneTimeFlagForEachEvapFluidCooler = false;
         }
 
         // Begin environment initializations
-        if (MyEnvrnFlag(EvapFluidCoolerNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
                                    DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                    RoutineName);
@@ -1287,11 +1270,11 @@ namespace EvaporativeFluidCoolers {
                                SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum,
                                SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum,
                                SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum);
-            MyEnvrnFlag(EvapFluidCoolerNum) = false;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(EvapFluidCoolerNum) = true;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).MyEnvrnFlag = true;
         }
 
         // Each time initializations
@@ -1310,11 +1293,6 @@ namespace EvaporativeFluidCoolers {
             SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress = DataEnvironment::OutBaroPress;
             SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }
-
-//        int LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
-//        int LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
-//        int BranchIndex = SimpleEvapFluidCooler(EvapFluidCoolerNum).BranchNum;
-//        int CompIndex = SimpleEvapFluidCooler(EvapFluidCoolerNum).CompNum;
 
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum,
                                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum,
@@ -1357,10 +1335,7 @@ namespace EvaporativeFluidCoolers {
         Real64 const Acc(0.0001); // Accuracy of result
         std::string const CalledFrom("SizeEvapFluidCooler");
 
-        int PltSizCondNum;               // Plant Sizing index for condenser loop
         int SolFla;                      // Flag of solver
-        Real64 DesEvapFluidCoolerLoad;   // Design evaporative fluid cooler load [W]
-        Real64 UA0;                      // Lower bound for UA [W/C]
         Real64 UA1;                      // Upper bound for UA [W/C]
         Real64 UA;                       // Calculated UA value [W/C]
         Real64 OutWaterTempAtUA0;        // Water outlet temperature at UA0
@@ -1378,12 +1353,12 @@ namespace EvaporativeFluidCoolers {
         Real64 tmpHighSpeedAirFlowRate;       // local temporary for high speed air flow rate
         Real64 tmpHighSpeedEvapFluidCoolerUA; // local temporary for high speed cooler UA
 
-        DesEvapFluidCoolerLoad = 0.0;
+        Real64 DesEvapFluidCoolerLoad = 0.0;   // Design evaporative fluid cooler load [W]
         tmpDesignWaterFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate;
         tmpHighSpeedFanPower = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower;
         tmpHighSpeedAirFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
 
-        PltSizCondNum = DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).PlantSizNum;
+        int PltSizCondNum = DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).PlantSizNum;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRateWasAutoSized &&
             SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num != PIM_StandardDesignCapacity) {
@@ -1631,7 +1606,9 @@ namespace EvaporativeFluidCoolers {
                     Par(3) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
                     Par(4) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
                     Par(5) = Cp;
-                    UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
+
+                    // Lower bound for UA [W/C]
+                    Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                     UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
                     SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).WaterTemp =
                         DataSizing::PlantSizData(PltSizCondNum).ExitTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;

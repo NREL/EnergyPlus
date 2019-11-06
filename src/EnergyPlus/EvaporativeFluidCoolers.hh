@@ -192,6 +192,9 @@ namespace EvaporativeFluidCoolers {
         Real64 FanPower;         // Evaporative fluid cooler fan power used
 //        Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
         Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
+        bool MyOneTimeFlag;
+        bool MyEnvrnFlag;
+        bool OneTimeFlagForEachEvapFluidCooler;
 
         // Default Constructor
         EvapFluidCoolerspecs()
@@ -212,7 +215,8 @@ namespace EvaporativeFluidCoolers {
               BypassFraction(0.0), EvapLossMode(EvapLossByMoistTheory), BlowdownMode(BlowdownByConcentration), SchedIDBlowdown(0), WaterTankID(0),
               WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
               LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
-              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), WaterUsage(0.0)
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
+              OneTimeFlagForEachEvapFluidCooler(true)
         {
         }
     };
