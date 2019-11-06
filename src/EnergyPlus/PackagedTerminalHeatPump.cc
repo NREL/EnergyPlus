@@ -948,6 +948,7 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     // call CoilCoolingDX constructor
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
                     // mine data from coil object
                     // mine data from coil object
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
@@ -1890,15 +1891,18 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     // call CoilCoolingDX constructor
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
-                    // mine data from coil object
-                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
-                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
-                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
-                    );
-                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
-                        PTUnit(PTUnitNum).useVSCoilModel = true;
-                    }
+                    CoolCoilInletNodeNum = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].evapInletNodeIndex;
+                    CoolCoilOutletNodeNum = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].evapOutletNodeIndex;
+//                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
+//                    // mine data from coil object
+//                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
+//                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
+//                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+//                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
+//                    );
+//                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
+//                        PTUnit(PTUnitNum).useVSCoilModel = true;
+//                    }
                 }
             } else if (UtilityRoutines::SameString(Alphas(11), "COIL:COOLING:DX:VARIABLESPEED")) {
                 PTUnit(PTUnitNum).DXCoolCoilType = Alphas(11);
@@ -4001,6 +4005,20 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
+
+            // we should call the coils first
+            coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
+            // mine data from coil object
+            CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
+            int dummyInletNode, dummyOutletNode;
+            coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
+                    dummyInletNode, dummyOutletNode, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                    PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
+            );
+            if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
+                PTUnit(PTUnitNum).useVSCoilModel = true;
+            }
+
             SizePTUnit(PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 

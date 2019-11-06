@@ -105,7 +105,7 @@ struct CoilCoolingDXCurveFitSpeed
     std::string name;
     Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
     Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
-    Real64 RatedSHR = 0.0;                 // rated sensible heat ratio at speed
+    Real64 grossRatedSHR = 0.0;            // rated sensible heat ratio at speed
     Real64 RatedCBF = 0.0;                 // rated coil bypass factor at speed
     Real64 RatedEIR = 0.0;                 // rated energy input ratio at speed {W/W}
     Real64 ratedCOP = 0.0;
@@ -132,7 +132,6 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 AirMassFlow = 0.0;              // coil inlet air mass flow rate {kg/s}
     Real64 evap_air_flow_rate = 0.0;
     Real64 condenser_air_flow_rate = 0.0;
-    Real64 gross_shr = 0.0;
     Real64 active_fraction_of_face_coil_area = 0.0;
 
     // rating data

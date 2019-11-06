@@ -366,7 +366,7 @@ void CoilCoolingDX::getSpeedData(Real64 &_normalModeRatedEvapAirFlowRate,
 }
 
 void CoilCoolingDX::size() {
-    this->performance.size(false);
+    this->performance.size();
 }
 
 void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)

@@ -232,7 +232,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       // speed class inputs
       RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
       RatedCondAirMassFlowRate(0.0), // condenser air mass flow rate at speed {kg/s}
-      RatedSHR(0.0),             // rated sensible heat ratio at speed
+      grossRatedSHR(0.0),             // rated sensible heat ratio at speed
       RatedCBF(0.0),             // rated coil bypass factor at speed
       RatedEIR(0.0),             // rated energy input ratio at speed {W/W}
       ratedCOP(0.0),
@@ -257,7 +257,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
 
         // other data members
-      evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
+      evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), active_fraction_of_face_coil_area(0.0),
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
@@ -321,7 +321,7 @@ void CoilCoolingDXCurveFitSpeed::size()
     this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->parentModeRatedGrossTotalCap;
     this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->parentModeRatedEvapAirFlowRate;
     this->condenser_air_flow_rate = this->original_input_specs.condenser_air_flow_fraction * this->parentModeRatedCondAirFlowRate;
-    this->gross_shr = this->original_input_specs.gross_rated_sensible_heat_ratio;
+    this->grossRatedSHR = this->original_input_specs.gross_rated_sensible_heat_ratio;
 
     this->RatedAirMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(
                                                                 DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
@@ -335,15 +335,11 @@ void CoilCoolingDXCurveFitSpeed::size()
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Air Flow Rate [m3/s]";
-    Real64 TempSize = this->evap_air_flow_rate;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->evap_air_flow_rate = TempSize;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->evap_air_flow_rate, PrintFlag, RoutineName);
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Gross Cooling Capacity [W]";
-    TempSize = this->rated_total_capacity;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->rated_total_capacity = TempSize;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
@@ -351,10 +347,7 @@ void CoilCoolingDXCurveFitSpeed::size()
     SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    TempSize = this->gross_shr;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->RatedSHR = TempSize;
-    this->gross_shr = TempSize;
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;
@@ -439,7 +432,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
                 SHRFlowModFrac = max(CurveManager::CurveValue(indexSHRFFF, AirFF), 0.0);
             }
 
-            SHR = this->RatedSHR * SHRTempModFrac * SHRFlowModFrac;
+            SHR = this->grossRatedSHR * SHRTempModFrac * SHRFlowModFrac;
             SHR = max(min(SHR, 1.0), 0.0);
             break;
         } else {
@@ -511,7 +504,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     Real64 deltaH = rated_total_capacity / airMassFlowRate;
     Real64 outp = p;
     Real64 outh = h - deltaH;
-    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->gross_shr) * deltaH); // enthalpy at Tdb,in and Wout
+    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->grossRatedSHR) * deltaH); // enthalpy at Tdb,in and Wout
     Real64 outtdb = Psychrometrics::PsyTdbFnHW(outh, outw);
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(outtdb, outw, outp);
 
@@ -523,7 +516,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
             ShowWarningError(RoutineName + object_name + " \"" + name +
                              "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
-            ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->gross_shr, 5));
+            ShowContinueError("Initial SHR = " + General::RoundSigDigits(this->grossRatedSHR, 5));
             ShowContinueError("Adjusted SHR = " + General::RoundSigDigits(adjustedSHR, 5));
         }
     }
@@ -579,7 +572,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
 
     if (iter > maxIter) {
         ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
-        ShowContinueError("The RatedSHR of [" + General::RoundSigDigits(this->gross_shr, 3) +
+        ShowContinueError("The RatedSHR of [" + General::RoundSigDigits(this->grossRatedSHR, 3) +
                           "], entered by the user or autosized (see *.eio file),");
         ShowContinueError("may be causing this. The line defined by the coil rated inlet air conditions");
         ShowContinueError("(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
