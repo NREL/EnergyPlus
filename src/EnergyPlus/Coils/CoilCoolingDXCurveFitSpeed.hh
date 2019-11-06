@@ -97,7 +97,6 @@ struct CoilCoolingDXCurveFitSpeed
     int indexEIRFFF = 0;
     int indexPLRFPLF = 0;
     int indexWHFT = 0;
-    int indexWHFFF = 0;
     int indexSHRFT = 0;
     int indexSHRFFF = 0;
 
@@ -111,7 +110,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 ratedCOP = 0.0;
     Real64 rated_total_capacity = 0.0;
     Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
-    Real64 rated_waste_heat_fraction_of_power_input = 0.0;
+    Real64 ratedWasteHeatFractionOfPowerInput = 0.0; // rated waste heat fraction of power input
     Real64 evap_condenser_pump_power_fraction = 0.0;
     Real64 evap_condenser_effectiveness = 0.0;
 
@@ -123,13 +122,14 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 parentModeRatedCondAirFlowRate = 0.0;
 
     // speed class objects
-    Real64 ambPressure = 0.0;              // outdoor pressure {Pa]
+    Real64 ambPressure = 0.0; // outdoor pressure {Pa]
     Real64 PLR = 0.0;
-    Real64 CondInletTemp = 0.0;            // condenser inlet node temp or outdoor temp if no condenser node {C}
-    Real64 AirFF = 0.0;                    // ratio of air mass flow rate to rated air mass flow rate
-    Real64 FullLoadPower = 0.0; // full load power at speed {W}
-    Real64 RTF = 0.0;           // coil runtime fraction at speed
-    Real64 AirMassFlow = 0.0;              // coil inlet air mass flow rate {kg/s}
+    Real64 CondInletTemp = 0.0;     // condenser inlet node temp or outdoor temp if no condenser node {C}
+    Real64 AirFF = 0.0;             // ratio of air mass flow rate to rated air mass flow rate
+    Real64 fullLoadPower = 0.0;     // full load power at speed {W}
+    Real64 fullLoadWasteHeat = 0.0; // full load waste heat at speed {W}
+    Real64 RTF = 0.0;               // coil runtime fraction at speed
+    Real64 AirMassFlow = 0.0;       // coil inlet air mass flow rate {kg/s}
     Real64 evap_air_flow_rate = 0.0;
     Real64 condenser_air_flow_rate = 0.0;
     Real64 active_fraction_of_face_coil_area = 0.0;

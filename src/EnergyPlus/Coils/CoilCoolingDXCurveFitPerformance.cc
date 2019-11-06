@@ -233,6 +233,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
     this->powerUse = currentMode.OpModePower;
     this->RTF = currentMode.OpModeRTF;
     this->electricityConsumption = this->powerUse * reportingConstant;
+    this->wasteHeatRate = currentMode.OpModeWasteHeat;
+
 }
 
 

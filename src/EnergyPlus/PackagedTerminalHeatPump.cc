@@ -946,11 +946,7 @@ namespace PackagedTerminalHeatPump {
                 if (errFlag) {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
-                    // call CoilCoolingDX constructor
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
-                    // mine data from coil object
-                    // mine data from coil object
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
                     coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
                         CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,
@@ -1889,12 +1885,7 @@ namespace PackagedTerminalHeatPump {
                 if (errFlag) {
                     ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 } else {
-                    // call CoilCoolingDX constructor
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
-                    CoolCoilInletNodeNum = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].evapInletNodeIndex;
-                    CoolCoilOutletNodeNum = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].evapOutletNodeIndex;
-                    // coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
-                    // mine data from coil object
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
                     coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
                         CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,

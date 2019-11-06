@@ -74,7 +74,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
-    this->rated_waste_heat_fraction_of_power_input = input_data.rated_waste_heat_fraction_of_power_input;
+    this->ratedWasteHeatFractionOfPowerInput = input_data.rated_waste_heat_fraction_of_power_input;
     this->ratedCOP = input_data.gross_rated_cooling_COP;
     errorsFound |= this->processCurve(input_data.total_cooling_capacity_function_of_temperature_curve_name,
                                       this->indexCapFT,
@@ -227,7 +227,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
 CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_to_find)
     :
       // model inputs
-      indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexWHFFF(0), indexSHRFT(0), indexSHRFFF(0),
+      indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
       RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
@@ -238,8 +238,9 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       ratedCOP(0.0),
       rated_total_capacity(0.0),
       rated_evap_fan_power_per_volume_flow_rate(0.0),
-      rated_waste_heat_fraction_of_power_input(0.0),
-      evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
+      ratedWasteHeatFractionOfPowerInput(0.0),  // rated waste heat fraction of power input
+      evap_condenser_pump_power_fraction(0.0), 
+      evap_condenser_effectiveness(0.0),
 
       FanOpMode(0),              // fan operating mode, constant or cycling fan
       parentModeRatedGrossTotalCap(0.0),
@@ -252,9 +253,10 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
                                  //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 
-      FullLoadPower(0.0), // full load power at speed {W}
-      RTF(0.0),           // coil runtime fraction at speed
-      AirMassFlow(0.0),          // coil inlet air mass flow rate {kg/s}
+      fullLoadPower(0.0),     // full load power at speed {W}
+      fullLoadWasteHeat(0.0), // full load waste heat at speed {W}
+      RTF(0.0),               // coil runtime fraction at speed
+      AirMassFlow(0.0),       // coil inlet air mass flow rate {kg/s}
 
         // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), active_fraction_of_face_coil_area(0.0),
@@ -372,7 +374,8 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         outletNode.HumRat = inletNode.HumRat;
         outletNode.Enthalpy = inletNode.Enthalpy;
         outletNode.Press = inletNode.Press;
-        FullLoadPower = 0.0;
+        fullLoadPower = 0.0;
+        fullLoadWasteHeat = 0.0;
         RTF = 0.0;
         return;
     }
@@ -483,9 +486,15 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         EIRFlowModFac = CurveManager::CurveValue(indexEIRFFF, AirFF);
     }
 
+    Real64 wastHeatempModFac = 1.0; // waste heat fraction as a function of temperature curve result
+    if (indexWHFT > 0) {
+        wastHeatempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
+    }
+
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
     RTF = _PLR / PLF;
-    FullLoadPower = TotCap * EIR;
+    fullLoadPower = TotCap * EIR;
+    fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wastHeatempModFac * fullLoadPower;
 
     outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);

@@ -2831,6 +2831,8 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+
+
   Coil:Cooling:DX,
     Sys 1 Furnace DX Cool Cooling Coil,  !- Name
     Sys 1 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
@@ -4687,4 +4689,3 @@
     ;                        !- Mechanical Ventilation Controller Name
 
   Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
-
