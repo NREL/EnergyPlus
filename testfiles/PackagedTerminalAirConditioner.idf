@@ -1631,7 +1631,7 @@
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     ,                        !- Condenser Inlet Node Name
-    Zone1PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
+    ,                        !- Condenser Outlet Node Name
     Zone1PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1692,7 +1692,7 @@
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     ,                        !- Condenser Inlet Node Name
-    Zone2PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
+    ,                        !- Condenser Outlet Node Name
     Zone2PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -1753,7 +1753,7 @@
     CoolingCoilAvailSched,   !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     ,                        !- Condenser Inlet Node Name
-    Zone3PTACDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
+    ,                        !- Condenser Outlet Node Name
     Zone3PTACDXCoolCoil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name

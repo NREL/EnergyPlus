@@ -14115,481 +14115,481 @@
   InternalMass,
     G SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G SW Apartment,          !- Zone Name
+    G SW Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G NW Apartment,          !- Zone Name
+    G NW Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     Office_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Office,                  !- Zone Name
+    Office,                  !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G NE Apartment,          !- Zone Name
+    G NE Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G N1 Apartment,          !- Zone Name
+    G N1 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G N2 Apartment,          !- Zone Name
+    G N2 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G S1 Apartment,          !- Zone Name
+    G S1 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    G S2 Apartment,          !- Zone Name
+    G S2 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     F2 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 SW Apartment,         !- Zone Name
+    F2 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 NW Apartment,         !- Zone Name
+    F2 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 SE Apartment,         !- Zone Name
+    F2 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 NE Apartment,         !- Zone Name
+    F2 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 N1 Apartment,         !- Zone Name
+    F2 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 N2 Apartment,         !- Zone Name
+    F2 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 S1 Apartment,         !- Zone Name
+    F2 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F2 S2 Apartment,         !- Zone Name
+    F2 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 SW Apartment,         !- Zone Name
+    F3 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 NW Apartment,         !- Zone Name
+    F3 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 SE Apartment,         !- Zone Name
+    F3 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 NE Apartment,         !- Zone Name
+    F3 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 N1 Apartment,         !- Zone Name
+    F3 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 N2 Apartment,         !- Zone Name
+    F3 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 S1 Apartment,         !- Zone Name
+    F3 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F3 S2 Apartment,         !- Zone Name
+    F3 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 SW Apartment,         !- Zone Name
+    F4 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 NW Apartment,         !- Zone Name
+    F4 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 SE Apartment,         !- Zone Name
+    F4 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 NE Apartment,         !- Zone Name
+    F4 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 N1 Apartment,         !- Zone Name
+    F4 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 N2 Apartment,         !- Zone Name
+    F4 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 S1 Apartment,         !- Zone Name
+    F4 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F4 S2 Apartment,         !- Zone Name
+    F4 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M SW Apartment,          !- Zone Name
+    M SW Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M NW Apartment,          !- Zone Name
+    M NW Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M SE Apartment,          !- Zone Name
+    M SE Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M NE Apartment,          !- Zone Name
+    M NE Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M N1 Apartment,          !- Zone Name
+    M N1 Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M N2 Apartment,          !- Zone Name
+    M N2 Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M S1 Apartment,          !- Zone Name
+    M S1 Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    M S2 Apartment,          !- Zone Name
+    M S2 Apartment,          !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 SW Apartment,         !- Zone Name
+    F6 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 NW Apartment,         !- Zone Name
+    F6 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 SE Apartment,         !- Zone Name
+    F6 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 NE Apartment,         !- Zone Name
+    F6 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 N1 Apartment,         !- Zone Name
+    F6 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 N2 Apartment,         !- Zone Name
+    F6 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 S1 Apartment,         !- Zone Name
+    F6 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F6 S2 Apartment,         !- Zone Name
+    F6 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 SW Apartment,         !- Zone Name
+    F7 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 NW Apartment,         !- Zone Name
+    F7 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 SE Apartment,         !- Zone Name
+    F7 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 NE Apartment,         !- Zone Name
+    F7 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 N1 Apartment,         !- Zone Name
+    F7 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 N2 Apartment,         !- Zone Name
+    F7 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 S1 Apartment,         !- Zone Name
+    F7 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F7 S2 Apartment,         !- Zone Name
+    F7 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 SW Apartment,         !- Zone Name
+    F8 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 NW Apartment,         !- Zone Name
+    F8 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 SE Apartment,         !- Zone Name
+    F8 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 NE Apartment,         !- Zone Name
+    F8 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 N1 Apartment,         !- Zone Name
+    F8 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 N2 Apartment,         !- Zone Name
+    F8 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 S1 Apartment,         !- Zone Name
+    F8 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F8 S2 Apartment,         !- Zone Name
+    F8 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 SW Apartment,         !- Zone Name
+    F9 SW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 NW Apartment,         !- Zone Name
+    F9 NW Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 SE Apartment,         !- Zone Name
+    F9 SE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 NE Apartment,         !- Zone Name
+    F9 NE Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 N1 Apartment,         !- Zone Name
+    F9 N1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 N2 Apartment,         !- Zone Name
+    F9 N2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 S1 Apartment,         !- Zone Name
+    F9 S1 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    F9 S2 Apartment,         !- Zone Name
+    F9 S2 Apartment,         !- Zone or ZoneList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     T SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T SW Apartment,          !- Zone Name
+    T SW Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T NW Apartment,          !- Zone Name
+    T NW Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T SE Apartment,          !- Zone Name
+    T SE Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T NE Apartment,          !- Zone Name
+    T NE Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T N1 Apartment,          !- Zone Name
+    T N1 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T N2 Apartment,          !- Zone Name
+    T N2 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T S1 Apartment,          !- Zone Name
+    T S1 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    T S2 Apartment,          !- Zone Name
+    T S2 Apartment,          !- Zone or ZoneList Name
     88.2492727;              !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -27662,7 +27662,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G NW Apartment Equipment,!- Name
@@ -27670,7 +27672,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office Equipment,        !- Name
@@ -27678,7 +27682,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Office Direct Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G NE Apartment Equipment,!- Name
@@ -27686,7 +27692,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G N1 Apartment Equipment,!- Name
@@ -27694,7 +27702,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G N2 Apartment Equipment,!- Name
@@ -27702,7 +27712,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G S1 Apartment Equipment,!- Name
@@ -27710,7 +27722,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     G S2 Apartment Equipment,!- Name
@@ -27718,7 +27732,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     G S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 SW Apartment Equipment,  !- Name
@@ -27726,7 +27742,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 NW Apartment Equipment,  !- Name
@@ -27734,7 +27752,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 SE Apartment Equipment,  !- Name
@@ -27742,7 +27762,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 NE Apartment Equipment,  !- Name
@@ -27750,7 +27772,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 N1 Apartment Equipment,  !- Name
@@ -27758,7 +27782,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 N2 Apartment Equipment,  !- Name
@@ -27766,7 +27792,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 S1 Apartment Equipment,  !- Name
@@ -27774,7 +27802,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F2 S2 Apartment Equipment,  !- Name
@@ -27782,7 +27812,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F2 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 SW Apartment Equipment,  !- Name
@@ -27790,7 +27822,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 NW Apartment Equipment,  !- Name
@@ -27798,7 +27832,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 SE Apartment Equipment,  !- Name
@@ -27806,7 +27842,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 NE Apartment Equipment,  !- Name
@@ -27814,7 +27852,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 N1 Apartment Equipment,  !- Name
@@ -27822,7 +27862,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 N2 Apartment Equipment,  !- Name
@@ -27830,7 +27872,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 S1 Apartment Equipment,  !- Name
@@ -27838,7 +27882,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F3 S2 Apartment Equipment,  !- Name
@@ -27846,7 +27892,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F3 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 SW Apartment Equipment,  !- Name
@@ -27854,7 +27902,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 NW Apartment Equipment,  !- Name
@@ -27862,7 +27912,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 SE Apartment Equipment,  !- Name
@@ -27870,7 +27922,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 NE Apartment Equipment,  !- Name
@@ -27878,7 +27932,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 N1 Apartment Equipment,  !- Name
@@ -27886,7 +27942,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 N2 Apartment Equipment,  !- Name
@@ -27894,7 +27952,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 S1 Apartment Equipment,  !- Name
@@ -27902,7 +27962,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F4 S2 Apartment Equipment,  !- Name
@@ -27910,7 +27972,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F4 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M SW Apartment Equipment,!- Name
@@ -27918,7 +27982,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M NW Apartment Equipment,!- Name
@@ -27926,7 +27992,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M SE Apartment Equipment,!- Name
@@ -27934,7 +28002,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M NE Apartment Equipment,!- Name
@@ -27942,7 +28012,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M N1 Apartment Equipment,!- Name
@@ -27950,7 +28022,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M N2 Apartment Equipment,!- Name
@@ -27958,7 +28032,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M S1 Apartment Equipment,!- Name
@@ -27966,7 +28042,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     M S2 Apartment Equipment,!- Name
@@ -27974,7 +28052,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     M S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 SW Apartment Equipment,  !- Name
@@ -27982,7 +28062,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 NW Apartment Equipment,  !- Name
@@ -27990,7 +28072,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 SE Apartment Equipment,  !- Name
@@ -27998,7 +28082,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 NE Apartment Equipment,  !- Name
@@ -28006,7 +28092,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 N1 Apartment Equipment,  !- Name
@@ -28014,7 +28102,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 N2 Apartment Equipment,  !- Name
@@ -28022,7 +28112,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 S1 Apartment Equipment,  !- Name
@@ -28030,7 +28122,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F6 S2 Apartment Equipment,  !- Name
@@ -28038,7 +28132,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F6 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 SW Apartment Equipment,  !- Name
@@ -28046,7 +28142,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 NW Apartment Equipment,  !- Name
@@ -28054,7 +28152,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 SE Apartment Equipment,  !- Name
@@ -28062,7 +28162,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 NE Apartment Equipment,  !- Name
@@ -28070,7 +28172,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 N1 Apartment Equipment,  !- Name
@@ -28078,7 +28182,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 N2 Apartment Equipment,  !- Name
@@ -28086,7 +28192,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 S1 Apartment Equipment,  !- Name
@@ -28094,7 +28202,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F7 S2 Apartment Equipment,  !- Name
@@ -28102,7 +28212,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F7 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 SW Apartment Equipment,  !- Name
@@ -28110,7 +28222,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 NW Apartment Equipment,  !- Name
@@ -28118,7 +28232,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 SE Apartment Equipment,  !- Name
@@ -28126,7 +28242,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 NE Apartment Equipment,  !- Name
@@ -28134,7 +28252,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 N1 Apartment Equipment,  !- Name
@@ -28142,7 +28262,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 N2 Apartment Equipment,  !- Name
@@ -28150,7 +28272,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 S1 Apartment Equipment,  !- Name
@@ -28158,7 +28282,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F8 S2 Apartment Equipment,  !- Name
@@ -28166,7 +28292,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F8 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 SW Apartment Equipment,  !- Name
@@ -28174,7 +28302,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 NW Apartment Equipment,  !- Name
@@ -28182,7 +28312,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 SE Apartment Equipment,  !- Name
@@ -28190,7 +28322,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 NE Apartment Equipment,  !- Name
@@ -28198,7 +28332,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 N1 Apartment Equipment,  !- Name
@@ -28206,7 +28342,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 N2 Apartment Equipment,  !- Name
@@ -28214,7 +28352,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 S1 Apartment Equipment,  !- Name
@@ -28222,7 +28362,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     F9 S2 Apartment Equipment,  !- Name
@@ -28230,7 +28372,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     F9 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T SW Apartment Equipment,!- Name
@@ -28238,7 +28382,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T SW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T NW Apartment Equipment,!- Name
@@ -28246,7 +28392,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T NW Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T SE Apartment Equipment,!- Name
@@ -28254,7 +28402,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T SE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T NE Apartment Equipment,!- Name
@@ -28262,7 +28412,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T NE Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T N1 Apartment Equipment,!- Name
@@ -28270,7 +28422,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T N1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T N2 Apartment Equipment,!- Name
@@ -28278,7 +28432,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T N2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T S1 Apartment Equipment,!- Name
@@ -28286,7 +28442,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T S1 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     T S2 Apartment Equipment,!- Name
@@ -28294,7 +28452,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     T S2 Apartment Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 

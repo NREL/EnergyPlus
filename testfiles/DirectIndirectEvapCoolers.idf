@@ -2355,7 +2355,7 @@
   InternalMass,
     units_gr_lf_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    units_gr_lf,             !- Zone Name
+    units_gr_lf,             !- Zone or ZoneList Name
     499.4097;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
@@ -2563,8 +2563,8 @@
     units_gr_lf Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     units_gr_lf Direct Air,  !- Name
@@ -2882,7 +2882,7 @@
   InternalMass,
     units_gr_rt_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    units_gr_rt,             !- Zone Name
+    units_gr_rt,             !- Zone or ZoneList Name
     749.1145;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
@@ -3090,8 +3090,8 @@
     units_gr_rt Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     units_gr_rt Direct Air,  !- Name
@@ -3238,7 +3238,7 @@
   InternalMass,
     unit_s_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
-    unit_s_g,                !- Zone Name
+    unit_s_g,                !- Zone or ZoneList Name
     111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
@@ -3448,8 +3448,8 @@
     unit_s_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     unit_s_g Direct Air,     !- Name
@@ -3596,7 +3596,7 @@
   InternalMass,
     unit_n_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
-    unit_n_g,                !- Zone Name
+    unit_n_g,                !- Zone or ZoneList Name
     111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
@@ -3806,8 +3806,8 @@
     unit_n_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     unit_n_g Direct Air,     !- Name
@@ -4035,7 +4035,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -4059,21 +4059,66 @@
     FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:1 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
+    FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Operating Mode,  !- Name
+    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
+    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    FURNACE_PACU_CAV:1_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    AUTOSIZE,                !- Gross Sensible Heat Ratio
+    2.6,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:1_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:1_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:1_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:1_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:1_Unitary_PackagecoolCapFT,  !- Name
@@ -4338,7 +4383,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -4362,21 +4407,66 @@
     FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:2 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
+    FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Operating Mode,  !- Name
+    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
+    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    FURNACE_PACU_CAV:2_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    AUTOSIZE,                !- Gross Sensible Heat Ratio
+    2.6,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:2_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:2_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:2_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:2_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:2_Unitary_PackagecoolCapFT,  !- Name
@@ -4666,7 +4756,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -4690,21 +4780,66 @@
     FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:3 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
+    FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Operating Mode,  !- Name
+    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
+    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    FURNACE_PACU_CAV:3_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    AUTOSIZE,                !- Gross Sensible Heat Ratio
+    2.6,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:3_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:3_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:3_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:3_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:3_Unitary_PackagecoolCapFT,  !- Name
@@ -4994,7 +5129,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -5018,21 +5153,66 @@
     FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     FURNACE_PACU_CAV:4 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil,  !- Name
+    FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
+    FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
-    2.6,                     !- Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Operating Mode,  !- Name
+    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
+    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    FURNACE_PACU_CAV:4_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    AUTOSIZE,                !- Gross Sensible Heat Ratio
+    2.6,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    FURNACE_PACU_CAV:4_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
-    FURNACE_PACU_CAV:4_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    FURNACE_PACU_CAV:4_Unitary_PackagecoolPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FURNACE_PACU_CAV:4_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   Curve:Biquadratic,
     FURNACE_PACU_CAV:4_Unitary_PackagecoolCapFT,  !- Name

@@ -52,9 +52,11 @@
 ! found in InputOutput Reference. Information for supply fan, and supplementel heating coil needs to be specified by the user for
 ! their specific case. Following the example, only the curve fits of DX cooling and heating coils are provided.
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
-
 !  Version,
 !    9.0;                    !- Version Identifier
+
+!  Version,
+!    9.3;                    !- Version Identifier
 
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
     RooftopPackagedHeatpumpExample,  !- Name
@@ -69,7 +71,7 @@
     SupplyFan,               !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     JCI J05XP Heating,       !- Heating Coil Name
-    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     JCI J05XP Cooling,       !- Cooling Coil Name
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil,       !- Supplemental Heating Coil Name
@@ -85,21 +87,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410A
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     JCI J05XP Cooling,       !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
-    0.73,                    !- Gross Rated Sensible Heat Ratio
-    3.8,                     !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    JCI J05XP Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    JCI J05XP Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    JCI J05XP Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    JCI J05XP Cooling Operating Mode,  !- Name
+    17789.3,                 !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    JCI J05XP Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    JCI J05XP Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.73,                    !- Gross Sensible Heat Ratio
+    3.8,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    JCI J05XP Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    JCI J05XP Cooling CapFFF,!- Total Cooling Capacity Function of Flow Fraction Curve Name
-    JCI J05XP Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    JCI J05XP Cooling EIRFFF,!- Energy Input Ratio Function of Flow Fraction Curve Name
-    JCI J05XP Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    JCI J05XP Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    JCI J05XP Cooling CapFFF,!- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    JCI J05XP Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    JCI J05XP Cooling EIRFFF,!- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    JCI J05XP Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -304,21 +351,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410A
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     JCI J10XP Cooling,       !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
-    0.73,                    !- Gross Rated Sensible Heat Ratio
-    3.8,                     !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    JCI J10XP Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    JCI J10XP Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    JCI J10XP Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    JCI J10XP Cooling Operating Mode,  !- Name
+    17789.3,                 !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    JCI J10XP Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    JCI J10XP Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.73,                    !- Gross Sensible Heat Ratio
+    3.8,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    JCI J10XP Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    JCI J10XP Cooling CapFFF,!- Total Cooling Capacity Function of Flow Fraction Curve Name
-    JCI J10XP Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    JCI J10XP Cooling EIRFFF,!- Energy Input Ratio Function of Flow Fraction Curve Name
-    JCI J10XP Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    JCI J10XP Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    JCI J10XP Cooling CapFFF,!- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    JCI J10XP Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    JCI J10XP Cooling EIRFFF,!- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    JCI J10XP Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -522,21 +614,66 @@
 ! Compressor Type = Hermetic
 ! Refrigerant = R-22
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     Carrier 50TFQ006 Cooling,!- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17789.3,                 !- Gross Rated Total Cooling Capacity {W}
-    0.69,                    !- Gross Rated Sensible Heat Ratio
-    3.34,                    !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Carrier 50TFQ006 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Carrier 50TFQ006 Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Carrier 50TFQ006 Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Carrier 50TFQ006 Cooling Operating Mode,  !- Name
+    17789.3,                 !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    Carrier 50TFQ006 Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Carrier 50TFQ006 Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.69,                    !- Gross Sensible Heat Ratio
+    3.34,                    !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50TFQ006 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Carrier 50TFQ006 Cooling CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Carrier 50TFQ006 Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Carrier 50TFQ006 Cooling EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Carrier 50TFQ006 Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Carrier 50TFQ006 Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Carrier 50TFQ006 Cooling CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50TFQ006 Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Carrier 50TFQ006 Cooling EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50TFQ006 Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -740,21 +877,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-22
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     Carrier 50HJQ012 Cooling,!- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    34992.558,               !- Gross Rated Total Cooling Capacity {W}
-    0.75,                    !- Gross Rated Sensible Heat Ratio
-    3.41,                    !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Carrier 50HJQ012 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Carrier 50HJQ012 Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Carrier 50HJQ012 Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Carrier 50HJQ012 Cooling Operating Mode,  !- Name
+    34992.558,               !- Rated Gross Total Cooling Capacity {W}
+    1.888,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    Carrier 50HJQ012 Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Carrier 50HJQ012 Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.75,                    !- Gross Sensible Heat Ratio
+    3.41,                    !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50HJQ012 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Carrier 50HJQ012 Cooling CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Carrier 50HJQ012 Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Carrier 50HJQ012 Cooling EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Carrier 50HJQ012 Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Carrier 50HJQ012 Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Carrier 50HJQ012 Cooling CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50HJQ012 Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Carrier 50HJQ012 Cooling EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50HJQ012 Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -958,21 +1140,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410 A
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     Carrier 50EZ060 Cooling, !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    17716.3372,              !- Gross Rated Total Cooling Capacity {W}
-    0.75,                    !- Gross Rated Sensible Heat Ratio
-    4.05,                    !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Carrier 50EZ060 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Carrier 50EZ060 Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Carrier 50EZ060 Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Carrier 50EZ060 Cooling Operating Mode,  !- Name
+    17716.3372,              !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    Carrier 50EZ060 Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Carrier 50EZ060 Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.75,                    !- Gross Sensible Heat Ratio
+    4.05,                    !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Carrier 50EZ060 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Carrier 50EZ060 Cooling CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Carrier 50EZ060 Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Carrier 50EZ060 Cooling EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Carrier 50EZ060 Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Carrier 50EZ060 Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Carrier 50EZ060 Cooling CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50EZ060 Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Carrier 50EZ060 Cooling EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Carrier 50EZ060 Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -1178,49 +1405,92 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-22
 
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+  Coil:Cooling:DX,
     Lennox LHA120H Cooling,  !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox LHA120H Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox LHA120H Cooling Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    2,                       !- Number of Capacity Stages
-    0,                       !- Number of Enhanced Dehumidification Modes
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-    Lennox LHA120H Stage 1,  !- Normal Mode Stage 1 Coil Performance Name
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-    Lennox LHA120H Stage 1&2;!- Normal Mode Stage 1+2 Coil Performance Name
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox LHA120H Cooling Normal Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox LHA120H Cooling Normal Operating Mode,  !- Name
+    36340.68,                !- Rated Gross Total Cooling Capacity {W}
+    1.888,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Lennox LHA120H Cooling Normal Mode Stage 1 Performance,  !- Speed 1 Name
+    Lennox LHA120H Cooling Normal Mode Stage 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox LHA120H Cooling Normal Mode Stage 1 Performance,  !- Name
+    0.5073,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.73,                    !- Gross Sensible Heat Ratio
+    3.55,                    !- Gross Cooling COP {W/W}
+    0.5100,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox LHA120H Stage 1 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox LHA120H Stage 1 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA120H Stage 1 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox LHA120H Stage 1 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA120H PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox LHA120H Cooling Normal Mode Stage 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.72,                    !- Gross Sensible Heat Ratio
+    3.8,                     !- Gross Cooling COP {W/W}
+    1.0000,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox LHA120H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox LHA120H Stage 1&2 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA120H Stage 1&2 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox LHA120H Stage 1&2 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA120H PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Stage 1 normal mode, 51% of total capacity, face-split coil, 49% of flow bypassed around active section of coil
 
-  CoilPerformance:DX:Cooling,
-    Lennox LHA120H Stage 1,  !- Name
-    18434.103,               !- Gross Rated Total Cooling Capacity {W}
-    0.73,                    !- Gross Rated Sensible Heat Ratio
-    3.55,                    !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.49,                    !- Fraction of Air Flow Bypassed Around Coil
-    Lennox LHA120H Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox LHA120H Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox LHA120H Stage 1 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox LHA120H Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox LHA120H PLFFPLR;  !- Part Load Fraction Correlation Curve Name
-
 ! Stages 1 and 2 normal mode, 100% of total capacity
-
-  CoilPerformance:DX:Cooling,
-    Lennox LHA120H Stage 1&2,!- Name
-    36340.68,                !- Gross Rated Total Cooling Capacity {W}
-    0.72,                    !- Gross Rated Sensible Heat Ratio
-    3.8,                     !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
-    Lennox LHA120H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox LHA120H Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox LHA120H Stage 1&2 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox LHA120H Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox LHA120H PLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -1276,7 +1546,7 @@
     1.2,                     !- Maximum Value of x
     0.9507,                  !- Minimum Curve Output
     1.062,                   !- Maximum Curve Output
-    Dimensionless,            !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! EIR Function of Flow Fraction Curve
@@ -1291,7 +1561,7 @@
     1.2,                     !- Maximum Value of x
     0.9507,                  !- Minimum Curve Output
     1.0458,                  !- Maximum Curve Output
-    Dimensionless,            !- Input Unit Type for X
+    Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
 
 ! Cooling Capacity Function of Temperature Curve
@@ -1488,49 +1758,92 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-22
 
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+  Coil:Cooling:DX,
     Lennox LHA240H Cooling,  !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox LHA240H Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox LHA240H Cooling Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    2,                       !- Number of Capacity Stages
-    0,                       !- Number of Enhanced Dehumidification Modes
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-    Lennox LHA240H Stage 1,  !- Normal Mode Stage 1 Coil Performance Name
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-    Lennox LHA240H Stage 1&2;!- Normal Mode Stage 1+2 Coil Performance Name
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox LHA240H Cooling Normal Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox LHA240H Cooling Normal Operating Mode,  !- Name
+    67171.644,               !- Rated Gross Total Cooling Capacity {W}
+    3.54,                    !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Lennox LHA240H Cooling Normal Mode Stage 1 Performance,  !- Speed 1 Name
+    Lennox LHA240H Cooling Normal Mode Stage 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox LHA240H Cooling Normal Mode Stage 1 Performance,  !- Name
+    0.4847,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.69,                    !- Gross Sensible Heat Ratio
+    3.16,                    !- Gross Cooling COP {W/W}
+    0.4850,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox LHA240H Stage 1 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox LHA240H Stage 1 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA240H Stage 1 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox LHA240H Stage 1 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA240H PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox LHA240H Cooling Normal Mode Stage 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.76,                    !- Gross Sensible Heat Ratio
+    3.5,                     !- Gross Cooling COP {W/W}
+    1.0000,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox LHA240H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox LHA240H Stage 1&2 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA240H Stage 1&2 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox LHA240H Stage 1&2 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox LHA240H PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Stage 1 normal mode, 48.5% of total capacity, face-split coil, 51.5% of flow bypassed around active section of coil
 
-  CoilPerformance:DX:Cooling,
-    Lennox LHA240H Stage 1,  !- Name
-    32560.077,               !- Gross Rated Total Cooling Capacity {W}
-    0.69,                    !- Gross Rated Sensible Heat Ratio
-    3.16,                    !- Gross Rated Cooling COP {W/W}
-    3.54,                    !- Rated Air Flow Rate {m3/s}
-    0.515,                   !- Fraction of Air Flow Bypassed Around Coil
-    Lennox LHA240H Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox LHA240H Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox LHA240H Stage 1 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox LHA240H Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox LHA240H PLFFPLR;  !- Part Load Fraction Correlation Curve Name
-
 ! Stages 1 and 2 normal mode, 100% of total capacity
-
-  CoilPerformance:DX:Cooling,
-    Lennox LHA240H Stage 1&2,!- Name
-    67171.644,               !- Gross Rated Total Cooling Capacity {W}
-    0.76,                    !- Gross Rated Sensible Heat Ratio
-    3.5,                     !- Gross Rated Cooling COP {W/W}
-    3.54,                    !- Rated Air Flow Rate {m3/s}
-    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
-    Lennox LHA240H Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox LHA240H Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox LHA240H Stage 1&2 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox LHA240H Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox LHA240H PLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -1797,21 +2110,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-22
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     Lennox THA060S2 Cooling, !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18903,                   !- Gross Rated Total Cooling Capacity {W}
-    0.74,                    !- Gross Rated Sensible Heat Ratio
-    4.1,                     !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox THA060S2 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox THA060S2 Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox THA060S2 Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox THA060S2 Cooling Operating Mode,  !- Name
+    18903,                   !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    Lennox THA060S2 Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox THA060S2 Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.74,                    !- Gross Sensible Heat Ratio
+    4.1,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox THA060S2 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox THA060S2 Cooling CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox THA060S2 Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox THA060S2 Cooling EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox THA060S2 Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox THA060S2 Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox THA060S2 Cooling CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA060S2 Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox THA060S2 Cooling EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA060S2 Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -2007,49 +2365,92 @@
 ! Compressor Type = Scroll
 ! Refrigerant = HCFC-22
 
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+  Coil:Cooling:DX,
     Lennox THA120S Cooling,  !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox THA120S Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox THA120S Cooling Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    2,                       !- Number of Capacity Stages
-    0,                       !- Number of Enhanced Dehumidification Modes
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-    Lennox THA120S Stage 1,  !- Normal Mode Stage 1 Coil Performance Name
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-    Lennox THA120S Stage 1&2;!- Normal Mode Stage 1+2 Coil Performance Name
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox THA120S Cooling Normal Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox THA120S Cooling Normal Operating Mode,  !- Name
+    36340.68,                !- Rated Gross Total Cooling Capacity {W}
+    1.888,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Lennox THA120S Cooling Normal Mode Stage 1 Performance,  !- Speed 1 Name
+    Lennox THA120S Cooling Normal Mode Stage 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox THA120S Cooling Normal Mode Stage 1 Performance,  !- Name
+    0.5073,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.73,                    !- Gross Sensible Heat Ratio
+    3.5,                     !- Gross Cooling COP {W/W}
+    0.5100,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox THA120S Stage 1 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox THA120S Stage 1 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA120S Stage 1 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox THA120S Stage 1 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA120S PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox THA120S Cooling Normal Mode Stage 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    .74,                     !- Gross Sensible Heat Ratio
+    3.7,                     !- Gross Cooling COP {W/W}
+    1.0000,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox THA120S Stage 1&2 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox THA120S Stage 1&2 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA120S Stage 1&2 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox THA120S Stage 1&2 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox THA120S PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Stage 1 normal mode, 51% of total capacity, face-split coil, 49% of flow bypassed around active section of coil
 
-  CoilPerformance:DX:Cooling,
-    Lennox THA120S Stage 1,  !- Name
-    18434.103,               !- Gross Rated Total Cooling Capacity {W}
-    0.73,                    !- Gross Rated Sensible Heat Ratio
-    3.5,                     !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.49,                    !- Fraction of Air Flow Bypassed Around Coil
-    Lennox THA120S Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox THA120S Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox THA120S Stage 1 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox THA120S Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox THA120S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
-
 ! Stages 1 and 2 normal mode, 100% of total capacity
-
-  CoilPerformance:DX:Cooling,
-    Lennox THA120S Stage 1&2,!- Name
-    36340.68,                !- Gross Rated Total Cooling Capacity {W}
-    .74,                     !- Gross Rated Sensible Heat Ratio
-    3.7,                     !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
-    Lennox THA120S Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox THA120S Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox THA120S Stage 1&2 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox THA120S Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox THA120S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -2316,21 +2717,66 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410A
 
-  Coil:Cooling:DX:SingleSpeed,
+  Coil:Cooling:DX,
     Lennox KHA060S4 Cooling, !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    18023.8,                 !- Gross Rated Total Cooling Capacity {W}
-    0.76,                    !- Gross Rated Sensible Heat Ratio
-    385,                     !- Gross Rated Cooling COP {W/W}
-    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox KHA060S4 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox KHA060S4 Cooling Performance,  !- Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    ,                        !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox KHA060S4 Cooling Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox KHA060S4 Cooling Operating Mode,  !- Name
+    18023.8,                 !- Rated Gross Total Cooling Capacity {W}
+    0.944,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    1,                       !- Nominal Speed Number
+    Lennox KHA060S4 Cooling Speed 1 Performance;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox KHA060S4 Cooling Speed 1 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.76,                    !- Gross Sensible Heat Ratio
+    385,                     !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
-    Lennox KHA060S4 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox KHA060S4 Cooling CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox KHA060S4 Cooling EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox KHA060S4 Cooling EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox KHA060S4 Cooling PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox KHA060S4 Cooling CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox KHA060S4 Cooling CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA060S4 Cooling EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox KHA060S4 Cooling EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA060S4 Cooling PLFFPLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -2526,49 +2972,92 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R410-A
 
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+  Coil:Cooling:DX,
     Lennox KHA120S4 Cooling, !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox KHA120S4 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox KHA120S4 Cooling Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    2,                       !- Number of Capacity Stages
-    0,                       !- Number of Enhanced Dehumidification Modes
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-    Lennox KHA120S4 Stage 1, !- Normal Mode Stage 1 Coil Performance Name
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-    Lennox KHA120S4 Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox KHA120S4 Cooling Normal Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox KHA120S4 Cooling Normal Operating Mode,  !- Name
+    36340.68,                !- Rated Gross Total Cooling Capacity {W}
+    1.888,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Lennox KHA120S4 Cooling Normal Mode Stage 1 Performance,  !- Speed 1 Name
+    Lennox KHA120S4 Cooling Normal Mode Stage 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox KHA120S4 Cooling Normal Mode Stage 1 Performance,  !- Name
+    0.4903,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.73,                    !- Gross Sensible Heat Ratio
+    3.53,                    !- Gross Cooling COP {W/W}
+    0.4900,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox KHA120S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox KHA120S4 Stage 1 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA120S4 Stage 1 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox KHA120S4 Stage 1 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA120S4 PLFFPLR, !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox KHA120S4 Cooling Normal Mode Stage 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    .75,                     !- Gross Sensible Heat Ratio
+    3.9,                     !- Gross Cooling COP {W/W}
+    1.0000,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox KHA120S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox KHA120S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA120S4 Stage 1&2 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox KHA120S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA120S4 PLFFPLR, !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Stage 1 normal mode, 49% of total capacity, face-split coil, 51% of flow bypassed around active section of coil
 
-  CoilPerformance:DX:Cooling,
-    Lennox KHA120S4 Stage 1, !- Name
-    17818.7,                 !- Gross Rated Total Cooling Capacity {W}
-    0.73,                    !- Gross Rated Sensible Heat Ratio
-    3.53,                    !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.51,                    !- Fraction of Air Flow Bypassed Around Coil
-    Lennox KHA120S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox KHA120S4 Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox KHA120S4 Stage 1 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox KHA120S4 Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox KHA120S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
-
 ! Stages 1 and 2 normal mode, 100% of total capacity
-
-  CoilPerformance:DX:Cooling,
-    Lennox KHA120S4 Stage 1&2,  !- Name
-    36340.68,                !- Gross Rated Total Cooling Capacity {W}
-    .75,                     !- Gross Rated Sensible Heat Ratio
-    3.9,                     !- Gross Rated Cooling COP {W/W}
-    1.888,                   !- Rated Air Flow Rate {m3/s}
-    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
-    Lennox KHA120S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox KHA120S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox KHA120S4 Stage 1&2 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox KHA120S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox KHA120S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
@@ -2836,49 +3325,92 @@
 ! Compressor Type = Scroll
 ! Refrigerant = R-410A
 
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+  Coil:Cooling:DX,
     Lennox KHA240S4 Cooling, !- Name
+    DXCoilAirInletNode,      !- Evaporator Inlet Node Name
+    DXCoilAirOutletNode,     !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    DXCoilAirInletNode,      !- Air Inlet Node Name
-    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Condenser Zone Name
+    ,                        !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    Lennox KHA240S4 Cooling Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Lennox KHA240S4 Cooling Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    2,                       !- Number of Capacity Stages
-    0,                       !- Number of Enhanced Dehumidification Modes
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
-    Lennox KHA240S4 Stage 1, !- Normal Mode Stage 1 Coil Performance Name
-    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
-    Lennox KHA240S4 Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Lennox KHA240S4 Cooling Normal Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Lennox KHA240S4 Cooling Normal Operating Mode,  !- Name
+    66966.5,                 !- Rated Gross Total Cooling Capacity {W}
+    3.776,                   !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    Lennox KHA240S4 Cooling Normal Mode Stage 1 Performance,  !- Speed 1 Name
+    Lennox KHA240S4 Cooling Normal Mode Stage 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox KHA240S4 Cooling Normal Mode Stage 1 Performance,  !- Name
+    0.5182,                  !- Gross Total Cooling Capacity Fraction
+    1.0000,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.76,                    !- Gross Sensible Heat Ratio
+    3.54,                    !- Gross Cooling COP {W/W}
+    0.5180,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox KHA240S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox KHA240S4 Stage 1 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA240S4 Stage 1 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox KHA240S4 Stage 1 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA240S4 PLFFPLR, !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Lennox KHA240S4 Cooling Normal Mode Stage 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.78,                    !- Gross Sensible Heat Ratio
+    3.7,                     !- Gross Cooling COP {W/W}
+    1.0000,                  !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    Lennox KHA240S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    Lennox KHA240S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA240S4 Stage 1&2 EIRFTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    Lennox KHA240S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Lennox KHA240S4 PLFFPLR, !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 ! Stage 1 normal mode, 51.8% of total capacity, face-split coil, 48.2% of flow bypassed around active section of coil
 
-  CoilPerformance:DX:Cooling,
-    Lennox KHA240S4 Stage 1, !- Name
-    34699.5,                 !- Gross Rated Total Cooling Capacity {W}
-    0.76,                    !- Gross Rated Sensible Heat Ratio
-    3.54,                    !- Gross Rated Cooling COP {W/W}
-    3.776,                   !- Rated Air Flow Rate {m3/s}
-    0.482,                   !- Fraction of Air Flow Bypassed Around Coil
-    Lennox KHA240S4 Stage 1 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox KHA240S4 Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox KHA240S4 Stage 1 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox KHA240S4 Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox KHA240S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
-
 ! Stages 1 and 2 normal mode, 100% of total capacity
-
-  CoilPerformance:DX:Cooling,
-    Lennox KHA240S4 Stage 1&2,  !- Name
-    66966.5,                 !- Gross Rated Total Cooling Capacity {W}
-    0.78,                    !- Gross Rated Sensible Heat Ratio
-    3.7,                     !- Gross Rated Cooling COP {W/W}
-    3.776,                   !- Rated Air Flow Rate {m3/s}
-    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
-    Lennox KHA240S4 Stage 1&2 CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
-    Lennox KHA240S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    Lennox KHA240S4 Stage 1&2 EIRFTemp,  !- Energy Input Ratio Function of Temperature Curve Name
-    Lennox KHA240S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
-    Lennox KHA240S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
 
 ! Cooling Capacity Function of Temperature Curve
 ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
