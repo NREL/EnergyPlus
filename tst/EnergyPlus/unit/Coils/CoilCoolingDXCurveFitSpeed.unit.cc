@@ -90,7 +90,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     thisSpeed.AirFF = 1.0;
     thisSpeed.rated_total_capacity = 3000.0;
     thisSpeed.RatedAirMassFlowRate = 1.0;
-    thisSpeed.RatedSHR = 0.75;
+    thisSpeed.grossRatedSHR = 0.75;
     thisSpeed.RatedCBF = 0.09;
     thisSpeed.RatedEIR = 0.30;
     thisSpeed.AirMassFlow = 1.0;

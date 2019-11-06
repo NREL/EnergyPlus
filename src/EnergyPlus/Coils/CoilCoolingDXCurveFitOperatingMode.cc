@@ -148,7 +148,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
+void CoilCoolingDXCurveFitOperatingMode::size()
 {
 
     std::string RoutineName = "sizeOperatingMode";
@@ -168,6 +168,7 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Rated Gross Total Cooling Capacity";
+    DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedGrossTotalCap = TempSize;

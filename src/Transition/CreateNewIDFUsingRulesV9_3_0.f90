@@ -1647,9 +1647,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                                 nodiff=.true.
                                 ! replace cooling coil object type name
-                                CoolingCoilType = InArgs(9)
+                                CoolingCoilType = InArgs(14)
                                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
-                                    OutArgs(9) = "Coil:Cooling:DX"
+                                    OutArgs(14) = "Coil:Cooling:DX"
                                 END IF
 
                             CASE('COILPERFORMANCE:DX:COOLING')

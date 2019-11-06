@@ -948,8 +948,8 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
-                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
+                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,
                         PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
                     );
                     if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
@@ -1887,8 +1887,8 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
                     CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getData(
-                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum, PTUnit(PTUnitNum).DesignCoolingCapacity,
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
+                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,
                         PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
                     );
                     if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
@@ -3996,6 +3996,14 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
+
+            // we should call the coils first
+            coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
+
+            if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
+                PTUnit(PTUnitNum).useVSCoilModel = true;
+            }
+
             SizePTUnit(PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
@@ -4011,8 +4019,8 @@ namespace PackagedTerminalHeatPump {
                     Real64 normalModeRatedEvapAirFlowRate;
                     std::vector<Real64> normalModeFlowRates;
                     std::vector<Real64> normalModeRatedCapacities_notused;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getSpeedData(
-                        normalModeRatedEvapAirFlowRate, normalModeFlowRates, normalModeRatedCapacities_notused);
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getDataAfterSizing(
+                        normalModeRatedEvapAirFlowRate, PTUnit(PTUnitNum).DesignCoolingCapacity, normalModeFlowRates, normalModeRatedCapacities_notused);
 
                     for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
                         int speedNum = Iter - 1;
@@ -5099,8 +5107,8 @@ namespace PackagedTerminalHeatPump {
                         coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
                         std::vector<Real64> normalModeFlowRates_notused;
                         std::vector<Real64> normalModeRatedCapacities_notused;
-                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getSpeedData(
-                            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, normalModeFlowRates_notused, normalModeRatedCapacities_notused);
+                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getDataAfterSizing(
+                            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, PTUnit(PTUnitNum).DesignCoolingCapacity, normalModeFlowRates_notused, normalModeRatedCapacities_notused);
                         ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
                     } else {
                         SimVariableSpeedCoils(BlankString,

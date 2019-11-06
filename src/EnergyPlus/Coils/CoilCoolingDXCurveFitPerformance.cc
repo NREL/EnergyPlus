@@ -178,13 +178,12 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size(bool useEnhancedMode)
+void CoilCoolingDXCurveFitPerformance::size()
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        if (useEnhancedMode) {
-            this->alternateMode.sizeOperatingMode();
-        } else {
-            this->normalMode.sizeOperatingMode();
+        this->normalMode.size();
+        if (this->hasAlternateMode) {
+            this->alternateMode.size();
         }
         this->mySizeFlag = false;
     }
