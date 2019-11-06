@@ -185,6 +185,7 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode()
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
         curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
+        curSpeed.size();
     }
 }
 
@@ -220,7 +221,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
-        thisspeed.AirFF = thisspeed.AirMassFlow / thisspeed.RatedAirMassFlowRate;
+        // TODO: The original two-speed just grabbed the RatedAirMassFlowRate(mode1), not for a specific speed, so that's what I'll do too
+        thisspeed.AirFF = thisspeed.AirMassFlow / this->ratedEvapAirMassFlowRate;  //thisspeed.RatedAirMassFlowRate;
     } else {
         thisspeed.AirFF = 0.0;
     }

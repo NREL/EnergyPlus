@@ -245,7 +245,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
       parentModeRatedCondAirFlowRate(0.0),
-      
+
       ambPressure(0.0),          // outdoor pressure {Pa}
       PLR(0.0),                  // coil operating part load ratio
       CondInletTemp(0.0),        // condenser inlet temperature {C}
@@ -259,15 +259,13 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
         // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), gross_shr(0.0), active_fraction_of_face_coil_area(0.0),
 
-
-
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
       RatedInletWetBulbTemp(19.44),      // 19.44 or 67F
       RatedInletAirHumRat(0.01125),      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
       RatedOutdoorAirTemp(35.0),         // 35 C or 95F
-      DryCoilOutletHumRatioMin(0.00001), // dry coil outlet minimum hum ratio kgH2O/kgdry air
-      mySizeFlag(true)
+      DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
+
 {
     int numSpeeds = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitSpeed::object_name);
     if (numSpeeds <= 0) {
@@ -315,7 +313,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::sizeSpeed()
+void CoilCoolingDXCurveFitSpeed::size()
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -375,11 +373,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("CalcSpeedOutput: ");
-
-    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        this->sizeSpeed();
-        this->mySizeFlag = false;
-    }
 
     if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;

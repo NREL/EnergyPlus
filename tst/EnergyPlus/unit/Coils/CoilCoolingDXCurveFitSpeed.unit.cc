@@ -94,7 +94,6 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     thisSpeed.RatedCBF = 0.09;
     thisSpeed.RatedEIR = 0.30;
     thisSpeed.AirMassFlow = 1.0;
-    thisSpeed.mySizeFlag = false; // disable this so that we don't actually resize the speed
     int fanOpMode = 0;
     Real64 condInletTemp = 24;
     thisSpeed.CalcSpeedOutput(inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);

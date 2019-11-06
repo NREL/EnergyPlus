@@ -178,6 +178,18 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
+void CoilCoolingDXCurveFitPerformance::size(bool useEnhancedMode)
+{
+    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
+        if (useEnhancedMode) {
+            this->alternateMode.sizeOperatingMode();
+        } else {
+            this->normalMode.sizeOperatingMode();
+        }
+        this->mySizeFlag = false;
+    }
+}
+
 void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
@@ -188,11 +200,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
                                                  DataLoopNode::NodeData &condInletNode,
                                                  DataLoopNode::NodeData &condOutletNode)
 {
-    // size if needed
-    if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        currentMode.sizeOperatingMode();
-        this->mySizeFlag = false;
-    }
 
     // calculate the performance at this mode/speed
     currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
@@ -330,8 +337,6 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         }
 
     } else {
-        //FanPowerPerEvapAirFlowRate = DefaultFanPowerPerEvapAirFlowRate;
-        //TODO: Check EVERY instance of "this->normalMode.ratedEvapAirFlowRate" in this function to see if it was originally a mass flow or vol flow rate and correct
         fanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
         fanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
         totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
@@ -367,11 +372,6 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     Real64 const ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
     EER_TestPoint_IP[0] = EER * ConvFromSIToIP;
 
-    if (condInletNodeIndex != 0) {
-        DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempRated;
-    } else {
-        DataEnvironment::OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempRated;
-    }
     Real64 speedRatio = 1.0;
     Real64 CycRatio = 1.0;
     DataLoopNode::NodeData evapInlet;
@@ -385,7 +385,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     condInlet.Temp = OutdoorUnitInletAirDryBulbTempRated;
-    int speedNum = 1; //(int)this->normalMode.speeds.size();
+    int speedNum = 1;
     int fanOpMode = DataHVACGlobals::CycFanCycCoil;
     this->calculate(this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, speedRatio, fanOpMode, condInlet, condOutlet);
     Real64 TempDryBulb_Leaving_Apoint = evapOutlet.Temp;
@@ -396,6 +396,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     // IEER - part load test points ***************************************************
     for (int PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
         // determine minimum unloading capacity fraction at point B conditions.
+        Real64 heldOutdoorDB = DataEnvironment::OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
         if (condInletNodeIndex != 0) {
             DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         } else {
@@ -441,6 +442,9 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                   LowerBoundMassFlowRate,
                   this->normalMode.ratedEvapAirMassFlowRate,
                   par);
+
+        //reset outdoor dry bulb, this is gross
+        DataEnvironment::OutDryBulbTemp = heldOutdoorDB;
 
         if (SolverFlag == -1) {
             ShowWarningError("CalcTwoSpeedDXCoilStandardRating: air flow rate solver failed. Iteration limit exceeded ");

@@ -2050,9 +2050,10 @@ namespace UnitarySystems {
                 // not sure what to do here
             }
 
+            newCoil.size();
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
-                newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                //newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
                 this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
                 // it seems the ratio should reference the actual flow rates, not the fan flow ???
