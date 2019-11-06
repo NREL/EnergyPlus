@@ -6,9 +6,9 @@
 #define AOI_MIN 0.5
 #define AOI_MAX 89.5
 
-static const double n_cover = 1.526;   // !refractive index of glass
-static const double l_thick = 0.002;   // !thickness of glass cover
-static const double k_trans = 4; // proportionality constant for 
+static const double n_glass = 1.526;   // !refractive index of glass
+static const double l_glass = 0.002;   // !thickness of glass cover
+static const double k_glass = 4; // proportionality constant for 
 
 double transmittance(double theta1_deg, /* incidence angle of incoming radiation (deg) */
 	double n_cover,  /* refractive index of cover material, n_glass = 1.586 */

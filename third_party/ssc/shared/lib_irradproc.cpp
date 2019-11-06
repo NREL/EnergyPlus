@@ -1,51 +1,24 @@
-/*******************************************************************************************************
-*  Copyright 2017 Alliance for Sustainable Energy, LLC
-*
-*  NOTICE: This software was developed at least in part by Alliance for Sustainable Energy, LLC
-*  (“Alliance”) under Contract No. DE-AC36-08GO28308 with the U.S. Department of Energy and the U.S.
-*  The Government retains for itself and others acting on its behalf a nonexclusive, paid-up,
-*  irrevocable worldwide license in the software to reproduce, prepare derivative works, distribute
-*  copies to the public, perform publicly and display publicly, and to permit others to do so.
-*
-*  Redistribution and use in source and binary forms, with or without modification, are permitted
-*  provided that the following conditions are met:
-*
-*  1. Redistributions of source code must retain the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer.
-*
-*  2. Redistributions in binary form must reproduce the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer in the documentation and/or
-*  other materials provided with the distribution.
-*
-*  3. The entire corresponding source code of any redistribution, with or without modification, by a
-*  research entity, including but not limited to any contracting manager/operator of a United States
-*  National Laboratory, any institution of higher learning, and any non-profit organization, must be
-*  made publicly available under this license for as long as the redistribution is made available by
-*  the research entity.
-*
-*  4. Redistribution of this software, without modification, must refer to the software by the same
-*  designation. Redistribution of a modified version of this software (i) may not refer to the modified
-*  version by the same designation, or by any confusingly similar designation, and (ii) must refer to
-*  the underlying software originally provided by Alliance as “System Advisor Model” or “SAM”. Except
-*  to comply with the foregoing, the terms “System Advisor Model”, “SAM”, or any confusingly similar
-*  designation may not be used to refer to any modified version of this software or any modified
-*  version of the underlying software originally provided by Alliance without the prior written consent
-*  of Alliance.
-*
-*  5. The name of the copyright holder, contributors, the United States Government, the United States
-*  Department of Energy, or any of their employees may not be used to endorse or promote products
-*  derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-*  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER,
-*  CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF THEIR
-*  EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-*  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-*  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+/**
+BSD-3-Clause
+Copyright 2019 Alliance for Sustainable Energy, LLC
+Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+that the following conditions are met :
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+and the following disclaimer.
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include <iomanip>
 #include <iostream>
@@ -1000,30 +973,30 @@ void irrad::get_irrad (double *ghi, double *dni, double *dhi){
 	*dhi = diffuseHorizontal;
 }
 
-void irrad::set_time( int year, int month, int day, int hour, double minute, double delt_hr )
+void irrad::set_time( int y, int m, int d, int h, double min, double delt_hr )
 {
-	this->year = year;
-	this->month = month;
-	this->day = day;
-	this->hour = hour;
-	this->minute = minute;
+	this->year = y;
+	this->month = m;
+	this->day = d;
+	this->hour = h;
+	this->minute = min;
 	this->delt = delt_hr;
 }
 
-void irrad::set_location( double latitudeDegrees, double longitudeDegrees, double timezone )
+void irrad::set_location( double latDegrees, double longDegrees, double tz )
 {
-	this->latitudeDegrees = latitudeDegrees;
-	this->longitudeDegrees = longitudeDegrees;
-	this->timezone = timezone;
+	this->latitudeDegrees = latDegrees;
+	this->longitudeDegrees = longDegrees;
+	this->timezone = tz;
 }
 
-void irrad::set_sky_model( int skyModel, double albedo )
+void irrad::set_sky_model( int sm, double alb )
 {
-	this->skyModel = skyModel;
-	this->albedo = albedo;
+	this->skyModel = sm;
+	this->albedo = alb;
 }
 
-void irrad::set_surface( int tracking, double tilt_deg, double azimuth_deg, double rotlim_deg, bool enableBacktrack, double groundCoverageRatio )
+void irrad::set_surface( int tracking, double tilt_deg, double azimuth_deg, double rotlim_deg, bool enBacktrack, double gcr )
 {
 	this->trackingMode = tracking;
 	if (tracking == 4)
@@ -1031,8 +1004,8 @@ void irrad::set_surface( int tracking, double tilt_deg, double azimuth_deg, doub
 	this->tiltDegrees = tilt_deg;
 	this->surfaceAzimuthDegrees = azimuth_deg;
 	this->rotationLimitDegrees = rotlim_deg;
-	this->enableBacktrack = enableBacktrack;
-	this->groundCoverageRatio = groundCoverageRatio;
+	this->enableBacktrack = enBacktrack;
+	this->groundCoverageRatio = gcr;
 }
 	
 void irrad::set_beam_diffuse( double beam, double diffuse )
@@ -1056,13 +1029,13 @@ void irrad::set_global_diffuse(double global, double diffuse)
 	this->radiationMode = irrad::GH_DF;
 }
 
-void irrad::set_poa_reference( double planeOfArrayIrradianceFront, poaDecompReq* pA){
-	this->weatherFilePOA = planeOfArrayIrradianceFront;
+void irrad::set_poa_reference( double poaIrradianceFront, poaDecompReq* pA){
+	this->weatherFilePOA = poaIrradianceFront;
 	this->radiationMode = irrad::POA_R;
 	this->poaAll = pA;
 }
-void irrad::set_poa_pyranometer( double planeOfArrayIrradianceFront, poaDecompReq* pA ){
-	this->weatherFilePOA = planeOfArrayIrradianceFront;
+void irrad::set_poa_pyranometer( double poaIrradianceFront, poaDecompReq* pA ){
+	this->weatherFilePOA = poaIrradianceFront;
 	this->radiationMode = irrad::POA_P;
 	this->poaAll = pA;
 }
@@ -1250,7 +1223,7 @@ int irrad::calc()
 
 }
 
-int irrad::calc_rear_side(double transmissionFactor, double bifaciality, double groundClearanceHeight, double slopeLength)
+int irrad::calc_rear_side(double transmissionFactor, double groundClearanceHeight, double slopeLength)
 {
 	// do irradiance calculations if sun is up
 	if (timeStepSunPosition[2] > 0)
@@ -1293,7 +1266,7 @@ int irrad::calc_rear_side(double transmissionFactor, double bifaciality, double 
 		std::vector<double> rearIrradiancePerCellrow;
 		double rearAverageIrradiance = 0;
 		getBackSurfaceIrradiances(pvBackShadeFraction, rowToRow, verticalHeight, clearanceGround, distanceBetweenRows, horizontalLength, rearGroundGHI, frontGroundGHI, frontReflected, rearIrradiancePerCellrow, rearAverageIrradiance);
-		planeOfArrayIrradianceRearAverage = rearAverageIrradiance * bifaciality;
+		planeOfArrayIrradianceRearAverage = rearAverageIrradiance;
 	}
 	return true;
 }
@@ -1679,7 +1652,7 @@ void irrad::getFrontSurfaceIrradiances(double pvFrontShadeFraction, double rowTo
 	}
 }
 
-void irrad::getBackSurfaceIrradiances(double pvBackShadeFraction, double rowToRow, double verticalHeight, double clearanceGround, double distanceBetweenRows, double horizontalLength, std::vector<double> rearGroundGHI, std::vector<double> frontGroundGHI, std::vector<double> frontReflected, std::vector<double> & rearIrradiance, double & rearAverageIrradiance)
+void irrad::getBackSurfaceIrradiances(double pvBackShadeFraction, double rowToRow, double verticalHeight, double clearanceGround, double , double horizontalLength, std::vector<double> rearGroundGHI, std::vector<double> frontGroundGHI, std::vector<double> frontReflected, std::vector<double> & rearIrradiance, double & rearAverageIrradiance)
 {
 	// front surface assumed to be glass
 	double n2 = 1.526;
@@ -1700,9 +1673,9 @@ void irrad::getBackSurfaceIrradiances(double pvBackShadeFraction, double rowToRo
 	double isotropicSkyDiffuse = diffuseIrradianceRear[0];
 
 	// Calculate components for a 90 degree tilt 
-	double surfaceAnglesRadians[5] = { 0,0,0,0,0 };
-	incidence(0, 90.0, 180.0, 45.0, solarZenithRadians, solarAzimuthRadians, this->enableBacktrack, this->groundCoverageRatio, surfaceAnglesRadians);
-	perez(0, calculatedDirectNormal, calculatedDiffuseHorizontal, albedo, surfaceAnglesRadians[0], surfaceAnglesRadians[1], solarZenithRadians, planeOfArrayIrradianceRear, diffuseIrradianceRear);
+	double surfaceAnglesRadians90[5] = { 0,0,0,0,0 };
+	incidence(0, 90.0, 180.0, 45.0, solarZenithRadians, solarAzimuthRadians, this->enableBacktrack, this->groundCoverageRatio, surfaceAnglesRadians90);
+	perez(0, calculatedDirectNormal, calculatedDiffuseHorizontal, albedo, surfaceAnglesRadians90[0], surfaceAnglesRadians90[1], solarZenithRadians, planeOfArrayIrradianceRear, diffuseIrradianceRear);
 	double horizonDiffuse = diffuseIrradianceRear[2];
 
 	// Calculate x,y coordinates of bottom and top edges of PV row in back of desired PV row so that portions of sky and ground viewed by the 

@@ -1,51 +1,24 @@
-/*******************************************************************************************************
-*  Copyright 2017 Alliance for Sustainable Energy, LLC
-*
-*  NOTICE: This software was developed at least in part by Alliance for Sustainable Energy, LLC
-*  (“Alliance”) under Contract No. DE-AC36-08GO28308 with the U.S. Department of Energy and the U.S.
-*  The Government retains for itself and others acting on its behalf a nonexclusive, paid-up,
-*  irrevocable worldwide license in the software to reproduce, prepare derivative works, distribute
-*  copies to the public, perform publicly and display publicly, and to permit others to do so.
-*
-*  Redistribution and use in source and binary forms, with or without modification, are permitted
-*  provided that the following conditions are met:
-*
-*  1. Redistributions of source code must retain the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer.
-*
-*  2. Redistributions in binary form must reproduce the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer in the documentation and/or
-*  other materials provided with the distribution.
-*
-*  3. The entire corresponding source code of any redistribution, with or without modification, by a
-*  research entity, including but not limited to any contracting manager/operator of a United States
-*  National Laboratory, any institution of higher learning, and any non-profit organization, must be
-*  made publicly available under this license for as long as the redistribution is made available by
-*  the research entity.
-*
-*  4. Redistribution of this software, without modification, must refer to the software by the same
-*  designation. Redistribution of a modified version of this software (i) may not refer to the modified
-*  version by the same designation, or by any confusingly similar designation, and (ii) must refer to
-*  the underlying software originally provided by Alliance as “System Advisor Model” or “SAM”. Except
-*  to comply with the foregoing, the terms “System Advisor Model”, “SAM”, or any confusingly similar
-*  designation may not be used to refer to any modified version of this software or any modified
-*  version of the underlying software originally provided by Alliance without the prior written consent
-*  of Alliance.
-*
-*  5. The name of the copyright holder, contributors, the United States Government, the United States
-*  Department of Energy, or any of their employees may not be used to endorse or promote products
-*  derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-*  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER,
-*  CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF THEIR
-*  EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-*  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-*  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+/**
+BSD-3-Clause
+Copyright 2019 Alliance for Sustainable Energy, LLC
+Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+that the following conditions are met :
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+and the following disclaimer.
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #ifndef __lib_util_h
 #define __lib_util_h
@@ -71,10 +44,14 @@ Define _DEBUG if compile with debugging
 
 */
 
-#if defined(_DEBUG) && defined(_MSC_VER) && defined(_WIN32) && !defined(_WIN64)
-#define VEC_ASSERT(x) {if(!(x)) _asm{int 0x03}}
+#if defined(_MSC_VER) && defined(_WIN32) && !defined(_WIN64)
+#define UTIL_ASSERT(x) {if(!(x)) throw std::runtime_error("matrix_t access '" + std::string(__func__) + "' invalid access.");}
 #else
-#define VEC_ASSERT(X) assert(X)
+#define UTIL_ASSERT(X) {if(!(X)) throw std::runtime_error("matrix_t method '" + std::string(__func__) + "' invalid access.");}
+#endif
+
+#if defined(_DEBUG)
+#define _LIB_UTIL_CHECK_
 #endif
 
 #define RCINDEX(arr, ncols, r, c) arr[ncols*r+c]
@@ -102,6 +79,9 @@ Define _DEBUG if compile with debugging
 #define acosd(x) (RTOD *acos(x))
 #define atand(x) (RTOD*atan(x))
 
+typedef std::vector<double> double_vec;
+typedef std::vector<int> int_vec;
+
 namespace util
 {
 	const double percent_to_fraction = 0.01;
@@ -123,7 +103,7 @@ namespace util
 	bool to_integer(const std::string &str, int *x);
 	bool to_float(const std::string &str, float *x);
 	bool to_double(const std::string &str, double *x);
-		
+
 	std::string to_string( int x, const char *fmt="%d" );
 	std::string to_string( double x, const char *fmt="%lg" );
 
@@ -137,11 +117,14 @@ namespace util
 	size_t hour_of_day(size_t hour_of_year); /* return the hour of day (0 - 23) given the hour of year (0 - 8759) */
 	double percent_of_year(int month, int hours); /* returns the fraction of a year, based on months and hours */
 	int month_of(double time); /* hour: 0 = jan 1st 12am-1am, returns 1-12 */
+	int day_of(double time); /* hour: 0 = jan 1st Monday 12am-1am, returns 0-6 */
+	int week_of(double time); /* hour: 0 = jan 1st Monday 12am-1am, returns 0-6 */
 	int day_of_month(int month, double time); /* month: 1-12 time: hours, starting 0=jan 1st 12am, returns 1-nday*/
 	int days_in_month(int month); /*month: 0-11, return 0-30, depending on the month*/
 	void month_hour(size_t hour_of_year, size_t & out_month, size_t & out_hour); /*given the hour of year, return the month, and hour of day*/
 	bool weekday(size_t hour_of_year); /* return true if is a weekday, assuming first hour of year is Monday at 12 am*/
-	size_t index_year_hour_step(size_t year, size_t hour_of_year, size_t step_of_hour, size_t steps_per_hour);
+	size_t lifetimeIndex(size_t year, size_t hour_of_year, size_t step_of_hour, size_t steps_per_hour);
+	size_t yearOneIndex(double dtHour, size_t lifetimeIndex);
 
 	int schedule_char_to_int( char c );
 	std::string schedule_int_to_month( int m );
@@ -245,32 +228,32 @@ namespace util
 		}
 		inline T &at(size_t r, size_t c)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[r][c];
 		}
 
 		inline const T &at(size_t r, size_t c) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[r][c];
 		}
 		
 		inline T &operator()(size_t r, size_t c)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[r][c];
 		}
 
 		inline const T &operator()(size_t r, size_t c) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[r][c];
 		}
@@ -459,72 +442,72 @@ namespace util
 		}
 		inline T &at(size_t i)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_rows*n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_rows*n_cols );
 	#endif
 			return t_array[i];
 		}
 
 		inline const T&at(size_t i) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_rows*n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_rows*n_cols );
 	#endif
 			return t_array[i];
 		}
 		
 		inline T &at(size_t r, size_t c)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[n_cols*r+c];
 		}
 
 		inline const T &at(size_t r, size_t c) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[n_cols*r+c];
 		}
 		
 		inline T &operator()(size_t r, size_t c)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[n_cols*r+c];
 		}
 
 		inline const T &operator()(size_t r, size_t c) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols );
 	#endif
 			return t_array[n_cols*r+c];
 		}
 		
 		T operator[] (size_t i) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_rows*n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_rows*n_cols );
 	#endif
 			return t_array[i];
 		}
 		
 		T &operator[] (size_t i)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_rows*n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_rows*n_cols );
 	#endif
 			return t_array[i];
 		}
 		
         matrix_t row(const size_t r) const
         {
-    #ifdef _DEBUG
-            VEC_ASSERT(r >= 0 && r < n_rows);
+    #ifdef _LIB_UTIL_CHECK_
+            UTIL_ASSERT(r >= 0 && r < n_rows);
     #endif
             matrix_t<T> array(n_cols);
             for (size_t i = 0; i < n_cols; i++)
@@ -534,8 +517,8 @@ namespace util
 
         matrix_t col(const size_t c) const
         {
-    #ifdef _DEBUG
-            VEC_ASSERT(c >= 0 && c < n_cols);
+    #ifdef _LIB_UTIL_CHECK_
+            UTIL_ASSERT(c >= 0 && c < n_cols);
     #endif
             matrix_t<T> array(n_rows);
             for (size_t i = 0; i < n_rows; i++)
@@ -610,7 +593,8 @@ namespace util
 
 		block_t(size_t nr, size_t nc, size_t nl, const T &val)
 		{
-			t_array = NULL;
+            n_rows = n_cols = n_layers = 0;
+            t_array = NULL;
 			if (nr < 1) nr = 1;
 			if (nc < 1) nc = 1;
 			if (nl < 1) nl = 1;
@@ -629,6 +613,7 @@ namespace util
 			//Do not use clear before calling these functions.
 			if (t_array) delete [] t_array;
 			n_layers = n_rows = n_cols = 0;
+            t_array = new T[1];
 		}
 		
 		void copy( const block_t &rhs )
@@ -731,32 +716,32 @@ namespace util
 		
 		inline T &at(size_t r, size_t c, size_t l)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols && l >= 0 && l < n_layers);
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols && l >= 0 && l < n_layers);
 	#endif
 			return t_array[n_cols*(n_rows*l + r)+c];
 		}
 
 		inline const T &at(size_t r, size_t c, size_t l) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols && l >= 0 && l < n_layers);
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( r >= 0 && r < n_rows && c >= 0 && c < n_cols && l >= 0 && l < n_layers);
 	#endif
 			return t_array[n_cols*(n_rows*l + r)+c];
 		}
 		
 		T operator[] (size_t i) const
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_cols );
 	#endif
 			return t_array[i];
 		}
 		
 		T &operator[] (size_t i)
 		{
-	#ifdef _DEBUG
-			VEC_ASSERT( i >= 0 && i < n_cols );
+	#ifdef _LIB_UTIL_CHECK_
+			UTIL_ASSERT( i >= 0 && i < n_cols );
 	#endif
 			return t_array[i];
 		}
@@ -812,7 +797,9 @@ namespace util
 	double bilinear( double rowval, double colval, const matrix_t<double> &mat );
 	double interpolate(double x1, double y1, double x2, double y2, double xValueToGetYValueFor);
 	double linterp_col( const matrix_t<double> &mat, size_t ixcol, double xval, size_t iycol );
-	bool translate_schedule(int tod[8760], const matrix_t<float> &wkday, const matrix_t<float> &wkend, int min_val, int max_val);
+	bool translate_schedule(int tod[8760], const matrix_t<double> &wkday, const matrix_t<double> &wkend, int min_val, int max_val);
+
+	std::vector<double> frequency_table(double* values, size_t n_vals, double bin_width);
 };
 
 

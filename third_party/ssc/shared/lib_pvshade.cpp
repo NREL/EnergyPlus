@@ -1,51 +1,24 @@
-/*******************************************************************************************************
-*  Copyright 2017 Alliance for Sustainable Energy, LLC
-*
-*  NOTICE: This software was developed at least in part by Alliance for Sustainable Energy, LLC
-*  (“Alliance”) under Contract No. DE-AC36-08GO28308 with the U.S. Department of Energy and the U.S.
-*  The Government retains for itself and others acting on its behalf a nonexclusive, paid-up,
-*  irrevocable worldwide license in the software to reproduce, prepare derivative works, distribute
-*  copies to the public, perform publicly and display publicly, and to permit others to do so.
-*
-*  Redistribution and use in source and binary forms, with or without modification, are permitted
-*  provided that the following conditions are met:
-*
-*  1. Redistributions of source code must retain the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer.
-*
-*  2. Redistributions in binary form must reproduce the above copyright notice, the above government
-*  rights notice, this list of conditions and the following disclaimer in the documentation and/or
-*  other materials provided with the distribution.
-*
-*  3. The entire corresponding source code of any redistribution, with or without modification, by a
-*  research entity, including but not limited to any contracting manager/operator of a United States
-*  National Laboratory, any institution of higher learning, and any non-profit organization, must be
-*  made publicly available under this license for as long as the redistribution is made available by
-*  the research entity.
-*
-*  4. Redistribution of this software, without modification, must refer to the software by the same
-*  designation. Redistribution of a modified version of this software (i) may not refer to the modified
-*  version by the same designation, or by any confusingly similar designation, and (ii) must refer to
-*  the underlying software originally provided by Alliance as “System Advisor Model” or “SAM”. Except
-*  to comply with the foregoing, the terms “System Advisor Model”, “SAM”, or any confusingly similar
-*  designation may not be used to refer to any modified version of this software or any modified
-*  version of the underlying software originally provided by Alliance without the prior written consent
-*  of Alliance.
-*
-*  5. The name of the copyright holder, contributors, the United States Government, the United States
-*  Department of Energy, or any of their employees may not be used to endorse or promote products
-*  derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-*  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER,
-*  CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF THEIR
-*  EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-*  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-*  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-*  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+/**
+BSD-3-Clause
+Copyright 2019 Alliance for Sustainable Energy, LLC
+Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+that the following conditions are met :
+1.	Redistributions of source code must retain the above copyright notice, this list of conditions 
+and the following disclaimer.
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+and the following disclaimer in the documentation and/or other materials provided with the distribution.
+3.	Neither the name of the copyright holder nor the names of its contributors may be used to endorse 
+or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ARE DISCLAIMED.IN NO EVENT SHALL THE COPYRIGHT HOLDER, CONTRIBUTORS, UNITED STATES GOVERNMENT OR UNITED STATES 
+DEPARTMENT OF ENERGY, NOR ANY OF THEIR EMPLOYEES, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+OR CONSEQUENTIAL DAMAGES(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include "lib_pvshade.h"
 #include "lib_util.h"
@@ -188,9 +161,11 @@ void diffuse_reduce(
 	double solzen,
 	double stilt,
 	double Gb_nor,
-	double Gd_poa,
+	double Gdh,
+	double poa_sky,
+	double poa_gnd,
 	double gcr,
-	double phi0, // mask angle
+//	double phi0, // mask angle
 	double alb,
 	double nrows,
 
@@ -200,23 +175,43 @@ void diffuse_reduce(
 	double &reduced_gnddiff,
 	double &Fgnddiff) // derate factor on ground diffuse
 {
+	double Gd_poa = poa_sky + poa_gnd;
 	if (Gd_poa < 0.1)
 	{
 		Fskydiff = Fgnddiff = 1.0;
 		return;
 	}
 
-	// view factor calculations assume isotropic sky
-	double Gd = Gd_poa; // total plane-of-array diffuse
-	double Gdh = Gd * 2 / (1 + cosd(stilt)); // total
+	// view factor  and shade derate calculations assume isotropic sky
 	double Gbh = Gb_nor * cosd(solzen); // beam irradiance on horizontal surface
-
-	// sky diffuse reduction
-	reduced_skydiff = Gd - Gdh*(1 - pow(cosd(phi0 / 2), 2))*(nrows - 1.0) / nrows;
-	Fskydiff = reduced_skydiff / Gd;
+	// double poa_sky_iso = Gdh * (1 + cosd(stilt)) / 2;
 
 	double B = 1.0;
 	double R = B / gcr;
+
+	// sky diffuse reduction
+	double step = 1.0 / 1000.0;
+	double g = 0.0;
+	Fskydiff = 0.0;
+	for (int n = 0; n < 1000; n++)
+	{
+        g = n * step;
+        double arg = (1 / tand(stilt)) - (1 / (gcr * sind(stilt) * (1 - g)));
+        double gamma = (-M_PI / 2) + atan(arg);
+        double Asky_shade = M_PI + M_PI / pow((1 + pow(tan(stilt * DTOR + gamma), 2)), 0.5);
+        double Asky = M_PI + M_PI / pow((1 + pow(tan(stilt * DTOR), 2)), 0.5);
+        if (isnan(Asky_shade))
+        {
+            Asky_shade = Asky;
+        }
+        else if ((stilt * DTOR + gamma) > (M_PI / 2))
+        {
+            Asky_shade = 2 * M_PI - Asky_shade;
+        }
+        else {}
+        Fskydiff += (Asky_shade / Asky) * step;
+	}
+	reduced_skydiff = Fskydiff * poa_sky;
 
 	double solalt = 90 - solzen;
 
@@ -224,16 +219,17 @@ void diffuse_reduce(
 	double F1 = alb * pow(sind(stilt / 2.0), 2);
 	double Y1 = R - B * sind(180.0 - solalt - stilt) / sind(solalt);
 	Y1 = fmax(0.00001, Y1); // constraint per Chris 4/23/12
-	double F2 = 0.5 * alb * (1.0 + Y1 / B - sqrt(pow(Y1, 2) / pow(B, 2) - 2 * Y1 / B * cosd(180 - stilt) + 1.0));
-	double F3 = 0.5 * alb * (1.0 + R / B - sqrt(pow(R, 2) / pow(B, 2) - 2 * R / B * cosd(180 - stilt) + 1.0));
+	double F2 = 0.5 * (1.0 + Y1 / B - sqrt(pow(Y1, 2) / pow(B, 2) - 2 * Y1 / B * cosd(180 - stilt) + 1.0));
+	double F3 = 0.5 * (1.0 + R / B - sqrt(pow(R, 2) / pow(B, 2) - 2 * R / B * cosd(180 - stilt) + 1.0));
 
 	double Gr1 = F1 * (Gbh + Gdh);
-	reduced_gnddiff = ((F1 + (nrows - 1)*F2) / nrows) * Gbh
-		+ ((F1 + (nrows - 1) * F3) / nrows) * Gdh;
+	double reduced_gnddiff_iso = ((F1 + (nrows - 1) * F1 * F2) / nrows) * Gbh
+		                          + ((F1 + (nrows - 1) * F1 * F3) / nrows) * Gdh;
 
 	Fgnddiff = 1.0;
 	if (Gr1 > 0)
-		Fgnddiff = reduced_gnddiff / Gr1;
+		Fgnddiff = reduced_gnddiff_iso / Gr1;
+	reduced_gnddiff = Fgnddiff * reduced_gnddiff_iso;
 }
 
 double selfshade_dc_derate(double X, double S, double FF0, double dbh_ratio, double m_d, double Vmp)
@@ -310,7 +306,7 @@ Chris Deline 4/9/2012 - updated 4/19/2012 - update 4/23/2012
 see SAM shade geometry_v2.docx
 Updated 1/18/13 to match new published coefficients in Solar Energy "A simplified model of uniform shading in large photovoltaic arrays"
 
-Definitions of X and S in SAM for the four layout conditions – portrait, landscape and vertical / horizontal strings.
+Definitions of X and S in SAM for the four layout conditions ï¿½ portrait, landscape and vertical / horizontal strings.
 Definitions:
 S: Fraction of submodules that are shaded in a given parallel string
 X: Fraction of parallel strings in the system that are shaded
@@ -339,8 +335,10 @@ bool ss_exec(
 	double solzen,		// solar zenith (deg)
 	double solazi,		// solar azimuth (deg)
 	double Gb_nor,		// beam normal irradiance (W/m2)
+	double Gdh,         // diffuse horizontal irradiance (W/m2)
 	double Gb_poa,		// POA beam irradiance (W/m2)
-	double Gd_poa,		// POA diffuse, sky+gnd (W/m2)
+	double poa_sky,		// POA diffuse sky irradiance (W/m2)
+	double poa_gnd,     // POA diffuse gnd irradiance (W/m2)
 	double albedo,		// used to calculate reduced relected irradiance
 	bool trackmode,		// 0 for fixed tilt, 1 for one-axis tracking
 	bool linear,		// 0 for non-linear shading (C. Deline's full algorithm), 1 to stop at linear shading
@@ -376,8 +374,8 @@ bool ss_exec(
 	if (inputs.mod_orient == 0) m_row_length = m_n * m_W; //Portrait Mode
 	else m_row_length = m_n * m_L; //Landscape Mode
 
-	double a = 0.0, b = m_B;
-	
+	//double a = 0.0, b = m_B;
+	/*
 	double mask_angle;
 	if (inputs.mask_angle_calc_method == 1)
 	{
@@ -391,7 +389,7 @@ bool ss_exec(
 		mask_angle = atan2( ( m_B * sind( tilt ) ), ( m_R - m_B * cosd( tilt ) ) );
 	}
 	mask_angle *= 180.0/M_PI; // change to degrees to pass into functions later
-
+	*/
 	// ***********************************
 	// SHADOW DIMENSION CALCULATIONS
 	// ***********************************
@@ -466,6 +464,11 @@ bool ss_exec(
 		//relative shaded area, Applebaum equation A15
 		double relative_shaded_area = Hs * (m_row_length - g) / (m_A * m_row_length); //numerator is shadow area, denom is row area
 		outputs.m_shade_frac_fixed = relative_shaded_area;
+		//determine reduction of diffuse incident on shaded sections due to self-shading (beam is not derated because that shading is taken into account in dc derate)
+		diffuse_reduce(solzen, tilt, Gb_nor, Gdh, poa_sky, poa_gnd, m_B / m_R, albedo, m_r,
+			// outputs
+			outputs.m_reduced_diffuse, outputs.m_diffuse_derate, outputs.m_reduced_reflected, outputs.m_reflected_derate);
+
 		return true;
 	}
 
@@ -518,7 +521,7 @@ bool ss_exec(
 	//Chris Deline's self-shading algorithm
 
 	// 1. determine reduction of diffuse incident on shaded sections due to self-shading (beam is not derated because that shading is taken into account in dc derate)
-	diffuse_reduce( solzen, tilt, Gb_nor, Gd_poa, m_B/m_R, mask_angle, albedo, m_r,
+	diffuse_reduce( solzen, tilt, Gb_nor, Gdh, poa_sky, poa_gnd, m_B/m_R, albedo, m_r,
 		// outputs
 		outputs.m_reduced_diffuse, outputs.m_diffuse_derate, outputs.m_reduced_reflected, outputs.m_reflected_derate );
 

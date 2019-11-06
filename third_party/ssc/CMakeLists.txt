@@ -1,18 +1,46 @@
-FILE(GLOB SSC_SOURCE_FILES "shared/*.h" "shared/*.cpp" "ssc/*.h" "ssc/*.cpp")
-if (WIN32)
-    ADD_COMPILE_DEFINITIONS(__WINDOWS__)
-endif(WIN32)
-if (UNIX)
-    ADD_COMPILE_DEFINITIONS(__UNIX__)
-endif(UNIX)
-if (APPLE)
-    ADD_COMPILE_DEFINITIONS(__MACOSX__)
-endif(APPLE)
-if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
-    message("Compiling SSC for 32 bit")
-    ADD_COMPILE_DEFINITIONS(__32BIT__)
-else()
-    message("Compiling SSC for 64 bit")
-    ADD_COMPILE_DEFINITIONS(__64BIT__)
+#####################################################################################################################
+#
+# CMake and System Settings
+#
+#####################################################################################################################
+
+cmake_minimum_required(VERSION 2.8)
+
+if(APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 endif()
-ADD_LIBRARY(ssc ${SSC_SOURCE_FILES})
+
+if (UNIX AND NOT CMAKE_C_COMPILER)
+	set(CMAKE_C_COMPILER gcc)
+	set(CMAKE_CXX_COMPILER g++)
+endif()
+set(CMAKE_CXX_STANDARD 11)
+
+if (POLICY CMP0043) # CMAKE 2.8 compatibility
+  cmake_policy(SET CMP0043 OLD)
+endif (POLICY CMP0043)
+
+#####################################################################################################################
+#
+# Project Settings 
+#
+#####################################################################################################################
+
+Project(sam_simulation_core)
+
+#add_subdirectory(splinter)
+#add_subdirectory(shared)
+#add_subdirectory(nlopt)
+#add_subdirectory(lpsolve)
+#add_subdirectory(solarpilot)
+#add_subdirectory(tcs)
+add_subdirectory(ssc)
+
+#if (NOT skip_tools)
+#	add_subdirectory(sdktool)
+#	add_subdirectory(tcsconsole)
+#endif()
+#
+#if (NOT skip_tests)
+#	add_subdirectory(test)
+#endif()

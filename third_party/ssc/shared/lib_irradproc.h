@@ -388,7 +388,7 @@ public:
 	int calc();
 
 	/// Run the irradiance processor for the rear-side of the surface to calculate rear-side plane-of-array irradiance
-	int calc_rear_side(double transmissionFactor, double bifaciality, double groundClearanceHeight, double slopeLength);
+	int calc_rear_side(double transmissionFactor, double groundClearanceHeight, double slopeLength);
 	
 	/// Return the calculated sun angles, some of which are converted to degrees
 	void get_sun( double *solazi,
