@@ -293,8 +293,8 @@ install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${CMAKE_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-2-0-Energy+.idd" )
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-3-0-Energy+.idd" )
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)

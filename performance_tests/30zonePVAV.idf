@@ -1807,7 +1807,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1998,8 +1998,8 @@
     ZN_1_FLR_1_SEC_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_1 VAV Box,!- Name
@@ -2213,7 +2213,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_1,        !- Zone Name
+    ZN_1_FLR_2_SEC_1,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2404,8 +2404,8 @@
     ZN_1_FLR_2_SEC_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_1 VAV Box,!- Name
@@ -2619,7 +2619,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2810,8 +2810,8 @@
     ZN_1_FLR_1_SEC_2 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_2 VAV Box,!- Name
@@ -3025,7 +3025,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_2,        !- Zone Name
+    ZN_1_FLR_2_SEC_2,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3216,8 +3216,8 @@
     ZN_1_FLR_2_SEC_2 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_2 VAV Box,!- Name
@@ -3431,7 +3431,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
     133.1698;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3622,8 +3622,8 @@
     ZN_1_FLR_1_SEC_3 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_3 VAV Box,!- Name
@@ -3837,7 +3837,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_3,        !- Zone Name
+    ZN_1_FLR_2_SEC_3,        !- Zone or ZoneList Name
     133.1698;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4028,8 +4028,8 @@
     ZN_1_FLR_2_SEC_3 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_3 VAV Box,!- Name
@@ -4243,7 +4243,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4434,8 +4434,8 @@
     ZN_1_FLR_1_SEC_4 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_4 VAV Box,!- Name
@@ -4649,7 +4649,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_4,        !- Zone Name
+    ZN_1_FLR_2_SEC_4,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4840,8 +4840,8 @@
     ZN_1_FLR_2_SEC_4 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_4 VAV Box,!- Name
@@ -5055,7 +5055,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5246,8 +5246,8 @@
     ZN_1_FLR_1_SEC_5 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_5 VAV Box,!- Name
@@ -5461,7 +5461,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_5,        !- Zone Name
+    ZN_1_FLR_2_SEC_5,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5652,8 +5652,8 @@
     ZN_1_FLR_2_SEC_5 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_5 VAV Box,!- Name
@@ -5867,7 +5867,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_6_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_6,        !- Zone Name
+    ZN_1_FLR_1_SEC_6,        !- Zone or ZoneList Name
     323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -6058,8 +6058,8 @@
     ZN_1_FLR_1_SEC_6 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_6 VAV Box,!- Name
@@ -6273,7 +6273,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_6_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_6,        !- Zone Name
+    ZN_1_FLR_2_SEC_6,        !- Zone or ZoneList Name
     323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -6464,8 +6464,8 @@
     ZN_1_FLR_2_SEC_6 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_6 VAV Box,!- Name
@@ -6679,7 +6679,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_7_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_7,        !- Zone Name
+    ZN_1_FLR_1_SEC_7,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -6870,8 +6870,8 @@
     ZN_1_FLR_1_SEC_7 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_7 VAV Box,!- Name
@@ -7085,7 +7085,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_7_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_7,        !- Zone Name
+    ZN_1_FLR_2_SEC_7,        !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -7276,8 +7276,8 @@
     ZN_1_FLR_2_SEC_7 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_7 VAV Box,!- Name
@@ -7491,7 +7491,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_8_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_8,        !- Zone Name
+    ZN_1_FLR_1_SEC_8,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -7682,8 +7682,8 @@
     ZN_1_FLR_1_SEC_8 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_8 VAV Box,!- Name
@@ -7897,7 +7897,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_8_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_8,        !- Zone Name
+    ZN_1_FLR_2_SEC_8,        !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -8088,8 +8088,8 @@
     ZN_1_FLR_2_SEC_8 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_8 VAV Box,!- Name
@@ -8303,7 +8303,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_9_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_9,        !- Zone Name
+    ZN_1_FLR_1_SEC_9,        !- Zone or ZoneList Name
     133.1698;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -8494,8 +8494,8 @@
     ZN_1_FLR_1_SEC_9 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_9 VAV Box,!- Name
@@ -8709,7 +8709,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_9_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_9,        !- Zone Name
+    ZN_1_FLR_2_SEC_9,        !- Zone or ZoneList Name
     133.1698;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -8900,8 +8900,8 @@
     ZN_1_FLR_2_SEC_9 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_9 VAV Box,!- Name
@@ -9115,7 +9115,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_10_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_10,       !- Zone Name
+    ZN_1_FLR_1_SEC_10,       !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -9306,8 +9306,8 @@
     ZN_1_FLR_1_SEC_10 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_10 VAV Box,  !- Name
@@ -9521,7 +9521,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_10_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_10,       !- Zone Name
+    ZN_1_FLR_2_SEC_10,       !- Zone or ZoneList Name
     137.1000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -9712,8 +9712,8 @@
     ZN_1_FLR_2_SEC_10 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_10 VAV Box,  !- Name
@@ -9927,7 +9927,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_11_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_11,       !- Zone Name
+    ZN_1_FLR_1_SEC_11,       !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -10118,8 +10118,8 @@
     ZN_1_FLR_1_SEC_11 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_11 VAV Box,  !- Name
@@ -10333,7 +10333,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_11_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_11,       !- Zone Name
+    ZN_1_FLR_2_SEC_11,       !- Zone or ZoneList Name
     95.3302;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -10524,8 +10524,8 @@
     ZN_1_FLR_2_SEC_11 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_11 VAV Box,  !- Name
@@ -10739,7 +10739,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_12_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_12,       !- Zone Name
+    ZN_1_FLR_1_SEC_12,       !- Zone or ZoneList Name
     323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -10930,8 +10930,8 @@
     ZN_1_FLR_1_SEC_12 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_12 VAV Box,  !- Name
@@ -11145,7 +11145,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_12_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_12,       !- Zone Name
+    ZN_1_FLR_2_SEC_12,       !- Zone or ZoneList Name
     323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -11336,8 +11336,8 @@
     ZN_1_FLR_2_SEC_12 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_12 VAV Box,  !- Name
@@ -11528,7 +11528,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_13_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_13,       !- Zone Name
+    ZN_1_FLR_1_SEC_13,       !- Zone or ZoneList Name
     361.6792;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -11719,8 +11719,8 @@
     ZN_1_FLR_1_SEC_13 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_13 VAV Box,  !- Name
@@ -11911,7 +11911,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_13_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_13,       !- Zone Name
+    ZN_1_FLR_2_SEC_13,       !- Zone or ZoneList Name
     361.6792;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -12102,8 +12102,8 @@
     ZN_1_FLR_2_SEC_13 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_13 VAV Box,  !- Name
@@ -12262,7 +12262,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_14_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_14,       !- Zone Name
+    ZN_1_FLR_1_SEC_14,       !- Zone or ZoneList Name
     32.9208;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -12453,8 +12453,8 @@
     ZN_1_FLR_1_SEC_14 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_14 VAV Box,  !- Name
@@ -12613,7 +12613,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_14_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_14,       !- Zone Name
+    ZN_1_FLR_2_SEC_14,       !- Zone or ZoneList Name
     32.9208;                 !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -12804,8 +12804,8 @@
     ZN_1_FLR_2_SEC_14 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_14 VAV Box,  !- Name
@@ -12996,7 +12996,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_15_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_15,       !- Zone Name
+    ZN_1_FLR_1_SEC_15,       !- Zone or ZoneList Name
     361.6792;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -13187,8 +13187,8 @@
     ZN_1_FLR_1_SEC_15 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_1_SEC_15 VAV Box,  !- Name
@@ -13379,7 +13379,7 @@
   InternalMass,
     ZN_1_FLR_2_SEC_15_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_2_SEC_15,       !- Zone Name
+    ZN_1_FLR_2_SEC_15,       !- Zone or ZoneList Name
     361.6792;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -13570,8 +13570,8 @@
     ZN_1_FLR_2_SEC_15 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN_1_FLR_2_SEC_15 VAV Box,  !- Name
@@ -13820,31 +13820,91 @@
     PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     PACKAGED VAV WITH REHEAT_CoolC DXCoil;  !- Cooling Coil Name
 
-  Coil:Cooling:DX:TwoSpeed,
+  Coil:Cooling:DX,
     PACKAGED VAV WITH REHEAT_CoolC DXCoil,  !- Name
+    PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- Evaporator Inlet Node Name
+    PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
-    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
-    3,                       !- High Speed Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Condenser Zone Name
+    PACKAGED VAV WITH REHEAT_CoolC Cond OA node,  !- Condenser Inlet Node Name
+    ,                        !- Condenser Outlet Node Name
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Performance,  !- Performance Object Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Performance,  !- Name
+    0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- Air Inlet Node Name
-    PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- Air Outlet Node Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    MultiSpeed,              !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Operating Mode;  !- Base Operating Mode
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Operating Mode,  !- Name
+    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
+    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power {W}
+    2,                       !- Nominal Speed Number
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 1 Performance,  !- Name
+    0.3333,                  !- Gross Total Cooling Capacity Fraction
+    0.3333,                  !- Evaporator Air Flow Rate Fraction
+    ,                        !- Condenser Air Flow Rate Fraction
+    0.69,                    !- Gross Sensible Heat Ratio
+    3,                       !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
     PACKAGED VAV WITH REHEAT_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
-    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
-    3,                       !- Low Speed Gross Rated Cooling COP {W/W}
-    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Condenser Air Inlet Node Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 2 Performance,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    AUTOSIZE,                !- Gross Sensible Heat Ratio
+    3,                       !- Gross Cooling COP {W/W}
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
+    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
+    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
   OutdoorAir:Node,
     PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Name
