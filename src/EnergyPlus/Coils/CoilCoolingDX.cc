@@ -152,28 +152,25 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                     DataLoopNode::NodeConnectionType_Outlet,
                                                                     1,
                                                                     DataLoopNode::ObjectIsNotParent);
-    if (!input_data.condenser_inlet_node_name.empty()) {
-        this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_inlet_node_name,
-                                                                       errorsFound,
-                                                                       coilCoolingDXObjectName,
-                                                                       input_data.name,
-                                                                       DataLoopNode::NodeType_Air,
-                                                                       DataLoopNode::NodeConnectionType_Inlet,
-                                                                       2,
-                                                                       DataLoopNode::ObjectIsNotParent);
-        // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-        if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
-            ShowWarningError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
-            ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
-                              "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-            ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-        }
 
-    } else {
-        this->condInletNodeIndex = 0;
+    this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_inlet_node_name,
+                                                                   errorsFound,
+                                                                   coilCoolingDXObjectName,
+                                                                   input_data.name,
+                                                                   DataLoopNode::NodeType_Air,
+                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                   2,
+                                                                   DataLoopNode::ObjectIsNotParent);
+
+    // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
+    if (!OutAirNodeManager::CheckOutAirNodeNumber(this->condInletNodeIndex)) {
+        ShowWarningError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
+        ShowContinueError("Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
+                          "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+        ShowContinueError("This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
     }
-    if (!input_data.condenser_outlet_node_name.empty()) {
-        this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_outlet_node_name,
+
+    this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(input_data.condenser_outlet_node_name,
                                                                         errorsFound,
                                                                         coilCoolingDXObjectName,
                                                                         input_data.name,
@@ -181,9 +178,6 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                         2,
                                                                         DataLoopNode::ObjectIsNotParent);
-    } else {
-        this->condOutletNodeIndex = 0;
-    }
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(this->name,
@@ -376,19 +370,11 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         this->myOneTimeInitFlag = false;
     }
 
-    // get inlet conditions from inlet node
+    // get node references
     auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
     auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-
-    // get condenser inlet conditions from condenser inlet node or from ambient
-    DataLoopNode::NodeData condInletNode;
-    DataLoopNode::NodeData condOutletNode; // dummy for now
-    if (this->condInletNodeIndex > 0) {
-        condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
-    } else {
-        condInletNode.Temp = DataEnvironment::OutDryBulbTemp;
-        condInletNode.HumRat = DataEnvironment::OutHumRat;
-    }
+    auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
+    auto &condOutletNode = DataLoopNode::Node(this->condOutletNodeIndex);
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
@@ -434,7 +420,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                       (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
             Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
             Real64 outdoorHumRat = DataEnvironment::OutHumRat;
-            Real64 condAirMassFlow = DataLoopNode::Node(this->condInletNodeIndex).MassFlowRate;
+            Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             if (!useAlternateMode) {
