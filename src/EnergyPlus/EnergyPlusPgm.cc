@@ -456,6 +456,11 @@ int RunEnergyPlus(std::string const & filepath)
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
 
+        if (DataGlobals::outputEpJSONConversion) {
+            DisplayString("Converted input file format. Exiting due to \"-c or --convert\" flag.");
+            return EndEnergyPlus();
+        }
+
         ResultsFramework::OutputSchema->setupOutputOptions();
 
         ManageSimulation();
