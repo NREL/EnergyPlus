@@ -254,7 +254,7 @@ void CoilCoolingDX::oneTimeInit() {
                         _,
                         "System");
     SetupOutputVariable(
-        "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->performance.RTF, "System", "Average", this->name);
+        "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name);
     SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
                         OutputProcessor::Unit::W,
                         this->performance.crankcaseHeaterPower,
@@ -272,6 +272,58 @@ void CoilCoolingDX::oneTimeInit() {
                         "DHW",
                         _,
                         "Plant");
+   // Ported from variable speed coil
+    SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
+        OutputProcessor::Unit::kg_s,
+        this->airMassFlowRate,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Air Inlet Temperature",
+        OutputProcessor::Unit::C,
+        this->inletAirDryBulbTemp,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Air Inlet Humidity Ratio",
+        OutputProcessor::Unit::kgWater_kgDryAir,
+        this->inletAirHumRat,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Air Outlet Temperature",
+        OutputProcessor::Unit::C,
+        this->outletAirDryBulbTemp,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Air Outlet Humidity Ratio",
+        OutputProcessor::Unit::kgWater_kgDryAir,
+        this->outletAirHumRat,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Part Load Ratio",
+        OutputProcessor::Unit::None,
+        this->partLoadRatioReport,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Upper Speed Level",
+        OutputProcessor::Unit::None,
+        this->speedNumReport,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Neighboring Speed Levels Ratio",
+        OutputProcessor::Unit::None,
+        this->speedRatioReport,
+        "System",
+        "Average",
+        this->name);
+
+
+
     if (this->performance.evapCondBasinHeatCap > 0) {
         SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
                             OutputProcessor::Unit::W,
@@ -448,6 +500,12 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     }
 
     // update report variables
+    this->airMassFlowRate = evapOutletNode.MassFlowRate;
+    this->inletAirDryBulbTemp = evapInletNode.Temp;
+    this->inletAirHumRat = evapInletNode.HumRat;
+    this->outletAirDryBulbTemp = evapOutletNode.Temp;
+    this->outletAirHumRat = evapOutletNode.HumRat;
+
     this->totalCoolingEnergyRate = evapOutletNode.MassFlowRate * (evapInletNode.Enthalpy - evapOutletNode.Enthalpy);
     this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
     Real64 minAirHumRat = min(evapInletNode.HumRat, evapOutletNode.HumRat);
@@ -462,6 +520,10 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->coolingCoilRuntimeFraction = this->performance.RTF;
     this->elecCoolingPower = this->performance.powerUse;
     this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
+
+    this->partLoadRatioReport = PLR;
+    this->speedNumReport = speedNum;
+    this->speedRatioReport = speedRatio;
 
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used

@@ -131,6 +131,17 @@ struct CoilCoolingDX
     Real64 coolingCoilRuntimeFraction = 0.0;
     Real64 elecCoolingPower = 0.0;
     Real64 elecCoolingConsumption = 0.0;
+
+    Real64 airMassFlowRate = 0.0;
+    Real64 inletAirDryBulbTemp = 0.0;
+    Real64 inletAirHumRat = 0.0;
+    Real64 outletAirDryBulbTemp = 0.0;
+    Real64 outletAirHumRat = 0.0;
+    Real64 partLoadRatioReport = 0.0;
+    Real64 runTimeFraction = 0.0;
+    int speedNumReport = 0;
+    Real64 speedRatioReport = 0.0;
+
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
