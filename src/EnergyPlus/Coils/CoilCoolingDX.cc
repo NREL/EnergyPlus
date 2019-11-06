@@ -335,10 +335,9 @@ void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanNam
     this->airLoopNum = _airLoopNum;
 }
 
-void CoilCoolingDX::getData(int &_evapInletNodeIndex,
+void CoilCoolingDX::getFixedData(int &_evapInletNodeIndex,
                             int &_evapOutletNodeIndex,
                             int &_condInletNodeIndex,
-                            Real64 &_normalModeRatedCapacity,
                             int &_normalModeNumSpeeds,
                             CoilCoolingDXCurveFitPerformance::CapControlMethod &_capacityControlMethod,
                             Real64 &_minOutdoorDryBulb)
@@ -346,14 +345,14 @@ void CoilCoolingDX::getData(int &_evapInletNodeIndex,
     _evapInletNodeIndex = this->evapInletNodeIndex;
     _evapOutletNodeIndex = this->evapOutletNodeIndex;
     _condInletNodeIndex = this->condInletNodeIndex;
-    _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
     _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size() - 1;
     _capacityControlMethod = this->performance.capControlMethod;
     _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
 }
 
-void CoilCoolingDX::getSpeedData(Real64 &_normalModeRatedEvapAirFlowRate, 
-                                 std::vector<Real64> &_normalModeFlowRates, 
+void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
+                                 Real64 &_normalModeRatedCapacity,
+                                 std::vector<Real64> &_normalModeFlowRates,
                                  std::vector<Real64> &_normalModeRatedCapacities)
 {
     _normalModeRatedEvapAirFlowRate = this->performance.normalMode.ratedEvapAirFlowRate;
@@ -363,6 +362,7 @@ void CoilCoolingDX::getSpeedData(Real64 &_normalModeRatedEvapAirFlowRate,
         _normalModeFlowRates.push_back(thisSpeed.evap_air_flow_rate);
         _normalModeRatedCapacities.push_back(thisSpeed.rated_total_capacity);
     }
+    _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
 }
 
 void CoilCoolingDX::size() {
