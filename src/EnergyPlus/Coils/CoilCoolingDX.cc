@@ -391,6 +391,8 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     }
 
     // call the simulation, which returns useful data
+    // TODO: check the avail schedule and reset data/pass through data as needed
+    // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
