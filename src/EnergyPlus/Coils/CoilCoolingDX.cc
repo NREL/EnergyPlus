@@ -399,7 +399,7 @@ void CoilCoolingDX::getData(int &_evapInletNodeIndex,
     _evapOutletNodeIndex = this->evapOutletNodeIndex;
     _condInletNodeIndex = this->condInletNodeIndex;
     _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
-    _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size() - 1;
+    _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size();
     _capacityControlMethod = this->performance.capControlMethod;
     _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
 }
@@ -520,6 +520,8 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->coolingCoilRuntimeFraction = this->performance.RTF;
     this->elecCoolingPower = this->performance.powerUse;
     this->elecCoolingConsumption = this->performance.powerUse * reportingConstant;
+    this->wasteHeatEnergyRate = this->performance.wasteHeatRate;
+    this->wasteHeatEnergy = this->performance.wasteHeatRate * reportingConstant;
 
     this->partLoadRatioReport = PLR;
     this->speedNumReport = speedNum;

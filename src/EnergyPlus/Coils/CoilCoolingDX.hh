@@ -141,6 +141,8 @@ struct CoilCoolingDX
     Real64 runTimeFraction = 0.0;
     int speedNumReport = 0;
     Real64 speedRatioReport = 0.0;
+    Real64 wasteHeatEnergyRate = 0.0;
+    Real64 wasteHeatEnergy = 0.0;
 
 };
 

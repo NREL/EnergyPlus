@@ -130,6 +130,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 electricityConsumption = 0.0;
     Real64 RTF = 0.0;
     bool oneTimeEIOHeaderWrite = true;
+    Real64 wasteHeatRate = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;
