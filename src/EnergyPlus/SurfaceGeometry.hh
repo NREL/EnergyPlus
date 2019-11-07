@@ -347,6 +347,8 @@ namespace SurfaceGeometry {
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
     void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
+                                Real64 &thisXShift, // Base surface shift of X to Lower Left Corner
+                                Real64 &thisYShift, // Base surface shift of Y to Lower Left Corner
                                 bool &ErrorsFound);
 
     void CalcCoordinateTransformation(int const SurfNum,            // Surface Number

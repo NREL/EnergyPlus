@@ -329,6 +329,10 @@ namespace SurfaceGeometry {
         FixedShadingCount = 0;
         AttachedShadingCount = 0;
 
+        // Shift of X and Y to Lower Left Corner - saved for base surfaces to use for subsurfaces 
+        std::vector<Real64> baseXShift(DataSurfaces::TotSurfaces + 1, 0.0);
+        std::vector<Real64> baseYShift(DataSurfaces::TotSurfaces + 1, 0.0);
+
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
             AirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + Surface(SurfNum).CosTilt));
@@ -342,7 +346,10 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass_Detached_F) ++FixedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass_Detached_B) ++BuildingShadingCount;
 
-            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(SurfNum, ErrorsFound);
+            Real64 thisXShift = baseXShift[Surface(SurfNum).BaseSurf];
+            Real64 thisYShift = baseYShift[Surface(SurfNum).BaseSurf];
+
+            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(SurfNum, thisXShift, thisYShift, ErrorsFound);
         }
 
         for (auto &e : Zone) {
@@ -10600,6 +10607,8 @@ namespace SurfaceGeometry {
     }
 
     void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
+                                Real64  &thisXShift, // Base surface shift of X to Lower Left Corner
+                                Real64  &thisYShift, // Base surface shift of Y to Lower Left Corner
                                 bool &ErrorsFound)
     {
 
@@ -10613,14 +10622,6 @@ namespace SurfaceGeometry {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine processes each surface into the vertex representation used
         // by the shading procedures.
-        // This routine depends on the surfaces coming in:
-        //  Base Surface
-        //   SubSurface (Window/Door)
-        //   SubSurface
-        //  Base Surface
-        //   SubSurface
-        //   SubSurface
-        //  Thus, some attributes of the "Base Surface" must be SAVEd.
 
         // METHODOLOGY EMPLOYED:
         // Detached Shading, Base Surfaces, Attached Shading surfaces are represented in the
@@ -10631,25 +10632,14 @@ namespace SurfaceGeometry {
 
         static std::string const RoutineName("ProcessSurfaceVertices: ");
 
-        //////////// hoisted into namespace
-        // static bool OneTimeFlag( true ); // now ProcessSurfaceVerticesOneTimeFlag
-        // static Array1D< Real64 > X; // now Xpsv (to avoid conflicts with CheckConvexity)
-        // static Array1D< Real64 > Y; // now Ypsv
-        // static Array1D< Real64 > Z; // now Zpsv
-        ////////////////////////////////////////////////
-
-        Real64 X1;            // Intermediate Result
-        Real64 Y1;            // Intermediate Result
-        Real64 Z1;            // Intermediate Result
-        static Real64 XSHIFT; // Shift of X to Lower Left Corner
-        static Real64 YSHIFT; // Shift of Y to Lower Left Corner
-        Real64 XLLC;          // X-coordinate of lower left corner
-        Real64 YLLC;          // Y-coordinate of lower left corner
-        Real64 ZLLC;          // Z-coordinate of lower left corner
-        //  INTEGER :: I  ! Loop Control
-        //  INTEGER :: J  ! Loop Control
-        int n;               // Vertex Number in Loop
-        int ThisBaseSurface; // Current base surface
+        Real64 X1;                  // Intermediate Result
+        Real64 Y1;                  // Intermediate Result
+        Real64 Z1;                  // Intermediate Result
+        Real64 XLLC;                // X-coordinate of lower left corner
+        Real64 YLLC;                // Y-coordinate of lower left corner
+        Real64 ZLLC;                // Z-coordinate of lower left corner
+        int n;                      // Vertex Number in Loop
+        int ThisBaseSurface;        // Current base surface
         Real64 Xp;
         Real64 Yp;
         Real64 Zp;
@@ -11109,8 +11099,9 @@ namespace SurfaceGeometry {
                 X1 = Xpsv(2) - CoordinateTransVector.x;
                 Y1 = Ypsv(2) - CoordinateTransVector.y;
                 Z1 = Zpsv(2) - CoordinateTransVector.z;
-                XSHIFT = Surface(ThisBaseSurface).lcsx.x * X1 + Surface(ThisBaseSurface).lcsx.y * Y1 + Surface(ThisBaseSurface).lcsx.z * Z1;
-                YSHIFT = Surface(ThisBaseSurface).lcsy.x * X1 + Surface(ThisBaseSurface).lcsy.y * Y1 + Surface(ThisBaseSurface).lcsy.z * Z1;
+                thisXShift = Surface(ThisBaseSurface).lcsx.x * X1 + Surface(ThisBaseSurface).lcsx.y * Y1 + Surface(ThisBaseSurface).lcsx.z * Z1;
+                thisYShift = Surface(ThisBaseSurface).lcsy.x * X1 + Surface(ThisBaseSurface).lcsy.y * Y1 + Surface(ThisBaseSurface).lcsy.z * Z1;
+
             }
 
             // SUBSURFACES: (Surface(ThisSurf)%BaseSurf /= ThisSurf)
@@ -11121,8 +11112,8 @@ namespace SurfaceGeometry {
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
 
             for (n = 1; n <= Surface(ThisSurf).Sides; ++n) {
-                ShadeV(ThisSurf).XV(n) += XSHIFT;
-                ShadeV(ThisSurf).YV(n) += YSHIFT;
+                ShadeV(ThisSurf).XV(n) += thisXShift;
+                ShadeV(ThisSurf).YV(n) += thisYShift;
             }
         }
 
@@ -13146,31 +13137,12 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 BaseCosAzimuth;
-        static Real64 BaseCosTilt;
-        static Real64 BaseSinAzimuth;
-        static Real64 BaseSinTilt;
-        static Real64 SurfWorldAz;
-        static Real64 SurfTilt;
+        Real64 BaseCosAzimuth;
+        Real64 BaseCosTilt;
+        Real64 BaseSinAzimuth;
+        Real64 BaseSinTilt;
+        Real64 SurfWorldAz;
+        Real64 SurfTilt;
         Real64 AspectRatio;  // Aspect ratio
         Real64 NumSurfSides; // Number of surface sides
         Real64 WidthEff;     // Effective width of the surface

@@ -84,6 +84,8 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     bool ErrorsFound(false);
     int ThisSurf(0);
+    Real64 dummy1;
+    Real64 dummy2;
 
     // Surface 1 - Rectangle
     ThisSurf = 1;
@@ -108,7 +110,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(ThisSurf).Shape);
 
@@ -135,7 +137,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -162,7 +164,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(4).y = 0.0;
     Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
 
@@ -185,7 +187,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(3).y = 0.0;
     Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(ThisSurf).Shape);
 
@@ -216,7 +218,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     Surface(ThisSurf).Vertex(5).y = 0.0;
     Surface(ThisSurf).Vertex(5).z = 3.0;
 
-    ProcessSurfaceVertices(ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(ThisSurf, dummy1, dummy2, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(ThisSurf).Shape);
 }
@@ -492,58 +494,60 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     // compare_err_stream( "" ); // just for debugging
 
     AllocateModuleArrays();
+    Real64 dummy1;
+    Real64 dummy2;
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
 
     //	enum surfaceShape:Triangle = 1
     //	Surface( 11 ).Name = "Surface 1 - Triangle"
-    ProcessSurfaceVertices(11, ErrorsFound);
+    ProcessSurfaceVertices(11, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Triangle, Surface(11).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
     //	Surface( 12 ).Name = "Surface 2 - Quadrilateral"
-    ProcessSurfaceVertices(12, ErrorsFound);
+    ProcessSurfaceVertices(12, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(12).Shape);
 
     //	enum surfaceShape:Rectangle = 3
     //	Surface( 7 ).Name = "Surface 3 - Rectangle"
-    ProcessSurfaceVertices(7, ErrorsFound);
+    ProcessSurfaceVertices(7, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, Surface(7).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	Surface( 8 ).Name = "Surface 4 - RectangularDoorWindow"
-    ProcessSurfaceVertices(8, ErrorsFound);
+    ProcessSurfaceVertices(8, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(8).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	Surface( 1 ).Name = "Surface 5 - RectangularOverhang"
-    ProcessSurfaceVertices(1, ErrorsFound);
+    ProcessSurfaceVertices(1, dummy1, dummy2, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(1).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	Surface( 3 ).Name = "Surface 6 - RectangularLeftFin"
-    ProcessSurfaceVertices(3, ErrorsFound);
+    ProcessSurfaceVertices(3, dummy1, dummy2, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(3).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	Surface( 5 ).Name = "Surface 7 - RectangularRightFin"
-    ProcessSurfaceVertices(5, ErrorsFound);
+    ProcessSurfaceVertices(5, dummy1, dummy2, ErrorsFound);
     EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(5).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	Surface( 9 ).Name = "Surface 8 - TriangularWindow"
-    ProcessSurfaceVertices(9, ErrorsFound);
+    ProcessSurfaceVertices(9, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(9).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
     //	Surface( 10 ).Name = "Surface 9 - TriangularDoor"
-    ProcessSurfaceVertices(10, ErrorsFound);
+    ProcessSurfaceVertices(10, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(10).Shape);
 
     //	enum surfaceShape:Polygonal = 10
     //	Surface( 13 ).Name = "Surface 10 - Polygonal"
-    ProcessSurfaceVertices(13, ErrorsFound);
+    ProcessSurfaceVertices(13, dummy1, dummy2, ErrorsFound);
     EXPECT_EQ(SurfaceShape::Polygonal, Surface(13).Shape);
 }
 
