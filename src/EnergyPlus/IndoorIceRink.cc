@@ -481,7 +481,7 @@ namespace IceRink {
                 DRink(Item).WidthRink = 30.0;
             }
 
-            DRink(Item).LengthRink = Numbers(8);
+            DRink(Item).DepthRink = Numbers(8);
             if (DRink(Item).DepthRink <= 0.0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " was entered with zero or negetive rink depth. This is not allowed");
@@ -502,7 +502,7 @@ namespace IceRink {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " was entered with zero or negetive flood water temperature. This is not allowed");
                 ShowContinueError("The rink length has been reset to 15.0.");
-                DRink(Item).IceThickness = 15.0;
+                DRink(Item).FloodWaterTemp = 15.0;
             }
         }
 
@@ -672,7 +672,7 @@ namespace IceRink {
                 IRink(Item).WidthRink = 30.0;
             }
 
-            IRink(Item).LengthRink = Numbers(8);
+            IRink(Item).DepthRink = Numbers(8);
             if (IRink(Item).DepthRink <= 0.0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  " was entered with zero or negetive rink depth. This is not allowed");
@@ -850,7 +850,7 @@ namespace IceRink {
                 "Refrigerant Outlet Temperature", OutputProcessor::Unit::C, IRink(Item).RefrigOutletTemp, "System", "Average", IRink(Item).Name);
         }
 
-        // Set output variables fro resurfacer
+        // Set output variables for resurfacer
 
         for (Item = 1; Item <= NumOfResurfacer; ++Item) {
             SetupOutputVariable("Heat load due to resurfacing",
