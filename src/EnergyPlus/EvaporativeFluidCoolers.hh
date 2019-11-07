@@ -62,36 +62,44 @@ namespace EvaporativeFluidCoolers {
     extern std::string const cEvapFluidCooler_SingleSpeed;
     extern std::string const cEvapFluidCooler_TwoSpeed;
 
-    extern int const EvapLossByUserFactor;
-    extern int const EvapLossByMoistTheory;
-
-    extern int const BlowdownByConcentration;
-    extern int const BlowdownBySchedule;
-
-    extern int const PIM_StandardDesignCapacity;
-    extern int const PIM_UFactor;
-    extern int const PIM_UserSpecifiedDesignCapacity;
-
-    extern int const EvapFluidCooler_SingleSpeed;
-    extern int const EvapFluidCooler_TwoSpeed;
-
     extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
 
-    // The following block of variables are used to carry model results for a evaporative fluid cooler instance
-    //   across sim, update, and report routines.  Simulation manager must be careful
-    //   in models with multiple evaporative fluid coolers.
+    struct EvapLoss
+    {
+        enum
+        {
+            ByUserFactor,
+            ByMoistTheory
+        };
+    };
 
-//    extern Real64 InletWaterTemp;    // CW temperature at evaporative fluid cooler inlet
-//    extern Real64 OutletWaterTemp;   // CW temperature at evaporative fluid cooler outlet
-//    extern int WaterInletNode;       // Node number at evaporative fluid cooler inlet
-//    extern int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
-//    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
-//    extern Real64 Qactual;          // Evaporative fluid cooler heat transfer
-//    extern Real64 FanPower;         // Evaporative fluid cooler fan power used
-//    extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
-//    extern Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
+    struct Blowdown
+    {
+        enum
+        {
+            ByConcentration,
+            BySchedule
+        };
+    };
 
-    extern Array1D_bool CheckEquipName;
+    struct PIM
+    {
+        enum
+        {
+            StandardDesignCapacity,
+            UFactor,
+            UserSpecifiedDesignCapacity
+        };
+    };
+
+    struct EvapFluidCooler
+    {
+        enum
+        {
+            SingleSpeed,
+            TwoSpeed
+        };
+    };
 
     struct EvapFluidCoolerspecs
     {
@@ -195,6 +203,7 @@ namespace EvaporativeFluidCoolers {
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool OneTimeFlagForEachEvapFluidCooler;
+        bool CheckEquipName;
 
         // Default Constructor
         EvapFluidCoolerspecs()
@@ -212,11 +221,11 @@ namespace EvaporativeFluidCoolers {
               OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0),
               WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
               WMFRGreaterThanMaxAvailErrIndex(0), EvapFluidCoolerAFRRFailedCount(0), EvapFluidCoolerAFRRFailedIndex(0), CapacityControl(0),
-              BypassFraction(0.0), EvapLossMode(EvapLossByMoistTheory), BlowdownMode(BlowdownByConcentration), SchedIDBlowdown(0), WaterTankID(0),
+              BypassFraction(0.0), EvapLossMode(EvapLoss::ByMoistTheory), BlowdownMode(Blowdown::ByConcentration), SchedIDBlowdown(0), WaterTankID(0),
               WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
               LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
               WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
-              OneTimeFlagForEachEvapFluidCooler(true)
+              OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true)
         {
         }
     };

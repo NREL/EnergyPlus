@@ -103,27 +103,12 @@ namespace EvaporativeFluidCoolers {
     std::string const cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     std::string const cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
 
-    int const EvapLossByUserFactor(80);
-    int const EvapLossByMoistTheory(81);
-
-    int const BlowdownByConcentration(90);
-    int const BlowdownBySchedule(91);
-
-    int const PIM_StandardDesignCapacity(1);
-    int const PIM_UFactor(2);
-    int const PIM_UserSpecifiedDesignCapacity(3);
-
-    int const EvapFluidCooler_SingleSpeed(1);
-    int const EvapFluidCooler_TwoSpeed(2);
-
     bool GetEvapFluidCoolerInputFlag(true);
-
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
 
     // Moving to member variable causes diffs... no idea at this point
     Real64 AirFlowRateRatio(0.0); // Ratio of air flow rate through VS evaporative fluid cooler
 
-    Array1D_bool CheckEquipName;
     Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
     Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
@@ -181,12 +166,12 @@ namespace EvaporativeFluidCoolers {
                 ShowFatalError("SimEvapFluidCoolers:  Invalid CompIndex passed = " + General::TrimSigDigits(EvapFluidCoolerNum) +
                                ", Number of Units = " + General::TrimSigDigits(NumSimpleEvapFluidCoolers) + ", Entered Unit name = " + EvapFluidCoolerName);
             }
-            if (CheckEquipName(EvapFluidCoolerNum)) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).CheckEquipName) {
                 if (EvapFluidCoolerName != SimpleEvapFluidCooler(EvapFluidCoolerNum).Name) {
                     ShowFatalError("SimEvapFluidCoolers: Invalid CompIndex passed = " + General::TrimSigDigits(EvapFluidCoolerNum) + ", Unit name = " +
                                    EvapFluidCoolerName + ", stored Unit Name for that index = " + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
                 }
-                CheckEquipName(EvapFluidCoolerNum) = false;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).CheckEquipName = false;
             }
         }
 
@@ -195,7 +180,7 @@ namespace EvaporativeFluidCoolers {
         {
             auto const SELECT_CASE_var(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num);
 
-            if (SELECT_CASE_var == EvapFluidCooler_SingleSpeed) {
+            if (SELECT_CASE_var == EvapFluidCooler::SingleSpeed) {
 
                 if (InitLoopEquip) {
                     InitEvapFluidCooler(EvapFluidCoolerNum, RunFlag);
@@ -215,7 +200,7 @@ namespace EvaporativeFluidCoolers {
                 UpdateEvapFluidCooler(EvapFluidCoolerNum);
                 ReportEvapFluidCooler(RunFlag, EvapFluidCoolerNum);
 
-            } else if (SELECT_CASE_var == EvapFluidCooler_TwoSpeed) {
+            } else if (SELECT_CASE_var == EvapFluidCooler::TwoSpeed) {
                 if (GetSizingFactor) {
                     SizingFactor = SimpleEvapFluidCooler(EvapFluidCoolerNum).SizFac;
                     return;
@@ -287,7 +272,6 @@ namespace EvaporativeFluidCoolers {
         UniqueSimpleEvapFluidCoolerNames.reserve(static_cast<unsigned>(NumSimpleEvapFluidCoolers));
         SimpleEvapFluidCoolerReport.allocate(NumSimpleEvapFluidCoolers);
         SimpleEvapFluidCoolerInlet.allocate(NumSimpleEvapFluidCoolers);
-        CheckEquipName.dimension(NumSimpleEvapFluidCoolers, true);
 
         // Load data structures with evaporative fluid cooler input data
         DataIPShortCuts::cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
@@ -310,7 +294,7 @@ namespace EvaporativeFluidCoolers {
 
             SimpleEvapFluidCooler(EvapFluidCoolerNum).Name = AlphArray(1);
             SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType = DataIPShortCuts::cCurrentModuleObject;
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num = EvapFluidCooler_SingleSpeed;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num = EvapFluidCooler::SingleSpeed;
             SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerMassFlowRateMultiplier = 2.5;
             SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -349,10 +333,10 @@ namespace EvaporativeFluidCoolers {
                 ErrorsFound = true;
             }
             if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (FluidName != "WATER") {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
-                                    "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\".");
+                                    R"(\". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
                     ShowContinueError("Currently, Fluid Type = " + FluidName + " in CondenserLoop = " + DataPlant::PlantLoop(DataSizing::CurLoopNum).Name);
                     ErrorsFound = true;
                 }
@@ -401,11 +385,11 @@ namespace EvaporativeFluidCoolers {
 
             // begin water use and systems get input
             if (UtilityRoutines::SameString(AlphArray(7), "LossFactor")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByUserFactor;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByUserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(7), "SaturatedExit")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByMoistTheory;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByMoistTheory;
             } else if (AlphArray(7).empty()) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByMoistTheory;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(7) + " = " + AlphArray(7));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
@@ -433,11 +417,11 @@ namespace EvaporativeFluidCoolers {
             SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio = NumArray(15); //  N15, \field Blowdown Concentration Ratio
 
             if (UtilityRoutines::SameString(AlphArray(8), "ScheduledRate")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownBySchedule;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::BySchedule;
             } else if (UtilityRoutines::SameString(AlphArray(8), "ConcentrationRatio")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownByConcentration;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::ByConcentration;
             } else if (AlphArray(8).empty()) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownByConcentration;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::ByConcentration;
                 if ((NumNums < 15) && (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio == 0.0)) {
                     // assume Concetration ratio was omitted and should be defaulted
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio = 3.0;
@@ -450,7 +434,7 @@ namespace EvaporativeFluidCoolers {
 
             SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(AlphArray(9));
             if ((SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown == 0) &&
-                (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownBySchedule)) {
+                (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::BySchedule)) {
                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(9) + " = " + AlphArray(9));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " =" + AlphArray(1));
                 ErrorsFound = true;
@@ -490,7 +474,7 @@ namespace EvaporativeFluidCoolers {
             }
 
             if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::UFactor;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <= 0.0 &&
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(6) +
@@ -504,14 +488,14 @@ namespace EvaporativeFluidCoolers {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedStandardDesignCapacity <= 0.0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(5) +
                                     "\", entered value <= 0.0, but must be > 0 for " + DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate <= 0.0 &&
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate != DataSizing::AutoSize) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(7) +
@@ -579,7 +563,7 @@ namespace EvaporativeFluidCoolers {
 
             SimpleEvapFluidCooler(EvapFluidCoolerNum).Name = AlphArray(1);
             SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType = DataIPShortCuts::cCurrentModuleObject;
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num = EvapFluidCooler_TwoSpeed;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num = EvapFluidCooler::TwoSpeed;
             SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerMassFlowRateMultiplier = 2.5;
             SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -639,10 +623,10 @@ namespace EvaporativeFluidCoolers {
             }
 
             if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (FluidName != "WATER") {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler(EvapFluidCoolerNum).Name +
-                                    "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\".");
+                                    R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
                     ShowContinueError("Currently, Fluid Type = " + FluidName + " in CondenserLoop = " + DataPlant::PlantLoop(DataSizing::CurLoopNum).Name);
                     ErrorsFound = true;
                 }
@@ -673,11 +657,11 @@ namespace EvaporativeFluidCoolers {
 
             // begin water use and systems get input
             if (UtilityRoutines::SameString(AlphArray(6), "LossFactor")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByUserFactor;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByUserFactor;
             } else if (UtilityRoutines::SameString(AlphArray(6), "SaturatedExit")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByMoistTheory;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByMoistTheory;
             } else if (DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLossByMoistTheory;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + AlphArray(6));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
@@ -704,11 +688,11 @@ namespace EvaporativeFluidCoolers {
             SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio = NumArray(25); //  N25, \field Blowdown Concentration Ratio
 
             if (UtilityRoutines::SameString(AlphArray(7), "ScheduledRate")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownBySchedule;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::BySchedule;
             } else if (UtilityRoutines::SameString(AlphArray(7), "ConcentrationRatio")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownByConcentration;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::ByConcentration;
             } else if (DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = BlowdownByConcentration;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode = Blowdown::ByConcentration;
                 if ((NumNums < 25) && (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio == 0.0)) {
                     // assume Concetration ratio was omitted and should be defaulted
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio = 3.0;
@@ -720,7 +704,7 @@ namespace EvaporativeFluidCoolers {
             }
             SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown = ScheduleManager::GetScheduleIndex(AlphArray(8));
             if ((SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown == 0) &&
-                (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownBySchedule)) {
+                (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::BySchedule)) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + " = " + AlphArray(8));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
@@ -788,7 +772,7 @@ namespace EvaporativeFluidCoolers {
             }
 
             if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::UFactor;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA <= 0.0 &&
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(12) +
@@ -816,7 +800,7 @@ namespace EvaporativeFluidCoolers {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedStandardDesignCapacity <= 0.0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(9) +
                                     "\", entered value <= 0.0, but must be > 0 for " + DataIPShortCuts::cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
@@ -834,7 +818,7 @@ namespace EvaporativeFluidCoolers {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate <= 0.0 &&
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate != DataSizing::AutoSize) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + DataIPShortCuts::cNumericFieldNames(15) +
@@ -1201,9 +1185,9 @@ namespace EvaporativeFluidCoolers {
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).OneTimeFlagForEachEvapFluidCooler) {
             int TypeOf_Num = 0;
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                 TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
-            } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+            } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                 TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
             } else {
                 assert(false);
@@ -1227,7 +1211,7 @@ namespace EvaporativeFluidCoolers {
                 ShowFatalError("InitEvapFluidCooler: Program terminated due to previous condition(s).");
             }
 
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                 if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate > 0.0) {
                     if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate <=
                         SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedAirFlowRate) {
@@ -1353,7 +1337,7 @@ namespace EvaporativeFluidCoolers {
         int PltSizCondNum = DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).PlantSizNum;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRateWasAutoSized &&
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num != PIM_StandardDesignCapacity) {
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num != PIM::StandardDesignCapacity) {
             if (PltSizCondNum > 0) {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     tmpDesignWaterFlowRate = DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).SizFac;
@@ -1385,7 +1369,7 @@ namespace EvaporativeFluidCoolers {
             }
             // Check when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
             // temperature is less than design inlet air wet bulb temperature
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UFactor) {
                 DesignEnteringAirWetBulb = 25.6;
             } else {
                 DesignEnteringAirWetBulb = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignEnteringAirWetBulbTemp;
@@ -1404,7 +1388,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor &&
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UFactor &&
             !SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
@@ -1423,12 +1407,12 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_StandardDesignCapacity) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::StandardDesignCapacity) {
             // Design water flow rate is assumed to be 3 gpm per ton (SI equivalent 5.382E-8 m3/s per watt)
             tmpDesignWaterFlowRate = 5.382e-8 * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedStandardDesignCapacity;
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate = tmpDesignWaterFlowRate;
-                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1441,7 +1425,7 @@ namespace EvaporativeFluidCoolers {
                                            "Initial Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]",
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate);
                     }
-                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1463,10 +1447,10 @@ namespace EvaporativeFluidCoolers {
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPowerWasAutoSized) {
             // We assume the nominal fan power is 0.0105 times the design load
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_StandardDesignCapacity) {
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::StandardDesignCapacity) {
                 tmpHighSpeedFanPower = 0.0105 * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedStandardDesignCapacity;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower = tmpHighSpeedFanPower;
-            } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity) {
+            } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity) {
                 tmpHighSpeedFanPower = 0.0105 * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedUserSpecifiedDesignCapacity;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower = tmpHighSpeedFanPower;
             } else {
@@ -1498,7 +1482,7 @@ namespace EvaporativeFluidCoolers {
                 }
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1511,7 +1495,7 @@ namespace EvaporativeFluidCoolers {
                                            "Initial Fan Power at Design Air Flow Rate [W]",
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedFanPower);
                     }
-                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1535,7 +1519,7 @@ namespace EvaporativeFluidCoolers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1548,7 +1532,7 @@ namespace EvaporativeFluidCoolers {
                                            "Initial Design Air Flow Rate [m3/s]",
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate);
                     }
-                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1566,7 +1550,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize &&
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor) {
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UFactor) {
             if (PltSizCondNum > 0) {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
@@ -1665,7 +1649,7 @@ namespace EvaporativeFluidCoolers {
                         SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA = 0.0;
                 }
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                    if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1678,7 +1662,7 @@ namespace EvaporativeFluidCoolers {
                                                "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                                SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA);
                         }
-                    } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                    } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1701,7 +1685,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_StandardDesignCapacity) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::StandardDesignCapacity) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 // Standard Design Capacity doesn't include compressor heat;
                 // predefined factor was 1.25 W heat rejection per W of delivered cooling, now a user input with 1.25 default
@@ -1746,7 +1730,7 @@ namespace EvaporativeFluidCoolers {
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1759,7 +1743,7 @@ namespace EvaporativeFluidCoolers {
                                            "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA);
                     }
-                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1776,7 +1760,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                        DataGlobals::InitConvTemp,
@@ -1852,7 +1836,7 @@ namespace EvaporativeFluidCoolers {
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed) {
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_SingleSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1865,7 +1849,7 @@ namespace EvaporativeFluidCoolers {
                                            "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedEvapFluidCoolerUA);
                     }
-                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+                } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(cEvapFluidCooler_TwoSpeed,
                                            SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1935,8 +1919,8 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_StandardDesignCapacity &&
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::StandardDesignCapacity &&
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow &&
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedStandardDesignCapacity > 0.0) {
                 // Standard design capacity doesn't include compressor heat;
@@ -1997,8 +1981,8 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity &&
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity &&
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num == EvapFluidCooler::TwoSpeed) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow &&
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedUserSpecifiedDesignCapacity > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
@@ -2561,7 +2545,7 @@ namespace EvaporativeFluidCoolers {
         Real64 AverageWaterTemp = (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp + SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / 2.0;
 
         // Set water and air properties
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByMoistTheory) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLoss::ByMoistTheory) {
 
             Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress,
                                            SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp,
@@ -2596,7 +2580,7 @@ namespace EvaporativeFluidCoolers {
                 EvapVdot = 0.0;
             }
 
-        } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByUserFactor) {
+        } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLoss::ByUserFactor) {
             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                    AverageWaterTemp,
                                    DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
@@ -2611,14 +2595,14 @@ namespace EvaporativeFluidCoolers {
         Real64 DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
                 AirFlowRateRatio;
 
-        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownBySchedule) {
+        if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::BySchedule) {
             // Amount of water lost due to blow down (purging contaminants from evaporative fluid cooler basin)
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown > 0) {
                 BlowDownVdot = ScheduleManager::GetCurrentScheduleValue(SimpleEvapFluidCooler(EvapFluidCoolerNum).SchedIDBlowdown);
             } else {
                 BlowDownVdot = 0.0;
             }
-        } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownByConcentration) {
+        } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::ByConcentration) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio > 2.0) { // protect divide by zero
                 BlowDownVdot = EvapVdot / (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio - 1) - DriftVdot;
             } else {
@@ -2631,7 +2615,7 @@ namespace EvaporativeFluidCoolers {
 
         // Added for fluid bypass
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).CapacityControl == 1) {
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByUserFactor)
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLoss::ByUserFactor)
                 EvapVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
             DriftVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
             BlowDownVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
@@ -2809,7 +2793,6 @@ namespace EvaporativeFluidCoolers {
     void clear_state()
     {
         NumSimpleEvapFluidCoolers = 0;
-        CheckEquipName.clear();
         UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
     }
