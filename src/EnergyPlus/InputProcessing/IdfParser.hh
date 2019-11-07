@@ -48,8 +48,8 @@
 #ifndef InputProcessing_IdfParser_hh_INCLUDED
 #define InputProcessing_IdfParser_hh_INCLUDED
 
-#include <nlohmann/json.hpp>
 #include <string>
+#include <nlohmann/json.hpp>
 #include <unordered_map>
 
 namespace EnergyPlus {
