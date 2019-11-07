@@ -252,17 +252,12 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput()
 {
-    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in);
+    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
         ShowFatalError("Input file path " + DataStringGlobals::inputFileName + " not found");
         return;
     }
 
-    std::string input_file;
-    std::string line;
-    while (std::getline(input_stream, line)) {
-        input_file.append(line + DataStringGlobals::NL);
-    }
     // For some reason this does not work properly on Windows. This will be faster so should investigate in future.
     // std::ifstream::pos_type size = input_stream.tellg();
     // char *memblock = new char[(size_t) size + 1];
@@ -283,13 +278,18 @@ void InputProcessor::processInput()
     // 	fclose(fp);
     // }
 
-    if (input_file.empty()) {
-        ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
-        return;
-    }
-
     try {
         if (!DataGlobals::isEpJSON) {
+            std::string input_file;
+            std::string line;
+            while (std::getline(input_stream, line)) {
+                input_file.append(line + DataStringGlobals::NL);
+            }
+            if (input_file.empty()) {
+                ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
+                return;
+            }
+
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
 
@@ -309,11 +309,15 @@ void InputProcessor::processInput()
                 convertedFS << input_file << std::endl;
             }
         } else if (DataGlobals::isCBOR) {
-            epJSON = json::from_cbor(input_file);
+            epJSON = json::from_cbor(input_stream);
         } else if (DataGlobals::isMsgPack) {
-            epJSON = json::from_msgpack(input_file);
+            epJSON = json::from_msgpack(input_stream);
+        } else if (DataGlobals::isUBJSON) {
+            epJSON = json::from_ubjson(input_stream);
+        } else if (DataGlobals::isBSON) {
+            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_file);
+            epJSON = json::parse(input_stream);
         }
     } catch (const std::exception &e) {
         ShowSevereError(e.what());

@@ -92,6 +92,8 @@ namespace DataGlobals {
     bool isEpJSON(false);
     bool isCBOR(false);
     bool isMsgPack(false);
+    bool isUBJSON(false);
+    bool isBSON(false);
     bool preserveIDFOrder(true);
 
     // MODULE PARAMETER DEFINITIONS:
