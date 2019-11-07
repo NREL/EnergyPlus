@@ -2325,20 +2325,6 @@ namespace EvaporativeFluidCoolers {
 
         std::string const RoutineName("CalcTwoSpeedEvapFluidCooler");
 
-        Real64 AirFlowRate;
-        Real64 UAdesign; // UA value at design conditions (entered by user) [W/C]
-        Real64 OutletWaterTemp1stStage;
-        Real64 OutletWaterTemp2ndStage;
-        Real64 FanModeFrac;
-        Real64 FanPowerLow;
-        Real64 FanPowerHigh;
-        Real64 CpWater;
-        Real64 TempSetPoint;
-        int LoopNum;
-        int LoopSideNum;
-
-        // set inlet and outlet nodes
-
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
         SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = 0.0;
@@ -2346,12 +2332,12 @@ namespace EvaporativeFluidCoolers {
         SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
         SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
 
-        OutletWaterTemp1stStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
-        OutletWaterTemp2ndStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
-        FanModeFrac = 0.0;
-        AirFlowRate = 0.0;
-        LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
-        LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
+        Real64 OutletWaterTemp1stStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+        Real64 OutletWaterTemp2ndStage = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+        Real64 AirFlowRate = 0.0;
+        int LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
+        int LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
+        Real64 TempSetPoint;
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -2366,15 +2352,15 @@ namespace EvaporativeFluidCoolers {
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp > TempSetPoint) {
             //     Setpoint was not met ,turn on evaporative fluid cooler 1st stage fan
-            UAdesign = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA;
+            Real64 UAdesign = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedEvapFluidCoolerUA;
             AirFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedAirFlowRate;
-            FanPowerLow = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedFanPower;
-
+            Real64 FanPowerLow = SimpleEvapFluidCooler(EvapFluidCoolerNum).LowSpeedFanPower;
+            Real64 FanPowerHigh;
             SimSimpleEvapFluidCooler(EvapFluidCoolerNum, SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
             if (OutletWaterTemp1stStage <= TempSetPoint) {
                 //         Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
-                FanModeFrac = (TempSetPoint - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp) / (OutletWaterTemp1stStage - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp);
+                Real64 FanModeFrac = (TempSetPoint - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp) / (OutletWaterTemp1stStage - SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp);
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = FanModeFrac * FanPowerLow;
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = TempSetPoint;
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual *= FanModeFrac;
@@ -2388,7 +2374,7 @@ namespace EvaporativeFluidCoolers {
 
                 if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                     //           Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
-                    FanModeFrac = (TempSetPoint - OutletWaterTemp1stStage) / (OutletWaterTemp2ndStage - OutletWaterTemp1stStage);
+                    Real64 FanModeFrac = (TempSetPoint - OutletWaterTemp1stStage) / (OutletWaterTemp2ndStage - OutletWaterTemp1stStage);
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = (FanModeFrac * FanPowerHigh) + (1.0 - FanModeFrac) * FanPowerLow;
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp = TempSetPoint;
                 } else {
@@ -2400,7 +2386,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Should this be water inlet node num??
-        CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                         DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp,
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
@@ -2433,7 +2419,6 @@ namespace EvaporativeFluidCoolers {
         Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations
         Real64 const DeltaTwbTolerance(0.001); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         std::string const RoutineName("SimSimpleEvapFluidCooler");
-
 
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
@@ -2570,54 +2555,38 @@ namespace EvaporativeFluidCoolers {
 
         std::string const RoutineName("CalculateWaterUseage");
 
-        Real64 AirDensity;
-        Real64 AirMassFlowRate;
-        Real64 AvailTankVdot;
         Real64 BlowDownVdot(0.0);
-        Real64 DriftVdot(0.0);
         Real64 EvapVdot(0.0);
-        Real64 InletAirEnthalpy;
-        Real64 InSpecificHumRat;
-        Real64 OutSpecificHumRat;
-        Real64 TairAvg;
-        Real64 MakeUpVdot;
-        Real64 OutletAirEnthalpy;
-        Real64 OutletAirHumRatSat;
-        Real64 OutletAirTSat;
-        Real64 StarvedVdot;
-        Real64 TankSupplyVdot;
-        Real64 rho;
-        Real64 AverageWaterTemp;
 
-        AverageWaterTemp = (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp + SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / 2.0;
+        Real64 AverageWaterTemp = (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp + SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / 2.0;
 
         // Set water and air properties
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByMoistTheory) {
 
-            AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress,
+            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress,
                                            SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp,
                                            SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
-            AirMassFlowRate = AirFlowRateRatio * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate * AirDensity;
-            InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(
+            Real64 AirMassFlowRate = AirFlowRateRatio * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate * AirDensity;
+            Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(
                 SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
 
             if (AirMassFlowRate > 0.0) {
                 // Calculate outlet air conditions for determining water usage
 
-                OutletAirEnthalpy = InletAirEnthalpy + SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual / AirMassFlowRate;
-                OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
-                OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
+                Real64 OutletAirEnthalpy = InletAirEnthalpy + SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual / AirMassFlowRate;
+                Real64 OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
+                Real64 OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
 
                 // calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
-                InSpecificHumRat =
+                Real64 InSpecificHumRat =
                     SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat / (1 + SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
-                OutSpecificHumRat = OutletAirHumRatSat / (1 + OutletAirHumRatSat);
+                Real64 OutSpecificHumRat = OutletAirHumRatSat / (1 + OutletAirHumRatSat);
 
                 // calculate average air temp for density call
-                TairAvg = (SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp + OutletAirTSat) / 2.0;
+                Real64 TairAvg = (SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp + OutletAirTSat) / 2.0;
 
                 // Amount of water evaporated
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                        TairAvg,
                                        DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                        RoutineName);
@@ -2628,7 +2597,7 @@ namespace EvaporativeFluidCoolers {
             }
 
         } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLossByUserFactor) {
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
                                    AverageWaterTemp,
                                    DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                    RoutineName);
@@ -2639,7 +2608,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         //   amount of water lost due to drift
-        DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
+        Real64 DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
                 AirFlowRateRatio;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == BlowdownBySchedule) {
@@ -2668,18 +2637,18 @@ namespace EvaporativeFluidCoolers {
             BlowDownVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
         }
 
-        MakeUpVdot = EvapVdot + DriftVdot + BlowDownVdot;
+        Real64 MakeUpVdot = EvapVdot + DriftVdot + BlowDownVdot;
 
-        // set demand request in Water STorage if needed
-        StarvedVdot = 0.0;
-        TankSupplyVdot = 0.0;
+        // set demand request in Water Storage if needed
+        Real64 StarvedVdot = 0.0;
+        Real64 TankSupplyVdot = 0.0;
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).SuppliedByWaterSystem) {
 
             // set demand request
             DataWater::WaterStorage(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterTankID)
                 .VdotRequestDemand(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterTankDemandARRID) = MakeUpVdot;
 
-            AvailTankVdot =
+            Real64 AvailTankVdot =
                 DataWater::WaterStorage(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterTankID)
                     .VdotAvailDemand(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterTankDemandARRID); // check what tank can currently provide
 
@@ -2723,17 +2692,11 @@ namespace EvaporativeFluidCoolers {
         Real64 const TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
         std::string CharErrOut;
         std::string CharLowOutletTemp;
-        Real64 TempDifference;
-        int LoopNum;
-        int LoopSideNum;
-        Real64 LoopMinTemp;
-
-        // set node information
 
         DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode).Temp = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
 
-        LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
-        LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
+        int LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
+        int LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
@@ -2760,8 +2723,8 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-        LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
-        TempDifference = DataPlant::PlantLoop(LoopNum).MinTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+        Real64 LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
+        Real64 TempDifference = DataPlant::PlantLoop(LoopNum).MinTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
         if (TempDifference > TempAllowance && SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate > 0.0) {
             ++SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTempErrorCount;
             ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
