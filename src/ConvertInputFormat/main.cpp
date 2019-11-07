@@ -50,16 +50,17 @@
 #include <omp.h>
 #endif
 
-#include <ezOptionParser.hpp>
-#include "EnergyPlus/FileSystem.hh"
 #include "EnergyPlus/DataStringGlobals.hh"
+#include "EnergyPlus/FileSystem.hh"
+#include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "EnergyPlus/InputProcessing/IdfParser.hh"
 #include "EnergyPlus/InputProcessing/InputValidation.hh"
-#include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
+#include <ezOptionParser.hpp>
 
 using json = nlohmann::json;
 
-enum class OutputTypes {
+enum class OutputTypes
+{
     Default,
     IDF,
     epJSON,
@@ -69,11 +70,12 @@ enum class OutputTypes {
     BSON
 };
 
-void displayMessage(std::string const & message) {
+void displayMessage(std::string const &message)
+{
     std::cout << message << EnergyPlus::DataStringGlobals::NL;
 }
 
-bool checkVersionMatch(json const & epJSON)
+bool checkVersionMatch(json const &epJSON)
 {
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
@@ -99,7 +101,7 @@ bool checkVersionMatch(json const & epJSON)
     return true;
 }
 
-bool processErrors(std::unique_ptr<IdfParser> const & idf_parser, std::unique_ptr<Validation> const & validation)
+bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr<Validation> const &validation)
 {
     auto const idf_parser_errors = idf_parser->errors();
     auto const idf_parser_warnings = idf_parser->warnings();
@@ -125,7 +127,7 @@ bool processErrors(std::unique_ptr<IdfParser> const & idf_parser, std::unique_pt
     return has_errors;
 }
 
-void cleanEPJSON(json & epjson)
+void cleanEPJSON(json &epjson)
 {
     if (epjson.type() == json::value_t::object) {
         epjson.erase("idf_order");
@@ -137,7 +139,7 @@ void cleanEPJSON(json & epjson)
     }
 }
 
-bool processInput(std::string const & inputFilePath, json const & schema, OutputTypes outputType, std::string outputDirectory)
+bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -294,7 +296,8 @@ bool processInput(std::string const & inputFilePath, json const & schema, Output
     return true;
 }
 
-std::vector<std::string> parse_input_paths(std::string const & input_paths_file) {
+std::vector<std::string> parse_input_paths(std::string const &input_paths_file)
+{
     std::ifstream input_paths_stream(input_paths_file);
     if (!input_paths_stream.is_open()) {
         displayMessage("Could not open file: " + input_paths_file);
@@ -309,69 +312,65 @@ std::vector<std::string> parse_input_paths(std::string const & input_paths_file)
     return input_paths;
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char *argv[])
+{
 
-	ez::ezOptionParser opt;
+    ez::ezOptionParser opt;
 
     opt.overview = "Run input file conversion tool";
     opt.syntax = "convertrinputformat [OPTIONS] input_file [input_file ..]";
     opt.example = "convertrinputformat in.idf\n\n";
 
-    opt.add(
-        "1", // Default.
-        false, // Required?
-        1, // Number of args expected.
-        0, // Delimiter if expecting multiple args.
-        "Number of threads", // Help description.
-        "-j"     // Flag token.
+    opt.add("1",                 // Default.
+            false,               // Required?
+            1,                   // Number of args expected.
+            0,                   // Delimiter if expecting multiple args.
+            "Number of threads", // Help description.
+            "-j"                 // Flag token.
     );
 
-    opt.add(
-        "", // Default.
-        false, // Required?
-        1, // Number of args expected.
-        0, // Delimiter if expecting multiple args.
-        "Text file with list of input files to convert (newline delimited)", // Help description.
-        "-i",     // Flag token.
-        "--input"  // Flag token.
+    opt.add("",                                                                  // Default.
+            false,                                                               // Required?
+            1,                                                                   // Number of args expected.
+            0,                                                                   // Delimiter if expecting multiple args.
+            "Text file with list of input files to convert (newline delimited)", // Help description.
+            "-i",                                                                // Flag token.
+            "--input"                                                            // Flag token.
     );
 
-    opt.add(
-        "", // Default.
-        false, // Required?
-        1, // Number of args expected.
-        0, // Delimiter if expecting multiple args.
-        "Output directory. Will use input file location by default.", // Help description.
-        "-o",     // Flag token.
-        "--output"  // Flag token.
+    opt.add("",                                                           // Default.
+            false,                                                        // Required?
+            1,                                                            // Number of args expected.
+            0,                                                            // Delimiter if expecting multiple args.
+            "Output directory. Will use input file location by default.", // Help description.
+            "-o",                                                         // Flag token.
+            "--output"                                                    // Flag token.
     );
 
-    const char* validOptions[] = {"default","idf","epjson","json","cbor","msgpack","ubjson","bson"};
-    auto * outputTypeValidation = new ez::ezOptionValidator(ez::ezOptionValidator::T, ez::ezOptionValidator::IN, validOptions, 8, true);
+    const char *validOptions[] = {"default", "idf", "epjson", "json", "cbor", "msgpack", "ubjson", "bson"};
+    auto *outputTypeValidation = new ez::ezOptionValidator(ez::ezOptionValidator::T, ez::ezOptionValidator::IN, validOptions, 8, true);
 
-    opt.add(
-        "default", // Default.
-        0, // Required?
-        1, // Number of args expected.
-        0, // Delimiter if expecting multiple args.
-        "Output format.\nDefault means IDF->epJSON or epJSON->IDF\nSelect one (case insensitive):\ndefault,idf,epjson,json,cbor,msgpack,ubjson,bson", // Help description.
-        "-f",     // Flag token.
-        "--format",     // Flag token.
-        outputTypeValidation
-  );
+    opt.add("default", // Default.
+            0,         // Required?
+            1,         // Number of args expected.
+            0,         // Delimiter if expecting multiple args.
+            "Output format.\nDefault means IDF->epJSON or epJSON->IDF\nSelect one (case "
+            "insensitive):\ndefault,idf,epjson,json,cbor,msgpack,ubjson,bson", // Help description.
+            "-f",                                                              // Flag token.
+            "--format",                                                        // Flag token.
+            outputTypeValidation);
 
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
-    opt.add(
-        "", // Default.
-        false, // Required?
-        0, // Number of args expected.
-        0, // Delimiter if expecting multiple args.
-        "Display usage instructions.", // Help description.
-        "-h",     // Flag token.
-        "-help",  // Flag token.
-        "--help", // Flag token.
-        "--usage" // Flag token.
+    opt.add("",                            // Default.
+            false,                         // Required?
+            0,                             // Number of args expected.
+            0,                             // Delimiter if expecting multiple args.
+            "Display usage instructions.", // Help description.
+            "-h",                          // Flag token.
+            "-help",                       // Flag token.
+            "--help",                      // Flag token.
+            "--usage"                      // Flag token.
     );
 
     opt.parse(argc, argv);
@@ -440,7 +439,7 @@ int main(int argc, const char *argv[]) {
     }
 
     if (!opt.lastArgs.empty()) {
-        for (auto const & lastArg : opt.lastArgs) {
+        for (auto const &lastArg : opt.lastArgs) {
             files.emplace_back(*lastArg);
         }
     } else if (opt.firstArgs.size() > 1) {
@@ -450,16 +449,16 @@ int main(int argc, const char *argv[]) {
     }
 
     std::vector<std::string> badOptions;
-    if(!opt.gotRequired(badOptions)) {
-        for (auto const & badOption : badOptions) {
+    if (!opt.gotRequired(badOptions)) {
+        for (auto const &badOption : badOptions) {
             std::cerr << "ERROR: Missing required option " << badOption << ".\n\n";
         }
         displayMessage(usage);
         return 1;
     }
 
-    if(!opt.gotExpected(badOptions)) {
-        for (auto const & badOption : badOptions) {
+    if (!opt.gotExpected(badOptions)) {
+        for (auto const &badOption : badOptions) {
             std::cerr << "ERROR: Got unexpected number of arguments for option " << badOption << ".\n\n";
         }
         displayMessage(usage);
@@ -467,8 +466,8 @@ int main(int argc, const char *argv[]) {
     }
 
     std::vector<std::string> badArgs;
-    if(!opt.gotValid(badOptions, badArgs)) {
-        for(std::size_t i = 0; i < badOptions.size(); ++i) {
+    if (!opt.gotValid(badOptions, badArgs)) {
+        for (std::size_t i = 0; i < badOptions.size(); ++i) {
             std::cerr << "ERROR: Got invalid argument \"" << badArgs[i] << "\" for option " << badOptions[i] << ".\n\n";
         }
         return 1;
@@ -479,34 +478,38 @@ int main(int argc, const char *argv[]) {
 
     auto number_files = files.size();
     std::size_t fileCount = 0;
+    auto newline = EnergyPlus::DataStringGlobals::NL;
 
 #ifdef _OPENMP
     omp_set_num_threads(number_of_threads);
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, std::cout, EnergyPlus::DataStringGlobals::NL)
-  {
+#pragma omp parallel default(none)                                                                                                                   \
+    shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, std::cout, newline)
+    {
 #pragma omp for
-    for (std::size_t i = 0; i < number_files; ++i) {
-        bool successful = processInput(files[i], schema, outputType, output_directory);
+        for (std::size_t i = 0; i < number_files; ++i) {
+            bool successful = processInput(files[i], schema, outputType, output_directory);
 #pragma omp atomic
-        ++fileCount;
-        if (successful) {
-            std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | " << files[i] << EnergyPlus::DataStringGlobals::NL;
-        } else {
-            std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << files[i] << EnergyPlus::DataStringGlobals::NL;
+            ++fileCount;
+            if (successful) {
+                std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | "
+                          << files[i] << newline;
+            } else {
+                std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << files[i] << newline;
+            }
         }
     }
-  }
 #else
-    for (auto const & file : files) {
+    for (auto const &file : files) {
         bool successful = processInput(file, schema, outputType, output_directory);
         ++fileCount;
         if (successful) {
-            std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | " << file << EnergyPlus::DataStringGlobals::NL;
+            std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | " << file
+                      << newline;
         } else {
-            std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << file << EnergyPlus::DataStringGlobals::NL;
+            std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << file << newline;
         }
     }
 #endif
