@@ -10609,7 +10609,6 @@ namespace SurfaceGeometry {
         //       MODIFIED        FW, Mar 2002: Add triangular windows
         //                       FW, May 2002: modify test for 4-sided but non-rectangular subsurfaces
         //                       FW, Sep 2002: add shape for base surfaces (walls and detached shading surfaces)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine processes each surface into the vertex representation used
@@ -10627,26 +10626,11 @@ namespace SurfaceGeometry {
         // Detached Shading, Base Surfaces, Attached Shading surfaces are represented in the
         // same manner as original.  Subsurfaces (windows, doors) are a "relative coordinate".
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::TrimSigDigits;
         using namespace Vectors;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ProcessSurfaceVertices: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace
         // static bool OneTimeFlag( true ); // now ProcessSurfaceVerticesOneTimeFlag
         // static Array1D< Real64 > X; // now Xpsv (to avoid conflicts with CheckConvexity)
@@ -10654,12 +10638,6 @@ namespace SurfaceGeometry {
         // static Array1D< Real64 > Z; // now Zpsv
         ////////////////////////////////////////////////
 
-        // LOCAL VARIABLES
-        //  REAL(r64) :: X00    ! Intermediate Result
-        //  REAL(r64) :: Y00    ! Intermediate Result
-        //  REAL(r64) :: Z00    ! Intermediate Result
-        //  REAL(r64) :: A(3,3) ! Surface Rotation Matrix
-        //  REAL(r64), SAVE :: B(3,3) ! Inverse Of Rotation Matrix
         Real64 X1;            // Intermediate Result
         Real64 Y1;            // Intermediate Result
         Real64 Z1;            // Intermediate Result
@@ -10675,20 +10653,8 @@ namespace SurfaceGeometry {
         Real64 Xp;
         Real64 Yp;
         Real64 Zp;
-        static Real64 BaseCosAzimuth;
-        static Real64 BaseCosTilt;
-        static Real64 BaseSinAzimuth;
-        static Real64 BaseSinTilt;
-        static Real64 BaseXLLC;
-        static Real64 BaseYLLC;
-        static Real64 BaseZLLC;
         Real64 SurfWorldAz; // Surface Azimuth (facing)
         Real64 SurfTilt;    // Surface Tilt
-        //  TYPE(PlaneEq) PlanarEQ
-        //  TYPE(Vector), dimension(3) :: TriVect
-        //  REAL(r64) testval
-        //  INTEGER ploop
-        //  INTEGER vloop
         SurfaceShape ThisShape(SurfaceShape::None);
         bool BaseSurface; // True if a base surface or a detached shading surface
         Real64 ThisSurfAz;
@@ -10761,18 +10727,11 @@ namespace SurfaceGeometry {
         if (BaseSurface) {
             SurfWorldAz = Surface(ThisSurf).Azimuth;
             SurfTilt = Surface(ThisSurf).Tilt;
-            BaseCosAzimuth = std::cos(SurfWorldAz * DegToRadians);
-            BaseSinAzimuth = std::sin(SurfWorldAz * DegToRadians);
-            BaseCosTilt = std::cos(SurfTilt * DegToRadians);
-            BaseSinTilt = std::sin(SurfTilt * DegToRadians);
             for (n = 1; n <= Surface(ThisSurf).Sides; ++n) {
                 Xpsv(n) = Surface(ThisSurf).Vertex(n).x;
                 Ypsv(n) = Surface(ThisSurf).Vertex(n).y;
                 Zpsv(n) = Surface(ThisSurf).Vertex(n).z;
             }
-            BaseXLLC = Surface(ThisSurf).Vertex(2).x;
-            BaseYLLC = Surface(ThisSurf).Vertex(2).y;
-            BaseZLLC = Surface(ThisSurf).Vertex(2).z;
             TVect = Surface(ThisSurf).Vertex(3) - Surface(ThisSurf).Vertex(2);
             ThisWidth = VecLength(TVect);
             TVect = Surface(ThisSurf).Vertex(2) - Surface(ThisSurf).Vertex(1);
@@ -10802,6 +10761,17 @@ namespace SurfaceGeometry {
 
             ThisSurfAz = Surface(ThisSurf).Azimuth;
             ThisSurfTilt = Surface(ThisSurf).Tilt;
+
+            // Retrieve base surface info
+            Real64 const baseSurfWorldAz = Surface(ThisBaseSurface).Azimuth;
+            Real64 const baseSurfTilt = Surface(ThisBaseSurface).Tilt;
+            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * DegToRadians);
+            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * DegToRadians);
+            Real64 const BaseCosTilt = std::cos(baseSurfTilt * DegToRadians);
+            Real64 const BaseSinTilt = std::sin(baseSurfTilt * DegToRadians);
+            Real64 const BaseXLLC = Surface(ThisBaseSurface).Vertex(2).x;
+            Real64 const BaseYLLC = Surface(ThisBaseSurface).Vertex(2).y;
+            Real64 const BaseZLLC = Surface(ThisBaseSurface).Vertex(2).z;
 
             if (HeatTransSurf) {
 
