@@ -129,12 +129,36 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
@@ -176,12 +200,36 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     Real64 extLitPow;
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
-                        "Exterior Lights", "General");
-    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
-                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
     SetupOutputVariable("Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
@@ -202,6 +250,16 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 
     std::vector<AnnualTable>::iterator firstTable = OutputReportTabularAnnual::annualTables.begin();
     std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets(0);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown)
+{
+    std::vector<AnnualTable> annualTables;
+    std::vector<AnnualTable>::iterator annualTableIt;
+    annualTables.push_back(AnnualTable("PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
+    annualTables.back().addFieldSet("HEATING:MYTH:VARIABLE", AnnualFieldSet::AggregationKind::hoursPositive, 2);
+    annualTables.back().addFieldSet("ELECTRICITY:MYTH", AnnualFieldSet::AggregationKind::maximumDuringHoursShown, 2);
+    annualTables.back().gatherForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
@@ -236,7 +294,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable("Misc Facility Electric Energy", OutputProcessor::Unit::J, facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility",
+    SetupOutputVariable("Misc Facility Electric Energy",
+                        OutputProcessor::Unit::J,
+                        facilUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Facility",
                         "General"); // create an electric meter
 
     OutputProcessor::NumEnergyMeters = 2;
@@ -286,7 +352,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Real64 facilUse;
-    SetupOutputVariable("Misc Facility Electric Energy", OutputProcessor::Unit::J, facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility",
+    SetupOutputVariable("Misc Facility Electric Energy",
+                        OutputProcessor::Unit::J,
+                        facilUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Facility",
                         "General"); // create an electric meter
 
     OutputProcessor::NumEnergyMeters = 2;
