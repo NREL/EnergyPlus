@@ -198,7 +198,7 @@ namespace EvaporativeFluidCoolers {
         Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
         Real64 Qactual;          // Evaporative fluid cooler heat transfer
         Real64 FanPower;         // Evaporative fluid cooler fan power used
-//        Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
+        Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
         Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
@@ -295,8 +295,6 @@ namespace EvaporativeFluidCoolers {
     );
 
     void GetEvapFluidCoolerInput();
-
-    void InitSimVars();
 
     void InitEvapFluidCooler(int EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
                              bool RunFlag            // Indication of

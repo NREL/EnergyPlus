@@ -106,9 +106,6 @@ namespace EvaporativeFluidCoolers {
     bool GetEvapFluidCoolerInputFlag(true);
     int NumSimpleEvapFluidCoolers(0); // Number of similar evaporative fluid coolers
 
-    // Moving to member variable causes diffs... no idea at this point
-    Real64 AirFlowRateRatio(0.0); // Ratio of air flow rate through VS evaporative fluid cooler
-
     Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
     Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
@@ -175,7 +172,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        InitSimVars();
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS Evaporative fluid cooler to design air flow rate
 
         {
             auto const SELECT_CASE_var(SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapFluidCoolerType_Num);
@@ -1138,21 +1135,6 @@ namespace EvaporativeFluidCoolers {
                                 "Sum",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
         } // loop all evaporative fluid coolers
-    }
-
-    void InitSimVars()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Chandan Sharma
-        //       DATE WRITTEN:    May 2009
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Initialize the simulation variables.
-
-        AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS Evaporative fluid cooler to design air flow rate
     }
 
     void InitEvapFluidCooler(int const EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
@@ -2253,7 +2235,7 @@ namespace EvaporativeFluidCoolers {
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
         SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
-        AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
     }
 
     void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum)
@@ -2375,7 +2357,7 @@ namespace EvaporativeFluidCoolers {
                                         DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
         SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp);
-        AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate;
     }
 
     void SimSimpleEvapFluidCooler(
@@ -2550,7 +2532,7 @@ namespace EvaporativeFluidCoolers {
             Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress,
                                            SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirTemp,
                                            SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirHumRat);
-            Real64 AirMassFlowRate = AirFlowRateRatio * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate * AirDensity;
+            Real64 AirMassFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio * SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedAirFlowRate * AirDensity;
             Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(
                 SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet(EvapFluidCoolerNum).AirPress);
 
@@ -2593,7 +2575,7 @@ namespace EvaporativeFluidCoolers {
 
         //   amount of water lost due to drift
         Real64 DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
-                AirFlowRateRatio;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::BySchedule) {
             // Amount of water lost due to blow down (purging contaminants from evaporative fluid cooler basin)
@@ -2783,7 +2765,7 @@ namespace EvaporativeFluidCoolers {
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower * ReportingConstant;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).AirFlowRatio = AirFlowRateRatio;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).AirFlowRatio = SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterUsage * ReportingConstant;
             // added for fluid bypass
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction;
