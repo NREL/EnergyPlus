@@ -64,41 +64,41 @@ namespace EvaporativeFluidCoolers {
 
     extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
 
-    struct EvapLoss
-    {
-        enum
-        {
-            ByUserFactor,
-            ByMoistTheory
-        };
+    enum struct EvapLoss {
+        ByUserFactor,
+        ByMoistTheory
     };
 
-    struct Blowdown
+    enum struct Blowdown
     {
-        enum
-        {
-            ByConcentration,
-            BySchedule
-        };
+        ByConcentration,
+        BySchedule
     };
 
-    struct PIM
+    enum struct PIM
     {
-        enum
-        {
-            StandardDesignCapacity,
-            UFactor,
-            UserSpecifiedDesignCapacity
-        };
+        StandardDesignCapacity,
+        UFactor,
+        UserSpecifiedDesignCapacity
     };
 
-    struct EvapFluidCooler
+    enum struct EvapFluidCooler
     {
-        enum
+        SingleSpeed,
+        TwoSpeed
+    };
+
+    struct EvapFluidCoolerInletConds
+    {
+        Real64 WaterTemp;  // Evaporative fluid cooler water inlet temperature (C)
+        Real64 AirTemp;    // Evaporative fluid cooler air inlet dry-bulb temperature (C)
+        Real64 AirWetBulb; // Evaporative fluid cooler air inlet wet-bulb temperature (C)
+        Real64 AirPress;   // Evaporative fluid cooler air barometric pressure
+        Real64 AirHumRat;  // Evaporative fluid cooler air inlet humidity ratio (kg/kg)
+
+        EvapFluidCoolerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
         {
-            SingleSpeed,
-            TwoSpeed
-        };
+        }
     };
 
     struct EvapFluidCoolerspecs
@@ -106,8 +106,8 @@ namespace EvaporativeFluidCoolers {
         // Members
         std::string Name;                // User identifier
         std::string EvapFluidCoolerType; // Type of evaporative fluid cooler
-        int EvapFluidCoolerType_Num;
-        int PerformanceInputMethod_Num;
+        EvapFluidCooler EvapFluidCoolerType_Num;
+        PIM PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
         Real64 DesignWaterFlowRate;                   // Design water flow rate through the evaporative fluid cooler [m3/s]
@@ -176,8 +176,8 @@ namespace EvaporativeFluidCoolers {
         Real64 BypassFraction; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
         // begin water system interactions
-        int EvapLossMode;          // sets how evaporative fluid cooler water evaporation is modeled
-        int BlowdownMode;          // sets how evaporative fluid cooler water blowdown is modeled
+        EvapLoss EvapLossMode;          // sets how evaporative fluid cooler water evaporation is modeled
+        Blowdown BlowdownMode;          // sets how evaporative fluid cooler water blowdown is modeled
         int SchedIDBlowdown;       // index "pointer" to schedule of blowdown in [m3/s]
         int WaterTankID;           // index "pointer" to WaterStorage structure
         int WaterTankDemandARRID;  // index "pointer" to demand array inside WaterStorage structure
@@ -220,10 +220,11 @@ namespace EvaporativeFluidCoolers {
         Real64 TankSupplyVol;
         Real64 StarvedMakeUpVdot;
         Real64 StarvedMakeUpVol;
+        EvapFluidCoolerInletConds inletConds;
 
         // Default Constructor
         EvapFluidCoolerspecs()
-            : EvapFluidCoolerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
+            : EvapFluidCoolerType_Num(EvapFluidCooler::SingleSpeed), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
               HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
@@ -248,43 +249,8 @@ namespace EvaporativeFluidCoolers {
         }
     };
 
-    struct EvapFluidCoolerInletConds
-    {
-        Real64 WaterTemp;  // Evaporative fluid cooler water inlet temperature (C)
-        Real64 AirTemp;    // Evaporative fluid cooler air inlet dry-bulb temperature (C)
-        Real64 AirWetBulb; // Evaporative fluid cooler air inlet wet-bulb temperature (C)
-        Real64 AirPress;   // Evaporative fluid cooler air barometric pressure
-        Real64 AirHumRat;  // Evaporative fluid cooler air inlet humidity ratio (kg/kg)
-
-        EvapFluidCoolerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
-        {
-        }
-    };
-
-//    struct ReportVars
-//    {
-//        // Members
-////        Real64 DriftVol;
-////        Real64 BlowdownVdot;
-////        Real64 BlowdownVol;
-////        Real64 MakeUpVdot;
-////        Real64 MakeUpVol;
-////        Real64 TankSupplyVdot;
-////        Real64 TankSupplyVol;
-////        Real64 StarvedMakeUpVdot;
-////        Real64 StarvedMakeUpVol;
-////        Real64 BypassFraction; // Added for fluid bypass
-//
-//        ReportVars()
-//            :
-//              StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0), BypassFraction(0.0)
-//        {
-//        }
-//    };
-
     // Object Data
     extern Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler;           // dimension to number of machines
-    extern Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
 
     void SimEvapFluidCoolers(std::string const &EvapFluidCoolerType,
                              std::string const &EvapFluidCoolerName,
