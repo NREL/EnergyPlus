@@ -204,6 +204,13 @@ namespace EvaporativeFluidCoolers {
         bool MyEnvrnFlag;
         bool OneTimeFlagForEachEvapFluidCooler;
         bool CheckEquipName;
+        Real64 fluidCoolerInletWaterTemp;    // Evaporative fluid cooler inlet water temperature (C)
+        Real64 fluidCoolerOutletWaterTemp;   // Evaporative fluid cooler outlet water temperature (C)
+        Real64 FanEnergy;         // Evaporative fluid cooler fan energy consumption (J)
+        Real64 WaterAmountUsed;   // Evaporative fluid cooler make up water usage (m3)
+        Real64 EvaporationVdot;
+        Real64 EvaporationVol;
+        Real64 DriftVdot;
 
         // Default Constructor
         EvapFluidCoolerspecs()
@@ -224,8 +231,9 @@ namespace EvaporativeFluidCoolers {
               BypassFraction(0.0), EvapLossMode(EvapLoss::ByMoistTheory), BlowdownMode(Blowdown::ByConcentration), SchedIDBlowdown(0), WaterTankID(0),
               WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
               LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
-              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
-              OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true)
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), AirFlowRateRatio(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
+              OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true), fluidCoolerInletWaterTemp(0.0), fluidCoolerOutletWaterTemp(0.0),
+              FanEnergy(0.0), WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0)
         {
         }
     };
@@ -246,17 +254,6 @@ namespace EvaporativeFluidCoolers {
     struct ReportVars
     {
         // Members
-        Real64 InletWaterTemp;    // Evaporative fluid cooler inlet water temperature (C)
-        Real64 OutletWaterTemp;   // Evaporative fluid cooler outlet water temperature (C)
-        Real64 WaterMassFlowRate; // Evaporative fluid cooler water mass flow rate (m3/s)
-        Real64 Qactual;           // Evaporative fluid cooler heat rejection rate (W)
-        Real64 FanPower;          // Evaporative fluid cooler fan power (W)
-        Real64 FanEnergy;         // Evaporative fluid cooler fan energy consumption (J)
-        Real64 AirFlowRatio;      // Air flow ratio through variable speed evaporative fluid cooler
-        Real64 WaterAmountUsed;   // Evaporative fluid cooler make up water usage (m3)
-        Real64 EvaporationVdot;
-        Real64 EvaporationVol;
-        Real64 DriftVdot;
         Real64 DriftVol;
         Real64 BlowdownVdot;
         Real64 BlowdownVol;
@@ -269,8 +266,8 @@ namespace EvaporativeFluidCoolers {
         Real64 BypassFraction; // Added for fluid bypass
 
         ReportVars()
-            : InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
-              WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0),
+            :
+              DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0),
               MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0),
               BypassFraction(0.0)
         {
@@ -280,7 +277,7 @@ namespace EvaporativeFluidCoolers {
     // Object Data
     extern Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler;           // dimension to number of machines
     extern Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
-    extern Array1D<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
+    extern Array1D<ReportVars> SimpleEvapFluidCoolerSimpleEvapFluidCoolerReport;               // report variables
 
     void SimEvapFluidCoolers(std::string const &EvapFluidCoolerType,
                              std::string const &EvapFluidCoolerName,

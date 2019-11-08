@@ -911,37 +911,37 @@ namespace EvaporativeFluidCoolers {
         for (int EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
             SetupOutputVariable("Cooling Tower Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Fan Electric Power",
                                 OutputProcessor::Unit::W,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy,
                                 "System",
                                 "Sum",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -965,37 +965,37 @@ namespace EvaporativeFluidCoolers {
              ++EvapFluidCoolerNum) {
             SetupOutputVariable("Cooling Tower Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Fan Electric Power",
                                 OutputProcessor::Unit::W,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy,
                                 "System",
                                 "Sum",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
@@ -1100,19 +1100,19 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).EvaporationVdot,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Water Evaporation Volume",
                                 OutputProcessor::Unit::m3,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).EvaporationVol,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVol,
                                 "System",
                                 "Sum",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
             SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).DriftVdot,
+                                SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot,
                                 "System",
                                 "Average",
                                 SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
@@ -2111,7 +2111,7 @@ namespace EvaporativeFluidCoolers {
         Real64 AirFlowRate;
         Real64 UAdesign; // UA value at design conditions (entered by user or calculated)
         Real64 CpWater;
-        Real64 TempSetPoint;
+        Real64 TempSetPoint = 0.0;
 
         // set inlet and outlet nodes
         SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
@@ -2303,7 +2303,7 @@ namespace EvaporativeFluidCoolers {
         Real64 AirFlowRate = 0.0;
         int LoopNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum;
         int LoopSideNum = SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopSideNum;
-        Real64 TempSetPoint;
+        Real64 TempSetPoint = 0.0;
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -2522,7 +2522,7 @@ namespace EvaporativeFluidCoolers {
         std::string const RoutineName("CalculateWaterUseage");
 
         Real64 BlowDownVdot(0.0);
-        Real64 EvapVdot(0.0);
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = 0.0;
 
         Real64 AverageWaterTemp = (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp + SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) / 2.0;
 
@@ -2556,10 +2556,10 @@ namespace EvaporativeFluidCoolers {
                                        TairAvg,
                                        DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                        RoutineName);
-                EvapVdot = (AirMassFlowRate * (OutSpecificHumRat - InSpecificHumRat)) / rho; // [m3/s]
-                if (EvapVdot < 0.0) EvapVdot = 0.0;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = (AirMassFlowRate * (OutSpecificHumRat - InSpecificHumRat)) / rho; // [m3/s]
+                if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot < 0.0) SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = 0.0;
             } else {
-                EvapVdot = 0.0;
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = 0.0;
             }
 
         } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLoss::ByUserFactor) {
@@ -2567,14 +2567,14 @@ namespace EvaporativeFluidCoolers {
                                    AverageWaterTemp,
                                    DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
                                    RoutineName);
-            EvapVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).UserEvapLossFactor * (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) * (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate / rho);
-            if (EvapVdot < 0.0) EvapVdot = 0.0;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).UserEvapLossFactor * (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp) * (SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate / rho);
+            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot < 0.0) SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot = 0.0;
         } else {
             // should never come here
         }
 
         //   amount of water lost due to drift
-        Real64 DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).DesignSprayWaterFlowRate * SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftLossFraction *
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio;
 
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::BySchedule) {
@@ -2586,9 +2586,9 @@ namespace EvaporativeFluidCoolers {
             }
         } else if (SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownMode == Blowdown::ByConcentration) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio > 2.0) { // protect divide by zero
-                BlowDownVdot = EvapVdot / (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio - 1) - DriftVdot;
+                BlowDownVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot / (SimpleEvapFluidCooler(EvapFluidCoolerNum).ConcentrationRatio - 1) - SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot;
             } else {
-                BlowDownVdot = EvapVdot - DriftVdot;
+                BlowDownVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot - SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot;
             }
             if (BlowDownVdot < 0.0) BlowDownVdot = 0.0;
         } else {
@@ -2598,12 +2598,12 @@ namespace EvaporativeFluidCoolers {
         // Added for fluid bypass
         if (SimpleEvapFluidCooler(EvapFluidCoolerNum).CapacityControl == 1) {
             if (SimpleEvapFluidCooler(EvapFluidCoolerNum).EvapLossMode == EvapLoss::ByUserFactor)
-                EvapVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
-            DriftVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
             BlowDownVdot *= (1 - SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction);
         }
 
-        Real64 MakeUpVdot = EvapVdot + DriftVdot + BlowDownVdot;
+        Real64 MakeUpVdot = SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot + SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot + BlowDownVdot;
 
         // set demand request in Water Storage if needed
         Real64 StarvedVdot = 0.0;
@@ -2628,10 +2628,8 @@ namespace EvaporativeFluidCoolers {
 
         //   total water usage
         // update report variables
-        SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).EvaporationVdot = EvapVdot;
-        SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).DriftVdot = DriftVdot;
-        SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).DriftVol = DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVol = SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).DriftVol = SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
         SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BlowdownVdot = BlowDownVdot;
         SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
         SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).MakeUpVdot = MakeUpVdot;
@@ -2749,25 +2747,21 @@ namespace EvaporativeFluidCoolers {
         ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (!RunFlag) {
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = 0.0;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = 0.0;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = 0.0;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).AirFlowRatio = 0.0;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = 0.0;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = 0.0; // added for fluid bypass
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = 0.0;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = 0.0;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy = 0.0;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio = 0.0;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterAmountUsed = 0.0;
+            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = 0.0;
         } else {
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).InletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).OutletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterMassFlowRate = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanPower = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).FanEnergy = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower * ReportingConstant;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).AirFlowRatio = SimpleEvapFluidCooler(EvapFluidCoolerNum).AirFlowRateRatio;
-            SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).WaterAmountUsed = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterUsage * ReportingConstant;
-            // added for fluid bypass
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp = DataLoopNode::Node(SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode).Temp;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).OutletWaterTemp;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual = SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy = SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower * ReportingConstant;
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterAmountUsed = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterUsage * ReportingConstant;
             SimpleEvapFluidCoolerReport(EvapFluidCoolerNum).BypassFraction = SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction;
         }
     }
