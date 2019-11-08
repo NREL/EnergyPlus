@@ -101,7 +101,7 @@ namespace EvaporativeFluidCoolers {
         }
     };
 
-    struct EvapFluidCoolerspecs
+    struct EvapFluidCoolerSpecs
     {
         // Members
         std::string Name;                // User identifier
@@ -223,7 +223,7 @@ namespace EvaporativeFluidCoolers {
         EvapFluidCoolerInletConds inletConds;
 
         // Default Constructor
-        EvapFluidCoolerspecs()
+        EvapFluidCoolerSpecs()
             : EvapFluidCoolerType_Num(EvapFluidCooler::SingleSpeed), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
@@ -247,10 +247,24 @@ namespace EvaporativeFluidCoolers {
               BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
         {
         }
+
+        void InitEvapFluidCooler();
+
+        void SizeEvapFluidCooler(int EvapFluidCoolerNum);
+
+        void CalculateWaterUseage();
+
+        void UpdateEvapFluidCooler();
+
+        void ReportEvapFluidCooler(bool RunFlag);
+
+        void CalcSingleSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
+
+        void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler;           // dimension to number of machines
+    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler;           // dimension to number of machines
 
     void SimEvapFluidCoolers(std::string const &EvapFluidCoolerType,
                              std::string const &EvapFluidCoolerName,
@@ -266,28 +280,11 @@ namespace EvaporativeFluidCoolers {
 
     void GetEvapFluidCoolerInput();
 
-    void InitEvapFluidCooler(int EvapFluidCoolerNum, // Number of the current evaporative fluid cooler being simulated
-                             bool RunFlag            // Indication of
-    );
-
-    void SizeEvapFluidCooler(int EvapFluidCoolerNum);
-
-    void CalcSingleSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
-
-    void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
-
-    void SimSimpleEvapFluidCooler(
-            int EvapFluidCoolerNum, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+    void SimSimpleEvapFluidCooler(int EvapFluidCoolerNum, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
     Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA,          // UA of evaporative fluid cooler
                                            Array1<Real64> const &Par // par(1) = design evaporative fluid cooler load [W]
     );
-
-    void CalculateWaterUseage(int EvapFluidCoolerNum);
-
-    void UpdateEvapFluidCooler(int EvapFluidCoolerNum);
-
-    void ReportEvapFluidCooler(bool RunFlag, int EvapFluidCoolerNum);
 
     void clear_state();
 
