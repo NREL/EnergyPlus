@@ -70,9 +70,17 @@ enum class OutputTypes
     BSON
 };
 
-void displayMessage(std::string const &message)
+template <typename T>
+void displayMessage(T t)
 {
-    std::cout << message << EnergyPlus::DataStringGlobals::NL;
+    std::cout << t << EnergyPlus::DataStringGlobals::NL;
+}
+
+template<typename T, typename... Args>
+void displayMessage(T t, Args... args) // recursive variadic function
+{
+    std::cout << t;
+    displayMessage(args...);
 }
 
 bool checkVersionMatch(json const &epJSON)
@@ -318,8 +326,8 @@ int main(int argc, const char *argv[])
     ez::ezOptionParser opt;
 
     opt.overview = "Run input file conversion tool";
-    opt.syntax = "convertrinputformat [OPTIONS] input_file [input_file ..]";
-    opt.example = "convertrinputformat in.idf\n\n";
+    opt.syntax = "ConvertInputFormat [OPTIONS] input_file [input_file ..]";
+    opt.example = "ConvertInputFormat in.idf\n\n";
 
     opt.add("1",                 // Default.
             false,               // Required?
@@ -392,6 +400,9 @@ int main(int argc, const char *argv[])
     int number_of_threads = 1;
     if (opt.isSet("-j")) {
         opt.get("-j")->getInt(number_of_threads);
+#ifndef _OPENMP
+        displayMessage("ConvertInputFormat is not compiled with OpenMP. Only running on 1 thread, not requested ", number_of_threads, " threads.");
+#endif
     }
 
     std::string output_directory;
@@ -478,7 +489,6 @@ int main(int argc, const char *argv[])
 
     auto number_files = files.size();
     std::size_t fileCount = 0;
-    auto newline = EnergyPlus::DataStringGlobals::NL;
 
 #ifdef _OPENMP
     omp_set_num_threads(number_of_threads);
@@ -486,7 +496,7 @@ int main(int argc, const char *argv[])
 
 #ifdef _OPENMP
 #pragma omp parallel default(none)                                                                                                                   \
-    shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, std::cout, newline)
+    shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
     {
 #pragma omp for
         for (std::size_t i = 0; i < number_files; ++i) {
@@ -494,10 +504,9 @@ int main(int argc, const char *argv[])
 #pragma omp atomic
             ++fileCount;
             if (successful) {
-                std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | "
-                          << files[i] << newline;
+                displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", files[i]);
             } else {
-                std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << files[i] << newline;
+                displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", files[i]);
             }
         }
     }
@@ -506,10 +515,9 @@ int main(int argc, const char *argv[])
         bool successful = processInput(file, schema, outputType, output_directory);
         ++fileCount;
         if (successful) {
-            std::cout << "Input file converted to " << outputTypeStr << " successfully | " << fileCount << "/" << number_files << " | " << file
-                      << newline;
+            displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
         } else {
-            std::cout << "Input file conversion failed: | " << fileCount << "/" << number_files << " | " << file << newline;
+            displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", file);
         }
     }
 #endif

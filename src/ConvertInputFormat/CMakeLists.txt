@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(convertinputformat)
+project(ConvertInputFormat)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -24,21 +24,21 @@ if (UNIX)
 endif()
 
 if (APPLE OR UNIX)
-  add_executable( convertinputformat main.cpp )
+  add_executable( ConvertInputFormat main.cpp )
 else()  # windows
-  add_executable( convertinputformat main.cpp ) #  "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
+  add_executable( ConvertInputFormat main.cpp ) #  "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
 endif()
 
-target_link_libraries( convertinputformat energyplusparser )
+target_link_libraries( ConvertInputFormat energyplusparser )
 
 if(UNIX AND NOT APPLE)
-  target_link_libraries( convertinputformat dl )
+  target_link_libraries( ConvertInputFormat dl )
 endif()
 
 if (WIN32)
-  target_link_libraries( convertinputformat Shlwapi )
+  target_link_libraries( ConvertInputFormat Shlwapi )
 endif()
 
-set_target_properties(convertinputformat PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(ConvertInputFormat PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
-install( TARGETS convertinputformat DESTINATION ./ )
+install( TARGETS ConvertInputFormat DESTINATION ./ )
