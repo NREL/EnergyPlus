@@ -61,16 +61,16 @@ namespace SwimmingPool {
 
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables
-    extern int NumSwimmingPools;                 // Number of swimming pools
-    extern Array1D<int> SurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
-    extern Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular pool
-    extern Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QPoolSrcAvg locally
-    extern Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern int modNumSwimmingPools;                 // Number of swimming pools
+    extern Array1D<int> modSurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
+    extern Array1D<Real64> modQPoolSrcAvg;          // Average source over the time step for a particular pool
+    extern Array1D<Real64> modHeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
+    extern Array1D<Real64> modZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate modQPoolSrcAvg locally
+    extern Array1D<Real64> modLastQPoolSrc;       // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> modLastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> modLastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> modLastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     struct SwimmingPoolData
     {
