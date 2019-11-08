@@ -298,7 +298,7 @@ void InputProcessor::processInput()
             //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
             //			}
 
-            if (DataGlobals::outputEpJSONConversion) {
+            if (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
@@ -332,7 +332,7 @@ void InputProcessor::processInput()
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
-    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
+    if (DataGlobals::isEpJSON && (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");

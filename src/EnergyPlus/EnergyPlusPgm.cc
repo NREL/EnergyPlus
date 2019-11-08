@@ -456,7 +456,7 @@ int RunEnergyPlus(std::string const & filepath)
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
 
-        if (DataGlobals::outputEpJSONConversion) {
+        if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
             return EndEnergyPlus();
         }
