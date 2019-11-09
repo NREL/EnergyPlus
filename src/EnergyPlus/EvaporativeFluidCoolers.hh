@@ -252,15 +252,21 @@ namespace EvaporativeFluidCoolers {
 
         void SizeEvapFluidCooler(int EvapFluidCoolerNum);
 
-        void CalculateWaterUseage();
+        void CalculateWaterUsage();
 
         void UpdateEvapFluidCooler();
 
         void ReportEvapFluidCooler(bool RunFlag);
 
-        void CalcSingleSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
+        void CalcSingleSpeedEvapFluidCooler();
 
-        void CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum);
+        void CalcTwoSpeedEvapFluidCooler();
+
+        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1<Real64> const &Par);
+
+        void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+
+        void setupOutputVars();
     };
 
     // Object Data
@@ -279,12 +285,6 @@ namespace EvaporativeFluidCoolers {
     );
 
     void GetEvapFluidCoolerInput();
-
-    void SimSimpleEvapFluidCooler(int EvapFluidCoolerNum, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
-
-    Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA,          // UA of evaporative fluid cooler
-                                           Array1<Real64> const &Par // par(1) = design evaporative fluid cooler load [W]
-    );
 
     void clear_state();
 

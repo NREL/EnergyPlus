@@ -85,9 +85,6 @@ namespace EnergyPlus {
 
 namespace EvaporativeFluidCoolers {
 
-    // Module containing the routines dealing with the objects EvaporativeFluidCooler:SingleSpeed and
-    // EvaporativeFluidCooler:TwoSpeed
-
     // MODULE INFORMATION:
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   May 2009
@@ -190,8 +187,8 @@ namespace EvaporativeFluidCoolers {
                     return;
                 }
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).InitEvapFluidCooler();
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalcSingleSpeedEvapFluidCooler(EvapFluidCoolerNum);
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalculateWaterUseage();
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalcSingleSpeedEvapFluidCooler();
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalculateWaterUsage();
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).UpdateEvapFluidCooler();
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).ReportEvapFluidCooler(RunFlag);
 
@@ -209,8 +206,8 @@ namespace EvaporativeFluidCoolers {
                     return;
                 }
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).InitEvapFluidCooler();
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalcTwoSpeedEvapFluidCooler(EvapFluidCoolerNum);
-                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalculateWaterUseage();
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalcTwoSpeedEvapFluidCooler();
+                SimpleEvapFluidCooler(EvapFluidCoolerNum).CalculateWaterUsage();
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).UpdateEvapFluidCooler();
                 SimpleEvapFluidCooler(EvapFluidCoolerNum).ReportEvapFluidCooler(RunFlag);
 
@@ -243,7 +240,7 @@ namespace EvaporativeFluidCoolers {
         int NumAlphas;                        // Number of elements in the alpha array
         int NumNums;                          // Number of elements in the numeric array
         int IOStat;                           // IO Status when calling get input subroutine
-        bool ErrorsFound(false);       // Logical flag set .TRUE. if errors found while getting input data
+        bool ErrorsFound(false);              // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(25);         // Numeric input data array
         Array1D_string AlphArray(13);         // Character string input data array
         std::string FluidName;
@@ -1525,6 +1522,8 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
+        auto boundUAResidualFunc = std::bind(&EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual, this, std::placeholders::_1, std::placeholders::_2);
+
         if (this->HighSpeedEvapFluidCoolerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize &&
             this->PerformanceInputMethod_Num == PIM::UFactor) {
             if (PltSizCondNum > 0) {
@@ -1571,15 +1570,15 @@ namespace EvaporativeFluidCoolers {
                         Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp,
                                        this->inletConds.AirWetBulb,
                                        this->inletConds.AirPress);
-                    General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par);
+                    General::SolveRoot(Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                         ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " +
                                           this->Name);
                         ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                     } else if (SolFla == -2) {
-                        SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                        SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                        SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                        SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
                         ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                         ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                         ShowContinueError("sizes for some \"autosizable\" fields while autosizing other \"autosizable\" fields may be contributing "
@@ -1689,7 +1688,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp,
                                                                                           this->inletConds.AirWetBulb,
                                                                                           this->inletConds.AirPress);
-                General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par);
+                General::SolveRoot(Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " +
@@ -1762,15 +1761,15 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp,
                                                                                           this->inletConds.AirWetBulb,
                                                                                           this->inletConds.AirPress);
-                General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par);
+                General::SolveRoot(Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " +
                                       this->Name);
                     ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -1925,7 +1924,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp,
                                                                                           this->inletConds.AirWetBulb,
                                                                                           this->inletConds.AirPress);
-                General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par);
+                General::SolveRoot(Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError("Autosizing of fluid cooler UA failed for evaporative fluid cooler = " +
@@ -1984,14 +1983,14 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->inletConds.AirTemp,
                                                                                           this->inletConds.AirWetBulb,
                                                                                           this->inletConds.AirPress);
-                General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par);
+                General::SolveRoot(Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError("Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
                     ShowFatalError("Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " +
                                    this->Name);
                 } else if (SolFla == -2) {
-                    SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleEvapFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -2048,7 +2047,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    void EvapFluidCoolerSpecs::CalcSingleSpeedEvapFluidCooler(int &EvapFluidCoolerNum)
+    void EvapFluidCoolerSpecs::CalcSingleSpeedEvapFluidCooler()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2103,7 +2102,7 @@ namespace EvaporativeFluidCoolers {
         // needs to expand for glycols
 
         Real64 AirFlowRate;
-        Real64 UAdesign; // UA value at design conditions (entered by user or calculated)
+        Real64 UAdesign = 0.0; // UA value at design conditions (entered by user or calculated)
         Real64 CpWater;
         Real64 TempSetPoint = 0.0;
 
@@ -2114,25 +2113,22 @@ namespace EvaporativeFluidCoolers {
         this->FanPower = 0.0;
         Real64 inletWaterTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
         this->OutletWaterTemp = inletWaterTemp;
-        int LoopNum = this->LoopNum;
-        int LoopSideNum = this->LoopSideNum;
         AirFlowRate = 0.0;
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPoint;
+                TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPointHi;
+                TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
             }
         }
 
         // Added for fluid bypass. First assume no fluid bypass
         int BypassFlag = 0;
         this->BypassFraction = 0.0;
-        int CapacityControl = this->CapacityControl;
 
         //   MassFlowTol is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return;
 
         if (inletWaterTemp > TempSetPoint) {
             //     Turn on evaporative fluid cooler fan
@@ -2140,10 +2136,10 @@ namespace EvaporativeFluidCoolers {
             AirFlowRate = this->HighSpeedAirFlowRate;
             Real64 FanPowerOn = this->HighSpeedFanPower;
 
-            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, this->WaterMassFlowRate, AirFlowRate, UAdesign, this->OutletWaterTemp);
+            SimSimpleEvapFluidCooler(this->WaterMassFlowRate, AirFlowRate, UAdesign, this->OutletWaterTemp);
 
             if (this->OutletWaterTemp <= TempSetPoint) {
-                if (CapacityControl == 0 || this->OutletWaterTemp <= OWTLowerLimit) {
+                if (this->CapacityControl == 0 || this->OutletWaterTemp <= OWTLowerLimit) {
                     //         Setpoint was met with pump ON and fan ON, calculate run-time fraction
                     Real64 FanModeFrac = (TempSetPoint - inletWaterTemp) / (this->OutletWaterTemp - inletWaterTemp);
                     this->FanPower = FanModeFrac * FanPowerOn;
@@ -2161,7 +2157,7 @@ namespace EvaporativeFluidCoolers {
             }
         } else if (inletWaterTemp <= TempSetPoint) {
             // Inlet water temperature lower than setpoint, assume 100% bypass, evaporative fluid cooler fan off
-            if (CapacityControl == 1) {
+            if (this->CapacityControl == 1) {
                 if (inletWaterTemp > OWTLowerLimit) {
                     this->FanPower = 0.0;
                     this->BypassFraction = 1.0;
@@ -2181,13 +2177,13 @@ namespace EvaporativeFluidCoolers {
                 AirFlowRate = 0.0;
             } else {
                 int NumIteration = 0;
-                Real64 BypassFraction2; // Fluid bypass fraction
+                Real64 BypassFraction2 = 0.0; // Fluid bypass fraction
                 Real64 BypassFractionPrev = bypassFraction;
                 Real64 OutletWaterTempPrev = this->OutletWaterTemp;
                 while (NumIteration < MaxIteration) {
                     ++NumIteration;
                     // need to iterate for the new OutletWaterTemp while bypassing evaporative fluid cooler water
-                    SimSimpleEvapFluidCooler(EvapFluidCoolerNum, this->WaterMassFlowRate * (1.0 - bypassFraction), AirFlowRate, UAdesign, this->OutletWaterTemp);
+                    SimSimpleEvapFluidCooler(this->WaterMassFlowRate * (1.0 - bypassFraction), AirFlowRate, UAdesign, this->OutletWaterTemp);
                     // Calc new bypassFraction based on the new OutletWaterTemp
                     if (std::abs(this->OutletWaterTemp - OWTLowerLimit) <= 0.01) {
                         BypassFraction2 = bypassFraction;
@@ -2196,8 +2192,7 @@ namespace EvaporativeFluidCoolers {
                         // Set OutletWaterTemp = OWTLowerLimit, and use linear interpolation to calculate the bypassFraction
                         BypassFraction2 = BypassFractionPrev - (BypassFractionPrev - bypassFraction) * (OutletWaterTempPrev - OWTLowerLimit) /
                                                                (OutletWaterTempPrev - this->OutletWaterTemp);
-                        SimSimpleEvapFluidCooler(
-                            EvapFluidCoolerNum, this->WaterMassFlowRate * (1.0 - BypassFraction2), AirFlowRate, UAdesign, this->OutletWaterTemp);
+                        SimSimpleEvapFluidCooler(this->WaterMassFlowRate * (1.0 - BypassFraction2), AirFlowRate, UAdesign, this->OutletWaterTemp);
                         if (this->OutletWaterTemp < OWTLowerLimit) {
                             // Use previous iteraction values
                             BypassFraction2 = BypassFractionPrev;
@@ -2232,7 +2227,7 @@ namespace EvaporativeFluidCoolers {
         this->AirFlowRateRatio = AirFlowRate / this->HighSpeedAirFlowRate;
     }
 
-    void EvapFluidCoolerSpecs::CalcTwoSpeedEvapFluidCooler(int &EvapFluidCoolerNum)
+    void EvapFluidCoolerSpecs::CalcTwoSpeedEvapFluidCooler()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2295,20 +2290,18 @@ namespace EvaporativeFluidCoolers {
         Real64 OutletWaterTemp1stStage = this->OutletWaterTemp;
         Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
         Real64 AirFlowRate = 0.0;
-        int LoopNum = this->LoopNum;
-        int LoopSideNum = this->LoopSideNum;
         Real64 TempSetPoint = 0.0;
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPoint;
+                TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPointHi;
+                TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
             }
         }
 
         //   MassFlowTol is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return;
 
         if (this->InletWaterTemp > TempSetPoint) {
             //     Setpoint was not met ,turn on evaporative fluid cooler 1st stage fan
@@ -2316,7 +2309,7 @@ namespace EvaporativeFluidCoolers {
             AirFlowRate = this->LowSpeedAirFlowRate;
             Real64 FanPowerLow = this->LowSpeedFanPower;
             Real64 FanPowerHigh;
-            SimSimpleEvapFluidCooler(EvapFluidCoolerNum, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
+            SimSimpleEvapFluidCooler(this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
             if (OutletWaterTemp1stStage <= TempSetPoint) {
                 //         Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
@@ -2330,7 +2323,7 @@ namespace EvaporativeFluidCoolers {
                 AirFlowRate = this->HighSpeedAirFlowRate;
                 FanPowerHigh = this->HighSpeedFanPower;
 
-                SimSimpleEvapFluidCooler(EvapFluidCoolerNum, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
+                SimSimpleEvapFluidCooler(this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
                 if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                     //           Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
@@ -2354,8 +2347,7 @@ namespace EvaporativeFluidCoolers {
         this->AirFlowRateRatio = AirFlowRate / this->HighSpeedAirFlowRate;
     }
 
-    void SimSimpleEvapFluidCooler(
-            int const EvapFluidCoolerNum, Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &outletWaterTemp)
+    void EvapFluidCoolerSpecs::SimSimpleEvapFluidCooler(Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &outletWaterTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2380,30 +2372,30 @@ namespace EvaporativeFluidCoolers {
         Real64 const DeltaTwbTolerance(0.001); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         std::string const RoutineName("SimSimpleEvapFluidCooler");
 
-        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterInletNodeNum;
-        SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNode = SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterOutletNodeNum;
+        this->WaterInletNode = this->WaterInletNodeNum;
+        this->WaterOutletNode = this->WaterOutletNodeNum;
         Real64 qActual = 0.0;
         Real64 WetBulbError = 1.0;
         Real64 DeltaTwb = 1.0;
 
         // set local evaporative fluid cooler inlet and outlet temperature variables
-        SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.WaterTemp;
-        outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
-        Real64 InletAirTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirTemp;
-        Real64 InletAirWetBulb = SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirWetBulb;
+        this->InletWaterTemp = this->inletConds.WaterTemp;
+        outletWaterTemp = this->InletWaterTemp;
+        Real64 InletAirTemp = this->inletConds.AirTemp;
+        Real64 InletAirWetBulb = this->inletConds.AirWetBulb;
 
         if (UAdesign == 0.0) return;
 
         // set water and air properties
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-            SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirPress, InletAirTemp, SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirHumRat);
+            this->inletConds.AirPress, InletAirTemp, this->inletConds.AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirHumRat, InletAirTemp);
-        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidName,
-                                                         SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp,
-                                        DataPlant::PlantLoop(SimpleEvapFluidCooler(EvapFluidCoolerNum).LoopNum).FluidIndex,
+        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->inletConds.AirHumRat, InletAirTemp);
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                         this->InletWaterTemp,
+                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                         RoutineName);
-        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(InletAirWetBulb, 1.0, SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirPress);
+        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(InletAirWetBulb, 1.0, this->inletConds.AirPress);
 
         // initialize exiting wet bulb temperature before iterating on final solution
         Real64 OutletAirWetBulb = InletAirWetBulb + 6.0;
@@ -2413,7 +2405,7 @@ namespace EvaporativeFluidCoolers {
         int Iter = 0;
         while ((WetBulbError > WetBulbTolerance) && (Iter <= IterMax) && (DeltaTwb > DeltaTwbTolerance)) {
             ++Iter;
-            Real64 OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, SimpleEvapFluidCooler(EvapFluidCoolerNum).inletConds.AirPress);
+            Real64 OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, this->inletConds.AirPress);
             // calculate the airside specific heat and capacity
             Real64 CpAirside = (OutletAirEnthalpy - InletAirEnthalpy) / (OutletAirWetBulb - InletAirWetBulb);
             Real64 AirCapacity = AirMassFlowRate * CpAirside;
@@ -2433,7 +2425,7 @@ namespace EvaporativeFluidCoolers {
                 effectiveness = NumTransferUnits / (1.0 + NumTransferUnits);
             }
             // calculate water to air heat transfer and store last exiting WB temp of air
-            qActual = effectiveness * CapacityRatioMin * (SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - InletAirWetBulb);
+            qActual = effectiveness * CapacityRatioMin * (this->InletWaterTemp - InletAirWetBulb);
             Real64 OutletAirWetBulbLast = OutletAirWetBulb;
             // calculate new exiting wet bulb temperature of airstream
             OutletAirWetBulb = InletAirWetBulb + qActual / AirCapacity;
@@ -2445,15 +2437,13 @@ namespace EvaporativeFluidCoolers {
         }
 
         if (qActual >= 0.0) {
-            outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp - qActual / MdotCpWater;
+            outletWaterTemp = this->InletWaterTemp - qActual / MdotCpWater;
         } else {
-            outletWaterTemp = SimpleEvapFluidCooler(EvapFluidCoolerNum).InletWaterTemp;
+            outletWaterTemp = this->InletWaterTemp;
         }
     }
 
-    Real64 SimpleEvapFluidCoolerUAResidual(Real64 const UA,          // UA of evaporative fluid cooler
-                                           Array1<Real64> const &Par // par(1) = design evaporative fluid cooler load [W]
-    )
+    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:
@@ -2483,18 +2473,16 @@ namespace EvaporativeFluidCoolers {
         // par(4) = design air volume flow rate [m3/s]
         // par(5) = water specific heat [J/(kg*C)]
 
-        int EvapFluidCoolerIndex; // index of this evaporative fluid cooler
         Real64 OutWaterTemp;      // outlet water temperature [C]
         Real64 CoolingOutput;     // Evaporative fluid cooler cooling output [W]
 
-        EvapFluidCoolerIndex = int(Par(2));
-        SimSimpleEvapFluidCooler(EvapFluidCoolerIndex, Par(3), Par(4), UA, OutWaterTemp);
-        CoolingOutput = Par(5) * Par(3) * (SimpleEvapFluidCooler(EvapFluidCoolerIndex).inletConds.WaterTemp - OutWaterTemp);
+        this->SimSimpleEvapFluidCooler(Par(3), Par(4), UA, OutWaterTemp);
+        CoolingOutput = Par(5) * Par(3) * (this->inletConds.WaterTemp - OutWaterTemp);
         Residuum = (Par(1) - CoolingOutput) / Par(1);
         return Residuum;
     }
 
-    void EvapFluidCoolerSpecs::CalculateWaterUseage()
+    void EvapFluidCoolerSpecs::CalculateWaterUsage()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2507,13 +2495,10 @@ namespace EvaporativeFluidCoolers {
         // Collect evaporative fluid cooler water useage calculations for
         // reuse by all the evaporative fluid cooler models.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
-        // Based on CalculateWaterUseage subroutine for cooling tower by B. Griffith, August 2006
+        // Based on CalculateWaterUsage subroutine for cooling tower by B. Griffith, August 2006
 
-        std::string const RoutineName("CalculateWaterUseage");
+        std::string const RoutineName("CalculateWaterUsage");
 
         this->BlowdownVdot = 0.0;
         this->EvaporationVdot = 0.0;
@@ -2649,9 +2634,7 @@ namespace EvaporativeFluidCoolers {
 
         DataLoopNode::Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
 
-        int LoopNum = this->LoopNum;
-        int LoopSideNum = this->LoopSideNum;
-        if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
         // show warning if greater than Design * Mulitplier
@@ -2677,8 +2660,8 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-        Real64 LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
-        Real64 TempDifference = DataPlant::PlantLoop(LoopNum).MinTemp - this->OutletWaterTemp;
+        Real64 LoopMinTemp = DataPlant::PlantLoop(this->LoopNum).MinTemp;
+        Real64 TempDifference = DataPlant::PlantLoop(this->LoopNum).MinTemp - this->OutletWaterTemp;
         if (TempDifference > TempAllowance && this->WaterMassFlowRate > 0.0) {
             ++this->OutletWaterTempErrorCount;
             ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
@@ -2755,9 +2738,10 @@ namespace EvaporativeFluidCoolers {
 
     void clear_state()
     {
-        NumSimpleEvapFluidCoolers = 0;
-        UniqueSimpleEvapFluidCoolerNames.clear();
         GetEvapFluidCoolerInputFlag = true;
+        NumSimpleEvapFluidCoolers = 0;
+        SimpleEvapFluidCooler.deallocate();
+        UniqueSimpleEvapFluidCoolerNames.clear();
     }
 
 } // namespace EvaporativeFluidCoolers
