@@ -118,6 +118,7 @@ namespace DataSystemVariables {
     std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
     std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
     std::string const cSutherlandHodgman("SutherlandHodgman");
+    std::string const cSlaterandBarsky("SlaterandBarsky");
     std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
     std::string const cMinimalShadowing("MinimalShadowing");
     std::string const cNumActiveSims("cntActv");
@@ -150,6 +151,7 @@ namespace DataSystemVariables {
     bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    bool SlaterandBarsky(false);                  // TRUE if SlaterandBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
     bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
@@ -375,6 +377,7 @@ namespace DataSystemVariables {
         DeveloperFlag = false;
         TimingFlag = false;
         SutherlandHodgman = true;
+        SlaterandBarsky = true;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;

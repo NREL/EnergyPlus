@@ -578,6 +578,7 @@ namespace SolarShading {
         using DataSystemVariables::DisableGroupSelfShading;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::SutherlandHodgman;
+        using DataSystemVariables::SlaterandBarsky;
         using DataSystemVariables::UseImportedSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
         using ScheduleManager::ScheduleFileShadingProcessed;
@@ -658,25 +659,42 @@ namespace SolarShading {
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ConvexWeilerAtherton")) {
                 SutherlandHodgman = false;
                 cAlphaArgs(2) = "ConvexWeilerAtherton";
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SlaterBarskyandSutherlHodgman")) {
+                SutherlandHodgman = true;
+                SlaterandBarsky = true;
+                cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
             } else if (lAlphaFieldBlanks(2)) {
                 if (!SutherlandHodgman) { // if already set.
                     cAlphaArgs(2) = "ConvexWeilerAtherton";
                 } else {
-                    cAlphaArgs(2) = "SutherlandHodgman";
+                    if (!SlaterandBarsky) {
+                        cAlphaArgs(2) = "SutherlandHodgman";
+                    } else {
+                        cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
+                    }
                 }
             } else {
                 ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2));
                 if (!SutherlandHodgman) {
                     ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", ConvexWeilerAtherton will be used.");
                 } else {
-                    ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SutherlandHodgman will be used.");
+                    if (!SlaterandBarsky) {
+                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SutherlandHodgman will be used.");
+                    } else {
+                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SlaterBarskyandSutherlHodgman will be used.");
+                    }
+
                 }
             }
         } else {
             if (!SutherlandHodgman) {
                 cAlphaArgs(2) = "ConvexWeilerAtherton";
             } else {
-                cAlphaArgs(2) = "SutherlandHodgman";
+                if (!SlaterandBarsky) {
+                    cAlphaArgs(2) = "SutherlandHodgman";
+                } else {
+                    cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
+                }
             }
         }
 
@@ -4169,8 +4187,7 @@ namespace SolarShading {
                   int const NV1, // Number of vertices of figure 1
                   int const NV2, // Number of vertices of figure 2
                   int &NV3       // Number of vertices of figure 3
-    )
-    {
+    ) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tyler Hoyt
@@ -4193,6 +4210,7 @@ namespace SolarShading {
         // Using/Aliasing
         using General::ReallocateRealArray;
         using General::SafeDivide;
+        using DataSystemVariables::SlaterandBarsky;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4242,17 +4260,18 @@ namespace SolarShading {
         KK = 0;
 
         //Check if clipping polygon is rectangle
-        auto l1(HCA.index(NS2, 1));
-        bool rectFlag = ((NV2 == 4) &&
-                (((((HCX[l1] == HCX[l1+1] && HCY[l1] != HCY[l1+1]) &&
-                ((HCY[l1+2] == HCY[l1+1] && HCY[l1+3] == HCY[l1]))) && HCX[l1+2] == HCX[l1+3]) ||
-                  ((((HCY[l1] == HCY[l1+1] && HCX[l1] != HCX[l1+1]) &&
-                   (HCX[l1+2] == HCX[l1+1] && HCX[l1+3] == HCX[l1])) && (HCY[l1+2] == HCY[l1+3]))))));
-
-
-        if (rectFlag) {
-            CLIPRECT(NS2, NV1, NV3);
-            return;
+        if (SlaterandBarsky) {
+            auto l1(HCA.index(NS2, 1));
+            bool rectFlag = ((NV2 == 4) && (((((HCX[l1] == HCX[l1 + 1] && HCY[l1] != HCY[l1 + 1]) &&
+                                               ((HCY[l1 + 2] == HCY[l1 + 1] && HCY[l1 + 3] == HCY[l1]))) &&
+                                              HCX[l1 + 2] == HCX[l1 + 3]) ||
+                                             ((((HCY[l1] == HCY[l1 + 1] && HCX[l1] != HCX[l1 + 1]) &&
+                                                (HCX[l1 + 2] == HCX[l1 + 1] && HCX[l1 + 3] == HCX[l1])) &&
+                                               (HCY[l1 + 2] == HCY[l1 + 3]))))));
+            if (rectFlag) {
+                CLIPRECT(NS2, NV1, NV3);
+                return;
+            }
         }
 
         auto l(HCA.index(NS2, 1));
