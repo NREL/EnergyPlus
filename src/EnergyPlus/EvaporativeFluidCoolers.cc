@@ -531,6 +531,9 @@ namespace EvaporativeFluidCoolers {
                 ShowContinueError("Evaporative fluid cooler Performance Input Method currently specified as: " + AlphArray(4));
                 ErrorsFound = true;
             }
+
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).setupOutputVars();
+
         } // End Single-Speed Evaporative Fluid Cooler Loop
 
         DataIPShortCuts::cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
@@ -893,241 +896,219 @@ namespace EvaporativeFluidCoolers {
                 ShowContinueError("Evaporative fluid cooler Performanace Input Method currently specified as: " + AlphArray(4));
                 ErrorsFound = true;
             }
+
+            SimpleEvapFluidCooler(EvapFluidCoolerNum).setupOutputVars();
+
         } // End Two-Speed Evaporative Fluid Cooler Loop
 
         if (ErrorsFound) {
             ShowFatalError("Errors found in getting evaporative fluid cooler input.");
         }
+    }
 
+    void EvapFluidCoolerSpecs::setupOutputVars()
+    {
         // Set up output variables
         // CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
-        for (int EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                _,
-                                "Plant");
+        if (this->EvapFluidCoolerType_Num == EvapFluidCooler::SingleSpeed) {
+
             // Added for fluid bypass
             SetupOutputVariable("Cooling Tower Bypass Fraction",
                                 OutputProcessor::Unit::None,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).BypassFraction,
+                                this->BypassFraction,
                                 "System",
                                 "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-        }
-
-        // CurrentModuleObject='EvaporativeFluidCooler:TwoSpeed'
-        for (int EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + 1;
-             EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
-             ++EvapFluidCoolerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerInletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).fluidCoolerOutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                _,
-                                "Plant");
+                                this->Name);
         }
 
         // setup common water reporting for all types of evaporative fluid coolers.
         // CurrentModuleObject='EvaporativeFluidCooler:*'
-        for (int EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum) {
-            if (SimpleEvapFluidCooler(EvapFluidCoolerNum).SuppliedByWaterSystem) {
-                SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).MakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-                SetupOutputVariable("Cooling Tower Make Up Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-                SetupOutputVariable("Cooling Tower Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).TankSupplyVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-                SetupOutputVariable("Cooling Tower Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).TankSupplyVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                    _,
-                                    "Water",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).StarvedMakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-                SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).StarvedMakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                    _,
-                                    "Water",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).StarvedMakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                    _,
-                                    "MainsWater",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-            } else { // Evaporative fluid cooler water from mains and gets metered
-                SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).MakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-                SetupOutputVariable("Cooling Tower Make Up Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                    _,
-                                    "Water",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleEvapFluidCooler(EvapFluidCoolerNum).Name,
-                                    _,
-                                    "MainsWater",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-            }
+        if (this->SuppliedByWaterSystem) {
+            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->MakeUpVdot,
+                                "System",
+                                "Average",
+                                this->Name);
 
-            SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVdot,
-                                "System",
-                                "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Evaporation Volume",
+            SetupOutputVariable("Cooling Tower Make Up Water Volume",
                                 OutputProcessor::Unit::m3,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).EvaporationVol,
+                                this->MakeUpVol,
                                 "System",
                                 "Sum",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
+                                this->Name);
+
+            SetupOutputVariable("Cooling Tower Storage Tank Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVdot,
+                                this->TankSupplyVdot,
                                 "System",
                                 "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Drift Volume",
+                                this->Name);
+
+            SetupOutputVariable("Cooling Tower Storage Tank Water Volume",
                                 OutputProcessor::Unit::m3,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).DriftVol,
+                                this->TankSupplyVol,
                                 "System",
                                 "Sum",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Blowdown Volume Flow Rate",
+                                this->Name,
+                                _,
+                                "Water",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownVdot,
+                                this->StarvedMakeUpVdot,
                                 "System",
                                 "Average",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Blowdown Volume",
+                                this->Name);
+
+            SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume",
                                 OutputProcessor::Unit::m3,
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).BlowdownVol,
+                                this->StarvedMakeUpVol,
                                 "System",
                                 "Sum",
-                                SimpleEvapFluidCooler(EvapFluidCoolerNum).Name);
-        } // loop all evaporative fluid coolers
+                                this->Name,
+                                _,
+                                "Water",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->StarvedMakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "MainsWater",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+
+        } else { // Evaporative fluid cooler water from mains and gets metered
+            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->MakeUpVdot,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Cooling Tower Make Up Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Water",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "MainsWater",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+        }
+
+        SetupOutputVariable("Cooling Tower Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->fluidCoolerInletWaterTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->fluidCoolerOutletWaterTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->WaterMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->Qactual,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Fan Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->FanPower,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->FanEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "Electric",
+                            "HeatRejection",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->EvaporationVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Water Evaporation Volume",
+                            OutputProcessor::Unit::m3,
+                            this->EvaporationVol,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->DriftVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Water Drift Volume",
+                            OutputProcessor::Unit::m3,
+                            this->DriftVol,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Water Blowdown Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->BlowdownVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Cooling Tower Water Blowdown Volume",
+                            OutputProcessor::Unit::m3,
+                            this->BlowdownVol,
+                            "System",
+                            "Sum",
+                            this->Name);
     }
 
     void EvapFluidCoolerSpecs::InitEvapFluidCooler()
