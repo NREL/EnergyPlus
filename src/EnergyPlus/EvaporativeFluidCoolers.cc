@@ -176,7 +176,7 @@ namespace EvaporativeFluidCoolers {
 
                 if (InitLoopEquip) {
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).InitEvapFluidCooler();
-                    SimpleEvapFluidCooler(EvapFluidCoolerNum).SizeEvapFluidCooler(EvapFluidCoolerNum);
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).SizeEvapFluidCooler();
                     MinCap = 0.0; // signifies non-load based model (i.e. forward
                     MaxCap = SimpleEvapFluidCooler(EvapFluidCoolerNum).HighSpeedStandardDesignCapacity *
                              SimpleEvapFluidCooler(EvapFluidCoolerNum).HeatRejectCapNomCapSizingRatio;
@@ -199,7 +199,7 @@ namespace EvaporativeFluidCoolers {
                 }
                 if (InitLoopEquip) {
                     SimpleEvapFluidCooler(EvapFluidCoolerNum).InitEvapFluidCooler();
-                    SimpleEvapFluidCooler(EvapFluidCoolerNum).SizeEvapFluidCooler(EvapFluidCoolerNum);
+                    SimpleEvapFluidCooler(EvapFluidCoolerNum).SizeEvapFluidCooler();
                     MinCap = 0.0; // signifies non-load based model (i.e. forward
                     MaxCap = 0.0; // heat exhanger model)
                     OptCap = 0.0;
@@ -1111,6 +1111,11 @@ namespace EvaporativeFluidCoolers {
                             this->Name);
     }
 
+    void EvapFluidCoolerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    {
+
+    }
+
     void EvapFluidCoolerSpecs::InitEvapFluidCooler()
     {
 
@@ -1248,7 +1253,7 @@ namespace EvaporativeFluidCoolers {
                              this->CompNum);
     }
 
-    void EvapFluidCoolerSpecs::SizeEvapFluidCooler(int const EvapFluidCoolerNum)
+    void EvapFluidCoolerSpecs::SizeEvapFluidCooler()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1281,7 +1286,7 @@ namespace EvaporativeFluidCoolers {
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
-        Array1D<Real64> Par(6); // Parameter array need for RegulaFalsi routine
+        Array1D<Real64> Par(4); // Parameter array need for RegulaFalsi routine
 
         Real64 DesEvapFluidCoolerLoad = 0.0;   // Design evaporative fluid cooler load [W]
         Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
@@ -1534,10 +1539,9 @@ namespace EvaporativeFluidCoolers {
                                                CalledFrom);
                     DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                     Par(1) = DesEvapFluidCoolerLoad;
-                    Par(2) = double(EvapFluidCoolerNum);
-                    Par(3) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                    Par(4) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
-                    Par(5) = Cp;
+                    Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                    Par(3) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
+                    Par(4) = Cp;
 
                     // Lower bound for UA [W/C]
                     Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
@@ -1558,8 +1562,8 @@ namespace EvaporativeFluidCoolers {
                                           this->Name);
                         ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                     } else if (SolFla == -2) {
-                        SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                        SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                        SimSimpleEvapFluidCooler(Par(2), Par(3), UA0, OutWaterTempAtUA0);
+                        SimSimpleEvapFluidCooler(Par(2), Par(3), UA1, OutWaterTempAtUA1);
                         ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                         ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                         ShowContinueError("sizes for some \"autosizable\" fields while autosizing other \"autosizable\" fields may be contributing "
@@ -1577,7 +1581,7 @@ namespace EvaporativeFluidCoolers {
                         ShowContinueError("Design Evaporative Fluid Cooler Load [W]                      = " + General::RoundSigDigits(Par(1), 2));
                         ShowContinueError("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = " +
                                           General::RoundSigDigits(this->DesignWaterFlowRate, 6));
-                        ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(4), 2));
+                        ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(3), 2));
                         ShowContinueError("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = " +
                                           General::RoundSigDigits(this->inletConds.AirWetBulb, 2));
                         ShowContinueError("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
@@ -1656,10 +1660,9 @@ namespace EvaporativeFluidCoolers {
                 DesEvapFluidCoolerLoad = this->HighSpeedStandardDesignCapacity *
                                          this->HeatRejectCapNomCapSizingRatio;
                 Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = double(EvapFluidCoolerNum);
-                Par(3) = rho * this->DesignWaterFlowRate; // Design water mass flow rate
-                Par(4) = this->HighSpeedAirFlowRate;      // Design air volume flow rate
-                Par(5) = Cp;
+                Par(2) = rho * this->DesignWaterFlowRate; // Design water mass flow rate
+                Par(3) = this->HighSpeedAirFlowRate;      // Design air volume flow rate
+                Par(4) = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad;                            // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;                                     // Assume deltaT = 1K
                 this->inletConds.WaterTemp = 35.0;  // 95F design inlet water temperature
@@ -1728,10 +1731,9 @@ namespace EvaporativeFluidCoolers {
                                            CalledFrom);
                 DesEvapFluidCoolerLoad = this->HighSpeedUserSpecifiedDesignCapacity;
                 Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = double(EvapFluidCoolerNum);
-                Par(3) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
-                Par(4) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
-                Par(5) = Cp;
+                Par(2) = rho * tmpDesignWaterFlowRate; // Design water mass flow rate
+                Par(3) = tmpHighSpeedAirFlowRate;      // Design air volume flow rate
+                Par(4) = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
 
@@ -1749,8 +1751,8 @@ namespace EvaporativeFluidCoolers {
                                       this->Name);
                     ShowContinueError("The final UA value = " + General::RoundSigDigits(UA, 2) + "W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    SimSimpleEvapFluidCooler(Par(2), Par(3), UA0, OutWaterTempAtUA0);
+                    SimSimpleEvapFluidCooler(Par(2), Par(3), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -1768,7 +1770,7 @@ namespace EvaporativeFluidCoolers {
                     ShowContinueError("Design Evaporative Fluid Cooler Load [W]                      = " + General::RoundSigDigits(Par(1), 2));
                     ShowContinueError("Design Evaporative Fluid Cooler Water Volume Flow Rate [m3/s] = " +
                                       General::RoundSigDigits(this->DesignWaterFlowRate, 6));
-                    ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(4), 2));
+                    ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate [m3/s]   = " + General::RoundSigDigits(Par(3), 2));
                     ShowContinueError("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp [C]   = " +
                                       General::RoundSigDigits(this->inletConds.AirWetBulb, 2));
                     ShowContinueError("Design Evaporative Fluid Cooler Water Inlet Temp [C]          = " +
@@ -1892,10 +1894,9 @@ namespace EvaporativeFluidCoolers {
                 DesEvapFluidCoolerLoad = this->LowSpeedStandardDesignCapacity *
                                          this->HeatRejectCapNomCapSizingRatio;
                 Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = double(EvapFluidCoolerNum);
-                Par(3) = rho * tmpDesignWaterFlowRate;                                  // Design water mass flow rate
-                Par(4) = this->LowSpeedAirFlowRate; // Air volume flow rate at low fan speed
-                Par(5) = Cp;
+                Par(2) = rho * tmpDesignWaterFlowRate;                                  // Design water mass flow rate
+                Par(3) = this->LowSpeedAirFlowRate; // Air volume flow rate at low fan speed
+                Par(4) = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad;                            // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;                                     // Assume deltaT = 1K
                 this->inletConds.WaterTemp = 35.0;  // 95F design inlet water temperature
@@ -1951,10 +1952,9 @@ namespace EvaporativeFluidCoolers {
                                            CalledFrom);
                 DesEvapFluidCoolerLoad = this->LowSpeedUserSpecifiedDesignCapacity;
                 Par(1) = DesEvapFluidCoolerLoad;
-                Par(2) = double(EvapFluidCoolerNum);
-                Par(3) = rho * tmpDesignWaterFlowRate;                                  // Design water mass flow rate
-                Par(4) = this->LowSpeedAirFlowRate; // Air volume flow rate at low fan speed
-                Par(5) = Cp;
+                Par(2) = rho * tmpDesignWaterFlowRate;                                  // Design water mass flow rate
+                Par(3) = this->LowSpeedAirFlowRate; // Air volume flow rate at low fan speed
+                Par(4) = Cp;
                 Real64 UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 Real64 UA1 = DesEvapFluidCoolerLoad;          // Assume deltaT = 1K
                 this->inletConds.WaterTemp = this->DesignEnteringWaterTemp;
@@ -1970,8 +1970,8 @@ namespace EvaporativeFluidCoolers {
                     ShowFatalError("Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " +
                                    this->Name);
                 } else if (SolFla == -2) {
-                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleEvapFluidCooler(Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    SimSimpleEvapFluidCooler(Par(2), Par(3), UA0, OutWaterTempAtUA0);
+                    SimSimpleEvapFluidCooler(Par(2), Par(3), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(
@@ -1983,8 +1983,8 @@ namespace EvaporativeFluidCoolers {
                     ShowContinueError("out of this range, the solution will not converge and UA will not be calculated. ");
                     ShowContinueError("Inputs to the Evaporative Fluid Cooler model are:");
                     ShowContinueError("Design Evaporative Fluid Cooler Load                    = " + General::RoundSigDigits(Par(1), 2));
-                    ShowContinueError("Design Evaporative Fluid Cooler Water Volume Flow Rate  = " + General::RoundSigDigits(Par(3), 2));
-                    ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate    = " + General::RoundSigDigits(Par(4), 2));
+                    ShowContinueError("Design Evaporative Fluid Cooler Water Volume Flow Rate  = " + General::RoundSigDigits(Par(2), 2));
+                    ShowContinueError("Design Evaporative Fluid Cooler Air Volume Flow Rate    = " + General::RoundSigDigits(Par(3), 2));
                     ShowContinueError("Design Evaporative Fluid Cooler Air Inlet Wet-bulb Temp = " +
                                       General::RoundSigDigits(this->inletConds.AirWetBulb, 2));
                     ShowContinueError("Design Evaporative Fluid Cooler Water Inlet Temp        = " +
@@ -2449,16 +2449,15 @@ namespace EvaporativeFluidCoolers {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = Evaporative fluid cooler number
-        // par(3) = design water mass flow rate [kg/s]
-        // par(4) = design air volume flow rate [m3/s]
-        // par(5) = water specific heat [J/(kg*C)]
+        // Par(2) = design water mass flow rate [kg/s]
+        // Par(3) = design air volume flow rate [m3/s]
+        // Par(4) = water specific heat [J/(kg*C)]
 
         Real64 OutWaterTemp;      // outlet water temperature [C]
         Real64 CoolingOutput;     // Evaporative fluid cooler cooling output [W]
 
-        this->SimSimpleEvapFluidCooler(Par(3), Par(4), UA, OutWaterTemp);
-        CoolingOutput = Par(5) * Par(3) * (this->inletConds.WaterTemp - OutWaterTemp);
+        this->SimSimpleEvapFluidCooler(Par(2), Par(3), UA, OutWaterTemp);
+        CoolingOutput = Par(4) * Par(2) * (this->inletConds.WaterTemp - OutWaterTemp);
         Residuum = (Par(1) - CoolingOutput) / Par(1);
         return Residuum;
     }

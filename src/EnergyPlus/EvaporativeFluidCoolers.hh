@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -101,7 +102,7 @@ namespace EvaporativeFluidCoolers {
         }
     };
 
-    struct EvapFluidCoolerSpecs
+    struct EvapFluidCoolerSpecs : PlantComponent
     {
         // Members
         std::string Name;                // User identifier
@@ -247,10 +248,11 @@ namespace EvaporativeFluidCoolers {
               BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
         {
         }
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler();
 
-        void SizeEvapFluidCooler(int EvapFluidCoolerNum);
+        void SizeEvapFluidCooler();
 
         void CalculateWaterUsage();
 
