@@ -2704,47 +2704,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        using DataGenerators::FuelCell;
-        using DataGenerators::NumFuelCellGenerators;
-        using DataGenerators::FCDataStruct;
-        using DataGenerators::DirectCurveMode;
-        using DataGenerators::NormalizedCurveMode;
-        using DataGenerators::ConstantRateSkinLoss;
-        using DataGenerators::UADTSkinLoss;
-        using DataGenerators::QuadraticFuelNdotSkin;
-        using DataGenerators::NumGeneratorFuelSups;
-        using DataGenerators::FuelSupply;
-        using DataGenerators::ConstantStoicsAirRat;
-        using DataGenerators::QuadraticFuncofPel;
-        using DataGenerators::QuadraticFuncofNdot;
-        using DataGenerators::RecoverBurnInvertBatt;
-        using DataGenerators::RecoverAuxiliaryBurner;
-        using DataGenerators::RecoverInverterBatt;
-        using DataGenerators::RecoverInverter;
-        using DataGenerators::RecoverBattery;
-        using DataGenerators::NoRecoveryOnAirIntake;
-        using DataGenerators::RegularAir;
-        using DataGenerators::UserDefinedConstituents;
-        using DataGenerators::GasPropertyDataStruct;
-        using DataGenerators::WaterInReformAirNode;
-        using DataGenerators::WaterInReformWaterNode;
-        using DataGenerators::WaterInReformMains;
-        using DataGenerators::WaterInReformSchedule;
-        using DataGenerators::SurroundingZone;
-        using DataGenerators::AirInletForFC;
-        using DataGenerators::FixedEffectiveness;
-        using DataGenerators::LMTDempiricalUAeff;
-        using DataGenerators::LMTDfundementalUAeff;
-        using DataGenerators::Condensing;
-        using DataGenerators::SimpleEffConstraints;
-        using DataGenerators::FuelInTempFromNode;
-        using DataGenerators::FuelInTempSchedule;
-        using DataGenerators::MinProductGasTemp;
-        using DataGenerators::MaxProductGasTemp;
-        using DataGenerators::LeadAcidBatterManwellMcGowan;
-        using DataGenerators::LeadAcidBatterySaupe;
-        using DataGenerators::NISTShomate;
-
         Real64 tempHprodGases;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2777,9 +2736,9 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (thisConstit = 1; thisConstit <= 5; ++thisConstit) {
-            gasID = FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+            gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
-                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == NISTShomate) {
+                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
                     B = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateB;
                     C = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateC;
@@ -2789,7 +2748,7 @@ namespace FuelCellElectricGenerator {
                     H = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateH;
 
                     tempHprodGases += ((A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H) *
-                                       FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
+                            DataGenerators::FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
                 }
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
                     A1 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A1;
@@ -2802,7 +2761,7 @@ namespace FuelCellElectricGenerator {
                     tempHprodGases += (((A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel) *
                                         DataGenerators::RinKJperMolpK * Tkel) -
                                        DataGenerators::GasPhaseThermoChemistryData(gasID).StdRefMolarEnthOfForm) *
-                                      FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
+                            DataGenerators::FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
                 }
             } // gasid > 0
         }
@@ -2822,47 +2781,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataGenerators::FuelCell;
-        using DataGenerators::NumFuelCellGenerators;
-        using DataGenerators::FCDataStruct;
-        using DataGenerators::DirectCurveMode;
-        using DataGenerators::NormalizedCurveMode;
-        using DataGenerators::ConstantRateSkinLoss;
-        using DataGenerators::UADTSkinLoss;
-        using DataGenerators::QuadraticFuelNdotSkin;
-        using DataGenerators::NumGeneratorFuelSups;
-        using DataGenerators::FuelSupply;
-        using DataGenerators::ConstantStoicsAirRat;
-        using DataGenerators::QuadraticFuncofPel;
-        using DataGenerators::QuadraticFuncofNdot;
-        using DataGenerators::RecoverBurnInvertBatt;
-        using DataGenerators::RecoverAuxiliaryBurner;
-        using DataGenerators::RecoverInverterBatt;
-        using DataGenerators::RecoverInverter;
-        using DataGenerators::RecoverBattery;
-        using DataGenerators::NoRecoveryOnAirIntake;
-        using DataGenerators::RegularAir;
-        using DataGenerators::UserDefinedConstituents;
-        using DataGenerators::GasPropertyDataStruct;
-        using DataGenerators::WaterInReformAirNode;
-        using DataGenerators::WaterInReformWaterNode;
-        using DataGenerators::WaterInReformMains;
-        using DataGenerators::WaterInReformSchedule;
-        using DataGenerators::SurroundingZone;
-        using DataGenerators::AirInletForFC;
-        using DataGenerators::FixedEffectiveness;
-        using DataGenerators::LMTDempiricalUAeff;
-        using DataGenerators::LMTDfundementalUAeff;
-        using DataGenerators::Condensing;
-        using DataGenerators::SimpleEffConstraints;
-        using DataGenerators::FuelInTempFromNode;
-        using DataGenerators::FuelInTempSchedule;
-        using DataGenerators::MinProductGasTemp;
-        using DataGenerators::MaxProductGasTemp;
-        using DataGenerators::LeadAcidBatterManwellMcGowan;
-        using DataGenerators::LeadAcidBatterySaupe;
-        using DataGenerators::NISTShomate;
-
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2890,10 +2808,10 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= isize(FuelCell(GeneratorNum).FCPM.GasLibID); ++thisConstit) {
-            gasID = FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+        for (thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID); ++thisConstit) {
+            gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
-                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == NISTShomate) {
+                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
                     B = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateB;
@@ -2902,7 +2820,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                               FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
+                            DataGenerators::FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -2913,7 +2831,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                              FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
+                            DataGenerators::FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2933,47 +2851,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataGenerators::FuelCell;
-        using DataGenerators::NumFuelCellGenerators;
-        using DataGenerators::FCDataStruct;
-        using DataGenerators::DirectCurveMode;
-        using DataGenerators::NormalizedCurveMode;
-        using DataGenerators::ConstantRateSkinLoss;
-        using DataGenerators::UADTSkinLoss;
-        using DataGenerators::QuadraticFuelNdotSkin;
-        using DataGenerators::NumGeneratorFuelSups;
-        using DataGenerators::FuelSupply;
-        using DataGenerators::ConstantStoicsAirRat;
-        using DataGenerators::QuadraticFuncofPel;
-        using DataGenerators::QuadraticFuncofNdot;
-        using DataGenerators::RecoverBurnInvertBatt;
-        using DataGenerators::RecoverAuxiliaryBurner;
-        using DataGenerators::RecoverInverterBatt;
-        using DataGenerators::RecoverInverter;
-        using DataGenerators::RecoverBattery;
-        using DataGenerators::NoRecoveryOnAirIntake;
-        using DataGenerators::RegularAir;
-        using DataGenerators::UserDefinedConstituents;
-        using DataGenerators::GasPropertyDataStruct;
-        using DataGenerators::WaterInReformAirNode;
-        using DataGenerators::WaterInReformWaterNode;
-        using DataGenerators::WaterInReformMains;
-        using DataGenerators::WaterInReformSchedule;
-        using DataGenerators::SurroundingZone;
-        using DataGenerators::AirInletForFC;
-        using DataGenerators::FixedEffectiveness;
-        using DataGenerators::LMTDempiricalUAeff;
-        using DataGenerators::LMTDfundementalUAeff;
-        using DataGenerators::Condensing;
-        using DataGenerators::SimpleEffConstraints;
-        using DataGenerators::FuelInTempFromNode;
-        using DataGenerators::FuelInTempSchedule;
-        using DataGenerators::MinProductGasTemp;
-        using DataGenerators::MaxProductGasTemp;
-        using DataGenerators::LeadAcidBatterManwellMcGowan;
-        using DataGenerators::LeadAcidBatterySaupe;
-        using DataGenerators::NISTShomate;
-
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -3001,10 +2878,10 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= isize(FuelCell(GeneratorNum).AuxilHeat.GasLibID); ++thisConstit) {
-            gasID = FuelCell(GeneratorNum).AuxilHeat.GasLibID(thisConstit);
+        for (thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID); ++thisConstit) {
+            gasID = DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID(thisConstit);
             if (gasID > 0) {
-                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == NISTShomate) {
+                if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
                     B = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateB;
@@ -3013,7 +2890,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                               FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit));
+                            DataGenerators::FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -3024,7 +2901,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                              FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit);
+                            DataGenerators::FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -3127,27 +3004,24 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the AC ancillaries to determine Pel
 
-        using DataGenerators::FuelCell;
-        using DataGenerators::FuelSupply;
-
         //  Using lagged values inside a sequential substitution loop
         PacAncill = 0.0;
         // sect. 5.9
-        FuelCell(GeneratorNum).FCPM.PelancillariesAC =
-            FuelCell(GeneratorNum).FCPM.ANC0 + FuelCell(GeneratorNum).FCPM.ANC1 * FuelCell(GeneratorNum).FCPM.NdotFuel;
+        DataGenerators::FuelCell(GeneratorNum).FCPM.PelancillariesAC =
+                DataGenerators::FuelCell(GeneratorNum).FCPM.ANC0 + DataGenerators::FuelCell(GeneratorNum).FCPM.ANC1 * DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel;
 
         // sect 6.0
-        FuelCell(GeneratorNum).AirSup.PairCompEl = CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
+        DataGenerators::FuelCell(GeneratorNum).AirSup.PairCompEl = CurveManager::CurveValue(DataGenerators::FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, DataGenerators::FuelCell(GeneratorNum).FCPM.NdotAir);
         // sect 7.0
-        FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl =
-            CurveManager::CurveValue(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+        DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl =
+            CurveManager::CurveValue(DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel);
 
         // sect. 8.0
-        FuelCell(GeneratorNum).WaterSup.PwaterCompEl =
-            CurveManager::CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
+        DataGenerators::FuelCell(GeneratorNum).WaterSup.PwaterCompEl =
+            CurveManager::CurveValue(DataGenerators::FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, DataGenerators::FuelCell(GeneratorNum).FCPM.NdotLiqwater);
 
-        PacAncill = FuelCell(GeneratorNum).FCPM.PelancillariesAC + FuelCell(GeneratorNum).AirSup.PairCompEl +
-                    FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl + FuelCell(GeneratorNum).WaterSup.PwaterCompEl;
+        PacAncill = DataGenerators::FuelCell(GeneratorNum).FCPM.PelancillariesAC + DataGenerators::FuelCell(GeneratorNum).AirSup.PairCompEl +
+                DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl + DataGenerators::FuelCell(GeneratorNum).WaterSup.PwaterCompEl;
     }
 
     void FigurePowerConditioningLosses(int const GeneratorNum, Real64 const Pdemand, Real64 &PpcuLosses)
@@ -3203,8 +3077,6 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataGenerators::FuelCell;
-
         Real64 CurrentFractionalDay; // working var, time in decimal days
         Real64 EndingFractionalDay;  // working var, time is decimal days
         Real64 MaxPel;               // working variable for max allowed by transient constraint
@@ -3214,46 +3086,46 @@ namespace FuelCellElectricGenerator {
         PelInput = Pel;
 
         // Check if in start up and if it still should be
-        if (FuelCell(GeneratorNum).FCPM.DuringStartUp) {
+        if (DataGenerators::FuelCell(GeneratorNum).FCPM.DuringStartUp) {
 
             // calculate time for end of start up period
             CurrentFractionalDay = double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
-            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp + FuelCell(GeneratorNum).FCPM.StartUpTime / DataGlobals::HoursInDay;
+            EndingFractionalDay = DataGenerators::FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp + DataGenerators::FuelCell(GeneratorNum).FCPM.StartUpTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
-                FuelCell(GeneratorNum).FCPM.DuringStartUp = false;
+                DataGenerators::FuelCell(GeneratorNum).FCPM.DuringStartUp = false;
             }
         }
 
         // Check if in shut down up and if it still should be
-        if (FuelCell(GeneratorNum).FCPM.DuringShutDown) {
+        if (DataGenerators::FuelCell(GeneratorNum).FCPM.DuringShutDown) {
 
             // calculate time for end of shut down period
             CurrentFractionalDay = double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
-            EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown + FuelCell(GeneratorNum).FCPM.ShutDownTime / DataGlobals::HoursInDay;
+            EndingFractionalDay = DataGenerators::FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown + DataGenerators::FuelCell(GeneratorNum).FCPM.ShutDownTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
-                FuelCell(GeneratorNum).FCPM.DuringShutDown = false;
+                DataGenerators::FuelCell(GeneratorNum).FCPM.DuringShutDown = false;
             }
         }
         // compare
 
-        if (!(FuelCell(GeneratorNum).FCPM.DuringShutDown) && !(FuelCell(GeneratorNum).FCPM.DuringStartUp)) {
+        if (!(DataGenerators::FuelCell(GeneratorNum).FCPM.DuringShutDown) && !(DataGenerators::FuelCell(GeneratorNum).FCPM.DuringStartUp)) {
             // unit is neither starting or stopping and the only constraints would come from transient limits
-            if (Pel > FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering up
-                MaxPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep + FuelCell(GeneratorNum).FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            if (Pel > DataGenerators::FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering up
+                MaxPel = DataGenerators::FuelCell(GeneratorNum).FCPM.PelLastTimeStep + DataGenerators::FuelCell(GeneratorNum).FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
                 } else {
                     Constrained = false;
                 }
-            } else if (Pel < FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering down
-                MinPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep - FuelCell(GeneratorNum).FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            } else if (Pel < DataGenerators::FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering down
+                MinPel = DataGenerators::FuelCell(GeneratorNum).FCPM.PelLastTimeStep - DataGenerators::FuelCell(GeneratorNum).FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -3267,13 +3139,13 @@ namespace FuelCellElectricGenerator {
 
         } // not in start up or shut down
 
-        if (FuelCell(GeneratorNum).FCPM.DuringStartUp) {
+        if (DataGenerators::FuelCell(GeneratorNum).FCPM.DuringStartUp) {
             // constant during start up modeling artifact
-            Pel = FuelCell(GeneratorNum).FCPM.StartUpElectProd / FuelCell(GeneratorNum).FCPM.StartUpTime;
+            Pel = DataGenerators::FuelCell(GeneratorNum).FCPM.StartUpElectProd / DataGenerators::FuelCell(GeneratorNum).FCPM.StartUpTime;
             Constrained = true;
         }
 
-        if (FuelCell(GeneratorNum).FCPM.DuringShutDown) {
+        if (DataGenerators::FuelCell(GeneratorNum).FCPM.DuringShutDown) {
 
             Pel = 0.0; // assumes no power generated during shut down
             Constrained = true;
@@ -3290,12 +3162,10 @@ namespace FuelCellElectricGenerator {
 
         // not yet implemented, just pass product gases thru nul domain
 
-        using DataGenerators::FuelCell;
-
-        FuelCell(Num).AuxilHeat.TauxMix = FuelCell(Num).FCPM.TprodGasLeavingFCPM;
-        FuelCell(Num).AuxilHeat.NdotAuxMix = FuelCell(Num).FCPM.NdotProdGas;
-        FuelCell(Num).AuxilHeat.ConstitMolalFract = FuelCell(Num).FCPM.ConstitMolalFract;
-        FuelCell(Num).AuxilHeat.GasLibID = FuelCell(Num).FCPM.GasLibID;
+        DataGenerators::FuelCell(Num).AuxilHeat.TauxMix = DataGenerators::FuelCell(Num).FCPM.TprodGasLeavingFCPM;
+        DataGenerators::FuelCell(Num).AuxilHeat.NdotAuxMix = DataGenerators::FuelCell(Num).FCPM.NdotProdGas;
+        DataGenerators::FuelCell(Num).AuxilHeat.ConstitMolalFract = DataGenerators::FuelCell(Num).FCPM.ConstitMolalFract;
+        DataGenerators::FuelCell(Num).AuxilHeat.GasLibID = DataGenerators::FuelCell(Num).FCPM.GasLibID;
     }
 
     void CalcFuelCellGenHeatRecovery(int const Num) // Generator number
@@ -3311,12 +3181,6 @@ namespace FuelCellElectricGenerator {
         // model exhaust gas to water heat exchanger
 
         // REFERENCES: Annex 42 model documentation
-
-        using DataGenerators::FuelCell;
-        using DataGenerators::FixedEffectiveness;
-        using DataGenerators::LMTDempiricalUAeff;
-        using DataGenerators::LMTDfundementalUAeff;
-        using DataGenerators::Condensing;
 
         static std::string const RoutineName("CalcFuelCellGenHeatRecovery");
 
@@ -3355,23 +3219,23 @@ namespace FuelCellElectricGenerator {
         Real64 Cp;
 
         {
-            auto const SELECT_CASE_var(FuelCell(Num).ExhaustHX.HXmodelMode);
+            auto const SELECT_CASE_var(DataGenerators::FuelCell(Num).ExhaustHX.HXmodelMode);
 
-            if (SELECT_CASE_var == FixedEffectiveness) { // Method 1
+            if (SELECT_CASE_var == DataGenerators::FixedEffectiveness) { // Method 1
 
-                eHX = FuelCell(Num).ExhaustHX.HXEffect;
+                eHX = DataGenerators::FuelCell(Num).ExhaustHX.HXEffect;
 
-                inNodeNum = FuelCell(Num).ExhaustHX.WaterInNode;
+                inNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode;
 
-                MdotWater = FuelCell(Num).ExhaustHX.WaterMassFlowRate;
+                MdotWater = DataGenerators::FuelCell(Num).ExhaustHX.WaterMassFlowRate;
                 MWwater = DataGenerators::GasPhaseThermoChemistryData(4).MolecularWeight;
                 NdotWater = MdotWater / MWwater;
-                TwaterIn = FuelCell(Num).ExhaustHX.WaterInletTemp;
+                TwaterIn = DataGenerators::FuelCell(Num).ExhaustHX.WaterInletTemp;
 
                 FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
 
-                NdotGas = FuelCell(Num).AuxilHeat.NdotAuxMix;
-                TprodGasIn = FuelCell(Num).AuxilHeat.TauxMix;
+                NdotGas = DataGenerators::FuelCell(Num).AuxilHeat.NdotAuxMix;
+                TprodGasIn = DataGenerators::FuelCell(Num).AuxilHeat.TauxMix;
                 FigureAuxilHeatGasHeatCap(Num, TprodGasIn, CpProdGasMol); // Cp in (J/mol*K)
                 // factor of 1000.0 for kmol -> mol
                 NdotCp = min(NdotGas * CpProdGasMol * 1000.0, NdotWater * CpWaterMol * 1000.0);
@@ -3381,7 +3245,7 @@ namespace FuelCellElectricGenerator {
                 THXexh = TprodGasIn - qHX / (NdotGas * CpProdGasMol * 1000.0);
 
                 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(FuelCell(Num).CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(FuelCell(Num).CWLoopNum).FluidIndex, RoutineName);
+                    DataPlant::PlantLoop(DataGenerators::FuelCell(Num).CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(DataGenerators::FuelCell(Num).CWLoopNum).FluidIndex, RoutineName);
 
                 if (MdotWater * Cp <= 0.0) {
                     TwaterOut = TwaterIn;
@@ -3389,18 +3253,18 @@ namespace FuelCellElectricGenerator {
                     TwaterOut = TwaterIn + qHX / (MdotWater * Cp);
                 }
 
-            } else if (SELECT_CASE_var == LMTDempiricalUAeff) { // method 2
-                inNodeNum = FuelCell(Num).ExhaustHX.WaterInNode;
-                MdotWater = FuelCell(Num).ExhaustHX.WaterMassFlowRate;
+            } else if (SELECT_CASE_var == DataGenerators::LMTDempiricalUAeff) { // method 2
+                inNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode;
+                MdotWater = DataGenerators::FuelCell(Num).ExhaustHX.WaterMassFlowRate;
                 MWwater = DataGenerators::GasPhaseThermoChemistryData(4).MolecularWeight;
                 NdotWater = MdotWater / MWwater;
-                NdotGas = FuelCell(Num).AuxilHeat.NdotAuxMix;
+                NdotGas = DataGenerators::FuelCell(Num).AuxilHeat.NdotAuxMix;
 
-                UAeff = FuelCell(Num).ExhaustHX.hxs0 + FuelCell(Num).ExhaustHX.hxs1 * NdotWater + FuelCell(Num).ExhaustHX.hxs2 * pow_2(NdotWater) +
-                        FuelCell(Num).ExhaustHX.hxs3 * NdotGas + FuelCell(Num).ExhaustHX.hxs4 * pow_2(NdotGas);
+                UAeff = DataGenerators::FuelCell(Num).ExhaustHX.hxs0 + DataGenerators::FuelCell(Num).ExhaustHX.hxs1 * NdotWater + DataGenerators::FuelCell(Num).ExhaustHX.hxs2 * pow_2(NdotWater) +
+                        DataGenerators::FuelCell(Num).ExhaustHX.hxs3 * NdotGas + DataGenerators::FuelCell(Num).ExhaustHX.hxs4 * pow_2(NdotGas);
 
-                TauxMix = FuelCell(Num).AuxilHeat.TauxMix;
-                TwaterIn = FuelCell(Num).ExhaustHX.WaterInletTemp;
+                TauxMix = DataGenerators::FuelCell(Num).AuxilHeat.TauxMix;
+                TwaterIn = DataGenerators::FuelCell(Num).ExhaustHX.WaterInletTemp;
                 FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
                 // factor of 1000.0 for kmol -> mol
                 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
@@ -3430,25 +3294,25 @@ namespace FuelCellElectricGenerator {
                     qHX = 0.0;
                 }
 
-            } else if (SELECT_CASE_var == LMTDfundementalUAeff) { // method 3
-                NdotGas = FuelCell(Num).AuxilHeat.NdotAuxMix;
-                inNodeNum = FuelCell(Num).ExhaustHX.WaterInNode;
-                MdotWater = FuelCell(Num).ExhaustHX.WaterMassFlowRate;
+            } else if (SELECT_CASE_var == DataGenerators::LMTDfundementalUAeff) { // method 3
+                NdotGas = DataGenerators::FuelCell(Num).AuxilHeat.NdotAuxMix;
+                inNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode;
+                MdotWater = DataGenerators::FuelCell(Num).ExhaustHX.WaterMassFlowRate;
                 MWwater = DataGenerators::GasPhaseThermoChemistryData(4).MolecularWeight;
                 NdotWater = MdotWater / MWwater;
 
                 hgas =
-                    FuelCell(Num).ExhaustHX.h0gas * std::pow(NdotGas / FuelCell(Num).ExhaustHX.NdotGasRef, FuelCell(Num).ExhaustHX.nCoeff); // Eq. 48
+                        DataGenerators::FuelCell(Num).ExhaustHX.h0gas * std::pow(NdotGas / DataGenerators::FuelCell(Num).ExhaustHX.NdotGasRef, DataGenerators::FuelCell(Num).ExhaustHX.nCoeff); // Eq. 48
 
-                hwater = FuelCell(Num).ExhaustHX.h0Water *
-                         std::pow(NdotWater / FuelCell(Num).ExhaustHX.NdotWaterRef, FuelCell(Num).ExhaustHX.mCoeff); // Eq. 48
+                hwater = DataGenerators::FuelCell(Num).ExhaustHX.h0Water *
+                         std::pow(NdotWater / DataGenerators::FuelCell(Num).ExhaustHX.NdotWaterRef, DataGenerators::FuelCell(Num).ExhaustHX.mCoeff); // Eq. 48
 
                 // now equation 47
-                UAeff = 1.0 / (1.0 / (hgas * FuelCell(Num).ExhaustHX.AreaGas) + 1.0 / (hwater * FuelCell(Num).ExhaustHX.AreaWater) +
-                               FuelCell(Num).ExhaustHX.Fadjust);
+                UAeff = 1.0 / (1.0 / (hgas * DataGenerators::FuelCell(Num).ExhaustHX.AreaGas) + 1.0 / (hwater * DataGenerators::FuelCell(Num).ExhaustHX.AreaWater) +
+                        DataGenerators::FuelCell(Num).ExhaustHX.Fadjust);
 
-                TauxMix = FuelCell(Num).AuxilHeat.TauxMix;
-                TwaterIn = FuelCell(Num).ExhaustHX.WaterInletTemp;
+                TauxMix = DataGenerators::FuelCell(Num).AuxilHeat.TauxMix;
+                TwaterIn = DataGenerators::FuelCell(Num).ExhaustHX.WaterInletTemp;
                 FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
                 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                 FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
@@ -3476,35 +3340,35 @@ namespace FuelCellElectricGenerator {
                     qHX = 0.0;
                 }
 
-            } else if (SELECT_CASE_var == Condensing) { // method 4
-                inNodeNum = FuelCell(Num).ExhaustHX.WaterInNode;
-                MdotWater = FuelCell(Num).ExhaustHX.WaterMassFlowRate;
+            } else if (SELECT_CASE_var == DataGenerators::Condensing) { // method 4
+                inNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode;
+                MdotWater = DataGenerators::FuelCell(Num).ExhaustHX.WaterMassFlowRate;
                 if (MdotWater != 0.0) {
 
                     MWwater = DataGenerators::GasPhaseThermoChemistryData(4).MolecularWeight;
                     NdotWater = MdotWater / MWwater;
-                    NdotGas = FuelCell(Num).AuxilHeat.NdotAuxMix;
+                    NdotGas = DataGenerators::FuelCell(Num).AuxilHeat.NdotAuxMix;
 
-                    UAeff = FuelCell(Num).ExhaustHX.hxs0 + FuelCell(Num).ExhaustHX.hxs1 * NdotWater +
-                            FuelCell(Num).ExhaustHX.hxs2 * pow_2(NdotWater) + FuelCell(Num).ExhaustHX.hxs3 * NdotGas +
-                            FuelCell(Num).ExhaustHX.hxs4 * pow_2(NdotGas);
+                    UAeff = DataGenerators::FuelCell(Num).ExhaustHX.hxs0 + DataGenerators::FuelCell(Num).ExhaustHX.hxs1 * NdotWater +
+                            DataGenerators::FuelCell(Num).ExhaustHX.hxs2 * pow_2(NdotWater) + DataGenerators::FuelCell(Num).ExhaustHX.hxs3 * NdotGas +
+                            DataGenerators::FuelCell(Num).ExhaustHX.hxs4 * pow_2(NdotGas);
 
-                    TauxMix = FuelCell(Num).AuxilHeat.TauxMix;
-                    TwaterIn = FuelCell(Num).ExhaustHX.WaterInletTemp;
+                    TauxMix = DataGenerators::FuelCell(Num).AuxilHeat.TauxMix;
+                    TwaterIn = DataGenerators::FuelCell(Num).ExhaustHX.WaterInletTemp;
                     FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
                     NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                     FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                     NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                     // find water fraction in incoming gas stream
-                    for (i = 1; i <= isize(FuelCell(Num).AuxilHeat.GasLibID); ++i) {
-                        if (FuelCell(Num).AuxilHeat.GasLibID(i) == 4) waterFract = FuelCell(Num).AuxilHeat.ConstitMolalFract(i);
+                    for (i = 1; i <= isize(DataGenerators::FuelCell(Num).AuxilHeat.GasLibID); ++i) {
+                        if (DataGenerators::FuelCell(Num).AuxilHeat.GasLibID(i) == 4) waterFract = DataGenerators::FuelCell(Num).AuxilHeat.ConstitMolalFract(i);
                     }
                     NdotWaterVapor = waterFract * NdotGas;
 
-                    TcondThresh = FuelCell(Num).ExhaustHX.CondensationThresholdTemp;
-                    hxl1 = FuelCell(Num).ExhaustHX.l1Coeff;
-                    hxl2 = FuelCell(Num).ExhaustHX.l2Coeff;
+                    TcondThresh = DataGenerators::FuelCell(Num).ExhaustHX.CondensationThresholdTemp;
+                    hxl1 = DataGenerators::FuelCell(Num).ExhaustHX.l1Coeff;
+                    hxl2 = DataGenerators::FuelCell(Num).ExhaustHX.l2Coeff;
 
                     NdotWaterCond = (TcondThresh - TwaterIn) * (hxl1 * (NdotWaterVapor / NdotGas) + hxl2 * pow_2(NdotWaterVapor / NdotGas));
 
@@ -3574,8 +3438,8 @@ namespace FuelCellElectricGenerator {
                     }
                 } else { // no cooling water flow, model will blow up.
                     qHX = 0.0;
-                    THXexh = FuelCell(Num).AuxilHeat.TauxMix;
-                    TwaterOut = FuelCell(Num).ExhaustHX.WaterInletTemp;
+                    THXexh = DataGenerators::FuelCell(Num).AuxilHeat.TauxMix;
+                    TwaterOut = DataGenerators::FuelCell(Num).ExhaustHX.WaterInletTemp;
                     NdotWaterCond = 0.0;
                     waterFract = -9999.0; // not defined
                 }
@@ -3585,14 +3449,14 @@ namespace FuelCellElectricGenerator {
         }
 
         // update results in data structure.
-        FuelCell(Num).ExhaustHX.qHX = qHX;
-        FuelCell(Num).ExhaustHX.THXexh = THXexh;
-        FuelCell(Num).ExhaustHX.WaterMassFlowRate = MdotWater;
-        FuelCell(Num).ExhaustHX.WaterVaporFractExh = waterFract;
+        DataGenerators::FuelCell(Num).ExhaustHX.qHX = qHX;
+        DataGenerators::FuelCell(Num).ExhaustHX.THXexh = THXexh;
+        DataGenerators::FuelCell(Num).ExhaustHX.WaterMassFlowRate = MdotWater;
+        DataGenerators::FuelCell(Num).ExhaustHX.WaterVaporFractExh = waterFract;
 
-        FuelCell(Num).ExhaustHX.CondensateRate = NdotWaterCond;
-        FuelCell(Num).ExhaustHX.WaterOutletTemp = TwaterOut;
-        FuelCell(Num).ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(inNodeNum).Enthalpy + qHX;
+        DataGenerators::FuelCell(Num).ExhaustHX.CondensateRate = NdotWaterCond;
+        DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletTemp = TwaterOut;
+        DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(inNodeNum).Enthalpy + qHX;
     }
 
     void SimFuelCellPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
