@@ -1331,8 +1331,6 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: IEA/ECBCS Annex 42....
 
-        Array1D<Real64> Par(3); // parameters passed in to SolveRoot
-
         // begin controls block to be moved out to GeneratorDynamics module
         // If no loop demand or Generator OFF, return
         if (!RunFlag) {
@@ -1817,6 +1815,7 @@ namespace FuelCellElectricGenerator {
             Real64 Acc = 0.01;     // guessing need to refine
             int MaxIter = 150;  // guessing need to refine
             SolverFlag = 0; // init
+            Array1D<Real64> Par(3); // parameters passed in to SolveRoot
             Par(1) = double(GeneratorNum);
             Par(2) = tmpTotProdGasEnthalpy;
             Par(3) = DataGenerators::FuelCell(GeneratorNum).FCPM.NdotProdGas;
@@ -1897,19 +1896,11 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // manage controls and calculations related to electrical storage in FuelCell model
 
-        Real64 tmpPdraw;   // power draw from storage, working var
-        Real64 tmpPcharge; // power charge to storage, working var
-        bool drawing;      // true if drawing power
-        bool charging;     // true if charging
-
-        // initialize locals
-        tmpPdraw = 0.0;
-        tmpPcharge = 0.0;
-        drawing = false;
-        charging = false;
+        Real64 tmpPdraw = 0.0;
+        Real64 tmpPcharge = 0.0;
+        bool drawing = false;  // true if drawing power
+        bool charging = false;  // true if charging
         Constrained = false;
-        Pstorage = 0.0;
-        PgridOverage = 0.0;
 
         // step 1 figure out what is desired of electrical storage system
 
@@ -2068,14 +2059,10 @@ namespace FuelCellElectricGenerator {
 
         Real64 Residuum; // F(x)
 
-        int GeneratorNum;
         Real64 thisHmolalProdGases;
-        Real64 desiredHprodGases;
-        Real64 NdotProdGases;
-
-        GeneratorNum = std::floor(Par(1));
-        desiredHprodGases = Par(2);
-        NdotProdGases = Par(3);
+        int GeneratorNum = std::floor(Par(1));
+        Real64 desiredHprodGases = Par(2);
+        Real64 NdotProdGases = Par(3);
 
         FigureProductGasesEnthalpy(GeneratorNum, TprodGas, thisHmolalProdGases);
 
@@ -2107,8 +2094,6 @@ namespace FuelCellElectricGenerator {
         // NIST Webbook on gas phase thermochemistry
 
         Real64 tempCp;
-        int thisConstit; // loop index
-        int gasID;
         Real64 A;  // shomate coeff
         Real64 B;  // shomate coeff
         Real64 C;  // shomate coeff
@@ -2135,8 +2120,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
-            gasID = DataGenerators::FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2191,8 +2176,6 @@ namespace FuelCellElectricGenerator {
 
         Real64 tempHair;
         Real64 HairI;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2221,8 +2204,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
-            gasID = DataGenerators::FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2280,8 +2263,6 @@ namespace FuelCellElectricGenerator {
         // NIST Webbook on gas phase thermochemistry
 
         Real64 tempCp;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2306,8 +2287,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
-            gasID = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2361,8 +2342,6 @@ namespace FuelCellElectricGenerator {
 
         Real64 tempHfuel;
         Real64 HfuelI;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2391,8 +2370,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
-            gasID = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
@@ -2450,8 +2429,6 @@ namespace FuelCellElectricGenerator {
         // NIST Webbook on gas phase thermochemistry
 
         Real64 tempHprodGases;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2480,8 +2457,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= 5; ++thisConstit) {
-            gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= 5; ++thisConstit) {
+            int gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
@@ -2527,8 +2504,6 @@ namespace FuelCellElectricGenerator {
         //       RE-ENGINEERED  na
 
         Real64 tempCp;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2553,8 +2528,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID); ++thisConstit) {
-            gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID); ++thisConstit) {
+            int gasID = DataGenerators::FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2597,8 +2572,6 @@ namespace FuelCellElectricGenerator {
         //       RE-ENGINEERED  na
 
         Real64 tempCp;
-        int thisConstit; // loop index
-        int gasID;       // look up into Gas structure
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2623,8 +2596,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID); ++thisConstit) {
-            gasID = DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= isize(DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID); ++thisConstit) {
+            int gasID = DataGenerators::FuelCell(GeneratorNum).AuxilHeat.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2783,24 +2756,19 @@ namespace FuelCellElectricGenerator {
 
         using DataGenerators::FuelCell;
 
-        Real64 lastPpcuLosses; // used in iterative solution
-        int iter;
-        Real64 Pel;
-
         if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffConstant) {
-
             PpcuLosses = Pdemand * (1 - FuelCell(GeneratorNum).Inverter.ConstEff) / FuelCell(GeneratorNum).Inverter.ConstEff;
         }
 
         if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
             // first use Pdemand instead of Pel to get initial estimate
-            lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
+            Real64 lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
                              CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand);
 
-            for (iter = 1; iter <= 20; ++iter) { // seems like need to iterate (??) Need to investigate number and convergence success here
+            for (int iter = 1; iter <= 20; ++iter) { // seems like need to iterate (??) Need to investigate number and convergence success here
 
-                Pel = Pdemand + lastPpcuLosses;
+                Real64 Pel = Pdemand + lastPpcuLosses;
 
                 lastPpcuLosses = (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pel)) * Pel;
             }
@@ -2951,17 +2919,8 @@ namespace FuelCellElectricGenerator {
         Real64 hwater;
         static Real64 waterFract(0.0);
         Real64 NdotWaterVapor;
-        Real64 TcondThresh;
-        Real64 hxl1;
-        Real64 hxl2;
-        static Real64 NdotWaterCond(0.0);
-        Real64 hfpwater;
-        int i;
 
-        Real64 qSens;
-        Real64 qLatent;
-        int loop;
-        Real64 Cp;
+        Real64 NdotWaterCond = 0.0;
 
         {
             auto const SELECT_CASE_var(DataGenerators::FuelCell(Num).ExhaustHX.HXmodelMode);
@@ -2989,7 +2948,7 @@ namespace FuelCellElectricGenerator {
 
                 THXexh = TprodGasIn - qHX / (NdotGas * CpProdGasMol * 1000.0);
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                     DataPlant::PlantLoop(DataGenerators::FuelCell(Num).CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(DataGenerators::FuelCell(Num).CWLoopNum).FluidIndex, RoutineName);
 
                 if (MdotWater * Cp <= 0.0) {
@@ -3106,20 +3065,20 @@ namespace FuelCellElectricGenerator {
                     NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                     // find water fraction in incoming gas stream
-                    for (i = 1; i <= isize(DataGenerators::FuelCell(Num).AuxilHeat.GasLibID); ++i) {
+                    for (int i = 1; i <= isize(DataGenerators::FuelCell(Num).AuxilHeat.GasLibID); ++i) {
                         if (DataGenerators::FuelCell(Num).AuxilHeat.GasLibID(i) == 4) waterFract = DataGenerators::FuelCell(Num).AuxilHeat.ConstitMolalFract(i);
                     }
                     NdotWaterVapor = waterFract * NdotGas;
 
-                    TcondThresh = DataGenerators::FuelCell(Num).ExhaustHX.CondensationThresholdTemp;
-                    hxl1 = DataGenerators::FuelCell(Num).ExhaustHX.l1Coeff;
-                    hxl2 = DataGenerators::FuelCell(Num).ExhaustHX.l2Coeff;
+                    Real64 TcondThresh = DataGenerators::FuelCell(Num).ExhaustHX.CondensationThresholdTemp;
+                    Real64 hxl1 = DataGenerators::FuelCell(Num).ExhaustHX.l1Coeff;
+                    Real64 hxl2 = DataGenerators::FuelCell(Num).ExhaustHX.l2Coeff;
 
                     NdotWaterCond = (TcondThresh - TwaterIn) * (hxl1 * (NdotWaterVapor / NdotGas) + hxl2 * pow_2(NdotWaterVapor / NdotGas));
 
                     if (NdotWaterCond < 0.0) NdotWaterCond = 0.0;
 
-                    hfpwater = 4.4004e+07; // molal heat of vaporization of water J/kmol)
+                    Real64 hfpwater = 4.4004e+07; // molal heat of vaporization of water J/kmol)
 
                     if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
 
@@ -3134,9 +3093,11 @@ namespace FuelCellElectricGenerator {
                         TwaterOut = TwaterIn + (NdotCpAuxMix / NdotCpWater) * (TauxMix - THXexh) + (NdotWaterCond * hfpwater) / NdotCpWater;
 
                         if (NdotWaterCond > 0) { // Eq. 44 is not correct. use its result as first guess for revised way...
+                            // iterative solution because in condensing case THXexh is function of qSens and qLatent
+                            for (int loop = 1; loop <= 5; ++loop) {
 
-                            for (loop = 1; loop <= 5;
-                                 ++loop) { // iterative soluion because in condensing case THXexh is function of qSens and qLatent
+                                Real64 qSens;
+                                Real64 qLatent;
 
                                 if ((THXexh - TwaterIn) != 0.0 &&
                                     ((TauxMix - TwaterOut) / (THXexh - TwaterIn) > 0.0001)) { // trap divide by zero and negative log
