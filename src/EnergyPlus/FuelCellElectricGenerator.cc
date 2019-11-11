@@ -58,7 +58,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -69,7 +68,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/GeneratorDynamicsManager.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -84,7 +82,7 @@ namespace EnergyPlus {
 namespace FuelCellElectricGenerator {
 
     // MODULE INFORMATION:
-    //       AUTHOR         Brent Griffth
+    //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   August. 2005
     //       MODIFIED       na
     //       RE-ENGINEERED  na
@@ -103,9 +101,7 @@ namespace FuelCellElectricGenerator {
 
     // Using/Aliasing
     using namespace DataGenerators;
-    using namespace DataLoopNode;
     using namespace GeneratorFuelSupply;
-    using namespace GeneratorDynamicsManager;
 
     bool GetFuelCellInput(true); // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
@@ -343,10 +339,10 @@ namespace FuelCellElectricGenerator {
                     FuelCell(thisFuelCell).FCPM.StackHeatLossToDilution = NumArray(23);
                     FuelCell(thisFuelCell).FCPM.DilutionInletNodeName = AlphArray(7);
                     FuelCell(thisFuelCell).FCPM.DilutionInletNode = NodeInputManager::GetOnlySingleNode(
-                        AlphArray(7), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                        AlphArray(7), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
                     FuelCell(thisFuelCell).FCPM.DilutionExhaustNodeName = AlphArray(8);
                     FuelCell(thisFuelCell).FCPM.DilutionExhaustNode = NodeInputManager::GetOnlySingleNode(
-                        AlphArray(8), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                        AlphArray(8), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
 
                     FuelCell(thisFuelCell).FCPM.PelMin = NumArray(24);
                     FuelCell(thisFuelCell).FCPM.PelMax = NumArray(25);
@@ -401,7 +397,7 @@ namespace FuelCellElectricGenerator {
 
                     // check the node connections
                     FuelCell(thisFuelCell).AirSup.SupNodeNum = NodeInputManager::GetOnlySingleNode(
-                        AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                        AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
 
                     FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if (FuelCell(thisFuelCell).AirSup.BlowerPowerCurveID == 0) {
@@ -601,10 +597,10 @@ namespace FuelCellElectricGenerator {
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     AlphArray(1),
-                                                                                    NodeType_Air,
-                                                                                    NodeConnectionType_Sensor,
+                                                                                    DataLoopNode::NodeType_Air,
+                                                                                    DataLoopNode::NodeConnectionType_Sensor,
                                                                                     1,
-                                                                                    ObjectIsNotParent);
+                                                                                    DataLoopNode::ObjectIsNotParent);
 
                     } else if (UtilityRoutines::SameString("TemperatureFromWaterNode", AlphArray(4))) {
                         FuelCell(thisFuelCell).WaterSup.WaterTempMode = WaterInReformWaterNode;
@@ -614,10 +610,10 @@ namespace FuelCellElectricGenerator {
                                                                                     ErrorsFound,
                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                     AlphArray(1),
-                                                                                    NodeType_Water,
-                                                                                    NodeConnectionType_Sensor,
+                                                                                    DataLoopNode::NodeType_Water,
+                                                                                    DataLoopNode::NodeConnectionType_Sensor,
                                                                                     1,
-                                                                                    ObjectIsNotParent);
+                                                                                    DataLoopNode::ObjectIsNotParent);
 
                     } else if (UtilityRoutines::SameString("MainsWaterTemperature", AlphArray(4))) {
                         FuelCell(thisFuelCell).WaterSup.WaterTempMode = WaterInReformMains;
@@ -735,24 +731,24 @@ namespace FuelCellElectricGenerator {
                                                                                      ErrorsFound,
                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                      AlphArray(1),
-                                                                                     NodeType_Water,
-                                                                                     NodeConnectionType_Inlet,
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                                                      1,
-                                                                                     ObjectIsNotParent);
+                                                                                     DataLoopNode::ObjectIsNotParent);
                     FuelCell(thisFuelCell).ExhaustHX.WaterOutNode = NodeInputManager::GetOnlySingleNode(AlphArray(3),
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       AlphArray(1),
-                                                                                      NodeType_Water,
-                                                                                      NodeConnectionType_Outlet,
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                       1,
-                                                                                      ObjectIsNotParent);
+                                                                                      DataLoopNode::ObjectIsNotParent);
                     BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
 
                     // CR9240
                     FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNodeName = AlphArray(4);
                     FuelCell(thisFuelCell).ExhaustHX.ExhaustOutNode = NodeInputManager::GetOnlySingleNode(
-                        AlphArray(4), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                        AlphArray(4), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsNotParent);
 
                     if (UtilityRoutines::SameString("FixedEffectiveness", AlphArray(5))) {
                         FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = FixedEffectiveness;
@@ -921,18 +917,18 @@ namespace FuelCellElectricGenerator {
                                                                                            ErrorsFound,
                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                            AlphArray(1),
-                                                                                           NodeType_Water,
-                                                                                           NodeConnectionType_Inlet,
+                                                                                           DataLoopNode::NodeType_Water,
+                                                                                           DataLoopNode::NodeConnectionType_Inlet,
                                                                                            1,
-                                                                                           ObjectIsNotParent);
+                                                                                           DataLoopNode::ObjectIsNotParent);
                         FuelCell(thisFuelCell).StackCooler.WaterOutNode = NodeInputManager::GetOnlySingleNode(AlphArray(3),
                                                                                             ErrorsFound,
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             AlphArray(1),
-                                                                                            NodeType_Water,
-                                                                                            NodeConnectionType_Outlet,
+                                                                                            DataLoopNode::NodeType_Water,
+                                                                                            DataLoopNode::NodeConnectionType_Outlet,
                                                                                             1,
-                                                                                            ObjectIsNotParent);
+                                                                                            DataLoopNode::ObjectIsNotParent);
                         BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Heat Recovery Nodes");
 
                         FuelCell(thisFuelCell).StackCooler.TstackNom = NumArray(1);
@@ -1561,7 +1557,7 @@ namespace FuelCellElectricGenerator {
 
             if (FuelSupply(FuelCell(GeneratorNum).FuelSupNum).FuelTempMode == FuelInTempFromNode) {
 
-                FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoCompress = Node(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).NodeNum).Temp;
+                FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoCompress = DataLoopNode::Node(FuelSupply(FuelCell(GeneratorNum).FuelSupNum).NodeNum).Temp;
 
             } else if (FuelSupply(FuelCell(GeneratorNum).FuelSupNum).FuelTempMode == FuelInTempSchedule) {
 
@@ -1621,7 +1617,7 @@ namespace FuelCellElectricGenerator {
 
                 } else if ((SELECT_CASE_var == WaterInReformAirNode) || (SELECT_CASE_var == WaterInReformWaterNode)) {
 
-                    FuelCell(GeneratorNum).WaterSup.TwaterIntoCompress = Node(FuelCell(GeneratorNum).WaterSup.NodeNum).Temp;
+                    FuelCell(GeneratorNum).WaterSup.TwaterIntoCompress = DataLoopNode::Node(FuelCell(GeneratorNum).WaterSup.NodeNum).Temp;
 
                 } else if (SELECT_CASE_var == WaterInReformSchedule) {
 
@@ -1661,7 +1657,7 @@ namespace FuelCellElectricGenerator {
 
             // Calculation Step 7, Air compressor
 
-            FuelCell(GeneratorNum).AirSup.TairIntoBlower = Node(FuelCell(GeneratorNum).AirSup.SupNodeNum).Temp;
+            FuelCell(GeneratorNum).AirSup.TairIntoBlower = DataLoopNode::Node(FuelCell(GeneratorNum).AirSup.SupNodeNum).Temp;
 
             FuelCell(GeneratorNum).AirSup.PairCompEl =
                 CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
@@ -3256,7 +3252,7 @@ namespace FuelCellElectricGenerator {
 
         FuelCell(Num).ExhaustHX.CondensateRate = NdotWaterCond;
         FuelCell(Num).ExhaustHX.WaterOutletTemp = TwaterOut;
-        FuelCell(Num).ExhaustHX.WaterOutletEnthalpy = Node(inNodeNum).Enthalpy + qHX;
+        FuelCell(Num).ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(inNodeNum).Enthalpy + qHX;
     }
 
     void SimFuelCellPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
@@ -3344,8 +3340,6 @@ namespace FuelCellElectricGenerator {
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
-
-        using DataLoopNode::Node;
 
         static std::string const RoutineName("InitFuelCellGenerators");
 
@@ -3459,8 +3453,8 @@ namespace FuelCellElectricGenerator {
             FuelCell(FCnum).ExhaustHX.WaterMassFlowRate = FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
             inNode = FuelCell(FCnum).ExhaustHX.WaterInNode;
             outNode = FuelCell(FCnum).ExhaustHX.WaterOutNode;
-            Node(inNode).Temp = InitHRTemp;
-            Node(outNode).Temp = InitHRTemp;
+            DataLoopNode::Node(inNode).Temp = InitHRTemp;
+            DataLoopNode::Node(outNode).Temp = InitHRTemp;
 
             PlantUtilities::InitComponentNodes(0.0,
                                FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign,
@@ -3507,7 +3501,7 @@ namespace FuelCellElectricGenerator {
                                  FuelCell(FCnum).CWCompNum);
 
             FuelCell(FCnum).ExhaustHX.WaterMassFlowRate = mdot;
-            FuelCell(FCnum).ExhaustHX.WaterInletTemp = Node(inNode).Temp;
+            FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(inNode).Temp;
             FuelCell(FCnum).TimeElapsed = TimeElapsed;
         } else {
             inNode = FuelCell(FCnum).ExhaustHX.WaterInNode;
@@ -3520,7 +3514,7 @@ namespace FuelCellElectricGenerator {
                                  FuelCell(FCnum).CWBranchNum,
                                  FuelCell(FCnum).CWCompNum);
 
-            FuelCell(FCnum).ExhaustHX.WaterInletTemp = Node(inNode).Temp;
+            FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(inNode).Temp;
         }
     }
 
@@ -3651,8 +3645,8 @@ namespace FuelCellElectricGenerator {
 
         PlantUtilities::SafeCopyPlantNode(InNodeNum, OutNodeNum);
 
-        Node(OutNodeNum).Temp = FuelCell(Num).ExhaustHX.WaterOutletTemp;
-        Node(OutNodeNum).Enthalpy = FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
+        DataLoopNode::Node(OutNodeNum).Temp = FuelCell(Num).ExhaustHX.WaterOutletTemp;
+        DataLoopNode::Node(OutNodeNum).Enthalpy = FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
     }
 
     void UpdateFuelCellGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
