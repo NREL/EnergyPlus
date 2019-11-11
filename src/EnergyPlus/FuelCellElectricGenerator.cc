@@ -1331,15 +1331,6 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: IEA/ECBCS Annex 42....
 
-        static Real64 PpcuLosses; // losses in inverter [W]
-        Real64 Pel;               // DC power generated in Fuel Cell Power Module
-        Real64 Pdemand;
-        Real64 Eel;
-        Real64 Tavg;                        // working average temperature
-        static bool ConstrainedFCPM(false); // true if power prod is constrained for some reason
-        static bool ConstrainedFCPMTrans(false);
-        Real64 PelDiff;
-        Real64 NdotO2;          // molar rate coeff working variable
         Array1D<Real64> Par(3); // parameters passed in to SolveRoot
 
         // begin controls block to be moved out to GeneratorDynamics module
@@ -1384,16 +1375,17 @@ namespace FuelCellElectricGenerator {
             return;
         }
 
-        // Note: MyLoad (input) is Pdemand (electical Power requested)
-        Pdemand = MyLoad;
+        // Note: MyLoad (input) is Pdemand (electrical Power requested)
+        Real64 Pdemand = MyLoad;
         Real64 PacAncillariesTotal = 0.0;
-        PpcuLosses = 0.0;
+        Real64 PpcuLosses = 0.0;
         Real64 Pstorage = 0.0;
         Real64 PgridExtra = 0.0;
         Real64 PoutofInverter = 0.0;
-        ConstrainedFCPM = false;
+        bool ConstrainedFCPM = false;
         int SolverFlag;
         int iter;
+        Real64 Pel;
 
         // BEGIN SEQUENTIAL SUBSTITUTION to handle a lot of inter-related calcs
         for (iter = 1; iter <= 20; ++iter) {
@@ -1415,6 +1407,8 @@ namespace FuelCellElectricGenerator {
 
             // Control step 2: adjust for transient and startup/shut down constraints
 
+            Real64 PelDiff;
+            bool ConstrainedFCPMTrans = false;
             FigureTransientConstraints(GeneratorNum, Pel, ConstrainedFCPMTrans, PelDiff);
 
             // Control step 3: adjust for max and min limits on Pel
@@ -1438,6 +1432,7 @@ namespace FuelCellElectricGenerator {
 
             // Calculation Step 1. Determine electrical Efficiency Eel
 
+            Real64 Eel = 0.0;
             if (DataGenerators::FuelCell(GeneratorNum).FCPM.EffMode == DataGenerators::NormalizedCurveMode) {
                 // Equation (8) in FuelCell Spec modified for normalized curve
 
@@ -1475,7 +1470,8 @@ namespace FuelCellElectricGenerator {
             // Calculation Step 3. Determine Air rate
 
             if (DataGenerators::FuelCell(GeneratorNum).AirSup.AirSupRateMode == DataGenerators::ConstantStoicsAirRat) { // MEthod 1
-                NdotO2 = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).StoicOxygenRate * DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel *
+                // molar rate coeff working variable
+                Real64 NdotO2 = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).StoicOxygenRate * DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel *
                          DataGenerators::FuelCell(GeneratorNum).AirSup.Stoics;
 
                 DataGenerators::FuelCell(GeneratorNum).FCPM.NdotAir = NdotO2 / DataGenerators::FuelCell(GeneratorNum).AirSup.O2fraction;
@@ -1510,8 +1506,7 @@ namespace FuelCellElectricGenerator {
 
             //  evaluate  heat capacity at average temperature using shomate
             Real64 Cp;              // temp Heat Capacity, used in thermochemistry units of (J/mol K)
-            Tavg =
-                (DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).TfuelIntoCompress + DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).TfuelIntoFCPM) / 2.0;
+            Real64 Tavg = (DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).TfuelIntoCompress + DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).TfuelIntoFCPM) / 2.0;
             FigureFuelHeatCap(GeneratorNum, Tavg, Cp); // Cp in (J/mol K)
 
             // calculate a Temp of fuel out of compressor and into power module
@@ -1529,8 +1524,7 @@ namespace FuelCellElectricGenerator {
                     DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).CompPowerLossFactor * DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl;
 
             if (DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).QskinLoss < 0.0) {
-                //   write(*,*) 'problem in FuelSupply%QskinLoss ', FuelSupply(DataGenerators::FuelCell(GeneratorNum)%FuelSupNum)%QskinLoss
-                ShowWarningError("problem in FuelSupply%QskinLoss " + General::RoundSigDigits(DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).QskinLoss, 3));
+                ShowWarningError("problem in FuelSupply.QskinLoss " + General::RoundSigDigits(DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).QskinLoss, 3));
                 DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).QskinLoss = 0.0;
             }
 
@@ -1675,7 +1669,7 @@ namespace FuelCellElectricGenerator {
             // calculation Step 8, Figure Product Gases
 
             // figure stoic N dot for air
-            NdotO2 = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).StoicOxygenRate * DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel;
+            Real64 NdotO2 = DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).StoicOxygenRate * DataGenerators::FuelCell(GeneratorNum).FCPM.NdotFuel;
 
             // Air in excess of match for fuel
             Real64 NdotStoicAir = NdotO2 / DataGenerators::FuelCell(GeneratorNum).AirSup.O2fraction;
