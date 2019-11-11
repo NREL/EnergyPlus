@@ -65,7 +65,8 @@ namespace EvaporativeFluidCoolers {
 
     extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
 
-    enum struct EvapLoss {
+    enum struct EvapLoss
+    {
         ByUserFactor,
         ByMoistTheory
     };
@@ -172,8 +173,8 @@ namespace EvaporativeFluidCoolers {
         Real64 BypassFraction; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
         // begin water system interactions
-        EvapLoss EvapLossMode;          // sets how evaporative fluid cooler water evaporation is modeled
-        Blowdown BlowdownMode;          // sets how evaporative fluid cooler water blowdown is modeled
+        EvapLoss EvapLossMode;     // sets how evaporative fluid cooler water evaporation is modeled
+        Blowdown BlowdownMode;     // sets how evaporative fluid cooler water blowdown is modeled
         int SchedIDBlowdown;       // index "pointer" to schedule of blowdown in [m3/s]
         int WaterTankID;           // index "pointer" to WaterStorage structure
         int WaterTankDemandARRID;  // index "pointer" to demand array inside WaterStorage structure
@@ -192,18 +193,18 @@ namespace EvaporativeFluidCoolers {
         int WaterInletNode;       // Node number at evaporative fluid cooler inlet
         int WaterOutletNode;      // Node number at evaporative fluid cooler outlet
         Real64 WaterMassFlowRate; // WaterMassFlowRate through evaporative fluid cooler
-        Real64 Qactual;          // Evaporative fluid cooler heat transfer
-        Real64 FanPower;         // Evaporative fluid cooler fan power used
-        Real64 AirFlowRateRatio; // Ratio of air flow rate through VS evaporative fluid cooler
-        Real64 WaterUsage; // Evaporative fluid cooler water usage (m3/s)
+        Real64 Qactual;           // Evaporative fluid cooler heat transfer
+        Real64 FanPower;          // Evaporative fluid cooler fan power used
+        Real64 AirFlowRateRatio;  // Ratio of air flow rate through VS evaporative fluid cooler
+        Real64 WaterUsage;        // Evaporative fluid cooler water usage (m3/s)
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool OneTimeFlagForEachEvapFluidCooler;
         bool CheckEquipName;
-        Real64 fluidCoolerInletWaterTemp;    // Evaporative fluid cooler inlet water temperature (C)
-        Real64 fluidCoolerOutletWaterTemp;   // Evaporative fluid cooler outlet water temperature (C)
-        Real64 FanEnergy;         // Evaporative fluid cooler fan energy consumption (J)
-        Real64 WaterAmountUsed;   // Evaporative fluid cooler make up water usage (m3)
+        Real64 fluidCoolerInletWaterTemp;  // Evaporative fluid cooler inlet water temperature (C)
+        Real64 fluidCoolerOutletWaterTemp; // Evaporative fluid cooler outlet water temperature (C)
+        Real64 FanEnergy;                  // Evaporative fluid cooler fan energy consumption (J)
+        Real64 WaterAmountUsed;            // Evaporative fluid cooler make up water usage (m3)
         Real64 EvaporationVdot;
         Real64 EvaporationVol;
         Real64 DriftVdot;
@@ -240,7 +241,8 @@ namespace EvaporativeFluidCoolers {
               WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), AirFlowRateRatio(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
               OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true), fluidCoolerInletWaterTemp(0.0), fluidCoolerOutletWaterTemp(0.0),
               FanEnergy(0.0), WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0),
-              BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
+              BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0),
+              StarvedMakeUpVol(0.0)
         {
         }
 
@@ -274,7 +276,7 @@ namespace EvaporativeFluidCoolers {
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler;           // dimension to number of machines
+    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
     void GetEvapFluidCoolerInput();
 
