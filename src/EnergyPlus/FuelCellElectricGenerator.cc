@@ -99,10 +99,6 @@ namespace FuelCellElectricGenerator {
     // REFERENCES:
     // IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
 
-    // Using/Aliasing
-    using namespace DataGenerators;
-    using namespace GeneratorFuelSupply;
-
     bool GetFuelCellInput(true); // When TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
 
@@ -121,6 +117,9 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE: This is the Solid oxide fuel cell Generator model driver.  It
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
 
         int GenNum; // Generator number counter
 
@@ -170,6 +169,41 @@ namespace FuelCellElectricGenerator {
 
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
 
         int GeneratorNum;              // Generator counter
         int NumAlphas;                 // Number of elements in the alpha array
@@ -360,10 +394,10 @@ namespace FuelCellElectricGenerator {
                 }
             } // loop over NumFuelCellPMs
 
-            GetGeneratorFuelSupplyInput();
+            GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+                GeneratorFuelSupply::SetupFuelConstituentData(FuelSupNum, ErrorsFound);
             }
 
             // set fuel supply ID in Fuel cell structure
@@ -856,8 +890,8 @@ namespace FuelCellElectricGenerator {
                 if (thisFuelCell > 0) {
                     FuelCell(thisFuelCell).Inverter.Name = AlphArray(1);
 
-                    if (UtilityRoutines::SameString(AlphArray(2), "QUADRATIC")) FuelCell(thisFuelCell).Inverter.EffMode = InverterEffQuadratic;
-                    if (UtilityRoutines::SameString(AlphArray(2), "Constant")) FuelCell(thisFuelCell).Inverter.EffMode = InverterEffConstant;
+                    if (UtilityRoutines::SameString(AlphArray(2), "QUADRATIC")) FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEffQuadratic;
+                    if (UtilityRoutines::SameString(AlphArray(2), "Constant")) FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEffConstant;
                     if (FuelCell(thisFuelCell).Inverter.EffMode == 0) {
                         ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + AlphArray(2));
                         ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -868,7 +902,7 @@ namespace FuelCellElectricGenerator {
 
                     FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID = CurveManager::GetCurveIndex(AlphArray(3));
                     if ((FuelCell(thisFuelCell).Inverter.EffQuadraticCurveID == 0) &&
-                        (FuelCell(thisFuelCell).Inverter.EffMode == InverterEffQuadratic)) {
+                        (FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEffQuadratic)) {
                         ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                         ShowContinueError("Curve was not found ");
@@ -1358,6 +1392,46 @@ namespace FuelCellElectricGenerator {
         // many subdomains such as fuel and air compressors, wa
 
         // REFERENCES: IEA/ECBCS Annex 42....
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
 
         static Real64 PpcuLosses; // losses in inverter [W]
         Real64 Pel;               // DC power generated in Fuel Cell Power Module
@@ -1898,12 +1972,12 @@ namespace FuelCellElectricGenerator {
             PintoInverter = Pel - Pstorage;
             // refine power conditioning losses with more current power production
 
-            if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffConstant) {
+            if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffConstant) {
 
                 PpcuLosses = (1.0 - FuelCell(GeneratorNum).Inverter.ConstEff) * PintoInverter;
             }
 
-            if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffQuadratic) {
+            if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
                 PpcuLosses = (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, PintoInverter)) * PintoInverter;
             }
@@ -1949,6 +2023,48 @@ namespace FuelCellElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // manage controls and calculations related to electrical storage in FuelCell model
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
 
         Real64 tmpPdraw;   // power draw from storage, working var
         Real64 tmpPcharge; // power charge to storage, working var
@@ -2159,6 +2275,50 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
+
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;
@@ -2241,6 +2401,51 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
 
         Real64 tempHair;
         Real64 HairI;
@@ -2332,6 +2537,51 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
+
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2411,6 +2661,51 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
 
         Real64 tempHfuel;
         Real64 HfuelI;
@@ -2502,6 +2797,51 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
+
         Real64 tempHprodGases;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2579,6 +2919,51 @@ namespace FuelCellElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
+
         Real64 tempCp;
         int thisConstit; // loop index
         int gasID;       // look up into Gas structure
@@ -2648,6 +3033,51 @@ namespace FuelCellElectricGenerator {
         //       DATE WRITTEN   Aug. 2005
         //       MODIFIED       na
         //       RE-ENGINEERED  na
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FCDataStruct;
+        using DataGenerators::DirectCurveMode;
+        using DataGenerators::NormalizedCurveMode;
+        using DataGenerators::ConstantRateSkinLoss;
+        using DataGenerators::UADTSkinLoss;
+        using DataGenerators::QuadraticFuelNdotSkin;
+        using DataGenerators::NumGeneratorFuelSups;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::ConstantStoicsAirRat;
+        using DataGenerators::QuadraticFuncofPel;
+        using DataGenerators::QuadraticFuncofNdot;
+        using DataGenerators::RecoverBurnInvertBatt;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RegularAir;
+        using DataGenerators::UserDefinedConstituents;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::GasPropertyDataStruct;
+        using DataGenerators::WaterInReformAirNode;
+        using DataGenerators::WaterInReformWaterNode;
+        using DataGenerators::WaterInReformMains;
+        using DataGenerators::WaterInReformSchedule;
+        using DataGenerators::SurroundingZone;
+        using DataGenerators::AirInletForFC;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
+        using DataGenerators::SimpleEffConstraints;
+        using DataGenerators::FuelInTempFromNode;
+        using DataGenerators::FuelInTempSchedule;
+        using DataGenerators::MinProductGasTemp;
+        using DataGenerators::MaxProductGasTemp;
+        using DataGenerators::ImBalanceTol;
+        using DataGenerators::LeadAcidBatterManwellMcGowan;
+        using DataGenerators::LeadAcidBatterySaupe;
+        using DataGenerators::NISTShomate;
+        using DataGenerators::NASAPolynomial;
+        using DataGenerators::RinKJperMolpK;
 
         Real64 tempCp;
         int thisConstit; // loop index
@@ -2802,6 +3232,9 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the AC ancillaries to determine Pel
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::FuelSupply;
+
         //  Using lagged values inside a sequential substitution loop
         PacAncill = 0.0;
         // sect. 5.9
@@ -2834,16 +3267,18 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate inverter losses
 
+        using DataGenerators::FuelCell;
+
         Real64 lastPpcuLosses; // used in iterative solution
         int iter;
         Real64 Pel;
 
-        if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffConstant) {
+        if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffConstant) {
 
             PpcuLosses = Pdemand * (1 - FuelCell(GeneratorNum).Inverter.ConstEff) / FuelCell(GeneratorNum).Inverter.ConstEff;
         }
 
-        if (FuelCell(GeneratorNum).Inverter.EffMode == InverterEffQuadratic) {
+        if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
             // first use Pdemand instead of Pel to get initial estimate
             lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
@@ -2872,6 +3307,8 @@ namespace FuelCellElectricGenerator {
         //       DATE WRITTEN   Aug 2005
         //       MODIFIED       na
         //       RE-ENGINEERED  na
+
+        using DataGenerators::FuelCell;
 
         Real64 CurrentFractionalDay; // working var, time in decimal days
         Real64 EndingFractionalDay;  // working var, time is decimal days
@@ -2958,6 +3395,8 @@ namespace FuelCellElectricGenerator {
 
         // not yet implemented, just pass product gases thru nul domain
 
+        using DataGenerators::FuelCell;
+
         FuelCell(Num).AuxilHeat.TauxMix = FuelCell(Num).FCPM.TprodGasLeavingFCPM;
         FuelCell(Num).AuxilHeat.NdotAuxMix = FuelCell(Num).FCPM.NdotProdGas;
         FuelCell(Num).AuxilHeat.ConstitMolalFract = FuelCell(Num).FCPM.ConstitMolalFract;
@@ -2977,6 +3416,13 @@ namespace FuelCellElectricGenerator {
         // model exhaust gas to water heat exchanger
 
         // REFERENCES: Annex 42 model documentation
+
+        using DataGenerators::FuelCell;
+        using DataGenerators::FixedEffectiveness;
+        using DataGenerators::GasPhaseThermoChemistryData;
+        using DataGenerators::LMTDempiricalUAeff;
+        using DataGenerators::LMTDfundementalUAeff;
+        using DataGenerators::Condensing;
 
         static std::string const RoutineName("CalcFuelCellGenHeatRecovery");
 
@@ -3279,6 +3725,9 @@ namespace FuelCellElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire FuelCell model
 
+        using DataGenerators::FuelCell;
+        using DataGenerators::FCDataStruct;
+
         if (GetFuelCellInput) {
 
             // Read input data.
@@ -3340,6 +3789,11 @@ namespace FuelCellElectricGenerator {
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
+
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FuelCell;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::InitHRTemp;
 
         static std::string const RoutineName("InitFuelCellGenerators");
 
@@ -3522,6 +3976,8 @@ namespace FuelCellElectricGenerator {
                                               std::string &heatRecoveryCompName)
     {
 
+        using DataGenerators::FuelCell;
+
         if (GetFuelCellInput) {
 
             // Read input data.
@@ -3551,6 +4007,16 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
+
+        using DataGenerators::NumFuelCellGenerators;
+        using DataGenerators::FuelCell;
+        using DataGenerators::FuelSupply;
+        using DataGenerators::NoRecoveryOnAirIntake;
+        using DataGenerators::RecoverAuxiliaryBurner;
+        using DataGenerators::RecoverInverterBatt;
+        using DataGenerators::RecoverInverter;
+        using DataGenerators::RecoverBattery;
+        using DataGenerators::RecoverBurnInvertBatt;
 
         Real64 TotalZoneHeatGain; // working variable for zone gain [w]
         int FCnum; // number of fuel cell
@@ -3636,6 +4102,8 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
+        using DataGenerators::FuelCell;
+
         int InNodeNum;
         int OutNodeNum;
 
@@ -3653,6 +4121,9 @@ namespace FuelCellElectricGenerator {
                                         int const Num                  // Generator number
     )
     {
+        using DataGenerators::FuelCell;
+        using DataGenerators::FuelSupply;
+
         FuelCell(Num).Report.ACPowerGen = FuelCell(Num).ACPowerGen;                            // electrical power produced [W]
         FuelCell(Num).Report.ACEnergyGen = FuelCell(Num).ACPowerGen * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // energy produced (J)
         FuelCell(Num).Report.QdotExhaust = 0.0;                                                // reporting: exhaust gas heat recovered (W)
@@ -3757,6 +4228,8 @@ namespace FuelCellElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // provide a get method to collect results at the load center level
+
+        using DataGenerators::FuelCell;
 
         GeneratorPower = FuelCell(GeneratorIndex).Report.ACPowerGen;
         GeneratorEnergy = FuelCell(GeneratorIndex).Report.ACEnergyGen;
