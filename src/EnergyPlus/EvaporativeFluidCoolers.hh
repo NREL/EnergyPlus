@@ -83,12 +83,6 @@ namespace EvaporativeFluidCoolers {
         UserSpecifiedDesignCapacity
     };
 
-    enum struct EvapFluidCooler
-    {
-        SingleSpeed,
-        TwoSpeed
-    };
-
     struct EvapFluidCoolerInletConds
     {
         Real64 WaterTemp;  // Evaporative fluid cooler water inlet temperature (C)
@@ -107,7 +101,8 @@ namespace EvaporativeFluidCoolers {
         // Members
         std::string Name;                // User identifier
         std::string EvapFluidCoolerType; // Type of evaporative fluid cooler
-        EvapFluidCooler EvapFluidCoolerType_Num;
+        int TypeOf_Num;
+        std::string PerformanceInputMethod;
         PIM PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
@@ -225,7 +220,7 @@ namespace EvaporativeFluidCoolers {
 
         // Default Constructor
         EvapFluidCoolerSpecs()
-            : EvapFluidCoolerType_Num(EvapFluidCooler::SingleSpeed), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
+            : TypeOf_Num(0), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
               HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
@@ -248,6 +243,15 @@ namespace EvaporativeFluidCoolers {
               BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
         {
         }
+
+        static PlantComponent *factory(int objectType, std::string const &objectName);
+
+        void setupOutputVars();
+
+        void getSizingFactor(Real64 &_SizFac) override;
+
+        void getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler();
@@ -267,24 +271,10 @@ namespace EvaporativeFluidCoolers {
         Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1<Real64> const &Par);
 
         void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
-
-        void setupOutputVars();
     };
 
     // Object Data
     extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler;           // dimension to number of machines
-
-    void SimEvapFluidCoolers(std::string const &EvapFluidCoolerType,
-                             std::string const &EvapFluidCoolerName,
-                             int &CompIndex,
-                             bool &RunFlag,
-                             bool InitLoopEquip,
-                             Real64 &MaxCap,
-                             Real64 &MinCap,
-                             Real64 &OptCap,
-                             bool GetSizingFactor, // TRUE when just the sizing factor is requested
-                             Real64 &SizingFactor        // sizing factor
-    );
 
     void GetEvapFluidCoolerInput();
 
