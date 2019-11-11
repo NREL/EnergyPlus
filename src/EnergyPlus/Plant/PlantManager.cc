@@ -77,6 +77,7 @@
 #include <HeatPumpWaterToWaterSimple.hh>
 #include <HeatPumpWaterToWaterCOOLING.hh>
 #include <HeatPumpWaterToWaterHEATING.hh>
+#include <IndoorIceRink.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -1034,6 +1035,12 @@ namespace EnergyPlus {
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(TypeOf_GrndHtExchgSlinky,
                                                                                             CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")) {
+                                this_comp.TypeOf_Num = TypeOf_IceRink;
+                                this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr =
+                                    IceRink::IceRinkData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric:EIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;

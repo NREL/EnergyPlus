@@ -803,6 +803,9 @@ namespace PlantLoopEquip {
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgSlinky) { // 'GROUND HEAT EXCHANGER:SLINKY'
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_IceRink) { // 'ICE RINK'
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             }
             // THERMAL STORAGE
         } else if (GeneralEquipType == GenEquipTypes_ThermalStorage) {

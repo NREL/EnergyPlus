@@ -79,7 +79,7 @@ namespace IceRink {
     extern int NotOperating; // Parameter for use with OperatingMode variable, set for not operating
     extern int CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
 
-    struct IceRink : PlantComponent
+    struct IceRinkData : PlantComponent
     {
         std::string Name;     // User identifier
         int RinkType; // Type of ice rink: Direct or indirect
@@ -144,7 +144,7 @@ namespace IceRink {
         Real64 CoolEnergy;       // Cooling sent to rink floor in Joules
 
         // Default Constructor
-        IceRink()
+        IceRinkData()
             : RinkType_Num(0)
         {
 
@@ -159,9 +159,7 @@ namespace IceRink {
 
         Real64 calcEffectiveness(Real64 const Temperature, Real64 const RefrigMassFlow);
 
-        void calculateDirectIceRink(Real64 &LoadMet);
-
-        void calculateIndirectIceRink();
+        void calculateIceRink(Real64 &LoadMet);
 
         void update();
 
@@ -201,7 +199,7 @@ namespace IceRink {
     };
 
     // Object Data:
-    extern Array1D<IceRink> Rink;
+    extern Array1D<IceRinkData> Rink;
     extern Array1D<ResurfacerData> Resurfacer;
 
     // Functions:

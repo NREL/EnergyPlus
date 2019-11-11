@@ -249,8 +249,7 @@ namespace DataPlant {
     extern int const TypeOf_FourPipeBeamAirTerminal;
     extern int const TypeOf_HeatPumpEIRCooling;
     extern int const TypeOf_HeatPumpEIRHeating;
-    extern int const TypeOf_IceRink_Direct;
-    extern int const TypeOf_IceRink_Indirect;
+    extern int const TypeOf_IceRink;
 
     // Parameters for General Equipment Types
     extern int const NumGeneralEquipTypes;

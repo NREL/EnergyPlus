@@ -114,7 +114,7 @@ namespace IceRink {
     bool GetInput(true);
 
     // Object Data
-    Array1D<IceRink> Rink;
+    Array1D<IceRinkData> Rink;
     Array1D<ResurfacerData> Resurfacer;
     std::unordered_map<std::string, std::string> UniqueRinkNames;
 
@@ -127,7 +127,7 @@ namespace IceRink {
         UniqueRinkNames.clear();
     }
 
-    PlantComponent *IceRink::factory(std::string const &objectName)
+    PlantComponent *IceRinkData::factory(std::string const &objectName)
     {
         // Process the input data for ice rinks if it hasn't been done yet
         if (GetInput) {
@@ -146,16 +146,14 @@ namespace IceRink {
         return nullptr;
     }
 
-    void IceRink::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void IceRinkData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                            bool const EP_UNUSED(FirstHVACIteration),
-                           Real64 &LoadMet,
+                           Real64 &CurLoad,
                            bool const RunFlag)
     {
         this->initialize();
-        if (this->RinkType_Num == DataPlant::TypeOf_IceRink_Direct) {
-            this->calculateDirectIceRink(LoadMet);
-        } else if (this->RinkType_Num == DataPlant::TypeOf_IceRink_Indirect) {
-            this->calculateIndirectIceRink();
+        if (this->RinkType_Num == DataPlant::TypeOf_IceRink) {
+            this->calculateIceRink(CurLoad);
         }
         this->update();
         this->report(RunFlag);
@@ -165,15 +163,15 @@ namespace IceRink {
     {
     }
 
-    void IceRink::initialize()
+    void IceRinkData::initialize()
     {
     }
 
-    void IceRink::setupOutputVariables()
+    void IceRinkData::setupOutputVariables()
     {
     }
 
-    Real64 IceRink::IceRinkFreezing(Real64 &FreezingLoad)
+    Real64 IceRinkData::IceRinkFreezing(Real64 &FreezingLoad)
     {
         Real64 QFusion(333550.00);
         Real64 CpIce(2108.00);
@@ -207,7 +205,7 @@ namespace IceRink {
         return (ResurfacingLoad);
     }
 
-    Real64 IceRink::calcEffectiveness(Real64 const Temperature,    // Temperature of refrigerant entering the floor radiant system, in C))
+    Real64 IceRinkData::calcEffectiveness(Real64 const Temperature,    // Temperature of refrigerant entering the floor radiant system, in C))
                                       Real64 const RefrigMassFlow) // Mass flow rate of refrigerant in the floor radiant system, in kg/s
     {
         // Using/Aliasing
@@ -259,7 +257,7 @@ namespace IceRink {
         return CalcEffectiveness;
     }
 
-    void IceRink::calculateDirectIceRink(Real64 &LoadMet)
+    void IceRinkData::calculateIceRink(Real64 &LoadMet)
     {
         // Using/Aliasing
         using DataHeatBalFanSys::CTFTsrcConstPart;
@@ -433,15 +431,11 @@ namespace IceRink {
         LoadMet = FreezingLoad + ResurfacingLoad;
     }
 
-    void IceRink::calculateIndirectIceRink()
+    void IceRinkData::update()
     {
     }
 
-    void IceRink::update()
-    {
-    }
-
-    void IceRink::report(bool RunFlag)
+    void IceRinkData::report(bool RunFlag)
     {
     }
 } // namespace IceRink
