@@ -146,7 +146,7 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
         installStatus = "No (use at your own risk)";
         widget.deselectComponent(compName);
       } else if (compName === "Libraries") {
-        console.log("-- Component 'Libraries' is highly recommended on Windows, at least when shipping to Windows 7/8.");
+        console.log("-- Component 'Libraries' is highly recommended on Windows, it will include msvc runtime, and also Windows Universal CRT libraries (needed for shipping to Windows 7/8).");
         // Allow unselect anyways
         installStatus = "No (use at your own risk)";
         widget.deselectComponent(compName);
