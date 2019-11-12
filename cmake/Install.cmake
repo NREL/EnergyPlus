@@ -633,7 +633,7 @@ cpack_ifw_configure_component(Unspecified
 )
 
 cpack_ifw_configure_component(Symlinks
-    SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
+    SCRIPT cmake/qtifw/install_unix_createsymlinks.qs
     REQUIRES_ADMIN_RIGHTS
 )
 
