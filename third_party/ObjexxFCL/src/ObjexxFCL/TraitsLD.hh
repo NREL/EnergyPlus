@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_TraitsLD_hh_INCLUDED
 #define ObjexxFCL_TraitsLD_hh_INCLUDED
 
-// TraitsLD: List-Directed I/O Type Traits
+// List-Directed I/O Type Traits
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // Notes:
 //  Intel Fortran default values used in this version
@@ -27,204 +27,204 @@ namespace ObjexxFCL {
 class byte;
 class ubyte;
 
-// TraitsLD
+// List-Directed I/O Type Traits
 template< typename T >
 struct TraitsLD
 {
-	typedef  T  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = T;
+	using Size = std::size_t;
 
 	static Size const w = 0; // Field width
 	static Size const d = 0; // Fraction width
 	static Size const e = 0; // Exponent width
 };
 
-// TraitsLD: char Specialization
+// char Specialization
 template<>
 struct TraitsLD< char >
 {
-	typedef  char  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = char;
+	using Size = std::size_t;
 
 	static Size const w = 1; // Field width
 };
 
-// TraitsLD: bool Specialization
+// bool Specialization
 template<>
 struct TraitsLD< bool >
 {
-	typedef  bool  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = bool;
+	using Size = std::size_t;
 
 	static Size const w = 2; // Field width
 };
 
-// TraitsLD: byte Specialization
+// byte Specialization
 template<>
 struct TraitsLD< byte >
 {
-	typedef  byte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = byte;
+	using Size = std::size_t;
 
 	static Size const w = 5; // Field width
 };
 
-// TraitsLD: ubyte Specialization
+// ubyte Specialization
 template<>
 struct TraitsLD< ubyte >
 {
-	typedef  ubyte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = ubyte;
+	using Size = std::size_t;
 
 	static Size const w = 5; // Field width
 };
 
-// TraitsLD: short int Specialization
+// short int Specialization
 template<>
 struct TraitsLD< short int >
 {
-	typedef  short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = short int;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsLD: unsigned short int Specialization
+// unsigned short int Specialization
 template<>
 struct TraitsLD< unsigned short int >
 {
-	typedef  unsigned short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned short int;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsLD: int Specialization
+// int Specialization
 template<>
 struct TraitsLD< int >
 {
-	typedef  int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = int;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsLD: unsigned int Specialization
+// unsigned int Specialization
 template<>
 struct TraitsLD< unsigned int >
 {
-	typedef  unsigned int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned int;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsLD: long int Specialization
+// long int Specialization
 template<>
 struct TraitsLD< long int >
 {
-	typedef  long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long int;
+	using Size = std::size_t;
 
 	static Size const w = 22; // Field width
 };
 
-// TraitsLD: unsigned long int Specialization
+// unsigned long int Specialization
 template<>
 struct TraitsLD< unsigned long int >
 {
-	typedef  unsigned long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long int;
+	using Size = std::size_t;
 
 	static Size const w = 22; // Field width
 };
 
-// TraitsLD: long long int Specialization
+// long long int Specialization
 template<>
 struct TraitsLD< long long int >
 {
-	typedef  long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long long int;
+	using Size = std::size_t;
 
 	static Size const w = 22; // Field width
 };
 
-// TraitsLD: unsigned long long int Specialization
+// unsigned long long int Specialization
 template<>
 struct TraitsLD< unsigned long long int >
 {
-	typedef  unsigned long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long long int;
+	using Size = std::size_t;
 
 	static Size const w = 22; // Field width
 };
 
-// TraitsLD: float Specialization
+// float Specialization
 template<>
 struct TraitsLD< float >
 {
-	typedef  float  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = float;
+	using Size = std::size_t;
 
 	static Size const w = 15; // Field width
 	static Size const d = 7; // Fraction width
 	static Size const e = 2; // Exponent width
 };
 
-// TraitsLD: double Specialization
+// double Specialization
 template<>
 struct TraitsLD< double >
 {
-	typedef  double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = double;
+	using Size = std::size_t;
 
 	static Size const w = 24; // Field width
 	static Size const d = 15; // Fraction width
 	static Size const e = 3; // Exponent width
 };
 
-// TraitsLD: long double Specialization
+// long double Specialization
 template<>
 struct TraitsLD< long double >
 {
-	typedef  long double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long double;
+	using Size = std::size_t;
 
 	static Size const w = 43; // Field width
 	static Size const d = 33; // Fraction width
 	static Size const e = 4; // Exponent width
 };
 
-// TraitsLD: std::complex< float > Specialization
+// std::complex< float > Specialization
 template<>
 struct TraitsLD< std::complex< float > >
 {
-	typedef  std::complex< float >  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = std::complex< float >;
+	using Size = std::size_t;
 
 	static Size const w = 14; // Field width
 	static Size const d = 7; // Fraction width
 	static Size const e = 2; // Exponent width
 };
 
-// TraitsLD: std::complex< double > Specialization
+// std::complex< double > Specialization
 template<>
 struct TraitsLD< std::complex< double > >
 {
-	typedef  std::complex< double >  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = std::complex< double >;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 	static Size const d = 15; // Fraction width
 	static Size const e = 3; // Exponent width
 };
 
-// TraitsLD: std::complex< long double > Specialization
+// std::complex< long double > Specialization
 template<>
 struct TraitsLD< std::complex< long double > >
 {
-	typedef  std::complex< long double >  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = std::complex< long double >;
+	using Size = std::size_t;
 
 	static Size const w = 42; // Field width
 	static Size const d = 33; // Fraction width

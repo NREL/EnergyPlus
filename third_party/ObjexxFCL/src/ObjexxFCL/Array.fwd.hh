@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array< bool >                Array_bool;
-typedef  Array< byte >                Array_byte;
-typedef  Array< sbyte >               Array_sbyte;
-typedef  Array< ubyte >               Array_ubyte;
-typedef  Array< short int >           Array_short;
-typedef  Array< int >                 Array_int;
-typedef  Array< long int >            Array_long;
-typedef  Array< unsigned short int >  Array_ushort;
-typedef  Array< unsigned int >        Array_uint;
-typedef  Array< unsigned long int >   Array_ulong;
-typedef  Array< std::size_t >         Array_size;
-typedef  Array< std::int8_t >         Array_int8;
-typedef  Array< std::int16_t >        Array_int16;
-typedef  Array< std::int32_t >        Array_int32;
-typedef  Array< std::int64_t >        Array_int64;
-typedef  Array< std::uint8_t >        Array_uint8;
-typedef  Array< std::uint16_t >       Array_uint16;
-typedef  Array< std::uint32_t >       Array_uint32;
-typedef  Array< std::uint64_t >       Array_uint64;
-typedef  Array< float >               Array_float;
-typedef  Array< double >              Array_double;
-typedef  Array< long double >         Array_longdouble;
-typedef  Array< char >                Array_char;
-typedef  Array< unsigned char >       Array_uchar;
-typedef  Array< signed char >         Array_schar;
-typedef  Array< std::string >         Array_string;
+using sbyte = byte;
+using Array_bool = Array< bool >;
+using Array_byte = Array< byte >;
+using Array_sbyte = Array< sbyte >;
+using Array_ubyte = Array< ubyte >;
+using Array_short = Array< short int >;
+using Array_int = Array< int >;
+using Array_long = Array< long int >;
+using Array_ushort = Array< unsigned short int >;
+using Array_uint = Array< unsigned int >;
+using Array_ulong = Array< unsigned long int >;
+using Array_size = Array< std::size_t >;
+using Array_int8 = Array< std::int8_t >;
+using Array_int16 = Array< std::int16_t >;
+using Array_int32 = Array< std::int32_t >;
+using Array_int64 = Array< std::int64_t >;
+using Array_uint8 = Array< std::uint8_t >;
+using Array_uint16 = Array< std::uint16_t >;
+using Array_uint32 = Array< std::uint32_t >;
+using Array_uint64 = Array< std::uint64_t >;
+using Array_float = Array< float >;
+using Array_double = Array< double >;
+using Array_longdouble = Array< long double >;
+using Array_char = Array< char >;
+using Array_uchar = Array< unsigned char >;
+using Array_schar = Array< signed char >;
+using Array_string = Array< std::string >;
 
 } // ObjexxFCL
 

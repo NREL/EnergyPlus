@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/fmt.manipulators.hh>
@@ -44,7 +44,7 @@ class ubyte;
 namespace fmt {
 
 // Types
-typedef  std::size_t  Size;
+using Size = std::size_t;
 
 // Constants
 static Size const NOSIZE = static_cast< Size >( -1 );
@@ -67,14 +67,13 @@ class Skip
 
 public: // Creation
 
-	// Constructor
-	explicit
-	Skip( Size const w = 1ul ) :
-	 w_( w )
-	{}
+	// Default Constructor
+	Skip() = default;
 
-	// Destructor
-	~Skip()
+	// Width Constructor
+	explicit
+	Skip( Size const w ) :
+	 w_( w )
 	{}
 
 public: // I/O
@@ -86,7 +85,7 @@ public: // I/O
 
 private: // Data
 
-	Size w_; // Width
+	Size w_{ 1ul }; // Width
 
 }; // Skip
 
@@ -510,7 +509,7 @@ inline
 std::string
 LD( float const v )
 {
-	typedef  TraitsLD< float >  Tr;
+	using Tr = TraitsLD< float >;
 	return G( v, Tr::w, Tr::d, Tr::e, 1 );
 }
 
@@ -519,7 +518,7 @@ inline
 std::string
 LD( double const v )
 {
-	typedef  TraitsLD< double >  Tr;
+	using Tr = TraitsLD< double >;
 	return G( v, Tr::w, Tr::d, Tr::e, 1 );
 }
 
@@ -528,7 +527,7 @@ inline
 std::string
 LD( long double const v )
 {
-	typedef  TraitsLD< long double >  Tr;
+	using Tr = TraitsLD< long double >;
 	return G( v, Tr::w, Tr::d, Tr::e, 1 );
 }
 
@@ -537,7 +536,7 @@ inline
 std::string
 LD( std::complex< float > const & c )
 {
-	typedef  TraitsLD< std::complex< float > >  Tr;
+	using Tr = TraitsLD< std::complex< float > >;
 	return '(' + stripped( G( c.real(), Tr::w, Tr::d, Tr::e, 1 ) ) + ',' + stripped( G( c.imag(),  Tr::w, Tr::d, Tr::e, 1 ) ) + ')';
 }
 
@@ -546,7 +545,7 @@ inline
 std::string
 LD( std::complex< double > const & c )
 {
-	typedef  TraitsLD< std::complex< double > >  Tr;
+	using Tr = TraitsLD< std::complex< double > >;
 	return '(' + stripped( G( c.real(), Tr::w, Tr::d, Tr::e, 1 ) ) + ',' + stripped( G( c.imag(),  Tr::w, Tr::d, Tr::e, 1 ) ) + ')';
 }
 
@@ -555,7 +554,7 @@ inline
 std::string
 LD( std::complex< long double > const & c )
 {
-	typedef  TraitsLD< std::complex< long double > >  Tr;
+	using Tr = TraitsLD< std::complex< long double > >;
 	return '(' + stripped( G( c.real(), Tr::w, Tr::d, Tr::e, 1 ) ) + ',' + stripped( G( c.imag(),  Tr::w, Tr::d, Tr::e, 1 ) ) + ')';
 }
 

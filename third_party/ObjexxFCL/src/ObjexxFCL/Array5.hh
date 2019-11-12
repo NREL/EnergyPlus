@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Array5_hh_INCLUDED
 #define ObjexxFCL_Array5_hh_INCLUDED
 
-// Array5: Row-Major 5D Array Abstract Base Class
+// Row-Major 5D Array Abstract Base Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array5.fwd.hh>
@@ -25,14 +25,14 @@ namespace ObjexxFCL {
 template< typename > class Array5D;
 template< typename > class Array5A;
 
-// Array5: Row-Major 5D Array Abstract Base Class
+// Row-Major 5D Array Abstract Base Class
 template< typename T >
 class Array5 : public Array< T >
 {
 
 private: // Types
 
-	typedef  Array< T >  Super;
+	using Super = Array< T >;
 
 private: // Friend
 
@@ -42,42 +42,42 @@ private: // Friend
 
 protected: // Types
 
-	typedef  internal::InitializerSentinel  InitializerSentinel;
-	typedef  internal::ProxySentinel  ProxySentinel;
+	using InitializerSentinel = internal::InitializerSentinel;
+	using ProxySentinel = internal::ProxySentinel;
 
 public: // Types
 
-	typedef  typename Super::Base  Base;
-	typedef  typename Super::Tail  Tail;
-	typedef  typename Super::IR  IR;
-	typedef  typename Super::IS  IS;
-	typedef  typename Super::DS  DS;
+	using Base = typename Super::Base;
+	using Tail = typename Super::Tail;
+	using IR = typename Super::IR;
+	using IS = typename Super::IS;
+	using DS = typename Super::DS;
 
 	// STL Style
-	typedef  typename Super::value_type  value_type;
-	typedef  typename Super::reference  reference;
-	typedef  typename Super::const_reference  const_reference;
-	typedef  typename Super::pointer  pointer;
-	typedef  typename Super::const_pointer  const_pointer;
-	typedef  typename Super::iterator  iterator;
-	typedef  typename Super::const_iterator  const_iterator;
-	typedef  typename Super::reverse_iterator  reverse_iterator;
-	typedef  typename Super::const_reverse_iterator  const_reverse_iterator;
-	typedef  typename Super::size_type  size_type;
-	typedef  typename Super::difference_type  difference_type;
+	using value_type = typename Super::value_type;
+	using reference = typename Super::reference;
+	using const_reference = typename Super::const_reference;
+	using pointer = typename Super::pointer;
+	using const_pointer = typename Super::const_pointer;
+	using iterator = typename Super::iterator;
+	using const_iterator = typename Super::const_iterator;
+	using reverse_iterator = typename Super::reverse_iterator;
+	using const_reverse_iterator = typename Super::const_reverse_iterator;
+	using size_type = typename Super::size_type;
+	using difference_type = typename Super::difference_type;
 
 	// C++ Style
-	typedef  typename Super::Value  Value;
-	typedef  typename Super::Reference  Reference;
-	typedef  typename Super::ConstReference  ConstReference;
-	typedef  typename Super::Pointer  Pointer;
-	typedef  typename Super::ConstPointer  ConstPointer;
-	typedef  typename Super::Iterator  Iterator;
-	typedef  typename Super::ConstIterator  ConstIterator;
-	typedef  typename Super::ReverseIterator  ReverseIterator;
-	typedef  typename Super::ConstReverseIterator  ConstReverseIterator;
-	typedef  typename Super::Size  Size;
-	typedef  typename Super::Difference  Difference;
+	using Value = typename Super::Value;
+	using Reference = typename Super::Reference;
+	using ConstReference = typename Super::ConstReference;
+	using Pointer = typename Super::Pointer;
+	using ConstPointer = typename Super::ConstPointer;
+	using Iterator = typename Super::Iterator;
+	using ConstIterator = typename Super::ConstIterator;
+	using ReverseIterator = typename Super::ReverseIterator;
+	using ConstReverseIterator = typename Super::ConstReverseIterator;
+	using Size = typename Super::Size;
+	using Difference = typename Super::Difference;
 
 	using Super::isize;
 	using Super::npos;
@@ -91,7 +91,9 @@ protected: // Types
 	using Super::swapB;
 
 	using Super::data_;
+#ifndef OBJEXXFCL_SANITIZED
 	using Super::sdata_;
+#endif
 	using Super::shift_;
 	using Super::size_;
 
@@ -395,13 +397,6 @@ protected: // Creation
 	 z3_( I3_.size() ),
 	 z4_( I4_.size() ),
 	 z5_( I5_.size() )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~Array5()
 	{}
 
 public: // Assignment: Array
@@ -1156,7 +1151,11 @@ public: // Subscript
 	operator ()( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
 	{
 		assert( contains( i1, i2, i3, i4, i5 ) );
+#ifndef OBJEXXFCL_SANITIZED
 		return sdata_[ ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ];
+#else
+		return data_[ ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 - shift_ ];
+#endif
 	}
 
 	// array( i1, i2, i3, i4, i5 )
@@ -1164,7 +1163,11 @@ public: // Subscript
 	operator ()( int const i1, int const i2, int const i3, int const i4, int const i5 )
 	{
 		assert( contains( i1, i2, i3, i4, i5 ) );
+#ifndef OBJEXXFCL_SANITIZED
 		return sdata_[ ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 ];
+#else
+		return data_[ ( ( ( ( ( ( ( i1 * z2_ ) + i2 ) * z3_ ) + i3 ) * z4_ ) + i4 ) * z5_ ) + i5 - shift_ ];
+#endif
 	}
 
 	// Linear Index
@@ -1192,7 +1195,7 @@ public: // Subscript
 		return Tail( data_ + offset, ( size_ != npos ? size_ - offset : npos ) );
 	}
 
-public: // Slice Proxy Generators
+public: // Slice Proxy Generator
 
 	// array( s1, s2, s3, s4, s5 ) const
 	Array5S< T >
@@ -2422,11 +2425,11 @@ public: // Modifier
 		return *this;
 	}
 
-public: // MArray Generators
+public: // MArray Generator
 
 	// Template Helpers
 	template< typename U > class Wrapper {};
-	typedef  typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type  ClassT;
+	using ClassT = typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type;
 
 	// MArray Generator
 	template< typename M >

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_ArrayInitializer_hh_INCLUDED
 #define ObjexxFCL_ArrayInitializer_hh_INCLUDED
 
-// ArrayInitializer: Array Initializer Class Template
+// Array Initializer Class Template
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/ArrayInitializer.fwd.hh>
@@ -24,7 +24,7 @@
 
 namespace ObjexxFCL {
 
-// ArrayInitializer: Array Initializer Class Template
+// Array Initializer Class Template
 template< typename T >
 class ArrayInitializer
 {
@@ -32,10 +32,10 @@ class ArrayInitializer
 public: // Types
 
 	// STL style
-	typedef  T  value_type;
+	using value_type = T;
 
 	// C++ style
-	typedef  T  Value;
+	using Value = T;
 
 private: // Types
 
@@ -136,6 +136,7 @@ public: // Assignment
 	ArrayInitializer &
 	operator =( ArrayInitializer && a ) NOEXCEPT
 	{
+		assert( this != &a );
 		if ( value_p_ != nullptr ) delete value_p_;
 		value_p_ = a.value_p_;
 		a.value_p_ = nullptr;

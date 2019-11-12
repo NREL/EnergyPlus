@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_DimensionSlice_hh_INCLUDED
 #define ObjexxFCL_DimensionSlice_hh_INCLUDED
 
-// DimensionSlice: Dimension Slice Class
+// Dimension Slice Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/IndexRange.hh>
@@ -27,26 +27,22 @@
 
 namespace ObjexxFCL {
 
-// DimensionSlice: Dimension Slice Class
+// Dimension Slice Class
 class DimensionSlice
 {
 
 public: // Types
 
 	// STL style
-	typedef  std::size_t  size_type;
+	using size_type = std::size_t;
 
 	// C++ style
-	typedef  std::size_t  Size;
+	using Size = std::size_t;
 
 public: // Creation
 
 	// Default Constructor
-	DimensionSlice() :
-	 m_( 1 ),
-	 k_( 0 ),
-	 u_( 0 )
-	{}
+	DimensionSlice() = default;
 
 	// Index Slice + Multiplier Constructor
 	DimensionSlice( IndexSlice const & slice, std::int64_t const multiplier = 1 ) :
@@ -166,10 +162,6 @@ public: // Creation
 		u_ = range.isize();
 	}
 
-	// Destructor
-	~DimensionSlice()
-	{}
-
 public: // Inspector
 
 	// Multiplier
@@ -230,9 +222,9 @@ protected: // Static Methods
 
 private: // Data
 
-	std::int64_t m_; // Multiplier
-	std::int64_t k_; // Constant
-	int u_; // Upper index
+	std::int64_t m_{ 1 }; // Multiplier
+	std::int64_t k_{ 0 }; // Constant
+	int u_{ 0 }; // Upper index
 
 }; // DimensionSlice
 

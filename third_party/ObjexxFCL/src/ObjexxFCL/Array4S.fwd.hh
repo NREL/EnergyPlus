@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array4S< bool >                Array4S_bool;
-typedef  Array4S< byte >                Array4S_byte;
-typedef  Array4S< sbyte >               Array4S_sbyte;
-typedef  Array4S< ubyte >               Array4S_ubyte;
-typedef  Array4S< short int >           Array4S_short;
-typedef  Array4S< int >                 Array4S_int;
-typedef  Array4S< long int >            Array4S_long;
-typedef  Array4S< unsigned short int >  Array4S_ushort;
-typedef  Array4S< unsigned int >        Array4S_uint;
-typedef  Array4S< unsigned long int >   Array4S_ulong;
-typedef  Array4S< std::size_t >         Array4S_size;
-typedef  Array4S< std::int8_t >         Array4S_int8;
-typedef  Array4S< std::int16_t >        Array4S_int16;
-typedef  Array4S< std::int32_t >        Array4S_int32;
-typedef  Array4S< std::int64_t >        Array4S_int64;
-typedef  Array4S< std::uint8_t >        Array4S_uint8;
-typedef  Array4S< std::uint16_t >       Array4S_uint16;
-typedef  Array4S< std::uint32_t >       Array4S_uint32;
-typedef  Array4S< std::uint64_t >       Array4S_uint64;
-typedef  Array4S< float >               Array4S_float;
-typedef  Array4S< double >              Array4S_double;
-typedef  Array4S< long double >         Array4S_longdouble;
-typedef  Array4S< char >                Array4S_char;
-typedef  Array4S< unsigned char >       Array4S_uchar;
-typedef  Array4S< signed char >         Array4S_schar;
-typedef  Array4S< std::string >         Array4S_string;
+using sbyte = byte;
+using Array4S_bool = Array4S< bool >;
+using Array4S_byte = Array4S< byte >;
+using Array4S_sbyte = Array4S< sbyte >;
+using Array4S_ubyte = Array4S< ubyte >;
+using Array4S_short = Array4S< short int >;
+using Array4S_int = Array4S< int >;
+using Array4S_long = Array4S< long int >;
+using Array4S_ushort = Array4S< unsigned short int >;
+using Array4S_uint = Array4S< unsigned int >;
+using Array4S_ulong = Array4S< unsigned long int >;
+using Array4S_size = Array4S< std::size_t >;
+using Array4S_int8 = Array4S< std::int8_t >;
+using Array4S_int16 = Array4S< std::int16_t >;
+using Array4S_int32 = Array4S< std::int32_t >;
+using Array4S_int64 = Array4S< std::int64_t >;
+using Array4S_uint8 = Array4S< std::uint8_t >;
+using Array4S_uint16 = Array4S< std::uint16_t >;
+using Array4S_uint32 = Array4S< std::uint32_t >;
+using Array4S_uint64 = Array4S< std::uint64_t >;
+using Array4S_float = Array4S< float >;
+using Array4S_double = Array4S< double >;
+using Array4S_longdouble = Array4S< long double >;
+using Array4S_char = Array4S< char >;
+using Array4S_uchar = Array4S< unsigned char >;
+using Array4S_schar = Array4S< signed char >;
+using Array4S_string = Array4S< std::string >;
 
 } // ObjexxFCL
 

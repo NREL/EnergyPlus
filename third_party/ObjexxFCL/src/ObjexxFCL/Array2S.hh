@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Array2S_hh_INCLUDED
 #define ObjexxFCL_Array2S_hh_INCLUDED
 
-// Array2S: 2D Slice Array Proxy
+// Row-Major 2D Slice Array Proxy
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2S.fwd.hh>
@@ -21,14 +21,14 @@
 
 namespace ObjexxFCL {
 
-// Array2S: 2D Slice Array Proxy
+// Row-Major 2D Slice Array Proxy
 template< typename T >
 class Array2S : public ArrayRS< T, 2 >
 {
 
 private: // Types
 
-	typedef  ArrayRS< T, 2 >  Super;
+	using Super = ArrayRS< T, 2 >;
 
 private: // Friend
 
@@ -36,29 +36,29 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename Super::Base  Base;
-	typedef  typename Super::Traits  Traits;
-	typedef  typename Super::IR  IR;
-	typedef  typename Super::IS  IS;
-	typedef  typename Super::DS  DS;
+	using Base = typename Super::Base;
+	using Traits = typename Super::Traits;
+	using IR = typename Super::IR;
+	using IS = typename Super::IS;
+	using DS = typename Super::DS;
 
 	// STL Style
-	typedef  typename Super::value_type  value_type;
-	typedef  typename Super::reference  reference;
-	typedef  typename Super::const_reference  const_reference;
-	typedef  typename Super::pointer  pointer;
-	typedef  typename Super::const_pointer  const_pointer;
-	typedef  typename Super::size_type  size_type;
-	typedef  typename Super::difference_type  difference_type;
+	using value_type = typename Super::value_type;
+	using reference = typename Super::reference;
+	using const_reference = typename Super::const_reference;
+	using pointer = typename Super::pointer;
+	using const_pointer = typename Super::const_pointer;
+	using size_type = typename Super::size_type;
+	using difference_type = typename Super::difference_type;
 
 	// C++ Style
-	typedef  typename Super::Value  Value;
-	typedef  typename Super::Reference  Reference;
-	typedef  typename Super::ConstReference  ConstReference;
-	typedef  typename Super::Pointer  Pointer;
-	typedef  typename Super::ConstPointer  ConstPointer;
-	typedef  typename Super::Size  Size;
-	typedef  typename Super::Difference  Difference;
+	using Value = typename Super::Value;
+	using Reference = typename Super::Reference;
+	using ConstReference = typename Super::ConstReference;
+	using Pointer = typename Super::Pointer;
+	using ConstPointer = typename Super::ConstPointer;
+	using Size = typename Super::Size;
+	using Difference = typename Super::Difference;
 
 	using Super::isize;
 	using Super::overlap;
@@ -137,11 +137,6 @@ public: // Creation
 		contiguous_ = true;
 		data_set();
 	}
-
-	// Destructor
-	virtual
-	~Array2S()
-	{}
 
 public: // Assignment: Array
 
@@ -691,7 +686,7 @@ public: // Subscript
 		return k_ + ( m1_ * i1 ) + ( m2_ * i2 );
 	}
 
-public: // Slice Proxy Generators
+public: // Slice Proxy Generator
 
 	// array( s1, s2 ) const
 	Array2S
@@ -949,11 +944,11 @@ public: // Inspector
 		return u2_ + 1;
 	}
 
-public: // MArray Generators
+public: // MArray Generator
 
 	// Template Helpers
 	template< typename U > class Wrapper {};
-	typedef  typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type  ClassT;
+	using ClassT = typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type;
 
 	// MArray Generator
 	template< typename M >
@@ -2398,7 +2393,7 @@ inline
 std::ostream &
 operator <<( std::ostream & stream, Array2S< T > const & a )
 {
-	typedef  TypeTraits< T >  Traits;
+	using Traits = TypeTraits< T >;
 	if ( stream && ( a.size() > 0u ) ) {
 		std::ios_base::fmtflags const old_flags( stream.flags() );
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );

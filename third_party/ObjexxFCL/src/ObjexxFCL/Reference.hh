@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Reference.fwd.hh>
@@ -31,39 +31,28 @@ class Reference
 
 public: // Types
 
-	typedef  T  Value; // Type: Includes const attribute for const argument
-	typedef  IndexRange  IR;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Value = T; // Type: Includes const attribute for const argument
+	using IR = IndexRange;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 public: // Creation
 
 	// Default Constructor
-	Reference() :
-	 ptr_( nullptr ),
-	 own_( false )
-	{}
+	Reference() = default;
 
 	// Copy Constructor
 	Reference( Reference const & ref ) :
-	 ptr_( ref.ptr_ ),
-	 own_( false )
+	 ptr_( ref.ptr_ )
 	{}
 
 	// Null Pointer Constructor
-	Reference( std::nullptr_t ) :
-	 ptr_( nullptr ),
-	 own_( false )
+	Reference( std::nullptr_t const )
 	{}
 
 	// Value Constructor
 	Reference( T const & val ) :
-	 ptr_( const_cast< T * >( &val ) ), // Fortran compilers allow modifying INTENT(IN) args via POINTERs
-	 own_( false )
-	{}
-
-	// Destructor
-	~Reference()
+	 ptr_( const_cast< T * >( &val ) ) // Fortran compilers allow modifying INTENT(IN) args via POINTERs
 	{}
 
 public: // Assignment
@@ -154,7 +143,7 @@ public: // Operators
 		own_ = false;
 	}
 
-public: // Properties
+public: // Property
 
 	// Associated?
 	bool
@@ -191,7 +180,7 @@ public: // Properties
 		return ( ptr_ == &val );
 	}
 
-public: // Modifiers
+public: // Modifier
 
 	// Attach to Value
 	void
@@ -340,8 +329,8 @@ public: // Comparison
 
 private: // Data
 
-	T * ptr_; // Pointer to object
-	bool own_; // Allocated the object?
+	T * ptr_{ nullptr }; // Pointer to object
+	bool own_{ false }; // Allocated the object?
 
 }; // Reference
 

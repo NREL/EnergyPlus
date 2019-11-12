@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <string>
@@ -31,10 +31,10 @@ class GlobalStreams
 
 public: // Types
 
-	typedef  int  Unit;
-	typedef  std::string  Name;
-	typedef  std::unordered_map< Unit, Stream * >  UnitStreams;
-	typedef  std::unordered_map< Name, Stream * >  NameStreams;
+	using Unit = int;
+	using Name = std::string;
+	using UnitStreams = std::unordered_map< Unit, Stream * >;
+	using NameStreams = std::unordered_map< Name, Stream * >;
 
 public: // Creation
 
@@ -65,7 +65,7 @@ public: // Lookup
 	Stream *
 	operator []( Name const & name );
 
-public: // Predicates
+public: // Predicate
 
 	// Has a Unit
 	bool
@@ -75,7 +75,7 @@ public: // Predicates
 	bool
 	has( Name const & name ) const;
 
-public: // Inspectors
+public: // Property
 
 	// Size
 	UnitStreams::size_type

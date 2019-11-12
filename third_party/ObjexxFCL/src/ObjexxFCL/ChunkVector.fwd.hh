@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  ChunkVector< bool >                ChunkVector_bool;
-typedef  ChunkVector< byte >                ChunkVector_byte;
-typedef  ChunkVector< sbyte >               ChunkVector_sbyte;
-typedef  ChunkVector< ubyte >               ChunkVector_ubyte;
-typedef  ChunkVector< short int >           ChunkVector_short;
-typedef  ChunkVector< int >                 ChunkVector_int;
-typedef  ChunkVector< long int >            ChunkVector_long;
-typedef  ChunkVector< unsigned short int >  ChunkVector_ushort;
-typedef  ChunkVector< unsigned int >        ChunkVector_uint;
-typedef  ChunkVector< unsigned long int >   ChunkVector_ulong;
-typedef  ChunkVector< std::size_t >         ChunkVector_size;
-typedef  ChunkVector< std::int8_t >         ChunkVector_int8;
-typedef  ChunkVector< std::int16_t >        ChunkVector_int16;
-typedef  ChunkVector< std::int32_t >        ChunkVector_int32;
-typedef  ChunkVector< std::int64_t >        ChunkVector_int64;
-typedef  ChunkVector< std::uint8_t >        ChunkVector_uint8;
-typedef  ChunkVector< std::uint16_t >       ChunkVector_uint16;
-typedef  ChunkVector< std::uint32_t >       ChunkVector_uint32;
-typedef  ChunkVector< std::uint64_t >       ChunkVector_uint64;
-typedef  ChunkVector< float >               ChunkVector_float;
-typedef  ChunkVector< double >              ChunkVector_double;
-typedef  ChunkVector< long double >         ChunkVector_longdouble;
-typedef  ChunkVector< char >                ChunkVector_char;
-typedef  ChunkVector< unsigned char >       ChunkVector_uchar;
-typedef  ChunkVector< signed char >         ChunkVector_schar;
-typedef  ChunkVector< std::string >         ChunkVector_string;
+using sbyte = byte;
+using ChunkVector_bool = ChunkVector< bool >;
+using ChunkVector_byte = ChunkVector< byte >;
+using ChunkVector_sbyte = ChunkVector< sbyte >;
+using ChunkVector_ubyte = ChunkVector< ubyte >;
+using ChunkVector_short = ChunkVector< short int >;
+using ChunkVector_int = ChunkVector< int >;
+using ChunkVector_long = ChunkVector< long int >;
+using ChunkVector_ushort = ChunkVector< unsigned short int >;
+using ChunkVector_uint = ChunkVector< unsigned int >;
+using ChunkVector_ulong = ChunkVector< unsigned long int >;
+using ChunkVector_size = ChunkVector< std::size_t >;
+using ChunkVector_int8 = ChunkVector< std::int8_t >;
+using ChunkVector_int16 = ChunkVector< std::int16_t >;
+using ChunkVector_int32 = ChunkVector< std::int32_t >;
+using ChunkVector_int64 = ChunkVector< std::int64_t >;
+using ChunkVector_uint8 = ChunkVector< std::uint8_t >;
+using ChunkVector_uint16 = ChunkVector< std::uint16_t >;
+using ChunkVector_uint32 = ChunkVector< std::uint32_t >;
+using ChunkVector_uint64 = ChunkVector< std::uint64_t >;
+using ChunkVector_float = ChunkVector< float >;
+using ChunkVector_double = ChunkVector< double >;
+using ChunkVector_longdouble = ChunkVector< long double >;
+using ChunkVector_char = ChunkVector< char >;
+using ChunkVector_uchar = ChunkVector< unsigned char >;
+using ChunkVector_schar = ChunkVector< signed char >;
+using ChunkVector_string = ChunkVector< std::string >;
 
 } // ObjexxFCL
 

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_TypeTraits_hh_INCLUDED
 #define ObjexxFCL_TypeTraits_hh_INCLUDED
 
-// TypeTraits: Type Traits Template
+// Type Traits Template
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/byte.hh>
@@ -94,12 +94,12 @@ is_a( A * )
 	return std::is_same< A, B >::value || std::is_base_of< B, A >::value;
 }
 
-// TypeTraits: Type Traits Template
+// Type Traits Template
 template< typename T >
 struct TypeTraits
 {
-	typedef  T  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = T;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -137,12 +137,12 @@ struct TypeTraits
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits char Specialization
+// char Specialization
 template<>
 struct TypeTraits< char >
 {
-	typedef  char  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = char;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -180,12 +180,12 @@ struct TypeTraits< char >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits signed char Specialization
+// signed char Specialization
 template<>
 struct TypeTraits< signed char >
 {
-	typedef  signed char  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = signed char;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -223,12 +223,12 @@ struct TypeTraits< signed char >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits unsigned char Specialization
+// unsigned char Specialization
 template<>
 struct TypeTraits< unsigned char >
 {
-	typedef  unsigned char  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned char;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -266,12 +266,12 @@ struct TypeTraits< unsigned char >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits bool Specialization
+// bool Specialization
 template<>
 struct TypeTraits< bool >
 {
-	typedef  bool  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = bool;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -309,12 +309,12 @@ struct TypeTraits< bool >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits byte Specialization
+// byte Specialization
 template<>
 struct TypeTraits< byte >
 {
-	typedef  byte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = byte;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -352,12 +352,12 @@ struct TypeTraits< byte >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits ubyte Specialization
+// ubyte Specialization
 template<>
 struct TypeTraits< ubyte >
 {
-	typedef  ubyte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = ubyte;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -395,12 +395,12 @@ struct TypeTraits< ubyte >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits short int Specialization
+// short int Specialization
 template<>
 struct TypeTraits< short int >
 {
-	typedef  short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = short int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -438,12 +438,12 @@ struct TypeTraits< short int >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits unsigned short int Specialization
+// unsigned short int Specialization
 template<>
 struct TypeTraits< unsigned short int >
 {
-	typedef  unsigned short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned short int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -481,12 +481,12 @@ struct TypeTraits< unsigned short int >
 	static Size const matmul_2_2_crossover = 20u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits int Specialization
+// int Specialization
 template<>
 struct TypeTraits< int >
 {
-	typedef  int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -524,12 +524,12 @@ struct TypeTraits< int >
 	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits unsigned int Specialization
+// unsigned int Specialization
 template<>
 struct TypeTraits< unsigned int >
 {
-	typedef  unsigned int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -567,12 +567,12 @@ struct TypeTraits< unsigned int >
 	static Size const matmul_2_2_crossover = 11u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits long int Specialization
+// long int Specialization
 template<>
 struct TypeTraits< long int >
 {
-	typedef  long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -610,12 +610,12 @@ struct TypeTraits< long int >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits unsigned long int Specialization
+// unsigned long int Specialization
 template<>
 struct TypeTraits< unsigned long int >
 {
-	typedef  unsigned long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -653,12 +653,12 @@ struct TypeTraits< unsigned long int >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits long long int Specialization
+// long long int Specialization
 template<>
 struct TypeTraits< long long int >
 {
-	typedef  long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long long int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -696,12 +696,12 @@ struct TypeTraits< long long int >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits unsigned long long int Specialization
+// unsigned long long int Specialization
 template<>
 struct TypeTraits< unsigned long long int >
 {
-	typedef  unsigned long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long long int;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -739,12 +739,12 @@ struct TypeTraits< unsigned long long int >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits float Specialization
+// float Specialization
 template<>
 struct TypeTraits< float >
 {
-	typedef  float  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = float;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -786,12 +786,12 @@ struct TypeTraits< float >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits double Specialization
+// double Specialization
 template<>
 struct TypeTraits< double >
 {
-	typedef  double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = double;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -833,12 +833,12 @@ struct TypeTraits< double >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits long double Specialization
+// long double Specialization
 template<>
 struct TypeTraits< long double >
 {
-	typedef  long double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long double;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -880,13 +880,13 @@ struct TypeTraits< long double >
 	static Size const matmul_2_2_crossover = ( sizeof( traits_type ) >= 16 ? 400u : 10u ); // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits std::complex< float > Specialization
+// std::complex< float > Specialization
 template<>
 struct TypeTraits< std::complex< float > >
 {
-	typedef  float  value_type;
-	typedef  std::complex< float >  traits_type;
-	typedef  std::size_t  Size;
+	using value_type = float;
+	using traits_type = std::complex< float >;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -928,13 +928,13 @@ struct TypeTraits< std::complex< float > >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits std::complex< double > Specialization
+// std::complex< double > Specialization
 template<>
 struct TypeTraits< std::complex< double > >
 {
-	typedef  double  value_type;
-	typedef  std::complex< double >  traits_type;
-	typedef  std::size_t  Size;
+	using value_type = double;
+	using traits_type = std::complex< double >;
+	using Size = std::size_t;
 
 	// Initial Value
 	static
@@ -976,13 +976,13 @@ struct TypeTraits< std::complex< double > >
 	static Size const matmul_2_2_crossover = 10u; // Array 2D x 2D multiplication crossover
 };
 
-// TypeTraits: Type Traits std::complex< long double > Specialization
+// std::complex< long double > Specialization
 template<>
 struct TypeTraits< std::complex< long double > >
 {
-	typedef  long double  value_type;
-	typedef  std::complex< long double >  traits_type;
-	typedef  std::size_t  Size;
+	using value_type = long double;
+	using traits_type = std::complex< long double >;
+	using Size = std::size_t;
 
 	// Initial Value
 	static

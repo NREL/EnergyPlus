@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
@@ -58,9 +58,7 @@ public: // Creation
 	 format_own_( w.format_own_ ),
 	 ter_( w.ter_ ),
 	 flags_( w.flags_ ? &w.flags_->clear_status() : nullptr ),
-#if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
 	 stream_( std::move( w.stream_ ) ),
-#endif
 	 pos_( 0 ),
 	 reverts_( 0 )
 	{
@@ -69,11 +67,9 @@ public: // Creation
 		w.format_ = nullptr;
 		w.format_own_ = false;
 		w.ter_ = LF;
-#if !defined(__GNUC__) || __GNUC__ >= 5
 		stream_.clear();
 		stream_.seekp( 0, std::ios::beg );
 		stream_.str( std::string() );
-#endif
 		w.pos_ = 0;
 		w.reverts_ = 0;
 	}
@@ -625,7 +621,7 @@ private: // Assignment
 	Write &
 	operator =( Write const & ); // Disallow
 
-public: // Properties
+public: // Property
 
 	// Stream
 	std::ostream const &

@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array5S< bool >                Array5S_bool;
-typedef  Array5S< byte >                Array5S_byte;
-typedef  Array5S< sbyte >               Array5S_sbyte;
-typedef  Array5S< ubyte >               Array5S_ubyte;
-typedef  Array5S< short int >           Array5S_short;
-typedef  Array5S< int >                 Array5S_int;
-typedef  Array5S< long int >            Array5S_long;
-typedef  Array5S< unsigned short int >  Array5S_ushort;
-typedef  Array5S< unsigned int >        Array5S_uint;
-typedef  Array5S< unsigned long int >   Array5S_ulong;
-typedef  Array5S< std::size_t >         Array5S_size;
-typedef  Array5S< std::int8_t >         Array5S_int8;
-typedef  Array5S< std::int16_t >        Array5S_int16;
-typedef  Array5S< std::int32_t >        Array5S_int32;
-typedef  Array5S< std::int64_t >        Array5S_int64;
-typedef  Array5S< std::uint8_t >        Array5S_uint8;
-typedef  Array5S< std::uint16_t >       Array5S_uint16;
-typedef  Array5S< std::uint32_t >       Array5S_uint32;
-typedef  Array5S< std::uint64_t >       Array5S_uint64;
-typedef  Array5S< float >               Array5S_float;
-typedef  Array5S< double >              Array5S_double;
-typedef  Array5S< long double >         Array5S_longdouble;
-typedef  Array5S< char >                Array5S_char;
-typedef  Array5S< unsigned char >       Array5S_uchar;
-typedef  Array5S< signed char >         Array5S_schar;
-typedef  Array5S< std::string >         Array5S_string;
+using sbyte = byte;
+using Array5S_bool = Array5S< bool >;
+using Array5S_byte = Array5S< byte >;
+using Array5S_sbyte = Array5S< sbyte >;
+using Array5S_ubyte = Array5S< ubyte >;
+using Array5S_short = Array5S< short int >;
+using Array5S_int = Array5S< int >;
+using Array5S_long = Array5S< long int >;
+using Array5S_ushort = Array5S< unsigned short int >;
+using Array5S_uint = Array5S< unsigned int >;
+using Array5S_ulong = Array5S< unsigned long int >;
+using Array5S_size = Array5S< std::size_t >;
+using Array5S_int8 = Array5S< std::int8_t >;
+using Array5S_int16 = Array5S< std::int16_t >;
+using Array5S_int32 = Array5S< std::int32_t >;
+using Array5S_int64 = Array5S< std::int64_t >;
+using Array5S_uint8 = Array5S< std::uint8_t >;
+using Array5S_uint16 = Array5S< std::uint16_t >;
+using Array5S_uint32 = Array5S< std::uint32_t >;
+using Array5S_uint64 = Array5S< std::uint64_t >;
+using Array5S_float = Array5S< float >;
+using Array5S_double = Array5S< double >;
+using Array5S_longdouble = Array5S< long double >;
+using Array5S_char = Array5S< char >;
+using Array5S_uchar = Array5S< unsigned char >;
+using Array5S_schar = Array5S< signed char >;
+using Array5S_string = Array5S< std::string >;
 
 } // ObjexxFCL
 

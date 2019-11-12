@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_TraitsI_hh_INCLUDED
 #define ObjexxFCL_TraitsI_hh_INCLUDED
 
-// TraitsI: I Format I/O Type Traits
+// I Format I/O Type Traits
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // Notes:
 //  Intel Fortran default values used in this version
@@ -27,162 +27,162 @@ namespace ObjexxFCL {
 class byte;
 class ubyte;
 
-// TraitsI
+// I Format I/O Type Traits
 template< typename T >
 struct TraitsI
 {
-	typedef  T  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = T;
+	using Size = std::size_t;
 
 	static Size const w = 0; // Field width
 };
 
-// TraitsI: char Specialization
+// char Specialization
 template<>
 struct TraitsI< char >
 {
-	typedef  char  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = char;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsI: bool Specialization
+// bool Specialization
 template<>
 struct TraitsI< bool >
 {
-	typedef  bool  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = bool;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsI: Type Traits byte Specialization
+// byte Specialization
 template<>
 struct TraitsI< byte >
 {
-	typedef  byte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = byte;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsI: ubyte Specialization
+// ubyte Specialization
 template<>
 struct TraitsI< ubyte >
 {
-	typedef  ubyte  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = ubyte;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsI: short int Specialization
+// short int Specialization
 template<>
 struct TraitsI< short int >
 {
-	typedef  short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = short int;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsI: unsigned short int Specialization
+// unsigned short int Specialization
 template<>
 struct TraitsI< unsigned short int >
 {
-	typedef  unsigned short int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned short int;
+	using Size = std::size_t;
 
 	static Size const w = 7; // Field width
 };
 
-// TraitsI: int Specialization
+// int Specialization
 template<>
 struct TraitsI< int >
 {
-	typedef  int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = int;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsI: unsigned int Specialization
+// unsigned int Specialization
 template<>
 struct TraitsI< unsigned int >
 {
-	typedef  unsigned int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned int;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsI: long int Specialization
+// long int Specialization
 template<>
 struct TraitsI< long int >
 {
-	typedef  long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long int;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 };
 
-// TraitsI: unsigned long int Specialization
+// unsigned long int Specialization
 template<>
 struct TraitsI< unsigned long int >
 {
-	typedef  unsigned long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long int;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 };
 
-// TraitsI: long long int Specialization
+// long long int Specialization
 template<>
 struct TraitsI< long long int >
 {
-	typedef  long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long long int;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 };
 
-// TraitsI: unsigned long long int Specialization
+// unsigned long long int Specialization
 template<>
 struct TraitsI< unsigned long long int >
 {
-	typedef  unsigned long long int  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = unsigned long long int;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 };
 
-// TraitsI: float Specialization
+// float Specialization
 template<>
 struct TraitsI< float >
 {
-	typedef  float  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = float;
+	using Size = std::size_t;
 
 	static Size const w = 12; // Field width
 };
 
-// TraitsI: double Specialization
+// double Specialization
 template<>
 struct TraitsI< double >
 {
-	typedef  double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = double;
+	using Size = std::size_t;
 
 	static Size const w = 23; // Field width
 };
 
-// TraitsI: long double Specialization
+// long double Specialization
 template<>
 struct TraitsI< long double >
 {
-	typedef  long double  traits_type;
-	typedef  std::size_t  Size;
+	using traits_type = long double;
+	using Size = std::size_t;
 
 	static Size const w = 40; // Field width
 };

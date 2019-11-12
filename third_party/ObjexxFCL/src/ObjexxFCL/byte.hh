@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_byte_hh_INCLUDED
 #define ObjexxFCL_byte_hh_INCLUDED
 
-// byte: One-Byte Signed Integer
+// One-Byte Signed Integer
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cassert>
@@ -21,16 +21,14 @@
 
 namespace ObjexxFCL {
 
-// byte: One-Byte Integer
+// One-Byte Signed Integer
 class byte
 {
 
 public: // Creation
 
 	// Default Constructor
-	byte() :
-	 b_( static_cast< signed char >( 0 ) )
-	{}
+	byte() = default;
 
 	// short Constructor
 	explicit
@@ -62,10 +60,6 @@ public: // Creation
 	 b_( c )
 	{}
 
-	// Destructor
-	~byte()
-	{}
-
 public: // Conversion
 
 	// short Conversion
@@ -88,7 +82,7 @@ public: // Assignment
 	byte &
 	operator +=( short int const i )
 	{
-		b_ += i;
+		b_ += static_cast< signed char >( i );
 		return *this;
 	}
 
@@ -96,7 +90,7 @@ public: // Assignment
 	byte &
 	operator -=( short int const i )
 	{
-		b_ -= i;
+		b_ -= static_cast< signed char >( i );
 		return *this;
 	}
 
@@ -104,7 +98,7 @@ public: // Assignment
 	byte &
 	operator *=( short int const i )
 	{
-		b_ *= i;
+		b_ *= static_cast< signed char >( i );
 		return *this;
 	}
 
@@ -113,7 +107,7 @@ public: // Assignment
 	operator /=( short int const i )
 	{
 		assert( i != 0 );
-		b_ /= i;
+		b_ /= static_cast< signed char >( i );
 		return *this;
 	}
 
@@ -365,12 +359,12 @@ public: // I/O
 
 private: // Data
 
-	signed char b_; // Value
+	signed char b_{ static_cast< signed char >( 0 ) }; // Value
 
 }; // byte
 
 // Types
-typedef  byte  sbyte;
+using sbyte = byte;
 
 // byte + byte
 byte

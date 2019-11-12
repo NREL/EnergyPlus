@@ -1,32 +1,24 @@
 #ifndef ObjexxFCL_ProxySentinel_hh_INCLUDED
 #define ObjexxFCL_ProxySentinel_hh_INCLUDED
 
-// ProxySentinel: Array Constructor Proxy Sentinel Class
+// Array Constructor Proxy Sentinel Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 namespace ObjexxFCL {
 namespace internal {
 
-// ProxySentinel: Array Constructor Proxy Sentinel Class
+// Array Constructor Proxy Sentinel Class
 class ProxySentinel
-{
-
-public: // Creation
-
-	// Default Constructor
-	ProxySentinel()
-	{}
-
-}; // ProxySentinel
+{};
 
 } // internal
 } // ObjexxFCL

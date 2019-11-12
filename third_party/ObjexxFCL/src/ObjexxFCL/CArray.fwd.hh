@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  CArray< bool >                CArray_bool;
-typedef  CArray< byte >                CArray_byte;
-typedef  CArray< sbyte >               CArray_sbyte;
-typedef  CArray< ubyte >               CArray_ubyte;
-typedef  CArray< short int >           CArray_short;
-typedef  CArray< int >                 CArray_int;
-typedef  CArray< long int >            CArray_long;
-typedef  CArray< unsigned short int >  CArray_ushort;
-typedef  CArray< unsigned int >        CArray_uint;
-typedef  CArray< unsigned long int >   CArray_ulong;
-typedef  CArray< std::size_t >         CArray_size;
-typedef  CArray< std::int8_t >         CArray_int8;
-typedef  CArray< std::int16_t >        CArray_int16;
-typedef  CArray< std::int32_t >        CArray_int32;
-typedef  CArray< std::int64_t >        CArray_int64;
-typedef  CArray< std::uint8_t >        CArray_uint8;
-typedef  CArray< std::uint16_t >       CArray_uint16;
-typedef  CArray< std::uint32_t >       CArray_uint32;
-typedef  CArray< std::uint64_t >       CArray_uint64;
-typedef  CArray< float >               CArray_float;
-typedef  CArray< double >              CArray_double;
-typedef  CArray< long double >         CArray_longdouble;
-typedef  CArray< char >                CArray_char;
-typedef  CArray< unsigned char >       CArray_uchar;
-typedef  CArray< signed char >         CArray_schar;
-typedef  CArray< std::string >         CArray_string;
+using sbyte = byte;
+using CArray_bool = CArray< bool >;
+using CArray_byte = CArray< byte >;
+using CArray_sbyte = CArray< sbyte >;
+using CArray_ubyte = CArray< ubyte >;
+using CArray_short = CArray< short int >;
+using CArray_int = CArray< int >;
+using CArray_long = CArray< long int >;
+using CArray_ushort = CArray< unsigned short int >;
+using CArray_uint = CArray< unsigned int >;
+using CArray_ulong = CArray< unsigned long int >;
+using CArray_size = CArray< std::size_t >;
+using CArray_int8 = CArray< std::int8_t >;
+using CArray_int16 = CArray< std::int16_t >;
+using CArray_int32 = CArray< std::int32_t >;
+using CArray_int64 = CArray< std::int64_t >;
+using CArray_uint8 = CArray< std::uint8_t >;
+using CArray_uint16 = CArray< std::uint16_t >;
+using CArray_uint32 = CArray< std::uint32_t >;
+using CArray_uint64 = CArray< std::uint64_t >;
+using CArray_float = CArray< float >;
+using CArray_double = CArray< double >;
+using CArray_longdouble = CArray< long double >;
+using CArray_char = CArray< char >;
+using CArray_uchar = CArray< unsigned char >;
+using CArray_schar = CArray< signed char >;
+using CArray_string = CArray< std::string >;
 
 } // ObjexxFCL
 

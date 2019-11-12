@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_MArray_functions_hh_INCLUDED
 #define ObjexxFCL_MArray_functions_hh_INCLUDED
 
-// MArray Functions
+// Row-Major MArray Functions
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArray1.hh>
@@ -2305,7 +2305,7 @@ Array1D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 1 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< T > r( shape[ 0 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2321,7 +2321,7 @@ Array2D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 2 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > r( shape[ 0 ], shape[ 1 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2337,7 +2337,7 @@ Array3D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 3 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array3D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2353,7 +2353,7 @@ Array4D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 4 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array4D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2369,7 +2369,7 @@ Array5D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 5 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array5D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2385,7 +2385,7 @@ Array6D< T >
 reshape( MArray1< A, T > const & a, std::array< I, 6 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array6D< T > r( shape[ 0 ], shape[ 1 ], shape[ 2 ], shape[ 3 ], shape[ 4 ], shape[ 5 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2401,7 +2401,7 @@ Array1D< T >
 reshape( MArray2< A, T > const & a, std::array< I, 1 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< T > r( shape[ 0 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2419,7 +2419,7 @@ Array2D< T >
 reshape( MArray2< A, T > const & a, std::array< I, 2 > const & shape )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > r( shape[ 0 ], shape[ 1 ] );
 	size_type l( 0u );
 	size_type const s( r.size() );
@@ -2442,7 +2442,7 @@ pack( MArray1< A, T > const & a, Array1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2462,7 +2462,7 @@ pack( MArray2< A, T > const & a, Array2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2484,7 +2484,7 @@ pack( MArray3< A, T > const & a, Array3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2508,7 +2508,7 @@ pack( MArray4< A, T > const & a, Array4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2534,7 +2534,7 @@ pack( MArray5< A, T > const & a, Array5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2562,7 +2562,7 @@ pack( MArray6< A, T > const & a, Array6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	size_type n( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
@@ -2594,7 +2594,7 @@ unpack( Array1< T > const & a, Array1< bool > const & mask, MArray1< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2613,7 +2613,7 @@ unpack( Array1< T > const & a, Array2< bool > const & mask, MArray2< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2632,7 +2632,7 @@ unpack( Array1< T > const & a, Array3< bool > const & mask, MArray3< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array3D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2651,7 +2651,7 @@ unpack( Array1< T > const & a, Array4< bool > const & mask, MArray4< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array4D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2670,7 +2670,7 @@ unpack( Array1< T > const & a, Array5< bool > const & mask, MArray5< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array5D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2689,7 +2689,7 @@ unpack( Array1< T > const & a, Array6< bool > const & mask, MArray6< A, T > cons
 {
 	assert( mask.size_bounded() );
 	assert( mask.conformable( f ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array6D< T > r( f );
 	size_type i( 0u );
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
@@ -2728,7 +2728,7 @@ Array2D< T >
 cshift( MArray2< A, T > const & a, int const shift, int const dim = 1 )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > o( Array2D< T >::shape( a ) );
 	int const s1( a.u1() );
 	int const s2( a.u2() );
@@ -2823,7 +2823,7 @@ Array2D< T >
 eoshift( MArray2< A, T > const & a, int const shift, T const bdy = TypeTraits< T >::initial_value(), int const dim = 1 )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > o( Array2D< T >::shape( a, bdy ) );
 	switch ( dim ) {
 	case 1:
@@ -2862,7 +2862,7 @@ Array2D< T >
 eoshift( MArray2< A, T > const & a, Array1< int > const & shift, T const bdy = TypeTraits< T >::initial_value(), int const dim = 1 )
 {
 	assert( a.size_bounded() );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array2D< T > o( Array2D< T >::shape( a, bdy ) );
 	switch ( dim ) {
 	case 1:
@@ -3063,7 +3063,7 @@ sum( MArray1< A, T > const & a, Array1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
@@ -3079,7 +3079,7 @@ sum( MArray2< A, T > const & a, Array2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3097,7 +3097,7 @@ sum( MArray3< A, T > const & a, Array3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3117,7 +3117,7 @@ sum( MArray4< A, T > const & a, Array4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3139,7 +3139,7 @@ sum( MArray5< A, T > const & a, Array5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3163,7 +3163,7 @@ sum( MArray6< A, T > const & a, Array6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 0 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3565,7 +3565,7 @@ product( MArray1< A, T > const & a, Array1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
@@ -3581,7 +3581,7 @@ product( MArray2< A, T > const & a, Array2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3599,7 +3599,7 @@ product( MArray3< A, T > const & a, Array3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3619,7 +3619,7 @@ product( MArray4< A, T > const & a, Array4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3641,7 +3641,7 @@ product( MArray5< A, T > const & a, Array5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -3665,7 +3665,7 @@ product( MArray6< A, T > const & a, Array6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	T r( 1 );
 	size_type l( 0u );
 	for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -4125,7 +4125,7 @@ minloc( MArray1< A, T > const & a, Array1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4152,7 +4152,7 @@ minloc( MArray2< A, T > const & a, Array2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 2, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4181,7 +4181,7 @@ minloc( MArray3< A, T > const & a, Array3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 3, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4212,7 +4212,7 @@ minloc( MArray4< A, T > const & a, Array4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 4, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4245,7 +4245,7 @@ minloc( MArray5< A, T > const & a, Array5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4280,7 +4280,7 @@ minloc( MArray6< A, T > const & a, Array6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 6, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::max() );
 	size_type l( 0u );
@@ -4507,7 +4507,7 @@ maxloc( MArray1< A, T > const & a, Array1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 1, a.empty() ? 0 : 1 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4534,7 +4534,7 @@ maxloc( MArray2< A, T > const & a, Array2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 2, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4563,7 +4563,7 @@ maxloc( MArray3< A, T > const & a, Array3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 3, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4594,7 +4594,7 @@ maxloc( MArray4< A, T > const & a, Array4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 4, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4627,7 +4627,7 @@ maxloc( MArray5< A, T > const & a, Array5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 5, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4662,7 +4662,7 @@ maxloc( MArray6< A, T > const & a, Array6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	Array1D< int > loc( 6, 0 ); // F2008 standard => 0 for empty arrays
 	T r( std::numeric_limits< T >::lowest() );
 	size_type l( 0u );
@@ -4946,7 +4946,7 @@ inline
 Array1D< T >
 merge( MArray1< A, T > const & a, MArray1< A, T > const & b, Array1< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
@@ -4963,7 +4963,7 @@ inline
 Array1D< T >
 merge( MArray1< A, T > const & a, Array1< T > const & b, Array1< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
@@ -4980,7 +4980,7 @@ inline
 Array1D< T >
 merge( Array1< T > const & a, MArray1< A, T > const & b, Array1< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
@@ -4997,7 +4997,7 @@ inline
 Array1D< T >
 merge( MArray1< A, T > const & a, T const & b, Array1< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array1D< T > m( a.isize() );
@@ -5013,7 +5013,7 @@ inline
 Array1D< T >
 merge( T const & a, MArray1< A, T > const & b, Array1< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array1D< T > m( b.isize() );
@@ -5102,12 +5102,12 @@ inline
 Array2D< T >
 merge( MArray2< A, T > const & a, MArray2< A, T > const & b, Array2< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array2D< T > m( a.isize1(), a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
 		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2, ++l ) {
 			m[ l ] = ( mask[ l ] ? a( ia1, ia2 ) : b( ib1, ib2 ) );
@@ -5122,12 +5122,12 @@ inline
 Array2D< T >
 merge( MArray2< A, T > const & a, Array2< T > const & b, Array2< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array2D< T > m( a.isize1(), a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++l ) {
 			m[ l ] = ( mask[ l ] ? a( ia1, ia2 ) : b[ l ] );
@@ -5142,12 +5142,12 @@ inline
 Array2D< T >
 merge( Array2< T > const & a, MArray2< A, T > const & b, Array2< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array2D< T > m( a.isize1(), a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eib = b.u1(); ib1 <= eib; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2, ++l ) {
 			m[ l ] = ( mask[ l ] ? a[ l ] : b( ib1, ib2 ) );
@@ -5162,11 +5162,11 @@ inline
 Array2D< T >
 merge( MArray2< A, T > const & a, T const & b, Array2< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array2D< T > m( a.isize1(), a.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++l ) {
 			m[ l ] = ( mask[ l ] ? a( ia1, ia2 ) : b );
@@ -5181,11 +5181,11 @@ inline
 Array2D< T >
 merge( T const & a, MArray2< A, T > const & b, Array2< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array2D< T > m( b.isize1(), b.isize2() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eib = b.u1(); ib1 <= eib; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2, ++l ) {
 			m[ l ] = ( mask[ l ] ? a : b( ib1, ib2 ) );
@@ -5273,12 +5273,12 @@ inline
 Array3D< T >
 merge( MArray3< A, T > const & a, MArray3< A, T > const & b, Array3< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array3D< T > m( a.isize1(), a.isize2(), a.isize3() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
 		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2 ) {
 			for ( int ia3 = a.l3(), ib3 = b.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++ib3, ++l ) {
@@ -5295,12 +5295,12 @@ inline
 Array3D< T >
 merge( MArray3< A, T > const & a, Array3< T > const & b, Array3< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array3D< T > m( a.isize1(), a.isize2(), a.isize3() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++l ) {
@@ -5317,12 +5317,12 @@ inline
 Array3D< T >
 merge( Array3< T > const & a, MArray3< A, T > const & b, Array3< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array3D< T > m( a.isize1(), a.isize2(), a.isize3() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3, ++l ) {
@@ -5339,11 +5339,11 @@ inline
 Array3D< T >
 merge( MArray3< A, T > const & a, T const & b, Array3< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array3D< T > m( a.isize1(), a.isize2(), a.isize3() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++l ) {
@@ -5360,11 +5360,11 @@ inline
 Array3D< T >
 merge( T const & a, MArray3< A, T > const & b, Array3< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array3D< T > m( b.isize1(), b.isize2(), b.isize3() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3, ++l ) {
@@ -5454,12 +5454,12 @@ inline
 Array4D< T >
 merge( MArray4< A, T > const & a, MArray4< A, T > const & b, Array4< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array4D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
 		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2 ) {
 			for ( int ia3 = a.l3(), ib3 = b.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++ib3 ) {
@@ -5478,12 +5478,12 @@ inline
 Array4D< T >
 merge( MArray4< A, T > const & a, Array4< T > const & b, Array4< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array4D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5502,12 +5502,12 @@ inline
 Array4D< T >
 merge( Array4< T > const & a, MArray4< A, T > const & b, Array4< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array4D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5526,11 +5526,11 @@ inline
 Array4D< T >
 merge( MArray4< A, T > const & a, T const & b, Array4< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array4D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5549,11 +5549,11 @@ inline
 Array4D< T >
 merge( T const & a, MArray4< A, T > const & b, Array4< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array4D< T > m( b.isize1(), b.isize2(), b.isize3(), b.isize4() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5645,12 +5645,12 @@ inline
 Array5D< T >
 merge( MArray5< A, T > const & a, MArray5< A, T > const & b, Array5< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
 		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2 ) {
 			for ( int ia3 = a.l3(), ib3 = b.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++ib3 ) {
@@ -5671,12 +5671,12 @@ inline
 Array5D< T >
 merge( MArray5< A, T > const & a, Array5< T > const & b, Array5< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5697,12 +5697,12 @@ inline
 Array5D< T >
 merge( Array5< T > const & a, MArray5< A, T > const & b, Array5< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5723,11 +5723,11 @@ inline
 Array5D< T >
 merge( MArray5< A, T > const & a, T const & b, Array5< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array5D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5748,11 +5748,11 @@ inline
 Array5D< T >
 merge( T const & a, MArray5< A, T > const & b, Array5< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array5D< T > m( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5846,12 +5846,12 @@ inline
 Array6D< T >
 merge( MArray6< A, T > const & a, MArray6< A, T > const & b, Array6< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array6D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ib1 = b.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1, ++ib1 ) {
 		for ( int ia2 = a.l2(), ib2 = b.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2, ++ib2 ) {
 			for ( int ia3 = a.l3(), ib3 = b.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3, ++ib3 ) {
@@ -5874,12 +5874,12 @@ inline
 Array6D< T >
 merge( MArray6< A, T > const & a, Array6< T > const & b, Array6< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array6D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5902,12 +5902,12 @@ inline
 Array6D< T >
 merge( Array6< T > const & a, MArray6< A, T > const & b, Array6< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( b ) );
 	assert( a.conformable( mask ) );
 	Array6D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5930,11 +5930,11 @@ inline
 Array6D< T >
 merge( MArray6< A, T > const & a, T const & b, Array6< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( a.size_bounded() );
 	assert( a.conformable( mask ) );
 	Array6D< T > m( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ia1 = a.l1(), ea1 = a.u1(); ia1 <= ea1; ++ia1 ) {
 		for ( int ia2 = a.l2(), ea2 = a.u2(); ia2 <= ea2; ++ia2 ) {
 			for ( int ia3 = a.l3(), ea3 = a.u3(); ia3 <= ea3; ++ia3 ) {
@@ -5957,11 +5957,11 @@ inline
 Array6D< T >
 merge( T const & a, MArray6< A, T > const & b, Array6< bool > const & mask )
 {
-	typedef  BArray::size_type  size_type;
+	using size_type = BArray::size_type;
 	assert( b.size_bounded() );
 	assert( b.conformable( mask ) );
 	Array6D< T > m( b.isize1(), b.isize2(), b.isize3(), b.isize4(), b.isize5(), b.isize6() );
-	size_type l( 0 );
+	size_type l( 0u );
 	for ( int ib1 = b.l1(), eb1 = b.u1(); ib1 <= eb1; ++ib1 ) {
 		for ( int ib2 = b.l2(), eb2 = b.u2(); ib2 <= eb2; ++ib2 ) {
 			for ( int ib3 = b.l3(), eb3 = b.u3(); ib3 <= eb3; ++ib3 ) {
@@ -5978,7 +5978,7 @@ merge( T const & a, MArray6< A, T > const & b, Array6< bool > const & mask )
 	return m;
 }
 
-// Subscript Array Generators /////
+// Subscript Array Generator /////
 
 // Subscripted Array
 template< class A, typename T >

@@ -1,14 +1,14 @@
-// Cstring: C String Wrapper
+// C String Wrapper
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Cstring.hh>
@@ -207,7 +207,7 @@ namespace ObjexxFCL {
 	bool
 	equali( Cstring const & s, Cstring const & t )
 	{
-		typedef  Cstring::size_type  size_type;
+		using size_type = Cstring::size_type;
 		size_type const s_len( s.length() );
 		if ( s_len != t.length() ) {
 			return false;
@@ -223,7 +223,7 @@ namespace ObjexxFCL {
 	bool
 	equali( Cstring const & s, char const * const t )
 	{
-		typedef  Cstring::size_type  size_type;
+		using size_type = Cstring::size_type;
 		size_type const s_len( s.length() );
 		if ( s_len != std::strlen( t ) ) {
 			return false;
@@ -239,7 +239,7 @@ namespace ObjexxFCL {
 	bool
 	equali( char const * const s, Cstring const & t )
 	{
-		typedef  Cstring::size_type  size_type;
+		using size_type = Cstring::size_type;
 		size_type const s_len( std::strlen( s ) );
 		if ( s_len != t.length() ) {
 			return false;
@@ -255,7 +255,7 @@ namespace ObjexxFCL {
 	bool
 	equali( Cstring const & s, std::string const & t )
 	{
-		typedef  Cstring::size_type  size_type;
+		using size_type = Cstring::size_type;
 		size_type const s_len( s.length() );
 		if ( s_len != t.length() ) {
 			return false;
@@ -271,7 +271,7 @@ namespace ObjexxFCL {
 	bool
 	equali( std::string const & s, Cstring const & t )
 	{
-		typedef  Cstring::size_type  size_type;
+		using size_type = Cstring::size_type;
 		size_type const s_len( s.length() );
 		if ( s_len != t.length() ) {
 			return false;
@@ -318,6 +318,6 @@ namespace ObjexxFCL {
 	}
 
 	// Static Data Member Definitions
-	Cstring::size_type const Cstring::npos = static_cast< size_type >( -1 );
+	Cstring::size_type const Cstring::npos;
 
 } // ObjexxFCL

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_IndexSlice_hh_INCLUDED
 #define ObjexxFCL_IndexSlice_hh_INCLUDED
 
-// IndexSlice: Index Slice Class
+// Index Slice Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Index.hh>
@@ -27,45 +27,24 @@
 
 namespace ObjexxFCL {
 
-// IndexSlice: Index Slice Class
+// Index Slice Class
 class IndexSlice
 {
 
 public: // Types
 
 	// STL style
-	typedef  std::size_t  size_type;
+	using size_type = std::size_t;
 
 	// C++ style
-	typedef  std::size_t  Size;
+	using Size = std::size_t;
 
 public: // Creation
 
 	// Default Constructor
-	IndexSlice() :
-	 l_init_( false ),
-	 u_init_( false ),
-	 scalar_( false ),
-	 l_( 1 ),
-	 u_( 0 ),
-	 s_( 1 ),
-	 size_( 0u )
-	{}
+	IndexSlice() = default;
 
-	// Copy Constructor
-	IndexSlice( IndexSlice const & I ) :
-	 l_init_( I.l_init_ ),
-	 u_init_( I.u_init_ ),
-	 scalar_( I.scalar_ ),
-	 l_( I.l_ ),
-	 u_( I.u_ ),
-	 s_( I.s_ ),
-	 size_( I.size_ )
-	{
-		assert( size_ == computed_size() );
-	}
-
-	// Scalar Constructor
+	// Integer Constructor
 	IndexSlice( int const i ) :
 	 l_init_( true ),
 	 u_init_( true ),
@@ -76,7 +55,7 @@ public: // Creation
 	 size_( 1u )
 	{}
 
-	// Index Slice Constructor
+	// Slice Constructor
 	IndexSlice( int const l, int const u, int const s = 1 ) :
 	 l_init_( true ),
 	 u_init_( true ),
@@ -219,10 +198,6 @@ public: // Creation
 	{
 		assert( s_ != 0 );
 	}
-
-	// Destructor
-	~IndexSlice()
-	{}
 
 public: // Assignment
 
@@ -597,20 +572,18 @@ private: // Inspector
 
 private: // Data
 
-	bool l_init_; // Lower index initialized?
-	bool u_init_; // Upper index initialized?
-	bool scalar_; // Scalar slice?
-
-	int l_; // Lower index
-	int u_; // Upper index
-	int s_; // Step
-
-	size_type size_; // Size (0 if unknown)
+	bool l_init_{ false }; // Lower index initialized?
+	bool u_init_{ false }; // Upper index initialized?
+	bool scalar_{ false }; // Scalar slice?
+	int l_{ 1 }; // Lower index
+	int u_{ 0 }; // Upper index
+	int s_{ 1 }; // Step
+	size_type size_{ 0u }; // Size (0 if unknown)
 
 }; // IndexSlice
 
 // Types
-typedef  IndexSlice  ISlice;
+using ISlice = IndexSlice;
 
 // IndexSlice == IndexSlice
 bool

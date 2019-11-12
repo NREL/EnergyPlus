@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_BArray_hh_INCLUDED
 #define ObjexxFCL_BArray_hh_INCLUDED
 
-// BArray: Array Abstract Base Class
+// Array Abstract Base Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/noexcept.hh>
@@ -21,61 +21,55 @@
 
 namespace ObjexxFCL {
 
-// BArray: Array Abstract Base Class
+// Array Abstract Base Class
 class BArray
 {
 
 public: // Types
 
-	typedef  IndexRange  IR;
-	typedef  IndexSlice  IS;
-	typedef  DimensionSlice  DS;
+	using IR = IndexRange;
+	using IS = IndexSlice;
+	using DS = DimensionSlice;
 
 	// STL style
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
 
 	// C++ style
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
+	using Size = std::size_t;
+	using Difference = std::ptrdiff_t;
 
 protected: // Creation
 
 	// Default Constructor
-	BArray()
-	{}
+	BArray() = default;
 
 	// Copy Constructor
-	BArray( BArray const & )
-	{}
+	BArray( BArray const & ) = default;
 
 	// Move Constructor
-	BArray( BArray && ) NOEXCEPT
-	{}
+	BArray( BArray && ) NOEXCEPT = default;
 
 public: // Creation
 
 	// Destructor
 	virtual
-	~BArray()
-	{}
+	~BArray() = default;
 
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( BArray const & )
-	{}
+	BArray &
+	operator =( BArray const & ) = default;
 
 	// Move Assignment
-	void
-	operator =( BArray && ) NOEXCEPT
-	{}
+	BArray &
+	operator =( BArray && ) NOEXCEPT = default;
 
 public: // Static Data
 
-	static size_type const npos; // Unbounded "size"
-	static size_type const max_size; // Max array size
+	static size_type const npos{ static_cast< size_type >( -1 ) }; // Unbounded "size"
+	static size_type const max_size{ static_cast< size_type >( -1 ) - static_cast< size_type >( 1 ) }; // Max array size
 
 }; // BArray
 

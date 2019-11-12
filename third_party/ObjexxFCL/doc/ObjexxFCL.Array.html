@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: Array</title>
 	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<meta name="copyright" content="Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.">
 	<link rel="icon" type="image/png" href="img/favicon.png">
 	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
@@ -16,7 +16,7 @@
 		<td></td>
 		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.3</div></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -40,7 +40,7 @@
 				<a href="ObjexxFCL.Users.html">Users Guide</a>
 				<a href="ObjexxFCL.Developers.html">Developers</a>
 				<a href="ObjexxFCL.Support.html">Support</a>
-				<a href="http://objexx.com">Web</a>
+				<a href="https://objexx.com">Web</a>
 			</div>
 		</td>
 		<td></td>
@@ -48,10 +48,10 @@
 			<h1>Array</h1>
 			<p class="body">The Array class template hierarchy provides Fortran-style arrays with these attributes of Fortran 77 arrays:</p>
 			<ul class="body">
+				<li>Row-major memory layout (unlike Fortran).</li>
 				<li>Arbitrary index ranges for each dimension.</li>
 				<li>Arrays and array elements can be passed to array arguments of any <b>rank</b> (number of dimensions) and/or dimensions.</li>
 				<li>Array arguments can be dimensioned with an assumed size for the last dimension.</li>
-				<li>Note: This ObjexxFCL variant uses row-major array layout, unlike Fortran's column-major layout to support projects migrated to the more typical C/C++ array layout.</li>
 			</ul>
 			<p class="body">and these capabilities <em>not</em> provided by Fortran 77 arrays:</p>
 			<ul class="body">
@@ -176,7 +176,7 @@ Array2D_int A( 5, {-10,10} );
 			</table>
 			<p class="body">To specify an index range with a lower index other than 1 an explicit index range must be specified, as in Fortran.</p>
 			<p class="body">The <span class="source">{-10,10}</span> index range notation is a convenient syntax that gets converted to <span class="source">IndexRange( -10, 10 )</span> within the constructor.</p>
-			<p class="body">Copy constructors accept any Array of the same rank that has an data type that is assignable to the Array being constructed:</p>
+			<p class="body">Copy constructors accept any Array of the same rank that has a data type that is assignable to the Array being constructed:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7"><pre>Array2D_int A( 3, 3 );
@@ -217,6 +217,7 @@ C.initializer_clear();</pre></td>
 				</tr>
 			</table>
 			<p class="body">Arrays without initializer values or functions can be <b>default initialized</b> to the default-constructed value of the data type (zero for numeric types) by defining the OBJEXXFCL_ARRAY_INIT macro when compiling (this is done with a -DOBJEXXFCL_ARRAY_INIT switch to GCC and some other compilers). All source files must be compiled with this definition if any are or undefined behavior may result. There could be a significant performance cost to initializing all arrays this way and it can mask initialization errors so this is recommended primarily for transitional use while migrating and debugging code that depended on a Fortran compiler (such as g77) that did (non-standard) zero-initialization of arrays.</p>
+			<p class="body">Arrays without initializer values or functions can be <b>default initialized</b> to a value chosen to help detect use of uninitialized array elements by defining the OBJEXXFCL_ARRAY_INIT_DEBUG macro when compiling (this is done with a -DOBJEXXFCL_ARRAY_INIT_DEBUG switch to GCC and some other compilers). All source files must be compiled with this definition if any are or undefined behavior may result. There could be a significant performance cost to initializing all arrays this way so this is recommended primarily for debugging.</p>
 
 			<h3 class="h4">Explicit Dimensioning</h3>
 			<p class="body">Although Fortran 77 does not provide array resizing real Arrays can be dynamically (re)sized via the <span class="source">allocate</span> and <span class="source">dimension</span> member functions:</p>
@@ -259,7 +260,7 @@ C.redimension( B ); // C is now 5 x 5 with 3 x 3 portion preserved</pre></td>
 			<p class="body"><b>Warning!</b> Resizing a real Array invalidates any argument Arrays attached to it.</p>
 
 			<h3 class="h4">Iterators</h3>
-			<p class="body">Arrays provide an iterator interface with <span class="source">begin</span>, <span class="source">end</span>, <span class="source">rbegin</span>, and <span class="source">rend</span> methods. This allows the Arrays to be used with many C++ Standard Library functions and C++11 range-based for loops. For multidimensional Arrays it is important to understand that iterators provide a memory-order traversal, which is row-major order for this variant of the ObjexxFCL.</p>
+			<p class="body">Arrays provide an iterator interface with <span class="source">begin</span>, <span class="source">end</span>, <span class="source">rbegin</span>, and <span class="source">rend</span> methods. This allows the Arrays to be used with many C++ Standard Library functions and C++11 range-based for loops. For multidimensional Arrays it is important to understand that iterators provide a memory-order traversal.</p>
 
 			<h3 class="h4">Array1D Vector-Like Interface</h3>
 			<p class="body">Array1D has an additional <span class="source">std::vector</span>-like personality for more natural use as a general purpose C++ container with the performance capabilities of <span class="source">std::vector</span>.</p>
@@ -380,7 +381,7 @@ B.dimension( 3, 3 );
 </pre></td>
 				</tr>
 			</table>
-			<p class="body">Dimensioning argument Arrays only changes the perceived size of the arrays' view and doesn't cause reallocation of a data array, so no initializing variants of <span class="source">dimension</span> are provided. From the argument Array's perspective the elements are reflowed in row-major order to fill the new dimensions, unlike a data-preserving <span class="source">redimension</span> call on a real Array, which keeps elements in their original index positions as the dimensions change. Attempting to dimension an argument Array to a size that exceeds the actual size of the associated data array, if known, will trigger an assertion failure in debug builds.</p>
+			<p class="body">Dimensioning argument Arrays only changes the perceived size of the arrays' view and doesn't cause reallocation of a data array, so no initializing variants of <span class="source">dimension</span> are provided. From the argument Array's perspective the elements are reflowed in memory order to fill the new dimensions, unlike a data-preserving <span class="source">redimension</span> call on a real Array, which keeps elements in their original index positions as the dimensions change. Attempting to dimension an argument Array to a size that exceeds the actual size of the associated data array, if known, will trigger an assertion failure in debug builds.</p>
 			<p class="body">Argument Arrays can also be dimensioned to match the dimensions of another array:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
@@ -656,7 +657,7 @@ C = A + 3; // Adds 3 to each element</pre>
 			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
 			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
 			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
-			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+			<a href="https://objexx.com"><span class="footer_link">Web</span></a>
 		</td>
 		<td></td>
 	</tr>
@@ -664,7 +665,7 @@ C = A + 3; // Adds 3 to each element</pre>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2019 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

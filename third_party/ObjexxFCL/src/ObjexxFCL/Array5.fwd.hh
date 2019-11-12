@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array5< bool >                Array5_bool;
-typedef  Array5< byte >                Array5_byte;
-typedef  Array5< sbyte >               Array5_sbyte;
-typedef  Array5< ubyte >               Array5_ubyte;
-typedef  Array5< short int >           Array5_short;
-typedef  Array5< int >                 Array5_int;
-typedef  Array5< long int >            Array5_long;
-typedef  Array5< unsigned short int >  Array5_ushort;
-typedef  Array5< unsigned int >        Array5_uint;
-typedef  Array5< unsigned long int >   Array5_ulong;
-typedef  Array5< std::size_t >         Array5_size;
-typedef  Array5< std::int8_t >         Array5_int8;
-typedef  Array5< std::int16_t >        Array5_int16;
-typedef  Array5< std::int32_t >        Array5_int32;
-typedef  Array5< std::int64_t >        Array5_int64;
-typedef  Array5< std::uint8_t >        Array5_uint8;
-typedef  Array5< std::uint16_t >       Array5_uint16;
-typedef  Array5< std::uint32_t >       Array5_uint32;
-typedef  Array5< std::uint64_t >       Array5_uint64;
-typedef  Array5< float >               Array5_float;
-typedef  Array5< double >              Array5_double;
-typedef  Array5< long double >         Array5_longdouble;
-typedef  Array5< char >                Array5_char;
-typedef  Array5< unsigned char >       Array5_uchar;
-typedef  Array5< signed char >         Array5_schar;
-typedef  Array5< std::string >         Array5_string;
+using sbyte = byte;
+using Array5_bool = Array5< bool >;
+using Array5_byte = Array5< byte >;
+using Array5_sbyte = Array5< sbyte >;
+using Array5_ubyte = Array5< ubyte >;
+using Array5_short = Array5< short int >;
+using Array5_int = Array5< int >;
+using Array5_long = Array5< long int >;
+using Array5_ushort = Array5< unsigned short int >;
+using Array5_uint = Array5< unsigned int >;
+using Array5_ulong = Array5< unsigned long int >;
+using Array5_size = Array5< std::size_t >;
+using Array5_int8 = Array5< std::int8_t >;
+using Array5_int16 = Array5< std::int16_t >;
+using Array5_int32 = Array5< std::int32_t >;
+using Array5_int64 = Array5< std::int64_t >;
+using Array5_uint8 = Array5< std::uint8_t >;
+using Array5_uint16 = Array5< std::uint16_t >;
+using Array5_uint32 = Array5< std::uint32_t >;
+using Array5_uint64 = Array5< std::uint64_t >;
+using Array5_float = Array5< float >;
+using Array5_double = Array5< double >;
+using Array5_longdouble = Array5< long double >;
+using Array5_char = Array5< char >;
+using Array5_uchar = Array5< unsigned char >;
+using Array5_schar = Array5< signed char >;
+using Array5_string = Array5< std::string >;
 
 } // ObjexxFCL
 

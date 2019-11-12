@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
@@ -38,19 +38,15 @@ public: // Creation
 
 	// Move Constructor
 	Print( Print && p ) NOEXCEPT :
-#if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
 	 stream_( std::move( p.stream_ ) ),
-#endif
 	 pos_( 0 ),
 	 format_( p.format_ ? &p.format_->reset() : nullptr ),
 	 own_( p.own_ ),
 	 reverts_( 0 )
 	{
-#if !defined(__GNUC__) || __GNUC__ >= 5
 		stream_.clear();
 		stream_.seekp( 0, std::ios::beg );
 		stream_.str( std::string() );
-#endif
 		p.pos_ = 0;
 		p.format_ = nullptr;
 		p.own_ = false;

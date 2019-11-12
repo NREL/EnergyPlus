@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Vector3< bool >                Vector3_bool;
-typedef  Vector3< byte >                Vector3_byte;
-typedef  Vector3< sbyte >               Vector3_sbyte;
-typedef  Vector3< ubyte >               Vector3_ubyte;
-typedef  Vector3< short int >           Vector3_short;
-typedef  Vector3< int >                 Vector3_int;
-typedef  Vector3< long int >            Vector3_long;
-typedef  Vector3< unsigned short int >  Vector3_ushort;
-typedef  Vector3< unsigned int >        Vector3_uint;
-typedef  Vector3< unsigned long int >   Vector3_ulong;
-typedef  Vector3< std::size_t >         Vector3_size;
-typedef  Vector3< std::int8_t >         Vector3_int8;
-typedef  Vector3< std::int16_t >        Vector3_int16;
-typedef  Vector3< std::int32_t >        Vector3_int32;
-typedef  Vector3< std::int64_t >        Vector3_int64;
-typedef  Vector3< std::uint8_t >        Vector3_uint8;
-typedef  Vector3< std::uint16_t >       Vector3_uint16;
-typedef  Vector3< std::uint32_t >       Vector3_uint32;
-typedef  Vector3< std::uint64_t >       Vector3_uint64;
-typedef  Vector3< float >               Vector3_float;
-typedef  Vector3< double >              Vector3_double;
-typedef  Vector3< long double >         Vector3_longdouble;
-typedef  Vector3< char >                Vector3_char;
-typedef  Vector3< unsigned char >       Vector3_uchar;
-typedef  Vector3< signed char >         Vector3_schar;
-typedef  Vector3< std::string >         Vector3_string;
+using sbyte = byte;
+using Vector3_bool = Vector3< bool >;
+using Vector3_byte = Vector3< byte >;
+using Vector3_sbyte = Vector3< sbyte >;
+using Vector3_ubyte = Vector3< ubyte >;
+using Vector3_short = Vector3< short int >;
+using Vector3_int = Vector3< int >;
+using Vector3_long = Vector3< long int >;
+using Vector3_ushort = Vector3< unsigned short int >;
+using Vector3_uint = Vector3< unsigned int >;
+using Vector3_ulong = Vector3< unsigned long int >;
+using Vector3_size = Vector3< std::size_t >;
+using Vector3_int8 = Vector3< std::int8_t >;
+using Vector3_int16 = Vector3< std::int16_t >;
+using Vector3_int32 = Vector3< std::int32_t >;
+using Vector3_int64 = Vector3< std::int64_t >;
+using Vector3_uint8 = Vector3< std::uint8_t >;
+using Vector3_uint16 = Vector3< std::uint16_t >;
+using Vector3_uint32 = Vector3< std::uint32_t >;
+using Vector3_uint64 = Vector3< std::uint64_t >;
+using Vector3_float = Vector3< float >;
+using Vector3_double = Vector3< double >;
+using Vector3_longdouble = Vector3< long double >;
+using Vector3_char = Vector3< char >;
+using Vector3_uchar = Vector3< unsigned char >;
+using Vector3_schar = Vector3< signed char >;
+using Vector3_string = Vector3< std::string >;
 
 } // ObjexxFCL
 

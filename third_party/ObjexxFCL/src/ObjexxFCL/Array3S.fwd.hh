@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array3S< bool >                Array3S_bool;
-typedef  Array3S< byte >                Array3S_byte;
-typedef  Array3S< sbyte >               Array3S_sbyte;
-typedef  Array3S< ubyte >               Array3S_ubyte;
-typedef  Array3S< short int >           Array3S_short;
-typedef  Array3S< int >                 Array3S_int;
-typedef  Array3S< long int >            Array3S_long;
-typedef  Array3S< unsigned short int >  Array3S_ushort;
-typedef  Array3S< unsigned int >        Array3S_uint;
-typedef  Array3S< unsigned long int >   Array3S_ulong;
-typedef  Array3S< std::size_t >         Array3S_size;
-typedef  Array3S< std::int8_t >         Array3S_int8;
-typedef  Array3S< std::int16_t >        Array3S_int16;
-typedef  Array3S< std::int32_t >        Array3S_int32;
-typedef  Array3S< std::int64_t >        Array3S_int64;
-typedef  Array3S< std::uint8_t >        Array3S_uint8;
-typedef  Array3S< std::uint16_t >       Array3S_uint16;
-typedef  Array3S< std::uint32_t >       Array3S_uint32;
-typedef  Array3S< std::uint64_t >       Array3S_uint64;
-typedef  Array3S< float >               Array3S_float;
-typedef  Array3S< double >              Array3S_double;
-typedef  Array3S< long double >         Array3S_longdouble;
-typedef  Array3S< char >                Array3S_char;
-typedef  Array3S< unsigned char >       Array3S_uchar;
-typedef  Array3S< signed char >         Array3S_schar;
-typedef  Array3S< std::string >         Array3S_string;
+using sbyte = byte;
+using Array3S_bool = Array3S< bool >;
+using Array3S_byte = Array3S< byte >;
+using Array3S_sbyte = Array3S< sbyte >;
+using Array3S_ubyte = Array3S< ubyte >;
+using Array3S_short = Array3S< short int >;
+using Array3S_int = Array3S< int >;
+using Array3S_long = Array3S< long int >;
+using Array3S_ushort = Array3S< unsigned short int >;
+using Array3S_uint = Array3S< unsigned int >;
+using Array3S_ulong = Array3S< unsigned long int >;
+using Array3S_size = Array3S< std::size_t >;
+using Array3S_int8 = Array3S< std::int8_t >;
+using Array3S_int16 = Array3S< std::int16_t >;
+using Array3S_int32 = Array3S< std::int32_t >;
+using Array3S_int64 = Array3S< std::int64_t >;
+using Array3S_uint8 = Array3S< std::uint8_t >;
+using Array3S_uint16 = Array3S< std::uint16_t >;
+using Array3S_uint32 = Array3S< std::uint32_t >;
+using Array3S_uint64 = Array3S< std::uint64_t >;
+using Array3S_float = Array3S< float >;
+using Array3S_double = Array3S< double >;
+using Array3S_longdouble = Array3S< long double >;
+using Array3S_char = Array3S< char >;
+using Array3S_uchar = Array3S< unsigned char >;
+using Array3S_schar = Array3S< signed char >;
+using Array3S_string = Array3S< std::string >;
 
 } // ObjexxFCL
 

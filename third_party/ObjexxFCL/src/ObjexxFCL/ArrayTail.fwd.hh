@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  ArrayTail< bool >                ArrayTail_bool;
-typedef  ArrayTail< byte >                ArrayTail_byte;
-typedef  ArrayTail< sbyte >               ArrayTail_sbyte;
-typedef  ArrayTail< ubyte >               ArrayTail_ubyte;
-typedef  ArrayTail< short int >           ArrayTail_short;
-typedef  ArrayTail< int >                 ArrayTail_int;
-typedef  ArrayTail< long int >            ArrayTail_long;
-typedef  ArrayTail< unsigned short int >  ArrayTail_ushort;
-typedef  ArrayTail< unsigned int >        ArrayTail_uint;
-typedef  ArrayTail< unsigned long int >   ArrayTail_ulong;
-typedef  ArrayTail< std::size_t >         ArrayTail_size;
-typedef  ArrayTail< std::int8_t >         ArrayTail_int8;
-typedef  ArrayTail< std::int16_t >        ArrayTail_int16;
-typedef  ArrayTail< std::int32_t >        ArrayTail_int32;
-typedef  ArrayTail< std::int64_t >        ArrayTail_int64;
-typedef  ArrayTail< std::uint8_t >        ArrayTail_uint8;
-typedef  ArrayTail< std::uint16_t >       ArrayTail_uint16;
-typedef  ArrayTail< std::uint32_t >       ArrayTail_uint32;
-typedef  ArrayTail< std::uint64_t >       ArrayTail_uint64;
-typedef  ArrayTail< float >               ArrayTail_float;
-typedef  ArrayTail< double >              ArrayTail_double;
-typedef  ArrayTail< long double >         ArrayTail_longdouble;
-typedef  ArrayTail< char >                ArrayTail_char;
-typedef  ArrayTail< unsigned char >       ArrayTail_uchar;
-typedef  ArrayTail< signed char >         ArrayTail_schar;
-typedef  ArrayTail< std::string >         ArrayTail_string;
+using sbyte = byte;
+using ArrayTail_bool = ArrayTail< bool >;
+using ArrayTail_byte = ArrayTail< byte >;
+using ArrayTail_sbyte = ArrayTail< sbyte >;
+using ArrayTail_ubyte = ArrayTail< ubyte >;
+using ArrayTail_short = ArrayTail< short int >;
+using ArrayTail_int = ArrayTail< int >;
+using ArrayTail_long = ArrayTail< long int >;
+using ArrayTail_ushort = ArrayTail< unsigned short int >;
+using ArrayTail_uint = ArrayTail< unsigned int >;
+using ArrayTail_ulong = ArrayTail< unsigned long int >;
+using ArrayTail_size = ArrayTail< std::size_t >;
+using ArrayTail_int8 = ArrayTail< std::int8_t >;
+using ArrayTail_int16 = ArrayTail< std::int16_t >;
+using ArrayTail_int32 = ArrayTail< std::int32_t >;
+using ArrayTail_int64 = ArrayTail< std::int64_t >;
+using ArrayTail_uint8 = ArrayTail< std::uint8_t >;
+using ArrayTail_uint16 = ArrayTail< std::uint16_t >;
+using ArrayTail_uint32 = ArrayTail< std::uint32_t >;
+using ArrayTail_uint64 = ArrayTail< std::uint64_t >;
+using ArrayTail_float = ArrayTail< float >;
+using ArrayTail_double = ArrayTail< double >;
+using ArrayTail_longdouble = ArrayTail< long double >;
+using ArrayTail_char = ArrayTail< char >;
+using ArrayTail_uchar = ArrayTail< unsigned char >;
+using ArrayTail_schar = ArrayTail< signed char >;
+using ArrayTail_string = ArrayTail< std::string >;
 
 } // ObjexxFCL
 

@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array2S< bool >                Array2S_bool;
-typedef  Array2S< byte >                Array2S_byte;
-typedef  Array2S< sbyte >               Array2S_sbyte;
-typedef  Array2S< ubyte >               Array2S_ubyte;
-typedef  Array2S< short int >           Array2S_short;
-typedef  Array2S< int >                 Array2S_int;
-typedef  Array2S< long int >            Array2S_long;
-typedef  Array2S< unsigned short int >  Array2S_ushort;
-typedef  Array2S< unsigned int >        Array2S_uint;
-typedef  Array2S< unsigned long int >   Array2S_ulong;
-typedef  Array2S< std::size_t >         Array2S_size;
-typedef  Array2S< std::int8_t >         Array2S_int8;
-typedef  Array2S< std::int16_t >        Array2S_int16;
-typedef  Array2S< std::int32_t >        Array2S_int32;
-typedef  Array2S< std::int64_t >        Array2S_int64;
-typedef  Array2S< std::uint8_t >        Array2S_uint8;
-typedef  Array2S< std::uint16_t >       Array2S_uint16;
-typedef  Array2S< std::uint32_t >       Array2S_uint32;
-typedef  Array2S< std::uint64_t >       Array2S_uint64;
-typedef  Array2S< float >               Array2S_float;
-typedef  Array2S< double >              Array2S_double;
-typedef  Array2S< long double >         Array2S_longdouble;
-typedef  Array2S< char >                Array2S_char;
-typedef  Array2S< unsigned char >       Array2S_uchar;
-typedef  Array2S< signed char >         Array2S_schar;
-typedef  Array2S< std::string >         Array2S_string;
+using sbyte = byte;
+using Array2S_bool = Array2S< bool >;
+using Array2S_byte = Array2S< byte >;
+using Array2S_sbyte = Array2S< sbyte >;
+using Array2S_ubyte = Array2S< ubyte >;
+using Array2S_short = Array2S< short int >;
+using Array2S_int = Array2S< int >;
+using Array2S_long = Array2S< long int >;
+using Array2S_ushort = Array2S< unsigned short int >;
+using Array2S_uint = Array2S< unsigned int >;
+using Array2S_ulong = Array2S< unsigned long int >;
+using Array2S_size = Array2S< std::size_t >;
+using Array2S_int8 = Array2S< std::int8_t >;
+using Array2S_int16 = Array2S< std::int16_t >;
+using Array2S_int32 = Array2S< std::int32_t >;
+using Array2S_int64 = Array2S< std::int64_t >;
+using Array2S_uint8 = Array2S< std::uint8_t >;
+using Array2S_uint16 = Array2S< std::uint16_t >;
+using Array2S_uint32 = Array2S< std::uint32_t >;
+using Array2S_uint64 = Array2S< std::uint64_t >;
+using Array2S_float = Array2S< float >;
+using Array2S_double = Array2S< double >;
+using Array2S_longdouble = Array2S< long double >;
+using Array2S_char = Array2S< char >;
+using Array2S_uchar = Array2S< unsigned char >;
+using Array2S_schar = Array2S< signed char >;
+using Array2S_string = Array2S< std::string >;
 
 } // ObjexxFCL
 

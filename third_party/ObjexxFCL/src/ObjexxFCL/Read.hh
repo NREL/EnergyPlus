@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Format.hh>
@@ -203,7 +203,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ && ! sstream_ ) {
 				if ( format_->non_advancing() ) { // Non-advancing
-					format_->input_pos( stream_, poa_ + por_ ); // Set final stream position
+					format_->input_pos( stream_, poa_ + por_ ); // Set stream position
 				} else { // Advancing
 					stream_ >> Format::skip; // Advance to next line
 				}
@@ -224,7 +224,7 @@ private: // Assignment
 	ReadStream &
 	operator =( ReadStream const & ); // Disallow
 
-public: // Properties
+public: // Property
 
 	// Stream
 	std::istream const &
@@ -269,9 +269,9 @@ public: // Operators
 					active = active->next();
 				}
 				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, poa_, por_, t ) ) { // Input arg using active format
-					Format::Size const reverts( format_->reverts() );
+					Format::Size const reverts_arg( format_->reverts() );
 					active = active->next();
-					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to next arg-based format if not terminated
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_arg ) && format_->not_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to next arg-based format if not terminated
 						active = active->next();
 					}
 				}
@@ -840,6 +840,9 @@ private: // Methods
 private: // Data
 
 	std::istringstream * sstream_; // Internal stream for std::cin reads
+#ifdef OBJEXXFCL_THREADS
+	std::istringstream internal_stream_; // Internal stream
+#endif
 	std::istream & stream_; // Input stream
 	Format * format_; // Format expression
 	bool format_own_; // Own the Format?
@@ -849,7 +852,9 @@ private: // Data
 
 private: // Static Data
 
+#ifndef OBJEXXFCL_THREADS
 	static std::istringstream internal_stream_; // Internal stream
+#endif
 
 }; // ReadStream
 
@@ -868,20 +873,14 @@ public: // Creation
 
 	// Move Constructor
 	ReadString( ReadString && r ) NOEXCEPT :
-#if !defined(__GNUC__) || __GNUC__ >= 5 // GCC 5 adds move constructor
 	 stream_( std::move( r.stream_ ) ),
-#endif
 	 format_( r.format_ ? &r.format_->reset() : nullptr ),
 	 format_own_( r.format_own_ ),
 	 flags_( r.flags_ ? &r.flags_->clear_status() : nullptr ),
 	 pos_( 0 )
 	{
-#if !defined(__GNUC__) || __GNUC__ >= 5
 		stream_.clear();
 		stream_.seekg( 0, std::ios::beg );
-#else
-		stream_.str( r.stream_.str() );
-#endif
 		r.format_ = nullptr;
 		r.format_own_ = false;
 		r.pos_ = 0;
@@ -1033,7 +1032,7 @@ private: // Assignment
 	ReadString &
 	operator =( ReadString const & ); // Disallow
 
-public: // Properties
+public: // Property
 
 	// Stream
 	std::istream const &
@@ -1078,9 +1077,9 @@ public: // Operators
 					active = active->next();
 				}
 				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, pos_, t ) ) { // Input arg using active format
-					Format::Size const reverts( format_->reverts() );
+					Format::Size const reverts_arg( format_->reverts() );
 					active = active->next();
-					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to next arg-based format if not terminated
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_arg ) && format_->not_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to next arg-based format if not terminated
 						active = active->next();
 					}
 				}

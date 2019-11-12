@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,61 +26,61 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Optional< bool >                Optional_bool;
-typedef  Optional< byte >                Optional_byte;
-typedef  Optional< sbyte >               Optional_sbyte;
-typedef  Optional< ubyte >               Optional_ubyte;
-typedef  Optional< short int >           Optional_short;
-typedef  Optional< int >                 Optional_int;
-typedef  Optional< long int >            Optional_long;
-typedef  Optional< unsigned short int >  Optional_ushort;
-typedef  Optional< unsigned int >        Optional_uint;
-typedef  Optional< unsigned long int >   Optional_ulong;
-typedef  Optional< std::size_t >         Optional_size;
-typedef  Optional< std::int8_t >         Optional_int8;
-typedef  Optional< std::int16_t >        Optional_int16;
-typedef  Optional< std::int32_t >        Optional_int32;
-typedef  Optional< std::int64_t >        Optional_int64;
-typedef  Optional< std::uint8_t >        Optional_uint8;
-typedef  Optional< std::uint16_t >       Optional_uint16;
-typedef  Optional< std::uint32_t >       Optional_uint32;
-typedef  Optional< std::uint64_t >       Optional_uint64;
-typedef  Optional< float >               Optional_float;
-typedef  Optional< double >              Optional_double;
-typedef  Optional< long double >         Optional_longdouble;
-typedef  Optional< char >                Optional_char;
-typedef  Optional< unsigned char >       Optional_uchar;
-typedef  Optional< signed char >         Optional_schar;
-typedef  Optional< std::string >         Optional_string;
+using sbyte = byte;
+using Optional_bool = Optional< bool >;
+using Optional_byte = Optional< byte >;
+using Optional_sbyte = Optional< sbyte >;
+using Optional_ubyte = Optional< ubyte >;
+using Optional_short = Optional< short int >;
+using Optional_int = Optional< int >;
+using Optional_long = Optional< long int >;
+using Optional_ushort = Optional< unsigned short int >;
+using Optional_uint = Optional< unsigned int >;
+using Optional_ulong = Optional< unsigned long int >;
+using Optional_size = Optional< std::size_t >;
+using Optional_int8 = Optional< std::int8_t >;
+using Optional_int16 = Optional< std::int16_t >;
+using Optional_int32 = Optional< std::int32_t >;
+using Optional_int64 = Optional< std::int64_t >;
+using Optional_uint8 = Optional< std::uint8_t >;
+using Optional_uint16 = Optional< std::uint16_t >;
+using Optional_uint32 = Optional< std::uint32_t >;
+using Optional_uint64 = Optional< std::uint64_t >;
+using Optional_float = Optional< float >;
+using Optional_double = Optional< double >;
+using Optional_longdouble = Optional< long double >;
+using Optional_char = Optional< char >;
+using Optional_uchar = Optional< unsigned char >;
+using Optional_schar = Optional< signed char >;
+using Optional_string = Optional< std::string >;
 
 // Const Types
-typedef  Optional< bool const >                Optional_bool_const;
-typedef  Optional< byte const >                Optional_byte_const;
-typedef  Optional< sbyte const >               Optional_sbyte_const;
-typedef  Optional< ubyte const >               Optional_ubyte_const;
-typedef  Optional< short int const >           Optional_short_const;
-typedef  Optional< int const >                 Optional_int_const;
-typedef  Optional< long int const >            Optional_long_const;
-typedef  Optional< unsigned short int const >  Optional_ushort_const;
-typedef  Optional< unsigned int const >        Optional_uint_const;
-typedef  Optional< unsigned long int const >   Optional_ulong_const;
-typedef  Optional< std::size_t const >         Optional_size_const;
-typedef  Optional< std::int8_t const >         Optional_int8_const;
-typedef  Optional< std::int16_t const >        Optional_int16_const;
-typedef  Optional< std::int32_t const >        Optional_int32_const;
-typedef  Optional< std::int64_t const >        Optional_int64_const;
-typedef  Optional< std::uint8_t const >        Optional_uint8_const;
-typedef  Optional< std::uint16_t const >       Optional_uint16_const;
-typedef  Optional< std::uint32_t const >       Optional_uint32_const;
-typedef  Optional< std::uint64_t const >       Optional_uint64_const;
-typedef  Optional< float const >               Optional_float_const;
-typedef  Optional< double const >              Optional_double_const;
-typedef  Optional< long double const >         Optional_longdouble_const;
-typedef  Optional< char const >                Optional_char_const;
-typedef  Optional< unsigned char const >       Optional_uchar_const;
-typedef  Optional< signed char const >         Optional_schar_const;
-typedef  Optional< std::string const >         Optional_string_const;
+using Optional_bool_const = Optional< bool const >;
+using Optional_byte_const = Optional< byte const >;
+using Optional_sbyte_const = Optional< sbyte const >;
+using Optional_ubyte_const = Optional< ubyte const >;
+using Optional_short_const = Optional< short int const >;
+using Optional_int_const = Optional< int const >;
+using Optional_long_const = Optional< long int const >;
+using Optional_ushort_const = Optional< unsigned short int const >;
+using Optional_uint_const = Optional< unsigned int const >;
+using Optional_ulong_const = Optional< unsigned long int const >;
+using Optional_size_const = Optional< std::size_t const >;
+using Optional_int8_const = Optional< std::int8_t const >;
+using Optional_int16_const = Optional< std::int16_t const >;
+using Optional_int32_const = Optional< std::int32_t const >;
+using Optional_int64_const = Optional< std::int64_t const >;
+using Optional_uint8_const = Optional< std::uint8_t const >;
+using Optional_uint16_const = Optional< std::uint16_t const >;
+using Optional_uint32_const = Optional< std::uint32_t const >;
+using Optional_uint64_const = Optional< std::uint64_t const >;
+using Optional_float_const = Optional< float const >;
+using Optional_double_const = Optional< double const >;
+using Optional_longdouble_const = Optional< long double const >;
+using Optional_char_const = Optional< char const >;
+using Optional_uchar_const = Optional< unsigned char const >;
+using Optional_schar_const = Optional< signed char const >;
+using Optional_string_const = Optional< std::string const >;
 
 } // ObjexxFCL
 

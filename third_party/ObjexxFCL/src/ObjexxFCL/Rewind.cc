@@ -2,19 +2,20 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Rewind.hh>
 #include <ObjexxFCL/IOFlags.hh>
 
 // C++ Headers
+#include <cassert>
 #include <istream>
 #include <ostream>
 
@@ -25,6 +26,8 @@ void
 Rewind( std::istream & stream )
 {
 	stream.clear();
+	assert( stream.tellg() != std::streampos( -1 ) ); // Non-seekable stream
+	if ( stream.tellg() == std::streampos( -1 ) ) return; // Non-seekable stream
 	stream.seekg( 0, std::ios::beg );
 }
 
@@ -42,6 +45,8 @@ void
 Rewind( std::ostream & stream )
 {
 	stream.clear();
+	assert( stream.tellp() != std::streampos( -1 ) ); // Non-seekable stream
+	if ( stream.tellp() == std::streampos( -1 ) ) return; // Non-seekable stream
 	stream.seekp( 0, std::ios::beg );
 }
 
@@ -59,6 +64,10 @@ void
 Rewind( std::iostream & stream )
 {
 	stream.clear();
+	assert( stream.tellg() != std::streampos( -1 ) ); // Non-seekable stream
+	assert( stream.tellp() != std::streampos( -1 ) ); // Non-seekable stream
+	if ( stream.tellg() == std::streampos( -1 ) ) return; // Non-seekable stream
+	if ( stream.tellp() == std::streampos( -1 ) ) return; // Non-seekable stream
 	stream.seekg( 0, std::ios::beg );
 	stream.seekp( 0, std::ios::beg );
 }

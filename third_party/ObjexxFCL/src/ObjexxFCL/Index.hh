@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Index_hh_INCLUDED
 #define ObjexxFCL_Index_hh_INCLUDED
 
-// Index: Index Class
+// Index Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Omit.hh>
@@ -24,25 +24,16 @@
 
 namespace ObjexxFCL {
 
-// Index: Index Class
+// Index Class
 class Index
 {
 
 public: // Creation
 
 	// Default Constructor
-	Index() :
-	 init_( false ),
-	 i_( 0 )
-	{}
+	Index() = default;
 
-	// Copy Constructor
-	Index( Index const & I ) :
-	 init_( I.init_ ),
-	 i_( I.i_ )
-	{}
-
-	// Index Constructor
+	// Value Constructor
 	Index( int const i ) :
 	 init_( true ),
 	 i_( i )
@@ -54,13 +45,9 @@ public: // Creation
 	 i_( 0 )
 	{}
 
-	// Destructor
-	~Index()
-	{}
-
 public: // Assignment
 
-	// Scalar Assignment
+	// Value Assignment
 	Index &
 	operator =( int const i )
 	{
@@ -71,7 +58,7 @@ public: // Assignment
 
 public: // Conversion
 
-	// int Conversion
+	// Integer Conversion
 	operator int() const
 	{
 		assert( init_ );
@@ -89,7 +76,7 @@ public: // Predicate
 
 public: // Inspector
 
-	// Index
+	// Value
 	int
 	i() const
 	{
@@ -107,7 +94,7 @@ public: // Modifier
 		i_ = 0;
 	}
 
-	// Index Set
+	// Value Set
 	Index &
 	i( int const i )
 	{
@@ -126,8 +113,8 @@ public: // Modifier
 
 private: // Data
 
-	bool init_; // Index initialized?
-	int i_; // Index
+	bool init_{ false }; // Index initialized?
+	int i_{ 0 }; // Index value
 
 }; // Index
 

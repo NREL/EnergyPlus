@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/noexcept.hh>
@@ -45,13 +45,10 @@ class ubyte;
 struct EntryFormatLD
 {
 
-	typedef  std::size_t  Size;
+	using Size = std::size_t;
 
 	// Default Constructor
-	EntryFormatLD() :
-	 h( false ),
-	 r( 0ul )
-	{}
+	EntryFormatLD() = default;
 
 	// Constructor
 	explicit
@@ -83,8 +80,8 @@ struct EntryFormatLD
 	}
 
 	std::string s; // Entry string
-	bool h; // Has non-null entry?
-	Size r; // Repeat counter
+	bool h{ false }; // Has non-null entry?
+	Size r{ 0ul }; // Repeat counter
 
 }; // EntryFormatLD
 
@@ -98,12 +95,36 @@ private: // Friends
 
 public: // Types
 
-	typedef  std::size_t  Size;
-	typedef  std::string  Token;
-	typedef  std::vector< Token >  Tokens;
-	typedef  std::vector< Format * >  Formats;
+	using Size = std::size_t;
+	using Token = std::string;
+	using Tokens = std::vector< Token >;
+	using Formats = std::vector< Format * >;
 
 protected: // Creation
+
+	// Copy Constructor
+	Format( Format const & f ) :
+	 p_( f.p_ ),
+	 r_( f.r_ ),
+	 u_( f.u_ ),
+	 i_( 0ul )
+	{}
+
+	// Move Constructor
+	Format( Format && f ) NOEXCEPT :
+	 p_( f.p_ ),
+	 r_( f.r_ ),
+	 u_( f.u_ ),
+	 i_( 0ul )
+	{}
+
+	// Copy + Format Constructor
+	Format( Format const & f, Format * p ) :
+	 p_( p != nullptr ? p : f.p_ ),
+	 r_( f.r_ ),
+	 u_( f.u_ ),
+	 i_( 0ul )
+	{}
 
 	// Repeat Constructor
 	explicit
@@ -117,7 +138,7 @@ protected: // Creation
 	// Star Constructor
 	Format( Format * p, char const star ) :
 	 p_( p ),
-	 r_( -1 ),
+	 r_( Size( -1 ) ),
 	 u_( true ),
 	 i_( 0ul )
 	{
@@ -126,22 +147,6 @@ protected: // Creation
 		static_cast< void >( star ); // Suppress unused warning
 #endif
 	}
-
-	// Copy Constructor
-	Format( Format const & f, Format * p = nullptr ) :
-	 p_( p ? p : f.p_ ),
-	 r_( f.r_ ),
-	 u_( f.u_ ),
-	 i_( 0ul )
-	{}
-
-	// Move Constructor
-	Format( Format && f ) NOEXCEPT :
-	 p_( f.p_ ),
-	 r_( f.r_ ),
-	 u_( f.u_ ),
-	 i_( 0ul )
-	{}
 
 public: // Creation
 
@@ -158,7 +163,7 @@ public: // Creation
 protected: // Assignment
 
 	// Copy Assignment
-	void
+	Format &
 	operator =( Format const & f )
 	{
 		if ( this != &f ) {
@@ -167,9 +172,22 @@ protected: // Assignment
 			u_ = f.u_;
 			i_ = 0ul;
 		}
+		return *this;
 	}
 
-public: // Properties
+	// Move Assignment
+	Format &
+	operator =( Format && f ) NOEXCEPT
+	{
+		assert( this != &f );
+		p_ = f.p_;
+		r_ = f.r_;
+		u_ = f.u_;
+		i_ = 0ul;
+		return *this;
+	}
+
+public: // Property
 
 	// Parent Format
 	Format const *
@@ -449,7 +467,7 @@ public: // Methods
 		return *this;
 	}
 
-public: // Input Methods
+public: // Input
 
 	// Input without Argument
 	std::istream &
@@ -658,7 +676,7 @@ public: // Input Methods
 		io_err( stream );
 	}
 
-public: // Output Methods
+public: // Output
 
 	// Output without Argument
 	std::ostream &
@@ -850,7 +868,7 @@ public: // Static Methods
 	void
 	skip( std::istream & stream, Size const w = 1ul );
 
-protected: // Properties
+protected: // Property
 
 	// Active index
 	Size
@@ -981,14 +999,14 @@ protected: // Static Methods
 
 private: // Data
 
-	Format * p_; // Parent format (non-owning)
-	Size r_; // Repeat count
-	bool u_; // Unlimited repeat?
-	Size i_; // Active repeat or member index
+	Format * p_{ nullptr }; // Parent format (non-owning)
+	Size r_{ 1ul }; // Repeat count
+	bool u_{ false }; // Unlimited repeat?
+	Size i_{ 0ul }; // Active repeat or member index
 
 protected: // Static Data
 
-	static Size const NOSIZE;
+	static Size const NOSIZE{ static_cast< Size >( -1 ) };
 	static std::string const LF;
 
 }; // Format
@@ -999,44 +1017,37 @@ class FormatCombo : public Format
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatCombo( FormatCombo const & f ) = default;
+
+	// Move Constructor
+	FormatCombo( FormatCombo && f ) NOEXCEPT = default;
+
+	// Repeat Constructor
 	explicit
 	FormatCombo( Format * p, Size const r = 1ul ) :
 	 Format( p, r )
 	{}
 
-	// Constructor
+	// Star Constructor
 	FormatCombo( Format * p, char const star ) :
 	 Format( p, star )
 	{}
 
-	// Copy Constructor
-	FormatCombo( FormatCombo const & f, Format * p = nullptr ) :
+	// Copy + Format Constructor
+	FormatCombo( FormatCombo const & f, Format * p ) :
 	 Format( f, p )
-	{}
-
-	// Move Constructor
-	FormatCombo( FormatCombo && f ) NOEXCEPT :
-	 Format( std::move( f ) )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~FormatCombo()
 	{}
 
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( FormatCombo const & f )
-	{
-		if ( this != &f ) {
-			Format::operator =( f );
-		}
-	}
+	FormatCombo &
+	operator =( FormatCombo const & f ) = default;
+
+	// Move Assignment
+	FormatCombo &
+	operator =( FormatCombo && f ) NOEXCEPT = default;
 
 }; // FormatCombo
 
@@ -1046,16 +1057,9 @@ class FormatList : public FormatCombo
 
 public: // Creation
 
-	// Constructor
-	explicit
-	FormatList( Format * p, Formats const & formats = Formats() ) :
-	 FormatCombo( p ),
-	 formats_( formats )
-	{}
-
 	// Copy Constructor
-	FormatList( FormatList const & f, Format * p = nullptr ) :
-	 FormatCombo( f, p )
+	FormatList( FormatList const & f ) :
+	 FormatCombo( f )
 	{
 		for ( Format * format : f.formats() ) formats_.push_back( format->clone( this ) );
 	}
@@ -1067,6 +1071,20 @@ public: // Creation
 	{
 		f.formats_.clear();
 	}
+
+	// Copy + Format Constructor
+	FormatList( FormatList const & f, Format * p ) :
+	 FormatCombo( f, p )
+	{
+		for ( Format * format : f.formats() ) formats_.push_back( format->clone( this ) );
+	}
+
+	// Format Constructor
+	explicit
+	FormatList( Format * p, Formats const & formats = Formats() ) :
+	 FormatCombo( p ),
+	 formats_( formats )
+	{}
 
 	// Clone
 	FormatList *
@@ -1086,9 +1104,30 @@ public: // Assignment
 
 	// Copy Assignment
 	FormatList &
-	operator =( FormatList const & f );
+	operator =( FormatList const & f )
+	{
+		if ( this != &f ) {
+			FormatCombo::operator =( f );
+			for ( Format * format : formats_ ) delete format;
+			formats_.clear();
+			for ( Format * format : f.formats() ) formats_.push_back( format->clone() );
+		}
+		return *this;
+	}
 
-public: // Properties
+	// Move Assignment
+	FormatList &
+	operator =( FormatList && f ) NOEXCEPT
+	{
+		assert( this != &f );
+		FormatCombo::operator =( std::move( f ) );
+		for ( Format * format : formats_ ) delete format;
+		formats_ = f.formats();
+		f.formats_.clear();
+		return *this;
+	}
+
+public: // Property
 
 	// Format List?
 	bool
@@ -1167,14 +1206,34 @@ class FormatGroup : public FormatCombo
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatGroup( FormatGroup const & f ) :
+	 FormatCombo( f ),
+	 format_( f.format() != nullptr ? f.format()->clone( this ) : nullptr )
+	{}
+
+	// Move Constructor
+	FormatGroup( FormatGroup && f ) NOEXCEPT :
+	 FormatCombo( std::move( f ) ),
+	 format_( f.format() )
+	{
+		f.clear();
+	}
+
+	// Copy + Format Constructor
+	FormatGroup( FormatGroup const & f, Format * p ) :
+	 FormatCombo( f, p ),
+	 format_( f.format() != nullptr ? f.format()->clone( this ) : nullptr )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatGroup( Format * p, Format * format = nullptr ) :
 	 FormatCombo( p ),
 	 format_( format )
 	{}
 
-	// Size Constructor
+	// Repeat Constructor
 	FormatGroup( Format * p, Size const r, Format * format = nullptr ) :
 	 FormatCombo( p, r ),
 	 format_( format )
@@ -1186,36 +1245,42 @@ protected: // Creation
 	 format_( format )
 	{}
 
-	// Copy Constructor
-	FormatGroup( FormatGroup const & f, Format * p = nullptr ) :
-	 FormatCombo( f, p ),
-	 format_( f.format() ? f.format()->clone( this ) : nullptr )
-	{}
-
-	// Move Constructor
-	FormatGroup( FormatGroup && f ) NOEXCEPT :
-	 FormatCombo( std::move( f ) ),
-	 format_( f.format_ )
-	{
-		f.format_ = nullptr;
-	}
-
 public: // Creation
 
 	// Destructor
 	virtual
 	~FormatGroup()
 	{
-		if ( format_ ) delete format_;
+		if ( format_ != nullptr ) delete format_;
 	}
 
 protected: // Assignment
 
 	// Copy Assignment
 	FormatGroup &
-	operator =( FormatGroup const & f );
+	operator =( FormatGroup const & f )
+	{
+		if ( this != &f ) {
+			FormatCombo::operator =( f );
+			if ( format_ != nullptr ) delete format_;
+			format_ = ( f.format() != nullptr ? f.format()->clone() : nullptr );
+		}
+		return *this;
+	}
 
-public: // Properties
+	// Move Assignment
+	FormatGroup &
+	operator =( FormatGroup && f ) NOEXCEPT
+	{
+		assert( this != &f );
+		FormatCombo::operator =( std::move( f ) );
+		if ( format_ != nullptr ) delete format_;
+		format_ = f.format();
+		f.clear();
+		return *this;
+	}
+
+public: // Property
 
 	// Format Group?
 	bool
@@ -1228,14 +1293,14 @@ public: // Properties
 	Format *
 	current()
 	{
-		return ( format_ ? format_->current() : nullptr );
+		return ( format_ != nullptr ? format_->current() : nullptr );
 	}
 
 	// Next Format
 	Format *
 	next()
 	{
-		return ( format_ ? format_->next() : nullptr );
+		return ( format_ != nullptr ? format_->next() : nullptr );
 	}
 
 	// Next Format: Upward Call
@@ -1261,24 +1326,32 @@ public: // Properties
 	void
 	format( Format * f )
 	{
-		if ( format_ ) delete format_;
+		if ( format_ != nullptr ) delete format_;
 		format_ = f;
 	}
 
 public: // Methods
+
+	// Clear
+	void
+	clear()
+	{
+		if ( format_ != nullptr ) delete format_;
+		format_ = nullptr;
+	}
 
 	// Reset
 	FormatGroup &
 	reset()
 	{
 		FormatCombo::reset();
-		if ( format_ ) format_->reset();
+		if ( format_ != nullptr ) format_->reset();
 		return *this;
 	}
 
 private: // Data
 
-	Format * format_;
+	Format * format_{ nullptr };
 
 }; // FormatGroup
 
@@ -1291,6 +1364,53 @@ public: // Types
 	using FormatGroup::format;
 
 public: // Creation
+
+	// Copy Constructor
+	FormatGroupTop( FormatGroupTop const & f ) :
+	 FormatGroup( f ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
+	 reverted_( false ),
+	 reverts_( 0ul ),
+	 ir_( 0ul ),
+	 fr_( nullptr ),
+	 spacer_( false )
+	{}
+
+	// Move Constructor
+	FormatGroupTop( FormatGroupTop && f ) NOEXCEPT :
+	 FormatGroup( std::move( f ) ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
+	 reverted_( false ),
+	 reverts_( 0ul ),
+	 ir_( 0ul ),
+	 fr_( f.fr_ ),
+	 spacer_( false )
+	{
+		f.fr_ = nullptr;
+	}
+
+	// Copy + Format Constructor
+	FormatGroupTop( FormatGroupTop const & f, Format * p ) :
+	 FormatGroup( f, p ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
+	 reverted_( false ),
+	 reverts_( 0ul ),
+	 ir_( 0ul ),
+	 fr_( nullptr ),
+	 spacer_( false )
+	{}
 
 	// Constructor
 	explicit
@@ -1308,7 +1428,7 @@ public: // Creation
 	 spacer_( false )
 	{}
 
-	// Size Constructor
+	// Repeat Constructor
 	explicit
 	FormatGroupTop( Size const r, Format * format = nullptr ) :
 	 FormatGroup( nullptr, r, format ),
@@ -1340,49 +1460,12 @@ public: // Creation
 	 spacer_( false )
 	{}
 
-	// Copy Constructor
-	FormatGroupTop( FormatGroupTop const & f, Format * p = nullptr ) :
-	 FormatGroup( f, p ),
-	 P_( 0 ),
-	 blank_zero_( false ),
-	 colon_terminated_( false ),
-	 slash_terminated_( false ),
-	 non_advancing_( false ),
-	 reverted_( false ),
-	 reverts_( 0ul ),
-	 ir_( 0ul ),
-	 fr_( nullptr ),
-	 spacer_( false )
-	{}
-
-	// Move Constructor
-	FormatGroupTop( FormatGroupTop && f ) NOEXCEPT :
-	 FormatGroup( std::move( f ) ),
-	 P_( 0 ),
-	 blank_zero_( false ),
-	 colon_terminated_( false ),
-	 slash_terminated_( false ),
-	 non_advancing_( false ),
-	 reverted_( false ),
-	 reverts_( 0ul ),
-	 ir_( 0ul ),
-	 fr_( f.fr_ ),
-	 spacer_( false )
-	{
-		f.fr_ = nullptr;
-	}
-
 	// Clone
 	FormatGroupTop *
 	clone( Format * p = nullptr ) const
 	{
 		return new FormatGroupTop( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatGroupTop()
-	{}
 
 public: // Assignment
 
@@ -1406,7 +1489,27 @@ public: // Assignment
 		return *this;
 	}
 
-public: // Properties
+	// Move Assignment
+	FormatGroupTop &
+	operator =( FormatGroupTop && f ) NOEXCEPT
+	{
+		assert( this != &f );
+		FormatGroup::operator =( std::move( f ) );
+		P_ = 0;
+		blank_zero_ = false;
+		colon_terminated_ = false;
+		slash_terminated_ = false;
+		non_advancing_ = false;
+		reverted_ = false;
+		reverts_ = 0ul;
+		ir_ = 0ul;
+		fr_ = f.fr_;
+		spacer_ = false;
+		f.fr_ = nullptr;
+		return *this;
+	}
+
+public: // Property
 
 	// List-Directed?
 	bool
@@ -1557,16 +1660,16 @@ private: // Methods
 
 private: // Data
 
-	int P_; // P scaling
-	bool blank_zero_; // Treat blanks in numeric inputs as zero?
-	bool colon_terminated_; // Colon terminated? (Stops all i/o after last item)
-	bool slash_terminated_; // Slash terminated? (Stops list-directed read)
-	bool non_advancing_; // Non-advancing output?
-	bool reverted_; // Reverted since any output performed?
-	Size reverts_; // Number of reversions
-	Size ir_; // Reversion Format list index
-	Format * fr_; // Reversion Format
-	bool spacer_; // Spacer item output last?
+	int P_{ 0 }; // P scaling
+	bool blank_zero_{ false }; // Treat blanks in numeric inputs as zero?
+	bool colon_terminated_{ false }; // Colon terminated? (Stops all i/o after last item)
+	bool slash_terminated_{ false }; // Slash terminated? (Stops list-directed read)
+	bool non_advancing_{ false }; // Non-advancing output?
+	bool reverted_{ false }; // Reverted since any output performed?
+	Size reverts_{ 0ul }; // Number of reversions
+	Size ir_{ 0ul }; // Reversion Format list index
+	Format * fr_{ nullptr }; // Reversion Format
+	bool spacer_{ false }; // Spacer item output last?
 
 }; // FormatGroupTop
 
@@ -1576,26 +1679,25 @@ class FormatGroupSub : public FormatGroup
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatGroupSub( FormatGroupSub const & f, Format * p ) :
+	 FormatGroup( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatGroupSub( Format * p, Format * format = nullptr ) :
 	 FormatGroup( p, format )
 	{}
 
-	// Constructor
+	// Repeat Constructor
 	FormatGroupSub( Format * p, Size const r, Format * format = nullptr ) :
 	 FormatGroup( p, r, format )
 	{}
 
-	// Constructor
+	// Star Constructor
 	FormatGroupSub( Format * p, char const star, Format * format = nullptr ) :
 	 FormatGroup( p, star, format )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatGroupSub( FormatGroupSub const & f, Format * p = nullptr ) :
-	 FormatGroup( f, p )
 	{}
 
 	// Clone
@@ -1605,11 +1707,6 @@ public: // Creation
 		return new FormatGroupSub( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatGroupSub()
-	{}
-
 }; // FormatGroupSub
 
 // Format Leaf Base Class
@@ -1618,41 +1715,34 @@ class FormatLeaf : public Format
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatLeaf( FormatLeaf const & f ) = default;
+
+	// Move Constructor
+	FormatLeaf( FormatLeaf && f ) NOEXCEPT = default;
+
+	// Copy + Format Constructor
+	FormatLeaf( FormatLeaf const & f, Format * p ) :
+	 Format( f, p )
+	{}
+
+	// Format + Repeat Constructor
 	explicit
 	FormatLeaf( Format * p, Size const r = 1ul ) :
 	 Format( p, r )
 	{}
 
-	// Copy Constructor
-	FormatLeaf( FormatLeaf const & f, Format * p = nullptr ) :
-	 Format( f, p )
-	{}
-
-	// Move Constructor
-	FormatLeaf( FormatLeaf && f ) NOEXCEPT :
-	 Format( std::move( f ) )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~FormatLeaf()
-	{}
-
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( FormatLeaf const & f )
-	{
-		if ( this != &f ) {
-			Format::operator =( f );
-		}
-	}
+	FormatLeaf &
+	operator =( FormatLeaf const & f ) = default;
 
-public: // Properties
+	// Move Assignment
+	FormatLeaf &
+	operator =( FormatLeaf && f ) NOEXCEPT = default;
+
+public: // Property
 
 	// Current Format
 	Format *
@@ -1686,18 +1776,16 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
-	explicit
+	// Copy + Format Constructor
+	FormatString( FormatString const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 s_( f.s_ )
+	{}
+
+	// String Constructor
 	FormatString( Format * p, std::string const & s ) :
 	 FormatLeaf( p ),
 	 s_( replaced( replaced( s, "\\\\", "\\" ), "\\\"", "\"" ) )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatString( FormatString const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 s_( f.s_ )
 	{}
 
 	// Clone
@@ -1706,11 +1794,6 @@ public: // Creation
 	{
 		return new FormatString( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatString()
-	{}
 
 public: // Methods
 
@@ -1754,18 +1837,16 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
-	explicit
+	// Copy + Format Constructor
+	FormatChar( FormatChar const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 s_( f.s_ )
+	{}
+
+	// Format + String Constructor
 	FormatChar( Format * p, std::string const & s ) :
 	 FormatLeaf( p ),
 	 s_( replaced( replaced( s, "\\\\", "\\" ), "\\'", "'" ) )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatChar( FormatChar const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 s_( f.s_ )
 	{}
 
 	// Clone
@@ -1774,11 +1855,6 @@ public: // Creation
 	{
 		return new FormatChar( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatChar()
-	{}
 
 public: // Methods
 
@@ -1821,16 +1897,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatBN( FormatBN const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatBN( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatBN( FormatBN const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -1839,11 +1914,6 @@ public: // Creation
 	{
 		return new FormatBN( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatBN()
-	{}
 
 public: // Methods
 
@@ -1873,16 +1943,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatBZ( FormatBZ const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatBZ( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatBZ( FormatBZ const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -1891,11 +1960,6 @@ public: // Creation
 	{
 		return new FormatBZ( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatBZ()
-	{}
 
 public: // Methods
 
@@ -1920,16 +1984,15 @@ class FormatS : public FormatLeaf
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatS( FormatS const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatS( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatS( FormatS const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -1939,11 +2002,6 @@ public: // Creation
 		return new FormatS( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatS()
-	{}
-
 }; // FormatS
 
 class FormatSP : public FormatLeaf
@@ -1951,16 +2009,15 @@ class FormatSP : public FormatLeaf
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatSP( FormatSP const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatSP( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatSP( FormatSP const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -1970,11 +2027,6 @@ public: // Creation
 		return new FormatSP( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatSP()
-	{}
-
 }; // FormatSP
 
 class FormatSS : public FormatLeaf
@@ -1982,16 +2034,15 @@ class FormatSS : public FormatLeaf
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatSS( FormatSS const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatSS( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatSS( FormatSS const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -2001,11 +2052,6 @@ public: // Creation
 		return new FormatSS( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatSS()
-	{}
-
 }; // FormatSS
 
 class FormatSU : public FormatLeaf
@@ -2013,16 +2059,15 @@ class FormatSU : public FormatLeaf
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatSU( FormatSU const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatSU( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatSU( FormatSU const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -2031,11 +2076,6 @@ public: // Creation
 	{
 		return new FormatSU( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatSU()
-	{}
 
 }; // FormatSU
 
@@ -2050,18 +2090,17 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatX( FormatX const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 n_( f.n_ )
+	{}
+
+	// Format + Size Constructor
 	explicit
 	FormatX( Format * p, Size const n = 1ul ) :
 	 FormatLeaf( p ),
 	 n_( n )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatX( FormatX const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 n_( f.n_ )
 	{}
 
 	// Clone
@@ -2070,11 +2109,6 @@ public: // Creation
 	{
 		return new FormatX( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatX()
-	{}
 
 public: // Methods
 
@@ -2101,7 +2135,7 @@ public: // Methods
 
 private: // Data
 
-	Size n_; // Number of spaces
+	Size n_{ 0u }; // Number of spaces
 
 }; // FormatX
 
@@ -2111,18 +2145,16 @@ class FormatR : public FormatLeaf
 
 public: // Creation
 
-	// Constructor
-	explicit
+	// Copy + Format Constructor
+	FormatR( FormatR const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 radix_( f.radix_ )
+	{}
+
+	// Format + Radix Constructor
 	FormatR( Format * p, Size const radix ) :
 	 FormatLeaf( p ),
 	 radix_( radix )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatR( FormatR const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 radix_( f.radix_ )
 	{}
 
 	// Clone
@@ -2132,14 +2164,9 @@ public: // Creation
 		return new FormatR( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatR()
-	{}
-
 private: // Data
 
-	Size radix_;
+	Size radix_{ 0u };
 
 }; // FormatR
 
@@ -2154,16 +2181,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatLinefeed( FormatLinefeed const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format + Repeat Constructor
 	explicit
 	FormatLinefeed( Format * p, Size const r = 1ul ) :
 	 FormatLeaf( p, r )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatLinefeed( FormatLinefeed const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -2172,11 +2198,6 @@ public: // Creation
 	{
 		return new FormatLinefeed( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatLinefeed()
-	{}
 
 public: // Methods
 
@@ -2220,16 +2241,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatColon( FormatColon const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatColon( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatColon( FormatColon const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -2238,11 +2258,6 @@ public: // Creation
 	{
 		return new FormatColon( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatColon()
-	{}
 
 public: // Methods
 
@@ -2279,16 +2294,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatDollar( FormatDollar const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatDollar( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatDollar( FormatDollar const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -2297,11 +2311,6 @@ public: // Creation
 	{
 		return new FormatDollar( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatDollar()
-	{}
 
 public: // Methods
 
@@ -2325,17 +2334,16 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatT( FormatT const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 n_( f.n_ )
+	{}
+
+	// Format + Size Constructor
 	FormatT( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n > 0 ? n : 1ul ) // Assure that n_ > 0
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatT( FormatT const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 n_( f.n_ )
 	{}
 
 	// Clone
@@ -2344,11 +2352,6 @@ public: // Creation
 	{
 		return new FormatT( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatT()
-	{}
 
 public: // Methods
 
@@ -2375,7 +2378,7 @@ public: // Methods
 
 private: // Data
 
-	Size n_;
+	Size n_{ 0u };
 
 }; // FormatT
 
@@ -2390,17 +2393,16 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatTL( FormatTL const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 n_( f.n_ )
+	{}
+
+	// Format + Size Constructor
 	FormatTL( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatTL( FormatTL const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 n_( f.n_ )
 	{}
 
 	// Clone
@@ -2409,11 +2411,6 @@ public: // Creation
 	{
 		return new FormatTL( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatTL()
-	{}
 
 public: // Methods
 
@@ -2440,7 +2437,7 @@ public: // Methods
 
 private: // Data
 
-	Size n_;
+	Size n_{ 0u };
 
 }; // FormatTL
 
@@ -2455,17 +2452,16 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatTR( FormatTR const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 n_( f.n_ )
+	{}
+
+	// Format + Size Constructor
 	FormatTR( Format * p, Size const n ) :
 	 FormatLeaf( p ),
 	 n_( n )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatTR( FormatTR const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 n_( f.n_ )
 	{}
 
 	// Clone
@@ -2474,11 +2470,6 @@ public: // Creation
 	{
 		return new FormatTR( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatTR()
-	{}
 
 public: // Methods
 
@@ -2505,7 +2496,7 @@ public: // Methods
 
 private: // Data
 
-	Size n_;
+	Size n_{ 0u };
 
 }; // FormatTR
 
@@ -2520,18 +2511,17 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatA( FormatA const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 w_( f.w_ )
+	{}
+
+	// Format + Repeat + Width Constructor
 	explicit
 	FormatA( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
 	 FormatLeaf( p, r ),
 	 w_( w )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatA( FormatA const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 w_( f.w_ )
 	{}
 
 	// Clone
@@ -2541,12 +2531,7 @@ public: // Creation
 		return new FormatA( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatA()
-	{}
-
-public: // Properties
+public: // Property
 
 	// Uses an Argument?
 	bool
@@ -2562,7 +2547,7 @@ public: // Properties
 		return ( w_ != NOSIZE );
 	}
 
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -2674,7 +2659,7 @@ public: // Input Methods
 		s = read( stream, w_ ); // Reads the whole record if w_ unspecified since std::string is variable length
 	}
 
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -2713,7 +2698,7 @@ public: // Output Methods
 
 	// Output
 	void
-	out( std::ostream & stream, int const i , std::string const & ter)
+	out( std::ostream & stream, int const i, std::string const & ter )
 	{
 		write_val_reinterpret( stream, i, ter );
 	}
@@ -2764,7 +2749,7 @@ public: // Output Methods
 	void
 	out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		write_val_reinterpret( stream, v, ter);
+		write_val_reinterpret( stream, v, ter );
 	}
 
 	// Output
@@ -2852,7 +2837,7 @@ private: // Methods
 
 private: // Data
 
-	Size w_;
+	Size w_{ 0u };
 
 }; // FormatA
 
@@ -2867,18 +2852,17 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatL( FormatL const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 w_( f.w_ )
+	{}
+
+	// Format + Repeat + Width Constructor
 	explicit
 	FormatL( Format * p, Size const r = 1ul, Size const w = NOSIZE ) :
 	 FormatLeaf( p, r ),
 	 w_( w )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatL( FormatL const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 w_( f.w_ )
 	{}
 
 	// Clone
@@ -2888,12 +2872,7 @@ public: // Creation
 		return new FormatL( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatL()
-	{}
-
-public: // Properties
+public: // Property
 
 	// Uses an Argument?
 	bool
@@ -2933,7 +2912,7 @@ private: // Methods
 
 private: // Data
 
-	Size w_;
+	Size w_{ 0u };
 
 }; // FormatL
 
@@ -2947,7 +2926,20 @@ public: // Types
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatInteger( FormatInteger const & f ) = default;
+
+	// Move Constructor
+	FormatInteger( FormatInteger && f ) NOEXCEPT = default;
+
+	// Copy + Format Constructor
+	FormatInteger( FormatInteger const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 w_( f.w_ ),
+	 m_( f.m_ )
+	{}
+
+	// Format + Repeat + Width + Minimum Width Constructor
 	explicit
 	FormatInteger( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatLeaf( p, r ),
@@ -2955,41 +2947,17 @@ protected: // Creation
 	 m_( m )
 	{}
 
-	// Copy Constructor
-	FormatInteger( FormatInteger const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 w_( f.w_ ),
-	 m_( f.m_ )
-	{}
-
-	// Move Constructor
-	FormatInteger( FormatInteger && f ) NOEXCEPT :
-	 FormatLeaf( std::move( f ) ),
-	 w_( f.w_ ),
-	 m_( f.m_ )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~FormatInteger()
-	{}
-
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( FormatInteger const & f )
-	{
-		if ( this != &f ) {
-			FormatLeaf::operator =( f );
-			w_ = f.w_;
-			m_ = f.m_;
-		}
-	}
+	FormatInteger &
+	operator =( FormatInteger const & f ) = default;
 
-public: // Properties
+	// Move Assignment
+	FormatInteger &
+	operator =( FormatInteger && f ) NOEXCEPT = default;
+
+public: // Property
 
 	// Uses an Argument?
 	bool
@@ -3019,7 +2987,7 @@ public: // Properties
 		return m_;
 	}
 
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -3142,36 +3110,82 @@ protected: // Methods
 	}
 
 	// Read Integer from String and Reinterpret as Type T
-	template< typename T >
+	template< typename T, typename std::enable_if< ( sizeof( T ) < sizeof( int ) ), int >::type = 0 >
 	void
 	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
 	{
 		if ( is_int_base( s ) ) {
 			long int const l( read_int_base( stream, s ) );
-			bool ok( true );
-			if ( sizeof( T ) < sizeof( int ) ) {
-				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
-				int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			} else if ( sizeof( T ) == sizeof( int ) ) {
-				ok = ( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
-				int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long int ) ) {
-				void const * vp( &l );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long long int ) ) {
-				long long int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else {
-				long long int const v( l );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			}
+			bool const ok( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+			int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
 			if ( ! ok ) io_err( stream );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) == sizeof( int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			bool const ok( ( ( long int )( std::numeric_limits< int >::min() ) <= l ) && ( l <= ( long int )( std::numeric_limits< int >::max() ) ) );
+			int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( int ) ) && ( sizeof( T ) <= sizeof( long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			void const * vp( &l );
+			t = *reinterpret_cast< T const * >( vp );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long int ) ) && ( sizeof( T ) <= sizeof( long long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			long long int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+		} else { // Bad input
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Integer from String and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long long int ) ), int >::type = 0 >
+	void
+	read_int_reinterpret( std::istream & stream, std::string const & s, T & t ) const
+	{
+		if ( is_int_base( s ) ) {
+			long int const l( read_int_base( stream, s ) );
+			long long int const v( l );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
 		} else { // Bad input
 			t = T( 0 );
 			io_err( stream );
@@ -3197,8 +3211,8 @@ protected: // Methods
 
 private: // Data
 
-	Size w_;
-	Size m_;
+	Size w_{ 0u };
+	Size m_{ 0u };
 
 }; // FormatInteger
 
@@ -3212,16 +3226,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatI( FormatI const & f, Format * p ) :
+	 FormatInteger( f, p )
+	{}
+
+	// Format + Repeat + Width + Minimum Width Constructor
 	explicit
 	FormatI( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatI( FormatI const & f, Format * p = nullptr ) :
-	 FormatInteger( f, p )
 	{}
 
 	// Clone
@@ -3231,12 +3244,7 @@ public: // Creation
 		return new FormatI( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatI()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -3312,16 +3320,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatB( FormatB const & f, Format * p ) :
+	 FormatInteger( f, p )
+	{}
+
+	// Format + Repeat + Width + Minimum Width Constructor
 	explicit
 	FormatB( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatB( FormatB const & f, Format * p = nullptr ) :
-	 FormatInteger( f, p )
 	{}
 
 	// Clone
@@ -3331,12 +3338,7 @@ public: // Creation
 		return new FormatB( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatB()
-	{}
-
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -3438,7 +3440,7 @@ public: // Input Methods
 		read_binary_reinterpret( stream, v );
 	}
 
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -3531,16 +3533,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatO( FormatO const & f, Format * p ) :
+	 FormatInteger( f, p )
+	{}
+
+	// Format + Repeat + Width + Minimum Width Constructor
 	explicit
 	FormatO( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatO( FormatO const & f, Format * p = nullptr ) :
-	 FormatInteger( f, p )
 	{}
 
 	// Clone
@@ -3550,12 +3551,7 @@ public: // Creation
 		return new FormatO( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatO()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -3630,16 +3626,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatZ( FormatZ const & f, Format * p ) :
+	 FormatInteger( f, p )
+	{}
+
+	// Format + Repeat + Width + Minimum Width Constructor
 	explicit
 	FormatZ( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const m = 0ul ) :
 	 FormatInteger( p, r, w, m )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatZ( FormatZ const & f, Format * p = nullptr ) :
-	 FormatInteger( f, p )
 	{}
 
 	// Clone
@@ -3649,12 +3644,7 @@ public: // Creation
 		return new FormatZ( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatZ()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -3730,18 +3720,17 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatP( FormatP const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 k_( f.k_ )
+	{}
+
+	// Format + Scaling Constructor
 	explicit
 	FormatP( Format * p, int k = 1 ) :
 	 FormatLeaf( p ),
 	 k_( k )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatP( FormatP const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 k_( f.k_ )
 	{}
 
 	// Clone
@@ -3750,11 +3739,6 @@ public: // Creation
 	{
 		return new FormatP( *this, p );
 	}
-
-	// Destructor
-	virtual
-	~FormatP()
-	{}
 
 public: // Methods
 
@@ -3781,7 +3765,7 @@ public: // Methods
 
 private: // Data
 
-	int const k_;
+	int k_{ 0 };
 
 }; // FormatP
 
@@ -3795,7 +3779,20 @@ public: // Types
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatFloat( FormatFloat const & f ) = default;
+
+	// Move Constructor
+	FormatFloat( FormatFloat && f ) NOEXCEPT = default;
+
+	// Copy + Format Constructor
+	FormatFloat( FormatFloat const & f, Format * p ) :
+	 FormatLeaf( f, p ),
+	 w_( f.w_ ),
+	 d_( f.d_ )
+	{}
+
+	// Format + Repeat + Width + Decimal Constructor
 	explicit
 	FormatFloat( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
 	 FormatLeaf( p, r ),
@@ -3803,41 +3800,17 @@ protected: // Creation
 	 d_( d )
 	{}
 
-	// Copy Constructor
-	FormatFloat( FormatFloat const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 w_( f.w_ ),
-	 d_( f.d_ )
-	{}
-
-	// Move Constructor
-	FormatFloat( FormatFloat && f ) NOEXCEPT :
-	 FormatLeaf( std::move( f ) ),
-	 w_( f.w_ ),
-	 d_( f.d_ )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~FormatFloat()
-	{}
-
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( FormatFloat const & f )
-	{
-		if ( this != &f ) {
-			FormatLeaf::operator =( f );
-			w_ = f.w_;
-			d_ = f.d_;
-		}
-	}
+	FormatFloat &
+	operator =( FormatFloat const & f ) = default;
 
-public: // Properties
+	// Move Assignment
+	FormatFloat &
+	operator =( FormatFloat && f ) NOEXCEPT = default;
+
+public: // Property
 
 	// Uses an Argument?
 	bool
@@ -3867,7 +3840,7 @@ public: // Properties
 		return d_;
 	}
 
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -3968,39 +3941,88 @@ protected: // Methods
 	}
 
 	// Read Value from Stream and Reinterpret as Type T
-	template< typename T >
+	template< typename T, typename std::enable_if< ( sizeof( T ) < sizeof( float ) ), int >::type = 0 >
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
 		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( s.length() > 0 ) {
-			bool ok( true );
-			if ( sizeof( T ) < sizeof( float ) ) {
-				ok = is_type< float >( s );
-				float const v( val_of< float >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			} else if ( sizeof( T ) == sizeof( float ) ) {
-				ok = is_type< float >( s );
-				float const v( val_of< float >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( double ) ) {
-				ok = is_type< double >( s );
-				double const v( val_of< double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else if ( sizeof( T ) == sizeof( long double ) ) {
-				ok = is_type< long double >( s );
-				long double const v( val_of< long double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp );
-			} else {
-				ok = is_type< long double >( s );
-				long double const v( val_of< long double >( s ) );
-				void const * vp( &v );
-				t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
-			}
+			bool const ok( is_type< float >( s ) );
+			float const v( val_of< float >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp ); // Probably not what user wants: May want to throw an error here
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) == sizeof( float ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< float >( s ) );
+			float const v( val_of< float >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( float ) ) && ( sizeof( T ) <= sizeof( double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< double >( s ) );
+			double const v( val_of< double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( double ) ) && ( sizeof( T ) <= sizeof( long double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< long double >( s ) );
+			long double const v( val_of< long double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
+			if ( ! ok ) io_err( stream );
+		} else { // Nothing read
+			t = T( 0 );
+			io_err( stream );
+		}
+	}
+
+	// Read Value from Stream and Reinterpret as Type T
+	template< typename T, typename std::enable_if< ( sizeof( T ) > sizeof( long double ) ), int >::type = 0 >
+	void
+	read_val_reinterpret( std::istream & stream, T & t ) const
+	{
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
+		if ( s.length() > 0 ) {
+			bool const ok( is_type< long double >( s ) );
+			long double const v( val_of< long double >( s ) );
+			void const * vp( &v );
+			t = *reinterpret_cast< T const * >( vp );
 			if ( ! ok ) io_err( stream );
 		} else { // Nothing read
 			t = T( 0 );
@@ -4028,8 +4050,8 @@ protected: // Methods
 
 private: // Data
 
-	Size w_;
-	Size d_;
+	Size w_{ 0u };
+	Size d_{ 0u };
 
 }; // FormatFloat
 
@@ -4043,16 +4065,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatF( FormatF const & f, Format * p ) :
+	 FormatFloat( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal Constructor
 	explicit
 	FormatF( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul ) :
 	 FormatFloat( p, r, w, d )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatF( FormatF const & f, Format * p = nullptr ) :
-	 FormatFloat( f, p )
 	{}
 
 	// Clone
@@ -4062,12 +4083,7 @@ public: // Creation
 		return new FormatF( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatF()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4089,45 +4105,36 @@ class FormatGED : public FormatFloat
 
 protected: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatGED( FormatGED const & f ) = default;
+
+	// Move Constructor
+	FormatGED( FormatGED && f ) NOEXCEPT = default;
+
+	// Copy + Format Constructor
+	FormatGED( FormatGED const & f, Format * p ) :
+	 FormatFloat( f, p ),
+	 e_( f.e_ )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatGED( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatFloat( p, r, w, d ),
 	 e_( e )
 	{}
 
-	// Copy Constructor
-	FormatGED( FormatGED const & f, Format * p = nullptr ) :
-	 FormatFloat( f, p ),
-	 e_( f.e_ )
-	{}
-
-	// Move Constructor
-	FormatGED( FormatGED && f ) NOEXCEPT :
-	 FormatFloat( std::move( f ) ),
-	 e_( f.e_ )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~FormatGED()
-	{}
-
 protected: // Assignment
 
 	// Copy Assignment
-	void
-	operator =( FormatGED const & f )
-	{
-		if ( this != &f ) {
-			FormatFloat::operator =( f );
-			e_ = f.e_;
-		}
-	}
+	FormatGED &
+	operator =( FormatGED const & f ) = default;
 
-public: // Properties
+	// Move Assignment
+	FormatGED &
+	operator =( FormatGED && f ) NOEXCEPT = default;
+
+public: // Property
 
 	// Field Exponent Digits
 	Size
@@ -4138,7 +4145,7 @@ public: // Properties
 
 private: // Data
 
-	Size e_;
+	Size e_{ 0u };
 
 }; // FormatGED
 
@@ -4153,16 +4160,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy = Format Constructor
+	FormatG( FormatG const & f, Format * p ) :
+	 FormatGED( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatG( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatG( FormatG const & f, Format * p = nullptr ) :
-	 FormatGED( f, p )
 	{}
 
 	// Clone
@@ -4172,12 +4178,7 @@ public: // Creation
 		return new FormatG( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatG()
-	{}
-
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -4264,7 +4265,7 @@ public: // Input Methods
 		s = read( stream, w() ); // Reads the whole record if w() unspecified since std::string is variable length
 	}
 
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4346,16 +4347,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatE( FormatE const & f, Format * p ) :
+	 FormatGED( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatE( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatE( FormatE const & f, Format * p = nullptr ) :
-	 FormatGED( f, p )
 	{}
 
 	// Clone
@@ -4365,12 +4365,7 @@ public: // Creation
 		return new FormatE( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatE()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4396,16 +4391,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatEN( FormatEN const & f, Format * p ) :
+	 FormatGED( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatEN( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatEN( FormatEN const & f, Format * p = nullptr ) :
-	 FormatGED( f, p )
 	{}
 
 	// Clone
@@ -4415,12 +4409,7 @@ public: // Creation
 		return new FormatEN( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatEN()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4446,16 +4435,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatES( FormatES const & f, Format * p ) :
+	 FormatGED( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatES( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatES( FormatES const & f, Format * p = nullptr ) :
-	 FormatGED( f, p )
 	{}
 
 	// Clone
@@ -4465,12 +4453,7 @@ public: // Creation
 		return new FormatES( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatES()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4496,16 +4479,15 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy + Format Constructor
+	FormatD( FormatD const & f, Format * p ) :
+	 FormatGED( f, p )
+	{}
+
+	// Format + Repeat + Width + Decimal + Exponent Constructor
 	explicit
 	FormatD( Format * p, Size const r = 1ul, Size const w = NOSIZE, Size const d = 0ul, Size const e = 2ul ) :
 	 FormatGED( p, r, w, d, e )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatD( FormatD const & f, Format * p = nullptr ) :
-	 FormatGED( f, p )
 	{}
 
 	// Clone
@@ -4515,12 +4497,7 @@ public: // Creation
 		return new FormatD( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatD()
-	{}
-
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4547,16 +4524,25 @@ public: // Types
 
 public: // Creation
 
-	// Constructor
+	// Copy Constructor
+	FormatLD( FormatLD const & f ) :
+	 FormatLeaf( f )
+	{} // Don't copy entry
+
+	// Move Constructor
+	FormatLD( FormatLD && f ) NOEXCEPT :
+	 FormatLeaf( std::move( f ) )
+	{} // Don't move entry
+
+	// Copy + Format Constructor
+	FormatLD( FormatLD const & f, Format * p ) :
+	 FormatLeaf( f, p )
+	{}
+
+	// Format Constructor
 	explicit
 	FormatLD( Format * p ) :
 	 FormatLeaf( p )
-	{}
-
-	// Copy Constructor
-	explicit
-	FormatLD( FormatLD const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -4566,24 +4552,30 @@ public: // Creation
 		return new FormatLD( *this, p );
 	}
 
-	// Destructor
-	virtual
-	~FormatLD()
-	{}
-
 public: // Assignment
 
 	// Copy Assignment
-	void
+	FormatLD &
 	operator =( FormatLD const & f )
 	{
 		if ( this != &f ) {
 			FormatLeaf::operator =( f );
 			entry_.reset(); // Don't assign entry
 		}
+		return *this;
 	}
 
-public: // Properties
+	// Move Assignment
+	FormatLD &
+	operator =( FormatLD && f ) NOEXCEPT
+	{
+		assert( this != &f );
+		FormatLeaf::operator =( std::move( f ) );
+		entry_.reset(); // Don't assign entry
+		return *this;
+	}
+
+public: // Property
 
 	// Uses an Argument?
 	bool
@@ -4638,7 +4630,7 @@ public: // Methods
 		return *this;
 	}
 
-public: // Input Methods
+public: // Input
 
 	// Input
 	void
@@ -4752,7 +4744,7 @@ public: // Input Methods
 		read_string( stream, s );
 	}
 
-public: // Output Methods
+public: // Output
 
 	// Output
 	void
@@ -4877,16 +4869,15 @@ class FormatFactory
 
 public: // Types
 
-	typedef  std::size_t  Size;
-	typedef  std::string  Token;
-	typedef  std::vector< Token >  Tokens;
-	typedef  std::vector< Format * >  Formats;
+	using Size = std::size_t;
+	using Token = std::string;
+	using Tokens = std::vector< Token >;
+	using Formats = std::vector< Format * >;
 
 private: // Creation
 
 	// Default Constructor
-	FormatFactory()
-	{}
+	FormatFactory() = delete;
 
 public: // Creation
 

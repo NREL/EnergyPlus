@@ -5,16 +5,17 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.fwd.hh>
+#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/Omit.hh>
 
 // C++ Headers
@@ -38,18 +39,15 @@ private: // Friend
 
 public: // Types
 
-	typedef  T  Value;
-	typedef  typename std::enable_if< ! std::is_abstract< T >::value >::type  EnableType;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Value = T;
+	using EnableType = typename std::enable_if< ! std::is_abstract< T >::value >::type;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 public: // Creation
 
 	// Default Constructor
-	Optional() :
-	 ptr_( nullptr ),
-	 own_( false )
-	{}
+	Optional() = default;
 
 	// Copy Constructor
 	Optional( Optional const & o ) :
@@ -64,10 +62,12 @@ public: // Creation
 	 own_( o.own_ )
 	{}
 
+	// Move Constructor
+	Optional( Optional && ) NOEXCEPT = default;
+
 	// Value Constructor
 	Optional( T const & val ) :
-	 ptr_( const_cast< T * >( &val ) ),
-	 own_( false )
+	 ptr_( const_cast< T * >( &val ) )
 	{}
 
 	// Value Constructor Template
@@ -84,9 +84,7 @@ public: // Creation
 	{}
 
 	// Omit Constructor
-	Optional( Omit ) :
-	 ptr_( nullptr ),
-	 own_( false )
+	Optional( Omit )
 	{}
 
 	// Destructor
@@ -108,6 +106,10 @@ public: // Assignment
 		}
 		return *this;
 	}
+
+	// Move Assignment
+	Optional &
+	operator =( Optional && ) NOEXCEPT = default;
 
 	// Value Assignment
 	Optional &
@@ -181,7 +183,7 @@ public: // Operators
 		return *ptr_;
 	}
 
-public: // Properties
+public: // Property
 
 	// Present?
 	bool
@@ -197,7 +199,7 @@ public: // Properties
 		return own_;
 	}
 
-public: // Modifiers
+public: // Modifier
 
 	// Clear
 	void
@@ -260,8 +262,8 @@ public: // Comparison
 
 private: // Data
 
-	T * ptr_; // Pointer to object
-	bool own_; // Own the object?
+	T * ptr_{ nullptr }; // Pointer to object
+	bool own_{ false }; // Own the object?
 
 }; // Optional
 
@@ -276,10 +278,10 @@ private: // Friend
 
 public: // Types
 
-	typedef  T  Value;
-	typedef  typename std::enable_if< std::is_abstract< T >::value >::type  EnableType;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Value = T;
+	using EnableType = typename std::enable_if< std::is_abstract< T >::value >::type;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 public: // Creation
 
@@ -305,12 +307,7 @@ public: // Creation
 	{}
 
 	// Omit Constructor
-	Optional( Omit ) :
-	 ptr_( nullptr )
-	{}
-
-	// Destructor
-	~Optional()
+	Optional( Omit )
 	{}
 
 public: // Assignment
@@ -393,7 +390,7 @@ public: // Operators
 		return *ptr_;
 	}
 
-public: // Properties
+public: // Property
 
 	// Present?
 	bool
@@ -402,7 +399,7 @@ public: // Properties
 		return ( ptr_ != nullptr );
 	}
 
-public: // Modifiers
+public: // Modifier
 
 	// Clear
 	void
@@ -463,7 +460,7 @@ public: // Comparison
 
 private: // Data
 
-	T * ptr_; // Pointer
+	T * ptr_{ nullptr }; // Pointer
 
 }; // Optional
 

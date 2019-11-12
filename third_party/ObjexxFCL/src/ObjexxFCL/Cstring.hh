@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Cstring_hh_INCLUDED
 #define ObjexxFCL_Cstring_hh_INCLUDED
 
-// Cstring: C String Wrapper
+// C String Wrapper
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/noexcept.hh>
@@ -27,7 +27,7 @@
 
 namespace ObjexxFCL {
 
-// Cstring: C String Wrapper
+// C String Wrapper
 //
 // Note:
 //  A memory-managed C string (char*) wrapper for convenience when using a C-style interfaces
@@ -41,10 +41,10 @@ class Cstring
 public: // Types
 
 	// STL Style
-	typedef  std::size_t  size_type;
+	using size_type = std::size_t;
 
 	// C++ Style
-	typedef  std::size_t  Size;
+	using Size = std::size_t;
 
 public: // Creation
 
@@ -150,7 +150,6 @@ public: // Creation
 	}
 
 	// Destructor
-	virtual
 	~Cstring()
 	{
 		delete[] str_;
@@ -734,11 +733,11 @@ public: // I/O
 
 public: // Data
 
-	static size_type const npos; // Unbounded "size"
+	static size_type const npos{ static_cast< size_type >( -1 ) }; // Unbounded "size"
 
 private: // Data
 
-	char * str_; // String
+	char * str_{ nullptr }; // String
 
 }; // Cstring
 

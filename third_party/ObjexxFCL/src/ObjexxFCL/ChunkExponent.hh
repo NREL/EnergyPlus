@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_ChunkExponent_hh_INCLUDED
 #define ObjexxFCL_ChunkExponent_hh_INCLUDED
 
-// ChunkExponent: ChunkVector Exponent Wrapper for Function Disambiguation and Range Clipping
+// ChunkVector Exponent Wrapper for Function Disambiguation and Range Clipping
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <algorithm>
@@ -20,7 +20,7 @@
 
 namespace ObjexxFCL {
 
-// ChunkExponent: ChunkVector Exponent Wrapper for Function Disambiguation and Range Clipping
+// ChunkVector Exponent Wrapper for Function Disambiguation and Range Clipping
 //
 // Note:
 //  The exponent is clipped to be less than the number of bits in its type so that 2^exponent can be stored in that type
@@ -29,18 +29,14 @@ class ChunkExponent
 
 public: // Types
 
-	typedef  std::size_t  T;
-	typedef  T  value_type;
+	using T = std::size_t;
+	using value_type = T;
 
 public: // Creation
 
 	// Constructor (Implicit): Clips Exponent to Valid Range
 	ChunkExponent( T const exponent ) :
 	 exponent_( std::min( exponent, static_cast< T >( std::numeric_limits< T >::digits - 1 ) ) )
-	{}
-
-	// Destructor
-	~ChunkExponent()
 	{}
 
 public: // Conversion

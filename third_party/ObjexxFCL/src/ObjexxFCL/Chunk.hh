@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Chunk_hh_INCLUDED
 #define ObjexxFCL_Chunk_hh_INCLUDED
 
-// Chunk: Contiguous Array for Use in ChunkVector
+// Contiguous Array for Use in ChunkVector
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/noexcept.hh>
@@ -26,7 +26,7 @@
 
 namespace ObjexxFCL {
 
-// Chunk: Contiguous Array for Use in ChunkVector
+// Contiguous Array for Use in ChunkVector
 //
 // Note:
 //  size <= capacity
@@ -42,24 +42,24 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 	// STL style
-	typedef  T  value_type;
-	typedef  T &  reference;
-	typedef  T const &  const_reference;
-	typedef  T *  pointer;
-	typedef  T const *  const_pointer;
-	typedef  std::size_t  size_type;
+	using value_type = T;
+	using reference = T &;
+	using const_reference = T const &;
+	using pointer = T *;
+	using const_pointer = T const *;
+	using size_type = std::size_t;
 
 	// C++ style
-	typedef  T  Value;
-	typedef  T &  Reference;
-	typedef  T const &  ConstReference;
-	typedef  T *  Pointer;
-	typedef  T const *  ConstPointer;
-	typedef  std::size_t  Size;
+	using Value = T;
+	using Reference = T &;
+	using ConstReference = T const &;
+	using Pointer = T *;
+	using ConstPointer = T const *;
+	using Size = std::size_t;
 
 public: // Creation
 

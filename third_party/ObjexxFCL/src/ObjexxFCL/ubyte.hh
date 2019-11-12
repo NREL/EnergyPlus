@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_ubyte_hh_INCLUDED
 #define ObjexxFCL_ubyte_hh_INCLUDED
 
-// ubyte: Unsigned One-Byte Integer
+// Unsigned One-Byte Integer
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cassert>
@@ -21,16 +21,14 @@
 
 namespace ObjexxFCL {
 
-// ubyte: One-Byte Integer
+// Unsigned One-Byte Integer
 class ubyte
 {
 
 public: // Creation
 
 	// Default Constructor
-	ubyte() :
-	 b_( static_cast< unsigned char >( 0 ) )
-	{}
+	ubyte() = default;
 
 	// short Constructor
 	explicit
@@ -92,10 +90,6 @@ public: // Creation
 	 b_( c )
 	{}
 
-	// Destructor
-	~ubyte()
-	{}
-
 public: // Conversion
 
 	// short Conversion
@@ -118,7 +112,7 @@ public: // Assignment
 	ubyte &
 	operator +=( unsigned short int const i )
 	{
-		b_ += i;
+		b_ += static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -126,7 +120,7 @@ public: // Assignment
 	ubyte &
 	operator -=( unsigned short int const i )
 	{
-		b_ -= i;
+		b_ -= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -134,7 +128,7 @@ public: // Assignment
 	ubyte &
 	operator *=( unsigned short int const i )
 	{
-		b_ *= i;
+		b_ *= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -143,7 +137,7 @@ public: // Assignment
 	operator /=( unsigned short int const i )
 	{
 		assert( i != 0u );
-		b_ /= i;
+		b_ /= static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -395,7 +389,7 @@ public: // I/O
 
 private: // Data
 
-	unsigned char b_; // Value
+	unsigned char b_{ static_cast< unsigned char >( 0 ) }; // Value
 
 }; // ubyte
 

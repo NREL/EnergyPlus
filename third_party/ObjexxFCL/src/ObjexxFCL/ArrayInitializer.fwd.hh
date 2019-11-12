@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  ArrayInitializer< bool >                ArrayInitializer_bool;
-typedef  ArrayInitializer< byte >                ArrayInitializer_byte;
-typedef  ArrayInitializer< sbyte >               ArrayInitializer_sbyte;
-typedef  ArrayInitializer< ubyte >               ArrayInitializer_ubyte;
-typedef  ArrayInitializer< short int >           ArrayInitializer_short;
-typedef  ArrayInitializer< int >                 ArrayInitializer_int;
-typedef  ArrayInitializer< long int >            ArrayInitializer_long;
-typedef  ArrayInitializer< unsigned short int >  ArrayInitializer_ushort;
-typedef  ArrayInitializer< unsigned int >        ArrayInitializer_uint;
-typedef  ArrayInitializer< unsigned long int >   ArrayInitializer_ulong;
-typedef  ArrayInitializer< std::size_t >         ArrayInitializer_size;
-typedef  ArrayInitializer< std::int8_t >         ArrayInitializer_int8;
-typedef  ArrayInitializer< std::int16_t >        ArrayInitializer_int16;
-typedef  ArrayInitializer< std::int32_t >        ArrayInitializer_int32;
-typedef  ArrayInitializer< std::int64_t >        ArrayInitializer_int64;
-typedef  ArrayInitializer< std::uint8_t >        ArrayInitializer_uint8;
-typedef  ArrayInitializer< std::uint16_t >       ArrayInitializer_uint16;
-typedef  ArrayInitializer< std::uint32_t >       ArrayInitializer_uint32;
-typedef  ArrayInitializer< std::uint64_t >       ArrayInitializer_uint64;
-typedef  ArrayInitializer< float >               ArrayInitializer_float;
-typedef  ArrayInitializer< double >              ArrayInitializer_double;
-typedef  ArrayInitializer< long double >         ArrayInitializer_longdouble;
-typedef  ArrayInitializer< char >                ArrayInitializer_char;
-typedef  ArrayInitializer< unsigned char >       ArrayInitializer_uchar;
-typedef  ArrayInitializer< signed char >         ArrayInitializer_schar;
-typedef  ArrayInitializer< std::string >         ArrayInitializer_string;
+using sbyte = byte;
+using ArrayInitializer_bool = ArrayInitializer< bool >;
+using ArrayInitializer_byte = ArrayInitializer< byte >;
+using ArrayInitializer_sbyte = ArrayInitializer< sbyte >;
+using ArrayInitializer_ubyte = ArrayInitializer< ubyte >;
+using ArrayInitializer_short = ArrayInitializer< short int >;
+using ArrayInitializer_int = ArrayInitializer< int >;
+using ArrayInitializer_long = ArrayInitializer< long int >;
+using ArrayInitializer_ushort = ArrayInitializer< unsigned short int >;
+using ArrayInitializer_uint = ArrayInitializer< unsigned int >;
+using ArrayInitializer_ulong = ArrayInitializer< unsigned long int >;
+using ArrayInitializer_size = ArrayInitializer< std::size_t >;
+using ArrayInitializer_int8 = ArrayInitializer< std::int8_t >;
+using ArrayInitializer_int16 = ArrayInitializer< std::int16_t >;
+using ArrayInitializer_int32 = ArrayInitializer< std::int32_t >;
+using ArrayInitializer_int64 = ArrayInitializer< std::int64_t >;
+using ArrayInitializer_uint8 = ArrayInitializer< std::uint8_t >;
+using ArrayInitializer_uint16 = ArrayInitializer< std::uint16_t >;
+using ArrayInitializer_uint32 = ArrayInitializer< std::uint32_t >;
+using ArrayInitializer_uint64 = ArrayInitializer< std::uint64_t >;
+using ArrayInitializer_float = ArrayInitializer< float >;
+using ArrayInitializer_double = ArrayInitializer< double >;
+using ArrayInitializer_longdouble = ArrayInitializer< long double >;
+using ArrayInitializer_char = ArrayInitializer< char >;
+using ArrayInitializer_uchar = ArrayInitializer< unsigned char >;
+using ArrayInitializer_schar = ArrayInitializer< signed char >;
+using ArrayInitializer_string = ArrayInitializer< std::string >;
 
 } // ObjexxFCL
 

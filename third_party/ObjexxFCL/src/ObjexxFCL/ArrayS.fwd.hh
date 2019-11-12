@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  ArrayS< bool >                ArrayS_bool;
-typedef  ArrayS< byte >                ArrayS_byte;
-typedef  ArrayS< sbyte >               ArrayS_sbyte;
-typedef  ArrayS< ubyte >               ArrayS_ubyte;
-typedef  ArrayS< short int >           ArrayS_short;
-typedef  ArrayS< int >                 ArrayS_int;
-typedef  ArrayS< long int >            ArrayS_long;
-typedef  ArrayS< unsigned short int >  ArrayS_ushort;
-typedef  ArrayS< unsigned int >        ArrayS_uint;
-typedef  ArrayS< unsigned long int >   ArrayS_ulong;
-typedef  ArrayS< std::size_t >         ArrayS_size;
-typedef  ArrayS< std::int8_t >         ArrayS_int8;
-typedef  ArrayS< std::int16_t >        ArrayS_int16;
-typedef  ArrayS< std::int32_t >        ArrayS_int32;
-typedef  ArrayS< std::int64_t >        ArrayS_int64;
-typedef  ArrayS< std::uint8_t >        ArrayS_uint8;
-typedef  ArrayS< std::uint16_t >       ArrayS_uint16;
-typedef  ArrayS< std::uint32_t >       ArrayS_uint32;
-typedef  ArrayS< std::uint64_t >       ArrayS_uint64;
-typedef  ArrayS< float >               ArrayS_float;
-typedef  ArrayS< double >              ArrayS_double;
-typedef  ArrayS< long double >         ArrayS_longdouble;
-typedef  ArrayS< char >                ArrayS_char;
-typedef  ArrayS< unsigned char >       ArrayS_uchar;
-typedef  ArrayS< signed char >         ArrayS_schar;
-typedef  ArrayS< std::string >         ArrayS_string;
+using sbyte = byte;
+using ArrayS_bool = ArrayS< bool >;
+using ArrayS_byte = ArrayS< byte >;
+using ArrayS_sbyte = ArrayS< sbyte >;
+using ArrayS_ubyte = ArrayS< ubyte >;
+using ArrayS_short = ArrayS< short int >;
+using ArrayS_int = ArrayS< int >;
+using ArrayS_long = ArrayS< long int >;
+using ArrayS_ushort = ArrayS< unsigned short int >;
+using ArrayS_uint = ArrayS< unsigned int >;
+using ArrayS_ulong = ArrayS< unsigned long int >;
+using ArrayS_size = ArrayS< std::size_t >;
+using ArrayS_int8 = ArrayS< std::int8_t >;
+using ArrayS_int16 = ArrayS< std::int16_t >;
+using ArrayS_int32 = ArrayS< std::int32_t >;
+using ArrayS_int64 = ArrayS< std::int64_t >;
+using ArrayS_uint8 = ArrayS< std::uint8_t >;
+using ArrayS_uint16 = ArrayS< std::uint16_t >;
+using ArrayS_uint32 = ArrayS< std::uint32_t >;
+using ArrayS_uint64 = ArrayS< std::uint64_t >;
+using ArrayS_float = ArrayS< float >;
+using ArrayS_double = ArrayS< double >;
+using ArrayS_longdouble = ArrayS< long double >;
+using ArrayS_char = ArrayS< char >;
+using ArrayS_uchar = ArrayS< unsigned char >;
+using ArrayS_schar = ArrayS< signed char >;
+using ArrayS_string = ArrayS< std::string >;
 
 } // ObjexxFCL
 

@@ -5,25 +5,26 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Sticky.fwd.hh>
 #include <ObjexxFCL/noexcept.hh>
 
 // C++ Headers
+#include <cassert>
 #include <type_traits>
 #include <utility>
 
 namespace ObjexxFCL {
 
-// Sticky: Sticky Argument Wrapper
+// Sticky Value Wrapper
 template< typename T >
 class Sticky
 {
@@ -31,10 +32,10 @@ class Sticky
 public: // Types
 
 	// STL style
-	typedef  T  value_type;
+	using value_type = T;
 
 	// C++ style
-	typedef  T  Value;
+	using Value = T;
 
 private: // Types
 
@@ -114,13 +115,11 @@ public: // Assignment
 
 	// Copy Assignment
 	Sticky &
-	operator =( Sticky const & s )
-	{
-		if ( this != &s ) {
-			value_ = s.value_;
-		}
-		return *this;
-	}
+	operator =( Sticky const & s ) = default;
+
+	// Move Assignment
+	Sticky &
+	operator =( Sticky && s ) NOEXCEPT = default;
 
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
@@ -128,14 +127,6 @@ public: // Assignment
 	operator =( Sticky< U > const & s )
 	{
 		value_ = s.value_;
-		return *this;
-	}
-
-	// Move Assignment
-	Sticky &
-	operator =( Sticky && s ) NOEXCEPT
-	{
-		value_ = std::move( s.value_ );
 		return *this;
 	}
 

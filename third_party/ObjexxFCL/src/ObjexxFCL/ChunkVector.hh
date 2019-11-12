@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_ChunkVector_hh_INCLUDED
 #define ObjexxFCL_ChunkVector_hh_INCLUDED
 
-// ChunkVector: Chunk-Contiguous Vector for Fast Very Large Vectors
+// Chunk-Contiguous Vector for Fast Very Large Vectors
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/ChunkVector.fwd.hh>
@@ -34,7 +34,7 @@
 
 namespace ObjexxFCL {
 
-// ChunkVector: Chunk-Contiguous Vector for Fast Very Large Vectors
+// Chunk-Contiguous Vector for Fast Very Large Vectors
 //
 // Note:
 //  Chunk allocation avoids large contiguous allocation failures with fragmented memory
@@ -59,44 +59,39 @@ private: // Friend
 
 public: // Types
 
-	typedef  std::vector< Chunk< T > >  Chunks;
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Chunks = std::vector< Chunk< T > >;
+	using Traits = TypeTraits< T >;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 	// STL style
-	typedef  Chunk< T >  Chunk_type;
-	typedef  T  value_type;
-	typedef  T &  reference;
-	typedef  T const &  const_reference;
-	typedef  T *  pointer;
-	typedef  T const *  const_pointer;
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
-	typedef  typename Chunks::size_type  Chunks_size_type;
+	using Chunk_type = Chunk< T >;
+	using value_type = T;
+	using reference = T &;
+	using const_reference = T const &;
+	using pointer = T *;
+	using const_pointer = T const *;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
+	using Chunks_size_type = typename Chunks::size_type;
 
 	// C++ style
-	typedef  Chunk< T >  ChunkType;
-	typedef  T  Value;
-	typedef  T &  Reference;
-	typedef  T const &  ConstReference;
-	typedef  T *  Pointer;
-	typedef  T const *  ConstPointer;
-	typedef  T *  Iterator;
-	typedef  T const *  ConstIterator;
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
-	typedef  typename Chunks::size_type  ChunksSize;
+	using ChunkType = Chunk< T >;
+	using Value = T;
+	using Reference = T &;
+	using ConstReference = T const &;
+	using Pointer = T *;
+	using ConstPointer = T const *;
+	using Iterator = T *;
+	using ConstIterator = T const *;
+	using Size = std::size_t;
+	using Difference = std::ptrdiff_t;
+	using ChunksSize = typename Chunks::size_type;
 
 public: // Creation
 
 	// Default Constructor
-	ChunkVector() :
-	 size_( 0u ),
-	 chunk_exponent_( 0u ),
-	 chunk_size_( 1u ),
-	 chunk_mask_( 0u )
-	{}
+	ChunkVector() = default;
 
 	// Copy Constructor
 	ChunkVector( ChunkVector const & v ) :
@@ -242,10 +237,6 @@ public: // Creation
 			chunks_[ i_last ].non_preserving_resize( computed_last_chunk_size(), value );
 		}
 	}
-
-	// Destructor
-	~ChunkVector()
-	{}
 
 public: // Assignment
 
@@ -1036,20 +1027,20 @@ private: // Functions
 
 public: // Static Data
 
-	static size_type const max_size; // Max size
+	static size_type const max_size{ static_cast< size_type >( -1 ) }; // Max size
 
 private: // Data
 
-	size_type size_; // Number of elements
-	size_type chunk_exponent_; // Chunk size exponent (< number of bits in size_type)
-	size_type chunk_size_; // Chunk size (a power of 2) (last Chunk can be smaller)
-	size_type chunk_mask_; // Chunk index identification mask
+	size_type size_{ 0u }; // Number of elements
+	size_type chunk_exponent_{ 0u }; // Chunk size exponent (< number of bits in size_type)
+	size_type chunk_size_{ 1u }; // Chunk size (a power of 2) (last Chunk can be smaller)
+	size_type chunk_mask_{ 0u }; // Chunk index identification mask
 	Chunks chunks_; // Vector of Chunks
 
 }; // ChunkVector
 
 	// Static Data Member Template Definitions
-	template< typename T > typename ChunkVector< T >::size_type const ChunkVector< T >::max_size = static_cast< size_type >( -1 );
+	template< typename T > typename ChunkVector< T >::size_type const ChunkVector< T >::max_size;
 
 // Functions
 
@@ -1592,7 +1583,7 @@ inline
 std::istream &
 operator >>( std::istream & stream, ChunkVector< T > & v )
 {
-	typedef  typename ChunkVector< T >::size_type  size_type;
+	using size_type = typename ChunkVector< T >::size_type;
 	if ( stream && ( ! v.emtpy() ) ) {
 		for ( size_type i = 0, e = v.size(); i < e; ++i ) {
 			stream >> v[ i ];
@@ -1609,8 +1600,8 @@ std::ostream &
 operator <<( std::ostream & stream, ChunkVector< T > const & v )
 {
 	using std::setw;
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename ChunkVector< T >::size_type  size_type;
+	using Traits = TypeTraits< T >;
+	using size_type = typename ChunkVector< T >::size_type;
 	if ( stream && ( ! v.empty() ) ) {
 		std::ios_base::fmtflags const old_flags( stream.flags() );
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );

@@ -2,13 +2,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -608,7 +608,7 @@ TEST( Array6Test, PredicateComparisonsValues )
 
 TEST( Array6Test, FunctionUnpack )
 {
-	Array1D_int const a( { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ,15, 16 } );
+	Array1D_int const a( { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 } );
 	Array6D_bool const mask( 2, 2, 2, 2, 2, 1, { true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true } );
 	EXPECT_TRUE( eq( Array6D_int( 2, 2, 2, 2, 2, 1, { 1, 42, 42, 2, 3, 42, 42, 4, 5, 42, 42, 6, 7, 42, 42, 8, 9, 42, 42, 10, 11, 42, 42, 12, 13, 42, 42, 14, 15, 42, 42, 16 } ), unpack( a, mask, 42 ) ) );
 	Array6D_int const f( 2, 2, 2, 2, 2, 1, { 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48 } );

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_ArrayS_hh_INCLUDED
 #define ObjexxFCL_ArrayS_hh_INCLUDED
 
-// ArrayS: Slice Array Proxy Abstract Base Class Template
+// Slice Array Proxy Abstract Base Class Template
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/ArrayS.fwd.hh>
@@ -36,7 +36,7 @@ namespace ObjexxFCL {
 // Forward
 template< typename > class Array;
 
-// ArrayS: Slice Array Proxy Abstract Base Class Template
+// Slice Array Proxy Abstract Base Class Template
 template< typename T >
 class ArrayS : public BArray
 {
@@ -48,22 +48,22 @@ private: // Friend
 
 public: // Types
 
-	typedef  ArrayS< T >  Base;
-	typedef  TypeTraits< T >  Traits;
+	using Base = ArrayS< T >;
+	using Traits = TypeTraits< T >;
 
 	// STL style
-	typedef  T  value_type;
-	typedef  T &  reference;
-	typedef  T const &  const_reference;
-	typedef  T *  pointer;
-	typedef  T const *  const_pointer;
+	using value_type = T;
+	using reference = T &;
+	using const_reference = T const &;
+	using pointer = T *;
+	using const_pointer = T const *;
 
 	// C++ style
-	typedef  T  Value;
-	typedef  T &  Reference;
-	typedef  T const &  ConstReference;
-	typedef  T *  Pointer;
-	typedef  T const *  ConstPointer;
+	using Value = T;
+	using Reference = T &;
+	using ConstReference = T const &;
+	using Pointer = T *;
+	using ConstPointer = T const *;
 
 protected: // Creation
 
@@ -102,13 +102,6 @@ protected: // Creation
 	 data_end_( nullptr ),
 	 size_( size ),
 	 contiguous_( false )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~ArrayS()
 	{}
 
 public: // Predicate

@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array6S< bool >                Array6S_bool;
-typedef  Array6S< byte >                Array6S_byte;
-typedef  Array6S< sbyte >               Array6S_sbyte;
-typedef  Array6S< ubyte >               Array6S_ubyte;
-typedef  Array6S< short int >           Array6S_short;
-typedef  Array6S< int >                 Array6S_int;
-typedef  Array6S< long int >            Array6S_long;
-typedef  Array6S< unsigned short int >  Array6S_ushort;
-typedef  Array6S< unsigned int >        Array6S_uint;
-typedef  Array6S< unsigned long int >   Array6S_ulong;
-typedef  Array6S< std::size_t >         Array6S_size;
-typedef  Array6S< std::int8_t >         Array6S_int8;
-typedef  Array6S< std::int16_t >        Array6S_int16;
-typedef  Array6S< std::int32_t >        Array6S_int32;
-typedef  Array6S< std::int64_t >        Array6S_int64;
-typedef  Array6S< std::uint8_t >        Array6S_uint8;
-typedef  Array6S< std::uint16_t >       Array6S_uint16;
-typedef  Array6S< std::uint32_t >       Array6S_uint32;
-typedef  Array6S< std::uint64_t >       Array6S_uint64;
-typedef  Array6S< float >               Array6S_float;
-typedef  Array6S< double >              Array6S_double;
-typedef  Array6S< long double >         Array6S_longdouble;
-typedef  Array6S< char >                Array6S_char;
-typedef  Array6S< unsigned char >       Array6S_uchar;
-typedef  Array6S< signed char >         Array6S_schar;
-typedef  Array6S< std::string >         Array6S_string;
+using sbyte = byte;
+using Array6S_bool = Array6S< bool >;
+using Array6S_byte = Array6S< byte >;
+using Array6S_sbyte = Array6S< sbyte >;
+using Array6S_ubyte = Array6S< ubyte >;
+using Array6S_short = Array6S< short int >;
+using Array6S_int = Array6S< int >;
+using Array6S_long = Array6S< long int >;
+using Array6S_ushort = Array6S< unsigned short int >;
+using Array6S_uint = Array6S< unsigned int >;
+using Array6S_ulong = Array6S< unsigned long int >;
+using Array6S_size = Array6S< std::size_t >;
+using Array6S_int8 = Array6S< std::int8_t >;
+using Array6S_int16 = Array6S< std::int16_t >;
+using Array6S_int32 = Array6S< std::int32_t >;
+using Array6S_int64 = Array6S< std::int64_t >;
+using Array6S_uint8 = Array6S< std::uint8_t >;
+using Array6S_uint16 = Array6S< std::uint16_t >;
+using Array6S_uint32 = Array6S< std::uint32_t >;
+using Array6S_uint64 = Array6S< std::uint64_t >;
+using Array6S_float = Array6S< float >;
+using Array6S_double = Array6S< double >;
+using Array6S_longdouble = Array6S< long double >;
+using Array6S_char = Array6S< char >;
+using Array6S_uchar = Array6S< unsigned char >;
+using Array6S_schar = Array6S< signed char >;
+using Array6S_string = Array6S< std::string >;
 
 } // ObjexxFCL
 

@@ -1,7 +1,7 @@
-#ifndef ObjexxFCL_BArray_fwd_hh_INCLUDED
-#define ObjexxFCL_BArray_fwd_hh_INCLUDED
+#ifndef ObjexxFCL_lock_guard_hh_INCLUDED
+#define ObjexxFCL_lock_guard_hh_INCLUDED
 
-// BArray Forward Declarations
+// LOCK_GUARD Macro Definition
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
@@ -13,11 +13,11 @@
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
-namespace ObjexxFCL {
+#ifdef OBJEXXFCL_THREADS
+#include <mutex>
+#define OBJEXXFCL_LOCK_GUARD(m) std::lock_guard< std::mutex > lock( m )
+#else
+#define OBJEXXFCL_LOCK_GUARD(m)
+#endif
 
-// Forward
-class BArray;
-
-} // ObjexxFCL
-
-#endif // ObjexxFCL_BArray_fwd_hh_INCLUDED
+#endif // ObjexxFCL_lock_guard_hh_INCLUDED

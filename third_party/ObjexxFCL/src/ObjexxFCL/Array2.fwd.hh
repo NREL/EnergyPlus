@@ -5,13 +5,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cstddef>
@@ -26,33 +26,33 @@ class byte;
 class ubyte;
 
 // Types
-typedef  byte  sbyte;
-typedef  Array2< bool >                Array2_bool;
-typedef  Array2< byte >                Array2_byte;
-typedef  Array2< sbyte >               Array2_sbyte;
-typedef  Array2< ubyte >               Array2_ubyte;
-typedef  Array2< short int >           Array2_short;
-typedef  Array2< int >                 Array2_int;
-typedef  Array2< long int >            Array2_long;
-typedef  Array2< unsigned short int >  Array2_ushort;
-typedef  Array2< unsigned int >        Array2_uint;
-typedef  Array2< unsigned long int >   Array2_ulong;
-typedef  Array2< std::size_t >         Array2_size;
-typedef  Array2< std::int8_t >         Array2_int8;
-typedef  Array2< std::int16_t >        Array2_int16;
-typedef  Array2< std::int32_t >        Array2_int32;
-typedef  Array2< std::int64_t >        Array2_int64;
-typedef  Array2< std::uint8_t >        Array2_uint8;
-typedef  Array2< std::uint16_t >       Array2_uint16;
-typedef  Array2< std::uint32_t >       Array2_uint32;
-typedef  Array2< std::uint64_t >       Array2_uint64;
-typedef  Array2< float >               Array2_float;
-typedef  Array2< double >              Array2_double;
-typedef  Array2< long double >         Array2_longdouble;
-typedef  Array2< char >                Array2_char;
-typedef  Array2< unsigned char >       Array2_uchar;
-typedef  Array2< signed char >         Array2_schar;
-typedef  Array2< std::string >         Array2_string;
+using sbyte = byte;
+using Array2_bool = Array2< bool >;
+using Array2_byte = Array2< byte >;
+using Array2_sbyte = Array2< sbyte >;
+using Array2_ubyte = Array2< ubyte >;
+using Array2_short = Array2< short int >;
+using Array2_int = Array2< int >;
+using Array2_long = Array2< long int >;
+using Array2_ushort = Array2< unsigned short int >;
+using Array2_uint = Array2< unsigned int >;
+using Array2_ulong = Array2< unsigned long int >;
+using Array2_size = Array2< std::size_t >;
+using Array2_int8 = Array2< std::int8_t >;
+using Array2_int16 = Array2< std::int16_t >;
+using Array2_int32 = Array2< std::int32_t >;
+using Array2_int64 = Array2< std::int64_t >;
+using Array2_uint8 = Array2< std::uint8_t >;
+using Array2_uint16 = Array2< std::uint16_t >;
+using Array2_uint32 = Array2< std::uint32_t >;
+using Array2_uint64 = Array2< std::uint64_t >;
+using Array2_float = Array2< float >;
+using Array2_double = Array2< double >;
+using Array2_longdouble = Array2< long double >;
+using Array2_char = Array2< char >;
+using Array2_uchar = Array2< unsigned char >;
+using Array2_schar = Array2< signed char >;
+using Array2_string = Array2< std::string >;
 
 } // ObjexxFCL
 

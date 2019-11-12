@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_MArray1_hh_INCLUDED
 #define ObjexxFCL_MArray1_hh_INCLUDED
 
-// MArray1: 1D Member Array Proxy
+// 1D Member Array Proxy
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArrayR.hh>
@@ -26,14 +26,14 @@
 
 namespace ObjexxFCL {
 
-// MArray1: 1D Member Array Proxy
+// 1D Member Array Proxy
 template< class A, typename T >
 class MArray1 : public MArrayR< A, T, 1 >
 {
 
 private: // Types
 
-	typedef  MArrayR< A, T, 1 >  Super;
+	using Super = MArrayR< A, T, 1 >;
 
 private: // Friend
 
@@ -41,29 +41,29 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename Super::ArrayType  ArrayType;
-	typedef  typename Super::Class  Class;
-	typedef  typename Super::MPtr  MPtr;
-	typedef  typename Super::Traits  Traits;
-	typedef  typename Super::IR  IR;
+	using ArrayType = typename Super::ArrayType;
+	using Class = typename Super::Class;
+	using MPtr = typename Super::MPtr;
+	using Traits = typename Super::Traits;
+	using IR = typename Super::IR;
 
 	// STL Style
-	typedef  typename Super::value_type  value_type;
-	typedef  typename Super::reference  reference;
-	typedef  typename Super::const_reference  const_reference;
-	typedef  typename Super::pointer  pointer;
-	typedef  typename Super::const_pointer  const_pointer;
-	typedef  typename Super::size_type  size_type;
-	typedef  typename Super::difference_type  difference_type;
+	using value_type = typename Super::value_type;
+	using reference = typename Super::reference;
+	using const_reference = typename Super::const_reference;
+	using pointer = typename Super::pointer;
+	using const_pointer = typename Super::const_pointer;
+	using size_type = typename Super::size_type;
+	using difference_type = typename Super::difference_type;
 
 	// C++ Style
-	typedef  typename Super::Value  Value;
-	typedef  typename Super::Reference  Reference;
-	typedef  typename Super::ConstReference  ConstReference;
-	typedef  typename Super::Pointer  Pointer;
-	typedef  typename Super::ConstPointer  ConstPointer;
-	typedef  typename Super::Size  Size;
-	typedef  typename Super::Difference  Difference;
+	using Value = typename Super::Value;
+	using Reference = typename Super::Reference;
+	using ConstReference = typename Super::ConstReference;
+	using Pointer = typename Super::Pointer;
+	using ConstPointer = typename Super::ConstPointer;
+	using Size = typename Super::Size;
+	using Difference = typename Super::Difference;
 
 	using Super::isize;
 	using Super::l;
@@ -88,11 +88,6 @@ public: // Creation
 	// Constructor
 	MArray1( A & a, T Class::* pmem ) :
 	 Super( a, pmem )
-	{}
-
-	// Destructor
-	virtual
-	~MArray1()
 	{}
 
 public: // Assignment: Array
@@ -895,7 +890,7 @@ public: // Subscript
 	T const &
 	operator []( size_type const i ) const
 	{
-		assert( i < std::numeric_limits< int >::max() );
+		assert( i < static_cast< size_type >( std::numeric_limits< int >::max() ) );
 		assert( contains( static_cast< int >( i + 1 ) ) );
 		return array_( j1( static_cast< int >( i + 1 ) ) ).*pmem_;
 	}
@@ -904,7 +899,7 @@ public: // Subscript
 	T &
 	operator []( size_type const i )
 	{
-		assert( i < std::numeric_limits< int >::max() );
+		assert( i < static_cast< size_type >( std::numeric_limits< int >::max() ) );
 		assert( contains( static_cast< int >( i + 1 ) ) );
 		return array_( j1( static_cast< int >( i + 1 ) ) ).*pmem_;
 	}
@@ -1044,11 +1039,11 @@ public: // Modifier
 		return *this;
 	}
 
-public: // MArray Generators
+public: // MArray Generator
 
 	// Template Helpers
 	template< typename U > class Wrapper {};
-	typedef  typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type  ClassT;
+	using ClassT = typename std::conditional< std::is_class< T >::value, T, Wrapper< T > >::type;
 
 	// MArray Generator
 	template< typename M >
@@ -2208,7 +2203,7 @@ inline
 std::ostream &
 operator <<( std::ostream & stream, MArray1< A, T > const & a )
 {
-	typedef  TypeTraits< T >  Traits;
+	using Traits = TypeTraits< T >;
 	if ( stream && ( a.size() > 0u ) ) {
 		std::ios_base::fmtflags const old_flags( stream.flags() );
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );

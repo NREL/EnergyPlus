@@ -2,13 +2,13 @@
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -29,8 +29,8 @@ operator <<( std::ostream & stream, ObjexxFCL::Chunk< T > const & c )
 {
 	using namespace ObjexxFCL;
 	using std::setw;
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename Chunk< T >::size_type  size_type;
+	using Traits = TypeTraits< T >;
+	using size_type = typename Chunk< T >::size_type;
 	if ( stream && ( ! c.empty() ) ) {
 		std::ios_base::fmtflags const old_flags( stream.flags() );
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );
@@ -48,8 +48,8 @@ operator <<( std::ostream & stream, ObjexxFCL::Chunk< T > const & c )
 
 using namespace ObjexxFCL;
 
-typedef  ObjexxFCL::Chunk< int >  Chunk_int;
-typedef  ObjexxFCL::Chunk< float >  Chunk_float;
+using Chunk_int = ObjexxFCL::Chunk< int >;
+using Chunk_float = ObjexxFCL::Chunk< float >;
 
 TEST( ChunkTest, Construction )
 {

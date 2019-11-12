@@ -1,24 +1,24 @@
 #ifndef ObjexxFCL_SetWrapper_hh_INCLUDED
 #define ObjexxFCL_SetWrapper_hh_INCLUDED
 
-// SetWrapper: Insulating Wrapper of std::set that can be Forward Declared
+// Insulating Wrapper of std::set that can be Forward Declared
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <set>
 
 namespace ObjexxFCL {
 
-// SetWrapper: Insulating Wrapper of std::set that can be Forward Declared
+// Insulating Wrapper of std::set that can be Forward Declared
 // For objects that manage their own memory not pointers to owned objects
 template< typename T >
 class SetWrapper
@@ -26,29 +26,19 @@ class SetWrapper
 
 public: // Types
 
-	typedef  std::set< T >  Container;
+	using Container = std::set< T >;
 
 	// STL style
-	typedef  T  value_type;
-	typedef  typename Container::iterator  iterator;
-	typedef  typename Container::const_iterator  const_iterator;
+	using value_type = T;
+	using iterator = typename Container::iterator;
+	using const_iterator = typename Container::const_iterator;
 
 	// C++ style
-	typedef  T  Value;
-	typedef  typename Container::iterator  Iterator;
-	typedef  typename Container::const_iterator  ConstIterator;
+	using Value = T;
+	using Iterator = typename Container::iterator;
+	using ConstIterator = typename Container::const_iterator;
 
-public: // Creation
-
-	// Default Constructor
-	SetWrapper()
-	{}
-
-	// Destructor
-	~SetWrapper()
-	{}
-
-public: // Inspector
+public: // Operator
 
 	// set Accessor
 	Container const &
@@ -56,8 +46,6 @@ public: // Inspector
 	{
 		return container_;
 	}
-
-public: // Modifier
 
 	// set Accessor
 	Container &

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_IOFlags_hh_INCLUDED
 #define ObjexxFCL_IOFlags_hh_INCLUDED
 
-// IOFlags: I/O Control and Status Flags
+// I/O Control and Status Flags
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // C++ Headers
 #include <cassert>
@@ -21,16 +21,16 @@
 
 namespace ObjexxFCL {
 
-// IOFlags: I/O Control and Status Flags
+// I/O Control and Status Flags
 class IOFlags
 {
 
 public: // Types
 
-	typedef  std::string  Msg;
-	typedef  std::string  Name;
-	typedef  std::streamsize  Size;
-	typedef  std::streampos  Pos;
+	using Msg = std::string;
+	using Name = std::string;
+	using Size = std::streamsize;
+	using Pos = std::streampos;
 
 	enum class Status { Old, New, Scratch, Replace, Unknown };
 	enum class Access { Sequential, Direct, Stream };
@@ -44,28 +44,7 @@ public: // Types
 public: // Creation
 
 	// Default Constructor
-	IOFlags() :
-	 unit_( 0 ),
-	 exists_( false ),
-	 open_( false ),
-	 status_( Status::Unknown ),
-	 access_( Access::Sequential ),
-	 action_( Action::ReadWrite ),
-	 form_( Form::Formatted ),
-	 positioning_( Positioning::AsIs ),
-	 truncate_( false ),
-	 blank_( Blank::Null ),
-	 advance_( Advance::Yes ),
-	 dispose_( Dispose::Keep ),
-	 her_( false ),
-	 size_( 0u ),
-	 pos_( 0 ),
-	 ter_( default_ter() ),
-	 err_( false ),
-	 end_( false ),
-	 eor_( false ),
-	 ios_( 0 )
-	{}
+	IOFlags() = default;
 
 	// Handle Errors Named Constructor
 	static
@@ -1093,7 +1072,23 @@ public: // Line Terminator
 		return *this;
 	}
 
-	// OS X Terminator Set
+	// macOS Terminator Set
+	IOFlags &
+	ter_macos()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// macOS Terminator Set
+	IOFlags &
+	ter_macOS()
+	{
+		ter_ = "\n";
+		return *this;
+	}
+
+	// macOS Terminator Set
 	IOFlags &
 	ter_osx()
 	{
@@ -1101,7 +1096,7 @@ public: // Line Terminator
 		return *this;
 	}
 
-	// OS X Terminator Set
+	// macOS Terminator Set
 	IOFlags &
 	ter_OSX()
 	{
@@ -1417,29 +1412,29 @@ public: // Static Methods
 private: // Data
 
 	// Control/Inquiry
-	int unit_; // Unit
+	int unit_{ 0 }; // Unit
 	Name name_; // Name
-	bool exists_; // Exists?
-	bool open_; // Open?
-	Status status_; // Status flag
-	Access access_; // Access flag
-	Action action_; // Action flag
-	Form form_; // Form flag
-	Positioning positioning_; // Positioning flag
-	bool truncate_; // Truncate?
-	Blank blank_; // Blanks in numeric input flag
-	Advance advance_; // Advancing i/o flag
-	Dispose dispose_; // Dispose on close flag
-	bool her_; // Handle Errors?
-	Size size_; // Size
-	Pos pos_; // Position
-	std::string ter_; // Output line terminator
+	bool exists_{ false }; // Exists?
+	bool open_{ false }; // Open?
+	Status status_{ Status::Unknown }; // Status flag
+	Access access_{ Access::Sequential }; // Access flag
+	Action action_{ Action::ReadWrite }; // Action flag
+	Form form_{ Form::Formatted }; // Form flag
+	Positioning positioning_{ Positioning::AsIs }; // Positioning flag
+	bool truncate_{ false }; // Truncate?
+	Blank blank_{ Blank::Null }; // Blanks in numeric input flag
+	Advance advance_{ Advance::Yes }; // Advancing i/o flag
+	Dispose dispose_{ Dispose::Keep }; // Dispose on close flag
+	bool her_{ false }; // Handle Errors?
+	Size size_{ 0u }; // Size
+	Pos pos_{ 0 }; // Position
+	std::string ter_{ default_ter() }; // Output line terminator
 
 	// Status
-	bool err_; // Error?
-	bool end_; // End of file?
-	bool eor_; // End of record?
-	int ios_; // Status code
+	bool err_{ false }; // Error?
+	bool end_{ false }; // End of file?
+	bool eor_{ false }; // End of record?
+	int ios_{ 0 }; // Status code
 	Msg msg_; // Status message
 
 }; // IOFlags

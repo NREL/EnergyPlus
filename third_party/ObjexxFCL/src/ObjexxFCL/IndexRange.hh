@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_IndexRange_hh_INCLUDED
 #define ObjexxFCL_IndexRange_hh_INCLUDED
 
-// IndexRange: Index Range Class
+// Index Range Class
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Index.hh>
@@ -27,7 +27,7 @@
 
 namespace ObjexxFCL {
 
-// IndexRange: Index Range Class
+// Index Range Class
 //
 // Note:
 //  Zero-size range is indicated by ( l - 1 == u ) and ( size == 0 )
@@ -39,26 +39,15 @@ class IndexRange
 public: // Types
 
 	// STL style
-	typedef  std::size_t  size_type;
+	using size_type = std::size_t;
 
 	// C++ style
-	typedef  std::size_t  Size;
+	using Size = std::size_t;
 
 public: // Creation
 
 	// Default Constructor
-	IndexRange() :
-	 l_( 1 ),
-	 u_( 0 ),
-	 size_( 0u )
-	{}
-
-	// Copy Constructor
-	IndexRange( IndexRange const & I ) :
-	 l_( I.l_ ),
-	 u_( I.u_ ),
-	 size_( I.size_ )
-	{}
+	IndexRange() = default;
 
 	// Upper Index Constructor
 	IndexRange( int const u ) :
@@ -163,24 +152,7 @@ public: // Creation
 	 size_( npos )
 	{}
 
-	// Destructor
-	~IndexRange()
-	{}
-
 public: // Assignment
-
-	// Copy Assignment
-	IndexRange &
-	operator =( IndexRange const & I )
-	{
-		if ( this != &I ) {
-			l_ = I.l_;
-			u_ = I.u_;
-			size_ = I.size_;
-		}
-		assert( legal() );
-		return *this;
-	}
 
 	// Upper Index Assignment
 	IndexRange &
@@ -547,15 +519,15 @@ private: // Methods
 
 public: // Data
 
-	static size_type const npos; // Unbounded "size"
-	static int const l_min; // Min lower index
-	static int const u_max; // Max upper index
+	static size_type const npos{ static_cast< size_type >( -1 ) }; // Unbounded "size"
+	static int const l_min{ -( static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ) - 1 ) }; // Min lower index
+	static int const u_max{ static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ) }; // Max upper index
 
 private: // Data
 
-	int l_; // Lower index
-	int u_; // Upper index
-	size_type size_; // Size (npos iff unbounded)
+	int l_{ 1 }; // Lower index
+	int u_{ 0 }; // Upper index
+	size_type size_{ 0u }; // Size (npos iff unbounded)
 
 }; // IndexRange
 

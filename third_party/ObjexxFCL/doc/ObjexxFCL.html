@@ -5,7 +5,7 @@
 	<title>Objexx Fortran-C++ Library (ObjexxFCL)</title>
 	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<meta name="copyright" content="Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.">
 	<link rel="icon" type="image/png" href="img/favicon.png">
 	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
@@ -16,7 +16,7 @@
 		<td></td>
 		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.3</div></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -40,7 +40,7 @@
 				<a href="ObjexxFCL.Users.html">Users Guide</a>
 				<a href="ObjexxFCL.Developers.html">Developers</a>
 				<a href="ObjexxFCL.Support.html">Support</a>
-				<a href="http://objexx.com">Web</a>
+				<a href="https://objexx.com">Web</a>
 			</div>
 		</td>
 		<td></td>
@@ -57,11 +57,11 @@
 			<p>Arrays have the attributes of Fortran arrays, including:</p>
 			<ul>
 				<li>Each dimension can have an arbitrary index range.</li>
+				<li>Row-major element ordering (unlike Fortran): nested loops should be reordered to provide efficient contiguous element access when migrating from Fortranic column-major ordered arrays.</li>
 				<li>Array passing &quot;tricks&quot;: Arrays and array elements can be passed to functions where they are declared with a different rank or dimensions.</li>
 				<li>Assumed size array arguments.</li>
 				<li>Array sections (slices) and assumed shape array arguments.</li>
 				<li>Treating members of arrays of user-defined types as arrays.</li>
-				<li>Note: This ObjexxFCL variant uses row-major array layout, unlike Fortran's column-major layout.</li>
 			</ul>
 			<p>Technical applications often depend on fast, safe arrays and the ObjexxFCL provides some powerful array support, such as the ability to migrate to dynamic array sizing via explicit calls or a de-centralized automatic mechanism for the common situation where the sizes for different parts of the array dimensions are determined in locations scattered throughout the code.</p>
 			<p>The Array arrays provide these capabilities that Fortran arrays lack (some of which are provided by Fortran 90 and later standards):</p>
@@ -105,7 +105,7 @@
 			<table width="260" border="0" cellpadding="16" cellspacing="0" bgcolor="#F5F5F5">
 			<tr>
 			<td>
-				<p><b>ObjexxFCL 4.2<br>
+				<p><b>ObjexxFCL 4.3<br>
 				<span class="News">
 					<font color="#DE1D61">&raquo;</font> Fortran 90-2008 compatibility<br>
 					<font color="#DE1D61">&raquo;</font> New formatted i/o system<br>
@@ -138,7 +138,7 @@
 			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
 			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
 			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
-			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+			<a href="https://objexx.com"><span class="footer_link">Web</span></a>
 		</td>
 		<td></td>
 	</tr>
@@ -146,7 +146,7 @@
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2019 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

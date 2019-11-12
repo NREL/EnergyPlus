@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_Vector4_hh_INCLUDED
 #define ObjexxFCL_Vector4_hh_INCLUDED
 
-// Vector4: Fast 4-Element Vector
+// Fast 4-Element Vector
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector4.fwd.hh>
@@ -31,10 +31,10 @@
 
 namespace ObjexxFCL {
 
-// Vector4: Fast 4-Element Vector
-// . Heap-free and loop-free for speed
-// . Provides direct element access via .x style lookup
-// . Use std::array< T, 4 > instead in array/vectorization context
+// Fast 4-Element Vector
+//  Heap-free and loop-free for speed
+//  Provides direct element access via .x style lookup
+//  Use std::array< T, 4 > instead in array/vectorization context
 template< typename T >
 class Vector4
 {
@@ -43,29 +43,31 @@ private: // Friends
 
 	template< typename > friend class Vector4;
 
+	using ElemPtr = T Vector4< T >::* const;
+
 public: // Types
 
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Traits = TypeTraits< T >;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 	// STL Style
-	typedef  T  value_type;
-	typedef  T &  reference;
-	typedef  T const &  const_reference;
-	typedef  T *  pointer;
-	typedef  T const *  const_pointer;
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
+	using value_type = T;
+	using reference = T &;
+	using const_reference = T const &;
+	using pointer = T *;
+	using const_pointer = T const *;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
 
 	// C++ Style
-	typedef  T  Value;
-	typedef  T &  Reference;
-	typedef  T const &  ConstReference;
-	typedef  T *  Pointer;
-	typedef  T const *  ConstPointer;
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
+	using Value = T;
+	using Reference = T &;
+	using ConstReference = T const &;
+	using Pointer = T *;
+	using ConstPointer = T const *;
+	using Size = std::size_t;
+	using Difference = std::ptrdiff_t;
 
 public: // Creation
 
@@ -196,10 +198,6 @@ public: // Creation
 	{
 		return Vector4( tar_length / T( 2 ) );
 	}
-
-	// Destructor
-	~Vector4()
-	{}
 
 public: // Assignment
 
@@ -581,7 +579,7 @@ public: // Subscript
 	operator []( size_type const i ) const
 	{
 		assert( i <= 3 );
-		return ( i < 2 ? ( i == 0 ? x : y ) : ( i == 2 ? z : w ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector4[ i ]: 0-Based Index
@@ -589,7 +587,7 @@ public: // Subscript
 	operator []( size_type const i )
 	{
 		assert( i <= 3 );
-		return ( i < 2 ? ( i == 0 ? x : y ) : ( i == 2 ? z : w ) );
+		return this->*vec_[ i ];
 	}
 
 	// Vector4( i ) const: 1-Based Index
@@ -597,7 +595,7 @@ public: // Subscript
 	operator ()( size_type const i ) const
 	{
 		assert( ( 1 <= i ) && ( i <= 4 ) );
-		return ( i <= 2 ? ( i == 1 ? x : y ) : ( i == 3 ? z : w ) );
+		return this->*vec_[ i - 1 ];
 	}
 
 	// Vector4( i ): 1-Based Index
@@ -605,10 +603,10 @@ public: // Subscript
 	operator ()( size_type const i )
 	{
 		assert( ( 1 <= i ) && ( i <= 4 ) );
-		return ( i <= 2 ? ( i == 1 ? x : y ) : ( i == 3 ? z : w ) );
+		return this->*vec_[ i - 1 ];
 	}
 
-public: // Properties: Predicates
+public: // Predicate
 
 	// Is Zero Vector?
 	bool
@@ -625,7 +623,7 @@ public: // Properties: Predicates
 		return ( length_squared() == T( 1 ) );
 	}
 
-public: // Properties: General
+public: // Property
 
 	// Size
 	Size
@@ -783,7 +781,7 @@ public: // Properties: General
 		return w;
 	}
 
-public: // Modifiers
+public: // Modifier
 
 	// Zero
 	Vector4 &
@@ -1016,7 +1014,7 @@ public: // Modifiers
 		return *this;
 	}
 
-public: // Generators
+public: // Generator
 
 	// -Vector4 (Negated)
 	Vector4
@@ -1200,11 +1198,24 @@ public: // Static Methods
 		return ( t >= T( 0 ) ? t : Two_Pi + t );
 	}
 
+private: // Static Data
+
+	static ElemPtr const vec_[ 4 ]; // Array accessor
+
 public: // Data
 
 	T x, y, z, w; // Elements
 
 }; // Vector4
+
+// Static Data Member Definitions
+template< typename T >
+typename Vector4< T >::ElemPtr const Vector4< T >::vec_[ 4 ] = {
+ &Vector4< T >::x,
+ &Vector4< T >::y,
+ &Vector4< T >::z,
+ &Vector4< T >::w
+};
 
 // Length
 template< typename T >
@@ -1911,7 +1922,7 @@ std::ostream &
 operator <<( std::ostream & stream, Vector4< T > const & v )
 {
 	// Types
-	typedef  TypeTraits< T >  Traits;
+	using Traits = TypeTraits< T >;
 
 	// Save current stream state and set persistent state
 	std::ios_base::fmtflags const old_flags( stream.flags() );

@@ -1,17 +1,17 @@
 #ifndef ObjexxFCL_CArrayA_hh_INCLUDED
 #define ObjexxFCL_CArrayA_hh_INCLUDED
 
-// CArrayA: Memory-Managed C Array Wrapper with Alignment Support
+// Memory-Managed C Array Wrapper with Alignment Support
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArrayA.fwd.hh>
@@ -35,7 +35,7 @@
 
 namespace ObjexxFCL {
 
-// CArrayA: Memory-Managed C Array Wrapper with Alignment Support
+// Memory-Managed C Array Wrapper with Alignment Support
 template< typename T >
 class CArrayA
 {
@@ -46,39 +46,39 @@ private: // Friend
 
 public: // Types
 
-	typedef  AlignedAllocator< T >  Aligned;
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
-	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
+	using Aligned = AlignedAllocator< T >;
+	using Traits = TypeTraits< T >;
+	using Tc = typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type;
+	using Tr = typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type;
 
 	// STL Style
-	typedef  T  value_type;
-	typedef  T &  reference;
-	typedef  T const &  const_reference;
-	typedef  T *  pointer;
-	typedef  T const *  const_pointer;
-	typedef  T *  iterator;
-	typedef  T const *  const_iterator;
-	typedef  std::reverse_iterator< T * >  reverse_iterator;
-	typedef  std::reverse_iterator< T const * >  const_reverse_iterator;
-	typedef  std::size_t  size_type;
-	typedef  std::ptrdiff_t  difference_type;
+	using value_type = T;
+	using reference = T &;
+	using const_reference = T const &;
+	using pointer = T *;
+	using const_pointer = T const *;
+	using iterator = T *;
+	using const_iterator = T const *;
+	using reverse_iterator = std::reverse_iterator< T * >;
+	using const_reverse_iterator = std::reverse_iterator< T const * >;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
 
 	// C++ Style
-	typedef  T  Value;
-	typedef  T &  Reference;
-	typedef  T const &  ConstReference;
-	typedef  T *  Pointer;
-	typedef  T const *  ConstPointer;
-	typedef  T *  Iterator;
-	typedef  T const *  ConstIterator;
-	typedef  std::reverse_iterator< T * >  ReverseIterator;
-	typedef  std::reverse_iterator< T const * >  ConstReverseIterator;
-	typedef  std::size_t  Size;
-	typedef  std::ptrdiff_t  Difference;
+	using Value = T;
+	using Reference = T &;
+	using ConstReference = T const &;
+	using Pointer = T *;
+	using ConstPointer = T const *;
+	using Iterator = T *;
+	using ConstIterator = T const *;
+	using ReverseIterator = std::reverse_iterator< T * >;
+	using ConstReverseIterator = std::reverse_iterator< T const * >;
+	using Size = std::size_t;
+	using Difference = std::ptrdiff_t;
 
 	// Types to prevent compile failure when std::distance is in scope
-	typedef  void  iterator_category;
+	using iterator_category = void;
 
 public: // Creation
 
@@ -1268,7 +1268,7 @@ inline
 std::istream &
 operator >>( std::istream & stream, CArrayA< T > & a )
 {
-	typedef  typename CArrayA< T >::size_type  size_type;
+	using size_type = typename CArrayA< T >::size_type;
 	if ( stream && ( ! a.emtpy() ) ) {
 		for ( size_type i = 0, e = a.size(); i < e; ++i ) {
 			stream >> a[ i ];
@@ -1285,8 +1285,8 @@ std::ostream &
 operator <<( std::ostream & stream, CArrayA< T > const & a )
 {
 	using std::setw;
-	typedef  TypeTraits< T >  Traits;
-	typedef  typename CArrayA< T >::size_type  size_type;
+	using Traits = TypeTraits< T >;
+	using size_type = typename CArrayA< T >::size_type;
 	if ( stream && ( ! a.emtpy() ) ) {
 		std::ios_base::fmtflags const old_flags( stream.flags() );
 		std::streamsize const old_precision( stream.precision( Traits::precision ) );

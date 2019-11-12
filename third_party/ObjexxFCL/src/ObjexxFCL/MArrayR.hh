@@ -1,31 +1,31 @@
 #ifndef ObjexxFCL_MArrayR_hh_INCLUDED
 #define ObjexxFCL_MArrayR_hh_INCLUDED
 
-// MArrayR: Rank Member Array Proxy Abstract Base Class Template
+// Rank Member Array Proxy Abstract Base Class Template
 //
 // Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.2.0
+// Version: 4.3.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2019 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
-// Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+// Licensing is available from Objexx Engineering, Inc.: https://objexx.com
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArray.hh>
 
 namespace ObjexxFCL {
 
-// MArrayR: Rank Member Array Proxy Abstract Base Class Template
+// Rank Member Array Proxy Abstract Base Class Template
 template< class A, typename T, int Rank >
 class MArrayR : public MArray< A, T >
 {
 
 private: // Types
 
-	typedef  MArray< A, T >  Super;
+	using Super = MArray< A, T >;
 
 private: // Friend
 
@@ -33,29 +33,29 @@ private: // Friend
 
 public: // Types
 
-	typedef  typename Super::ArrayType  ArrayType;
-	typedef  typename Super::Class  Class;
-	typedef  typename Super::MPtr  MPtr;
-	typedef  typename Super::Traits  Traits;
-	typedef  typename Super::IR  IR;
+	using ArrayType = typename Super::ArrayType;
+	using Class = typename Super::Class;
+	using MPtr = typename Super::MPtr;
+	using Traits = typename Super::Traits;
+	using IR = typename Super::IR;
 
 	// STL Style
-	typedef  typename Super::value_type  value_type;
-	typedef  typename Super::reference  reference;
-	typedef  typename Super::const_reference  const_reference;
-	typedef  typename Super::pointer  pointer;
-	typedef  typename Super::const_pointer  const_pointer;
-	typedef  typename Super::size_type  size_type;
-	typedef  typename Super::difference_type  difference_type;
+	using value_type = typename Super::value_type;
+	using reference = typename Super::reference;
+	using const_reference = typename Super::const_reference;
+	using pointer = typename Super::pointer;
+	using const_pointer = typename Super::const_pointer;
+	using size_type = typename Super::size_type;
+	using difference_type = typename Super::difference_type;
 
 	// C++ Style
-	typedef  typename Super::Value  Value;
-	typedef  typename Super::Reference  Reference;
-	typedef  typename Super::ConstReference  ConstReference;
-	typedef  typename Super::Pointer  Pointer;
-	typedef  typename Super::ConstPointer  ConstPointer;
-	typedef  typename Super::Size  Size;
-	typedef  typename Super::Difference  Difference;
+	using Value = typename Super::Value;
+	using Reference = typename Super::Reference;
+	using ConstReference = typename Super::ConstReference;
+	using Pointer = typename Super::Pointer;
+	using ConstPointer = typename Super::ConstPointer;
+	using Size = typename Super::Size;
+	using Difference = typename Super::Difference;
 
 	using Super::isize;
 	using Super::l;
@@ -81,13 +81,6 @@ protected: // Creation
 	// Constructor
 	MArrayR( A & a, T Class::* pmem ) :
 	 Super( a, pmem )
-	{}
-
-public: // Creation
-
-	// Destructor
-	virtual
-	~MArrayR()
 	{}
 
 protected: // Assignment
