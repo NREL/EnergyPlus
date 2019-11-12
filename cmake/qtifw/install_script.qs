@@ -10,16 +10,16 @@ Usage:
 # Linux
 sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script install_script.qs
 
-# Windows: open cmd.exe as admin
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --platform minimal --script install_script.qs
-
 # Mac: `--plaftorm minimal` appears to produce a segmentation fault
-open EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg
-sudo /Volumes/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64 --verbose --script install_script.qs
+open EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.dmg
+sudo /Volumes/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64 --verbose --script install_script.qs
+
+# Windows: open cmd.exe as admin: `--platform minimal` appears unsupported
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs
 ```
 
 You can also customize the install directory by passing `TargetDir`
-If you don't, it defaults to;
+If you don't, it defaults to:
 * Linux: `/usr/local/EnergyPlus-9-2-0`
 * Mac: `/Applications/EnergyPlus-9-2-0`
 * Windows: `C:\EnergyPlusV9-2-0`
@@ -40,7 +40,7 @@ Unix:
 Windows: Open cmd.exe as admin
 
 ```
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --platform minimal --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
 ```
 
 
@@ -50,9 +50,12 @@ complete uninstall
 ```
 # Linux
 sudo /usr/local/EnergyPlus-9-2-0/maintenancetool --verbose --plaftorm minimal --script install_script.qs
-# Mac: `--platform minimal` appears to produce a segfault right now
-sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --platform minimal --script install_script.qs
 
+# Mac: `--platform minimal` appears to produce a segfault right now
+sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --script install_script.qs
+
+# Windows: `--platform minimal` appears unsupported at the moment
+C:\EnergyPlusV9-2-0\maintenancetool.exe --verbose --script install_script.qs
 ```
 
 **/
@@ -138,7 +141,12 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
                     "' is mandatory and cannot be unselected");
         installStatus = "Yes (FORCED AS REQUIRED)";
       } else if (compName === "CopyAndRegisterSystemDLLs") {
-        console.log("-- CopyAndRegisterSystemDLLs is highly recommended on Windows, and it will not overwrite any existing DLLs so it should not have side effects");
+        console.log("-- Component 'CopyAndRegisterSystemDLLs' is highly recommended on Windows, and it will not overwrite any existing DLLs so it should not have side effects");
+        // Allow unselect anyways
+        installStatus = "No (use at your own risk)";
+        widget.deselectComponent(compName);
+      } else if (compName === "Libraries") {
+        console.log("-- Component 'Libraries' is highly recommended on Windows, at least when shipping to Windows 7/8.");
         // Allow unselect anyways
         installStatus = "No (use at your own risk)";
         widget.deselectComponent(compName);
@@ -158,11 +166,12 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   // Unix (Mac/Linux)
   // widget.deselectComponent("Symlinks");
 
-  // Windows: "CreateStartMenu", "RegisterFileType", "CopyAndRegisterSystemDLLs"
+  // Windows: "CreateStartMenu", "RegisterFileType",
+  // "CopyAndRegisterSystemDLLs", "Libraries"
 
 
-  // Linux/Mac: Packages:  Symlinks Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
-  // Windows:   Packages:
+  // Linux/Mac: Packages: Symlinks Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
+  // Windows:   Packages: RegisterFileType CopyAndRegisterSystemDLLs CreateStartMenu Libraries Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
 
   gui.clickButton(buttons.NextButton);
 };
@@ -197,11 +206,6 @@ Controller.prototype.PerformInstallationPageCallback = function()
 Controller.prototype.FinishedPageCallback = function() {
   console.log("---- FINISHED PAGE");
   logCurrentPage();
-  /*
-   *var checkBoxForm = gui.currentPageWidget().LaunchQtCreatorCheckBoxForm;
-   *if (checkBoxForm && checkBoxForm.launchQtCreatorCheckBox) {
-   *  checkBoxForm.launchQtCreatorCheckBox.checked = false;
-   *}
-   */
+
   gui.clickButton(buttons.FinishButton);
 };
