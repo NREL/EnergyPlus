@@ -73,12 +73,12 @@ namespace FuelCellElectricGenerator {
 
     // Functions
 
-    void SimFuelCellGenerator(int const GeneratorType,          // type of Generator
+    void SimFuelCellGenerator(int GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator
                               int &GeneratorIndex,
-                              bool const RunFlag,  // simulate Generator when TRUE
-                              Real64 const MyLoad, // demand on electric generator
-                              bool const FirstHVACIteration);
+                              bool RunFlag,  // simulate Generator when TRUE
+                              Real64 MyLoad, // demand on electric generator
+                              bool FirstHVACIteration);
 
     // End FuelCell Generator Module Driver Subroutines
     //******************************************************************************
@@ -93,113 +93,113 @@ namespace FuelCellElectricGenerator {
     // Beginning of Generator model Subroutines
     // *****************************************************************************
 
-    void CalcFuelCellGeneratorModel(int const GeneratorNum, // Generator number
-                                    bool const RunFlag,     // TRUE when Generator operating
-                                    Real64 const MyLoad,    // Generator demand
-                                    bool const FirstHVACIteration);
+    void CalcFuelCellGeneratorModel(int GeneratorNum, // Generator number
+                                    bool RunFlag,     // TRUE when Generator operating
+                                    Real64 MyLoad,    // Generator demand
+                                    bool FirstHVACIteration);
 
-    void ManageElectStorInteractions(int const Num, // Generator number, index for structure
-                                     Real64 const Pdemand,
-                                     Real64 const PpcuLosses,
+    void ManageElectStorInteractions(int Num, // Generator number, index for structure
+                                     Real64 Pdemand,
+                                     Real64 PpcuLosses,
                                      bool &Constrained,  // TODO: This one is never used anywhere in the code
                                      Real64 &Pstorage,
                                      Real64 &PgridOverage // electricity that can't be stored and needs to go out
     );
 
-    Real64 FuelCellProductGasEnthResidual(Real64 const TprodGas,    // temperature, this is "x" being searched
+    Real64 FuelCellProductGasEnthResidual(Real64 TprodGas,    // temperature, this is "x" being searched
                                           Array1<Real64> const &Par // par(1) = Generator Number
     );
 
-    void FigureAirHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                          Real64 const FluidTemp, // degree C
+    void FigureAirHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
+                          Real64 FluidTemp, // degree C
                           Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureAirEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 const FluidTemp, // degree C
+    void FigureAirEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
+                           Real64 FluidTemp, // degree C
                            Real64 &Hair            // (kJ/mol)
     );
 
-    void FigureFuelHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 const FluidTemp, // degree C
+    void FigureFuelHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
+                           Real64 FluidTemp, // degree C
                            Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureFuelEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                            Real64 const FluidTemp, // degree C
+    void FigureFuelEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
+                            Real64 FluidTemp, // degree C
                             Real64 &Hfuel           // kJ/mol
     );
 
-    void FigureProductGasesEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                                    Real64 const FluidTemp, // degree C
+    void FigureProductGasesEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
+                                    Real64 FluidTemp, // degree C
                                     Real64 &HProdGases      // kJ/mol
     );
 
-    void FigureProductGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                 Real64 const FluidTemp, // degree C
+    void FigureProductGasHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
+                                 Real64 FluidTemp, // degree C
                                  Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureAuxilHeatGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                   Real64 const FluidTemp, // degree C
+    void FigureAuxilHeatGasHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
+                                   Real64 FluidTemp, // degree C
                                    Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureGaseousWaterEnthalpy(Real64 const FluidTemp, // degree C
+    void FigureGaseousWaterEnthalpy(Real64 FluidTemp, // degree C
                                     Real64 &HGasWater       // kJ/mol
     );
 
-    void FigureLiquidWaterEnthalpy(Real64 const FluidTemp, // degree C
+    void FigureLiquidWaterEnthalpy(Real64 FluidTemp, // degree C
                                    Real64 &HLiqWater       // kJ/mol
     );
 
-    void FigureLiquidWaterHeatCap(Real64 const FluidTemp, // degree C
+    void FigureLiquidWaterHeatCap(Real64 FluidTemp, // degree C
                                   Real64 &Cp              // (J/mol*K)
     );
 
-    void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill);
+    void FigureACAncillaries(int GeneratorNum, Real64 &PacAncill);
 
-    void FigurePowerConditioningLosses(int const GeneratorNum, Real64 const Pdemand, Real64 &PpcuLosses);
+    void FigurePowerConditioningLosses(int GeneratorNum, Real64 Pdemand, Real64 &PpcuLosses);
 
-    void FigureTransientConstraints(int const GeneratorNum, // index number for accessing correct generator
+    void FigureTransientConstraints(int GeneratorNum, // index number for accessing correct generator
                                     Real64 &Pel,            // DC power control setting for power module
                                     bool &Constrained,      // true if transient constraints kick in (TODO: never used anywhere)
                                     Real64 &PelDiff         // if constrained then this is the difference, positive
     );
 
-    void CalcFuelCellAuxHeater(int const Num); // Generator number
+    void CalcFuelCellAuxHeater(int Num); // Generator number
 
-    void CalcFuelCellGenHeatRecovery(int const Num); // Generator number
+    void CalcFuelCellGenHeatRecovery(int Num); // Generator number
 
     void SimFuelCellPlantHeatRecovery(std::string const &CompType,
                                       std::string const &CompName,
-                                      int const CompTypeNum,
+                                      int CompTypeNum,
                                       int &CompNum,
-                                      bool const RunFlag,
+                                      bool RunFlag,
                                       bool &InitLoopEquip,
                                       Real64 &MyLoad, // unused1208
                                       Real64 &MaxCap,
                                       Real64 &MinCap,
                                       Real64 &OptCap,
-                                      bool const FirstHVACIteration // TRUE if First iteration of simulation
+                                      bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
-    void InitFuelCellGenerators(int const FCnum); // index to specific fuel cell generator
+    void InitFuelCellGenerators(int FCnum); // index to specific fuel cell generator
 
     void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
                                               std::string &heatRecoveryCompName);
 
     void FigureFuelCellZoneGains();
 
-    void CalcUpdateHeatRecovery(int const Num, // Generator number
-                                bool const FirstHVACIteration);
+    void CalcUpdateHeatRecovery(int Num, // Generator number
+                                bool FirstHVACIteration);
 
-    void UpdateFuelCellGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
-                                        int const Num       // Generator number
+    void UpdateFuelCellGeneratorRecords(bool RunFlag, // TRUE if Generator operating
+                                        int Num       // Generator number
     );
 
-    void GetFuelCellGeneratorResults(int const GeneratorType, // type of Generator
-                                     int const GeneratorIndex,
+    void GetFuelCellGeneratorResults(int GeneratorType, // type of Generator
+                                     int GeneratorIndex,
                                      Real64 &GeneratorPower,  // electrical power
                                      Real64 &GeneratorEnergy, // electrical energy
                                      Real64 &ThermalPower,    // heat power
