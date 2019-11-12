@@ -2156,12 +2156,18 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         break;
     }
     case GeneratorType::microturbine: {
-        MicroturbineElectricGenerator::SimMTGenerator(
-            DataGlobalConstants::iGeneratorMicroturbine, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration);
-        MicroturbineElectricGenerator::GetMTGeneratorResults(
-            DataGlobalConstants::iGeneratorMicroturbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
-        electricPowerOutput = electProdRate;
-        thermalPowerOutput = thermProdRate;
+        auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(name);
+
+        // dummy vars
+        PlantLocation L(0,0,0,0);
+        Real64 tempLoad = myElecLoadRequest;
+
+        // simulate
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(runFlag, tempLoad, FirstHVACIteration);
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(runFlag, tempLoad);
+        dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
+        electricPowerOutput = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
+        thermalPowerOutput = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;
         break;
     }
     case GeneratorType::windTurbine: {
