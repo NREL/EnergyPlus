@@ -552,6 +552,29 @@ namespace FuelCellElectricGenerator {
                   DynamicsControlID(0), TimeElapsed(0.0), InitGenerator(true), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
         {
         }
+
+        void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
+
+        void FigureAirEnthalpy(Real64 FluidTemp, Real64 &Hair);
+
+        void FigureFuelHeatCap(Real64 FluidTemp, Real64 &Cp);
+
+        void FigureFuelEnthalpy(Real64 FluidTemp, Real64 &Hfuel);
+
+        void FigureProductGasesEnthalpy(Real64 FluidTemp, Real64 &HProdGases);
+
+        void FigureProductGasHeatCap(Real64 FluidTemp, Real64 &Cp);
+
+        void FigureAuxilHeatGasHeatCap(Real64 FluidTemp, Real64 &Cp);
+
+        void FigureACAncillaries(Real64 &PacAncill);
+
+        void FigurePowerConditioningLosses(Real64 Pdemand, Real64 &PpcuLosses);
+
+        void FigureTransientConstraints(Real64 &Pel,            // DC power control setting for power module
+                                        bool &Constrained,      // true if transient constraints kick in (TODO: never used anywhere)
+                                        Real64 &PelDiff         // if constrained then this is the difference, positive
+        );
     };
 
     void clear_state();
@@ -582,41 +605,6 @@ namespace FuelCellElectricGenerator {
                                           Array1<Real64> const &Par // par(1) = Generator Number
     );
 
-    void FigureAirHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
-                          Real64 FluidTemp, // degree C
-                          Real64 &Cp              // (J/mol*K)
-    );
-
-    void FigureAirEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 FluidTemp, // degree C
-                           Real64 &Hair            // (kJ/mol)
-    );
-
-    void FigureFuelHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 FluidTemp, // degree C
-                           Real64 &Cp              // (J/mol*K)
-    );
-
-    void FigureFuelEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
-                            Real64 FluidTemp, // degree C
-                            Real64 &Hfuel           // kJ/mol
-    );
-
-    void FigureProductGasesEnthalpy(int GeneratorNum, // ID of generator FuelCell data structure
-                                    Real64 FluidTemp, // degree C
-                                    Real64 &HProdGases      // kJ/mol
-    );
-
-    void FigureProductGasHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
-                                 Real64 FluidTemp, // degree C
-                                 Real64 &Cp              // (J/mol*K)
-    );
-
-    void FigureAuxilHeatGasHeatCap(int GeneratorNum, // ID of generator FuelCell data structure
-                                   Real64 FluidTemp, // degree C
-                                   Real64 &Cp              // (J/mol*K)
-    );
-
     void FigureGaseousWaterEnthalpy(Real64 FluidTemp, // degree C
                                     Real64 &HGasWater       // kJ/mol
     );
@@ -627,16 +615,6 @@ namespace FuelCellElectricGenerator {
 
     void FigureLiquidWaterHeatCap(Real64 FluidTemp, // degree C
                                   Real64 &Cp              // (J/mol*K)
-    );
-
-    void FigureACAncillaries(int GeneratorNum, Real64 &PacAncill);
-
-    void FigurePowerConditioningLosses(int GeneratorNum, Real64 Pdemand, Real64 &PpcuLosses);
-
-    void FigureTransientConstraints(int GeneratorNum, // index number for accessing correct generator
-                                    Real64 &Pel,            // DC power control setting for power module
-                                    bool &Constrained,      // true if transient constraints kick in (TODO: never used anywhere)
-                                    Real64 &PelDiff         // if constrained then this is the difference, positive
     );
 
     void CalcFuelCellAuxHeater(int Num); // Generator number

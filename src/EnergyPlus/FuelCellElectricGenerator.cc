@@ -1391,15 +1391,15 @@ namespace FuelCellElectricGenerator {
         // BEGIN SEQUENTIAL SUBSTITUTION to handle a lot of inter-related calcs
         for (iter = 1; iter <= 20; ++iter) {
             if (iter > 1) {
-                FigurePowerConditioningLosses(GeneratorNum, PoutofInverter, PpcuLosses);
-                FigureACAncillaries(GeneratorNum, PacAncillariesTotal);
+                FuelCell(GeneratorNum).FigurePowerConditioningLosses(PoutofInverter, PpcuLosses);
+                FuelCell(GeneratorNum).FigureACAncillaries(PacAncillariesTotal);
                 Pdemand = MyLoad + PacAncillariesTotal + PpcuLosses;
             } else {
                 // control Step 1a: Figure ancillary AC power draws
-                FigureACAncillaries(GeneratorNum, PacAncillariesTotal);
+                FuelCell(GeneratorNum).FigureACAncillaries(PacAncillariesTotal);
                 Pdemand = MyLoad + PacAncillariesTotal;
                 // Control Step 1b: Calculate losses associated with Power conditioning
-                FigurePowerConditioningLosses(GeneratorNum, Pdemand, PpcuLosses);
+                FuelCell(GeneratorNum).FigurePowerConditioningLosses(Pdemand, PpcuLosses);
                 Pdemand += PpcuLosses;
                 Pel = Pdemand;
             }
@@ -1410,7 +1410,7 @@ namespace FuelCellElectricGenerator {
 
             Real64 PelDiff;
             bool ConstrainedFCPMTrans = false;
-            FigureTransientConstraints(GeneratorNum, Pel, ConstrainedFCPMTrans, PelDiff);
+            FuelCell(GeneratorNum).FigureTransientConstraints(Pel, ConstrainedFCPMTrans, PelDiff);
 
             // Control step 3: adjust for max and min limits on Pel
 
@@ -1508,7 +1508,7 @@ namespace FuelCellElectricGenerator {
             //  evaluate  heat capacity at average temperature using shomate
             Real64 Cp;              // temp Heat Capacity, used in thermochemistry units of (J/mol K)
             Real64 Tavg = (DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoCompress + DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoFCPM) / 2.0;
-            FigureFuelHeatCap(GeneratorNum, Tavg, Cp); // Cp in (J/mol K)
+            FuelCell(GeneratorNum).FigureFuelHeatCap(Tavg, Cp); // Cp in (J/mol K)
 
             // calculate a Temp of fuel out of compressor and into power module
 
@@ -1533,7 +1533,7 @@ namespace FuelCellElectricGenerator {
 
             // (Hmolfuel in KJ/mol)
             Real64 Hmolfuel;        // temp enthalpy of fuel mixture in KJ/mol
-            FigureFuelEnthalpy(GeneratorNum, DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoFCPM, Hmolfuel);
+            FuelCell(GeneratorNum).FigureFuelEnthalpy(DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).TfuelIntoFCPM, Hmolfuel);
 
             // units, NdotFuel in kmol/sec. Hmolfule in KJ/mol ,
             //        factor of 1000's to get to J/s or watts
@@ -1604,7 +1604,7 @@ namespace FuelCellElectricGenerator {
 
             Tavg = (FuelCell(GeneratorNum).AirSup.TairIntoBlower + FuelCell(GeneratorNum).AirSup.TairIntoFCPM) / 2.0;
 
-            FigureAirHeatCap(GeneratorNum, Tavg, Cp); // Cp in (J/mol K)
+            FuelCell(GeneratorNum).FigureAirHeatCap(Tavg, Cp); // Cp in (J/mol K)
 
             // if PEMFC with stack cooler, then calculate stack cooler impacts
             if (FuelCell(GeneratorNum).StackCooler.StackCoolerPresent) {
@@ -1661,7 +1661,7 @@ namespace FuelCellElectricGenerator {
             }
 
             Real64 Hmolair;         // temp enthalpy of air mixture in KJ/mol
-            FigureAirEnthalpy(GeneratorNum, FuelCell(GeneratorNum).AirSup.TairIntoFCPM, Hmolair); // (Hmolair in KJ/mol)
+            FuelCell(GeneratorNum).FigureAirEnthalpy(FuelCell(GeneratorNum).AirSup.TairIntoFCPM, Hmolair); // (Hmolair in KJ/mol)
 
             // units, NdotAir in kmol/sec.; Hmolfuel in KJ/mol ,
             //        factor of 1000's to get to J/s or watts
@@ -1754,7 +1754,7 @@ namespace FuelCellElectricGenerator {
 
             // HmolProdGases KJ/mol)
             Real64 HmolProdGases;   // enthalpy of product gas mixture in KJ/mol
-            FigureProductGasesEnthalpy(GeneratorNum, FuelCell(GeneratorNum).FCPM.TprodGasLeavingFCPM, HmolProdGases);
+            FuelCell(GeneratorNum).FigureProductGasesEnthalpy(FuelCell(GeneratorNum).FCPM.TprodGasLeavingFCPM, HmolProdGases);
 
             // units, NdotProdGas in kmol/sec.; HmolProdGases in KJ/mol ,
             //        factor of 1000's to get to J/s or watts
@@ -1784,7 +1784,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(GeneratorNum).FCPM.ANC0 + FuelCell(GeneratorNum).FCPM.ANC1 * FuelCell(GeneratorNum).FCPM.NdotFuel;
 
             // calculation Step 11, Dilution air
-            FigureAirEnthalpy(GeneratorNum, FuelCell(GeneratorNum).AirSup.TairIntoBlower, Hmolair); // (Hmolair in KJ/mol)
+            FuelCell(GeneratorNum).FigureAirEnthalpy(FuelCell(GeneratorNum).AirSup.TairIntoBlower, Hmolair); // (Hmolair in KJ/mol)
 
             // units, NdotDilutionAir in kmol/sec.; Hmolair in KJ/mol ,
             //        factor of 1000's to get to J/s or watts
@@ -2067,17 +2067,14 @@ namespace FuelCellElectricGenerator {
         Real64 desiredHprodGases = Par(2);
         Real64 NdotProdGases = Par(3);
 
-        FigureProductGasesEnthalpy(GeneratorNum, TprodGas, thisHmolalProdGases);
+        FuelCell(GeneratorNum).FigureProductGasesEnthalpy(TprodGas, thisHmolalProdGases);
 
         Residuum = (thisHmolalProdGases * NdotProdGases * 1000000.0) - desiredHprodGases;
 
         return Residuum;
     }
 
-    void FigureAirHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                          Real64 const FluidTemp, // degree C
-                          Real64 &Cp              // (J/mol*K)
-    )
+    void FCDataStruct::FigureAirHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2122,8 +2119,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
-            int gasID = FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= this->AirSup.NumConstituents; ++thisConstit) {
+            int gasID = this->AirSup.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2134,7 +2131,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                            FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstit));
+                            this->AirSup.ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -2146,7 +2143,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                            FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstit);
+                            this->AirSup.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2154,10 +2151,7 @@ namespace FuelCellElectricGenerator {
         Cp = tempCp;
     }
 
-    void FigureAirEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 const FluidTemp, // degree C
-                           Real64 &Hair            // (kJ/mol)
-    )
+    void FCDataStruct::FigureAirEnthalpy(Real64 const FluidTemp, Real64 &Hair)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2204,8 +2198,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= FuelCell(GeneratorNum).AirSup.NumConstituents; ++thisConstit) {
-            int gasID = FuelCell(GeneratorNum).AirSup.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= this->AirSup.NumConstituents; ++thisConstit) {
+            int gasID = this->AirSup.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2219,7 +2213,7 @@ namespace FuelCellElectricGenerator {
 
                     Real64 HairI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
 
-                    tempHair += HairI * FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstit);
+                    tempHair += HairI * this->AirSup.ConstitMolalFract(thisConstit);
                 }
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
                     A1 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A1;
@@ -2232,7 +2226,7 @@ namespace FuelCellElectricGenerator {
                     tempHair += (((A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel) *
                                   DataGenerators::RinKJperMolpK * Tkel) -
                                  DataGenerators::GasPhaseThermoChemistryData(gasID).StdRefMolarEnthOfForm) *
-                                FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstit);
+                                this->AirSup.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2240,10 +2234,7 @@ namespace FuelCellElectricGenerator {
         Hair = tempHair;
     }
 
-    void FigureFuelHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                           Real64 const FluidTemp, // degree C
-                           Real64 &Cp              // (J/mol*K)
-    )
+    void FCDataStruct::FigureFuelHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2286,8 +2277,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
-            int gasID = DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(this->FuelSupNum).NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelSupply(this->FuelSupNum).GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2298,7 +2289,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                            DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).ConstitMolalFract(thisConstit));
+                            DataGenerators::FuelSupply(this->FuelSupNum).ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -2309,7 +2300,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                            DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).ConstitMolalFract(thisConstit);
+                            DataGenerators::FuelSupply(this->FuelSupNum).ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2317,10 +2308,7 @@ namespace FuelCellElectricGenerator {
         Cp = tempCp;
     }
 
-    void FigureFuelEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                            Real64 const FluidTemp, // degree C
-                            Real64 &Hfuel           // kJ/mol
-    )
+    void FCDataStruct::FigureFuelEnthalpy(Real64 const FluidTemp, Real64 &Hfuel)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2367,8 +2355,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).NumConstituents; ++thisConstit) {
-            int gasID = DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= DataGenerators::FuelSupply(this->FuelSupNum).NumConstituents; ++thisConstit) {
+            int gasID = DataGenerators::FuelSupply(this->FuelSupNum).GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
@@ -2381,7 +2369,7 @@ namespace FuelCellElectricGenerator {
 
                     Real64 HfuelI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
 
-                    tempHfuel += HfuelI * DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).ConstitMolalFract(thisConstit);
+                    tempHfuel += HfuelI * DataGenerators::FuelSupply(this->FuelSupNum).ConstitMolalFract(thisConstit);
                 }
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
 
@@ -2395,7 +2383,7 @@ namespace FuelCellElectricGenerator {
                     tempHfuel += (((A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel) *
                                    DataGenerators::RinKJperMolpK * Tkel) -
                                   DataGenerators::GasPhaseThermoChemistryData(gasID).StdRefMolarEnthOfForm) *
-                            DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).ConstitMolalFract(thisConstit);
+                            DataGenerators::FuelSupply(this->FuelSupNum).ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2403,10 +2391,7 @@ namespace FuelCellElectricGenerator {
         Hfuel = tempHfuel;
     }
 
-    void FigureProductGasesEnthalpy(int const GeneratorNum, // ID of generator FuelCell data structure
-                                    Real64 const FluidTemp, // degree C
-                                    Real64 &HProdGases      // kJ/mol
-    )
+    void FCDataStruct::FigureProductGasesEnthalpy(Real64 const FluidTemp, Real64 &HProdGases)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2454,7 +2439,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (int thisConstit = 1; thisConstit <= 5; ++thisConstit) {
-            int gasID = FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+            int gasID = this->FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
                     A = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateA;
@@ -2466,7 +2451,7 @@ namespace FuelCellElectricGenerator {
                     H = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateH;
 
                     tempHprodGases += ((A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H) *
-                            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
+                            this->FCPM.ConstitMolalFract(thisConstit));
                 }
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
                     A1 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A1;
@@ -2479,7 +2464,7 @@ namespace FuelCellElectricGenerator {
                     tempHprodGases += (((A1 + A2 * Tkel / 2.0 + A3 * pow_2_Tkel / 3.0 + A4 * pow_3_Tkel / 4.0 + A5 * pow_4_Tkel / 5.0 + A6 / Tkel) *
                                         DataGenerators::RinKJperMolpK * Tkel) -
                                        DataGenerators::GasPhaseThermoChemistryData(gasID).StdRefMolarEnthOfForm) *
-                            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
+                            this->FCPM.ConstitMolalFract(thisConstit);
                 }
             } // gasid > 0
         }
@@ -2487,10 +2472,7 @@ namespace FuelCellElectricGenerator {
         HProdGases = tempHprodGases;
     }
 
-    void FigureProductGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                 Real64 const FluidTemp, // degree C
-                                 Real64 &Cp              // (J/mol*K)
-    )
+    void FCDataStruct::FigureProductGasHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2524,8 +2506,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= isize(FuelCell(GeneratorNum).FCPM.GasLibID); ++thisConstit) {
-            int gasID = FuelCell(GeneratorNum).FCPM.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= isize(this->FCPM.GasLibID); ++thisConstit) {
+            int gasID = this->FCPM.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2536,7 +2518,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit));
+                            this->FCPM.ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -2547,7 +2529,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                            FuelCell(GeneratorNum).FCPM.ConstitMolalFract(thisConstit);
+                            this->FCPM.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2555,10 +2537,7 @@ namespace FuelCellElectricGenerator {
         Cp = tempCp;
     }
 
-    void FigureAuxilHeatGasHeatCap(int const GeneratorNum, // ID of generator FuelCell data structure
-                                   Real64 const FluidTemp, // degree C
-                                   Real64 &Cp              // (J/mol*K)
-    )
+    void FCDataStruct::FigureAuxilHeatGasHeatCap(Real64 const FluidTemp, Real64 &Cp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2592,8 +2571,8 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_3_Tkel(pow_3(Tkel));
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
-        for (int thisConstit = 1; thisConstit <= isize(FuelCell(GeneratorNum).AuxilHeat.GasLibID); ++thisConstit) {
-            int gasID = FuelCell(GeneratorNum).AuxilHeat.GasLibID(thisConstit);
+        for (int thisConstit = 1; thisConstit <= isize(this->AuxilHeat.GasLibID); ++thisConstit) {
+            int gasID = this->AuxilHeat.GasLibID(thisConstit);
             if (gasID > 0) {
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NISTShomate) {
 
@@ -2604,7 +2583,7 @@ namespace FuelCellElectricGenerator {
                     E = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateE;
 
                     tempCp += ((A + B * Tsho + C * pow_2_Tsho + D * pow_3_Tsho + E / pow_2_Tsho) *
-                            FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit));
+                            this->AuxilHeat.ConstitMolalFract(thisConstit));
                 }
 
                 if (DataGenerators::GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::NASAPolynomial) {
@@ -2615,7 +2594,7 @@ namespace FuelCellElectricGenerator {
                     A5 = DataGenerators::GasPhaseThermoChemistryData(gasID).NASA_A5;
 
                     tempCp += (A1 + A2 * Tkel + A3 * pow_2_Tkel + A4 * pow_3_Tkel + A5 * pow_4_Tkel) * DataGenerators::RinKJperMolpK *
-                            FuelCell(GeneratorNum).AuxilHeat.ConstitMolalFract(thisConstit);
+                            this->AuxilHeat.ConstitMolalFract(thisConstit);
                 }
             }
         }
@@ -2706,7 +2685,7 @@ namespace FuelCellElectricGenerator {
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
     }
 
-    void FigureACAncillaries(int const GeneratorNum, Real64 &PacAncill)
+    void FCDataStruct::FigureACAncillaries(Real64 &PacAncill)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2721,24 +2700,24 @@ namespace FuelCellElectricGenerator {
         //  Using lagged values inside a sequential substitution loop
         PacAncill = 0.0;
         // sect. 5.9
-        FuelCell(GeneratorNum).FCPM.PelancillariesAC =
-                FuelCell(GeneratorNum).FCPM.ANC0 + FuelCell(GeneratorNum).FCPM.ANC1 * FuelCell(GeneratorNum).FCPM.NdotFuel;
+        this->FCPM.PelancillariesAC =
+                this->FCPM.ANC0 + this->FCPM.ANC1 * this->FCPM.NdotFuel;
 
         // sect 6.0
-        FuelCell(GeneratorNum).AirSup.PairCompEl = CurveManager::CurveValue(FuelCell(GeneratorNum).AirSup.BlowerPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotAir);
+        this->AirSup.PairCompEl = CurveManager::CurveValue(this->AirSup.BlowerPowerCurveID, this->FCPM.NdotAir);
         // sect 7.0
-        DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl =
-            CurveManager::CurveValue(DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).CompPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotFuel);
+        DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl =
+            CurveManager::CurveValue(DataGenerators::FuelSupply(this->FuelSupNum).CompPowerCurveID, this->FCPM.NdotFuel);
 
         // sect. 8.0
-        FuelCell(GeneratorNum).WaterSup.PwaterCompEl =
-            CurveManager::CurveValue(FuelCell(GeneratorNum).WaterSup.PmpPowerCurveID, FuelCell(GeneratorNum).FCPM.NdotLiqwater);
+        this->WaterSup.PwaterCompEl =
+            CurveManager::CurveValue(this->WaterSup.PmpPowerCurveID, this->FCPM.NdotLiqwater);
 
-        PacAncill = FuelCell(GeneratorNum).FCPM.PelancillariesAC + FuelCell(GeneratorNum).AirSup.PairCompEl +
-                DataGenerators::FuelSupply(FuelCell(GeneratorNum).FuelSupNum).PfuelCompEl + FuelCell(GeneratorNum).WaterSup.PwaterCompEl;
+        PacAncill = this->FCPM.PelancillariesAC + this->AirSup.PairCompEl +
+                DataGenerators::FuelSupply(this->FuelSupNum).PfuelCompEl + this->WaterSup.PwaterCompEl;
     }
 
-    void FigurePowerConditioningLosses(int const GeneratorNum, Real64 const Pdemand, Real64 &PpcuLosses)
+    void FCDataStruct::FigurePowerConditioningLosses(Real64 const Pdemand, Real64 &PpcuLosses)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2750,29 +2729,28 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate inverter losses
 
-        if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffConstant) {
-            PpcuLosses = Pdemand * (1 - FuelCell(GeneratorNum).Inverter.ConstEff) / FuelCell(GeneratorNum).Inverter.ConstEff;
+        if (this->Inverter.EffMode == DataGenerators::InverterEffConstant) {
+            PpcuLosses = Pdemand * (1 - this->Inverter.ConstEff) / this->Inverter.ConstEff;
         }
 
-        if (FuelCell(GeneratorNum).Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
+        if (this->Inverter.EffMode == DataGenerators::InverterEffQuadratic) {
 
             // first use Pdemand instead of Pel to get initial estimate
-            Real64 lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand)) /
-                             CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pdemand);
+            Real64 lastPpcuLosses = Pdemand * (1.0 - CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pdemand)) /
+                             CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pdemand);
 
             for (int iter = 1; iter <= 20; ++iter) { // seems like need to iterate (??) Need to investigate number and convergence success here
 
                 Real64 Pel = Pdemand + lastPpcuLosses;
 
-                lastPpcuLosses = (1.0 - CurveManager::CurveValue(FuelCell(GeneratorNum).Inverter.EffQuadraticCurveID, Pel)) * Pel;
+                lastPpcuLosses = (1.0 - CurveManager::CurveValue(this->Inverter.EffQuadraticCurveID, Pel)) * Pel;
             }
 
             PpcuLosses = lastPpcuLosses;
         }
     }
 
-    void FigureTransientConstraints(int const GeneratorNum, // index number for accessing correct generator
-                                    Real64 &Pel,            // DC power control setting for power module
+    void FCDataStruct::FigureTransientConstraints(Real64 &Pel,            // DC power control setting for power module
                                     bool &Constrained,      // true if transient constraints kick in
                                     Real64 &PelDiff         // if constrained then this is the difference, positive
     )
@@ -2789,44 +2767,44 @@ namespace FuelCellElectricGenerator {
         Real64 CurrentFractionalDay = double(DataGlobals::DayOfSim) + (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) / DataGlobals::HoursInDay;
 
         // Check if in start up and if it still should be
-        if (FuelCell(GeneratorNum).FCPM.DuringStartUp) {
+        if (this->FCPM.DuringStartUp) {
 
             // calculate time for end of start up period
-            Real64 EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastStartUp + FuelCell(GeneratorNum).FCPM.StartUpTime / DataGlobals::HoursInDay;
+            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastStartUp + this->FCPM.StartUpTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
-                FuelCell(GeneratorNum).FCPM.DuringStartUp = false;
+                this->FCPM.DuringStartUp = false;
             }
         }
 
         // Check if in shut down up and if it still should be
-        if (FuelCell(GeneratorNum).FCPM.DuringShutDown) {
+        if (this->FCPM.DuringShutDown) {
 
             // calculate time for end of shut down period
-            Real64 EndingFractionalDay = FuelCell(GeneratorNum).FCPM.FractionalDayofLastShutDown + FuelCell(GeneratorNum).FCPM.ShutDownTime / DataGlobals::HoursInDay;
+            Real64 EndingFractionalDay = this->FCPM.FractionalDayofLastShutDown + this->FCPM.ShutDownTime / DataGlobals::HoursInDay;
 
             if (CurrentFractionalDay > EndingFractionalDay) {
                 // start up period is now over
-                FuelCell(GeneratorNum).FCPM.DuringShutDown = false;
+                this->FCPM.DuringShutDown = false;
             }
         }
         // compare
 
-        if (!(FuelCell(GeneratorNum).FCPM.DuringShutDown) && !(FuelCell(GeneratorNum).FCPM.DuringStartUp)) {
+        if (!(this->FCPM.DuringShutDown) && !(this->FCPM.DuringStartUp)) {
             // unit is neither starting or stopping and the only constraints would come from transient limits
-            if (Pel > FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering up
+            if (Pel > this->FCPM.PelLastTimeStep) { // powering up
                 // working variable for max allowed by transient constraint
-                Real64 MaxPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep + FuelCell(GeneratorNum).FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                Real64 MaxPel = this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
                 } else {
                     Constrained = false;
                 }
-            } else if (Pel < FuelCell(GeneratorNum).FCPM.PelLastTimeStep) { // powering down
+            } else if (Pel < this->FCPM.PelLastTimeStep) { // powering down
                // working variable for min allowed by transient constraint
-                Real64 MinPel = FuelCell(GeneratorNum).FCPM.PelLastTimeStep - FuelCell(GeneratorNum).FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                Real64 MinPel = this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -2840,13 +2818,13 @@ namespace FuelCellElectricGenerator {
 
         } // not in start up or shut down
 
-        if (FuelCell(GeneratorNum).FCPM.DuringStartUp) {
+        if (this->FCPM.DuringStartUp) {
             // constant during start up modeling artifact
-            Pel = FuelCell(GeneratorNum).FCPM.StartUpElectProd / FuelCell(GeneratorNum).FCPM.StartUpTime;
+            Pel = this->FCPM.StartUpElectProd / this->FCPM.StartUpTime;
             Constrained = true;
         }
 
-        if (FuelCell(GeneratorNum).FCPM.DuringShutDown) {
+        if (this->FCPM.DuringShutDown) {
 
             Pel = 0.0; // assumes no power generated during shut down
             Constrained = true;
@@ -2902,7 +2880,7 @@ namespace FuelCellElectricGenerator {
                 Real64 NdotGas = FuelCell(Num).AuxilHeat.NdotAuxMix;
                 Real64 TprodGasIn = FuelCell(Num).AuxilHeat.TauxMix;
                 Real64 CpProdGasMol;
-                FigureAuxilHeatGasHeatCap(Num, TprodGasIn, CpProdGasMol); // Cp in (J/mol*K)
+                FuelCell(Num).FigureAuxilHeatGasHeatCap(TprodGasIn, CpProdGasMol); // Cp in (J/mol*K)
                 // factor of 1000.0 for kmol -> mol
                 Real64 NdotCp = min(NdotGas * CpProdGasMol * 1000.0, NdotWater * CpWaterMol * 1000.0);
 
@@ -2934,7 +2912,7 @@ namespace FuelCellElectricGenerator {
                 // factor of 1000.0 for kmol -> mol
                 Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                 Real64 CpProdGasMol;
-                FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
+                FuelCell(Num).FigureAuxilHeatGasHeatCap(TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                 Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                 if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
@@ -2979,7 +2957,7 @@ namespace FuelCellElectricGenerator {
                 FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
                 Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                 Real64 CpProdGasMol;
-                FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
+                FuelCell(Num).FigureAuxilHeatGasHeatCap(TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                 Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                 if ((NdotCpWater != 0.0) && (NdotCpAuxMix != 0.0)) { // trap divide by zero
@@ -3021,7 +2999,7 @@ namespace FuelCellElectricGenerator {
                     FigureLiquidWaterHeatCap(TwaterIn, CpWaterMol);
                     Real64 NdotCpWater = NdotWater * CpWaterMol * 1000.0;
                     Real64 CpProdGasMol;
-                    FigureAuxilHeatGasHeatCap(Num, TauxMix, CpProdGasMol); // Cp in (J/mol*K)
+                    FuelCell(Num).FigureAuxilHeatGasHeatCap(TauxMix, CpProdGasMol); // Cp in (J/mol*K)
                     Real64 NdotCpAuxMix = NdotGas * CpProdGasMol * 1000.0;
 
                     // find water fraction in incoming gas stream
