@@ -79,6 +79,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -100,6 +101,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 
 namespace EnergyPlus {
 
@@ -1232,9 +1234,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                                 this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
@@ -1255,6 +1259,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Generator:InternalCombustionEngine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
