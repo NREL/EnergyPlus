@@ -890,7 +890,7 @@ Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem ob
 
 Allowed choices are: ScriptF (default) and CarrollMRT. ScriptF uses view factors among all surfaces in a zone and calculates radiant heat transfer from each surface in the zone to each other surface in the zone based on their respective temperatures and emissivities. The CarrollMRT algorithm calculates radiant heat transfer between surfaces which exchange heat through a central, mean radiant temperature (MRT) node.
 
-Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates "view factors" based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can "view" every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
+Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates ``view factors'' based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can ``view'' every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
 
 An IDF example:
 
