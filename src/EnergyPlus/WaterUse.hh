@@ -59,27 +59,23 @@ namespace EnergyPlus {
 
     namespace WaterUse {
 
-        // Using/Aliasing
+        enum struct HeatRecoveryHX
+        {
+            Ideal,
+            CounterFlow,
+            CrossFlow
+        };
 
-        // Data
-        // MODULE PARAMETER DEFINITIONS:
-        extern int const HeatRecoveryHXIdeal;
-        extern int const HeatRecoveryHXCounterFlow;
-        extern int const HeatRecoveryHXCrossFlow;
+        enum struct HeatRecoveryConfig
+        {
+            Plant,
+            Equipment,
+            PlantAndEquip
+        };
 
-        extern int const HeatRecoveryConfigPlant;
-        extern int const HeatRecoveryConfigEquipment;
-        extern int const HeatRecoveryConfigPlantAndEquip;
-
-        // DERIVED TYPE DEFINITIONS:
-
-        // MODULE VARIABLE TYPE DECLARATIONS:
-
-        // MODULE VARIABLE DECLARATIONS:
         extern int NumWaterEquipment;
         extern int NumWaterConnections;
-        // INTEGER :: MaxIterationsErrorCount =0
-        extern bool GetWaterUseInputFlag;
+        extern bool getWaterUseInputFlag;
 
         extern Array1D_bool CheckEquipName;
         extern Array1D_bool CheckPlantLoop;
@@ -166,8 +162,8 @@ namespace EnergyPlus {
             int TankDemandID; // array to request flow from supply tank
             int TankSupplyID; // array to send flow to recovery tank
             bool HeatRecovery;
-            int HeatRecoveryHX;
-            int HeatRecoveryConfig;
+            HeatRecoveryHX HeatRecoveryHX;
+            HeatRecoveryConfig HeatRecoveryConfig;
             Real64 HXUA;
             Real64 Effectiveness;
             Real64 RecoveryRate;
@@ -217,7 +213,7 @@ namespace EnergyPlus {
             // Default Constructor
             WaterConnectionsType()
                     : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
-                      TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHXIdeal), HeatRecoveryConfig(HeatRecoveryConfigPlant), HXUA(0.0),
+                      TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHX::Ideal), HeatRecoveryConfig(HeatRecoveryConfig::Plant), HXUA(0.0),
                       Effectiveness(0.0), RecoveryRate(0.0), RecoveryEnergy(0.0), MainsMassFlowRate(0.0), TankMassFlowRate(0.0), ColdMassFlowRate(0.0),
                       HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), RecoveryMassFlowRate(0.0), PeakVolFlowRate(0.0),
                       MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0), DrainVolFlowRate(0.0),

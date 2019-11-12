@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
@@ -85,36 +84,21 @@ namespace EnergyPlus {
         //       MODIFIED       Brent Griffith, plant upgrade
         //       RE-ENGINEERED  na
 
-        // MODULE PARAMETER DEFINITIONS:
-        int const HeatRecoveryHXIdeal(1);
-        int const HeatRecoveryHXCounterFlow(2);
-        int const HeatRecoveryHXCrossFlow(3);
-
-        int const HeatRecoveryConfigPlant(1);
-        int const HeatRecoveryConfigEquipment(2);
-        int const HeatRecoveryConfigPlantAndEquip(3);
-
-        static std::string const BlankString;
-
-        // MODULE VARIABLE DECLARATIONS:
-        int modNumWaterEquipment(0);
-        int modNumWaterConnections(0);
-        bool GetWaterUseInputFlag(true);
+        bool getWaterUseInputFlag(true);
+        int numWaterEquipment(0);
+        int numWaterConnections(0);
 
         Array1D_bool CheckEquipName;
-        Array1D_bool CheckPlantLoop;
 
-        // Object Data
         Array1D<WaterEquipmentType> WaterEquipment;
         Array1D<WaterConnectionsType> WaterConnections;
 
         void clear_state()
         {
-            modNumWaterEquipment = 0;
-            modNumWaterConnections = 0;
-            GetWaterUseInputFlag = true;
+            numWaterEquipment = 0;
+            numWaterConnections = 0;
+            getWaterUseInputFlag = true;
             CheckEquipName.deallocate();
-            CheckPlantLoop.deallocate();
             WaterEquipment.deallocate();
             WaterConnections.deallocate();
         }
@@ -141,18 +125,16 @@ namespace EnergyPlus {
             int WaterEquipNum;
             int WaterConnNum;
             int NumIteration;
-            int MaxIterationsErrorCount;
             bool MyEnvrnFlag(true);
 
             // FLOW:
-            if (GetWaterUseInputFlag) {
+            if (getWaterUseInputFlag) {
                 GetWaterUseInput();
-                GetWaterUseInputFlag = false;
+                getWaterUseInputFlag = false;
             }
 
             if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
-                MaxIterationsErrorCount = 0;
-                if (modNumWaterEquipment > 0) {
+                if (numWaterEquipment > 0) {
                     for (auto &e : WaterEquipment) {
                         e.SensibleRate = 0.0;
                         e.SensibleEnergy = 0.0;
@@ -164,7 +146,7 @@ namespace EnergyPlus {
                     }
                 }
 
-                if (modNumWaterConnections > 0) {
+                if (numWaterConnections > 0) {
                     for (auto &e : WaterConnections)
                         e.TotalMassFlowRate = 0.0;
                 }
@@ -175,7 +157,7 @@ namespace EnergyPlus {
             if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
 
             // Simulate all unconnected WATER USE EQUIPMENT objects
-            for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
+            for (WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
                 if (WaterEquipment(WaterEquipNum).Connections == 0) {
                     CalcEquipmentFlowRates(WaterEquipNum);
                     CalcEquipmentDrainTemp(WaterEquipNum);
@@ -185,7 +167,7 @@ namespace EnergyPlus {
             ReportStandAloneWaterUse();
 
             // Simulate WATER USE CONNECTIONS objects and connected WATER USE EQUIPMENT objects
-            for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
+            for (WaterConnNum = 1; WaterConnNum <= numWaterConnections; ++WaterConnNum) {
 
                 if (!WaterConnections(WaterConnNum).StandAlone) continue; // only model non plant connections here
 
@@ -247,14 +229,12 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             //  INTEGER :: WaterEquipNum
             int WaterConnNum;
-            int NumIteration;
-            int MaxIterationsErrorCount;
             bool MyEnvrnFlag(true);
 
             // FLOW:
-            if (GetWaterUseInputFlag) {
+            if (getWaterUseInputFlag) {
                 GetWaterUseInput();
-                GetWaterUseInputFlag = false;
+                getWaterUseInputFlag = false;
             }
 
             if (CompIndex == 0) {
@@ -265,9 +245,9 @@ namespace EnergyPlus {
                 CompIndex = WaterConnNum;
             } else {
                 WaterConnNum = CompIndex;
-                if (WaterConnNum > modNumWaterConnections || WaterConnNum < 1) {
+                if (WaterConnNum > numWaterConnections || WaterConnNum < 1) {
                     ShowFatalError("SimulateWaterUseConnection: Invalid CompIndex passed=" + General::TrimSigDigits(WaterConnNum) +
-                                   ", Number of Units=" + General::TrimSigDigits(modNumWaterConnections) + ", Entered Unit name=" + CompName);
+                                   ", Number of Units=" + General::TrimSigDigits(numWaterConnections) + ", Entered Unit name=" + CompName);
                 }
                 if (CheckEquipName(WaterConnNum)) {
                     if (CompName != WaterConnections(WaterConnNum).Name) {
@@ -283,14 +263,13 @@ namespace EnergyPlus {
             }
 
             if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
-                MaxIterationsErrorCount = 0;
-                if (modNumWaterEquipment > 0) {
+                if (numWaterEquipment > 0) {
                     for (int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i) {
                         WaterEquipment(i).reset();
                     }
                 }
 
-                if (modNumWaterConnections > 0) {
+                if (numWaterConnections > 0) {
                     for (auto &e : WaterConnections)
                         e.TotalMassFlowRate = 0.0;
                 }
@@ -302,7 +281,7 @@ namespace EnergyPlus {
 
             InitConnections(WaterConnNum);
 
-            NumIteration = 0;
+            int NumIteration = 0;
 
             while (true) {
                 ++NumIteration;
@@ -350,21 +329,15 @@ namespace EnergyPlus {
             int IOStatus;                   // Used in GetObjectItem
             int NumAlphas;                  // Number of Alphas for each GetObjectItem call
             int NumNumbers;                 // Number of Numbers for each GetObjectItem call
-            // unused1208  INTEGER                        :: NumArgs
-            int WaterEquipNum;
-            int WaterConnNum;
             int AlphaNum;
-            int thisWaterEquipNum;
-
-            // FLOW:
 
             DataIPShortCuts::cCurrentModuleObject = "WaterUse:Equipment";
-            modNumWaterEquipment = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+            numWaterEquipment = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-            if (modNumWaterEquipment > 0) {
-                WaterEquipment.allocate(modNumWaterEquipment);
+            if (numWaterEquipment > 0) {
+                WaterEquipment.allocate(numWaterEquipment);
 
-                for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
+                for (int WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
                     inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                                   WaterEquipNum,
                                                   DataIPShortCuts::cAlphaArgs,
@@ -463,12 +436,12 @@ namespace EnergyPlus {
             }
 
             DataIPShortCuts::cCurrentModuleObject = "WaterUse:Connections";
-            modNumWaterConnections = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+            numWaterConnections = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-            if (modNumWaterConnections > 0) {
-                WaterConnections.allocate(modNumWaterConnections);
+            if (numWaterConnections > 0) {
+                WaterConnections.allocate(numWaterConnections);
 
-                for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
+                for (int WaterConnNum = 1; WaterConnNum <= numWaterConnections; ++WaterConnNum) {
                     inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                                   WaterConnNum,
                                                   DataIPShortCuts::cAlphaArgs,
@@ -559,11 +532,11 @@ namespace EnergyPlus {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
                             if (SELECT_CASE_var == "IDEAL") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXIdeal;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::Ideal;
                             } else if (SELECT_CASE_var == "COUNTERFLOW") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXCounterFlow;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::CounterFlow;
                             } else if (SELECT_CASE_var == "CROSSFLOW") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXCrossFlow;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::CrossFlow;
                             } else {
                                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
                                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -574,11 +547,11 @@ namespace EnergyPlus {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(9));
                             if (SELECT_CASE_var == "PLANT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigPlant;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::Plant;
                             } else if (SELECT_CASE_var == "EQUIPMENT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEquipment;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::Equipment;
                             } else if (SELECT_CASE_var == "PLANTANDEQUIPMENT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigPlantAndEquip;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::PlantAndEquip;
                             } else {
                                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
                                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -592,7 +565,7 @@ namespace EnergyPlus {
                     WaterConnections(WaterConnNum).WaterEquipment.allocate(NumAlphas - 9);
 
                     for (AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum) {
-                        WaterEquipNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(AlphaNum), WaterEquipment);
+                        int WaterEquipNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(AlphaNum), WaterEquipment);
 
                         if (WaterEquipNum == 0) {
                             ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(AlphaNum) + '=' + DataIPShortCuts::cAlphaArgs(AlphaNum));
@@ -621,20 +594,18 @@ namespace EnergyPlus {
 
                 if (ErrorsFound) ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
 
-                if (modNumWaterConnections > 0) {
-                    CheckEquipName.allocate(modNumWaterConnections);
-                    CheckPlantLoop.allocate(modNumWaterConnections);
+                if (numWaterConnections > 0) {
+                    CheckEquipName.allocate(numWaterConnections);
                     CheckEquipName = true;
-                    CheckPlantLoop = true;
                 }
             }
 
             // determine connection's peak mass flow rates.
-            if (modNumWaterConnections > 0) {
-                for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
+            if (numWaterConnections > 0) {
+                for (int WaterConnNum = 1; WaterConnNum <= numWaterConnections; ++WaterConnNum) {
                     WaterConnections(WaterConnNum).PeakMassFlowRate = 0.0;
-                    for (WaterEquipNum = 1; WaterEquipNum <= WaterConnections(WaterConnNum).NumWaterEquipment; ++WaterEquipNum) {
-                        thisWaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(WaterEquipNum);
+                    for (int WaterEquipNum = 1; WaterEquipNum <= WaterConnections(WaterConnNum).NumWaterEquipment; ++WaterEquipNum) {
+                        int thisWaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(WaterEquipNum);
                         if (WaterEquipment(thisWaterEquipNum).Zone > 0) {
                             WaterConnections(WaterConnNum).PeakMassFlowRate +=
                                     WaterEquipment(thisWaterEquipNum).PeakVolFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp) *
@@ -651,7 +622,7 @@ namespace EnergyPlus {
 
             // Setup EQUIPMENT report variables (now that connections have been established)
             // CurrentModuleObject='WaterUse:Equipment'
-            for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
+            for (int WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
 
                 SetupOutputVariable("Water Use Equipment Hot Water Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -868,7 +839,7 @@ namespace EnergyPlus {
 
             // Setup CONNECTIONS report variables (don't put any on meters; they are metered at WATER USE EQUIPMENT level)
             // CurrentModuleObject='WaterUse:Connections'
-            for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
+            for (int WaterConnNum = 1; WaterConnNum <= numWaterConnections; ++WaterConnNum) {
 
                 SetupOutputVariable("Water Use Connections Hot Water Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -1043,17 +1014,10 @@ namespace EnergyPlus {
             // PURPOSE OF THIS SUBROUTINE:
             // Calculate desired hot and cold water flow rates
 
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            int WaterConnNum;
-
-            // FLOW:
-            WaterConnNum = WaterEquipment(WaterEquipNum).Connections;
-
-            if (WaterConnNum > 0) {
+            if (WaterEquipment(WaterEquipNum).Connections > 0) {
                 // Get water temperature conditions from the CONNECTIONS object
-                WaterEquipment(WaterEquipNum).ColdTemp = WaterConnections(WaterConnNum).ColdTemp;
-                WaterEquipment(WaterEquipNum).HotTemp = WaterConnections(WaterConnNum).HotTemp;
+                WaterEquipment(WaterEquipNum).ColdTemp = WaterConnections(WaterEquipment(WaterEquipNum).Connections).ColdTemp;
+                WaterEquipment(WaterEquipNum).HotTemp = WaterConnections(WaterEquipment(WaterEquipNum).Connections).HotTemp;
 
             } else {
                 // Get water temperature conditions from the WATER USE EQUIPMENT schedules
@@ -1254,13 +1218,13 @@ namespace EnergyPlus {
             Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
             bool errFlag;
 
-            if (MyOneTimeFlag) {                                       // DSU
-                SetLoopIndexFlag.dimension(modNumWaterConnections, true); // DSU
-                MyOneTimeFlag = false;                                 // DSU
-            }                                                          // DSU
+            if (MyOneTimeFlag) {                                       
+                SetLoopIndexFlag.dimension(numWaterConnections, true); 
+                MyOneTimeFlag = false;                                 
+            }                                                          
 
-            if (SetLoopIndexFlag(WaterConnNum)) {                                         // DSU
-                if (allocated(DataPlant::PlantLoop) && !WaterConnections(WaterConnNum).StandAlone) { // DSU
+            if (SetLoopIndexFlag(WaterConnNum)) {                                         
+                if (allocated(DataPlant::PlantLoop) && !WaterConnections(WaterConnNum).StandAlone) { 
                     errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(WaterConnections(WaterConnNum).Name,
                                                             DataPlant::TypeOf_WaterUseConnection,
@@ -1273,12 +1237,12 @@ namespace EnergyPlus {
                                                             _,
                                                             _,
                                                             _,
-                                                            _);                                                        // DSU | DSU | DSU | DSU | DSU | DSU | DSU
-                    if (errFlag) {                                                                           // DSU
-                        ShowFatalError("InitConnections: Program terminated due to previous condition(s)."); // DSU
-                    }                                                                                        // DSU
-                    SetLoopIndexFlag(WaterConnNum) = false;                                                  // DSU
-                }                                                                                            // DSU
+                                                            _);                                                       
+                    if (errFlag) {                                                                           
+                        ShowFatalError("InitConnections: Program terminated due to previous condition(s)."); 
+                    }                                                                                        
+                    SetLoopIndexFlag(WaterConnNum) = false;                                                  
+                }                                                                                            
                 if (WaterConnections(WaterConnNum).StandAlone) SetLoopIndexFlag(WaterConnNum) = false;
             }
 
@@ -1408,17 +1372,12 @@ namespace EnergyPlus {
                                                              LoopSideNum,
                                                              WaterConnections(WaterConnNum).PlantLoopBranchNum,
                                                              WaterConnections(WaterConnNum).PlantLoopCompNum);
-                        // DSU3   Node(InletNode)%MassFlowRate = MIN(WaterConnections(WaterConnNum)%HotMassFlowRate, Node(InletNode)%MassFlowRateMaxAvail)
-                        // DSU3   Node(InletNode)%MassFlowRate = MAX(WaterConnections(WaterConnNum)%HotMassFlowRate, Node(InletNode)%MassFlowRateMinAvail)
                         // readjust if more than actual available mass flow rate determined by the demand side manager
                         if ((WaterConnections(WaterConnNum).HotMassFlowRate != DesiredHotWaterMassFlow) &&
                             (WaterConnections(WaterConnNum).HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 
-                            // DSU3   Node(InletNode)%MassFlowRate = Node(InletNode)%MassFlowRateMaxAvail
-
                             AvailableFraction = DesiredHotWaterMassFlow / WaterConnections(WaterConnNum).HotMassFlowRate;
 
-                            // DSU3    WaterConnections(WaterConnNum)%HotMassFlowRate = Node(InletNode)%MassFlowRateMaxAvail
                             WaterConnections(WaterConnNum).ColdMassFlowRate =
                                     WaterConnections(WaterConnNum).TotalMassFlowRate -
                                     WaterConnections(WaterConnNum).HotMassFlowRate; // Preserve the total mass flow rate
@@ -1542,11 +1501,11 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryConfig);
-                    if (SELECT_CASE_var == HeatRecoveryConfigPlant) {
+                    if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
                         WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).HotMassFlowRate;
-                    } else if (SELECT_CASE_var == HeatRecoveryConfigEquipment) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
                         WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).ColdMassFlowRate;
-                    } else if (SELECT_CASE_var == HeatRecoveryConfigPlantAndEquip) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
                         WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).TotalMassFlowRate;
                     }
                 }
@@ -1557,10 +1516,10 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryHX);
-                    if (SELECT_CASE_var == HeatRecoveryHXIdeal) {
+                    if (SELECT_CASE_var == HeatRecoveryHX::Ideal) {
                         WaterConnections(WaterConnNum).Effectiveness = 1.0;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryHXCounterFlow) { // Unmixed
+                    } else if (SELECT_CASE_var == HeatRecoveryHX::CounterFlow) { // Unmixed
                         CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                         NTU = WaterConnections(WaterConnNum).HXUA / MinCapacityRate;
                         if (CapacityRatio == 1.0) {
@@ -1570,7 +1529,7 @@ namespace EnergyPlus {
                             WaterConnections(WaterConnNum).Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
                         }
 
-                    } else if (SELECT_CASE_var == HeatRecoveryHXCrossFlow) { // Unmixed
+                    } else if (SELECT_CASE_var == HeatRecoveryHX::CrossFlow) { // Unmixed
                         CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                         NTU = WaterConnections(WaterConnNum).HXUA / MinCapacityRate;
                         WaterConnections(WaterConnNum).Effectiveness =
@@ -1600,19 +1559,18 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryConfig);
-                    if (SELECT_CASE_var == HeatRecoveryConfigPlant) {
+                    if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
                         WaterConnections(WaterConnNum).TempError = 0.0; // No feedback back to the cold supply
-                        // WaterConnections(WaterConnNum)%ColdTemp = WaterConnections(WaterConnNum)%ColdSupplyTemp
                         WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).RecoveryTemp;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryConfigEquipment) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
                         WaterConnections(WaterConnNum).TempError =
                                 std::abs(WaterConnections(WaterConnNum).ColdTemp - WaterConnections(WaterConnNum).RecoveryTemp);
 
                         WaterConnections(WaterConnNum).ColdTemp = WaterConnections(WaterConnNum).RecoveryTemp;
                         WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryConfigPlantAndEquip) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
                         WaterConnections(WaterConnNum).TempError =
                                 std::abs(WaterConnections(WaterConnNum).ColdTemp - WaterConnections(WaterConnNum).RecoveryTemp);
 
@@ -1648,7 +1606,6 @@ namespace EnergyPlus {
             if (InletNode > 0 && OutletNode > 0) {
                 // Pass all variables from inlet to outlet node
                 PlantUtilities::SafeCopyPlantNode(InletNode, OutletNode, LoopNum);
-                // DSU3 Node(OutletNode) = Node(InletNode)
 
                 // Set outlet node variables that are possibly changed
                 DataLoopNode::Node(OutletNode).Temp = WaterConnections(WaterConnNum).ReturnTemp;
@@ -1675,7 +1632,7 @@ namespace EnergyPlus {
             int WaterEquipNum;
 
             // FLOW:
-            for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
+            for (WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
                 WaterEquipment(WaterEquipNum).ColdVolFlowRate =
                         WaterEquipment(WaterEquipNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
                 WaterEquipment(WaterEquipNum).HotVolFlowRate =
@@ -1793,7 +1750,7 @@ namespace EnergyPlus {
             bool MyEnvrnFlag(true);
 
             // FLOW:
-            if (modNumWaterEquipment == 0) return;
+            if (numWaterEquipment == 0) return;
 
             if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
                 for (auto &e : WaterEquipment) {
@@ -1817,7 +1774,7 @@ namespace EnergyPlus {
 
             if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
 
-            for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
+            for (WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
                 if (WaterEquipment(WaterEquipNum).Zone == 0) continue;
                 ZoneNum = WaterEquipment(WaterEquipNum).Zone;
                 WaterEquipment(WaterEquipNum).SensibleRateNoMultiplier =
