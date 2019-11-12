@@ -6669,34 +6669,18 @@ namespace DXCoils {
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
         using namespace OutputReportPredefined;
-        using DataAirSystems::PrimaryAirSystem;
         using StandardRatings::CalcDXCoilStandardRating;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 rhoair;
-        Real64 MixTemp;
-        Real64 MixHumRat;
-        Real64 MixEnth;
-        Real64 MixWetBulb;
-        Real64 SupTemp;
-        Real64 SupHumRat;
-        Real64 SupEnth;
-        Real64 OutTemp;
-        Real64 OutAirFrac;
-        Real64 CoilInTemp;
-        Real64 VolFlowRate;
-        Real64 CoolCapAtPeak;
-        Real64 TotCapTempModFac;
-        Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity[m3/s-W)
-        int TimeStepNumAtMax;
-        int DDNum;
-        int CapacityStageNum;    // Loop index for 1,Number of capacity stages
-        int DehumidModeNum;      // Loop index for 1,Number of enhanced dehumidification modes
-        int Mode;                // Operating mode for MultiMode DX coil; Always 1 for other coil types
-        int NumOfSpeedCompanion; // Number of speed for a companion cooling coil (Multispeed HO heating coil only
+        Real64 CoilInTemp;                      // DX coil inlet temperature
+        Real64 RatedVolFlowPerRatedTotCap;      // Rated Air Volume Flow Rate divided by Rated Total Capacity[m3/s-W)
+        int CapacityStageNum;                   // Loop index for 1,Number of capacity stages
+        int DehumidModeNum;                     // Loop index for 1,Number of enhanced dehumidification modes
+        int Mode;                               // Operating mode for MultiMode DX coil; Always 1 for other coil types
+        int NumOfSpeedCompanion;                // Number of speed for a companion cooling coil (Multispeed HO heating coil only
         std::string equipName;
         Real64 RatedAirVolFlowRateDes;          // Design rated air volume flow for reporting
         Real64 RatedAirVolFlowRateUser;         // Hard-sized rated air volume flow for reporting
@@ -6722,7 +6706,7 @@ namespace DXCoils {
         Real64 DefrostCapacityUser;             // Hard-sized defrost heater capacity for reporting
         Real64 MSRatedAirVolFlowRateDes;        // Design multispeed rated air volume flow rate for reporting
         Real64 MSRatedAirVolFlowRateUser;       // Hard-sized multispeed rated air volume flow rate for reporting
-        //Real64 MSRatedTotCapDes;                // Design multispeed rated total capacity for reporting
+        Real64 MSRatedTotCapDesAtMaxSpeed;      // Design multispeed rated total capacity for reporting (at maximum speed)
         Real64 MSRatedTotCapUser;               // Hard-sized multispeed rated total capacity for reporting
         Real64 MSRatedSHRDes;                   // Design multispeed rated SHR for reporting
         Real64 MSRatedSHRUser;                  // Hard-sized multispeed rated SHR for reporting
@@ -6752,7 +6736,6 @@ namespace DXCoils {
         bool SizeSecDXCoil;                     // if true do sizing calculation for secondary coil
         Real64 SecCoilAirFlowDes;               // Design secondary DX coil air flow for reporting
         Real64 SecCoilAirFlowUser;              // Hard-sized secondary DX coil air flow for reporting
-        Real64 MSRatedTotCapDesAtMaxSpeed;      // Design multispeed rated total capacity at maximum speed 
 
         // Initiate all reporting variables
         if (SysSizingRunDone || ZoneSizingRunDone) {
