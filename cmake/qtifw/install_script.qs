@@ -182,8 +182,10 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   // "CopyAndRegisterSystemDLLs", "Libraries"
 
 
-  // Linux/Mac: Packages: Symlinks Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
-  // Windows:   Packages: RegisterFileType CopyAndRegisterSystemDLLs CreateStartMenu Libraries Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
+  // Linux/Mac: Packages: Symlinks
+  //                      Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
+  // Windows:   Packages: RegisterFileType CopyAndRegisterSystemDLLs CreateStartMenu Libraries
+  //                      Datasets Documentation ExampleFiles Licenses Unspecified WeatherData
 
   gui.clickButton(buttons.NextButton);
 };
@@ -198,14 +200,18 @@ Controller.prototype.LicenseAgreementPageCallback = function() {
 Controller.prototype.StartMenuDirectoryPageCallback = function() {
   console.log("---- START MENU DIRECTORY PAGE");
   logCurrentPage();
-  if (systemInfo.kernelType == "winnt") { // You won't get in this callback if it wasn't...
+
+  // You won't get in this callback if it wasn't already Windows, but let's be explicit & safe
+  if (systemInfo.kernelType == "winnt") {
     // TODO: extra logging for debug for now
     console.log("installer StartMenuDir: " + installer.value("StartMenuDir"));
     console.log("Text: " + gui.currentPageWidget().StartMenuPathLineEdit.text);
     console.log("AllUsersStartMenuProgramsPath: " + installer.value("AllUsersStartMenuProgramsPath"));
     console.log("UserStartMenuProgramsPath: " + installer.value("UserStartMenuProgramsPath"));
     if (installer.value("UseAllUsersStartMenu") === "true") {
-      console.log("Will use the All Users Start Menu at: " + installer.value("AllUsersStartMenuProgramsPath"));
+      console.log("Will use the **All** Users Start Menu at: " + installer.value("AllUsersStartMenuProgramsPath"));
+    } else {
+      console.log("Will use this Users' Start Menu at: " + installer.value("UserStartMenuProgramsPath"));
     }
   }
   gui.clickButton(buttons.NextButton);
