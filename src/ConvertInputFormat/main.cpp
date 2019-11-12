@@ -147,7 +147,7 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory)
+bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -272,12 +272,14 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         EnergyPlus::FileSystem::makeNativePath(convertedEpJSON);
         std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
         convertedFS << input_file << std::endl;
+        outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
         auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
         std::string convertedIDF(outputDirectory + inputFileNameOnly + ".epJSON");
         EnergyPlus::FileSystem::makeNativePath(convertedIDF);
         std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
         convertedFS << input_file << std::endl;
+        outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
         std::string convertedCBOR(outputDirectory + inputFileNameOnly + ".cbor");
         EnergyPlus::FileSystem::makeNativePath(convertedCBOR);
@@ -500,7 +502,7 @@ int main(int argc, const char *argv[])
     {
 #pragma omp for
         for (std::size_t i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory);
+            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
 #pragma omp atomic
             ++fileCount;
             if (successful) {
