@@ -505,11 +505,20 @@ endif ()
 
 ##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
-# Set to TRUE to install the Windows Universal CRT libraries for app-local deployment (e.g. to Windows XP).
-# This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
-SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-INCLUDE(InstallRequiredSystemLibraries)
-INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
+# Add compiler-provided system runtime libraries
+if( WIN32 AND NOT UNIX )
+  # Skip the call to install(PROGRAMS) so we can specify our own install rule (using the value of `CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS`)
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+
+  # Set to TRUE to install the Windows Universal CRT libraries for app-local deployment (e.g. to Windows XP, but apparently needed for Windows 8 too).
+  # This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
+  SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+
+  include(InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
+  endif()
+endif()
 
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
@@ -587,10 +596,12 @@ cpack_add_component(CopyAndRegisterSystemDLLs
   HIDDEN
 )
 
-#cpack_add_component(Libraries
-#  DISPLAY_NAME "Install required system libraries"
-#  DESCRIPTION  "This is probably not required right now..."
-#)
+cpack_add_component(Libraries
+  DISPLAY_NAME "Install required system libraries"
+  DESCRIPTION  "Install compiler-provided system runtime libraries, and Windows Universal CRT libraries for app-local deployment"
+  REQUIRED
+  HIDDEN
+)
 
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
