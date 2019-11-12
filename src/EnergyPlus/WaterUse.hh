@@ -73,20 +73,12 @@ namespace EnergyPlus {
             PlantAndEquip
         };
 
-        extern int NumWaterEquipment;
-        extern int NumWaterConnections;
         extern bool getWaterUseInputFlag;
 
         extern Array1D_bool CheckEquipName;
-        extern Array1D_bool CheckPlantLoop;
-
-        // SUBROUTINE SPECIFICATIONS:
-
-        // Types
 
         struct WaterEquipmentType
         {
-            // Members
             std::string Name; // Name of DHW
             std::string EndUseSubcatName;
             int Connections;          // Index for WATER USE CONNECTIONS object
@@ -124,7 +116,6 @@ namespace EnergyPlus {
             Real64 Power;       // Heating rate required to meet the mixed water temperature (W)
             Real64 Energy;      // Heating energy required to meet the mixed water temperature (J)
 
-            // Default Constructor
             WaterEquipmentType()
                     : Connections(0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
                       ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0),
@@ -150,7 +141,6 @@ namespace EnergyPlus {
 
         struct WaterConnectionsType
         {
-            // Members
             std::string Name; // Name of DHW
             bool Init;        // Flag for initialization:  TRUE means do the init
             bool InitSizing;  // Flag for initialization of plant sizing
@@ -210,7 +200,6 @@ namespace EnergyPlus {
             int PlantLoopBranchNum;
             int PlantLoopCompNum;
 
-            // Default Constructor
             WaterConnectionsType()
                     : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
                       TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHX::Ideal), HeatRecoveryConfig(HeatRecoveryConfig::Plant), HXUA(0.0),
@@ -225,18 +214,11 @@ namespace EnergyPlus {
             }
         };
 
-        // Object Data
-        extern Array1D<WaterEquipmentType> WaterEquipment;
-        extern Array1D<WaterConnectionsType> WaterConnections;
-
-        // Functions
-
         void clear_state();
 
         void SimulateWaterUse(bool FirstHVACIteration);
 
-        void SimulateWaterUseConnection(
-                int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
+        void SimulateWaterUseConnection(int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
         void GetWaterUseInput();
 
@@ -259,6 +241,10 @@ namespace EnergyPlus {
         void ReportWaterUse(int WaterConnNum);
 
         void CalcWaterUseZoneGains();
+
+        extern Array1D<WaterEquipmentType> WaterEquipment;
+
+        extern Array1D<WaterConnectionsType> WaterConnections;
 
     } // namespace WaterUse
 
