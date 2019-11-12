@@ -3964,6 +3964,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).MSErrIndex.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSErrIndex = 0;
             DXCoil(DXCoilNum).MSRatedTotCap.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+            DXCoil(DXCoilNum).MSRatedTotCapDes.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSRatedSHR.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSRatedCOP.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
             DXCoil(DXCoilNum).MSRatedAirVolFlowRate.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
@@ -7394,6 +7395,7 @@ namespace DXCoils {
                         DataConstantUsedForSizing = TempSize;
                         DataFractionUsedForSizing = 1.0;
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
+                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = TempSize;
                         PrintFlag = true;
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
@@ -7401,6 +7403,7 @@ namespace DXCoils {
                     DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
+                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = TempSize;
                     }
                 } else {
                     // cooling capacity at lower speeds
@@ -7417,6 +7420,7 @@ namespace DXCoils {
                             DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedTotCap( DXCoil( DXCoilNum ).NumOfSpeeds );
                         }
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
+                        DXCoil( DXCoilNum ).MSRatedTotCapDes( Mode ) = DataConstantUsedForSizing * DataFractionUsedForSizing;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
@@ -7789,18 +7793,18 @@ namespace DXCoils {
                         DataFractionUsedForSizing = 1.0;
                         if (DXCoil(DXCoilNum).CompanionUpstreamDXCoil > 0) {
                             NumOfSpeedCompanion = DXCoil(DXCoil(DXCoilNum).CompanionUpstreamDXCoil).NumOfSpeeds;
-                            DataConstantUsedForSizing = DXCoil(DXCoil(DXCoilNum).CompanionUpstreamDXCoil).MSRatedTotCap(NumOfSpeedCompanion);
+                            DataConstantUsedForSizing = DXCoil(DXCoil(DXCoilNum).CompanionUpstreamDXCoil).MSRatedTotCapDes(NumOfSpeedCompanion);
                         } else {
                             DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(1); // sized above
                         }
-                        TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                        TempSize = DataSizing::AutoSize;
                         DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                         DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
                         RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                        MSRatedTotCapDesAtMaxSpeed = TempSize;
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
                         DataFractionUsedForSizing = 1.0;
-                        MSRatedTotCapDesAtMaxSpeed = TempSize;
                     }
                     PrintFlag = true;
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
@@ -7811,7 +7815,6 @@ namespace DXCoils {
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
                     }
-
                 } else {
                     PrintFlag = true;
                     SizingMethod = HeatingCapacitySizing;
