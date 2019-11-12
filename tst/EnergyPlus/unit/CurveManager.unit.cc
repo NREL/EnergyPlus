@@ -84,5 +84,70 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
 
     EXPECT_EQ(1.0, PerfCurve(1).CurveMax);
     EXPECT_TRUE(PerfCurve(1).CurveMaxPresent);
+}
 
+
+TEST_F(EnergyPlusFixture, QuadraticCurveTest)
+{
+    std::string const idf_quadratic = delimited_string({
+        "CURVE:QUADLINEAR,",
+        "  MinDsnWBCurveName, ! Curve Name",
+        "  -3.3333,           ! CoefficientC1",
+        "  0.0,               ! CoefficientC2",
+        "  38.9,              ! CoefficientC3",
+        "  0.,                ! CoefficientC4",
+        "  0.,                ! CoefficientC5",
+        "  -30.,              ! Minimum Value of w",
+        "  40.,               ! Maximum Value of w",
+        "  0.,                ! Minimum Value of x",
+        "  1.,                ! Maximum Value of x",
+        "  10.,               ! Minimum Value of y",
+        "  8.,                ! Maximum Value of y",
+        "  1E-8,              ! Minimum Value of z",
+        "  8E-8,              ! Maximum Value of z",
+        "  0.,                ! Minimum Curve Output",
+        "  38.;               ! Maximum Curve Output",
+    });
+
+    ASSERT_TRUE(process_idf(idf_quadratic));
+    EXPECT_EQ(0, CurveManager::NumCurves);
+    CurveManager::GetCurveInput();
+    CurveManager::GetCurvesInputFlag = false;
+    ASSERT_EQ(1, CurveManager::NumCurves);
+
+    EXPECT_EQ(1.0, PerfCurve(1).CurveMax);
+    EXPECT_TRUE(PerfCurve(1).CurveMaxPresent);
+}
+
+
+TEST_F(EnergyPlusFixture, TableLookup)
+{
+    std::string const idf_table = delimited_string({
+        "Table:Lookup,",
+        "  HPACCoolCapFT,           !- Name",
+        "  HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name",
+        "  AutomaticWithDivisor,    !- Normalization Method",
+        "  ,                        !- Normalization Divisor",
+        "  0,                       !- Minimum Output",
+        "  40000,                   !- Maximum Output",
+        "  Dimensionless,           !- Output Unit Type",
+        "  ,                        !- External File Name",
+        "  ,                        !- External File Column Number",
+        "  ,                        !- External File Starting Row Number",
+        "  24421.69383, 22779.73113, 21147.21662, 19794.00525, 19524.15032, 18178.81244, 16810.36004,",
+        "  25997.3589,  24352.1562,  22716.4017,  21360.49033, 21090.0954,  19742.05753, 18370.84513,",
+        "  28392.31868, 26742.74198, 25102.61348, 23743.0571,  23471.93318, 22120.2503,  20745.3119,",
+        "  29655.22876, 28003.546,   26361.31143, 25000,       24728.52506, 23375.08713, 21998.35468,",
+        "  31094.97495, 29441.02425, 27796.52175, 26433.32038, 26161.46745, 24806.13958, 23427.47518,",
+        "  33988.3473,  32330.1846,  30681.4701,  29314.75872, 29042.2038,  27683.36592, 26301.11353;",
+        });
+
+    ASSERT_TRUE(process_idf(idf_table));
+    EXPECT_EQ(0, CurveManager::NumCurves);
+    CurveManager::GetCurveInput();
+    CurveManager::GetCurvesInputFlag = false;
+    ASSERT_EQ(1, CurveManager::NumCurves);
+
+    EXPECT_EQ(1.0, PerfCurve(1).CurveMax);
+    EXPECT_TRUE(PerfCurve(1).CurveMaxPresent);
 }

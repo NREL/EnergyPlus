@@ -2028,8 +2028,6 @@ namespace CurveManager {
                     normalizationDivisor = fields.at("normalization_divisor");
                 }
 
-                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;  // TODO: Remove/Fix use in Hybrid Unitary
-
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
                     std::string filePath = fields.at("external_file_name");
@@ -2088,11 +2086,28 @@ namespace CurveManager {
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
                         // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
-                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor);
+                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor)*normalizationDivisor*normalizationDivisor;
                     }
+                }
 
-              }
+                // Perform Divisor Normalization for methods: NM_DIVISOR_ONLY || NM_AUTO_WITH_DIVISOR
+                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;
 
+                if (normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMaxPresent) {
+                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                }
+                if (normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMinPresent) {
+                    PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                }
+
+                if (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMaxPresent) {
+                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                }
+                if (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMinPresent) {
+                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                }
             }
         }
         btwxtManager.tableFiles.clear();
@@ -2127,8 +2142,8 @@ namespace CurveManager {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
-        grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+    double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
+        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear() {
