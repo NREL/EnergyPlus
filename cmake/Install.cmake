@@ -26,23 +26,25 @@ if (UNIX)
   set(CPACK_BINARY_NSIS    OFF CACHE BOOL "Recommended OFF")
 
   if(APPLE)
-    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
-    set(CPACK_BINARY_STGZ    OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_IFW   ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ OFF CACHE BOOL "Recommended OFF")
 
     # Mac Specific options to turn off
     set(CPACK_BINARY_BUNDLE        OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_DRAGNDROP     OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_OSXX11        OFF CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW.")
+    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW")
     set(CPACK_BINRARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
-    set(CPACK_BINARY_IFW     OFF CACHE BOOL "This should be off")
-    set(CPACK_BINARY_STGZ ON CACHE BOOL "Enable to build a Linux sh installer script, which is the recommended method") # Uses STGZ currently (install .sh script CACHE BOOL)
+    # TODO: Make IFW recommended? Deprecate STGZ?
+    set(CPACK_BINARY_IFW   ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ  ON CACHE BOOL "Enable to build a Linux sh installer script, which is the legacy method")
 
     # Unix (non Apple CACHE BOOL) specific option to turn off
     set(CPACK_BINARY_TZ  OFF CACHE BOOL "Recommended OFF")
   endif()
+
   # Tar.gz for inclusion in other programs for eg
   set(CPACK_BINARY_TGZ    ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
 
@@ -395,6 +397,8 @@ endif()
 #set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
 set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/release/ep_nobg.png")
 
+# TODO: TEMP
+set(CPACK_IFW_VERBOSE ON)
 
 if( APPLE )
   set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
@@ -417,32 +421,11 @@ if( APPLE )
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.icns")
-elseif(WIN32)
+elseif(UNIX)
+  set(CPACK_PACKAGE_DEFAULT_LOCATION "/usr/local")
+  set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+  set(CPACK_IFW_TARGET_DIRECTORY "/usr/local/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
 
-  # TODO: TEMP
-  set(CPACK_IFW_VERBOSE ON)
-
-  # Will also set CPACK_IFW_PACKAGE_START_MENU_DIRECTORY (name of default program group in Windows start menu)
-  set(CPACK_IFW_PACKAGE_NAME "EnergyPlusV${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
-
-  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_IFW_PACKAGE_NAME}" )
-  set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
-
-    # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
-  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.ico")
-
-  # You need at least one "install(..." command for it to be registered as a component
-  install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
-  install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
-  install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
-
-endif()
-
-if(UNIX)
-  install(FILES doc/man/energyplus.1 DESTINATION "./")
-endif()
-
-if( UNIX AND NOT APPLE )
   INSTALL(PROGRAMS "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare" DESTINATION "PostProcess/EP-Compare/")
   INSTALL(FILES "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHInterfaces5001.so" DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
   INSTALL(FILES "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Linux/EP-Compare Libs/EHObjectArray5001.so" DESTINATION "PostProcess/EP-Compare/EP-Compare Libs/")
@@ -463,6 +446,29 @@ if( UNIX AND NOT APPLE )
   install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
+
+  # You need at least one "install(..." command for it to be registered as a component
+  install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+elseif(WIN32)
+
+  # Will also set CPACK_IFW_PACKAGE_START_MENU_DIRECTORY (name of default program group in Windows start menu)
+  set(CPACK_IFW_PACKAGE_NAME "EnergyPlusV${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
+
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_IFW_PACKAGE_NAME}" )
+  set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
+
+    # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
+  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.ico")
+
+  # You need at least one "install(..." command for it to be registered as a component
+  install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
+  install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
+  install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
+
+endif()
+
+if(UNIX)
+  install(FILES doc/man/energyplus.1 DESTINATION "./")
 endif()
 
 # TODO: Unused now
