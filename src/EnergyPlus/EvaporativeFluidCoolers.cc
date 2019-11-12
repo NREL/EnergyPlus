@@ -188,7 +188,7 @@ namespace EvaporativeFluidCoolers {
                                                      DataIPShortCuts::cAlphaFieldNames(1),
                                                      ErrorsFound);
 
-            auto thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
+            auto &thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = DataIPShortCuts::cCurrentModuleObject;
@@ -446,8 +446,6 @@ namespace EvaporativeFluidCoolers {
                 ErrorsFound = true;
             }
 
-            thisEFC.setupOutputVars();
-
         } // End Single-Speed Evaporative Fluid Cooler Loop
 
         DataIPShortCuts::cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
@@ -471,7 +469,7 @@ namespace EvaporativeFluidCoolers {
                                                      DataIPShortCuts::cAlphaFieldNames(1),
                                                      ErrorsFound);
 
-            auto thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
+            auto &thisEFC = SimpleEvapFluidCooler(EvapFluidCoolerNum);
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = DataIPShortCuts::cCurrentModuleObject;
@@ -817,8 +815,6 @@ namespace EvaporativeFluidCoolers {
                 ErrorsFound = true;
             }
 
-            thisEFC.setupOutputVars();
-
         } // End Two-Speed Evaporative Fluid Cooler Loop
 
         if (ErrorsFound) {
@@ -1050,6 +1046,8 @@ namespace EvaporativeFluidCoolers {
 
         bool ErrorsFound(false); // Flag if input data errors are found
         if (this->MyOneTimeFlag) {
+
+            this->setupOutputVars();
 
             this->FluidIndex = DataPlant::PlantLoop(DataSizing::CurLoopNum).FluidIndex;
             std::string FluidName = FluidProperties::GetGlycolNameByIndex(this->FluidIndex);
