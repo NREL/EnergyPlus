@@ -99,8 +99,16 @@ namespace FuelCellElectricGenerator {
     // REFERENCES:
     // IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
 
-    bool GetFuelCellInput(true); // When TRUE, calls subroutine to read input file.
+    int NumFuelCellGenerators(0);
+    bool GetFuelCellInput(true);
     Array1D_bool CheckEquipName;
+
+    void clear_state()
+    {
+        NumFuelCellGenerators = 0;
+        GetFuelCellInput = true;
+        CheckEquipName.deallocate();
+    }
 
     void SimFuelCellGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
@@ -132,9 +140,9 @@ namespace FuelCellElectricGenerator {
             GeneratorIndex = GenNum;
         } else {
             GenNum = GeneratorIndex;
-            if (GenNum > DataGenerators::NumFuelCellGenerators || GenNum < 1) {
+            if (GenNum > NumFuelCellGenerators || GenNum < 1) {
                 ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
-                               ", Number of FuelCell Generators=" + General::TrimSigDigits(DataGenerators::NumFuelCellGenerators) + ", Generator name=" + GeneratorName);
+                               ", Number of FuelCell Generators=" + General::TrimSigDigits(NumFuelCellGenerators) + ", Generator name=" + GeneratorName);
             }
             if (CheckEquipName(GenNum)) {
                 if (GeneratorName != DataGenerators::FuelCell(GenNum).Name) {
@@ -176,19 +184,19 @@ namespace FuelCellElectricGenerator {
         bool ErrorsFound(false); // error flag
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell";
-        DataGenerators::NumFuelCellGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        NumFuelCellGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (DataGenerators::NumFuelCellGenerators <= 0) {
+        if (NumFuelCellGenerators <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        DataGenerators::FuelCell.allocate(DataGenerators::NumFuelCellGenerators); // inits handled in derived type definitions
-        CheckEquipName.dimension(DataGenerators::NumFuelCellGenerators, true);
+        DataGenerators::FuelCell.allocate(NumFuelCellGenerators); // inits handled in derived type definitions
+        CheckEquipName.dimension(NumFuelCellGenerators, true);
 
         // first load in FuelCell names
-        for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+        for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
             inputProcessor->getObjectItem(
                 DataIPShortCuts::cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -311,7 +319,7 @@ namespace FuelCellElectricGenerator {
                 DataGenerators::FuelCell(thisFuelCell).FCPM.PelMax = NumArray(25);
 
                 // check for other FuelCell using the same power module and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).FCPM.Name, DataGenerators::FuelCell(thisFuelCell).FCPM.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).FCPM = DataGenerators::FuelCell(thisFuelCell).FCPM;
                     }
@@ -330,7 +338,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // set fuel supply ID in Fuel cell structure
-        for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+        for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
             DataGenerators::FuelCell(GeneratorNum).FuelSupNum =
                 UtilityRoutines::FindItemInList(DataGenerators::FuelCell(GeneratorNum).NameFCFuelSup, DataGenerators::FuelSupply); // Fuel Supply ID
             if (DataGenerators::FuelCell(GeneratorNum).FuelSupNum == 0) {
@@ -483,7 +491,7 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // check for other FuelCell using the same Air Supply module and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).AirSup.Name, DataGenerators::FuelCell(thisFuelCell).AirSup.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).AirSup = DataGenerators::FuelCell(thisFuelCell).AirSup;
                     }
@@ -495,7 +503,7 @@ namespace FuelCellElectricGenerator {
             }
         }
 
-        for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+        for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
             // find molal fraction of oxygen in air supply
             int thisConstituent =
                 UtilityRoutines::FindItem("Oxygen", DataGenerators::FuelCell(GeneratorNum).AirSup.ConstitName, DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents);
@@ -599,7 +607,7 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // check for other FuelCell using the same Water Supply module and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).WaterSup.Name, DataGenerators::FuelCell(thisFuelCell).WaterSup.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).WaterSup = DataGenerators::FuelCell(thisFuelCell).WaterSup;
                     }
@@ -660,7 +668,7 @@ namespace FuelCellElectricGenerator {
                 // TODO finish Auxiliary heater
 
                 // check for other FuelCell using the same Auxiliary Heating module and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).AuxilHeat.Name, DataGenerators::FuelCell(thisFuelCell).AuxilHeat.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).AuxilHeat = DataGenerators::FuelCell(thisFuelCell).AuxilHeat;
                     }
@@ -791,7 +799,7 @@ namespace FuelCellElectricGenerator {
                 DataGenerators::FuelCell(thisFuelCell).ElecStorage.StartingEnergyStored = NumArray(6);
 
                 // check for other FuelCell using the same Electrical Storage and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).ElecStorage.Name, DataGenerators::FuelCell(thisFuelCell).ElecStorage.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).ElecStorage = DataGenerators::FuelCell(thisFuelCell).ElecStorage;
                     }
@@ -843,7 +851,7 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // check for other FuelCell using the same Inverter and fill
-                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= DataGenerators::NumFuelCellGenerators; ++otherFuelCell) {
+                for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= NumFuelCellGenerators; ++otherFuelCell) {
                     if (UtilityRoutines::SameString(DataGenerators::FuelCell(otherFuelCell).Inverter.Name, DataGenerators::FuelCell(thisFuelCell).Inverter.Name)) {
                         DataGenerators::FuelCell(otherFuelCell).Inverter = DataGenerators::FuelCell(thisFuelCell).Inverter;
                     }
@@ -932,7 +940,7 @@ namespace FuelCellElectricGenerator {
             ShowFatalError("Errors found in getting input for fuel cell model ");
         }
 
-        for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+        for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
             SetupOutputVariable("Generator Produced Electric Power",
                                 OutputProcessor::Unit::W,
                                 DataGenerators::FuelCell(GeneratorNum).Report.ACPowerGen,
@@ -3387,7 +3395,7 @@ namespace FuelCellElectricGenerator {
 
         static bool MyEnvrnFlag(true);
 
-        if (DataGenerators::NumFuelCellGenerators == 0) return;
+        if (NumFuelCellGenerators == 0) return;
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : DataGenerators::FuelSupply)
@@ -3416,7 +3424,7 @@ namespace FuelCellElectricGenerator {
         // this routine needs to do something for zone gains during sizing
 
         // first collect skin losses from different subsystems
-        for (int FCnum = 1; FCnum <= DataGenerators::NumFuelCellGenerators; ++FCnum) {
+        for (int FCnum = 1; FCnum <= NumFuelCellGenerators; ++FCnum) {
             Real64 TotalZoneHeatGain = DataGenerators::FuelCell(FCnum).AirSup.QskinLoss + DataGenerators::FuelSupply(DataGenerators::FuelCell(FCnum).FuelSupNum).QskinLoss +
                                 DataGenerators::FuelCell(FCnum).WaterSup.QskinLoss + DataGenerators::FuelCell(FCnum).AuxilHeat.QskinLoss +
                                 DataGenerators::FuelCell(FCnum).FCPM.QdotSkin; // intake Blower losses to zone | fuel compressor losses to zone | water pump losses to

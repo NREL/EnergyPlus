@@ -150,7 +150,6 @@ namespace DataGenerators {
 
     int NumFuelConstit(0);
     int NumGeneratorFuelSups(0);
-    int NumFuelCellGenerators(0); // number of SOFC Generators specified in input
     int NumMicroCHPs(0);
     int NumMicroCHPParams(0); // number of parameter sets for micro chp
     int NumGensWDynamics(0);  // number of dynamics controls for generators
@@ -167,7 +166,6 @@ namespace DataGenerators {
     {
         NumFuelConstit = 0;
         NumGeneratorFuelSups = 0;
-        NumFuelCellGenerators = 0;
         NumMicroCHPs = 0;
         NumMicroCHPParams = 0;
         NumGensWDynamics = 0;

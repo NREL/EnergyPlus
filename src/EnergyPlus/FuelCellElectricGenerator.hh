@@ -58,8 +58,11 @@ namespace EnergyPlus {
 
 namespace FuelCellElectricGenerator {
 
-    extern bool GetFuelCellInput; // When TRUE, calls subroutine to read input file.
+    extern bool GetFuelCellInput;
+    extern int NumFuelCellGenerators;
     extern Array1D_bool CheckEquipName;
+
+    void clear_state();
 
     void SimFuelCellGenerator(int GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator

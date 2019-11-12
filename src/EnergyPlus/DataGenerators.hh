@@ -136,7 +136,6 @@ namespace DataGenerators {
 
     extern int NumFuelConstit;
     extern int NumGeneratorFuelSups;
-    extern int NumFuelCellGenerators; // number of SOFC Generators specified in input
     extern int NumMicroCHPs;
     extern int NumMicroCHPParams; // number of parameter sets for micro chp
     extern int NumGensWDynamics;  // number of dynamics controls for generators
