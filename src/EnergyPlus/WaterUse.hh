@@ -137,6 +137,10 @@ namespace EnergyPlus {
                 TotalMassFlowRate = 0.0;
                 DrainTemp = 0.0;
             }
+
+            void CalcEquipmentFlowRates();
+
+            void CalcEquipmentDrainTemp();
         };
 
         struct WaterConnectionsType
@@ -212,6 +216,8 @@ namespace EnergyPlus {
                       PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
             {
             }
+
+            void InitConnections(int WaterConnNum);
         };
 
         void clear_state();
@@ -221,12 +227,6 @@ namespace EnergyPlus {
         void SimulateWaterUseConnection(int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
         void GetWaterUseInput();
-
-        void CalcEquipmentFlowRates(int WaterEquipNum);
-
-        void CalcEquipmentDrainTemp(int WaterEquipNum);
-
-        void InitConnections(int WaterConnNum);
 
         void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration);
 
