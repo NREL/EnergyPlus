@@ -2001,11 +2001,12 @@ namespace HeatBalanceIntRadExchange {
     void CalcFp(int const N,             // Number of surfaces
                 Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
                 Array1<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTNACE VALUES
+                Array1<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
+        Real64 SB = DataGlobals::StefanBoltzmann;
         for (int iS = 0; iS < N; iS++) {
-            Fp[iS] = StefanBoltzmann*EMISS[iS]/(EMISS[iS]/FMRT[iS] + 1. - EMISS[iS]);  // actually sigma *
+            Fp[iS] = SB*EMISS[iS]/(EMISS[iS]/FMRT[iS] + 1. - EMISS[iS]);  // actually sigma *
         }
         return;
     }
