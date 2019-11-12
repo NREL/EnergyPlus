@@ -1817,8 +1817,7 @@ namespace FuelCellElectricGenerator {
             Par(2) = tmpTotProdGasEnthalpy;
             Par(3) = this->FCPM.NdotProdGas;
             Real64 tmpTprodGas = this->FCPM.TprodGasLeavingFCPM;
-            auto boundFunc = std::bind(&FCDataStruct::FuelCellProductGasEnthResidual, this, std::placeholders::_1, std::placeholders::_2);
-            General::SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, boundFunc, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
+            General::SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, this->FuelCellProductGasEnthResidual, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
 
             if (SolverFlag == -2) {
 
@@ -1838,7 +1837,7 @@ namespace FuelCellElectricGenerator {
             // How much power is really going into inverter?
             Real64 PintoInverter = Pel + Pstorage; // Back out so we can reapply
             bool ConstrainedStorage;
-            ManageElectStorInteractions(GeneratorNum, Pdemand, PpcuLosses, ConstrainedStorage, Pstorage, PgridExtra);
+            this->ManageElectStorInteractions(Pdemand, PpcuLosses, ConstrainedStorage, Pstorage, PgridExtra);
             PintoInverter = Pel - Pstorage;
             // refine power conditioning losses with more current power production
 
@@ -1876,8 +1875,7 @@ namespace FuelCellElectricGenerator {
         this->FCPM.RegulaFalsiIter = SolverFlag;
     }
 
-    void ManageElectStorInteractions(int const Num, // Generator number, index for structure
-                                     Real64 const Pdemand,
+    void FCDataStruct::ManageElectStorInteractions(Real64 const Pdemand,
                                      Real64 const EP_UNUSED(PpcuLosses),
                                      bool &Constrained,
                                      Real64 &Pstorage,
@@ -1902,15 +1900,15 @@ namespace FuelCellElectricGenerator {
 
         // step 1 figure out what is desired of electrical storage system
 
-        if (FuelCell(Num).FCPM.Pel < (Pdemand)) {
+        if (this->FCPM.Pel < (Pdemand)) {
             // draw from storage
-            tmpPdraw = (Pdemand)-FuelCell(Num).FCPM.Pel;
+            tmpPdraw = (Pdemand)-this->FCPM.Pel;
             drawing = true;
         }
 
-        if (FuelCell(Num).FCPM.Pel > (Pdemand)) {
+        if (this->FCPM.Pel > (Pdemand)) {
             // add to storage
-            tmpPcharge = FuelCell(Num).FCPM.Pel - (Pdemand);
+            tmpPcharge = this->FCPM.Pel - (Pdemand);
             charging = true;
         }
 
@@ -1918,45 +1916,45 @@ namespace FuelCellElectricGenerator {
 
         if (charging) {
 
-            if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::SimpleEffConstraints) {
+            if (this->ElecStorage.StorageModelMode == DataGenerators::SimpleEffConstraints) {
 
-                if (FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge >= FuelCell(Num).ElecStorage.NominalEnergyCapacity) {
+                if (this->ElecStorage.LastTimeStepStateOfCharge >= this->ElecStorage.NominalEnergyCapacity) {
                     // storage full!  no more allowed!
                     PgridOverage = tmpPcharge;
                     tmpPcharge = 0.0;
                     Constrained = true;
                 }
-                if (tmpPcharge > FuelCell(Num).ElecStorage.MaxPowerStore) {
-                    PgridOverage = tmpPcharge - FuelCell(Num).ElecStorage.MaxPowerStore;
-                    tmpPcharge = FuelCell(Num).ElecStorage.MaxPowerStore;
+                if (tmpPcharge > this->ElecStorage.MaxPowerStore) {
+                    PgridOverage = tmpPcharge - this->ElecStorage.MaxPowerStore;
+                    tmpPcharge = this->ElecStorage.MaxPowerStore;
                     Constrained = true;
                 }
 
                 // now add energy to storage from charging
-                if ((FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                     tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge) <
-                    FuelCell(Num).ElecStorage.NominalEnergyCapacity) {
+                if ((this->ElecStorage.LastTimeStepStateOfCharge +
+                     tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge) <
+                    this->ElecStorage.NominalEnergyCapacity) {
 
-                    FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
-                        FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
+                    this->ElecStorage.ThisTimeStepStateOfCharge =
+                        this->ElecStorage.LastTimeStepStateOfCharge +
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge;
                 } else { // would over charge this time step
 
-                    tmpPcharge = (FuelCell(Num).ElecStorage.NominalEnergyCapacity - FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge) /
-                                 (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge);
+                    tmpPcharge = (this->ElecStorage.NominalEnergyCapacity - this->ElecStorage.LastTimeStepStateOfCharge) /
+                                 (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge);
                     Constrained = true;
-                    FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
-                        FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * FuelCell(Num).ElecStorage.EnergeticEfficCharge;
+                    this->ElecStorage.ThisTimeStepStateOfCharge =
+                        this->ElecStorage.LastTimeStepStateOfCharge +
+                        tmpPcharge * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour * this->ElecStorage.EnergeticEfficCharge;
                 }
 
                 // losses go into QairIntake
-                FuelCell(Num).ElecStorage.QairIntake = tmpPcharge * (1.0 - FuelCell(Num).ElecStorage.EnergeticEfficCharge);
+                this->ElecStorage.QairIntake = tmpPcharge * (1.0 - this->ElecStorage.EnergeticEfficCharge);
 
-            } else if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterManwellMcGowan) {
+            } else if (this->ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterManwellMcGowan) {
                 ShowWarningError("ManageElectStorInteractions: Not yet implemented: Lead Acid Battery By Manwell and McGowan 1993 ");
 
-            } else if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterySaupe) {
+            } else if (this->ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterySaupe) {
                 ShowWarningError("ManageElectStorInteractions: Not yet implemented: Lead Acid Battery By Saupe 1993 ");
 
             } else {
@@ -1969,41 +1967,41 @@ namespace FuelCellElectricGenerator {
         } // charging
 
         if (drawing) {
-            if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::SimpleEffConstraints) {
+            if (this->ElecStorage.StorageModelMode == DataGenerators::SimpleEffConstraints) {
 
-                if (FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge <= 0.0) {
+                if (this->ElecStorage.LastTimeStepStateOfCharge <= 0.0) {
                     // storage empty  no more allowed!
                     tmpPdraw = 0.0;
                     Constrained = true;
                     drawing = false;
                 }
-                if (tmpPdraw > FuelCell(Num).ElecStorage.MaxPowerDraw) {
-                    tmpPdraw = FuelCell(Num).ElecStorage.MaxPowerDraw;
+                if (tmpPdraw > this->ElecStorage.MaxPowerDraw) {
+                    tmpPdraw = this->ElecStorage.MaxPowerDraw;
                     Constrained = true;
                 }
 
                 // now take energy from storage by drawing  (amplified by energetic effic)
-                if ((FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                     tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge) > 0.0) {
+                if ((this->ElecStorage.LastTimeStepStateOfCharge -
+                     tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
 
-                    FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
-                        FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
+                    this->ElecStorage.ThisTimeStepStateOfCharge =
+                        this->ElecStorage.LastTimeStepStateOfCharge -
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
                 } else { // would over drain storage this timestep so reduce tmpPdraw
-                    tmpPdraw = FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge * FuelCell(Num).ElecStorage.EnergeticEfficDischarge /
+                    tmpPdraw = this->ElecStorage.LastTimeStepStateOfCharge * this->ElecStorage.EnergeticEfficDischarge /
                                (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-                    FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge =
-                        FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / FuelCell(Num).ElecStorage.EnergeticEfficDischarge;
+                    this->ElecStorage.ThisTimeStepStateOfCharge =
+                        this->ElecStorage.LastTimeStepStateOfCharge -
+                        tmpPdraw * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
 
                     Constrained = true;
                 }
                 // losses go into QairIntake
-                FuelCell(Num).ElecStorage.QairIntake = tmpPdraw * (1.0 / FuelCell(Num).ElecStorage.EnergeticEfficDischarge - 1.0);
-            } else if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterManwellMcGowan) {
+                this->ElecStorage.QairIntake = tmpPdraw * (1.0 / this->ElecStorage.EnergeticEfficDischarge - 1.0);
+            } else if (this->ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterManwellMcGowan) {
                 ShowWarningError("ManageElectStorInteractions: Not yet implemented: Lead Acid Battery By Manwell and McGowan 1993 ");
 
-            } else if (FuelCell(Num).ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterySaupe) {
+            } else if (this->ElecStorage.StorageModelMode == DataGenerators::LeadAcidBatterySaupe) {
                 ShowWarningError("ManageElectStorInteractions: Not yet implemented: Lead Acid Battery By Saupe 1993 ");
 
             } else {
@@ -2017,21 +2015,21 @@ namespace FuelCellElectricGenerator {
 
         if ((!charging) && (!drawing)) {
 
-            FuelCell(Num).ElecStorage.ThisTimeStepStateOfCharge = FuelCell(Num).ElecStorage.LastTimeStepStateOfCharge;
-            FuelCell(Num).ElecStorage.PelNeedFromStorage = 0.0;
-            FuelCell(Num).ElecStorage.PelFromStorage = 0.0;
-            FuelCell(Num).ElecStorage.QairIntake = 0.0;
+            this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.LastTimeStepStateOfCharge;
+            this->ElecStorage.PelNeedFromStorage = 0.0;
+            this->ElecStorage.PelFromStorage = 0.0;
+            this->ElecStorage.QairIntake = 0.0;
         }
 
         if (Pstorage >= 0.0) {
 
-            FuelCell(Num).ElecStorage.PelIntoStorage = Pstorage;
-            FuelCell(Num).ElecStorage.PelFromStorage = 0.0;
+            this->ElecStorage.PelIntoStorage = Pstorage;
+            this->ElecStorage.PelFromStorage = 0.0;
         }
         if (Pstorage < 0.0) {
 
-            FuelCell(Num).ElecStorage.PelIntoStorage = 0.0;
-            FuelCell(Num).ElecStorage.PelFromStorage = -Pstorage;
+            this->ElecStorage.PelIntoStorage = 0.0;
+            this->ElecStorage.PelFromStorage = -Pstorage;
         }
     }
 
@@ -2610,7 +2608,7 @@ namespace FuelCellElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for gaseous water
-        // No ethalphy of formation in this one.
+        // No enthalpy of formation in this one.
 
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
@@ -3298,8 +3296,8 @@ namespace FuelCellElectricGenerator {
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
-        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
-        if (this->TimeElapsed != TimeElapsed) {
+        Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        if (this->TimeElapsed != timeElapsed) {
 
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.ThisTimeStepStateOfCharge;
             this->FCPM.PelLastTimeStep = this->FCPM.Pel;
@@ -3317,7 +3315,7 @@ namespace FuelCellElectricGenerator {
 
             this->ExhaustHX.WaterMassFlowRate = mdot;
             this->ExhaustHX.WaterInletTemp = DataLoopNode::Node(this->ExhaustHX.WaterInNode).Temp;
-            this->TimeElapsed = TimeElapsed;
+            this->TimeElapsed = timeElapsed;
         } else {
 
             PlantUtilities::SetComponentFlowRate(this->ExhaustHX.WaterMassFlowRate,

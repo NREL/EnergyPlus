@@ -578,13 +578,13 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff         // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
+        static Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
 
-        void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
+        static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
-        void FigureLiquidWaterEnthalpy(Real64 FluidTemp, Real64 &HLiqWater);
+        static void FigureLiquidWaterEnthalpy(Real64 FluidTemp, Real64 &HLiqWater);
 
-        void FigureLiquidWaterHeatCap(Real64 FluidTemp, Real64 &Cp);
+        static void FigureLiquidWaterHeatCap(Real64 FluidTemp, Real64 &Cp);
 
         void CalcFuelCellAuxHeater();
 
@@ -593,6 +593,13 @@ namespace FuelCellElectricGenerator {
         void CalcFuelCellGeneratorModel(int GeneratorNum, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
+
+        void ManageElectStorInteractions(Real64 Pdemand,
+                                         Real64 PpcuLosses,
+                                         bool &Constrained,  // TODO: This one is never used anywhere in the code
+                                         Real64 &Pstorage,
+                                         Real64 &PgridOverage // electricity that can't be stored and needs to go out
+        );
 
         void UpdateFuelCellGeneratorRecords();
     };
@@ -607,14 +614,6 @@ namespace FuelCellElectricGenerator {
                               bool FirstHVACIteration);
 
     void GetFuelCellGeneratorInput();
-
-    void ManageElectStorInteractions(int Num, // Generator number, index for structure
-                                     Real64 Pdemand,
-                                     Real64 PpcuLosses,
-                                     bool &Constrained,  // TODO: This one is never used anywhere in the code
-                                     Real64 &Pstorage,
-                                     Real64 &PgridOverage // electricity that can't be stored and needs to go out
-    );
 
     void SimFuelCellPlantHeatRecovery(std::string const &CompType,
                                       std::string const &CompName,
