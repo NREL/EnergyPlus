@@ -553,6 +553,8 @@ namespace FuelCellElectricGenerator {
         {
         }
 
+        void InitFuelCellGenerators();
+
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
         void FigureAirEnthalpy(Real64 FluidTemp, Real64 &Hair);
@@ -575,6 +577,24 @@ namespace FuelCellElectricGenerator {
                                         bool &Constrained,      // true if transient constraints kick in (TODO: never used anywhere)
                                         Real64 &PelDiff         // if constrained then this is the difference, positive
         );
+
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
+
+        void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
+
+        void FigureLiquidWaterEnthalpy(Real64 FluidTemp, Real64 &HLiqWater);
+
+        void FigureLiquidWaterHeatCap(Real64 FluidTemp, Real64 &Cp);
+
+        void CalcFuelCellAuxHeater();
+
+        void CalcFuelCellGenHeatRecovery();
+
+        void CalcFuelCellGeneratorModel(int GeneratorNum, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+
+        void CalcUpdateHeatRecovery(bool FirstHVACIteration);
+
+        void UpdateFuelCellGeneratorRecords();
     };
 
     void clear_state();
@@ -588,11 +608,6 @@ namespace FuelCellElectricGenerator {
 
     void GetFuelCellGeneratorInput();
 
-    void CalcFuelCellGeneratorModel(int GeneratorNum, // Generator number
-                                    bool RunFlag,     // TRUE when Generator operating
-                                    Real64 MyLoad,    // Generator demand
-                                    bool FirstHVACIteration);
-
     void ManageElectStorInteractions(int Num, // Generator number, index for structure
                                      Real64 Pdemand,
                                      Real64 PpcuLosses,
@@ -600,26 +615,6 @@ namespace FuelCellElectricGenerator {
                                      Real64 &Pstorage,
                                      Real64 &PgridOverage // electricity that can't be stored and needs to go out
     );
-
-    Real64 FuelCellProductGasEnthResidual(Real64 TprodGas,    // temperature, this is "x" being searched
-                                          Array1<Real64> const &Par // par(1) = Generator Number
-    );
-
-    void FigureGaseousWaterEnthalpy(Real64 FluidTemp, // degree C
-                                    Real64 &HGasWater       // kJ/mol
-    );
-
-    void FigureLiquidWaterEnthalpy(Real64 FluidTemp, // degree C
-                                   Real64 &HLiqWater       // kJ/mol
-    );
-
-    void FigureLiquidWaterHeatCap(Real64 FluidTemp, // degree C
-                                  Real64 &Cp              // (J/mol*K)
-    );
-
-    void CalcFuelCellAuxHeater(int Num); // Generator number
-
-    void CalcFuelCellGenHeatRecovery(int Num); // Generator number
 
     void SimFuelCellPlantHeatRecovery(std::string const &CompType,
                                       std::string const &CompName,
@@ -634,19 +629,10 @@ namespace FuelCellElectricGenerator {
                                       bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
-    void InitFuelCellGenerators(int FCnum); // index to specific fuel cell generator
-
     void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
                                               std::string &heatRecoveryCompName);
 
     void FigureFuelCellZoneGains();
-
-    void CalcUpdateHeatRecovery(int Num, // Generator number
-                                bool FirstHVACIteration);
-
-    void UpdateFuelCellGeneratorRecords(bool RunFlag, // TRUE if Generator operating
-                                        int Num       // Generator number
-    );
 
     void GetFuelCellGeneratorResults(int GeneratorType, // type of Generator
                                      int GeneratorIndex,
