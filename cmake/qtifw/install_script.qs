@@ -13,9 +13,9 @@ sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal
 # Windows: open cmd.exe as admin
 EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --platform minimal --script install_script.qs
 
-# Mac (Don't forget the sudo if you run with platform minimal)
+# Mac: `--plaftorm minimal` appears to produce a segmentation fault
 open EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg
-sudo /Volumes/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64 --verbose --platform minimal --script ~/Software/Others/EnergyPlus/cmake/qtifw/install_script.qs
+sudo /Volumes/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64 --verbose --script install_script.qs
 ```
 
 You can also customize the install directory by passing `TargetDir`
@@ -50,8 +50,8 @@ complete uninstall
 ```
 # Linux
 sudo /usr/local/EnergyPlus-9-2-0/maintenancetool --verbose --plaftorm minimal --script install_script.qs
-# Mac
-sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --plaftorm minimal --script ~/Software/Others/EnergyPlus/cmake/qtifw/install_script.qs
+# Mac: `--platform minimal` appears to produce a segfault right now
+sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --platform minimal --script install_script.qs
 
 ```
 
