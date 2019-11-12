@@ -52,7 +52,8 @@ sudo /usr/local/EnergyPlus-9-2-0/maintenancetool --verbose --plaftorm minimal --
 function Controller() {
   installer.autoRejectMessageBoxes();
 
-  installer.setMessageBoxAutomaticAnswer("OverwriteTargetDirectory", QMessageBox.Yes);
+  installer.setMessageBoxAutomaticAnswer("OverwriteTargetDirectory",
+                                         QMessageBox.Yes);
 
   installer.installationFinished.connect(function() {
     gui.clickButton(buttons.NextButton);
@@ -61,13 +62,12 @@ function Controller() {
   installer.uninstallationFinished.connect(function() {
     gui.clickButton(buttons.NextButton);
   });
-
 }
 
 function logCurrentPage() {
-    var pageName = gui.currentPageWidget().objectName
-    var pagePrettyTitle = gui.currentPageWidget().title
-    console.log("At page: " + pageName + " ('" + pagePrettyTitle + "')")
+    var pageName = gui.currentPageWidget().objectName;
+    var pagePrettyTitle = gui.currentPageWidget().title;
+    console.log("At page: " + pageName + " ('" + pagePrettyTitle + "')");
 }
 
 // NOT USED
@@ -77,20 +77,20 @@ function logCurrentPage() {
  *  logCurrentPage();
  *  // click delay because the next button is initially disabled for ~1s
  *  gui.clickButton(buttons.NextButton, 3000);
- *}
+ *};
  *
  *Controller.prototype.CredentialsPageCallback = function() {
  *  console.log("---- CREDENTIAL PAGE");
  *  logCurrentPage();
  *  gui.clickButton(buttons.NextButton);
- *}
+ *};
  */
 
 Controller.prototype.IntroductionPageCallback = function() {
   console.log("---- INTRODUCTION PAGE");
   logCurrentPage();
   gui.clickButton(buttons.NextButton);
-}
+};
 
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
@@ -99,11 +99,12 @@ Controller.prototype.TargetDirectoryPageCallback = function()
 
   console.log("User-suplied TargetDir: " + installer.value("TargetDir"));
 
-  // gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.value("HomeDir") + "/Qt");
-  console.log("Target dir: " + gui.currentPageWidget().TargetDirectoryLineEdit.text);
+  // gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.value("harcoded/path/EnergyPlus");
+  console.log("Target dir: " +
+              gui.currentPageWidget().TargetDirectoryLineEdit.text);
 
   gui.clickButton(buttons.NextButton);
-}
+};
 
 Controller.prototype.ComponentSelectionPageCallback = function() {
   console.log("---- COMPONENT SELECTION PAGE");
@@ -111,27 +112,21 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
 
   var widget = gui.currentPageWidget();
 
-  var symlinks = installer.value("symlinks");
-  console.log("symlinks=" + symlinks);
-  if (symlinks === 'false') {
-    widget.deselectComponent("Symlinks");
-    console.log("Symlinks will not be installed");
-  }
-
   var components = installer.components();
   console.log("There are " + components.length + " available components.");
   console.log("Components selection for installation:");
-  for (var i = 0 ; i < components.length ;i++) {
+  for (var i = 0; i < components.length; i++) {
     var compName = components[i].name;
     var installStatus = "Yes";
 
     // Get command line args passed
     var thisCompFlag = installer.value(compName);
 
-    if (thisCompFlag === 'false') {
+    if (thisCompFlag === "false") {
       // Protect against trying to deselect something required
       if (["Unspecified", "Licenses"].indexOf(compName) >= 0) {
-        console.log("-- Component '" + compName + "' is mandatory and cannot be unselected");
+        console.log("-- Component '" + compName +
+                    "' is mandatory and cannot be unselected");
         installStatus = "Yes (FORCED AS REQUIRED)";
       } else if (compName === "CopyAndRegisterSystemDLLs") {
         console.log("-- CopyAndRegisterSystemDLLs is highly recommended on Windows, and it will not overwrite any existing DLLs so it should not have side effects");
@@ -162,34 +157,34 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   // Windows: Packages:
 
   gui.clickButton(buttons.NextButton);
-}
+};
 
 Controller.prototype.LicenseAgreementPageCallback = function() {
   console.log("---- LICENSE AGREEMENT PAGE");
   logCurrentPage();
   gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
   gui.clickButton(buttons.NextButton);
-}
+};
 
 Controller.prototype.StartMenuDirectoryPageCallback = function() {
   console.log("---- START MENU DIRECTORY PAGE");
   logCurrentPage();
   gui.clickButton(buttons.NextButton);
-}
+};
 
 Controller.prototype.ReadyForInstallationPageCallback = function()
 {
   console.log("---- READY FOR INSTALLATION PAGE");
   logCurrentPage();
   gui.clickButton(buttons.CommitButton);
-}
+};
 
 Controller.prototype.PerformInstallationPageCallback = function()
 {
   console.log("---- PERFORM INSTALLATION PAGE");
   logCurrentPage();
   gui.clickButton(buttons.CommitButton);
-}
+};
 
 Controller.prototype.FinishedPageCallback = function() {
   console.log("---- FINISHED PAGE");
@@ -201,4 +196,4 @@ Controller.prototype.FinishedPageCallback = function() {
    *}
    */
   gui.clickButton(buttons.FinishButton);
-}
+};
