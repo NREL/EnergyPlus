@@ -58,20 +58,8 @@ namespace EnergyPlus {
 
 namespace FuelCellElectricGenerator {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern bool GetFuelCellInput; // When TRUE, calls subroutine to read input file.
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE FuelCell ElectricGenerator
-
-    // PRIVATE    SetupFuelAndAirConstituentData ! hardwired data for gas phase thermochemistry calcs
-
-    // Functions
 
     void SimFuelCellGenerator(int GeneratorType,          // type of Generator
                               std::string const &GeneratorName, // user specified name of Generator
@@ -80,18 +68,7 @@ namespace FuelCellElectricGenerator {
                               Real64 MyLoad, // demand on electric generator
                               bool FirstHVACIteration);
 
-    // End FuelCell Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of FuelCell Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetFuelCellGeneratorInput();
-
-    // End of Get Input subroutines for the FuelCell Generator Module
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
 
     void CalcFuelCellGeneratorModel(int GeneratorNum, // Generator number
                                     bool RunFlag,     // TRUE when Generator operating

@@ -602,7 +602,7 @@ namespace DataGenerators {
         std::string NameFCAirSup;            // name of air supply module for fuel cell
         FCAirSupplyDataStruct AirSup;        // data for air supply module
         std::string NameFCFuelSup;           // name of fuel supply module
-        int FuelSupNum;                      // indes for fuel supply module structure
+        int FuelSupNum;                      // index for fuel supply module structure
         std::string NameFCWaterSup;          // name of water supply module
         FCWaterSupplyDataStruct WaterSup;    // data for water supply module
         std::string NameFCAuxilHeat;         // name of auxiliary heating module
@@ -612,9 +612,9 @@ namespace DataGenerators {
         std::string NameElecStorage;         // name of Battery module
         FCElecStorageDataStruct ElecStorage; // data for Battery module
         std::string NameInverter;            // name of Inverter Module
-        FCInverterDataStruct Inverter;       // data for INverter module
+        FCInverterDataStruct Inverter;       // data for Inverter module
         std::string NameStackCooler;         // name of Inverter Module
-        FCStackCoolerDataStruct StackCooler; // data for INverter module
+        FCStackCoolerDataStruct StackCooler; // data for Inverter module
         int CWLoopNum;                       // cooling water plant loop index number
         int CWLoopSideNum;                   // cooling water plant loop side index
         int CWBranchNum;                     // cooling water plant loop branch index
@@ -626,11 +626,15 @@ namespace DataGenerators {
         Real64 QradZone;   // radiative heat lost to surrounding zone
         int DynamicsControlID;
         Real64 TimeElapsed; // used to track when timestep has changed
+        bool InitGenerator;
+        bool MyEnvrnFlag_Init;
+        bool MyWarmupFlag_Init;
+        bool MyPlantScanFlag_Init;
 
         // Default Constructor
         FCDataStruct()
             : FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-              DynamicsControlID(0), TimeElapsed(0.0)
+              DynamicsControlID(0), TimeElapsed(0.0), InitGenerator(true), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
         {
         }
     };

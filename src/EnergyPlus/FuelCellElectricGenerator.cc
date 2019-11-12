@@ -3194,24 +3194,14 @@ namespace FuelCellElectricGenerator {
 
         static std::string const RoutineName("InitFuelCellGenerators");
 
-        static bool InitGeneratorOnce(true); // flag for 1 time initialization
-        static Array1D_bool MyEnvrnFlag;     // flag for init once at start of environment
-        static Array1D_bool MyWarmupFlag;    // flag for init after warmup complete
-        static Array1D_bool MyPlantScanFlag;
         bool errFlag;
 
         // Do the one time initializations
-        if (InitGeneratorOnce) {
-            MyEnvrnFlag.allocate(DataGenerators::NumFuelCellGenerators);
-            MyWarmupFlag.allocate(DataGenerators::NumFuelCellGenerators);
-            MyPlantScanFlag.allocate(DataGenerators::NumFuelCellGenerators);
-            MyEnvrnFlag = true;
-            MyWarmupFlag = false;
-            InitGeneratorOnce = false;
-            MyPlantScanFlag = true;
+        if (DataGenerators::FuelCell(FCnum).InitGenerator) {
+            DataGenerators::FuelCell(FCnum).InitGenerator = false;
         } // end one time setups and inits
 
-        if (MyPlantScanFlag(FCnum) && allocated(DataPlant::PlantLoop)) {
+        if (DataGenerators::FuelCell(FCnum).MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
 
             PlantUtilities::ScanPlantLoopsForObject(DataGenerators::FuelCell(FCnum).NameExhaustHX,
@@ -3232,11 +3222,11 @@ namespace FuelCellElectricGenerator {
             if (errFlag) {
                 ShowFatalError("InitFuelCellGenerators: Program terminated due to previous condition(s).");
             }
-            MyPlantScanFlag(FCnum) = false;
+            DataGenerators::FuelCell(FCnum).MyPlantScanFlag_Init = false;
         }
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(FCnum) && !MyPlantScanFlag(FCnum)) {
+        if (DataGlobals::BeginEnvrnFlag && DataGenerators::FuelCell(FCnum).MyEnvrnFlag_Init && !DataGenerators::FuelCell(FCnum).MyPlantScanFlag_Init) {
 
             DataGenerators::FuelSupply(DataGenerators::FuelCell(FCnum).FuelSupNum).PfuelCompEl = 0.0;
             DataGenerators::FuelSupply(DataGenerators::FuelCell(FCnum).FuelSupNum).TfuelIntoFCPM = 0.0;
@@ -3309,19 +3299,19 @@ namespace FuelCellElectricGenerator {
                                DataGenerators::FuelCell(FCnum).CWBranchNum,
                                DataGenerators::FuelCell(FCnum).CWCompNum);
 
-            MyEnvrnFlag(FCnum) = false;
-            MyWarmupFlag(FCnum) = true;
+            DataGenerators::FuelCell(FCnum).MyEnvrnFlag_Init = false;
+            DataGenerators::FuelCell(FCnum).MyWarmupFlag_Init = true;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(FCnum) = true;
+            DataGenerators::FuelCell(FCnum).MyEnvrnFlag_Init = true;
         }
 
-        if (MyWarmupFlag(FCnum) && (!DataGlobals::WarmupFlag)) {
+        if (DataGenerators::FuelCell(FCnum).MyWarmupFlag_Init && (!DataGlobals::WarmupFlag)) {
             // need to reset initial state of charge at beginning of environment but after warm up is complete
             DataGenerators::FuelCell(FCnum).ElecStorage.LastTimeStepStateOfCharge = DataGenerators::FuelCell(FCnum).ElecStorage.StartingEnergyStored;
             DataGenerators::FuelCell(FCnum).ElecStorage.ThisTimeStepStateOfCharge = DataGenerators::FuelCell(FCnum).ElecStorage.StartingEnergyStored;
-            MyWarmupFlag(FCnum) = false;
+            DataGenerators::FuelCell(FCnum).MyWarmupFlag_Init = false;
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
