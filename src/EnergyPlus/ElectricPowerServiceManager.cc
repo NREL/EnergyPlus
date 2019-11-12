@@ -2098,12 +2098,19 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
     // Select and call models and also collect results for load center power conditioning and reporting
     switch (generatorType) {
     case GeneratorType::iCEngine: {
-        ICEngineElectricGenerator::SimICEngineGenerator(
-            DataGlobalConstants::iGeneratorICEngine, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration);
-        ICEngineElectricGenerator::GetICEGeneratorResults(
-            DataGlobalConstants::iGeneratorICEngine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
-        electricPowerOutput = electProdRate;
-        thermalPowerOutput = thermProdRate;
+
+        auto thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(name);
+
+        // dummy vars
+        PlantLocation L(0,0,0,0);
+        Real64 tempLoad = myElecLoadRequest;
+
+        // simulate
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(runFlag, FirstHVACIteration);
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(runFlag, tempLoad);
+        dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
+        electricPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
+        thermalPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
         break;
     }
     case GeneratorType::combTurbine: {
