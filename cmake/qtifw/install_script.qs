@@ -47,9 +47,10 @@ EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script
 
 On Windows only, if CreateStartMenu is true (default), an extra option `UseAllUsersStartMenu=true` was added to create the shortcuts in the All Users start menu,
 which is useful if you use SCCM (or psexec) to run the commands as you are LOCAL SYSTEM account when you do and these shortcuts won't work for the regular user
+NOTE/TODO: THIS OPTION WILL ONLY BE SUPPORTED ON THE NEXT OFFICIAL E+ RELEASE, IT WON'T WORK WITH THE EXISINT 9.2.0 BINARY
 
 ```
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs UseAllUsersStartMenu=true
+EnergyPlus-9.3.0-xxxxxxxxx-Windows-x86_64.exe --verbose --script install_script.qs UseAllUsersStartMenu=true
 ```
 
 -------------------------------------------------------------------------------
