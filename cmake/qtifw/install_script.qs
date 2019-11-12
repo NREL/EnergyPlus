@@ -2,6 +2,8 @@
 
 Allows performing silent installs on all platforms.
 
+## Installation
+
 NOTE: By running a silent install, you agree to the EnergyPlus License Agreement
 
 Usage:
@@ -43,6 +45,16 @@ Windows: Open cmd.exe as admin
 EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
 ```
 
+On Windows only, if CreateStartMenu is true (default), an extra option `UseAllUsersStartMenu=true` was added to create the shortcuts in the All Users start menu,
+which is useful if you use SCCM (or psexec) to run the commands as you are LOCAL SYSTEM account when you do and these shortcuts won't work for the regular user
+
+```
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs UseAllUsersStartMenu=true
+```
+
+-------------------------------------------------------------------------------
+
+## Uninstallation
 
 NOTE: You can also pass this same script to the maintenancetool for a silent
 complete uninstall
@@ -186,6 +198,16 @@ Controller.prototype.LicenseAgreementPageCallback = function() {
 Controller.prototype.StartMenuDirectoryPageCallback = function() {
   console.log("---- START MENU DIRECTORY PAGE");
   logCurrentPage();
+  if (systemInfo.kernelType == "winnt") { // You won't get in this callback if it wasn't...
+    // TODO: extra logging for debug for now
+    console.log("installer StartMenuDir: " + installer.value("StartMenuDir"));
+    console.log("Text: " + gui.currentPageWidget().StartMenuPathLineEdit.text);
+    console.log("AllUsersStartMenuProgramsPath: " + installer.value("AllUsersStartMenuProgramsPath"));
+    console.log("UserStartMenuProgramsPath: " + installer.value("UserStartMenuProgramsPath"));
+    if (installer.value("UseAllUsersStartMenu") === "true") {
+      console.log("Will use the All Users Start Menu at: " + installer.value("AllUsersStartMenuProgramsPath"));
+    }
+  }
   gui.clickButton(buttons.NextButton);
 };
 
