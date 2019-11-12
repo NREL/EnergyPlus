@@ -111,7 +111,7 @@ namespace FuelCellElectricGenerator {
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   MArch 2005
+        //       DATE WRITTEN   March 2005
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This is the Solid oxide fuel cell Generator model driver.  It
@@ -167,14 +167,13 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        int GeneratorNum;              // Generator counter
         int NumAlphas;                 // Number of elements in the alpha array
         int NumNums;                   // Number of elements in the numeric array
         int IOStat;                    // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);  // character string data
         Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
         Array1D_bool lAlphaBlanks(25);
-        static bool ErrorsFound(false); // error flag
+        bool ErrorsFound(false); // error flag
         static bool MyOneTimeFlag(true);
 
         if (MyOneTimeFlag) {
@@ -188,11 +187,11 @@ namespace FuelCellElectricGenerator {
             }
 
             // ALLOCATE ARRAYS
-            DataGenerators::FuelCell.allocate(DataGenerators::NumFuelCellGenerators); // inits handeled in derived type definitions
+            DataGenerators::FuelCell.allocate(DataGenerators::NumFuelCellGenerators); // inits handled in derived type definitions
             CheckEquipName.dimension(DataGenerators::NumFuelCellGenerators, true);
 
             // first load in FuelCell names
-            for (GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+            for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
                 inputProcessor->getObjectItem(
                     DataIPShortCuts::cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -334,7 +333,7 @@ namespace FuelCellElectricGenerator {
             }
 
             // set fuel supply ID in Fuel cell structure
-            for (GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+            for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
                 DataGenerators::FuelCell(GeneratorNum).FuelSupNum =
                     UtilityRoutines::FindItemInList(DataGenerators::FuelCell(GeneratorNum).NameFCFuelSup, DataGenerators::FuelSupply); // Fuel Supply ID
                 if (DataGenerators::FuelCell(GeneratorNum).FuelSupNum == 0) {
@@ -499,7 +498,7 @@ namespace FuelCellElectricGenerator {
                 }
             }
 
-            for (GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+            for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
                 // find molal fraction of oxygen in air supply
                 int thisConstituent =
                     UtilityRoutines::FindItem("Oxygen", DataGenerators::FuelCell(GeneratorNum).AirSup.ConstitName, DataGenerators::FuelCell(GeneratorNum).AirSup.NumConstituents);
@@ -936,7 +935,7 @@ namespace FuelCellElectricGenerator {
                 ShowFatalError("Errors found in getting input for fuel cell model ");
             }
 
-            for (GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
+            for (int GeneratorNum = 1; GeneratorNum <= DataGenerators::NumFuelCellGenerators; ++GeneratorNum) {
                 SetupOutputVariable("Generator Produced Electric Power",
                                     OutputProcessor::Unit::W,
                                     DataGenerators::FuelCell(GeneratorNum).Report.ACPowerGen,
@@ -2093,7 +2092,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 tempCp;
         Real64 A;  // shomate coeff
         Real64 B;  // shomate coeff
         Real64 C;  // shomate coeff
@@ -2109,7 +2107,7 @@ namespace FuelCellElectricGenerator {
 
         // two different themodynamic curve fits might be used
 
-        tempCp = 0.0;
+        Real64 tempCp = 0.0;
 
         Real64 const Tkel = (FluidTemp + DataGlobals::KelvinConv);          // temp for NASA eq. in Kelvin
         Real64 const Tsho = (FluidTemp + DataGlobals::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
@@ -2174,8 +2172,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 tempHair;
-        Real64 HairI;
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2195,7 +2191,7 @@ namespace FuelCellElectricGenerator {
 
         // loop through fuel constituents and sum up Cp
 
-        tempHair = 0.0;
+        Real64 tempHair = 0.0;
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -2217,7 +2213,7 @@ namespace FuelCellElectricGenerator {
                     F = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateF;
                     H = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateH;
 
-                    HairI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
+                    Real64 HairI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
 
                     tempHair += HairI * DataGenerators::FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstit);
                 }
@@ -2262,7 +2258,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 tempCp;
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2279,7 +2274,7 @@ namespace FuelCellElectricGenerator {
 
         // loop through fuel constituents and sum up Cp
 
-        tempCp = 0.0;
+        Real64 tempCp = 0.0;
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -2340,8 +2335,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 tempHfuel;
-        Real64 HfuelI;
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2361,7 +2354,7 @@ namespace FuelCellElectricGenerator {
 
         // loop through fuel constituents and sum up Cp
 
-        tempHfuel = 0.0;
+        Real64 tempHfuel = 0.0;
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -2382,7 +2375,7 @@ namespace FuelCellElectricGenerator {
                     F = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateF;
                     H = DataGenerators::GasPhaseThermoChemistryData(gasID).ShomateH;
 
-                    HfuelI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
+                    Real64 HfuelI = (A * Tsho + B * pow_2_Tsho / 2.0 + C * pow_3_Tsho / 3.0 + D * pow_4_Tsho / 4.0 - E / Tsho + F - H);
 
                     tempHfuel += HfuelI * DataGenerators::FuelSupply(DataGenerators::FuelCell(GeneratorNum).FuelSupNum).ConstitMolalFract(thisConstit);
                 }
@@ -2428,7 +2421,6 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 tempHprodGases;
         Real64 A;        // shomate coeff
         Real64 B;        // shomate coeff
         Real64 C;        // shomate coeff
@@ -2448,7 +2440,7 @@ namespace FuelCellElectricGenerator {
 
         // loop through fuel constituents and sum up Cp
 
-        tempHprodGases = 0.0;
+        Real64 tempHprodGases = 0.0;
 
         Real64 const pow_2_Tsho(pow_2(Tsho));
         Real64 const pow_3_Tsho(pow_3(Tsho));
@@ -3147,8 +3139,6 @@ namespace FuelCellElectricGenerator {
         // does not (re)simulate entire FuelCell model
 
         if (GetFuelCellInput) {
-
-            // Read input data.
             GetFuelCellGeneratorInput();
             GetFuelCellInput = false;
         }
@@ -3213,12 +3203,7 @@ namespace FuelCellElectricGenerator {
         static bool InitGeneratorOnce(true); // flag for 1 time initialization
         static Array1D_bool MyEnvrnFlag;     // flag for init once at start of environment
         static Array1D_bool MyWarmupFlag;    // flag for init after warmup complete
-        int inNode;                          // inlet index in Node array
-        int outNode;                         // outlet, index in Node array
-        Real64 TimeElapsed;                  // Fraction of the current hour that has elapsed (h)
         static Array1D_bool MyPlantScanFlag;
-        Real64 mdot; // local temporary mass flow rate
-        Real64 rho;  // local temporary fluid density
         bool errFlag;
 
         // Do the one time initializations
@@ -3313,20 +3298,18 @@ namespace FuelCellElectricGenerator {
             DataGenerators::FuelCell(FCnum).Inverter.PCUlosses = 0.0;
             DataGenerators::FuelCell(FCnum).Inverter.QairIntake = 0.0;
 
-            rho = FluidProperties::GetDensityGlycol(
+            Real64 rho = FluidProperties::GetDensityGlycol(
                 DataPlant::PlantLoop(DataGenerators::FuelCell(FCnum).CWLoopNum).FluidName, DataGenerators::InitHRTemp, DataPlant::PlantLoop(DataGenerators::FuelCell(FCnum).CWLoopNum).FluidIndex, RoutineName);
 
             DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterVolumeFlowMax * rho;
             DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRate = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
-            inNode = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode;
-            outNode = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterOutNode;
-            DataLoopNode::Node(inNode).Temp = DataGenerators::InitHRTemp;
-            DataLoopNode::Node(outNode).Temp = DataGenerators::InitHRTemp;
+            DataLoopNode::Node(DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode).Temp = DataGenerators::InitHRTemp;
+            DataLoopNode::Node(DataGenerators::FuelCell(FCnum).ExhaustHX.WaterOutNode).Temp = DataGenerators::InitHRTemp;
 
             PlantUtilities::InitComponentNodes(0.0,
                                DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign,
-                               inNode,
-                               outNode,
+                                               DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode,
+                                               DataGenerators::FuelCell(FCnum).ExhaustHX.WaterOutNode,
                                DataGenerators::FuelCell(FCnum).CWLoopNum,
                                DataGenerators::FuelCell(FCnum).CWLoopSideNum,
                                DataGenerators::FuelCell(FCnum).CWBranchNum,
@@ -3348,30 +3331,27 @@ namespace FuelCellElectricGenerator {
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
-        TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (DataGenerators::FuelCell(FCnum).TimeElapsed != TimeElapsed) {
 
             DataGenerators::FuelCell(FCnum).ElecStorage.LastTimeStepStateOfCharge = DataGenerators::FuelCell(FCnum).ElecStorage.ThisTimeStepStateOfCharge;
             DataGenerators::FuelCell(FCnum).FCPM.PelLastTimeStep = DataGenerators::FuelCell(FCnum).FCPM.Pel;
 
-            inNode = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode;
-            outNode = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterOutNode;
             // intialize flow rate in water loop, this is "requesting" flow
-            mdot = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
+            Real64 mdot = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRateDesign;
 
             PlantUtilities::SetComponentFlowRate(mdot,
-                                 inNode,
-                                 outNode,
+                                                 DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode,
+                                                 DataGenerators::FuelCell(FCnum).ExhaustHX.WaterOutNode,
                                  DataGenerators::FuelCell(FCnum).CWLoopNum,
                                  DataGenerators::FuelCell(FCnum).CWLoopSideNum,
                                  DataGenerators::FuelCell(FCnum).CWBranchNum,
                                  DataGenerators::FuelCell(FCnum).CWCompNum);
 
             DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRate = mdot;
-            DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(inNode).Temp;
+            DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode).Temp;
             DataGenerators::FuelCell(FCnum).TimeElapsed = TimeElapsed;
         } else {
-            inNode = DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode;
 
             PlantUtilities::SetComponentFlowRate(DataGenerators::FuelCell(FCnum).ExhaustHX.WaterMassFlowRate,
                                  DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode,
@@ -3381,7 +3361,7 @@ namespace FuelCellElectricGenerator {
                                  DataGenerators::FuelCell(FCnum).CWBranchNum,
                                  DataGenerators::FuelCell(FCnum).CWCompNum);
 
-            DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(inNode).Temp;
+            DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInletTemp = DataLoopNode::Node(DataGenerators::FuelCell(FCnum).ExhaustHX.WaterInNode).Temp;
         }
     }
 
@@ -3414,15 +3394,13 @@ namespace FuelCellElectricGenerator {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Couple equpment skin losses to the Zone Heat Balance
+        // Couple equipment skin losses to the Zone Heat Balance
         // calculate skin losses from different subsystems and set the value
 
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
 
-        Real64 TotalZoneHeatGain; // working variable for zone gain [w]
-        int FCnum; // number of fuel cell
         static bool MyEnvrnFlag(true);
 
         if (DataGenerators::NumFuelCellGenerators == 0) return;
@@ -3454,8 +3432,8 @@ namespace FuelCellElectricGenerator {
         // this routine needs to do something for zone gains during sizing
 
         // first collect skin losses from different subsystems
-        for (FCnum = 1; FCnum <= DataGenerators::NumFuelCellGenerators; ++FCnum) {
-            TotalZoneHeatGain = DataGenerators::FuelCell(FCnum).AirSup.QskinLoss + DataGenerators::FuelSupply(DataGenerators::FuelCell(FCnum).FuelSupNum).QskinLoss +
+        for (int FCnum = 1; FCnum <= DataGenerators::NumFuelCellGenerators; ++FCnum) {
+            Real64 TotalZoneHeatGain = DataGenerators::FuelCell(FCnum).AirSup.QskinLoss + DataGenerators::FuelSupply(DataGenerators::FuelCell(FCnum).FuelSupNum).QskinLoss +
                                 DataGenerators::FuelCell(FCnum).WaterSup.QskinLoss + DataGenerators::FuelCell(FCnum).AuxilHeat.QskinLoss +
                                 DataGenerators::FuelCell(FCnum).FCPM.QdotSkin; // intake Blower losses to zone | fuel compressor losses to zone | water pump losses to
                                                                // zone | auxil burner losses to zone | power module (stack and reformer) losses to
@@ -3505,17 +3483,12 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        int InNodeNum;
-        int OutNodeNum;
-
         // now update water outlet node Changing to Kg/s!
-        OutNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterOutNode;
-        InNodeNum = DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode;
 
-        PlantUtilities::SafeCopyPlantNode(InNodeNum, OutNodeNum);
+        PlantUtilities::SafeCopyPlantNode(DataGenerators::FuelCell(Num).ExhaustHX.WaterInNode, DataGenerators::FuelCell(Num).ExhaustHX.WaterOutNode);
 
-        DataLoopNode::Node(OutNodeNum).Temp = DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletTemp;
-        DataLoopNode::Node(OutNodeNum).Enthalpy = DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
+        DataLoopNode::Node(DataGenerators::FuelCell(Num).ExhaustHX.WaterOutNode).Temp = DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletTemp;
+        DataLoopNode::Node(DataGenerators::FuelCell(Num).ExhaustHX.WaterOutNode).Enthalpy = DataGenerators::FuelCell(Num).ExhaustHX.WaterOutletEnthalpy;
     }
 
     void UpdateFuelCellGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
