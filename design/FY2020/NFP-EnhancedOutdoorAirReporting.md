@@ -1,27 +1,582 @@
-TITLE OF FEATURE
+Enhance Outdoor Air Reporting
 ================
 
-**Author, Company**
+**Jason Glazer and Mike Witte, GARD Analytics**
 
- - Original Date
- - Revision Date
+ - November 13, 2019
  
 
 ## Justification for New Feature ##
 
-insert text
-
-## E-mail and  Conference Call Conclusions ##
-
-insert text
+Currently, users seeking to use EnergyPlus for LEED work needs to document the use of Outdoor Air (OA) in their models. While 
+the current Outdoor Air Summary in EnergyPlus provides some information to help these users, it does not provide enough information. 
+Users often find it difficult to compare the OA delivered for proposed vs. baseline simulations, especially with economizers 
+and zone equipment. 
 
 ## Overview ##
 
-insert text
+Specific tasks for this include:
+
+- Expand the scope of the OA Summary to include zone heating, ventilation and air conditioning (HVAC) equipment.
+
+- Add tracking and table outputs for the minimum requested OA flow in addition to the existing output for actual OA flow.
+
+- Track times when the delivered OA is less than the minimum requirement, and
+
+- Provide outputs at standard air density.
+
+An issue was started to gather futher input on this topic:
+
+https://github.com/NREL/EnergyPlus/issues/5298
+
+Which stated:
+
+> Users often find it difficult to compare the outdoor air delivered for proposed vs baseline simulations. The logical place to look
+> is the Outdoor Air Summary Report and the component sizing report. The component sizing report shows the minimum outdoor air flow 
+> rates for Controller:OutdoorAir objects that have autosized OA flow rates, but there is no building total. But this would only 
+> cover air handlers, not zone equipment. OA flow rates show up in some other tables as well, but again, no building totals.
+> The Outdoor Air Summary report has average and minimum OA flow rates during occupied hours listed by zone, reported as ACH. It 
+> would be helpful to add flow in CFM or m3/s to these tables, and to add a total row for the entire building. Economizers can 
+> cloud the issue as well. Is it useful to report what the minimum flows would be if the economizer was not operating?
+
+More than a dozen people who were known to regularly submit projects under LEED using EnergyPlus were specifically asked to comment on 
+the issue and provided comments:
+
+- The total minimum OA for the building needs to be compared between the Baseline and Proposed Case models.
+
+- The Controller:OutdoorAir component sizing summary only shows values if the min/mas were autosized. If the user enters a hard value 
+the table is empty. The hard value should be reported as well when not autosized.
+
+- Include design (not including the economizer mode where OA may equal SA) and minimum (to check that area ventilation requirement is 
+modeled correctly if DCV is included) occupied ventilation by system (both zone level and air handlers) and a total for the building 
+in the Outdoor Air Summary report. 
+
+- If it would make more sense, this information could be included in a new report. You could label the new report as ASHRAE 62 
+Ventilation Summary, Mechanical Ventilation Summary, etc. 
+
+- Thinking about tabular reports (hence forgetting about tables of hour versus month (weekends v weekends too) showing OA numbers), 
+I would say that two metrics would be useful: "total outdoor air volume (m3) for the run period, per zone and building" and "total 
+outdoor air volume when economizer is off." That would help see whether the deviation in absolute numbers are off because of economizer
+or not. It would require setting a new output variable to keep track of OA only when econ isn't running, so annoying and probably 
+tedious but doable. 
+
+
+
+## E-mail and  Conference Call Conclusions ##
+
+No call yet
 
 ## Approach ##
 
-insert text
+The current report is shown below
+
+### Current Existing Report ###
+
+<p>Report:<b> Outdoor Air Summary</b></p>
+<p>For:<b> Entire Facility</b></p>
+<p>Timestamp: <b>2019-11-13
+    07:52:15</b></p>
+<b>Average Outdoor Air During Occupied Hours</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Average Number of Occupants</td>
+    <td align="right">Nominal Number of Occupants</td>
+    <td align="right">Zone Volume [ft3]</td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Infiltration [ACH]</td>
+    <td align="right">AFN Infiltration [ACH]</td>
+    <td align="right">Simple Ventilation [ACH]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        9.50</td>
+    <td align="right">       11.00</td>
+    <td align="right">     8450.18</td>
+    <td align="right">       1.591</td>
+    <td align="right">       0.057</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        4.32</td>
+    <td align="right">        5.00</td>
+    <td align="right">     3648.94</td>
+    <td align="right">       2.921</td>
+    <td align="right">       0.057</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        9.50</td>
+    <td align="right">       11.00</td>
+    <td align="right">     8450.18</td>
+    <td align="right">       1.484</td>
+    <td align="right">       0.057</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        4.32</td>
+    <td align="right">        5.00</td>
+    <td align="right">     3648.94</td>
+    <td align="right">       3.098</td>
+    <td align="right">       0.057</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">       17.27</td>
+    <td align="right">       20.00</td>
+    <td align="right">    15812.07</td>
+    <td align="right">       0.882</td>
+    <td align="right">       0.059</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+</table>
+<i>Values shown for a single zone without multipliers</i>
+<br><br>
+<b>Minimum Outdoor Air During Occupied Hours</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Average Number of Occupants</td>
+    <td align="right">Nominal Number of Occupants</td>
+    <td align="right">Zone Volume [ft3]</td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Infiltration [ACH]</td>
+    <td align="right">AFN Infiltration [ACH]</td>
+    <td align="right">Simple Ventilation [ACH]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        9.50</td>
+    <td align="right">       11.00</td>
+    <td align="right">     8450.18</td>
+    <td align="right">       0.030</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        4.32</td>
+    <td align="right">        5.00</td>
+    <td align="right">     3648.94</td>
+    <td align="right">       0.058</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        9.50</td>
+    <td align="right">       11.00</td>
+    <td align="right">     8450.18</td>
+    <td align="right">       0.028</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        4.32</td>
+    <td align="right">        5.00</td>
+    <td align="right">     3648.94</td>
+    <td align="right">       0.068</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">       17.27</td>
+    <td align="right">       20.00</td>
+    <td align="right">    15812.07</td>
+    <td align="right">       0.016</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+    <td align="right">       0.000</td>
+  </tr>
+</table>
+<i>Values shown for a single zone without multipliers</i>
+<br><br>
+
+After reviewing the original task as well as the input received issue #5298, the proposed updated Outdoor Air Summary report 
+will appear as shown below.
+
+### Proposed New Report ###
+
+<p>Report:<b> Outdoor Air Summary</b></p>
+<p>For:<b> Entire Facility</b></p>
+<p>Timestamp: <b>2019-11-13
+    07:52:15</b></p>
+
+<b>Parameters Related to Outdoor Air</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Average Number of Occupants</td>
+    <td align="right">Nominal Number of Occupants</td>
+    <td align="right">Zone Volume [ft3]</td>
+    <td align="right">Minimum Outdoor Air (ACH)</td>
+    <td align="right">Minimum Outdoor Air (ft3/min)</td>
+    <td align="right">Maximum Outdoor Air (ACH)</td>
+    <td align="right">Maximum Outdoor Air (ft3/min)</td>
+    <td align="right">Time Below Minimum Outside Air [Hours]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+
+
+<b>Average Outdoor Air During Occupied Hours - Air Changes</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Infiltration [ACH]</td>
+    <td align="right">AFN Infiltration [ACH]</td>
+    <td align="right">Simple Ventilation [ACH]</td>
+    <td align="right">Zone HVAC Ventilation [ACH</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<br><br>
+
+<b>Average Outdoor Air During Occupied Hours - Flow Rates</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Infiltration [ft3/min]</td>
+    <td align="right">AFN Infiltration [ft3/min]</td>
+    <td align="right">Simple Ventilation [ft3/min]</td>
+    <td align="right">Zone HVAC Ventilation [ft3/min]/td>
+    <td align="right">Total Outdoor Air Volume [ft3]</td>
+    <td align="right">Total Outdoor Air Volume when Economizer is Off [ft3]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<br><br>
+
+
+<b>Minimum Outdoor Air During Occupied Hours - Air Changes</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Infiltration [ACH]</td>
+    <td align="right">AFN Infiltration [ACH]</td>
+    <td align="right">Simple Ventilation [ACH]</td>
+    <td align="right">Zone HVAC Ventilation[ACH]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<br><br>
+
+
+<b>Minimum Outdoor Air During Occupied Hours - Flow Rates</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Infiltration [ft3/min]</td>
+    <td align="right">AFN Infiltration [ft3/min]</td>
+    <td align="right">Simple Ventilation [ft3/min]</td>
+    <td align="right">Zone HVAC Ventilation[ft3/min]</td>
+    <td align="right">Total Outdoor Air Volume [ft3]</td>
+    <td align="right">Total Outdoor Air Volume when Economizer is Off [ft3]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<br><br>
 
 ## Testing/Validation/Data Sources ##
 
