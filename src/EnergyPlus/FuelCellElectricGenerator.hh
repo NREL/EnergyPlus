@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -60,8 +61,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCPowerModuleStruct
     {
-        // Members
-        // user input data
         std::string Name;           // name of this PowerModule data
         int EffMode;                // mode for efficiency curves
         int EffCurveID;             // pointer to curve for efficiency
@@ -146,8 +145,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCAirSupplyDataStruct
     {
-        // Members
-        // user input data
         std::string Name;            // name of this
         std::string NodeName;        // Air supply node name
         int SupNodeNum;              // Air supply node ID
@@ -184,7 +181,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCWaterSupplyDataStruct
     {
-        // Members
         std::string Name;          // name of this water supply module
         int WaterTempMode;         // temperature of water inlet determination
         std::string NodeName;      // node name for temperature at input
@@ -210,7 +206,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCAuxilHeatDataStruct
     {
-        // Members
         std::string Name; // name of this auxiliary heating module
         std::string ZoneName;
         int ZoneID;
@@ -243,8 +238,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCExhaustHXDataStruct
     {
-        // Members
-        // user defined variables
         std::string Name;                 // name of this exhaust gas heat recovery
         std::string WaterInNodeName;      // HR Water Inlet Node
         int WaterInNode;                  // HR Water Outlet Node ID
@@ -299,8 +292,6 @@ namespace FuelCellElectricGenerator {
 
     struct BatteryDichargeDataStruct
     {
-        // Members
-        // user defined variables
         std::string Name; // name of this battery data set
         Real64 NumInSeries;
         Real64 NumInParallel;
@@ -323,8 +314,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCElecStorageDataStruct
     {
-        // Members
-        // user defined variables
         std::string Name; // name of this electrical storage module
         int StorageModelMode;
         Real64 StartingEnergyStored; // joules inside
@@ -357,8 +346,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCInverterDataStruct
     {
-        // Members
-        // user-defined data
         std::string Name; // name of this inverter
         int EffMode;      // efficiency calculation mode
         Real64 ConstEff;
@@ -468,8 +455,6 @@ namespace FuelCellElectricGenerator {
 
     struct FCStackCoolerDataStruct
     {
-        // Members
-        // user input data
         std::string Name;             // name of this stack cooler module
         std::string WaterInNodeName;  // HR Water Inlet Node
         int WaterInNode;              // HR Water Outlet Node ID
@@ -507,7 +492,7 @@ namespace FuelCellElectricGenerator {
         }
     };
 
-    struct FCDataStruct
+    struct FCDataStruct : PlantComponent
     {
         // Members
         // from input data and nested types for subsystems
@@ -556,6 +541,8 @@ namespace FuelCellElectricGenerator {
         void initialize();
 
         void setupOutputVars();
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 

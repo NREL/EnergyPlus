@@ -112,6 +112,11 @@ namespace FuelCellElectricGenerator {
         FuelCell.deallocate();
     }
 
+    void FCDataStruct::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    {
+
+    }
+
     void SimFuelCellGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
                               int &GeneratorIndex,
@@ -1572,7 +1577,7 @@ namespace FuelCellElectricGenerator {
                 DataGenerators::FuelSupply(this->FuelSupNum).QskinLoss = 0.0;
             }
 
-            // calculate tatal fuel enthalpy coming into power module
+            // calculate total fuel enthalpy coming into power module
 
             // (Hmolfuel in KJ/mol)
             Real64 Hmolfuel;        // temp enthalpy of fuel mixture in KJ/mol
@@ -1629,7 +1634,6 @@ namespace FuelCellElectricGenerator {
                 this->WaterSup.PmpPowerLossFactor * this->WaterSup.PwaterCompEl;
 
             if (this->WaterSup.QskinLoss < 0.0) {
-                // write(*,*) 'problem in WaterSup%QskinLoss ',FuelCell(GeneratorNum)%WaterSup%QskinLoss
                 this->WaterSup.QskinLoss = 0.0;
             }
 
@@ -1684,7 +1688,7 @@ namespace FuelCellElectricGenerator {
                 }
             }
 
-            if (this->FCPM.NdotAir <= 0.0) { // just pass through, domain probably collapased in modeling
+            if (this->FCPM.NdotAir <= 0.0) { // just pass through, domain probably collapsed in modeling
                 this->AirSup.TairIntoFCPM = this->AirSup.TairIntoBlower;
 
             } else {
@@ -1698,8 +1702,7 @@ namespace FuelCellElectricGenerator {
             this->AirSup.QskinLoss = this->AirSup.BlowerHeatLossFactor * this->AirSup.PairCompEl;
 
             if (this->AirSup.QskinLoss < 0.0) {
-                //   write(*,*) 'problem in AirSup%QskinLoss ', FuelCell(GeneratorNum)%AirSup%QskinLoss
-                ShowWarningError("problem in AirSup%QskinLoss " + General::RoundSigDigits(this->AirSup.QskinLoss, 3));
+                ShowWarningError("problem in AirSup.QskinLoss " + General::RoundSigDigits(this->AirSup.QskinLoss, 3));
                 this->AirSup.QskinLoss = 0.0;
             }
 
@@ -1766,7 +1769,6 @@ namespace FuelCellElectricGenerator {
                     } else if (SELECT_CASE_var == 4) {
                         // all the H20 coming in plus the new H20 from reactions and the H20 from water used in reforming
                         NdotH20 = NdotH20ProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
-                        //+ FuelCell(GeneratorNum)%FCPM%NdotLiqwater
 
                     } else if (SELECT_CASE_var == 5) {
                         // all the argon coming in.
@@ -1783,7 +1785,7 @@ namespace FuelCellElectricGenerator {
 
             this->FCPM.ConstitMolalFract(1) = NdotCO2 / this->FCPM.NdotProdGas;
 
-            // all the nitrogen comming in
+            // all the nitrogen coming in
             this->FCPM.ConstitMolalFract(2) = NdotN2 / this->FCPM.NdotProdGas;
 
             // all the oxygen in the excess air stream
@@ -1879,8 +1881,6 @@ namespace FuelCellElectricGenerator {
                 this->FCPM.TprodGasLeavingFCPM = tmpTprodGas;
                 //  write(*,*) 'Number of Root Solver iterations: ', solverFlag
             }
-
-            //  moved call to HeatBalanceInternalGains.   Call FigureFuelCellZoneGains(GeneratorNum)
 
             // Control Step 3 determine interaction with electrical storage
             // How much power is really going into inverter?
@@ -3439,39 +3439,40 @@ namespace FuelCellElectricGenerator {
 
         // first collect skin losses from different subsystems
         for (int FCnum = 1; FCnum <= NumFuelCellGenerators; ++FCnum) {
-            Real64 TotalZoneHeatGain = FuelCell(FCnum).AirSup.QskinLoss + DataGenerators::FuelSupply(FuelCell(FCnum).FuelSupNum).QskinLoss +
-                                FuelCell(FCnum).WaterSup.QskinLoss + FuelCell(FCnum).AuxilHeat.QskinLoss +
-                                FuelCell(FCnum).FCPM.QdotSkin; // intake Blower losses to zone | fuel compressor losses to zone | water pump losses to
+            auto &thisFC = FuelCell(FCnum);
+            Real64 TotalZoneHeatGain = thisFC.AirSup.QskinLoss + DataGenerators::FuelSupply(thisFC.FuelSupNum).QskinLoss +
+                                thisFC.WaterSup.QskinLoss + thisFC.AuxilHeat.QskinLoss +
+                                thisFC.FCPM.QdotSkin; // intake Blower losses to zone | fuel compressor losses to zone | water pump losses to
                                                                // zone | auxil burner losses to zone | power module (stack and reformer) losses to
                                                                // zone
 
             // now account for other subsystems that may or may not have air intake recovery
             {
-                auto const SELECT_CASE_var(FuelCell(FCnum).AirSup.IntakeRecoveryMode);
+                auto const SELECT_CASE_var(thisFC.AirSup.IntakeRecoveryMode);
 
                 if (SELECT_CASE_var == DataGenerators::NoRecoveryOnAirIntake) { // then the heat has to go into zone
                     TotalZoneHeatGain +=
-                        FuelCell(FCnum).AuxilHeat.QairIntake + FuelCell(FCnum).ElecStorage.QairIntake + FuelCell(FCnum).Inverter.QairIntake;
+                        thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
                 } else if (SELECT_CASE_var == DataGenerators::RecoverAuxiliaryBurner) {
-                    TotalZoneHeatGain += FuelCell(FCnum).ElecStorage.QairIntake + FuelCell(FCnum).Inverter.QairIntake;
+                    TotalZoneHeatGain += thisFC.ElecStorage.QairIntake + thisFC.Inverter.QairIntake;
 
                 } else if (SELECT_CASE_var == DataGenerators::RecoverInverterBatt) {
-                    TotalZoneHeatGain += FuelCell(FCnum).AuxilHeat.QairIntake;
+                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake;
 
                 } else if (SELECT_CASE_var == DataGenerators::RecoverInverter) {
-                    TotalZoneHeatGain += FuelCell(FCnum).AuxilHeat.QairIntake + FuelCell(FCnum).ElecStorage.QairIntake;
+                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.ElecStorage.QairIntake;
                 } else if (SELECT_CASE_var == DataGenerators::RecoverBattery) {
-                    TotalZoneHeatGain += FuelCell(FCnum).AuxilHeat.QairIntake + FuelCell(FCnum).Inverter.QairIntake;
+                    TotalZoneHeatGain += thisFC.AuxilHeat.QairIntake + thisFC.Inverter.QairIntake;
 
                 } else if (SELECT_CASE_var == DataGenerators::RecoverBurnInvertBatt) {
                     // do nothing
                 }
             }
 
-            FuelCell(FCnum).QconvZone = TotalZoneHeatGain * (1 - FuelCell(FCnum).FCPM.RadiativeFract);
-            FuelCell(FCnum).Report.SkinLossConvect = FuelCell(FCnum).QconvZone;
-            FuelCell(FCnum).QradZone = TotalZoneHeatGain * FuelCell(FCnum).FCPM.RadiativeFract;
-            FuelCell(FCnum).Report.SkinLossRadiat = FuelCell(FCnum).QradZone;
+            thisFC.QconvZone = TotalZoneHeatGain * (1 - thisFC.FCPM.RadiativeFract);
+            thisFC.Report.SkinLossConvect = thisFC.QconvZone;
+            thisFC.QradZone = TotalZoneHeatGain * thisFC.FCPM.RadiativeFract;
+            thisFC.Report.SkinLossRadiat = thisFC.QradZone;
 
         } // over number of Fuel cells
     }
@@ -3573,7 +3574,7 @@ namespace FuelCellElectricGenerator {
 
         this->Report.PCUlosses = this->Inverter.PCUlosses; // inverter losses
         this->Report.DCPowerGen = this->FCPM.Pel;          // DC power out of FCPM.
-        this->Report.DCPowerEff = this->FCPM.Eel;          // FCPM efficienty Eel.
+        this->Report.DCPowerEff = this->FCPM.Eel;          // FCPM efficiency Eel.
         this->Report.ElectEnergyinStorage = this->ElecStorage.ThisTimeStepStateOfCharge;
         this->Report.StoredPower = this->ElecStorage.PelIntoStorage;
         this->Report.StoredEnergy = this->ElecStorage.PelIntoStorage * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
