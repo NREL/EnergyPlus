@@ -8,10 +8,10 @@ configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/Configure
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
 SET( SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
@@ -634,11 +634,11 @@ endif()
 add_custom_target( GenerateEmbeddedEpJSONSchema
                    COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
                            -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
+                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
                            -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
                            -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
-                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
-                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                           -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )
 
 add_subdirectory(AirflowNetwork)
@@ -698,15 +698,16 @@ if( BUILD_TESTING )
   target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
   add_test(NAME "integration.TestEnergyPlusCallbacks"
            COMMAND ${CMAKE_COMMAND}
-           -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-           -DBINARY_DIR=${CMAKE_BINARY_DIR}
+           -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
+           -DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
-           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
+           -P ${PROJECT_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
-  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${PROJECT_BINARY_DIR}/Products/EnergyPlus")
 endif()
+

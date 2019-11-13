@@ -35,7 +35,7 @@ endif()
 
 if(GIT_FOUND)
   execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
-                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
                   TIMEOUT 10
                   RESULT_VARIABLE RESULT
                   OUTPUT_VARIABLE GIT_VERSION
@@ -124,37 +124,37 @@ if (MINGW)
   set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif ()
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/btwxt/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/re2 )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/doj )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/nlohmann )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/valijson )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/btwxt/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/re2 )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/doj )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/nlohmann )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/valijson )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/Expat" "${PROJECT_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/eigen/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
 
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
-# target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
+# target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/third_party/nlohmann" "${PROJECT_SOURCE_DIR}/third_party/doj" )
 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
@@ -194,7 +194,7 @@ ADD_SUBDIRECTORY(third_party/btwxt)
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
 
-execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
   message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
 endif()
@@ -249,7 +249,7 @@ endif()
 
 if( BUILD_PACKAGE )
   # We handle everything in a dedicated cmake file
-  include(cmake/Install.cmake)
+  include(${PROJECT_SOURCE_DIR}/cmake/Install.cmake)
 endif()
 
 if (BUILD_DOCS)
