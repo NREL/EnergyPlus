@@ -3572,4 +3572,265 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(31899.037804634620, DXCoil(2).MSRatedTotCap(2));
     EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(2).MSRatedTotCap(1));
 }
+
+TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
+{
+    // Test partial autosize Coil:Cooling:DX:MultiSpeed #7477
+
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:DX:MultiSpeed,",
+        "   ashp clg coil,                          !- Name",
+        "   ,                                       !- Availability Schedule Name",
+        "   ashp unitary system Fan - Cooling Coil Node, !- Air Inlet Node Name",
+        "   ashp unitary system Cooling Coil - Heating Coil Node, !- Air Outlet Node Name",
+        "   ,                                       !- Condenser Air Inlet Node Name",
+        "   AirCooled,                              !- Condenser Type",
+        "   ,                                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   ,                                       !- Supply Water Storage Tank Name",
+        "   ,                                       !- Condensate Collection Water Storage Tank Name",
+        "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
+        "   No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
+        "   0,                                      !- Crankcase Heater Capacity {W}",
+        "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "   0,                                      !- Basin Heater Capacity {W/K}",
+        "   2,                                      !- Basin Heater Setpoint Temperature {C}",
+        "   ,                                       !- Basin Heater Operating Schedule Name",
+        "   Electricity,                            !- Fuel Type",
+        "   2,                                      !- Number of Speeds",
+        "   AutoSize,                               !- Speed Gross Rated Total Cooling Capacity 1 {W}",
+        "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 1",
+        "   4.80,                                   !- Speed Gross Rated Cooling COP 1 {W/W}",
+        "   AutoSize,                               !- Speed Rated Air Flow Rate 1 {m3/s}",
+        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
+        "   Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
+        "   Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
+        "   Cool-EIR-fFF1,                          !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 1",
+        "   Cool-PLF-fPLR1,                         !- Speed Part Load Fraction Correlation Curve Name 1",
+        "   1000,                                   !- Speed Nominal Time for Condensate Removal to Begin 1 {s}",
+        "   1.5,                                    !- Speed Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity 1 "
+        "{dimensionless}",
+        "   3,                                      !- Speed Maximum Cycling Rate 1 {cycles/hr}",
+        "   45,                                     !- Speed Latent Capacity Time Constant 1 {s}",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 1 {dimensionless}",
+        "   ConstantBiquadratic 1,                  !- Speed Waste Heat Function of Temperature Curve Name 1",
+        "   0.9,                                    !- Speed Evaporative Condenser Effectiveness 1 {dimensionless}",
+        "   AutoSize,                               !- Speed Evaporative Condenser Air Flow Rate 1 {m3/s}",
+        "   AutoSize,                               !- Speed Rated Evaporative Condenser Pump Power Consumption 1 {W}",
+        "   AutoSize,                               !- Speed Gross Rated Total Cooling Capacity 2 {W}",
+        "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 2",
+        "   4.80,                                   !- Speed Gross Rated Cooling COP 2 {W/W}",
+        "   AutoSize,                               !- Speed Rated Air Flow Rate 2 {m3/s}",
+        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
+        "   Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
+        "   Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
+        "   Cool-EIR-fFF2,                          !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 2",
+        "   Cool-PLF-fPLR2,                         !- Speed Part Load Fraction Correlation Curve Name 2",
+        "   1000,                                   !- Speed Nominal Time for Condensate Removal to Begin 2 {s}",
+        "   1.5,                                    !- Speed Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity 2 "
+        "{dimensionless}",
+        "   3,                                      !- Speed Maximum Cycling Rate 2 {cycles/hr}",
+        "   45,                                     !- Speed Latent Capacity Time Constant 2 {s}",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 2 {dimensionless}",
+        "   ConstantBiquadratic 1,                  !- Speed Waste Heat Function of Temperature Curve Name 2",
+        "   0.9,                                    !- Speed Evaporative Condenser Effectiveness 2 {dimensionless}",
+        "   AutoSize,                               !- Speed Evaporative Condenser Air Flow Rate 2 {m3/s}",
+        "   AutoSize;                               !- Speed Rated Evaporative Condenser Pump Power Consumption 2 {W}",
+
+        " Curve:Biquadratic,",
+        "   Cool-Cap-fT1,                           !- Name",
+        "   1.658788451,                            !- Coefficient1 Constant",
+        "   -0.0834530076,                          !- Coefficient2 x",
+        "   0.00342409032,                          !- Coefficient3 x**2",
+        "   0.0024332436,                           !- Coefficient4 y",
+        "   -4.5036e-005,                           !- Coefficient5 y**2",
+        "   -0.00053367984,                         !- Coefficient6 x*y",
+        "   13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "   23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "   18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "   51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-Cap-fFF1,                          !- Name",
+        "   0.655239515,                            !- Coefficient1 Constant",
+        "   0.511655216,                            !- Coefficient2 x",
+        "   -0.166894731,                           !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "   2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        " Curve:Biquadratic,",
+        "   Cool-EIR-fT1,                           !- Name",
+        "   -0.582915701,                           !- Coefficient1 Constant",
+        "   0.1581006726,                           !- Coefficient2 x",
+        "   -0.00439794684,                         !- Coefficient3 x**2",
+        "   -0.020335122,                           !- Coefficient4 y",
+        "   0.00107983368,                          !- Coefficient5 y**2",
+        "   -0.0006395922,                          !- Coefficient6 x*y",
+        "   13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "   23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "   18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "   51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-EIR-fFF1,                          !- Name",
+        "   1.639108268,                            !- Coefficient1 Constant",
+        "   -0.998953996,                           !- Coefficient2 x",
+        "   0.359845728,                            !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "   2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-PLF-fPLR1,                         !- Name",
+        "   0.89,                                   !- Coefficient1 Constant",
+        "   0.11,                                   !- Coefficient2 x",
+        "   0,                                      !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   1,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0.7,                                    !- Minimum Curve Output {BasedOnField A3}",
+        "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        " Curve:Biquadratic,",
+        "   ConstantBiquadratic 1,                  !- Name",
+        "   1,                                      !- Coefficient1 Constant",
+        "   0,                                      !- Coefficient2 x",
+        "   0,                                      !- Coefficient3 x**2",
+        "   0,                                      !- Coefficient4 y",
+        "   0,                                      !- Coefficient5 y**2",
+        "   0,                                      !- Coefficient6 x*y",
+        "   -100,                                   !- Minimum Value of x {BasedOnField A2}",
+        "   100,                                    !- Maximum Value of x {BasedOnField A2}",
+        "   -100,                                   !- Minimum Value of y {BasedOnField A3}",
+        "   100;                                    !- Maximum Value of y {BasedOnField A3}",
+
+        " Curve:Biquadratic,",
+        "   Cool-Cap-fT2,                           !- Name",
+        "   1.472738138,                            !- Coefficient1 Constant",
+        "   -0.0672218352,                          !- Coefficient2 x",
+        "   0.0029199042,                           !- Coefficient3 x**2",
+        "   5.16005999999982e-005,                  !- Coefficient4 y",
+        "   -2.97756e-005,                          !- Coefficient5 y**2",
+        "   -0.00035908596,                         !- Coefficient6 x*y",
+        "   13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "   23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "   18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "   51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-Cap-fFF2,                          !- Name",
+        "   0.618281092,                            !- Coefficient1 Constant",
+        "   0.569060264,                            !- Coefficient2 x",
+        "   -0.187341356,                           !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "   2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        " Curve:Biquadratic,",
+        "   Cool-EIR-fT2,                           !- Name",
+        "   -0.488195597,                           !- Coefficient1 Constant",
+        "   0.0991621818,                           !- Coefficient2 x",
+        "   -0.00236967444,                         !- Coefficient3 x**2",
+        "   0.019503441,                            !- Coefficient4 y",
+        "   0.0004297698,                           !- Coefficient5 y**2",
+        "   -0.00109743984,                         !- Coefficient6 x*y",
+        "   13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "   23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "   18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "   51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-EIR-fFF2,                          !- Name",
+        "   1.570774717,                            !- Coefficient1 Constant",
+        "   -0.914152018,                           !- Coefficient2 x",
+        "   0.343377302,                            !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "   2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        " Curve:Quadratic,",
+        "   Cool-PLF-fPLR2,                         !- Name",
+        "   0.89,                                   !- Coefficient1 Constant",
+        "   0.11,                                   !- Coefficient2 x",
+        "   0,                                      !- Coefficient3 x**2",
+        "   0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "   1,                                      !- Maximum Value of x {BasedOnField A2}",
+        "   0.7,                                    !- Minimum Curve Output {BasedOnField A3}",
+        "   1;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // get input
+    GetDXCoils();
+    SetPredefinedTables();
+    // check multi-speed DX cooling coil
+    EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
+    EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
+
+    DataEnvironment::StdBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = 1.2;
+    Psychrometrics::InitializePsychRoutines();
+
+    // set system sizing parameters
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 1;
+    DataSizing::FinalSysSizing.allocate(1);
+
+    DataSizing::SysSizingRunDone = true;
+    DataSizing::FinalSysSizing(CurSysNum).DesMainVolFlow = 1.75;
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 13.0;
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0080;
+    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 24.290004300002032;
+    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
+    DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+
+    DataSizing::SysSizInput.allocate(1);
+    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
+    DataSizing::NumSysSizInput = 1;
+    // Need this to prevent crash in RequestSizing
+    DataSizing::UnitarySysEqSizing.allocate(1);
+
+    // test SHR design size when all autosized
+    SizeDXCoil(1);
+    // Design flow rate at speed 2 and speed 1
+    EXPECT_EQ(1.75, DXCoil(1).MSRatedAirVolFlowRate(2));
+    EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
+    EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
+    // Design Capacity at speed 2 and speed 1
+    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
+    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
+    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    // Design SHR at speed 2 and speed 1
+    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
+    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+
+    // test SHR design size when partial autosizing (capacity is hardsized)
+    DXCoil( 1 ).MSRatedTotCap( 1 ) = 17500.0; // DataSizing::AutoSize;
+    DXCoil( 1 ).MSRatedTotCap( 2 ) = 35000.0; // DataSizing::AutoSize;
+
+    SizeDXCoil(1);
+    // Design size SHR at speed 2 and speed 1
+    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
+    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    // Design Capacity at speed 2 and speed 1
+    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
+    EXPECT_EQ(35000.0, DXCoil(1).MSRatedTotCap(2));
+    EXPECT_EQ(35000.0 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    // Design flow rate at speed 2 and speed 1
+    EXPECT_EQ(1.75, DXCoil(1).MSRatedAirVolFlowRate(2));
+    EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
+}
 } // namespace EnergyPlus
