@@ -99,9 +99,10 @@ namespace IceRink {
     Real64 InletTemp;
     Real64 OutletTemp;
     Real64 FlowRate;
+    Real64 HeatFlux;
 
-        // Control types:
-        int const SurfaceTempControl(1); // Controls system using ice surface temperature
+    // Control types:
+    int const SurfaceTempControl(1); // Controls system using ice surface temperature
     int const BrineOutletTempControl(2); // Controls system using brine outlet temperature
 
     // Operating Mode:
@@ -246,7 +247,7 @@ namespace IceRink {
             Rink(Item).TubeLength = rNumericArgs(2);
 
             if (UtilityRoutines::SameString(cAlphaArgs(5), BOTC)) {
-                Rink(Item).ControlStrategy == BrineOutletTempControl;
+                Rink(Item).ControlStrategy = BrineOutletTempControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), STC)) {
                 Rink(Item).ControlStrategy = SurfaceTempControl;
             }
@@ -566,7 +567,6 @@ namespace IceRink {
     {
         // Using/Aliasing
         using DataHeatBalFanSys::CTFTsrcConstPart;
-        using DataHeatBalFanSys::QRadSysSource;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
         using DataHeatBalFanSys::RadSysTiHBToutCoef;
@@ -625,7 +625,7 @@ namespace IceRink {
             // or a slight mismatch between zone and system controls.  This is not
             // necessarily a "problem" so this exception is necessary in the code.
 
-            QRadSysSource(SurfNum) = 0.0;
+            this->QSrc = 0.0;
             Real64 ReqMassFlow = 0.0;
             SetComponentFlowRate(ReqMassFlow, this->InNode, this->OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
         } else {
@@ -653,11 +653,11 @@ namespace IceRink {
             Real64 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
             Real64 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
-            QRadSysSource(SurfNum) =
+            HeatFlux =
                 (RefrigTempIn - Ck) / ((Cl / DataSurfaces::Surface(SurfNum).Area) + (1 / (Effectiveness * RefrigMassFlow * CpRefrig)));
 
-            Real64 TSource = Ck + (Cl * QRadSysSource(SurfNum));
-            Real64 IceTemp = (Ca + (Cb * Cd) + (QRadSysSource(SurfNum) * (Cc + (Cb * Cf)))) / (1 - (Cb * Ce));
+            Real64 TSource = Ck + (Cl * HeatFlux);
+            Real64 IceTemp = (Ca + (Cb * Cd) + HeatFlux * (Cc + (Cb * Cf))) / (1 - (Cb * Ce));
             Real64 QRadSysSourceMax = RefrigMassFlow * CpRefrig * (RefrigTempIn - TSource);
 
             if (ControlStrategy == BrineOutletTempControl) {
@@ -668,7 +668,7 @@ namespace IceRink {
                 Real64 ReqMassFlow = (((Ck - RefrigTempIn) / (this->RefrigSetptTemp - RefrigTempIn)) - (1 / Effectiveness)) *
                                      (DataSurfaces::Surface(SurfNum).Area / (CpRefrig * Cl));
 
-                Real64 TRefigOutCheck = RefrigTempIn - ((QRadSysSource(SurfNum)) / RefrigMassFlow * CpRefrig);
+                Real64 TRefigOutCheck = RefrigTempIn - (HeatFlux) / RefrigMassFlow * CpRefrig;
 
                 if (TRefigOutCheck <= (this->RefrigSetptTemp)) {
                     RefrigMassFlow = this->MinRefrigMassFlow;
@@ -693,7 +693,7 @@ namespace IceRink {
                 Real64 ReqMassFlow = QSetPoint / ((Effectiveness * CpRefrig) * (RefrigTempIn - TSource));
 
                 if (IceTemp <= this->IceSetptTemp) {
-                    QRadSysSource(SurfNum) = 0.0;
+                    HeatFlux = 0.0;
                     RefrigMassFlow = 0.0;
                     SetComponentFlowRate(RefrigMassFlow, this->InNode, this->OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
                 } else {
@@ -716,7 +716,7 @@ namespace IceRink {
         // If so then the refrigeration system is doing opposite of its intension
         // and it needs to be shut down.
 
-        if (QRadSysSource(SurfNum) >= 0.0) {
+        if (HeatFlux >= 0.0) {
             RefrigMassFlow = 0.0;
             SetComponentFlowRate(RefrigMassFlow, this->InNode, this->OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
             this->RefrigMassFlow = RefrigMassFlow;
@@ -729,7 +729,7 @@ namespace IceRink {
         for (auto &R : Resurfacer) {
             R.RinkResurfacer(ResurfacingLoad);
         }
-        LoadMet = FreezingLoad + ResurfacingLoad + QRadSysSource(SurfNum);
+        LoadMet = FreezingLoad + ResurfacingLoad + HeatFlux;
     }
 
     void IceRinkData::update()
@@ -751,7 +751,7 @@ namespace IceRink {
         int LoopNum;
         int LoopSideNum;
 
-        this->QSrc = SourceFlux;
+        this->QSrc = HeatFlux;
 
         LoopNum = this->LoopNum;
         LoopSideNum = this->LoopSide;
@@ -766,7 +766,7 @@ namespace IceRink {
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QSrcAvg += this->QSrc * TimeStepSys / TimeStepZone;
 
-            this->LastQSrc = SourceFlux;
+            this->LastQSrc = HeatFlux;
             this->LastSysTimeElapsed = SysTimeElapsed;
             this->LastTimeStepSys = TimeStepSys;
 
@@ -775,7 +775,7 @@ namespace IceRink {
             SafeCopyPlantNode(this->InNode, this->OutNode);
             // check for flow
             if ((CpFluid > 0.0) && (FlowRate > 0.0)) {
-                Node(this->OutNode).Temp = RefrigInletTemp - this->TotalSurfaceArea * SourceFlux / (FlowRate * CpFluid);
+                Node(this->OutNode).Temp = RefrigInletTemp - this->TotalSurfaceArea * HeatFlux / (FlowRate * CpFluid);
                 Node(this->OutNode).Enthalpy = Node(this->OutNode).Temp * CpFluid;
             }
         }
