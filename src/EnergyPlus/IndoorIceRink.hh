@@ -99,6 +99,8 @@ namespace IceRink {
         int WaterIndex;
         Real64 FloodWaterTemp;
         int NumOfSurfaces;        // Total number of surfaces in the ice rink arena
+        Real64 DesignMassFlowRate; // Design flow rate through the rink HX [kg/s]
+        Real64 DesignCapacity;     // design cooling capacity
         Real64 MinRefrigMassFlow; // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
         Real64 MaxRefrigMassFlow; // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
         int ControlStrategy;      // Control strategy for the ice rink (BOTC or STC)
@@ -119,8 +121,10 @@ namespace IceRink {
         int BranchNum;
         int CompNum;
 
-        int RefrigInNode;             // Inlet node number for the cold refrigerant entring the floor radiant system
-        int RefrigOutNode;            // Outlet node number for the hot refrigerant exiting the floor radiant system
+        std::string RefrigInNode;     // Inlet node for the cold refrigerant entring the floor radiant system
+        std::string RefrigOutNode;    // Outlet node for the hot refrigerant exiting the floor radiant system
+        int InNode;                   // Refrigerant inlet node number
+        int OutNode;                  // Refrigerant outlet node number
         int RefrigSetptSchedPtr;      // Pointer to set point temperature of refrigerant outlet
         int IceSetptSchedPtr;         // Pointer to set point temperature of ice surface
         Real64 RefrigSetptTemp;       // Set point temperature for refrigerant outlet
@@ -135,6 +139,14 @@ namespace IceRink {
         int GlycolIndex; // Index to secondary refrigerant used in indirect system
         int RefrigType;
         Real64 RefrigConc;
+
+        bool MyFlag;
+        bool oneTimeFlag;
+        Real64 QSrc;
+        Real64 QSrcAvg;
+        Real64 LastQSrc;
+        Real64 LastSysTimeElapsed;
+        Real64 LastTimeStepSys;
 
         // ReportData
         Real64 RefrigInletTemp;  // Refrigerant inlet temperature
