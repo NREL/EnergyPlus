@@ -77,6 +77,9 @@ C:\EnergyPlusV9-2-0\maintenancetool.exe --verbose --script install_script.qs
 function Controller() {
   installer.autoRejectMessageBoxes();
 
+  // silent install is not an option until QtIFW v3.0.1
+  gui.setSilent(true);
+
   installer.setMessageBoxAutomaticAnswer("OverwriteTargetDirectory",
                                          QMessageBox.Yes);
 
