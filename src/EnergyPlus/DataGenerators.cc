@@ -144,34 +144,22 @@ namespace DataGenerators {
 
     Real64 const ImBalanceTol(0.00001); // used as fraction of electrical power at power module
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
     int NumFuelConstit(0);
     int NumGeneratorFuelSups(0);
-    int NumMicroCHPs(0);
-    int NumMicroCHPParams(0); // number of parameter sets for micro chp
     int NumGensWDynamics(0);  // number of dynamics controls for generators
 
     // Object Data
     Array1D<GasPropertyDataStruct> GasPhaseThermoChemistryData;
     Array1D<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
-    Array1D<MicroCHPDataStruct> MicroCHP;
-    Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
     Array1D<GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
     void clear_state()
     {
         NumFuelConstit = 0;
         NumGeneratorFuelSups = 0;
-        NumMicroCHPs = 0;
-        NumMicroCHPParams = 0;
         NumGensWDynamics = 0;
         GasPhaseThermoChemistryData.deallocate();
         FuelSupply.deallocate();
-        MicroCHP.deallocate();
-        MicroCHPParamInput.deallocate();
         GeneratorDynamics.deallocate();
     }
 
