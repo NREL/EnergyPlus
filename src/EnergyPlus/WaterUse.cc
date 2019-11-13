@@ -206,6 +206,31 @@ namespace EnergyPlus {
             } // WaterConnNum
         }
 
+        PlantComponent *WaterConnectionsType::factory(std::string const &objectName)
+        {
+            // Process the input data
+            if (getWaterUseInputFlag) {
+                GetWaterUseInput();
+                getWaterUseInputFlag = false;
+            }
+
+            // Now look for this particular object in the list
+            for (auto &thisWC : WaterConnections) {
+                if (thisWC.Name == objectName) {
+                    return &thisWC;
+                }
+            }
+            // If we didn't find it, fatal
+            ShowFatalError("LocalWaterUseConnectionFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+            // Shut up the compiler
+            return nullptr; // LCOV_EXCL_LINE
+        }
+
+        void WaterConnectionsType::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+        {
+
+        }
+
         void SimulateWaterUseConnection(
                 int EP_UNUSED(EquipTypeNum), std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration)
         {

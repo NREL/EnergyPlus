@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -143,7 +144,7 @@ namespace EnergyPlus {
             void CalcEquipmentDrainTemp();
         };
 
-        struct WaterConnectionsType
+        struct WaterConnectionsType : PlantComponent
         {
             std::string Name; // Name of DHW
             bool Init;        // Flag for initialization:  TRUE means do the init
@@ -216,6 +217,10 @@ namespace EnergyPlus {
                       PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
             {
             }
+
+            static PlantComponent *factory(std::string const &objectName);
+
+            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
             void InitConnections(int WaterConnNum);
 
