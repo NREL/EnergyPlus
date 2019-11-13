@@ -125,7 +125,7 @@ namespace EnergyPlus {
             int WaterEquipNum;
             int WaterConnNum;
             int NumIteration;
-            bool MyEnvrnFlag(true);
+            static bool MyEnvrnFlag(true);
 
             // FLOW:
             if (getWaterUseInputFlag) {
@@ -229,7 +229,7 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             //  INTEGER :: WaterEquipNum
             int WaterConnNum;
-            bool MyEnvrnFlag(true);
+            static bool MyEnvrnFlag(true);
 
             // FLOW:
             if (getWaterUseInputFlag) {
