@@ -553,7 +553,9 @@ namespace FuelCellElectricGenerator {
         {
         }
 
-        void InitFuelCellGenerators();
+        void initialize();
+
+        void setupOutputVars();
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 
