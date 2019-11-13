@@ -178,9 +178,9 @@ namespace EnergyPlus {
                 while (true) {
                     ++NumIteration;
 
-                    CalcConnectionsFlowRates(WaterConnNum, FirstHVACIteration);
-                    CalcConnectionsDrainTemp(WaterConnNum);
-                    CalcConnectionsHeatRecovery(WaterConnNum);
+                    WaterConnections(WaterConnNum).CalcConnectionsFlowRates(FirstHVACIteration);
+                    WaterConnections(WaterConnNum).CalcConnectionsDrainTemp();
+                    WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
 
                     if (WaterConnections(WaterConnNum).TempError < Tolerance) {
                         break;
@@ -200,9 +200,8 @@ namespace EnergyPlus {
 
                 } // WHILE
 
-                UpdateWaterConnections(WaterConnNum);
-
-                ReportWaterUse(WaterConnNum);
+                WaterConnections(WaterConnNum).UpdateWaterConnections();
+                WaterConnections(WaterConnNum).ReportWaterUse();
 
             } // WaterConnNum
         }
@@ -286,9 +285,9 @@ namespace EnergyPlus {
             while (true) {
                 ++NumIteration;
 
-                CalcConnectionsFlowRates(WaterConnNum, FirstHVACIteration);
-                CalcConnectionsDrainTemp(WaterConnNum);
-                CalcConnectionsHeatRecovery(WaterConnNum);
+                WaterConnections(WaterConnNum).CalcConnectionsFlowRates(FirstHVACIteration);
+                WaterConnections(WaterConnNum).CalcConnectionsDrainTemp();
+                WaterConnections(WaterConnNum).CalcConnectionsHeatRecovery();
 
                 if (WaterConnections(WaterConnNum).TempError < Tolerance) {
                     break;
@@ -308,9 +307,8 @@ namespace EnergyPlus {
 
             } // WHILE
 
-            UpdateWaterConnections(WaterConnNum);
-
-            ReportWaterUse(WaterConnNum);
+            WaterConnections(WaterConnNum).UpdateWaterConnections();
+            WaterConnections(WaterConnNum).ReportWaterUse();
         }
 
         void GetWaterUseInput()
@@ -562,7 +560,7 @@ namespace EnergyPlus {
 
                     WaterConnections(WaterConnNum).HXUA = DataIPShortCuts::rNumericArgs(1);
 
-                    WaterConnections(WaterConnNum).WaterEquipment.allocate(NumAlphas - 9);
+                    WaterConnections(WaterConnNum).myWaterEquipArr.allocate(NumAlphas - 9);
 
                     for (AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum) {
                         int WaterEquipNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(AlphaNum), WaterEquipment);
@@ -582,7 +580,7 @@ namespace EnergyPlus {
                                 WaterEquipment(WaterEquipNum).Connections = WaterConnNum;
 
                                 ++WaterConnections(WaterConnNum).NumWaterEquipment;
-                                WaterConnections(WaterConnNum).WaterEquipment(WaterConnections(WaterConnNum).NumWaterEquipment) = WaterEquipNum;
+                                WaterConnections(WaterConnNum).myWaterEquipArr(WaterConnections(WaterConnNum).NumWaterEquipment) = WaterEquipNum;
 
                                 WaterConnections(WaterConnNum).PeakVolFlowRate +=
                                         WaterEquipment(WaterEquipNum).PeakVolFlowRate; // this does not include possible multipliers
@@ -605,7 +603,7 @@ namespace EnergyPlus {
                 for (int WaterConnNum = 1; WaterConnNum <= numWaterConnections; ++WaterConnNum) {
                     WaterConnections(WaterConnNum).PeakMassFlowRate = 0.0;
                     for (int WaterEquipNum = 1; WaterEquipNum <= WaterConnections(WaterConnNum).NumWaterEquipment; ++WaterEquipNum) {
-                        int thisWaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(WaterEquipNum);
+                        int thisWaterEquipNum = WaterConnections(WaterConnNum).myWaterEquipArr(WaterEquipNum);
                         if (WaterEquipment(thisWaterEquipNum).Zone > 0) {
                             WaterConnections(WaterConnNum).PeakMassFlowRate +=
                                     WaterEquipment(thisWaterEquipNum).PeakVolFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp) *
@@ -1277,7 +1275,7 @@ namespace EnergyPlus {
             }
         }
 
-        void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration)
+        void WaterConnectionsType::CalcConnectionsFlowRates(bool FirstHVACIteration)
         {
 
             // SUBROUTINE INFORMATION:
@@ -1289,60 +1287,59 @@ namespace EnergyPlus {
             // PURPOSE OF THIS SUBROUTINE:
             // Calculate summed values for WATER USE CONNECTIONS (to prepare to request flow from plant, and for reporting).
 
-            WaterConnections(WaterConnNum).ColdMassFlowRate = 0.0;
-            WaterConnections(WaterConnNum).HotMassFlowRate = 0.0;
+            this->ColdMassFlowRate = 0.0;
+            this->HotMassFlowRate = 0.0;
 
-            for (int Loop = 1; Loop <= WaterConnections(WaterConnNum).NumWaterEquipment; ++Loop) {
-                int WaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(Loop);
+            for (int Loop = 1; Loop <= this->NumWaterEquipment; ++Loop) {
+                int WaterEquipNum = this->myWaterEquipArr(Loop);
 
                 WaterEquipment(WaterEquipNum).CalcEquipmentFlowRates();
 
-                WaterConnections(WaterConnNum).ColdMassFlowRate += WaterEquipment(WaterEquipNum).ColdMassFlowRate;
-                WaterConnections(WaterConnNum).HotMassFlowRate += WaterEquipment(WaterEquipNum).HotMassFlowRate;
+                this->ColdMassFlowRate += WaterEquipment(WaterEquipNum).ColdMassFlowRate;
+                this->HotMassFlowRate += WaterEquipment(WaterEquipNum).HotMassFlowRate;
             } // Loop
 
-            WaterConnections(WaterConnNum).TotalMassFlowRate =
-                    WaterConnections(WaterConnNum).ColdMassFlowRate + WaterConnections(WaterConnNum).HotMassFlowRate;
+            this->TotalMassFlowRate =
+                    this->ColdMassFlowRate + this->HotMassFlowRate;
 
-            if (!WaterConnections(WaterConnNum).StandAlone) { // Interact with the plant loop
-                if (WaterConnections(WaterConnNum).InletNode > 0) {
+            if (!this->StandAlone) { // Interact with the plant loop
+                if (this->InletNode > 0) {
                     if (FirstHVACIteration) {
                         // Request the mass flow rate from the demand side manager
-                        PlantUtilities::SetComponentFlowRate(WaterConnections(WaterConnNum).HotMassFlowRate,
-                                                             WaterConnections(WaterConnNum).InletNode,
-                                                             WaterConnections(WaterConnNum).OutletNode,
-                                                             WaterConnections(WaterConnNum).PlantLoopNum,
-                                                             WaterConnections(WaterConnNum).PlantLoopSide,
-                                                             WaterConnections(WaterConnNum).PlantLoopBranchNum,
-                                                             WaterConnections(WaterConnNum).PlantLoopCompNum);
+                        PlantUtilities::SetComponentFlowRate(this->HotMassFlowRate,
+                                                             this->InletNode,
+                                                             this->OutletNode,
+                                                             this->PlantLoopNum,
+                                                             this->PlantLoopSide,
+                                                             this->PlantLoopBranchNum,
+                                                             this->PlantLoopCompNum);
 
                     } else {
-                        Real64 DesiredHotWaterMassFlow = WaterConnections(WaterConnNum).HotMassFlowRate;
+                        Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
                         PlantUtilities::SetComponentFlowRate(DesiredHotWaterMassFlow,
-                                                             WaterConnections(WaterConnNum).InletNode,
-                                                             WaterConnections(WaterConnNum).OutletNode,
-                                                             WaterConnections(WaterConnNum).PlantLoopNum,
-                                                             WaterConnections(WaterConnNum).PlantLoopSide,
-                                                             WaterConnections(WaterConnNum).PlantLoopBranchNum,
-                                                             WaterConnections(WaterConnNum).PlantLoopCompNum);
+                                                             this->InletNode,
+                                                             this->OutletNode,
+                                                             this->PlantLoopNum,
+                                                             this->PlantLoopSide,
+                                                             this->PlantLoopBranchNum,
+                                                             this->PlantLoopCompNum);
                         // readjust if more than actual available mass flow rate determined by the demand side manager
-                        if ((WaterConnections(WaterConnNum).HotMassFlowRate != DesiredHotWaterMassFlow) &&
-                            (WaterConnections(WaterConnNum).HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
+                        if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) &&
+                            (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 
-                            Real64 AvailableFraction = DesiredHotWaterMassFlow / WaterConnections(WaterConnNum).HotMassFlowRate;
+                            Real64 AvailableFraction = DesiredHotWaterMassFlow / this->HotMassFlowRate;
 
-                            WaterConnections(WaterConnNum).ColdMassFlowRate =
-                                    WaterConnections(WaterConnNum).TotalMassFlowRate -
-                                    WaterConnections(WaterConnNum).HotMassFlowRate; // Preserve the total mass flow rate
+                            this->ColdMassFlowRate =
+                                    this->TotalMassFlowRate -
+                                    this->HotMassFlowRate; // Preserve the total mass flow rate
 
                             // Proportionally reduce hot water and increase cold water for all WATER USE EQUIPMENT
-                            for (int Loop = 1; Loop <= WaterConnections(WaterConnNum).NumWaterEquipment; ++Loop) {
-                                int WaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(Loop);
+                            for (int Loop = 1; Loop <= this->NumWaterEquipment; ++Loop) {
+                                int WaterEquipNum = this->myWaterEquipArr(Loop);
 
                                 // Recalculate flow rates for water equipment within connection
                                 WaterEquipment(WaterEquipNum).HotMassFlowRate *= AvailableFraction;
-                                WaterEquipment(WaterEquipNum).ColdMassFlowRate =
-                                        WaterEquipment(WaterEquipNum).TotalMassFlowRate - WaterEquipment(WaterEquipNum).HotMassFlowRate;
+                                WaterEquipment(WaterEquipNum).ColdMassFlowRate = WaterEquipment(WaterEquipNum).TotalMassFlowRate - WaterEquipment(WaterEquipNum).HotMassFlowRate;
 
                                 // Recalculate mixed water temperature
                                 if (WaterEquipment(WaterEquipNum).TotalMassFlowRate > 0.0) {
@@ -1359,24 +1356,21 @@ namespace EnergyPlus {
                 }
             }
 
-            if (WaterConnections(WaterConnNum).SupplyTankNum > 0) {
+            if (this->SupplyTankNum > 0) {
                 // Set the demand request for supply water from water storage tank
-                WaterConnections(WaterConnNum).ColdVolFlowRate =
-                        WaterConnections(WaterConnNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-                DataWater::WaterStorage(WaterConnections(WaterConnNum).SupplyTankNum).VdotRequestDemand(WaterConnections(WaterConnNum).TankDemandID) =
-                        WaterConnections(WaterConnNum).ColdVolFlowRate;
+                this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                DataWater::WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
 
                 // Check if cold flow rate should be starved by restricted flow from tank
                 // Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
                 // But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
-                WaterConnections(WaterConnNum).TankVolFlowRate = DataWater::WaterStorage(WaterConnections(WaterConnNum).SupplyTankNum)
-                        .VdotAvailDemand(WaterConnections(WaterConnNum).TankDemandID);
-                WaterConnections(WaterConnNum).TankMassFlowRate =
-                        WaterConnections(WaterConnNum).TankVolFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                this->TankVolFlowRate = DataWater::WaterStorage(this->SupplyTankNum)
+                        .VdotAvailDemand(this->TankDemandID);
+                this->TankMassFlowRate = this->TankVolFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             }
         }
 
-        void CalcConnectionsDrainTemp(int WaterConnNum)
+        void WaterConnectionsType::CalcConnectionsDrainTemp()
         {
 
             // SUBROUTINE INFORMATION:
@@ -1386,28 +1380,27 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             Real64 MassFlowTempSum = 0.0;
-            WaterConnections(WaterConnNum).DrainMassFlowRate = 0.0;
+            this->DrainMassFlowRate = 0.0;
 
-            for (int Loop = 1; Loop <= WaterConnections(WaterConnNum).NumWaterEquipment; ++Loop) {
-                int WaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(Loop);
+            for (int Loop = 1; Loop <= this->NumWaterEquipment; ++Loop) {
+                int WaterEquipNum = this->myWaterEquipArr(Loop);
 
                 WaterEquipment(WaterEquipNum).CalcEquipmentDrainTemp();
 
-                WaterConnections(WaterConnNum).DrainMassFlowRate += WaterEquipment(WaterEquipNum).DrainMassFlowRate;
+                this->DrainMassFlowRate += WaterEquipment(WaterEquipNum).DrainMassFlowRate;
                 MassFlowTempSum += WaterEquipment(WaterEquipNum).DrainMassFlowRate * WaterEquipment(WaterEquipNum).DrainTemp;
             } // Loop
 
-            if (WaterConnections(WaterConnNum).DrainMassFlowRate > 0.0) {
-                WaterConnections(WaterConnNum).DrainTemp = MassFlowTempSum / WaterConnections(WaterConnNum).DrainMassFlowRate;
+            if (this->DrainMassFlowRate > 0.0) {
+                this->DrainTemp = MassFlowTempSum / this->DrainMassFlowRate;
             } else {
-                WaterConnections(WaterConnNum).DrainTemp = WaterConnections(WaterConnNum).HotTemp;
+                this->DrainTemp = this->HotTemp;
             }
 
-            WaterConnections(WaterConnNum).DrainVolFlowRate =
-                    WaterConnections(WaterConnNum).DrainMassFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+            this->DrainVolFlowRate = this->DrainMassFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
         }
 
-        void CalcConnectionsHeatRecovery(int WaterConnNum)
+        void WaterConnectionsType::CalcConnectionsHeatRecovery()
         {
 
             // SUBROUTINE INFORMATION:
@@ -1419,103 +1412,89 @@ namespace EnergyPlus {
             // PURPOSE OF THIS SUBROUTINE:
             // Calculate drainwater heat recovery
 
-            if (!WaterConnections(WaterConnNum).HeatRecovery) {
-                WaterConnections(WaterConnNum).RecoveryTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
-                WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
-                WaterConnections(WaterConnNum).WasteTemp = WaterConnections(WaterConnNum).DrainTemp;
+            if (!this->HeatRecovery) {
+                this->RecoveryTemp = this->ColdSupplyTemp;
+                this->ReturnTemp = this->ColdSupplyTemp;
+                this->WasteTemp = this->DrainTemp;
 
-            } else if (WaterConnections(WaterConnNum).TotalMassFlowRate == 0.0) {
-                WaterConnections(WaterConnNum).Effectiveness = 0.0;
-                WaterConnections(WaterConnNum).RecoveryRate = 0.0;
-                WaterConnections(WaterConnNum).RecoveryTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
-                WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
-                WaterConnections(WaterConnNum).WasteTemp = WaterConnections(WaterConnNum).DrainTemp;
+            } else if (this->TotalMassFlowRate == 0.0) {
+                this->Effectiveness = 0.0;
+                this->RecoveryRate = 0.0;
+                this->RecoveryTemp = this->ColdSupplyTemp;
+                this->ReturnTemp = this->ColdSupplyTemp;
+                this->WasteTemp = this->DrainTemp;
 
             } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
                 {
-                    auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryConfig);
+                    auto const SELECT_CASE_var(this->HeatRecoveryConfig);
                     if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
-                        WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).HotMassFlowRate;
+                        this->RecoveryMassFlowRate = this->HotMassFlowRate;
                     } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
-                        WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).ColdMassFlowRate;
+                        this->RecoveryMassFlowRate = this->ColdMassFlowRate;
                     } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
-                        WaterConnections(WaterConnNum).RecoveryMassFlowRate = WaterConnections(WaterConnNum).TotalMassFlowRate;
+                        this->RecoveryMassFlowRate = this->TotalMassFlowRate;
                     }
                 }
 
-                Real64 HXCapacityRate = Psychrometrics::CPHW(DataGlobals::InitConvTemp) * WaterConnections(WaterConnNum).RecoveryMassFlowRate;
-                Real64 DrainCapacityRate = Psychrometrics::CPHW(DataGlobals::InitConvTemp) * WaterConnections(WaterConnNum).DrainMassFlowRate;
+                Real64 HXCapacityRate = Psychrometrics::CPHW(DataGlobals::InitConvTemp) * this->RecoveryMassFlowRate;
+                Real64 DrainCapacityRate = Psychrometrics::CPHW(DataGlobals::InitConvTemp) * this->DrainMassFlowRate;
                 Real64 MinCapacityRate = min(DrainCapacityRate, HXCapacityRate);
 
                 {
-                    auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryHX);
+                    auto const SELECT_CASE_var(this->HeatRecoveryHX);
                     if (SELECT_CASE_var == HeatRecoveryHX::Ideal) {
-                        WaterConnections(WaterConnNum).Effectiveness = 1.0;
+                        this->Effectiveness = 1.0;
 
                     } else if (SELECT_CASE_var == HeatRecoveryHX::CounterFlow) { // Unmixed
                         Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
-                        Real64 NTU = WaterConnections(WaterConnNum).HXUA / MinCapacityRate;
+                        Real64 NTU = this->HXUA / MinCapacityRate;
                         if (CapacityRatio == 1.0) {
-                            WaterConnections(WaterConnNum).Effectiveness = NTU / (1.0 + NTU);
+                            this->Effectiveness = NTU / (1.0 + NTU);
                         } else {
                             Real64 ExpVal = std::exp(-NTU * (1.0 - CapacityRatio));
-                            WaterConnections(WaterConnNum).Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
+                            this->Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
                         }
 
                     } else if (SELECT_CASE_var == HeatRecoveryHX::CrossFlow) { // Unmixed
                         Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
-                        Real64 NTU = WaterConnections(WaterConnNum).HXUA / MinCapacityRate;
-                        WaterConnections(WaterConnNum).Effectiveness =
-                                1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
+                        Real64 NTU = this->HXUA / MinCapacityRate;
+                        this->Effectiveness = 1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
                     }
                 }
 
-                WaterConnections(WaterConnNum).RecoveryRate = WaterConnections(WaterConnNum).Effectiveness * MinCapacityRate *
-                                                              (WaterConnections(WaterConnNum).DrainTemp - WaterConnections(WaterConnNum).ColdSupplyTemp);
+                this->RecoveryRate = this->Effectiveness * MinCapacityRate * (this->DrainTemp - this->ColdSupplyTemp);
+                this->RecoveryTemp = this->ColdSupplyTemp + this->RecoveryRate / (Psychrometrics::CPHW(DataGlobals::InitConvTemp) * this->TotalMassFlowRate);
+                this->WasteTemp = this->DrainTemp - this->RecoveryRate / (Psychrometrics::CPHW(DataGlobals::InitConvTemp) * this->TotalMassFlowRate);
 
-                WaterConnections(WaterConnNum).RecoveryTemp =
-                        WaterConnections(WaterConnNum).ColdSupplyTemp +
-                        WaterConnections(WaterConnNum).RecoveryRate /
-                        (Psychrometrics::CPHW(DataGlobals::InitConvTemp) * WaterConnections(WaterConnNum).TotalMassFlowRate);
-
-                WaterConnections(WaterConnNum).WasteTemp =
-                        WaterConnections(WaterConnNum).DrainTemp -
-                        WaterConnections(WaterConnNum).RecoveryRate /
-                        (Psychrometrics::CPHW(DataGlobals::InitConvTemp) * WaterConnections(WaterConnNum).TotalMassFlowRate);
-
-                if (WaterConnections(WaterConnNum).RecoveryTankNum > 0) {
-                    DataWater::WaterStorage(WaterConnections(WaterConnNum).RecoveryTankNum).VdotAvailSupply(WaterConnections(WaterConnNum).TankSupplyID) =
-                            WaterConnections(WaterConnNum).DrainVolFlowRate;
-                    DataWater::WaterStorage(WaterConnections(WaterConnNum).RecoveryTankNum).TwaterSupply(WaterConnections(WaterConnNum).TankSupplyID) =
-                            WaterConnections(WaterConnNum).WasteTemp;
+                if (this->RecoveryTankNum > 0) {
+                    DataWater::WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
+                    DataWater::WaterStorage(this->RecoveryTankNum).TwaterSupply(this->TankSupplyID) = this->WasteTemp;
                 }
 
                 {
-                    auto const SELECT_CASE_var(WaterConnections(WaterConnNum).HeatRecoveryConfig);
+                    auto const SELECT_CASE_var(this->HeatRecoveryConfig);
                     if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
-                        WaterConnections(WaterConnNum).TempError = 0.0; // No feedback back to the cold supply
-                        WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).RecoveryTemp;
+                        this->TempError = 0.0; // No feedback back to the cold supply
+                        this->ReturnTemp = this->RecoveryTemp;
 
                     } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
-                        WaterConnections(WaterConnNum).TempError =
-                                std::abs(WaterConnections(WaterConnNum).ColdTemp - WaterConnections(WaterConnNum).RecoveryTemp);
+                        this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
-                        WaterConnections(WaterConnNum).ColdTemp = WaterConnections(WaterConnNum).RecoveryTemp;
-                        WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).ColdSupplyTemp;
+                        this->ColdTemp = this->RecoveryTemp;
+                        this->ReturnTemp = this->ColdSupplyTemp;
 
                     } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
-                        WaterConnections(WaterConnNum).TempError =
-                                std::abs(WaterConnections(WaterConnNum).ColdTemp - WaterConnections(WaterConnNum).RecoveryTemp);
+                        this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
-                        WaterConnections(WaterConnNum).ColdTemp = WaterConnections(WaterConnNum).RecoveryTemp;
-                        WaterConnections(WaterConnNum).ReturnTemp = WaterConnections(WaterConnNum).RecoveryTemp;
+                        this->ColdTemp = this->RecoveryTemp;
+                        this->ReturnTemp = this->RecoveryTemp;
                     }
                 }
             }
         }
 
-        void UpdateWaterConnections(int WaterConnNum)
+        void WaterConnectionsType::UpdateWaterConnections()
         {
 
             // SUBROUTINE INFORMATION:
@@ -1527,12 +1506,12 @@ namespace EnergyPlus {
             // PURPOSE OF THIS SUBROUTINE:
             // Updates the node variables with local variables.
 
-            if (WaterConnections(WaterConnNum).InletNode > 0 && WaterConnections(WaterConnNum).OutletNode > 0) {
+            if (this->InletNode > 0 && this->OutletNode > 0) {
                 // Pass all variables from inlet to outlet node
-                PlantUtilities::SafeCopyPlantNode(WaterConnections(WaterConnNum).InletNode, WaterConnections(WaterConnNum).OutletNode, WaterConnections(WaterConnNum).PlantLoopNum);
+                PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode, this->PlantLoopNum);
 
                 // Set outlet node variables that are possibly changed
-                DataLoopNode::Node(WaterConnections(WaterConnNum).OutletNode).Temp = WaterConnections(WaterConnNum).ReturnTemp;
+                DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;
                 // should add enthalpy update to return?
             }
         }
@@ -1578,7 +1557,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReportWaterUse(int WaterConnNum)
+        void WaterConnectionsType::ReportWaterUse()
         {
 
             // SUBROUTINE INFORMATION:
@@ -1590,55 +1569,37 @@ namespace EnergyPlus {
             // PURPOSE OF THIS SUBROUTINE:
             // Calculates report variables.
 
-            for (int Loop = 1; Loop <= WaterConnections(WaterConnNum).NumWaterEquipment; ++Loop) {
-                int WaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(Loop);
-                WaterEquipment(WaterEquipNum).ColdVolFlowRate =
-                        WaterEquipment(WaterEquipNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-                WaterEquipment(WaterEquipNum).HotVolFlowRate =
-                        WaterEquipment(WaterEquipNum).HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-                WaterEquipment(WaterEquipNum).TotalVolFlowRate =
-                        WaterEquipment(WaterEquipNum).ColdVolFlowRate + WaterEquipment(WaterEquipNum).HotVolFlowRate;
+            for (int Loop = 1; Loop <= this->NumWaterEquipment; ++Loop) {
 
-                WaterEquipment(WaterEquipNum).ColdVolume =
-                        WaterEquipment(WaterEquipNum).ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                WaterEquipment(WaterEquipNum).HotVolume =
-                        WaterEquipment(WaterEquipNum).HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                WaterEquipment(WaterEquipNum).TotalVolume =
-                        WaterEquipment(WaterEquipNum).TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                int WaterEquipNum = this->myWaterEquipArr(Loop);
+                auto &thisWEq = WaterEquipment(WaterEquipNum);
 
-                if (WaterEquipment(WaterEquipNum).Connections == 0) {
-                    WaterEquipment(WaterEquipNum).Power = WaterEquipment(WaterEquipNum).HotMassFlowRate *
-                                                          Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
-                                                          (WaterEquipment(WaterEquipNum).HotTemp - WaterEquipment(WaterEquipNum).ColdTemp);
+                thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
+                thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+
+                if (thisWEq.Connections == 0) {
+                    thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
                 } else {
-                    WaterEquipment(WaterEquipNum).Power =
-                            WaterEquipment(WaterEquipNum).HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
-                            (WaterEquipment(WaterEquipNum).HotTemp - WaterConnections(WaterEquipment(WaterEquipNum).Connections).ReturnTemp);
+                    thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
+                            (thisWEq.HotTemp - WaterConnections(thisWEq.Connections).ReturnTemp);
                 }
 
-                WaterEquipment(WaterEquipNum).Energy = WaterEquipment(WaterEquipNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             }
 
-            WaterConnections(WaterConnNum).ColdVolFlowRate =
-                    WaterConnections(WaterConnNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-            WaterConnections(WaterConnNum).HotVolFlowRate =
-                    WaterConnections(WaterConnNum).HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-            WaterConnections(WaterConnNum).TotalVolFlowRate =
-                    WaterConnections(WaterConnNum).ColdVolFlowRate + WaterConnections(WaterConnNum).HotVolFlowRate;
-
-            WaterConnections(WaterConnNum).ColdVolume =
-                    WaterConnections(WaterConnNum).ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            WaterConnections(WaterConnNum).HotVolume =
-                    WaterConnections(WaterConnNum).HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            WaterConnections(WaterConnNum).TotalVolume =
-                    WaterConnections(WaterConnNum).TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-            WaterConnections(WaterConnNum).Power = WaterConnections(WaterConnNum).HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
-                                                   (WaterConnections(WaterConnNum).HotTemp - WaterConnections(WaterConnNum).ReturnTemp);
-            WaterConnections(WaterConnNum).Energy = WaterConnections(WaterConnNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-            WaterConnections(WaterConnNum).RecoveryEnergy =
-                    WaterConnections(WaterConnNum).RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+            this->HotVolFlowRate = this->HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+            this->TotalVolFlowRate = this->ColdVolFlowRate + this->HotVolFlowRate;
+            this->ColdVolume = this->ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->HotVolume = this->HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->TotalVolume = this->TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->Power = this->HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) * (this->HotTemp - this->ReturnTemp);
+            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->RecoveryEnergy = this->RecoveryRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         }
 
         void CalcWaterUseZoneGains()

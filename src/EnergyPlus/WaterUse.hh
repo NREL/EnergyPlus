@@ -198,7 +198,7 @@ namespace EnergyPlus {
             Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
             int NumWaterEquipment;
             int MaxIterationsErrorIndex; // recurring error index
-            Array1D_int WaterEquipment;
+            Array1D_int myWaterEquipArr;
             int PlantLoopNum;
             int PlantLoopSide;
             int PlantLoopBranchNum;
@@ -218,6 +218,16 @@ namespace EnergyPlus {
             }
 
             void InitConnections(int WaterConnNum);
+
+            void CalcConnectionsFlowRates(bool FirstHVACIteration);
+
+            void CalcConnectionsDrainTemp();
+
+            void CalcConnectionsHeatRecovery();
+
+            void UpdateWaterConnections();
+
+            void ReportWaterUse();
         };
 
         void clear_state();
@@ -228,17 +238,7 @@ namespace EnergyPlus {
 
         void GetWaterUseInput();
 
-        void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration);
-
-        void CalcConnectionsDrainTemp(int WaterConnNum);
-
-        void CalcConnectionsHeatRecovery(int WaterConnNum);
-
-        void UpdateWaterConnections(int WaterConnNum);
-
         void ReportStandAloneWaterUse();
-
-        void ReportWaterUse(int WaterConnNum);
 
         void CalcWaterUseZoneGains();
 
