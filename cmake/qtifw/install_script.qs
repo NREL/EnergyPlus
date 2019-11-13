@@ -16,7 +16,7 @@ sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal
 open EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.dmg
 sudo /Volumes/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64 --verbose --script install_script.qs
 
-# Windows: open cmd.exe as admin: `--platform minimal` appears unsupported
+# Windows: open cmd.exe as admin: `--platform minimal` appears unsupported (but we use gui.setSilent(true) so nothing will pop up)
 EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs
 ```
 
@@ -45,12 +45,12 @@ Windows: Open cmd.exe as admin
 EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
 ```
 
-On Windows only, if CreateStartMenu is true (default), an extra option `UseAllUsersStartMenu=true` was added to create the shortcuts in the All Users start menu,
+On Windows only, if CreateStartMenu is true (default), there is a built-in option `AllUsers=true`
+which will in particular create the shortcuts in the All Users start menu (C:\ProgramData\Microsoft\Windows\Start Menu\Programs)
 which is useful if you use SCCM (or psexec) to run the commands as you are LOCAL SYSTEM account when you do and these shortcuts won't work for the regular user
-NOTE/TODO: THIS OPTION WILL ONLY BE SUPPORTED ON THE NEXT OFFICIAL E+ RELEASE, IT WON'T WORK WITH THE EXISINT 9.2.0 BINARY
 
 ```
-EnergyPlus-9.3.0-xxxxxxxxx-Windows-x86_64.exe --verbose --script install_script.qs UseAllUsersStartMenu=true
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs AllUsers=true
 ```
 
 -------------------------------------------------------------------------------

@@ -10,7 +10,8 @@ function Component()
     // ... add custom operations
 
     var kernel = systemInfo.kernelType;
-    // On Windows
+
+    // On Windows (which is always true in this context)
     if( kernel == "winnt" ) {
 
       // Regular case: same as just using "@StartMenuDir@/link_name.lnk"
@@ -20,21 +21,27 @@ function Component()
 
       var target_dir = startMenuDir;
 
-      // For use with install_script.qs, for headless install via local system
-      // admin
-      if (installer.value("UseAllUsersStartMenu") === "true") {
+      // Note: Actually there is a built-in flag AllUsers=true that will already make
+      // StartMenuDir = installer.value("AllUsersStartMenuProgramsPath") + "/EnergyPlusV9-2-0"
+      // So the workaround below isn't needed (keeping it just in case for now)
 
-        // Extract the last part of that full group: that's your group, eg "EnergyPlusV9-2-0"
-        var startMenuGroup = startMenuDir.match(/([^\\]*)\\*$/)[1];
-
-        // TODO: extra logging for debug
-        console.log("startMenuGroup: " + startMenuGroup);
-        console.log("startMenuDir: " + startMenuDir);
-        console.log("Reconstructed startMenuDir using UserStartMenuProgramsPath & startMenuGroup: " + installer.value("UserStartMenuProgramsPath") + "/" + startMenuGroup);
-
-        target_dir = installer.value("AllUsersStartMenuProgramsPath") + "/" + startMenuGroup;
-        console.log("UseAllUsersStartMenu was passed!")
-      }
+/*
+ *      // For use with install_script.qs, for headless install via local system
+ *      // admin
+ *      if (installer.value("UseAllUsersStartMenu") === "true") {
+ *
+ *        // Extract the last part of that full group: that's your group, eg "EnergyPlusV9-2-0"
+ *        var startMenuGroup = startMenuDir.match(/([^\\]*)\\*$/)[1];
+ *
+ *        // TODO: extra logging for debug
+ *        console.log("startMenuGroup: " + startMenuGroup);
+ *        console.log("startMenuDir: " + startMenuDir);
+ *        console.log("Reconstructed startMenuDir using UserStartMenuProgramsPath & startMenuGroup: " + installer.value("UserStartMenuProgramsPath") + "/" + startMenuGroup);
+ *
+ *        target_dir = installer.value("AllUsersStartMenuProgramsPath") + "/" + startMenuGroup;
+ *        console.log("UseAllUsersStartMenu was passed!")
+ *      }
+ */
 
       console.log("Target directory for Start Menu Shortcuts: " + target_dir);
 
