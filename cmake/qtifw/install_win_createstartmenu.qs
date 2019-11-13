@@ -14,19 +14,30 @@ function Component()
     if( kernel == "winnt" ) {
 
       // Regular case: same as just using "@StartMenuDir@/link_name.lnk"
-      var target_dir = installer.value("UserStartMenuProgramsPath") + "/" +
-                       installer.value("StartMenuDir");
-      console.log("StartMenuDir: " + target_dir);
+      // [QTIFW-697]: StartMenuDir returns the full path, not just the group.
+      // eg: installer.value("UserStartMenuProgramsPath") + "/EnergyPlusV9-2-0"
+      var startMenuDir = installer.value("StartMenuDir");
+
+      var target_dir = startMenuDir;
 
       // For use with install_script.qs, for headless install via local system
       // admin
       if (installer.value("UseAllUsersStartMenu") === "true") {
-        target_dir = installer.value("AllUsersStartMenuProgramsPath") + "/" +
-                     installer.value("StartMenuDir");
+
+        // Extract the last part of that full group: that's your group, eg "EnergyPlusV9-2-0"
+        var startMenuGroup = startMenuDir.match(/([^\\]*)\\*$/)[1];
+
+        // TODO: extra logging for debug
+        console.log("startMenuGroup: " + startMenuGroup);
+        console.log("startMenuDir: " + startMenuDir);
+        console.log("Reconstructed startMenuDir using UserStartMenuProgramsPath & startMenuGroup: " + installer.value("UserStartMenuProgramsPath") + "/" + startMenuGroup);
+
+        target_dir = installer.value("AllUsersStartMenuProgramsPath") + "/" + startMenuGroup;
         console.log("UseAllUsersStartMenu was passed!")
       }
 
       console.log("Target directory for Start Menu Shortcuts: " + target_dir);
+
       component.addOperation("CreateShortcut", "@TargetDir@/Documentation/index.html", target_dir + "/EnergyPlus Documentation.lnk");
       component.addOperation("CreateShortcut", "@TargetDir@/PostProcess/EP-Compare/EP-Compare.exe", target_dir + "/EP-Compare.lnk");
       component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/EPDraw/EPDrawGUI.exe", target_dir + "/EPDrawGUI.lnk");
