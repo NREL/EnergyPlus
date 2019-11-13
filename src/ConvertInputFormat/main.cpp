@@ -514,7 +514,7 @@ int main(int argc, const char *argv[])
     }
 #else
     for (auto const &file : files) {
-        bool successful = processInput(file, schema, outputType, output_directory);
+        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr);
         ++fileCount;
         if (successful) {
             displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
