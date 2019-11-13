@@ -64,15 +64,6 @@ namespace DataGenerators {
     // to the Fuel cell and Micro CHP modeling in EnergyPlus
     //  the data for the older BLAST generators are in those component's modules
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
 
     // Data
@@ -151,16 +142,12 @@ namespace DataGenerators {
     int NumFuelConstit(0);
     int NumGeneratorFuelSups(0);
     int NumFuelCellGenerators(0); // number of SOFC Generators specified in input
-    int NumMicroCHPs(0);
-    int NumMicroCHPParams(0); // number of parameter sets for micro chp
     int NumGensWDynamics(0);  // number of dynamics controls for generators
 
     // Object Data
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
     Array1D<GasPropertyDataStruct> GasPhaseThermoChemistryData;
     Array1D<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
-    Array1D<MicroCHPDataStruct> MicroCHP;
-    Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
     Array1D<GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
     void clear_state()
@@ -168,15 +155,10 @@ namespace DataGenerators {
         NumFuelConstit = 0;
         NumGeneratorFuelSups = 0;
         NumFuelCellGenerators = 0;
-        NumMicroCHPs = 0;
-        NumMicroCHPParams = 0;
         NumGensWDynamics = 0;
         FuelCell.deallocate();
         GasPhaseThermoChemistryData.deallocate();
         FuelSupply.deallocate();
-        MicroCHP.deallocate();
-        MicroCHPParamInput.deallocate();
-        GeneratorDynamics.deallocate();
     }
 
 } // namespace DataGenerators

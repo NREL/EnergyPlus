@@ -191,13 +191,8 @@ namespace PlantLoopEquip {
         using CTElectricGenerator::SimCTPlantHeatRecovery;
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
-        using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
-        using IceThermalStorage::SimIceStorage;
-        using MicroCHPElectricGenerator::SimMicroCHPPlantHeatRecovery;
-        using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
 
-        // using PlantLoadProfile::PlantProfileData::simulate;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
@@ -810,39 +805,10 @@ namespace PlantLoopEquip {
             }
 
             if (EquipTypeNum == TypeOf_TS_IceSimple) {
-
-                SimIceStorage(sim_component.TypeOf,
-                              sim_component.Name,
-                              EquipNum,
-                              RunFlag,
-                              FirstHVACIteration,
-                              InitLoopEquip,
-                              CurLoad); // DSU | ,EquipFlowCtrl
-
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = 0.0;
-                    sim_component.MinLoad = 0.0;
-                    sim_component.OptLoad = 0.0;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_TS_IceDetailed) {
-
-                SimIceStorage(sim_component.TypeOf,
-                              sim_component.Name,
-                              EquipNum,
-                              RunFlag,
-                              FirstHVACIteration,
-                              InitLoopEquip,
-                              CurLoad); // DSU | ,EquipFlowCtrl
-
-                // Not sure what this really needs to do here...
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = 0.0;
-                    sim_component.MinLoad = 0.0;
-                    sim_component.OptLoad = 0.0;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
                 SimWaterThermalTank(EquipTypeNum,
@@ -927,60 +893,13 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_Generator_MicroCHP) {
-                SimMicroCHPPlantHeatRecovery(sim_component.TypeOf,
-                                             sim_component.Name,
-                                             EquipNum,
-                                             RunFlag,
-                                             InitLoopEquip,
-                                             CurLoad,
-                                             MaxLoad,
-                                             MinLoad,
-                                             OptLoad,
-                                             FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_MicroTurbine) {
-                SimMTPlantHeatRecovery(sim_component.TypeOf,
-                                       sim_component.Name,
-                                       TypeOf_Generator_MicroTurbine,
-                                       EquipNum,
-                                       RunFlag,
-                                       InitLoopEquip,
-                                       CurLoad,
-                                       MaxLoad,
-                                       MinLoad,
-                                       OptLoad,
-                                       FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_ICEngine) {
-                SimICEPlantHeatRecovery(sim_component.TypeOf,
-                                        sim_component.Name,
-                                        TypeOf_Generator_ICEngine,
-                                        EquipNum,
-                                        RunFlag,
-                                        InitLoopEquip,
-                                        CurLoad,
-                                        MaxLoad,
-                                        MinLoad,
-                                        OptLoad,
-                                        FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_CTurbine) {
                 SimCTPlantHeatRecovery(sim_component.TypeOf,
