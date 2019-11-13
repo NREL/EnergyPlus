@@ -59,6 +59,7 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -69,6 +70,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -1280,6 +1282,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1297,24 +1300,27 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
                                 //
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:TwoSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "EvaporativeFluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
-                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidcooler:TwoSpeed")) {
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_SingleSpd, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:FlatPlate:PhotovoltaicThermal")) {
                                 this_comp.TypeOf_Num = TypeOf_PVTSolarCollectorFlatPlate;
