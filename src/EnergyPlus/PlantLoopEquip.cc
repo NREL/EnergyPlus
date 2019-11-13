@@ -189,7 +189,6 @@ namespace PlantLoopEquip {
         using WaterThermalTanks::SimWaterThermalTank;
 
         using CTElectricGenerator::SimCTPlantHeatRecovery;
-        using EvaporativeFluidCoolers::SimEvapFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
 
@@ -605,59 +604,19 @@ namespace PlantLoopEquip {
 
             // FLUID COOLERS
         } else if (GeneralEquipType == GenEquipTypes_FluidCooler) {
-
             sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
+            // EVAPORATIVE FLUID COOLERS
         } else if (GeneralEquipType == GenEquipTypes_EvapFluidCooler) {
 
-            // EvapFluidCoolers
             if (EquipTypeNum == TypeOf_EvapFluidCooler_SingleSpd) {
-
-                SimEvapFluidCoolers(sim_component.TypeOf,
-                                    sim_component.Name,
-                                    EquipNum,
-                                    RunFlag,
-                                    InitLoopEquip,
-                                    MaxLoad,
-                                    MinLoad,
-                                    OptLoad,
-                                    GetCompSizFac,
-                                    SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else if (EquipTypeNum == TypeOf_EvapFluidCooler_TwoSpd) {
-
-                SimEvapFluidCoolers(sim_component.TypeOf,
-                                    sim_component.Name,
-                                    EquipNum,
-                                    RunFlag,
-                                    InitLoopEquip,
-                                    MaxLoad,
-                                    MinLoad,
-                                    OptLoad,
-                                    GetCompSizFac,
-                                    SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else {
                 ShowSevereError("SimPlantEquip: Invalid EvapFluidCooler Type=" + sim_component.TypeOf);
                 ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);
                 ShowFatalError("Preceding condition causes termination.");
-            }
-
-            if (InitLoopEquip && EquipNum == 0) {
-                ShowSevereError("InitLoop did not set Equipment Index for Fluid Cooler=" + sim_component.TypeOf);
-                ShowContinueError("..Fluid Cooler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-                ShowFatalError("Previous condition causes termination.");
             }
 
             // BOILERS
