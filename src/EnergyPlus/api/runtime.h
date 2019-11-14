@@ -51,6 +51,10 @@
 #include <EnergyPlus/api/EnergyPlusAPI.hh>
 #include <EnergyPlus/TypeDefs.h>
 
+#ifdef __cplusplus
+
+#include <functional>
+
 ENERGYPLUSLIB_API void callbackBeginNewEnvironment(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f);
@@ -69,8 +73,8 @@ ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(std::function<void ()
 ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(std::function<void ()> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(std::function<void ()> f);
 
-#ifdef __cplusplus
 extern "C" {
+
 #endif
 
 ENERGYPLUSLIB_API void cClearAllStates();
