@@ -49,6 +49,7 @@
 #define EPLUS_PLUGINMANAGER_HH
 
 #include <vector>
+#include <functional>
 #include <EnergyPlus/EnergyPlus.hh>
 
 #ifdef _DEBUG
@@ -67,7 +68,7 @@ namespace EnergyPlus {
 
 namespace PluginManagement {
 
-    void registerNewCallback(int iCalledFrom, void (*f)());
+    void registerNewCallback(int iCalledFrom, std::function<void ()> f);
 
     void runAnyRegisteredCallbacks(int iCalledFrom);
 

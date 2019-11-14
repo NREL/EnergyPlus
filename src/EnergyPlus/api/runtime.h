@@ -51,6 +51,24 @@
 #include <EnergyPlus/api/EnergyPlusAPI.hh>
 #include <EnergyPlus/TypeDefs.h>
 
+ENERGYPLUSLIB_API void callbackBeginNewEnvironment(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneSizing(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemSizing(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackUnitarySystemSizing(std::function<void ()> f);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,6 +112,7 @@ ENERGYPLUSLIB_API void callbackUnitarySystemSizing(void (*f)());
 
 #ifdef __cplusplus
 }
+
 #endif
 
 #endif // EnergyPlusAPIRuntime_h_INCLUDED
