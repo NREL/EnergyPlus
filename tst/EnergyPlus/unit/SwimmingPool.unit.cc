@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     SwimmingPool::clear_state();
     DataSurfaces::clear_state();
 
-    modNumSwimmingPools = 1;
+    NumSwimmingPools = 1;
     Pool.allocate(1);
     DataSurfaces::Surface.allocate(1);
     Surface(1).Area = 10.0;
@@ -132,9 +132,9 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     SwimmingPool::clear_state();
     DataPlant::clear_state();
 
-    modNumSwimmingPools = 2;
+    NumSwimmingPools = 2;
     TotNumLoops = 2;
-    Pool.allocate(modNumSwimmingPools);
+    Pool.allocate(NumSwimmingPools);
     MyPlantScanFlagPool = true;
     Pool(1).Name = "FirstPool";
     Pool(2).Name = "SecondPool";
@@ -196,9 +196,9 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     DataPlant::clear_state();
     DataLoopNode::clear_state();
     
-    modNumSwimmingPools = 1;
+    NumSwimmingPools = 1;
     TotNumLoops = 1;
-    Pool.allocate(modNumSwimmingPools);
+    Pool.allocate(NumSwimmingPools);
     MyPlantScanFlagPool = false;
     
     Pool(1).Name = "FirstPool";

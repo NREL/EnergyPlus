@@ -114,8 +114,8 @@ namespace SwimmingPool {
     static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
-    int modNumSwimmingPools(0); // Number of swimming pools
-    Array1D_bool modCheckEquipName;
+    int NumSwimmingPools(0); // Number of swimming pools
+    Array1D_bool CheckEquipName;
     Array1D_int modSurfaceToPoolIndex;
     Array1D<Real64> modQPoolSrcAvg;          // Average source over the time step for a particular radiant surface
     Array1D<Real64> modHeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
@@ -131,9 +131,9 @@ namespace SwimmingPool {
 
     void clear_state()
     {
-        modNumSwimmingPools = 0;
+        NumSwimmingPools = 0;
         getSwimmingPoolInput = true;
-        modCheckEquipName.deallocate();
+        CheckEquipName.deallocate();
         modSurfaceToPoolIndex.deallocate();
         modQPoolSrcAvg.deallocate();
         modHeatTransCoefsAvg.deallocate();
@@ -171,7 +171,7 @@ namespace SwimmingPool {
         DataHeatBalFanSys::SumConvPool = 0.0;
         DataHeatBalFanSys::SumLatentPool = 0.0;
 
-        for (PoolNum = 1; PoolNum <= modNumSwimmingPools; ++PoolNum) {
+        for (PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
 
             InitSwimmingPool(FirstHVACIteration, PoolNum);
 
@@ -180,7 +180,7 @@ namespace SwimmingPool {
             UpdateSwimmingPool(PoolNum);
         }
 
-        if (modNumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
         ReportSwimmingPool();
     }
@@ -243,17 +243,17 @@ namespace SwimmingPool {
         lNumericBlanks.allocate(MaxNumbers);
         lNumericBlanks = true;
 
-        modNumSwimmingPools = inputProcessor->getNumObjectsFound("SwimmingPool:Indoor");
-        modCheckEquipName.allocate(modNumSwimmingPools);
-        modCheckEquipName = true;
+        NumSwimmingPools = inputProcessor->getNumObjectsFound("SwimmingPool:Indoor");
+        CheckEquipName.allocate(NumSwimmingPools);
+        CheckEquipName = true;
 
-        Pool.allocate(modNumSwimmingPools);
+        Pool.allocate(NumSwimmingPools);
         modSurfaceToPoolIndex.allocate(DataSurfaces::TotSurfaces);
         modSurfaceToPoolIndex = 0;
 
         // Obtain all of the user data related to indoor swimming pools...
         CurrentModuleObject = "SwimmingPool:Indoor";
-        for (Item = 1; Item <= modNumSwimmingPools; ++Item) {
+        for (Item = 1; Item <= NumSwimmingPools; ++Item) {
 
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           Item,
@@ -481,7 +481,7 @@ namespace SwimmingPool {
 
         // Set up the output variables for swimming pools
         // CurrentModuleObject = "SwimmingPool:Indoor"
-        for (Item = 1; Item <= modNumSwimmingPools; ++Item) {
+        for (Item = 1; Item <= NumSwimmingPools; ++Item) {
             SetupOutputVariable("Indoor Pool Makeup Water Rate",
                                 OutputProcessor::Unit::m3_s,
                                 Pool(Item).MakeUpWaterVolFlowRate,
@@ -1215,7 +1215,7 @@ namespace SwimmingPool {
         Real64 Cp;      // specific heat of water
         Real64 Density; // density of water
 
-        for (PoolNum = 1; PoolNum <= modNumSwimmingPools; ++PoolNum) {
+        for (PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
 
             SurfNum = Pool(PoolNum).SurfacePtr;
 

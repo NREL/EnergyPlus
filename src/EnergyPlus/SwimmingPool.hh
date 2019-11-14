@@ -61,7 +61,7 @@ namespace SwimmingPool {
 
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables
-    extern int modNumSwimmingPools;                 // Number of swimming pools
+    extern int NumSwimmingPools;                 // Number of swimming pools
     extern Array1D<int> modSurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
     extern Array1D<Real64> modQPoolSrcAvg;          // Average source over the time step for a particular pool
     extern Array1D<Real64> modHeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
