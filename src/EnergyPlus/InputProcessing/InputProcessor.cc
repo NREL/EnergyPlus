@@ -655,16 +655,29 @@ void InputProcessor::getObjectItem(std::string const &Object,
         unusedInputs.erase(find_unused);
     }
 
-    size_t idf_max_fields = 0;
-    auto found_idf_max_fields = obj_val.find("idf_max_fields");
-    if (found_idf_max_fields != obj_val.end()) {
-        idf_max_fields = *found_idf_max_fields;
-    }
+    auto has_idd_name_field = schema_name_field != epJSON_schema_it_val.end();
 
+    size_t idf_max_fields = 0;
     size_t idf_max_extensible_fields = 0;
-    auto found_idf_max_extensible_fields = obj_val.find("idf_max_extensible_fields");
-    if (found_idf_max_extensible_fields != obj_val.end()) {
-        idf_max_extensible_fields = *found_idf_max_extensible_fields;
+    if (!DataGlobals::isEpJSON) {
+        auto found_idf_max_fields = obj_val.find("idf_max_fields");
+        if (found_idf_max_fields != obj_val.end()) {
+            idf_max_fields = *found_idf_max_fields;
+        }
+        auto found_idf_max_extensible_fields = obj_val.find("idf_max_extensible_fields");
+        if (found_idf_max_extensible_fields != obj_val.end()) {
+            idf_max_extensible_fields = *found_idf_max_extensible_fields;
+        }
+    } else {
+        for (auto const& field : obj_val.items()) {
+            auto const & field_key = field.key();
+            if (field_key == extension_key) continue;
+            for (std::size_t i = idf_max_fields; i < legacy_idd_fields.size(); ++i) {
+                if (field_key == legacy_idd_fields[i]) {
+                    idf_max_fields = (i + 1);
+                }
+            }
+        }
     }
 
     int alpha_index = 1;
@@ -676,9 +689,11 @@ void InputProcessor::getObjectItem(std::string const &Object,
         if (field_info == legacy_idd_field_info.end()) {
             ShowFatalError("Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
         }
-        auto const &field_type = field_info.value().at("field_type").get<std::string>();
+        auto const &field_info_val = field_info.value();
+        auto const &field_type = field_info_val.at("field_type").get<std::string>();
+
         bool within_idf_fields = (i < idf_max_fields);
-        if (field == "name" && schema_name_field != epJSON_schema_it_val.end()) {
+        if (has_idd_name_field && field == "name") {
             auto const &name_iter = schema_name_field.value();
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
@@ -687,7 +702,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
-                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
+                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
             }
             NumAlphas++;
             alpha_index++;
@@ -752,13 +767,13 @@ void InputProcessor::getObjectItem(std::string const &Object,
         if (field_type == "a") {
             if (within_idf_fields) NumAlphas++;
             if (is_AlphaFieldNames) {
-                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
+                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
             }
             alpha_index++;
         } else if (field_type == "n") {
             if (within_idf_fields) NumNumbers++;
             if (is_NumericFieldNames) {
-                NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
+                NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
             }
             numeric_index++;
         }
@@ -772,6 +787,21 @@ void InputProcessor::getObjectItem(std::string const &Object,
             auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
             auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
             auto const &schema_extension_fields = schema_obj_props[extension_key]["items"]["properties"];
+
+            if (DataGlobals::isEpJSON) {
+                for (auto const& exts : epJSON_extensions_array.items()) {
+                    std::size_t max_extensible_field = 0;
+                    for (auto const& ext : exts.value().items()) {
+                        auto const & ext_key = ext.key();
+                        for (std::size_t i = max_extensible_field; i < legacy_idd_extensibles.size(); ++i) {
+                            if (ext_key == legacy_idd_extensibles[i]) {
+                                max_extensible_field = (i + 1);
+                            }
+                        }
+                    }
+                    idf_max_extensible_fields += max_extensible_field;
+                }
+            }
 
             for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                 auto const &epJSON_extension_obj = it.value();
