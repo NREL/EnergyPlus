@@ -538,6 +538,8 @@ namespace FuelCellElectricGenerator {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void initialize();
 
         void setupOutputVars();
@@ -567,7 +569,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff         // if constrained then this is the difference, positive
         );
 
-        static Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(Real64 TprodGas, Array1<Real64> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
@@ -579,7 +581,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGenHeatRecovery();
 
-        void CalcFuelCellGeneratorModel(int GeneratorNum, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcFuelCellGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
 
@@ -590,19 +592,16 @@ namespace FuelCellElectricGenerator {
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
+        void SimFuelCellGenerator(bool RunFlag,  // simulate Generator when TRUE
+                                  Real64 MyLoad, // demand on electric generator
+                                  bool FirstHVACIteration);
+
         void UpdateFuelCellGeneratorRecords();
     };
 
     void clear_state();
 
-    void SimFuelCellGenerator(int GeneratorType,          // type of Generator
-                              std::string const &GeneratorName, // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool RunFlag,  // simulate Generator when TRUE
-                              Real64 MyLoad, // demand on electric generator
-                              bool FirstHVACIteration);
-
-    void GetFuelCellGeneratorInput();
+    void getFuelCellInput();
 
     void SimFuelCellPlantHeatRecovery(std::string const &CompType,
                                       std::string const &CompName,
@@ -622,15 +621,7 @@ namespace FuelCellElectricGenerator {
 
     void FigureFuelCellZoneGains();
 
-    void GetFuelCellGeneratorResults(int GeneratorType, // type of Generator
-                                     int GeneratorIndex,
-                                     Real64 &GeneratorPower,  // electrical power
-                                     Real64 &GeneratorEnergy, // electrical energy
-                                     Real64 &ThermalPower,    // heat power
-                                     Real64 &ThermalEnergy    // heat energy
-    );
-
-    extern bool GetFuelCellInput;
+    extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;
     extern Array1D_bool CheckEquipName;
     extern Array1D<FCDataStruct> FuelCell; // dimension to number of machines

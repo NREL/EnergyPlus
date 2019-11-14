@@ -100,16 +100,36 @@ namespace FuelCellElectricGenerator {
     // IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
 
     int NumFuelCellGenerators(0);
-    bool GetFuelCellInput(true);
+    bool getFuelCellInputFlag(true);
     Array1D_bool CheckEquipName;
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
 
     void clear_state()
     {
         NumFuelCellGenerators = 0;
-        GetFuelCellInput = true;
+        getFuelCellInputFlag = true;
         CheckEquipName.deallocate();
         FuelCell.deallocate();
+    }
+
+    PlantComponent *FCDataStruct::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getFuelCellInputFlag) {
+            getFuelCellInput();
+            getFuelCellInputFlag = false;
+        }
+
+        // Now look for this object
+        for (auto &thisFC : FuelCell) {
+            if (thisFC.Name == objectName) {
+                return &thisFC;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalFuelCellGenFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void FCDataStruct::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
@@ -117,10 +137,7 @@ namespace FuelCellElectricGenerator {
 
     }
 
-    void SimFuelCellGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
-                              std::string const &GeneratorName,   // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool const RunFlag,  // simulate Generator when TRUE
+    void FCDataStruct::SimFuelCellGenerator(bool const RunFlag,  // simulate Generator when TRUE
                               Real64 const MyLoad, // demand on electric generator
                               bool const FirstHVACIteration)
     {
@@ -133,40 +150,13 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        int GenNum; // Generator number counter
-
-        // Get Generator data from input file
-        if (GetFuelCellInput) {
-            GetFuelCellGeneratorInput();
-            GetFuelCellInput = false;
-        }
-
-        if (GeneratorIndex == 0) {
-            GenNum = UtilityRoutines::FindItemInList(GeneratorName, FuelCell);
-            if (GenNum == 0) ShowFatalError("SimFuelCellGenerator: Specified Generator not one of Valid FuelCell Generators " + GeneratorName);
-            GeneratorIndex = GenNum;
-        } else {
-            GenNum = GeneratorIndex;
-            if (GenNum > NumFuelCellGenerators || GenNum < 1) {
-                ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
-                               ", Number of FuelCell Generators=" + General::TrimSigDigits(NumFuelCellGenerators) + ", Generator name=" + GeneratorName);
-            }
-            if (CheckEquipName(GenNum)) {
-                if (GeneratorName != FuelCell(GenNum).Name) {
-                    ShowFatalError("SimFuelCellGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
-                                   ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + FuelCell(GenNum).Name);
-                }
-                CheckEquipName(GenNum) = false;
-            }
-        }
-
-        FuelCell(GenNum).initialize();
-        FuelCell(GenNum).CalcFuelCellGeneratorModel(GenNum, RunFlag, MyLoad, FirstHVACIteration);
-        FuelCell(GenNum).CalcUpdateHeatRecovery(FirstHVACIteration);
-        FuelCell(GenNum).UpdateFuelCellGeneratorRecords();
+        this->initialize();
+        this->CalcFuelCellGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
+        this->CalcUpdateHeatRecovery(FirstHVACIteration);
+        this->UpdateFuelCellGeneratorRecords();
     }
 
-    void GetFuelCellGeneratorInput()
+    void getFuelCellInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -1365,7 +1355,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::CalcFuelCellGeneratorModel(int const GeneratorNum, bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
+    void FCDataStruct::CalcFuelCellGeneratorModel(bool const RunFlag, Real64 const MyLoad, bool const EP_UNUSED(FirstHVACIteration))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1863,12 +1853,12 @@ namespace FuelCellElectricGenerator {
             Real64 Acc = 0.01;     // guessing need to refine
             int MaxIter = 150;  // guessing need to refine
             SolverFlag = 0; // init
-            Array1D<Real64> Par(3); // parameters passed in to SolveRoot
-            Par(1) = double(GeneratorNum);
-            Par(2) = tmpTotProdGasEnthalpy;
-            Par(3) = this->FCPM.NdotProdGas;
+            Array1D<Real64> Par(2); // parameters passed in to SolveRoot
+            Par(1) = tmpTotProdGasEnthalpy;
+            Par(2) = this->FCPM.NdotProdGas;
             Real64 tmpTprodGas = this->FCPM.TprodGasLeavingFCPM;
-            General::SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, this->FuelCellProductGasEnthResidual, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
+            auto boundFunc = std::bind(&FCDataStruct::FuelCellProductGasEnthResidual, this, std::placeholders::_1, std::placeholders::_2);
+            General::SolveRoot(Acc, MaxIter, SolverFlag, tmpTprodGas, boundFunc, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
 
             if (SolverFlag == -2) {
 
@@ -2105,11 +2095,10 @@ namespace FuelCellElectricGenerator {
         Real64 Residuum; // F(x)
 
         Real64 thisHmolalProdGases;
-        int GeneratorNum = std::floor(Par(1));
-        Real64 desiredHprodGases = Par(2);
-        Real64 NdotProdGases = Par(3);
+        Real64 desiredHprodGases = Par(1);
+        Real64 NdotProdGases = Par(2);
 
-        FuelCell(GeneratorNum).FigureProductGasesEnthalpy(TprodGas, thisHmolalProdGases);
+        this->FigureProductGasesEnthalpy(TprodGas, thisHmolalProdGases);
 
         Residuum = (thisHmolalProdGases * NdotProdGases * 1000000.0) - desiredHprodGases;
 
@@ -3162,9 +3151,9 @@ namespace FuelCellElectricGenerator {
         // makes sure input are gotten and setup from Plant loop perspective.
         // does not (re)simulate entire FuelCell model
 
-        if (GetFuelCellInput) {
-            GetFuelCellGeneratorInput();
-            GetFuelCellInput = false;
+        if (getFuelCellInputFlag) {
+            getFuelCellInput();
+            getFuelCellInputFlag = false;
         }
 
         if (InitLoopEquip) {
@@ -3380,9 +3369,9 @@ namespace FuelCellElectricGenerator {
                                               std::string &heatRecoveryCompName)
     {
 
-        if (GetFuelCellInput) {
-            GetFuelCellGeneratorInput();
-            GetFuelCellInput = false;
+        if (getFuelCellInputFlag) {
+            getFuelCellInput();
+            getFuelCellInputFlag = false;
         }
 
         int thisFuelCell = UtilityRoutines::FindItemInList(GeneratorName, FuelCell);
@@ -3585,30 +3574,6 @@ namespace FuelCellElectricGenerator {
         this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
-    }
-
-    void GetFuelCellGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
-                                     int const GeneratorIndex,
-                                     Real64 &GeneratorPower,  // electrical power
-                                     Real64 &GeneratorEnergy, // electrical energy
-                                     Real64 &ThermalPower,    // heat power
-                                     Real64 &ThermalEnergy    // heat energy
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // provide a get method to collect results at the load center level
-
-        GeneratorPower = FuelCell(GeneratorIndex).Report.ACPowerGen;
-        GeneratorEnergy = FuelCell(GeneratorIndex).Report.ACEnergyGen;
-        ThermalPower = FuelCell(GeneratorIndex).Report.qHX;
-        ThermalEnergy = FuelCell(GeneratorIndex).Report.HXenergy;
     }
 
 } // namespace FuelCellElectricGenerator

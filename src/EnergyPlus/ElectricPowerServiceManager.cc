@@ -2145,12 +2145,11 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         break;
     }
     case GeneratorType::fuelCell: {
-        FuelCellElectricGenerator::SimFuelCellGenerator(
-            DataGlobalConstants::iGeneratorFuelCell, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration);
-        FuelCellElectricGenerator::GetFuelCellGeneratorResults(
-            DataGlobalConstants::iGeneratorFuelCell, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
-        electricPowerOutput = electProdRate;
-        thermalPowerOutput = thermProdRate;
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->initialize();
+        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(runFlag, myElecLoadRequest, FirstHVACIteration);
+        electricPowerOutput = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
+        thermalPowerOutput = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.qHX;
         break;
     }
     case GeneratorType::microCHP: {
