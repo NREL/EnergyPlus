@@ -73,6 +73,7 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
@@ -1134,10 +1135,10 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
                                 this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
                                 this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1295,6 +1296,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1305,7 +1307,6 @@ namespace EnergyPlus {
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
-                                //
                             } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;

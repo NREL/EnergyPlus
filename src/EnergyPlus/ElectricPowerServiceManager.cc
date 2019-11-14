@@ -1977,7 +1977,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
 {
 
     std::string const routineName = "GeneratorController constructor ";
-    bool errorsFound = false;
 
     name = objectName;
     typeOfName = objectType;
@@ -2012,7 +2011,8 @@ GeneratorController::GeneratorController(std::string const &objectName,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        FuelCellElectricGenerator::getFuelCellGeneratorHeatRecoveryInfo(name, compPlantName);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::microCHP;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
@@ -2025,7 +2025,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
     } else {
         ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry.");
         ShowContinueError("Invalid " + objectType + " associated with generator = " + objectName);
-        errorsFound = true;
     }
 
     availSched = availSchedName;
@@ -2037,7 +2036,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
             ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + ", invalid entry.");
             ShowContinueError("Invalid availability schedule = " + availSchedName);
             ShowContinueError("Schedule was not found ");
-            errorsFound = true;
         } else {
             if (generatorType == GeneratorType::pvWatts) {
                 ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
@@ -2146,7 +2144,6 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
     }
     case GeneratorType::fuelCell: {
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
-        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->initialize();
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(runFlag, myElecLoadRequest, FirstHVACIteration);
         electricPowerOutput = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
         thermalPowerOutput = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.qHX;

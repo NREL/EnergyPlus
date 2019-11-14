@@ -496,6 +496,7 @@ namespace FuelCellElectricGenerator {
     {
         // Members
         // from input data and nested types for subsystems
+        int TypeOf;
         std::string Name;                    // user identifier
         std::string NameFCPM;                // name of FC Power Module
         FCPowerModuleStruct FCPM;            // data for Power Module
@@ -526,21 +527,24 @@ namespace FuelCellElectricGenerator {
         Real64 QradZone;   // radiative heat lost to surrounding zone
         int DynamicsControlID;
         Real64 TimeElapsed; // used to track when timestep has changed
-        bool InitGenerator;
         bool MyEnvrnFlag_Init;
         bool MyWarmupFlag_Init;
         bool MyPlantScanFlag_Init;
 
         // Default Constructor
         FCDataStruct()
-                : FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-                  DynamicsControlID(0), TimeElapsed(0.0), InitGenerator(true), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
+                : TypeOf(0), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
+                  DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true)
         {
         }
 
         static PlantComponent *factory(std::string const &objectName);
 
+        static PlantComponent *factory_exhaust(std::string const &objectName);
+
         void initialize();
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars();
 
@@ -602,22 +606,6 @@ namespace FuelCellElectricGenerator {
     void clear_state();
 
     void getFuelCellInput();
-
-    void SimFuelCellPlantHeatRecovery(std::string const &CompType,
-                                      std::string const &CompName,
-                                      int CompTypeNum,
-                                      int &CompNum,
-                                      bool RunFlag,
-                                      bool &InitLoopEquip,
-                                      Real64 &MyLoad, // unused1208
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap,
-                                      bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
-                                              std::string &heatRecoveryCompName);
 
     void FigureFuelCellZoneGains();
 

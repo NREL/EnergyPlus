@@ -187,7 +187,6 @@ namespace PlantLoopEquip {
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
-        using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
@@ -811,42 +810,12 @@ namespace PlantLoopEquip {
             // for heat recovery plant interactions.
 
             if (EquipTypeNum == TypeOf_Generator_FCExhaust) {
-                SimFuelCellPlantHeatRecovery(sim_component.TypeOf,
-                                             sim_component.Name,
-                                             TypeOf_Generator_FCExhaust,
-                                             EquipNum,
-                                             RunFlag,
-                                             InitLoopEquip,
-                                             CurLoad,
-                                             MaxLoad,
-                                             MinLoad,
-                                             OptLoad,
-                                             FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_FCStackCooler) {
-                SimFuelCellPlantHeatRecovery(sim_component.TypeOf,
-                                             sim_component.Name,
-                                             TypeOf_Generator_FCStackCooler,
-                                             EquipNum,
-                                             RunFlag,
-                                             InitLoopEquip,
-                                             CurLoad,
-                                             MaxLoad,
-                                             MinLoad,
-                                             OptLoad,
-                                             FirstHVACIteration); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_MicroCHP) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);

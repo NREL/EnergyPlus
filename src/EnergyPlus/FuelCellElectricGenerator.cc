@@ -132,9 +132,23 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void FCDataStruct::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
-    {
+    PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName){
+        // Process the input data
+        if (getFuelCellInputFlag) {
+            getFuelCellInput();
+            getFuelCellInputFlag = false;
+        }
 
+        // Now look for this object
+        for (auto &thisFC : FuelCell) {
+            if (UtilityRoutines::MakeUPPERCase(thisFC.NameExhaustHX) ==  UtilityRoutines::MakeUPPERCase(objectName)) {
+                return &thisFC;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalFuelCellGenFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void FCDataStruct::SimFuelCellGenerator(bool const RunFlag,  // simulate Generator when TRUE
@@ -498,7 +512,7 @@ namespace FuelCellElectricGenerator {
         }
 
         for (int GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum) {
-            // find molal fraction of oxygen in air supply
+            // find molar fraction of oxygen in air supply
             int thisConstituent =
                 UtilityRoutines::FindItem("Oxygen", FuelCell(GeneratorNum).AirSup.ConstitName, FuelCell(GeneratorNum).AirSup.NumConstituents);
             if (thisConstituent > 0) FuelCell(GeneratorNum).AirSup.O2fraction = FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstituent);
@@ -513,7 +527,7 @@ namespace FuelCellElectricGenerator {
                 FuelCell(GeneratorNum).AirSup.GasLibID(i) = thisGasID;
             }
 
-            // set up gas constiuents for product gases
+            // set up gas constituents for product gases
             FuelCell(GeneratorNum).FCPM.GasLibID(1) = 1; // Carbon Dioxide
             FuelCell(GeneratorNum).FCPM.GasLibID(2) = 2; // Nitrogen
             FuelCell(GeneratorNum).FCPM.GasLibID(3) = 3; // Oxygen
@@ -3127,72 +3141,38 @@ namespace FuelCellElectricGenerator {
         this->ExhaustHX.WaterOutletEnthalpy = DataLoopNode::Node(this->ExhaustHX.WaterInNode).Enthalpy + this->ExhaustHX.qHX;
     }
 
-    void SimFuelCellPlantHeatRecovery(std::string const &EP_UNUSED(CompType),
-                                      std::string const &CompName,
-                                      int const CompTypeNum,
-                                      int &CompNum,
-                                      bool const EP_UNUSED(RunFlag),
-                                      bool &InitLoopEquip,
-                                      Real64 &EP_UNUSED(MyLoad), // unused1208
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap,
-                                      bool const FirstHVACIteration // TRUE if First iteration of simulation
-    )
+
+    void FCDataStruct::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        MaxLoad = 0.0;
+        MinLoad = 0.0;
+        OptLoad = 0.0;
+    }
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Jan 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // makes sure input are gotten and setup from Plant loop perspective.
-        // does not (re)simulate entire FuelCell model
-
-        if (getFuelCellInputFlag) {
-            getFuelCellInput();
-            getFuelCellInputFlag = false;
-        }
-
-        if (InitLoopEquip) {
-            if (CompTypeNum == DataPlant::TypeOf_Generator_FCExhaust) {
-                CompNum = UtilityRoutines::FindItemInList(CompName, FuelCell, &FCDataStruct::NameExhaustHX);
-            } else if (CompTypeNum == DataPlant::TypeOf_Generator_FCStackCooler) {
-                CompNum = UtilityRoutines::FindItemInList(CompName, FuelCell, &FCDataStruct::NameStackCooler);
-            }
-            if (CompNum == 0) {
-                ShowFatalError("SimFuelCellPlantHeatRecovery: Fuel Cell Generator Unit not found=" + CompName);
-            }
-            MinCap = 0.0;
-            MaxCap = 0.0;
-            OptCap = 0.0;
-            return;
-        } // End Of InitLoopEquip
-
-        if (CompTypeNum == DataPlant::TypeOf_Generator_FCStackCooler) {
-            PlantUtilities::UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
-                                            FuelCell(CompNum).CWLoopSideNum,
-                                            DataPlant::TypeOf_Generator_FCStackCooler,
-                                            FuelCell(CompNum).StackCooler.WaterInNode,
-                                            FuelCell(CompNum).StackCooler.WaterOutNode,
-                                            FuelCell(CompNum).Report.qHX,
-                                            FuelCell(CompNum).Report.HeatRecInletTemp,
-                                            FuelCell(CompNum).Report.HeatRecOutletTemp,
-                                            FuelCell(CompNum).Report.HeatRecMdot,
-                                            FirstHVACIteration);
-        } else if (CompTypeNum == DataPlant::TypeOf_Generator_FCExhaust) {
-            PlantUtilities::UpdateComponentHeatRecoverySide(FuelCell(CompNum).CWLoopNum,
-                                            FuelCell(CompNum).CWLoopSideNum,
-                                            DataPlant::TypeOf_Generator_FCExhaust,
-                                            FuelCell(CompNum).ExhaustHX.WaterInNode,
-                                            FuelCell(CompNum).ExhaustHX.WaterOutNode,
-                                            FuelCell(CompNum).ExhaustHX.qHX,
-                                            FuelCell(CompNum).ExhaustHX.WaterInletTemp,
-                                            FuelCell(CompNum).ExhaustHX.WaterOutletTemp,
-                                            FuelCell(CompNum).ExhaustHX.WaterMassFlowRate,
-                                            FirstHVACIteration);
+    void FCDataStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+        if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
+            PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
+                                                            this->CWLoopSideNum,
+                                                            DataPlant::TypeOf_Generator_FCStackCooler,
+                                                            this->StackCooler.WaterInNode,
+                                                            this->StackCooler.WaterOutNode,
+                                                            this->Report.qHX,
+                                                            this->Report.HeatRecInletTemp,
+                                                            this->Report.HeatRecOutletTemp,
+                                                            this->Report.HeatRecMdot,
+                                                            FirstHVACIteration);
+        } else if (this->TypeOf == DataPlant::TypeOf_Generator_FCExhaust) {
+            PlantUtilities::UpdateComponentHeatRecoverySide(this->CWLoopNum,
+                                                            this->CWLoopSideNum,
+                                                            DataPlant::TypeOf_Generator_FCExhaust,
+                                                            this->ExhaustHX.WaterInNode,
+                                                            this->ExhaustHX.WaterOutNode,
+                                                            this->ExhaustHX.qHX,
+                                                            this->ExhaustHX.WaterInletTemp,
+                                                            this->ExhaustHX.WaterOutletTemp,
+                                                            this->ExhaustHX.WaterMassFlowRate,
+                                                            FirstHVACIteration);
         }
     }
 
@@ -3212,10 +3192,6 @@ namespace FuelCellElectricGenerator {
         // Uses the status flags to trigger initializations.
 
         static std::string const RoutineName("InitFuelCellGenerators");
-
-        if (this->InitGenerator) {
-            this->InitGenerator = false;
-        }
 
         if (this->MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
             bool errFlag = false;
