@@ -249,30 +249,22 @@ namespace SimulationManager {
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
         using BranchNodeConnections::TestCompSetInletOutletNodes;
-        using CostEstimateManager::SimCostEstimate;
         using CurveManager::InitCurveReporting;
         using DataErrorTracking::AskForConnectionsReport;
         using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
-        using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
-        using EconomicTariff::ComputeTariff; // added for computing annual utility costs
         using EconomicTariff::WriteTabularTariffReports;
         using EMSManager::CheckIfAnyEMS;
         using EMSManager::ManageEMS;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
-        using HVACControllers::DumpAirLoopStatistics;
         using MixedAir::CheckControllerLists;
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
-        using OutputProcessor::ReportForTabularReports;
         using OutputProcessor::SetupTimePointers;
         using OutputReportPredefined::SetPredefinedTables;
-        using OutputReportTabular::CloseOutputTabularFile;
-        using OutputReportTabular::OpenOutputTabularFile;
         using OutputReportTabular::ResetTabularReports;
-        using OutputReportTabular::WriteTabularReports;
         using PlantManager::CheckIfAnyPlant;
         using PollutionModule::CheckPollutionMeterReporting;
         using PollutionModule::SetupPollutionCalculations;
@@ -644,6 +636,11 @@ namespace SimulationManager {
             }
         }
 
+        FinalizeSimulation();
+    }
+
+    void FinalizeSimulation()
+    {
         PlantManager::CheckOngoingPlantWarnings();
 
         if (sqlite) sqlite->sqliteBegin(); // for final data to write
@@ -651,32 +648,31 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        CostEstimateManager::SimCostEstimate();
 
-        ComputeTariff(); //     Compute the utility bills
+        EconomicTariff::ComputeTariff(); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
 
-        ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
+        OutputProcessor::ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile();
+        OutputReportTabular::OpenOutputTabularFile();
 
-        WriteTabularReports(); //     Create the tabular reports at completion of each
+        OutputReportTabular::WriteTabularReports(); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        EconomicTariff::WriteTabularTariffReports();
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        EconomicLifeCycleCost::ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
 
-        CloseOutputTabularFile();
+        OutputReportTabular::CloseOutputTabularFile();
 
-        DumpAirLoopStatistics(); // Dump runtime statistics for air loop controller simulation to csv file
+        HVACControllers::DumpAirLoopStatistics(); // Dump runtime statistics for air loop controller simulation to csv file
 
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
 #endif
         CloseOutputFiles();
 
-        // sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput();
 
         if (sqlite) {

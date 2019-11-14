@@ -75,6 +75,8 @@ namespace SimulationManager {
 
     void ManageSimulation();
 
+    void FinalizeSimulation();
+
     void GetProjectData();
 
     void CheckForMisMatchedEnvironmentSpecifications();
