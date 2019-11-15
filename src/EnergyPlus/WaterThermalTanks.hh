@@ -77,13 +77,11 @@ namespace WaterThermalTanks {
         };
     };
 
-    struct CrankTemp
+    enum struct CrankTempEnum
     {
-        enum {
-            Schedule, // temperature controlling compressor crankcase heater is scheduled
-            Zone,     // temperature controlling compressor crankcase heater is zone air
-            Exterior // temperature controlling compressor crankcase heater is outdoor air
-        };
+        Schedule, // temperature controlling compressor crankcase heater is scheduled
+        Zone,     // temperature controlling compressor crankcase heater is zone air
+        Exterior // temperature controlling compressor crankcase heater is outdoor air
     };
     
     enum struct TankShapeEnum
@@ -101,18 +99,17 @@ namespace WaterThermalTanks {
         Modulate
     };
 
+    // order of ControlTypeEnum and PriorityEnum must be enforced
     enum PriorityEnum
     {
         MasterSlave, // water heater only, master-slave priority control of heater elements
         Simultaneous  // water heater only, simultaneous control of heater elements
     };
 
-    struct InletMode
+    enum struct InletModeEnum
     {
-        enum {
-            Fixed,   // water heater only, inlet water always enters at the user-specified height
-            Seeking  // water heater only, inlet water seeks out the node with the closest temperature
-        };
+        Fixed,   // water heater only, inlet water always enters at the user-specified height
+        Seeking  // water heater only, inlet water seeks out the node with the closest temperature
     };
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
@@ -129,17 +126,16 @@ namespace WaterThermalTanks {
         };
     };
 
-    struct Side
+    enum struct SideEnum
     {
-        enum {
-            Use,  // Indicates Use side of water heater
-            Source // Indicates Source side of water heater
-        };
+        Use,  // Indicates Use side of water heater
+        Source // Indicates Source side of water heater
     };
 
-    struct Size
+    struct SizeEnum
     {
-        enum {
+        enum
+        {
             NotSet,
             PeakDraw,
             ResidentialMin,
@@ -240,7 +236,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterHeaterSizingData()
-            : DesignMode(Size::NotSet), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
+            : DesignMode(SizeEnum::NotSet), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
               NumberOfBathrooms(0.0), TankCapacityPerPerson(0.0), RecoveryCapacityPerPerson(0.0), TankCapacityPerArea(0.0),
               RecoveryCapacityPerArea(0.0), NumberOfUnits(0.0), TankCapacityPerUnit(0.0), RecoveryCapacityPerUnit(0.0),
               TankCapacityPerCollectorArea(0.0), HeightAspectRatio(0.0), PeakDemand(0.0), PeakNumberOfPeople(0.0), TotalFloorArea(0.0),
@@ -321,7 +317,7 @@ namespace WaterThermalTanks {
         int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
         int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
         int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
-        int CrankcaseTempIndicator;                         // Indicator for HPWH compressor/crankcase heater location
+        CrankTempEnum CrankcaseTempIndicator;                         // Indicator for HPWH compressor/crankcase heater location
         int CrankcaseTempSchedule;                          // Schedule index pointer where crankcase heater is located
         int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
         Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
@@ -394,7 +390,7 @@ namespace WaterThermalTanks {
                   FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
                   SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
                   MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
-                  AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(0), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
+                  AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(CrankTempEnum::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
                   OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
                   OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
                   HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
@@ -535,7 +531,7 @@ namespace WaterThermalTanks {
         int UseOutletStratNode;             // Use-side outlet node number
         int SourceInletStratNode;           // Source-side inlet node number
         int SourceOutletStratNode;          // Source-side outlet node number
-        int InletMode;                      // Inlet position mode:  1 = FIXED; 2 = SEEKING
+        InletModeEnum InletMode;                      // Inlet position mode:  1 = FIXED; 2 = SEEKING
         Real64 InversionMixingRate;
         Array1D<Real64> AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
         int Nodes;                           // Number of nodes
@@ -635,7 +631,7 @@ namespace WaterThermalTanks {
               SetPointTempSchedule2(0), DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0), SkinLossCoeff(0.0),
               SkinLossFracToZone(0.0), OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0), UseOutletHeight(0.0),
               UseOutletHeightWasAutoSized(false), SourceInletHeight(0.0), SourceInletHeightWasAutoSized(false), SourceOutletHeight(0.0),
-              UseInletStratNode(0), UseOutletStratNode(0), SourceInletStratNode(0), SourceOutletStratNode(0), InletMode(1), InversionMixingRate(0.0),
+              UseInletStratNode(0), UseOutletStratNode(0), SourceInletStratNode(0), SourceOutletStratNode(0), InletMode(InletModeEnum::Fixed), InversionMixingRate(0.0),
               Nodes(0), VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0), LossRate(0.0), FlueLossRate(0.0), UseRate(0.0), TotalDemandRate(0.0),
               SourceRate(0.0), HeaterRate(0.0), HeaterRate1(0.0), HeaterRate2(0.0), FuelRate(0.0), FuelRate1(0.0), FuelRate2(0.0), VentRate(0.0),
               OffCycParaFuelRate(0.0), OffCycParaRateToTank(0.0), OnCycParaFuelRate(0.0), OnCycParaRateToTank(0.0), NetHeatTransferRate(0.0),
@@ -664,7 +660,7 @@ namespace WaterThermalTanks {
 
         Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
-        void CalcNodeMassFlows(int InletMode_loc);
+        void CalcNodeMassFlows(InletModeEnum inletMode);
 
         void SetupStratifiedNodes();
 
@@ -710,7 +706,7 @@ namespace WaterThermalTanks {
 
         Real64 PlantMassFlowRatesFunc(int InNodeNum,
                                       bool FirstHVACIteration,
-                                      int WaterThermalTankSide,
+                                      SideEnum WaterThermalTankSide,
                                       int PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
                                       int BranchControlType,
