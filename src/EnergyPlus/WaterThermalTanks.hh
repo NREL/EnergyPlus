@@ -62,10 +62,10 @@ namespace EnergyPlus {
 
 namespace WaterThermalTanks {
 
-    extern int const modHeatMode;  // heating source is on, source will not turn off until setpoint temp is reached
-    extern int const modFloatMode; // heating source is off, source will not turn on until cutin temp is reached
-    extern int const modVentMode;  // tank temp is above maximum temperature and water is venting
-    extern int const modCoolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
+    extern int const heatMode;  // heating source is on, source will not turn off until setpoint temp is reached
+    extern int const floatMode; // heating source is off, source will not turn on until cutin temp is reached
+    extern int const ventMode;  // tank temp is above maximum temperature and water is venting
+    extern int const coolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
 
     struct AmbientTemp
     {
@@ -86,8 +86,8 @@ namespace WaterThermalTanks {
         };
     };
     
-    extern int const modControlTypeCycle;    // water heater only, cycling heating source control
-    extern int const modControlTypeModulate; // water heater only, modulating heating source control
+    extern int const controlTypeCycle;    // water heater only, cycling heating source control
+    extern int const controlTypeModulate; // water heater only, modulating heating source control
 
     struct TankShape
     {
@@ -159,19 +159,19 @@ namespace WaterThermalTanks {
     };
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int modNumChilledWaterMixed;        // number of mixed chilled water tanks
-    extern int modNumChilledWaterStratified;   // number of stratified chilled water tanks
-    extern int modNumWaterHeaterMixed;         // number of mixed water heaters
-    extern int modNumWaterHeaterStratified;    // number of stratified water heaters
-    extern int modNumWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
-    extern int modNumWaterHeaterDesuperheater; // number of desuperheater heating coils
-    extern int modNumHeatPumpWaterHeater;      // number of heat pump water heaters
+    extern int numChilledWaterMixed;        // number of mixed chilled water tanks
+    extern int numChilledWaterStratified;   // number of stratified chilled water tanks
+    extern int numWaterHeaterMixed;         // number of mixed water heaters
+    extern int numWaterHeaterStratified;    // number of stratified water heaters
+    extern int numWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
+    extern int numWaterHeaterDesuperheater; // number of desuperheater heating coils
+    extern int numHeatPumpWaterHeater;      // number of heat pump water heaters
 
-    extern Real64 modHPPartLoadRatio;            // part load ratio of HPWH
+    extern Real64 hpPartLoadRatio;            // part load ratio of HPWH
     extern bool getWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
-    extern Real64 modMixerInletAirSchedule;      // output of inlet air mixer node schedule
-    extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
-    extern int modNumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
+    extern Real64 mixerInletAirSchedule;      // output of inlet air mixer node schedule
+    extern Real64 mdotAir;                    // mass flow rate of evaporator air, kg/s
+    extern int numWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
 
     struct StratifiedNodeData
     {
@@ -549,6 +549,18 @@ namespace WaterThermalTanks {
                                       Real64 DeadBandTemp,
                                       Real64 SetPointTemp);
 
+        static Real64 CalcTimeNeeded(Real64 Ti, // Initial tank temperature (C)
+                              Real64 Tf, // Final tank temperature (C)
+                              Real64 Ta, // Ambient environment temperature (C)
+                              Real64 T1, // Temperature of flow 1 (C)
+                              Real64 T2, // Temperature of flow 2 (C)
+                              Real64 m,  // Mass of tank fluid (kg)
+                              Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                              Real64 m1, // Mass flow rate 1 (kg/s)
+                              Real64 m2, // Mass flow rate 2 (kg/s)
+                              Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                              Real64 Q   // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+        );
     };
 
     struct HeatPumpWaterHeaterData : PlantComponent
@@ -859,19 +871,6 @@ namespace WaterThermalTanks {
                                                  Real64 &SourceMassFlowRate, // source mass flow rate (kg/s)
                                                  Real64 &Qheatpump,          // heat transfer rate from heat pump
                                                  Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
-    );
-
-    Real64 CalcTimeNeeded(Real64 Ti, // Initial tank temperature (C)
-                          Real64 Tf, // Final tank temperature (C)
-                          Real64 Ta, // Ambient environment temperature (C)
-                          Real64 T1, // Temperature of flow 1 (C)
-                          Real64 T2, // Temperature of flow 2 (C)
-                          Real64 m,  // Mass of tank fluid (kg)
-                          Real64 Cp, // Specific heat of fluid (J/kg deltaC)
-                          Real64 m1, // Mass flow rate 1 (kg/s)
-                          Real64 m2, // Mass flow rate 2 (kg/s)
-                          Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                          Real64 Q   // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
     );
 
     Real64 CalcTankTemp(Real64 Ti, // Initial tank temperature (C)
