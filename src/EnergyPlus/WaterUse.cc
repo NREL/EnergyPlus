@@ -505,11 +505,11 @@ namespace EnergyPlus {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
                             if (SELECT_CASE_var == "IDEAL") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::Ideal;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::Ideal;
                             } else if (SELECT_CASE_var == "COUNTERFLOW") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::CounterFlow;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::CounterFlow;
                             } else if (SELECT_CASE_var == "CROSSFLOW") {
-                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHX::CrossFlow;
+                                WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::CrossFlow;
                             } else {
                                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + DataIPShortCuts::cAlphaArgs(8));
                                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -520,11 +520,11 @@ namespace EnergyPlus {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(9));
                             if (SELECT_CASE_var == "PLANT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::Plant;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::Plant;
                             } else if (SELECT_CASE_var == "EQUIPMENT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::Equipment;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::Equipment;
                             } else if (SELECT_CASE_var == "PLANTANDEQUIPMENT") {
-                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfig::PlantAndEquip;
+                                WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::PlantAndEquip;
                             } else {
                                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
                                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -1389,11 +1389,11 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(this->HeatRecoveryConfig);
-                    if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
+                    if (SELECT_CASE_var == HeatRecoveryConfigEnum::Plant) {
                         this->RecoveryMassFlowRate = this->HotMassFlowRate;
-                    } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::Equipment) {
                         this->RecoveryMassFlowRate = this->ColdMassFlowRate;
-                    } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::PlantAndEquip) {
                         this->RecoveryMassFlowRate = this->TotalMassFlowRate;
                     }
                 }
@@ -1404,10 +1404,10 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(this->HeatRecoveryHX);
-                    if (SELECT_CASE_var == HeatRecoveryHX::Ideal) {
+                    if (SELECT_CASE_var == HeatRecoveryHXEnum::Ideal) {
                         this->Effectiveness = 1.0;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryHX::CounterFlow) { // Unmixed
+                    } else if (SELECT_CASE_var == HeatRecoveryHXEnum::CounterFlow) { // Unmixed
                         Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                         Real64 NTU = this->HXUA / MinCapacityRate;
                         if (CapacityRatio == 1.0) {
@@ -1417,7 +1417,7 @@ namespace EnergyPlus {
                             this->Effectiveness = (1.0 - ExpVal) / (1.0 - CapacityRatio * ExpVal);
                         }
 
-                    } else if (SELECT_CASE_var == HeatRecoveryHX::CrossFlow) { // Unmixed
+                    } else if (SELECT_CASE_var == HeatRecoveryHXEnum::CrossFlow) { // Unmixed
                         Real64 CapacityRatio = MinCapacityRate / max(DrainCapacityRate, HXCapacityRate);
                         Real64 NTU = this->HXUA / MinCapacityRate;
                         this->Effectiveness = 1.0 - std::exp((std::pow(NTU, 0.22) / CapacityRatio) * (std::exp(-CapacityRatio * std::pow(NTU, 0.78)) - 1.0));
@@ -1435,17 +1435,17 @@ namespace EnergyPlus {
 
                 {
                     auto const SELECT_CASE_var(this->HeatRecoveryConfig);
-                    if (SELECT_CASE_var == HeatRecoveryConfig::Plant) {
+                    if (SELECT_CASE_var == HeatRecoveryConfigEnum::Plant) {
                         this->TempError = 0.0; // No feedback back to the cold supply
                         this->ReturnTemp = this->RecoveryTemp;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryConfig::Equipment) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::Equipment) {
                         this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                         this->ColdTemp = this->RecoveryTemp;
                         this->ReturnTemp = this->ColdSupplyTemp;
 
-                    } else if (SELECT_CASE_var == HeatRecoveryConfig::PlantAndEquip) {
+                    } else if (SELECT_CASE_var == HeatRecoveryConfigEnum::PlantAndEquip) {
                         this->TempError = std::abs(this->ColdTemp - this->RecoveryTemp);
 
                         this->ColdTemp = this->RecoveryTemp;
