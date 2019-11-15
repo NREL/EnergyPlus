@@ -200,7 +200,6 @@ namespace PlantLoopEquip {
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using UserDefinedComponents::SimUserDefinedPlantComponent;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
-        using WaterUse::SimulateWaterUseConnection;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EquipNum; // Plant side component list equipment number
@@ -937,11 +936,8 @@ namespace PlantLoopEquip {
 
             if (EquipTypeNum == TypeOf_WaterUseConnection) {
 
-                SimulateWaterUseConnection(EquipTypeNum, sim_component.Name, EquipNum, InitLoopEquip, FirstHVACIteration);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Load Coil Type=" + sim_component.TypeOf);
                 ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);

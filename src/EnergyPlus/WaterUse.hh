@@ -222,7 +222,7 @@ namespace EnergyPlus {
 
             void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-            void InitConnections(int WaterConnNum);
+            void InitConnections();
 
             void CalcConnectionsFlowRates(bool FirstHVACIteration);
 
@@ -238,8 +238,6 @@ namespace EnergyPlus {
         void clear_state();
 
         void SimulateWaterUse(bool FirstHVACIteration);
-
-        void SimulateWaterUseConnection(int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
         void GetWaterUseInput();
 
