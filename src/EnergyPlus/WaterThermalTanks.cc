@@ -9394,7 +9394,8 @@ namespace WaterThermalTanks {
 
                         int SolFla;
                         std::string IterNum;
-                        General::SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS);
+                        auto boundPLRFunc = std::bind(&WaterThermalTanks::WaterThermalTankData::PLRResidualIterSpeed, this, std::placeholders::_1, std::placeholders::_2);
+                        General::SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
 
                         if (SolFla == -1) {
                             ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
@@ -9946,9 +9947,8 @@ namespace WaterThermalTanks {
         }
     }
 
-    Real64 PLRResidualIterSpeed(Real64 const SpeedRatio,  // speed ratio between two speed levels
-                                Array1<Real64> const &Par //
-    )
+    Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio,  // speed ratio between two speed levels
+                                Array1<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Shen, ORNL, 12/2014
@@ -9965,22 +9965,20 @@ namespace WaterThermalTanks {
 
         Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling variable-speed coil function
 
-        int WaterThermalTankNum = int(Par(1));
         int HPNum = int(Par(2));
         int SpeedNum = int(Par(3));
         int HPWaterInletNode = int(Par(4));
         int HPWaterOutletNode = int(Par(5));
         Real64 RhoWater = Par(6);
-        WaterThermalTank(WaterThermalTankNum).Mode = int(Par(8));
+        this->Mode = int(Par(8));
         bool FirstHVACIteration = (Par(9) == 1.0);
 
         hpPartLoadRatio = 1.0;
         Real64 MdotWater = 0.0;
 
-        auto &Tank = WaterThermalTank(WaterThermalTankNum);
         auto &HPWH = HPWaterHeater(HPNum);
 
-        Tank.SetVSHPWHFlowRates(HPWH, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+        this->SetVSHPWHFlowRates(HPWH, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
         if (HPWaterHeater(HPNum).bIsIHP) {
             IntegratedHeatPump::SimIHP(HPWaterHeater(HPNum).DXCoilName,
@@ -10019,7 +10017,7 @@ namespace WaterThermalTanks {
 
         //           move the full load outlet temperature rate to the water heater structure variables
         //           (water heaters source inlet node temperature/mdot are set in Init, set it here after DXCoils::CalcHPWHDXCoil has been called)
-        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = DataLoopNode::Node(HPWaterInletNode).Temp + CondenserDeltaT;
+        this->SourceInletTemp = DataLoopNode::Node(HPWaterInletNode).Temp + CondenserDeltaT;
 
         //           this CALL does not update node temps, must use WaterThermalTank variables
         // select tank type
@@ -10027,11 +10025,11 @@ namespace WaterThermalTanks {
         {
             auto const SELECT_CASE_var1(HPWaterHeater(HPNum).TankTypeNum);
             if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterMixed) {
-                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankMixed();
-                NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                this->CalcWaterThermalTankMixed();
+                NewTankTemp = this->TankTemp;
             } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
-                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
-                NewTankTemp = WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
+                this->CalcWaterThermalTankStratified();
+                NewTankTemp = this->FindStratifiedTankSensedTemp();
             }
         }
 
@@ -10142,7 +10140,6 @@ namespace WaterThermalTanks {
 
         // PURPOSE OF THIS FUNCTION:
         // Determine by tank type, tank temperature and control mode if source side flow is needed
-
 
         //return value initialization
         bool NeedsHeatOrCool = false;

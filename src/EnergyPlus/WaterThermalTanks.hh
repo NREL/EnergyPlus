@@ -787,6 +787,10 @@ namespace WaterThermalTanks {
 
         Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
+        Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
+                                    Array1<Real64> const &Par //
+        );
+
     };
 
     struct WaterHeaterDesuperheaterData
@@ -922,10 +926,6 @@ namespace WaterThermalTanks {
     bool getWaterTankStratifiedInput();
 
     bool GetWaterThermalTankInput();
-
-    Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
-                                Array1<Real64> const &Par //
-    );
 
     // used by: GetWaterThermalTankInput
     void ValidatePLFCurve(int CurveIndex, bool &IsValid);
