@@ -270,7 +270,6 @@ namespace WaterThermalTanks {
 
         if (Tank->myOneTimeInitFlag) {
             Tank->setupOutputVars();
-//            Tank->setupZoneInternalGains();
             Tank->myOneTimeInitFlag = false;
         }
 
@@ -351,7 +350,7 @@ namespace WaterThermalTanks {
                 Tank->CalcWaterThermalTankStratified();
             }
         } else if (Tank->DesuperheaterNum > 0) {
-            CalcDesuperheaterWaterHeater(CompNum, FirstHVACIteration);
+            Tank->CalcDesuperheaterWaterHeater(FirstHVACIteration);
         }
         Tank->UpdateWaterThermalTank();
         Tank->ReportWaterThermalTank();
@@ -411,7 +410,6 @@ namespace WaterThermalTanks {
         if (HPWH->myOneTimeInitFlag) {
             if (Tank->myOneTimeInitFlag) {
                 Tank->setupOutputVars();
-//                Tank->setupZoneInternalGains();
                 Tank->myOneTimeInitFlag = false;
             }
             HPWH->myOneTimeInitFlag = false;
@@ -633,31 +631,31 @@ namespace WaterThermalTanks {
         }
     }
 
-    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
-    {
-        // Process the input data
-        if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
-            getWaterThermalTankInputFlag = false;
-        }
-
-        // Now look for this object in the list
-        for (auto &HPWtrHtr : HPWaterHeater) {
-            if (HPWtrHtr.Name == objectName) {
-                return &HPWtrHtr;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for heat pump water heater named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
-    {
-
-    }
+//    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
+//    {
+//        // Process the input data
+//        if (getWaterThermalTankInputFlag) {
+//            GetWaterThermalTankInput();
+//            getWaterThermalTankInputFlag = false;
+//        }
+//
+//        // Now look for this object in the list
+//        for (auto &HPWtrHtr : HPWaterHeater) {
+//            if (HPWtrHtr.Name == objectName) {
+//                return &HPWtrHtr;
+//            }
+//        }
+//        // If we didn't find it, fatal
+//        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for heat pump water heater named: " + objectName); // LCOV_EXCL_LINE
+//        // Shut up the compiler
+//        return nullptr; // LCOV_EXCL_LINE
+//    }
+//
+//    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+//                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+//    {
+//
+//    }
 
     void SimHeatPumpWaterHeater(std::string const &CompName,
                                 bool const FirstHVACIteration,
@@ -8233,9 +8231,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void CalcDesuperheaterWaterHeater(int const WaterThermalTankNum, // Water Heater being simulated
-                                      bool const FirstHVACIteration  // TRUE if First iteration of simulation
-    )
+    void WaterThermalTankData::CalcDesuperheaterWaterHeater(bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8256,8 +8252,7 @@ namespace WaterThermalTanks {
 
         Array1D<Real64> Par(5);     // Parameters passed to RegulaFalsi
 
-        auto Tank = &WaterThermalTank(WaterThermalTankNum);
-        auto DesuperheaterNum = Tank->DesuperheaterNum;
+        auto DesuperheaterNum = this->DesuperheaterNum;
         auto DesupHtr = &WaterHeaterDesuperheater(DesuperheaterNum);
 
         int WaterInletNode = DesupHtr->WaterInletNode;
@@ -8267,8 +8262,8 @@ namespace WaterThermalTanks {
         if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && DesupHtr->FirstTimeThroughFlag) {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
-            Tank->SavedTankTemp = Tank->TankTemp;
-            Tank->SavedSourceOutletTemp = Tank->SourceOutletTemp;
+            this->SavedTankTemp = this->TankTemp;
+            this->SavedSourceOutletTemp = this->SourceOutletTemp;
             DesupHtr->SaveMode = DesupHtr->Mode;
             DesupHtr->FirstTimeThroughFlag = false;
         }
@@ -8278,14 +8273,14 @@ namespace WaterThermalTanks {
         }
 
         // initialize variables before invoking any RETURN statement
-        Tank->SourceMassFlowRate = 0.0;
+        this->SourceMassFlowRate = 0.0;
         // reset tank inlet temp from previous time step
-        Tank->SourceInletTemp = Tank->SavedSourceOutletTemp;
+        this->SourceInletTemp = this->SavedSourceOutletTemp;
         DesupHtr->DesuperheaterPLR = 0.0;
 
         DataLoopNode::Node(WaterInletNode).MassFlowRate = 0.0;
         DataLoopNode::Node(WaterOutletNode).MassFlowRate = 0.0;
-        DataLoopNode::Node(WaterOutletNode).Temp = Tank->SavedSourceOutletTemp;
+        DataLoopNode::Node(WaterOutletNode).Temp = this->SavedSourceOutletTemp;
 
         DesupHtr->DesuperheaterPLR = 0.0;
         DesupHtr->OnCycParaFuelRate = 0.0;
@@ -8302,7 +8297,7 @@ namespace WaterThermalTanks {
         Real64 AvailSchedule = ScheduleManager::GetCurrentScheduleValue(DesupHtr->AvailSchedPtr);
         if (AvailSchedule == 0.0) {
             DesupHtr->Mode = floatMode;
-            Tank->CalcWaterThermalTank();
+            this->CalcWaterThermalTank();
             return;
         }
 
@@ -8311,9 +8306,9 @@ namespace WaterThermalTanks {
         if (DesupHtr->ValidSourceType) {
             int SourceID = DesupHtr->ReclaimHeatingSourceIndexNum;
             if (DesupHtr->ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
-                if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= Tank->SourceInletTemp) {
+                if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= this->SourceInletTemp) {
                     DesupHtr->Mode = floatMode;
-                    Tank->CalcWaterThermalTank();
+                    this->CalcWaterThermalTank();
                     ShowRecurringWarningErrorAtEnd("WaterHeating:Desuperheater " + DesupHtr->Name +
                                                        " - Waste heat source temperature was too low to be useful.",
                                                    DesupHtr->InsuffTemperatureWarn);
@@ -8329,7 +8324,7 @@ namespace WaterThermalTanks {
         // check that water heater tank cut-in temp is greater than desuperheater cut-in temp
         Real64 SetPointTemp = DesupHtr->SetPointTemp;
         Real64 DeadBandTempDiff = DesupHtr->DeadBandTempDiff;
-        if ((SetPointTemp - DeadBandTempDiff) <= Tank->SetPointTemp) {
+        if ((SetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 Real64 MinTemp = SetPointTemp - DeadBandTempDiff;
                 ++DesupHtr->SetPointError;
@@ -8350,14 +8345,14 @@ namespace WaterThermalTanks {
             }
 
             //   Simulate tank if desuperheater unavailable for water heating
-            Tank->CalcWaterThermalTank();
+            this->CalcWaterThermalTank();
             return;
         }
 
         Real64 Effic = DesupHtr->HeatReclaimRecoveryEff;
 
-        Real64 TankTemp = Tank->SavedTankTemp;
-        DataLoopNode::Node(WaterInletNode).Temp = Tank->SavedSourceOutletTemp;
+        Real64 TankTemp = this->SavedTankTemp;
+        DataLoopNode::Node(WaterInletNode).Temp = this->SavedSourceOutletTemp;
         DesupHtr->Mode = DesupHtr->SaveMode;
 
         Real64 HEffFTemp;
@@ -8404,7 +8399,7 @@ namespace WaterThermalTanks {
 
         // simulate only water heater tank if reclaim heating source is off
         if (DesupHtr->DXSysPLR == 0.0) {
-            Tank->CalcWaterThermalTank();
+            this->CalcWaterThermalTank();
             return;
         }
 
@@ -8445,7 +8440,8 @@ namespace WaterThermalTanks {
 
             if (TankType == DataPlant::TypeOf_WtrHeaterMixed||TankType == DataPlant::TypeOf_WtrHeaterStratified) {
 
-                DesupHtr->SaveWHMode = Tank->Mode;
+                DesupHtr->SaveWHMode = this->Mode;
+                auto boundPLRFunc = std::bind(&WaterThermalTanks::WaterThermalTankData::PLRResidualWaterThermalTank, this, std::placeholders::_1, std::placeholders::_2);
 
                 {
                     auto const SELECT_CASE_var1(DesupHtr->Mode);
@@ -8454,17 +8450,17 @@ namespace WaterThermalTanks {
                         PartLoadRatio = DesupHtr->DXSysPLR;
 
                         //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                        Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                        this->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                         //         set the source mass flow rate for the tank
-                        Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
+                        this->SourceMassFlowRate = MdotWater * PartLoadRatio;
 
-                        Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
-                        Tank->MinCapacity = DesupHtr->BackupElementCapacity;
+                        this->MaxCapacity = DesupHtr->BackupElementCapacity;
+                        this->MinCapacity = DesupHtr->BackupElementCapacity;
                         DesupHtr->DesuperheaterPLR = PartLoadRatio;
                         DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
-                        Tank->CalcWaterThermalTank();
-                        Real64 NewTankTemp = Tank->TankTemp;
+                        this->CalcWaterThermalTank();
+                        Real64 NewTankTemp = this->TankTemp;
 
                         if (NewTankTemp > SetPointTemp) {
                             //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
@@ -8473,7 +8469,6 @@ namespace WaterThermalTanks {
                             }
                             Par(1) = SetPointTemp;
                             Par(2) = DesupHtr->SaveWHMode;
-                            Par(3) = WaterThermalTankNum;
                             if (FirstHVACIteration) {
                                 Par(4) = 1.0;
                             } else {
@@ -8486,7 +8481,7 @@ namespace WaterThermalTanks {
                                       MaxIte,
                                       SolFla,
                                       PartLoadRatio,
-                                      PLRResidualWaterThermalTank,
+                                               boundPLRFunc,
                                       0.0,
                                       DesupHtr->DXSysPLR,
                                       Par);
@@ -8537,7 +8532,7 @@ namespace WaterThermalTanks {
                                     }
                                 }
                             }
-                            NewTankTemp = Tank->TankTemp;
+                            NewTankTemp = this->TankTemp;
                         } else {
                             PartLoadRatio = DesupHtr->DXSysPLR;
                         }
@@ -8548,22 +8543,22 @@ namespace WaterThermalTanks {
                         PartLoadRatio = 0.0;
 
                         //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                        Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                        this->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                         //         check tank temperature by setting source inlet mass flow rate to zero
-                        Tank->SourceMassFlowRate = 0.0;
+                        this->SourceMassFlowRate = 0.0;
 
                         //         disable the tank heater to find PLR of the HPWH
-                        Tank->MaxCapacity = 0.0;
-                        Tank->MinCapacity = 0.0;
+                        this->MaxCapacity = 0.0;
+                        this->MinCapacity = 0.0;
                         DesupHtr->DesuperheaterPLR = PartLoadRatio;
                         DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
-                        Tank->CalcWaterThermalTank();
-                        Real64 NewTankTemp = Tank->TankTemp;
+                        this->CalcWaterThermalTank();
+                        Real64 NewTankTemp = this->TankTemp;
 
                         if (NewTankTemp <= (SetPointTemp - DeadBandTempDiff)) {
                             DesupHtr->Mode = heatMode;
-                            Tank->Mode = DesupHtr->SaveWHMode;
+                            this->Mode = DesupHtr->SaveWHMode;
                             if ((TankTemp - NewTankTemp) != 0.0) {
                                 PartLoadRatio = min(DesupHtr->DXSysPLR,
                                                     max(0.0, ((SetPointTemp - DeadBandTempDiff) - NewTankTemp) / (TankTemp - NewTankTemp)));
@@ -8572,20 +8567,19 @@ namespace WaterThermalTanks {
                             }
 
                             //           set the full load outlet temperature on the water heater source inlet node
-                            Tank->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
+                            this->SourceInletTemp = DataLoopNode::Node(WaterOutletNode).Temp;
 
                             //           set the source mass flow rate for the tank and enable backup heating element
-                            Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
-                            Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
-                            Tank->MinCapacity = DesupHtr->BackupElementCapacity;
+                            this->SourceMassFlowRate = MdotWater * PartLoadRatio;
+                            this->MaxCapacity = DesupHtr->BackupElementCapacity;
+                            this->MinCapacity = DesupHtr->BackupElementCapacity;
                             DesupHtr->DesuperheaterPLR = PartLoadRatio;
                             DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
-                            Tank->CalcWaterThermalTank();
-                            NewTankTemp = Tank->TankTemp;
+                            this->CalcWaterThermalTank();
+                            NewTankTemp = this->TankTemp;
                             if (NewTankTemp > SetPointTemp) {
                                 Par(1) = SetPointTemp;
                                 Par(2) = DesupHtr->SaveWHMode;
-                                Par(3) = WaterThermalTankNum;
                                 if (FirstHVACIteration) {
                                     Par(4) = 1.0;
                                 } else {
@@ -8598,7 +8592,7 @@ namespace WaterThermalTanks {
                                           MaxIte,
                                           SolFla,
                                           PartLoadRatio,
-                                          PLRResidualWaterThermalTank,
+                                          boundPLRFunc,
                                           0.0,
                                           DesupHtr->DXSysPLR,
                                           Par);
@@ -8651,8 +8645,8 @@ namespace WaterThermalTanks {
                                 }
                             }
                         } else {
-                            Tank->MaxCapacity = DesupHtr->BackupElementCapacity;
-                            Tank->MinCapacity = DesupHtr->BackupElementCapacity;
+                            this->MaxCapacity = DesupHtr->BackupElementCapacity;
+                            this->MinCapacity = DesupHtr->BackupElementCapacity;
                         }
 
                     } else {
@@ -8672,11 +8666,11 @@ namespace WaterThermalTanks {
         DataLoopNode::Node(WaterOutletNode).MassFlowRate = MdotWater * PartLoadRatio;
         DesupHtr->HEffFTempOutput = HEffFTemp;
         DesupHtr->HeaterRate = QHeatRate * PartLoadRatio;
-        Tank->SourceMassFlowRate = MdotWater * PartLoadRatio;
+        this->SourceMassFlowRate = MdotWater * PartLoadRatio;
 
         if (PartLoadRatio == 0) {
-            Tank->SourceInletTemp = Tank->SourceOutletTemp;
-            DataLoopNode::Node(WaterOutletNode).Temp = Tank->SourceOutletTemp;
+            this->SourceInletTemp = this->SourceOutletTemp;
+            DataLoopNode::Node(WaterOutletNode).Temp = this->SourceOutletTemp;
             DesupHtr->HEffFTempOutput = 0.0;
             DesupHtr->HeaterRate = 0.0;
         }
@@ -10053,7 +10047,7 @@ namespace WaterThermalTanks {
         return Par(7) - NewTankTemp;
     }
 
-    Real64 PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 WaterThermalTankData::PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     )
     {
@@ -10080,12 +10074,10 @@ namespace WaterThermalTanks {
         // par(4) = FirstHVACIteration
         // par(5) = MdotWater
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WaterThermalTankNum = int(Par(3));
-        WaterThermalTank(WaterThermalTankNum).Mode = int(Par(2));
-        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = Par(5) * HPPartLoadRatio;
-        WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank();
-        Real64 NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+        this->Mode = int(Par(2));
+        this->SourceMassFlowRate = Par(5) * HPPartLoadRatio;
+        this->CalcWaterThermalTank();
+        Real64 NewTankTemp = this->TankTemp;
         Real64 PLRResidualWaterThermalTank = Par(1) - NewTankTemp;
         return PLRResidualWaterThermalTank;
     }
@@ -12278,7 +12270,6 @@ namespace WaterThermalTanks {
 
         if (this->MyOneTimeSetupFlag) {
             this->setupOutputVars();
-//            this->setupZoneInternalGains();
             this->MyOneTimeSetupFlag = false;
         }
 

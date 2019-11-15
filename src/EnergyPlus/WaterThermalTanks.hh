@@ -605,9 +605,15 @@ namespace WaterThermalTanks {
                                                      Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
         );
 
+        void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
+
+        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                           Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
+        );
+
     };
 
-    struct HeatPumpWaterHeaterData : PlantComponent
+    struct HeatPumpWaterHeaterData
     {
         // Members
         std::string Name;                                   // Name of heat pump water heater
@@ -767,10 +773,6 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
-
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
-
     };
 
     struct WaterHeaterDesuperheaterData
@@ -907,10 +909,6 @@ namespace WaterThermalTanks {
 
     bool GetWaterThermalTankInput();
 
-    void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
-                                      bool FirstHVACIteration  // TRUE if First iteration of simulation
-    );
-
     void CalcHeatPumpWaterHeater(int WaterThermalTankNum, // Water Heater tank being simulated
                                  bool FirstHVACIteration  // TRUE if First iteration of simulation
     );
@@ -919,10 +917,6 @@ namespace WaterThermalTanks {
 
     Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
                                 Array1<Real64> const &Par //
-    );
-
-    Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 
     void SetVSHPWHFlowRates(WaterThermalTankData &Tank,
