@@ -561,6 +561,44 @@ namespace WaterThermalTanks {
                               Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
                               Real64 Q   // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
         );
+
+        static Real64 CalcTankTemp(Real64 Ti, // Initial tank temperature (C)
+                            Real64 Ta, // Ambient environment temperature (C)
+                            Real64 T1, // Temperature of flow 1 (C)
+                            Real64 T2, // Temperature of flow 2 (C)
+                            Real64 m,  // Mass of tank fluid (kg)
+                            Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                            Real64 m1, // Mass flow rate 1 (kg/s)
+                            Real64 m2, // Mass flow rate 2 (kg/s)
+                            Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                            Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+                            Real64 t   // Time elapsed from Ti to Tf (s)
+        );
+
+        static Real64 CalcTempIntegral(Real64 Ti, // Initial tank temperature (C)
+                                Real64 Tf, // Final tank temperature (C)
+                                Real64 Ta, // Ambient environment temperature (C)
+                                Real64 T1, // Temperature of flow 1 (C)
+                                Real64 T2, // Temperature of flow 2 (C)
+                                Real64 m,  // Mass of tank fluid (kg)
+                                Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                                Real64 m1, // Mass flow rate 1 (kg/s)
+                                Real64 m2, // Mass flow rate 2 (kg/s)
+                                Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                                Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+                                Real64 t   // Time elapsed from Ti to Tf (s)
+        );
+
+        static void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
+                // there is no heat pump or if the heat pump is off
+                                                     Real64 SourceInletTemp,     // input, Source inlet temperature (C)
+                                                     Real64 Cp,                  // Specific heat of fluid (J/kg deltaC)
+                                                     Real64 SetPointTemp,        // input, Mixed tank set point temperature
+                                                     Real64 &SourceMassFlowRate, // source mass flow rate (kg/s)
+                                                     Real64 &Qheatpump,          // heat transfer rate from heat pump
+                                                     Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
+        );
+        
     };
 
     struct HeatPumpWaterHeaterData : PlantComponent
@@ -862,44 +900,7 @@ namespace WaterThermalTanks {
     bool getWaterTankStratifiedInput();
 
     bool GetWaterThermalTankInput();
-
-    void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
-                                                                             // there is no heat pump or if the heat pump is off
-                                                 Real64 SourceInletTemp,     // input, Source inlet temperature (C)
-                                                 Real64 Cp,                  // Specific heat of fluid (J/kg deltaC)
-                                                 Real64 SetPointTemp,        // input, Mixed tank set point temperature
-                                                 Real64 &SourceMassFlowRate, // source mass flow rate (kg/s)
-                                                 Real64 &Qheatpump,          // heat transfer rate from heat pump
-                                                 Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
-    );
-
-    Real64 CalcTankTemp(Real64 Ti, // Initial tank temperature (C)
-                        Real64 Ta, // Ambient environment temperature (C)
-                        Real64 T1, // Temperature of flow 1 (C)
-                        Real64 T2, // Temperature of flow 2 (C)
-                        Real64 m,  // Mass of tank fluid (kg)
-                        Real64 Cp, // Specific heat of fluid (J/kg deltaC)
-                        Real64 m1, // Mass flow rate 1 (kg/s)
-                        Real64 m2, // Mass flow rate 2 (kg/s)
-                        Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                        Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
-                        Real64 t   // Time elapsed from Ti to Tf (s)
-    );
-
-    Real64 CalcTempIntegral(Real64 Ti, // Initial tank temperature (C)
-                            Real64 Tf, // Final tank temperature (C)
-                            Real64 Ta, // Ambient environment temperature (C)
-                            Real64 T1, // Temperature of flow 1 (C)
-                            Real64 T2, // Temperature of flow 2 (C)
-                            Real64 m,  // Mass of tank fluid (kg)
-                            Real64 Cp, // Specific heat of fluid (J/kg deltaC)
-                            Real64 m1, // Mass flow rate 1 (kg/s)
-                            Real64 m2, // Mass flow rate 2 (kg/s)
-                            Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                            Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
-                            Real64 t   // Time elapsed from Ti to Tf (s)
-    );
-
+    
     void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
                                       bool FirstHVACIteration  // TRUE if First iteration of simulation
     );

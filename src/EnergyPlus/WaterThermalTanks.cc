@@ -6826,7 +6826,7 @@ namespace WaterThermalTanks {
 
         Real64 Qheatpump;
         Real64 Qsource;
-        CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp_loc, Cp, SetPointTemp_loc, SourceMassFlowRate_loc, Qheatpump, Qsource);
+        this->CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp_loc, Cp, SetPointTemp_loc, SourceMassFlowRate_loc, Qheatpump, Qsource);
 
         // Calculate steady-state use heat rate.
         Real64 Quse = UseMassFlowRate_loc * Cp * (UseInletTemp_loc - SetPointTemp_loc);
@@ -6868,7 +6868,7 @@ namespace WaterThermalTanks {
                         Qheat = Qoncycheat + Qheater + Qheatpump;
 
                         // Calculate time needed to recover to the setpoint at maximum heater capacity
-                        TimeNeeded = CalcTimeNeeded(TankTemp_loc,
+                        TimeNeeded = this->CalcTimeNeeded(TankTemp_loc,
                                                     SetPointTemp_loc,
                                                     AmbientTemp_loc,
                                                     UseInletTemp_loc,
@@ -6886,7 +6886,7 @@ namespace WaterThermalTanks {
 
                             TimeNeeded = TimeRemaining;
 
-                            NewTankTemp = CalcTankTemp(TankTemp_loc,
+                            NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                        AmbientTemp_loc,
                                                        UseInletTemp_loc,
                                                        SourceInletTemp_loc,
@@ -6972,7 +6972,7 @@ namespace WaterThermalTanks {
                             Qunmet = Qneeded - Qheater;
                             Qheat = Qoncycheat + Qheater + Qheatpump;
 
-                            NewTankTemp = CalcTankTemp(TankTemp_loc,
+                            NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                        AmbientTemp_loc,
                                                        UseInletTemp_loc,
                                                        SourceInletTemp_loc,
@@ -7029,7 +7029,7 @@ namespace WaterThermalTanks {
                         Qheat = Qoffcycheat + Qheatpump;
 
                         // Calculate time needed for tank temperature to fall to minimum (setpoint - deadband)
-                        TimeNeeded = CalcTimeNeeded(TankTemp_loc,
+                        TimeNeeded = this->CalcTimeNeeded(TankTemp_loc,
                                                     DeadBandTemp,
                                                     AmbientTemp_loc,
                                                     UseInletTemp_loc,
@@ -7051,7 +7051,7 @@ namespace WaterThermalTanks {
                         } else { // TimeNeeded > TimeRemaining
                             // Heating will not be needed for all of the remaining time
 
-                            NewTankTemp = CalcTankTemp(TankTemp_loc,
+                            NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                        AmbientTemp_loc,
                                                        UseInletTemp_loc,
                                                        SourceInletTemp_loc,
@@ -7099,7 +7099,7 @@ namespace WaterThermalTanks {
                         Mode_loc = coolMode;
                         Qheat = Qheatpump;
 
-                        NewTankTemp = CalcTankTemp(TankTemp_loc,
+                        NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                    AmbientTemp_loc,
                                                    UseInletTemp_loc,
                                                    SourceInletTemp_loc,
@@ -7117,7 +7117,7 @@ namespace WaterThermalTanks {
 
                         Qheat = Qheatpump;
 
-                        NewTankTemp = CalcTankTemp(TankTemp_loc,
+                        NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                    AmbientTemp_loc,
                                                    UseInletTemp_loc,
                                                    SourceInletTemp_loc,
@@ -7142,7 +7142,7 @@ namespace WaterThermalTanks {
                     LossFracToZone = this->OffCycLossFracToZone;
                     Qheat = Qoffcycheat + Qheatpump;
 
-                    NewTankTemp = CalcTankTemp(TankTemp_loc,
+                    NewTankTemp = this->CalcTankTemp(TankTemp_loc,
                                                AmbientTemp_loc,
                                                UseInletTemp_loc,
                                                SourceInletTemp_loc,
@@ -7184,7 +7184,7 @@ namespace WaterThermalTanks {
                 }
             }
 
-            Real64 deltaTsum = CalcTempIntegral(TankTemp_loc,
+            Real64 deltaTsum = this->CalcTempIntegral(TankTemp_loc,
                                                 NewTankTemp,
                                                 AmbientTemp_loc,
                                                 UseInletTemp_loc,
@@ -7307,7 +7307,7 @@ namespace WaterThermalTanks {
         if (this->AmbientTempZone > 0) this->AmbientZoneGain = -Qlosszone - Qvent;
     }
 
-    void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
+    void WaterThermalTankData::CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
                                                                              // there is no heat pump or if the heat pump is off
                                                  Real64 SourceInletTemp,     // input, Source inlet temperature (C)
                                                  Real64 Cp,                  // Specific heat of fluid (J/kg deltaC)
@@ -7435,7 +7435,7 @@ namespace WaterThermalTanks {
         return CalcTimeNeeded;
     }
 
-    Real64 CalcTankTemp(Real64 const Ti, // Initial tank temperature (C)
+    Real64 WaterThermalTankData::CalcTankTemp(Real64 const Ti, // Initial tank temperature (C)
                         Real64 const Ta, // Ambient environment temperature (C)
                         Real64 const T1, // Temperature of flow 1 (C)
                         Real64 const T2, // Temperature of flow 2 (C)
@@ -7491,7 +7491,7 @@ namespace WaterThermalTanks {
         return CalcTankTemp;
     }
 
-    Real64 CalcTempIntegral(Real64 const Ti, // Initial tank temperature (C)
+    Real64 WaterThermalTankData::CalcTempIntegral(Real64 const Ti, // Initial tank temperature (C)
                             Real64 const Tf, // Final tank temperature (C)
                             Real64 const Ta, // Ambient environment temperature (C)
                             Real64 const T1, // Temperature of flow 1 (C)

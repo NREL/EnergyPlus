@@ -93,7 +93,7 @@ TEST_F(WaterThermalTanksFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
     // Mixed Tank
 
     // Test case without HPWH
-    WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
+    WaterThermalTanks::WaterThermalTankData::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
     // Qsource is non zero and calculated relative to the tank setpoint.
     EXPECT_DOUBLE_EQ(SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp), Qsource);
     // Qheatpump is zero
@@ -103,7 +103,7 @@ TEST_F(WaterThermalTanksFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
 
     // Test case with HPWH
     DeltaT = 5.0;
-    WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
+    WaterThermalTanks::WaterThermalTankData::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
     // Qsource is Qheatpump
     EXPECT_DOUBLE_EQ(Qsource, Qheatpump);
     // Qheatpump is the heat transfer rate from the input DeltaT
@@ -1059,19 +1059,19 @@ TEST_F(WaterThermalTanksFixture, WaterThermalTank_CalcTempIntegral)
     Real64 Q = 0.0;      // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
     Real64 t = 269.2;    // Time elapsed from Ti to Tf (s)
 
-    EXPECT_NEAR(14716.6, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t), 0.1);
+    EXPECT_NEAR(14716.6, WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t), 0.1);
 
-    EXPECT_NEAR(0.0, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, 0.0), 0.1); // elapsed time is zero
+    EXPECT_NEAR(0.0, WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, 0.0), 0.1); // elapsed time is zero
 
     EXPECT_NEAR(15403.6,
-                WaterThermalTanks::CalcTempIntegral(Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t),
+                WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t),
                 0.1); // final tank temperature same as initial tank temperature
 
     EXPECT_NEAR(15461.9,
-                WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t),
+                WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t),
                 0.1); // UA, m1, m2 all zero, Q = 1000W
 
-    EXPECT_NEAR(14772.5, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t), 0.1); // Q = 1000W
+    EXPECT_NEAR(14772.5, WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t), 0.1); // Q = 1000W
 }
 
 TEST_F(WaterThermalTanksFixture, HPWHOutdoorAirMissingNodeNameWarning)
