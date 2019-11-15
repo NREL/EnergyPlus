@@ -225,6 +225,31 @@ private:
         std::vector<json::const_iterator> inputObjectIterators;
     };
 
+    struct MaxFields
+    {
+        MaxFields() = default;
+        std::size_t max_fields = 0;
+        std::size_t max_extensible_fields = 0;
+    };
+
+    MaxFields findMaxFields(json const & ep_object, std::string const & extension_key, json const & legacy_idd);
+
+    void setObjectItemValue(json const & ep_object,
+                            json const & ep_schema_object,
+                            std::string const & field,
+                            json const & legacy_field_info,
+                            int & alpha_index,
+                            int & numeric_index,
+                            bool within_max_fields,
+                            Array1S_string Alphas,
+                            int &NumAlphas,
+                            Array1S<Real64> Numbers,
+                            int &NumNumbers,
+                            Optional<Array1D_bool> NumBlank = _,
+                            Optional<Array1D_bool> AlphaBlank = _,
+                            Optional<Array1D_string> AlphaFieldNames = _,
+                            Optional<Array1D_string> NumericFieldNames = _);
+
     void addVariablesForMonthlyReport(std::string const &reportName);
 
     void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
