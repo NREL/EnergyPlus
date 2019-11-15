@@ -549,7 +549,6 @@ TEST_F(WaterThermalTanksFixture, HPWHEnergyBalance)
     using DataHVACGlobals::TimeStepSys;
     using FluidProperties::GetSpecificHeatGlycol;
     using FluidProperties::Water;
-    using WaterThermalTanks::CalcHeatPumpWaterHeater;
     using WaterThermalTanks::HPWaterHeater;
     using WaterThermalTanks::WaterThermalTank;
 
@@ -778,7 +777,7 @@ TEST_F(WaterThermalTanksFixture, HPWHEnergyBalance)
     int GlycolIndex = 0;
     const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");
 
-    CalcHeatPumpWaterHeater(1, false);
+    Tank.CalcHeatPumpWaterHeater( false);
 
     const Real64 HeatFromCoil = Coil.TotalHeatingEnergyRate * TimeStepSys * 3600; // J
     Real64 TankEnergySum = 0;
@@ -1425,7 +1424,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.InitWaterThermalTank(1, FirstHVACIteration);
     DataGlobals::WarmupFlag = false;
     Tank.InitWaterThermalTank(1, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
     EXPECT_NEAR(60.0, Tank.TankTemp, 0.0000001);
@@ -1442,7 +1441,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     HeatPump.SaveMode = WaterThermalTanks::heatMode;
     Tank.SavedMode = WaterThermalTanks::heatMode;
     Tank.InitWaterThermalTank(1, FirstHVACIteration);
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
     EXPECT_NEAR(57.2000377, Tank.TankTemp, 0.0000001);         // final tank temperature
@@ -1456,7 +1455,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.SavedTankTemp = 56.0;
     HeatPump.SaveMode = WaterThermalTanks::heatMode;
     Tank.SavedMode = WaterThermalTanks::heatMode;
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
     EXPECT_NEAR(60.00110205, Tank.TankTemp, 0.0000001);
@@ -1472,7 +1471,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.SavedMode = WaterThermalTanks::heatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
@@ -1489,7 +1488,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.SavedMode = WaterThermalTanks::floatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
@@ -1507,7 +1506,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.SavedMode = WaterThermalTanks::heatMode;
     Tank.UseMassFlowRate = 0.0;
     Tank.UseInletTemp = 90.0;
-    WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
+    Tank.CalcHeatPumpWaterHeater( FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should remain at 56 C since use nodes are not adding heat to tank and HP set point temp was reduced
     EXPECT_NEAR(56.0, Tank.TankTemp, 0.0000001);

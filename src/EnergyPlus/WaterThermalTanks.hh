@@ -248,6 +248,168 @@ namespace WaterThermalTanks {
         }
     };
 
+    struct HeatPumpWaterHeaterData
+    {
+        // Members
+        std::string Name;                                   // Name of heat pump water heater
+        std::string Type;                                   // Type of water heater (HEAT PUMP:WATER HEATER)
+        int TypeNum;                                        // integer parameter for heat pump water heater
+        std::string TankName;                               // Name of tank associated with heat pump water heater
+        std::string TankType;                               // Type of water heater (MIXED or STRATIFIED) used with heat pump
+        int TankTypeNum;                                    // Parameter for tank type (MIXED or STRATIFIED)
+        bool StandAlone;                                    // Flag for operation with no plant connections (no use nodes)
+        int AvailSchedPtr;                                  // Index to Availability Schedule curve index
+        int SetPointTempSchedule;                           // Index to Setpoint Temperature Schedule curve
+        Real64 DeadBandTempDiff;                            // Dead band temperature difference (cut-in temperature)
+        Real64 Capacity;                                    // Heat Pump rated capacity (W)
+        Real64 BackupElementCapacity;                       // Tank backup element capacity (W)
+        Real64 BackupElementEfficiency;                     // Tank backup element efficiency
+        Real64 WHOnCycParaLoad;                             // tank's on-cycle parasitic load (W), disable for rating
+        Real64 WHOffCycParaLoad;                            // tank's off-cycle parasitic load (W), disable for rating
+        Real64 WHOnCycParaFracToTank;                       // tank's on-cycle parasitic frac to tank, disable for rating
+        Real64 WHOffCycParaFracToTank;                      // tank's off-cycle parasitic frac to tank, disable for rating
+        int WHPLFCurve;                                     // tank part-load fraction curve index, used for rating procedure
+        Real64 OperatingAirFlowRate;                        // Operating volumetric air flow rate (m3/s)
+        Real64 OperatingAirMassFlowRate;                    // Operating air mass flow rate (kg/s)
+        Real64 OperatingWaterFlowRate;                      // Operating volumetric water flow rate (m3/s)
+        Real64 COP;                                         // Heat Pump coefficient of performance (W/W)
+        Real64 SHR;                                         // Heat Pump air-side coil sensible heat ratio
+        Real64 RatedInletDBTemp;                            // Rated evaporator inlet air dry-bulb temperature (C)
+        Real64 RatedInletWBTemp;                            // Rated evaporator inlet air wet-bulb temperature (C)
+        Real64 RatedInletWaterTemp;                         // Rated condenser inlet water temperature (C)
+        bool FoundTank;                                     // Found storage tank flag associated with HP water heater
+        int HeatPumpAirInletNode;                           // HP air inlet node (for zone, zone/outdoor or scheduled)
+        int HeatPumpAirOutletNode;                          // HP air outlet node (for zone, zone/outdoor or scheduled)
+        int OutsideAirNode;                                 // outdoor air node (for outdoor or zone/outdoor air unit only)
+        int ExhaustAirNode;                                 // Exhaust air node (for outdoor or zone/outdoor air unit only)
+        int CondWaterInletNode;                             // Condenser water inlet node
+        int CondWaterOutletNode;                            // Condenser water outlet node
+        int WHUseInletNode;                                 // Water heater tank use side inlet node
+        int WHUseOutletNode;                                // Water heater tank use side outlet node
+        int WHUseSidePlantLoopNum;                          // if not zero, then this water heater is on plant loop #
+        std::string DXCoilType;                             // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
+        std::string DXCoilName;                             // Name of DX coil
+        int DXCoilNum;                                      // Index of DX coil
+        int DXCoilTypeNum;                                  // Type Number of DX coil
+        int DXCoilAirInletNode;                             // Inlet air node number of DX coil
+        int DXCoilPLFFPLR;                                  // Index to HPWH's DX Coil PLF as a function of PLR curve
+        std::string FanType;                                // Type of Fan (Fan:OnOff)
+        int FanType_Num;                                    // Integer type of fan (3 = Fan:OnOff)
+        std::string FanName;                                // Name of Fan
+        std::string FanInletNode_str;                       // Fan inlet node name
+        std::string FanOutletNode_str;                      // Fan outlet node name
+        int FanNum;                                         // Index of Fan
+        int FanPlacement;                                   // Location of Fan
+        int FanOutletNode;                                  // Outlet node of heat pump water heater fan
+        int WaterHeaterTankNum;                             // Index of Water Heater Tank
+        int OutletAirSplitterSchPtr;                        // Index to air-side outlet air splitter schedule
+        int InletAirMixerSchPtr;                            // Index to air-side inlet air mixer schedule
+        int Mode;                                           // HP mode (0 = float, 1 = heating [-1 = venting na for HP])
+        int SaveMode;                                       // HP mode on first iteration
+        int SaveWHMode;                                     // mode of water heater tank element (backup element)
+        Real64 Power;                                       // HP power used for reporting
+        Real64 Energy;                                      // HP energy used for reporting
+        Real64 HeatingPLR;                                  // HP PLR used for reporting
+        Real64 SetPointTemp;                                // set point or cut-out temperature [C]
+        Real64 MinAirTempForHPOperation;                    // HP does not operate below this ambient temperature
+        Real64 MaxAirTempForHPOperation;                    // HP does not operate above this ambient temperature
+        int InletAirMixerNode;                              // Inlet air mixer node number of HP water heater
+        int OutletAirSplitterNode;                          // Outlet air splitter node number of HP water heater
+        Real64 SourceMassFlowRate;                          // Maximum mass flow rate on the source side (kg/s)
+        int InletAirConfiguration;                          // Identifies source of HPWH inlet air
+        int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
+        int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
+        int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
+        int CrankcaseTempIndicator;                         // Indicator for HPWH compressor/crankcase heater location
+        int CrankcaseTempSchedule;                          // Schedule index pointer where crankcase heater is located
+        int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
+        Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
+        Real64 OnCycParaLoad;                               // Rate for on-cycle parasitic load (W)
+        int ParasiticTempIndicator;                         // Indicator for HPWH parasitic heat rejection location
+        Real64 OffCycParaFuelRate;                          // Electric consumption rate for off-cycle parasitic load (W)
+        Real64 OnCycParaFuelRate;                           // Electric consumption rate for on-cycle parasitic load (W)
+        Real64 OffCycParaFuelEnergy;                        // Electric energy consumption for off-cycle parasitic load (J)
+        Real64 OnCycParaFuelEnergy;                         // Electric energy consumption for on-cycle parasitic load (J)
+        bool AirFlowRateAutoSized;                          // Used to report air flow autosize info in Init
+        bool WaterFlowRateAutoSized;                        // Used to report water flow autosize info in Init
+        int HPSetPointError;                                // Used when temperature SP's in tank and HP are reversed
+        int HPSetPointErrIndex1;                            // Index to recurring error for tank/HP set point temp
+        int IterLimitErrIndex1;                             // Index for recurring iteration limit warning messages
+        int IterLimitExceededNum1;                          // Counter for recurring iteration limit warning messages
+        int RegulaFalsiFailedIndex1;                        // Index for recurring RegulaFalsi failed warning messages
+        int RegulaFalsiFailedNum1;                          // Counter for recurring RegulaFalsi failed warning messages
+        int IterLimitErrIndex2;                             // Index for recurring iteration limit warning messages
+        int IterLimitExceededNum2;                          // Counter for recurring iteration limit warning messages
+        int RegulaFalsiFailedIndex2;                        // Index for recurring RegulaFalsi failed warning messages
+        int RegulaFalsiFailedNum2;                          // Counter for recurring RegulaFalsi failed warning messages
+        bool FirstTimeThroughFlag;                          // Flag for saving water heater status
+        bool ShowSetPointWarning;                           // Warn when set point is greater than max tank temp limit
+        Real64 HPWaterHeaterSensibleCapacity;               // sensible capacity delivered when HPWH is attached to a zone (W)
+        Real64 HPWaterHeaterLatentCapacity;                 // latent capacity delivered when HPWH is attached to a zone (kg/s)
+        Real64 WrappedCondenserBottomLocation;              // Location of the bottom of the wrapped condenser.
+        Real64 WrappedCondenserTopLocation;                 // Location of the top of the wrapped condenser.
+        Real64 ControlSensor1Height;                        // location from bottom of tank of control sensor 1
+        int ControlSensor1Node;                             // Node number of control sensor 1
+        Real64 ControlSensor1Weight;                        // weight of control sensor 1
+        Real64 ControlSensor2Height;                        // location from bottom of tank of control sensor 2
+        int ControlSensor2Node;                             // Node number of control sensor 2
+        Real64 ControlSensor2Weight;                        // weight of control sensor 2
+        Real64 ControlTempAvg;                              // Measured control temperature for the heat pump, average over timestep, for reporting
+        Real64 ControlTempFinal;                            // Measured control temperature at the end of the timestep, for reporting
+        bool AllowHeatingElementAndHeatPumpToRunAtSameTime; // if false, if the heating element kicks on, it will recover with that before turning the
+        // heat pump back on.
+        // variables for variable-speed HPWH
+        int NumofSpeed;                        // number of speeds for VS HPWH
+        Array1D<Real64> HPWHAirVolFlowRate;    // air volume flow rate during heating operation
+        Array1D<Real64> HPWHAirMassFlowRate;   // air mass flow rate during heating operation
+        Array1D<Real64> HPWHWaterVolFlowRate;  // water volume flow rate during heating operation
+        Array1D<Real64> HPWHWaterMassFlowRate; // water mass flow rate during heating operation
+        Array1D<Real64> MSAirSpeedRatio;       // air speed ratio in heating mode
+        Array1D<Real64> MSWaterSpeedRatio;     // water speed ratio in heating mode
+        bool bIsIHP;                           // whether the HP is a part of Integrated Heat Pump
+        bool MyOneTimeFlagHP; // first pass log
+        bool MyTwoTimeFlagHP; // second pass do input check
+        std::string CoilInletNode_str;         // Used to set up comp set
+        std::string CoilOutletNode_str;        // Used to set up comp set
+        bool CheckHPWHEquipName;
+
+        std::string InletNodeName1;
+        std::string OutletNodeName1;
+        std::string InletNodeName2;
+        std::string OutletNodeName2;
+
+        bool myOneTimeInitFlag;
+
+        // end of variables for variable-speed HPWH
+
+        // Default Constructor
+        HeatPumpWaterHeaterData()
+                : TypeNum(0), TankTypeNum(0), StandAlone(false), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0),
+                  BackupElementCapacity(0.0), BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0),
+                  WHOffCycParaFracToTank(0.0), WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
+                  RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0), HeatPumpAirOutletNode(0),
+                  OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0), WHUseOutletNode(0),
+                  WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0), FanNum(0),
+                  FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
+                  SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
+                  MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
+                  AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(0), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
+                  OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
+                  OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
+                  HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
+                  IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
+                  ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
+                  WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0), ControlSensor2Height(-1.0),
+                  ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
+                  AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
+                  HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
+                  MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false),
+                  MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
+        {
+        }
+
+    };
+
     struct WaterThermalTankData : PlantComponent
     {
         // Members
@@ -611,167 +773,19 @@ namespace WaterThermalTanks {
                                            Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
         );
 
-    };
+        void CalcHeatPumpWaterHeater(bool FirstHVACIteration);
 
-    struct HeatPumpWaterHeaterData
-    {
-        // Members
-        std::string Name;                                   // Name of heat pump water heater
-        std::string Type;                                   // Type of water heater (HEAT PUMP:WATER HEATER)
-        int TypeNum;                                        // integer parameter for heat pump water heater
-        std::string TankName;                               // Name of tank associated with heat pump water heater
-        std::string TankType;                               // Type of water heater (MIXED or STRATIFIED) used with heat pump
-        int TankTypeNum;                                    // Parameter for tank type (MIXED or STRATIFIED)
-        bool StandAlone;                                    // Flag for operation with no plant connections (no use nodes)
-        int AvailSchedPtr;                                  // Index to Availability Schedule curve index
-        int SetPointTempSchedule;                           // Index to Setpoint Temperature Schedule curve
-        Real64 DeadBandTempDiff;                            // Dead band temperature difference (cut-in temperature)
-        Real64 Capacity;                                    // Heat Pump rated capacity (W)
-        Real64 BackupElementCapacity;                       // Tank backup element capacity (W)
-        Real64 BackupElementEfficiency;                     // Tank backup element efficiency
-        Real64 WHOnCycParaLoad;                             // tank's on-cycle parasitic load (W), disable for rating
-        Real64 WHOffCycParaLoad;                            // tank's off-cycle parasitic load (W), disable for rating
-        Real64 WHOnCycParaFracToTank;                       // tank's on-cycle parasitic frac to tank, disable for rating
-        Real64 WHOffCycParaFracToTank;                      // tank's off-cycle parasitic frac to tank, disable for rating
-        int WHPLFCurve;                                     // tank part-load fraction curve index, used for rating procedure
-        Real64 OperatingAirFlowRate;                        // Operating volumetric air flow rate (m3/s)
-        Real64 OperatingAirMassFlowRate;                    // Operating air mass flow rate (kg/s)
-        Real64 OperatingWaterFlowRate;                      // Operating volumetric water flow rate (m3/s)
-        Real64 COP;                                         // Heat Pump coefficient of performance (W/W)
-        Real64 SHR;                                         // Heat Pump air-side coil sensible heat ratio
-        Real64 RatedInletDBTemp;                            // Rated evaporator inlet air dry-bulb temperature (C)
-        Real64 RatedInletWBTemp;                            // Rated evaporator inlet air wet-bulb temperature (C)
-        Real64 RatedInletWaterTemp;                         // Rated condenser inlet water temperature (C)
-        bool FoundTank;                                     // Found storage tank flag associated with HP water heater
-        int HeatPumpAirInletNode;                           // HP air inlet node (for zone, zone/outdoor or scheduled)
-        int HeatPumpAirOutletNode;                          // HP air outlet node (for zone, zone/outdoor or scheduled)
-        int OutsideAirNode;                                 // outdoor air node (for outdoor or zone/outdoor air unit only)
-        int ExhaustAirNode;                                 // Exhaust air node (for outdoor or zone/outdoor air unit only)
-        int CondWaterInletNode;                             // Condenser water inlet node
-        int CondWaterOutletNode;                            // Condenser water outlet node
-        int WHUseInletNode;                                 // Water heater tank use side inlet node
-        int WHUseOutletNode;                                // Water heater tank use side outlet node
-        int WHUseSidePlantLoopNum;                          // if not zero, then this water heater is on plant loop #
-        std::string DXCoilType;                             // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
-        std::string DXCoilName;                             // Name of DX coil
-        int DXCoilNum;                                      // Index of DX coil
-        int DXCoilTypeNum;                                  // Type Number of DX coil
-        int DXCoilAirInletNode;                             // Inlet air node number of DX coil
-        int DXCoilPLFFPLR;                                  // Index to HPWH's DX Coil PLF as a function of PLR curve
-        std::string FanType;                                // Type of Fan (Fan:OnOff)
-        int FanType_Num;                                    // Integer type of fan (3 = Fan:OnOff)
-        std::string FanName;                                // Name of Fan
-        std::string FanInletNode_str;                       // Fan inlet node name
-        std::string FanOutletNode_str;                      // Fan outlet node name
-        int FanNum;                                         // Index of Fan
-        int FanPlacement;                                   // Location of Fan
-        int FanOutletNode;                                  // Outlet node of heat pump water heater fan
-        int WaterHeaterTankNum;                             // Index of Water Heater Tank
-        int OutletAirSplitterSchPtr;                        // Index to air-side outlet air splitter schedule
-        int InletAirMixerSchPtr;                            // Index to air-side inlet air mixer schedule
-        int Mode;                                           // HP mode (0 = float, 1 = heating [-1 = venting na for HP])
-        int SaveMode;                                       // HP mode on first iteration
-        int SaveWHMode;                                     // mode of water heater tank element (backup element)
-        Real64 Power;                                       // HP power used for reporting
-        Real64 Energy;                                      // HP energy used for reporting
-        Real64 HeatingPLR;                                  // HP PLR used for reporting
-        Real64 SetPointTemp;                                // set point or cut-out temperature [C]
-        Real64 MinAirTempForHPOperation;                    // HP does not operate below this ambient temperature
-        Real64 MaxAirTempForHPOperation;                    // HP does not operate above this ambient temperature
-        int InletAirMixerNode;                              // Inlet air mixer node number of HP water heater
-        int OutletAirSplitterNode;                          // Outlet air splitter node number of HP water heater
-        Real64 SourceMassFlowRate;                          // Maximum mass flow rate on the source side (kg/s)
-        int InletAirConfiguration;                          // Identifies source of HPWH inlet air
-        int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
-        int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
-        int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
-        int CrankcaseTempIndicator;                         // Indicator for HPWH compressor/crankcase heater location
-        int CrankcaseTempSchedule;                          // Schedule index pointer where crankcase heater is located
-        int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
-        Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
-        Real64 OnCycParaLoad;                               // Rate for on-cycle parasitic load (W)
-        int ParasiticTempIndicator;                         // Indicator for HPWH parasitic heat rejection location
-        Real64 OffCycParaFuelRate;                          // Electric consumption rate for off-cycle parasitic load (W)
-        Real64 OnCycParaFuelRate;                           // Electric consumption rate for on-cycle parasitic load (W)
-        Real64 OffCycParaFuelEnergy;                        // Electric energy consumption for off-cycle parasitic load (J)
-        Real64 OnCycParaFuelEnergy;                         // Electric energy consumption for on-cycle parasitic load (J)
-        bool AirFlowRateAutoSized;                          // Used to report air flow autosize info in Init
-        bool WaterFlowRateAutoSized;                        // Used to report water flow autosize info in Init
-        int HPSetPointError;                                // Used when temperature SP's in tank and HP are reversed
-        int HPSetPointErrIndex1;                            // Index to recurring error for tank/HP set point temp
-        int IterLimitErrIndex1;                             // Index for recurring iteration limit warning messages
-        int IterLimitExceededNum1;                          // Counter for recurring iteration limit warning messages
-        int RegulaFalsiFailedIndex1;                        // Index for recurring RegulaFalsi failed warning messages
-        int RegulaFalsiFailedNum1;                          // Counter for recurring RegulaFalsi failed warning messages
-        int IterLimitErrIndex2;                             // Index for recurring iteration limit warning messages
-        int IterLimitExceededNum2;                          // Counter for recurring iteration limit warning messages
-        int RegulaFalsiFailedIndex2;                        // Index for recurring RegulaFalsi failed warning messages
-        int RegulaFalsiFailedNum2;                          // Counter for recurring RegulaFalsi failed warning messages
-        bool FirstTimeThroughFlag;                          // Flag for saving water heater status
-        bool ShowSetPointWarning;                           // Warn when set point is greater than max tank temp limit
-        Real64 HPWaterHeaterSensibleCapacity;               // sensible capacity delivered when HPWH is attached to a zone (W)
-        Real64 HPWaterHeaterLatentCapacity;                 // latent capacity delivered when HPWH is attached to a zone (kg/s)
-        Real64 WrappedCondenserBottomLocation;              // Location of the bottom of the wrapped condenser.
-        Real64 WrappedCondenserTopLocation;                 // Location of the top of the wrapped condenser.
-        Real64 ControlSensor1Height;                        // location from bottom of tank of control sensor 1
-        int ControlSensor1Node;                             // Node number of control sensor 1
-        Real64 ControlSensor1Weight;                        // weight of control sensor 1
-        Real64 ControlSensor2Height;                        // location from bottom of tank of control sensor 2
-        int ControlSensor2Node;                             // Node number of control sensor 2
-        Real64 ControlSensor2Weight;                        // weight of control sensor 2
-        Real64 ControlTempAvg;                              // Measured control temperature for the heat pump, average over timestep, for reporting
-        Real64 ControlTempFinal;                            // Measured control temperature at the end of the timestep, for reporting
-        bool AllowHeatingElementAndHeatPumpToRunAtSameTime; // if false, if the heating element kicks on, it will recover with that before turning the
-                                                            // heat pump back on.
-        // variables for variable-speed HPWH
-        int NumofSpeed;                        // number of speeds for VS HPWH
-        Array1D<Real64> HPWHAirVolFlowRate;    // air volume flow rate during heating operation
-        Array1D<Real64> HPWHAirMassFlowRate;   // air mass flow rate during heating operation
-        Array1D<Real64> HPWHWaterVolFlowRate;  // water volume flow rate during heating operation
-        Array1D<Real64> HPWHWaterMassFlowRate; // water mass flow rate during heating operation
-        Array1D<Real64> MSAirSpeedRatio;       // air speed ratio in heating mode
-        Array1D<Real64> MSWaterSpeedRatio;     // water speed ratio in heating mode
-        bool bIsIHP;                           // whether the HP is a part of Integrated Heat Pump
-        bool MyOneTimeFlagHP; // first pass log
-        bool MyTwoTimeFlagHP; // second pass do input check
-        std::string CoilInletNode_str;         // Used to set up comp set
-        std::string CoilOutletNode_str;        // Used to set up comp set
-        bool CheckHPWHEquipName;
+        void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
 
-        std::string InletNodeName1;
-        std::string OutletNodeName1;
-        std::string InletNodeName2;
-        std::string OutletNodeName2;
+        void SetVSHPWHFlowRates(HeatPumpWaterHeaterData &HPWH,
+                                int SpeedNum,
+                                Real64 SpeedRatio,
+                                Real64 WaterDens,
+                                Real64 &MdotWater,            // water flow rate
+                                bool FirstHVACIteration // TRUE if First iteration of simulation
+        );
 
-        bool myOneTimeInitFlag;
-
-        // end of variables for variable-speed HPWH
-
-        // Default Constructor
-        HeatPumpWaterHeaterData()
-                : TypeNum(0), TankTypeNum(0), StandAlone(false), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0),
-                  BackupElementCapacity(0.0), BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0),
-                  WHOffCycParaFracToTank(0.0), WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
-                  RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0), HeatPumpAirOutletNode(0),
-                  OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0), WHUseOutletNode(0),
-                  WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0), FanNum(0),
-                  FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
-                  SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
-                  MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
-                  AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(0), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
-                  OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
-                  OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
-                  HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
-                  IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
-                  ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
-                  WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0), ControlSensor2Height(-1.0),
-                  ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-                  AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
-                  HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
-                  MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false),
-                  MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
-        {
-        }
+        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
     };
 
@@ -909,29 +923,9 @@ namespace WaterThermalTanks {
 
     bool GetWaterThermalTankInput();
 
-    void CalcHeatPumpWaterHeater(int WaterThermalTankNum, // Water Heater tank being simulated
-                                 bool FirstHVACIteration  // TRUE if First iteration of simulation
-    );
-
-    void ConvergeSingleSpeedHPWHCoilAndTank(int WaterThermalTankNum, Real64 PartLoadRatio);
-
     Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
                                 Array1<Real64> const &Par //
     );
-
-    void SetVSHPWHFlowRates(WaterThermalTankData &Tank,
-                            HeatPumpWaterHeaterData &HPWH,
-                            int SpeedNum,
-                            Real64 SpeedRatio,
-                            Real64 WaterDens,
-                            Real64 &MdotWater,            // water flow rate
-                            bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    // STATIC FUNCTIONS
-
-    // used by: CalcHeatPumpWaterHeater
-    Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
     // used by: GetWaterThermalTankInput
     void ValidatePLFCurve(int CurveIndex, bool &IsValid);
