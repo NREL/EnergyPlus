@@ -4785,15 +4785,12 @@ namespace WaterThermalTanks {
                     if ((WaterThermalTank(WaterThermalTankNum).TypeNum != DataPlant::TypeOf_ChilledWaterTankMixed) &&
                         (WaterThermalTank(WaterThermalTankNum).TypeNum != DataPlant::TypeOf_ChilledWaterTankStratified)) {
                         WaterThermalTank(WaterThermalTankNum).setupWaterHeaterOutputVars();
-                    } else if ((WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (WaterThermalTank(WaterThermalTankNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-                        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
                     }
 
                     WaterThermalTank(WaterThermalTankNum).setupZoneInternalGains();
 
                 } // WaterThermalTankNum
             }
-
         } // get input flag
 
         return ErrorsFound;
@@ -4801,138 +4798,146 @@ namespace WaterThermalTanks {
 
     void WaterThermalTankData::setupOutputVars()
     {
-        if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) ||
-        (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+        if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+            this->setupChilledWaterTankOutputVars();
+        } else {
+            // moving setupWaterHeaterOutputVars to here causes big table diffs but no math diffs...
+            // this->setupWaterHeaterOutputVars();
+        }
+        // moving setupZoneInternalGains to here causes some big math and table diffs...
+        // this->setupZoneInternalGains();
+    }
 
-            static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
+    void WaterThermalTankData::setupChilledWaterTankOutputVars()
+    {
+        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
 
-            // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
-            SetupOutputVariable("Chilled Water Thermal Storage Tank Temperature",
-                                OutputProcessor::Unit::C,
-                                this->TankTempAvg,
-                                "System",
-                                "Average",
-                                this->Name);
+        // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
+        SetupOutputVariable("Chilled Water Thermal Storage Tank Temperature",
+                            OutputProcessor::Unit::C,
+                            this->TankTempAvg,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Final Tank Temperature",
-                                OutputProcessor::Unit::C,
-                                this->TankTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Final Tank Temperature",
+                            OutputProcessor::Unit::C,
+                            this->TankTemp,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Rate",
-                                OutputProcessor::Unit::W,
-                                this->LossRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Energy",
-                                OutputProcessor::Unit::J,
-                                this->LossEnergy,
-                                "System",
-                                "Sum",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Rate",
+                            OutputProcessor::Unit::W,
+                            this->LossRate,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Tank Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            this->LossEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Use Side Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->UseMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Use Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->UseMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Use Side Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->UseInletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Use Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->UseInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Use Side Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->UseOutletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Use Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->UseOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->UseRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                this->UseEnergy,
-                                "System",
-                                "Sum",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->UseRate,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Use Side Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->UseEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Source Side Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->SourceMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Source Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->SourceMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Source Side Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->SourceInletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Source Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->SourceInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Source Side Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->SourceOutletTemp,
-                                "System",
-                                "Average",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Source Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->SourceOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->SourceRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                this->SourceEnergy,
-                                "System",
-                                "Sum",
-                                this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->SourceRate,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chilled Water Thermal Storage Source Side Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->SourceEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
 
-            if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
+        if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
-                for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                    SetupOutputVariable("Chilled Water Thermal Storage Temperature Node " + General::TrimSigDigits(NodeNum) + "",
-                                        OutputProcessor::Unit::C,
-                                        this->Node(NodeNum).TempAvg,
-                                        "System",
-                                        "Average",
-                                        this->Name);
-                }
-
-                for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                    SetupOutputVariable("Chilled Water Thermal Storage Final Temperature Node " + General::TrimSigDigits(NodeNum) + "",
-                                        OutputProcessor::Unit::C,
-                                        this->Node(NodeNum).Temp,
-                                        "System",
-                                        "Average",
-                                        this->Name);
-                }
+            for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
+                SetupOutputVariable("Chilled Water Thermal Storage Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+                                    OutputProcessor::Unit::C,
+                                    this->Node(NodeNum).TempAvg,
+                                    "System",
+                                    "Average",
+                                    this->Name);
             }
 
-            if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
+            for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
+                SetupOutputVariable("Chilled Water Thermal Storage Final Temperature Node " + General::TrimSigDigits(NodeNum) + "",
+                                    OutputProcessor::Unit::C,
+                                    this->Node(NodeNum).Temp,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+            }
+        }
 
-                for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                    ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_724)
-                            << General::TrimSigDigits(NodeNum) << General::TrimSigDigits(this->Node(NodeNum).Height, 4)
-                            << General::TrimSigDigits(this->Node(NodeNum).Volume, 4)
-                            << General::TrimSigDigits(this->Node(NodeNum).OffCycLossCoeff, 4)
-                            << General::TrimSigDigits(this->Node(NodeNum).Inlets)
-                            << General::TrimSigDigits(this->Node(NodeNum).Outlets);
-                }
+        if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
+
+            for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
+                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_724)
+                        << General::TrimSigDigits(NodeNum) << General::TrimSigDigits(this->Node(NodeNum).Height, 4)
+                        << General::TrimSigDigits(this->Node(NodeNum).Volume, 4)
+                        << General::TrimSigDigits(this->Node(NodeNum).OffCycLossCoeff, 4)
+                        << General::TrimSigDigits(this->Node(NodeNum).Inlets)
+                        << General::TrimSigDigits(this->Node(NodeNum).Outlets);
             }
         }
     }

@@ -493,6 +493,8 @@ namespace WaterThermalTanks {
 
         void setupZoneInternalGains();
 
+        void setupChilledWaterTankOutputVars();
+
         void setupWaterHeaterOutputVars();
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
