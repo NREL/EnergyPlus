@@ -489,7 +489,11 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void setupOutputVariables();
+        void setupOutputVars();
+
+        void setupZoneInternalGains();
+
+        void setupWaterHeaterOutputVars();
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -598,7 +602,7 @@ namespace WaterThermalTanks {
                                                      Real64 &Qheatpump,          // heat transfer rate from heat pump
                                                      Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
         );
-        
+
     };
 
     struct HeatPumpWaterHeaterData : PlantComponent
@@ -900,7 +904,7 @@ namespace WaterThermalTanks {
     bool getWaterTankStratifiedInput();
 
     bool GetWaterThermalTankInput();
-    
+
     void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
                                       bool FirstHVACIteration  // TRUE if First iteration of simulation
     );
@@ -929,8 +933,6 @@ namespace WaterThermalTanks {
     );
 
     // STATIC FUNCTIONS
-
-    void SetupWaterHeaterOutputs(int WaterThermalTankNum);
 
     // used by: CalcHeatPumpWaterHeater
     Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
