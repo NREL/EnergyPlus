@@ -86,24 +86,25 @@ namespace WaterThermalTanks {
         };
     };
     
-    extern int const controlTypeCycle;    // water heater only, cycling heating source control
-    extern int const controlTypeModulate; // water heater only, modulating heating source control
-
-    struct TankShape
+    enum struct TankShapeEnum
     {
-        enum {
-            VertCylinder,  // tank shape is a vertical cylinder
-            HorizCylinder, // tank shape is a horizontal cylinder
-            Other          // tank shape has an arbitrary perimeter shape
-        };
+        VertCylinder,  // tank shape is a vertical cylinder
+        HorizCylinder, // tank shape is a horizontal cylinder
+        Other          // tank shape has an arbitrary perimeter shape
     };
 
-    struct Priority
+
+    // order of ControlTypeEnum and PriorityEnum must be enforced
+    enum ControlTypeEnum
     {
-        enum {
-            MasterSlave,  // water heater only, master-slave priority control of heater elements
-            Simultaneous  // water heater only, simultaneous control of heater elements
-        };
+        Cycle,
+        Modulate
+    };
+
+    enum PriorityEnum
+    {
+        MasterSlave, // water heater only, master-slave priority control of heater elements
+        Simultaneous  // water heater only, simultaneous control of heater elements
     };
 
     struct InletMode
@@ -504,7 +505,7 @@ namespace WaterThermalTanks {
         Real64 Height;           // Height of tank (m)
         bool HeightWasAutoSized; // true if the height of tank was autosize on input
         Real64 Perimeter;        // Perimeter of tank (m), only used for OTHER shape
-        int Shape;               // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
+        TankShapeEnum Shape;               // Tank shape:  VERTICAL CYLINDER, HORIZONTAL CYLINDER, or OTHER
         Real64 HeaterHeight1;
         int HeaterNode1;
         bool HeaterOn1;
@@ -617,7 +618,7 @@ namespace WaterThermalTanks {
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
               TimeElapsed(0.0), AmbientTempIndicator(0), AmbientTempSchedule(0), AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0),
               AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0), OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0),
-              Mode(0), SavedMode(0), ControlType(1), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0), Efficiency(0.0), PLFCurve(0),
+              Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0), Efficiency(0.0), PLFCurve(0),
               SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0), IgnitionDelay(0.0), OffCycParaLoad(0.0),
               OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0), UseCurrentFlowLock(0), UseInletNode(0), UseInletTemp(0.0),
               UseOutletNode(0), UseOutletTemp(0.0), UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0),
@@ -629,7 +630,7 @@ namespace WaterThermalTanks {
               SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(0),
               SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
               FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
-              HeightWasAutoSized(false), Perimeter(0.0), Shape(0), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false),
+              HeightWasAutoSized(false), Perimeter(0.0), Shape(TankShapeEnum::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false),
               HeaterHeight2(0.0), HeaterNode2(0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0), SetPointTemp2(0.0),
               SetPointTempSchedule2(0), DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0), SkinLossCoeff(0.0),
               SkinLossFracToZone(0.0), OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0), UseOutletHeight(0.0),
