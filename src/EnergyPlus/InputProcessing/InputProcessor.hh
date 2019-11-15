@@ -50,9 +50,9 @@
 
 // C++ Headers
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -179,7 +179,7 @@ public:
 
     void reportOrphanRecordObjects();
 
-    const json& getObjectInstances(std::string const &ObjType);
+    const json &getObjectInstances(std::string const &ObjType);
 
 private:
     struct ObjectInfo
@@ -194,10 +194,10 @@ private:
         {
         }
 
-        bool operator<(const ObjectInfo& rhs) const
+        bool operator<(const ObjectInfo &rhs) const
         {
             int cmp = this->objectType.compare(rhs.objectType);
-            if(cmp == 0) {
+            if (cmp == 0) {
                 return this->objectName < rhs.objectName;
             }
             return cmp < 0;
@@ -232,14 +232,14 @@ private:
         std::size_t max_extensible_fields = 0;
     };
 
-    MaxFields findMaxFields(json const & ep_object, std::string const & extension_key, json const & legacy_idd);
+    MaxFields findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd);
 
-    void setObjectItemValue(json const & ep_object,
-                            json const & ep_schema_object,
-                            std::string const & field,
-                            json const & legacy_field_info,
-                            int & alpha_index,
-                            int & numeric_index,
+    void setObjectItemValue(json const &ep_object,
+                            json const &ep_schema_object,
+                            std::string const &field,
+                            json const &legacy_field_info,
+                            int &alpha_index,
+                            int &numeric_index,
                             bool within_max_fields,
                             Array1S_string Alphas,
                             int &NumAlphas,
@@ -288,9 +288,11 @@ private:
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
-    public:
+
+public:
     json epJSON;
-    private:
+
+private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
     UnusedObjectSet unusedInputs;

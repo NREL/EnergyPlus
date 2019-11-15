@@ -302,7 +302,7 @@ void InputProcessor::processInput()
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
-                //input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
+                // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
                 FileSystem::makeNativePath(convertedIDF);
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
@@ -561,12 +561,13 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
     return output;
 }
 
-const json& InputProcessor::getObjectInstances(std::string const &ObjType)
+const json &InputProcessor::getObjectInstances(std::string const &ObjType)
 {
     return epJSON.find(ObjType).value();
 }
 
-InputProcessor::MaxFields InputProcessor::findMaxFields(json const & ep_object, std::string const & extension_key, json const & legacy_idd) {
+InputProcessor::MaxFields InputProcessor::findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+{
     InputProcessor::MaxFields maxFields;
     if (!DataGlobals::isEpJSON) {
         auto found_idf_max_fields = ep_object.find("idf_max_fields");
@@ -579,8 +580,8 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(json const & ep_object, 
         }
     } else {
         auto const &legacy_idd_fields = legacy_idd["fields"];
-        for (auto const& field : ep_object.items()) {
-            auto const & field_key = field.key();
+        for (auto const &field : ep_object.items()) {
+            auto const &field_key = field.key();
             if (field_key == extension_key) continue;
             for (std::size_t i = maxFields.max_fields; i < legacy_idd_fields.size(); ++i) {
                 if (field_key == legacy_idd_fields[i]) {
@@ -596,10 +597,10 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(json const & ep_object, 
                 auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
                 auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
 
-                for (auto const& exts : epJSON_extensions_array.items()) {
+                for (auto const &exts : epJSON_extensions_array.items()) {
                     std::size_t max_extensible_field = 0;
-                    for (auto const& ext : exts.value().items()) {
-                        auto const & ext_key = ext.key();
+                    for (auto const &ext : exts.value().items()) {
+                        auto const &ext_key = ext.key();
                         for (std::size_t i = max_extensible_field; i < legacy_idd_extensibles.size(); ++i) {
                             if (ext_key == legacy_idd_extensibles[i]) {
                                 max_extensible_field = (i + 1);
@@ -614,12 +615,12 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(json const & ep_object, 
     return maxFields;
 }
 
-void InputProcessor::setObjectItemValue(json const & ep_object,
-                                        json const & ep_schema_object,
-                                        std::string const & field,
-                                        json const & legacy_field_info,
-                                        int & alpha_index,
-                                        int & numeric_index,
+void InputProcessor::setObjectItemValue(json const &ep_object,
+                                        json const &ep_schema_object,
+                                        std::string const &field,
+                                        json const &legacy_field_info,
+                                        int &alpha_index,
+                                        int &numeric_index,
                                         bool within_max_fields,
                                         Array1S_string Alphas,
                                         int &NumAlphas,
@@ -825,9 +826,21 @@ void InputProcessor::getObjectItem(std::string const &Object,
             continue;
         }
 
-        setObjectItemValue(obj_val, schema_obj_props, field, field_info_val, alpha_index, numeric_index,
-                within_idf_fields, Alphas, NumAlphas, Numbers, NumNumbers, NumBlank, AlphaBlank, AlphaFieldNames,
-                NumericFieldNames);
+        setObjectItemValue(obj_val,
+                           schema_obj_props,
+                           field,
+                           field_info_val,
+                           alpha_index,
+                           numeric_index,
+                           within_idf_fields,
+                           Alphas,
+                           NumAlphas,
+                           Numbers,
+                           NumNumbers,
+                           NumBlank,
+                           AlphaBlank,
+                           AlphaFieldNames,
+                           NumericFieldNames);
     }
 
     size_t extensible_count = 0;
@@ -852,9 +865,21 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
 
-                    setObjectItemValue(epJSON_extension_obj, schema_extension_fields, field_name, field_info_val,
-                            alpha_index, numeric_index, within_idf_extensible_fields, Alphas, NumAlphas, Numbers,
-                            NumNumbers, NumBlank, AlphaBlank, AlphaFieldNames, NumericFieldNames);
+                    setObjectItemValue(epJSON_extension_obj,
+                                       schema_extension_fields,
+                                       field_name,
+                                       field_info_val,
+                                       alpha_index,
+                                       numeric_index,
+                                       within_idf_extensible_fields,
+                                       Alphas,
+                                       NumAlphas,
+                                       Numbers,
+                                       NumNumbers,
+                                       NumBlank,
+                                       AlphaBlank,
+                                       AlphaFieldNames,
+                                       NumericFieldNames);
                 }
             }
         }
