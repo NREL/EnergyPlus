@@ -298,6 +298,12 @@ namespace HybridUnitaryAirConditioners {
                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure,
                                                                          "InitZoneHybridUnitaryAirConditioners");
 
+
+        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Temp;
+        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).HumRat;
+        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Enthalpy;
+        ZoneHybridUnitaryAirConditioner(UnitNum).ZonePressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Press;
+
         // Set default outlet state to inlet states, just to be safe
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;   // Supply Air Node
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
@@ -396,7 +402,7 @@ namespace HybridUnitaryAirConditioners {
             ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
         SensibleOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
 
-        LatentOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass; // dehumidification negative kg/s
+        LatentOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOut; // dehumidification negative kg/s
     }
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum)
@@ -421,6 +427,9 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int ZoneNodeNum;
+
+        ZoneNodeNum = ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum;
 
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
 
@@ -482,7 +491,7 @@ namespace HybridUnitaryAirConditioners {
         int UnitLoop;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
+        static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
         MaxNumbers = 0;
         MaxAlphas = 0;
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";

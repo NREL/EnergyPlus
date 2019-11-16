@@ -255,7 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
-                Y_val = max(min(Y_val,1.0),0.0);
+                Y_val = max(min(Y_val, 1.0), 0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -919,7 +919,7 @@ namespace HybridEvapCoolingModel {
           InletTemp(0.0), InletWetBulbTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletRH(0.0),
           OutletVolumetricFlowRate(0.0), OutletMassFlowRate(0.0), OutletTemp(0.0), OutletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0),
           OutletPressure(0.0), OutletRH(0.0), SecInletMassFlowRate(0.0), SecInletTemp(0.0), SecInletWetBulbTemp(0.0), SecInletHumRat(0.0),
-          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0),
+          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0), 
           SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0), SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0),
           Wsa(0.0), SupplyVentilationAir(0.0), SupplyVentilationVolume(0.0), ModelNormalizationReference(0.0), OutdoorAir(false), MinOA_Msa(0.0),
           OARequirementsPtr(0), Tsa(0.0), ModeCounter(0), CoolingRequested(false), HeatingRequested(false), VentilationRequested(false),
@@ -1587,8 +1587,9 @@ namespace HybridEvapCoolingModel {
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
             // Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
             // Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}
-            Real64 SensibleRoomORZone = ScaledMsa * 0.5 * (SupplyAirCp + ReturnAirCP) * (StepIns.Tra - Tsa) / 1000; // kw  dynamic cp
-            Real64 latentRoomORZone = LambdaSa * MsaDry * (Wra - Wsa);                                              // kw
+            Real64 ZoneCp = PsyCpAirFnWTdb(ZoneHumRat, ZoneTemp);
+            Real64 SensibleRoomORZone = ScaledMsa * 0.5 * (SupplyAirCp + ZoneCp) * (ZoneTemp - Tsa) / 1000;         // kw  dynamic cp
+            Real64 latentRoomORZone = LambdaSa * MsaDry * (ZoneHumRat - Wsa);                                              // kw
                                                                                                                     // Total room cooling
             Real64 TotalRoomORZone = (Hra - Hsa) * ScaledMsa / 1000;                                                // kw
                                                                                                                     // Perform latent check
@@ -1689,7 +1690,13 @@ namespace HybridEvapCoolingModel {
                             if (CoolingRequested && (SensibleRoomORZone > PreviousMaxiumConditioningOutput)) {
                                 store_best_attempt = true;
                             }
-                            if (HeatingRequested && (SensibleRoomORZone < PreviousMaxiumConditioningOutput)) {
+                            else if (HeatingRequested && (SensibleRoomORZone < PreviousMaxiumConditioningOutput)) {
+                                store_best_attempt = true;
+                            } 
+                            else if (CoolingRequested && (SensibleRoomORZone < PreviousMaxiumConditioningOutput)) {
+                                store_best_attempt = true;
+                            } 
+                            else if (HeatingRequested && (SensibleRoomORZone > PreviousMaxiumConditioningOutput)) {
                                 store_best_attempt = true;
                             }
                             if (store_best_attempt) {
@@ -1745,7 +1752,8 @@ namespace HybridEvapCoolingModel {
                 PrimaryModeRuntimeFraction = 1;
             }
             // if we didn't even partially meet the load make sure the operational settings are just the standby mode.
-            else {
+            else
+            {
                 oStandBy.Runtime_Fraction = 1;
                 CurrentOperatingSettings[0] = oStandBy;
                 ErrorCode = -1;
@@ -1919,14 +1927,14 @@ namespace HybridEvapCoolingModel {
         // set requested loads to output variables
         RequestedLoadToHeatingSetpoint = RequestedHeatingLoad;
         RequestedLoadToCoolingSetpoint = RequestedCoolingLoad;
-        Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
+        Real64 LambdaZone = Psychrometrics::PsyHfgAirFnWTdb(0, ZoneTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
-        RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa / 1000;                      // [kW];
-        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
+        RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaZone / 1000;                    // [kW];
+        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaZone * TimeStepSys * SecInHour; // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
-        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa / 1000;                      // [kW];
-        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * SecInHour; // [j]
+        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaZone / 1000;                    // [kW];
+        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaZone * TimeStepSys * SecInHour; // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
@@ -1963,13 +1971,15 @@ namespace HybridEvapCoolingModel {
         }
         // Test system availbility status
         UnitOn = 1;
+        bool ForceOff = false;
         StandBy = false;
         if (GetCurrentScheduleValue(SchedPtr) <= 0 || AvailStatus == 1) {
             UnitOn = 0;
+            ForceOff = true;
         }
         // Go into standby if unit is off or not needed
-        if (((!CoolingRequested && !HeatingRequested) && !VentilationRequested && !HumidificationRequested && !DehumidificationRequested) ||
-            !UnitOn) // what about humid / dehumid
+        if ((!CoolingRequested && !HeatingRequested && !VentilationRequested && !HumidificationRequested && !DehumidificationRequested) ||
+            ForceOff) // what about humid / dehumid
         {
             StandBy = true;
             oStandBy.Runtime_Fraction = 1;
@@ -2008,8 +2018,9 @@ namespace HybridEvapCoolingModel {
         Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
         OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // consider if inlet and outlet presures are different
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
+        Real64 ZoneRH = PsyRhFnTdbWPb(ZoneTemp, ZoneHumRat, ZonePressure);
 
-        if (StdRhoAir > 1)
+        if (StdRhoAir > 1) 
         {
             OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
         }
@@ -2035,16 +2046,30 @@ namespace HybridEvapCoolingModel {
             Real64 Outletcp = PsyCpAirFnWTdb(OutletHumRat, OutletTemp); // J/degreesK.kg
             Real64 Returncp = PsyCpAirFnWTdb(Wra, StepIns.Tra);         // J/degreesK.kg
             Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa, StepIns.Tosa);      // J/degreesK.kg
+            Real64 Zonecp = PsyCpAirFnWTdb(ZoneHumRat, ZoneTemp);
+
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
             // Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
             // Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}
-            QSensZoneOut = OutletMassFlowRate * 0.5 * (Returncp + Outletcp) * (StepIns.Tra - OutletTemp); // Watts
+
+            QSensZoneOut = OutletMassFlowRate * 0.5 * (Zonecp + Outletcp) * (ZoneTemp - OutletTemp); // Watts
             Real64 OutletMassFlowRateDry = OutletMassFlowRate * (1 - Wsa);
             Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, OutletTemp);
-            QLatentZoneOutMass = 1000 * OutletMassFlowRateDry * (InletHumRat - OutletHumRat); // Watts
+            QLatentZoneOutMass = 1000 * OutletMassFlowRateDry * (ZoneHumRat - OutletHumRat); // Watts
             QLatentZoneOut = QLatentZoneOutMass * LambdaSa;
-            QTotZoneOut = OutletMassFlowRateDry * (InletEnthalpy - OutletEnthalpy); // Watts
-            Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;                       // Watts
+            QTotZoneOut = OutletMassFlowRateDry * (ZoneEnthalpy - OutletEnthalpy); // Watts
+//            Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;                       // Watts
+
+//            // Zone Total Cooling = m' * (OutletEnthalpy - ZoneEnthalpy)
+//            // MinHumRat = min(OutletHumRat, ZoneHumRat)
+//            // Zone Sensible Cooling = m' * (OutletEnthalpy_MinHumRat - ZoneEnthalpy_MinHumRat)
+//            // Zone Latent Cooling = Zone Total Cooling - Zone Sensible Cooling
+
+//            Real64 ZoneEnthalpy = PsyHFnTdbW(ZoneTemp, ZoneHumRat);
+//            QTotZoneOut = OutletMassFlowRate * (ZoneEnthalpy - OutletEnthalpy);
+//            Real64 MinHumRat = min(OutletHumRat, ZoneHumRat);
+//            QSensZoneOut = OutletMassFlowRate * (PsyHFnTdbW(ZoneTemp, MinHumRat) - PsyHFnTdbW(OutletTemp, MinHumRat));
+//            QLatentZoneOut = QTotZoneOut - QSensZoneOut;
 
             // System Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA + OSAF*(cpOSA-cpRA) + cpSA) {kJ/kg-C} * (T_RA + OSAF*(T_OSA - T_RA)  - T_SA)
             // System Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA + OSAF *(HR_OSA - HR_RA) - HR_SA) {kgWater/kgDryAir}
@@ -2057,7 +2082,7 @@ namespace HybridEvapCoolingModel {
 
             QLatentSystemOut = 1000 * LambdaSa * OutletMassFlowRateDry * SystemTimeStepW; // Watts
             QTotSystemOut = OutletMassFlowRateDry * (MixedAirEnthalpy - OutletEnthalpy);  // Watts
-            QLatentCheck = QTotSystemOut - QSensSystemOut;                                // Watts
+            Real64 QLatentCheck = QTotSystemOut - QSensSystemOut;                                // Watts
 
             // reset outputs
             ResetOutputs();
@@ -2080,13 +2105,20 @@ namespace HybridEvapCoolingModel {
                 UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * SecInHour; // J
             }
 
-            if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0) {
-                UnitLatentCoolingRate = UnitTotalCoolingRate - UnitSensibleCoolingRate;       // Watts
-                UnitLatentCoolingEnergy = UnitTotalCoolingEnergy - UnitSensibleCoolingEnergy; // J
-            }
-            if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) < 0) {
-                UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;       // Watts
-                UnitLatentHeatingEnergy = UnitTotalHeatingEnergy - UnitSensibleHeatingEnergy; // J
+//            if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0) {
+//                UnitLatentCoolingRate = UnitTotalCoolingRate - UnitSensibleCoolingRate;       // Watts
+//                UnitLatentCoolingEnergy = UnitTotalCoolingEnergy - UnitSensibleCoolingEnergy; // J
+//            }
+//            if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) < 0) {
+//                UnitLatentHeatingRate = UnitTotalHeatingRate - UnitSensibleHeatingRate;       // Watts
+//                UnitLatentHeatingEnergy = UnitTotalHeatingEnergy - UnitSensibleHeatingEnergy; // J
+            if (QLatentZoneOut > 0)                                                       // zone cooling is possitive, else remain zero
+            {
+                UnitLatentCoolingRate = std::abs(QLatentZoneOut);                          // Watts
+                UnitLatentCoolingEnergy = UnitLatentCoolingRate * TimeStepSys * SecInHour; // J
+            } else {
+                UnitLatentHeatingRate = std::abs(QLatentZoneOut);                          // Watts
+                UnitLatentHeatingEnergy = UnitLatentHeatingRate * TimeStepSys * SecInHour; // J
             }
 
             // set SYSTEM outputs

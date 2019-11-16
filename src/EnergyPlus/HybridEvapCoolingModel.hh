@@ -239,6 +239,8 @@ namespace HybridEvapCoolingModel {
         int ZoneNum;  // stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of
                       // functionality additions.
         int SchedPtr; // Pointer to the correct schedule
+        std::string ZoneName;             // Name of zone the system is serving
+        int ZonePtr;                      // Point to this zone in the Zone derived type
         int ZoneNodeNum;                  // index of zone air node in node structure
         std::string AvailManagerListName; // Name of an availability manager list object
         int AvailStatus;
@@ -307,7 +309,11 @@ namespace HybridEvapCoolingModel {
         int SecondaryOutletNode;      // This outlet node of the secondary side and ilet to the secondary fan
         Real64 FinalElectricalPower;  // Output fuel use in W
         Real64 FinalElectricalEnergy; // Output fuel energy use in J
-        Real64 InletMassFlowRate;     // Inlet is primary process air node at inlet to cooler
+        Real64 ZoneTemp;     // Zone Temp
+        Real64 ZoneHumRat;              // Zone Humidity Ratio
+        Real64 ZoneEnthalpy;     // Zone Temp
+        Real64 ZonePressure;   // Zone Humidity Ratio
+        Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletTemp;
         Real64 InletWetBulbTemp;
         Real64 InletHumRat;
