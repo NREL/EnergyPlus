@@ -109,6 +109,8 @@ namespace IceRink {
     int NotOperating(0); // Parameter for use with OperatingMode variable, set for not operating
     int CoolingMode(2);  // Parameter for use with OperatingMode variable, set for cooling
 
+    int NumOfRinks(0);
+
     bool GetInput(true);
 
     // Object Data
@@ -118,6 +120,7 @@ namespace IceRink {
     // Functions:
     void clear_state()
     {
+        NumOfRinks = 0;
         GetInput = true;
         Rink.deallocate();
         Resurfacer.deallocate();
@@ -182,7 +185,7 @@ namespace IceRink {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
 
-        int NumOfRinks = inputProcessor->getNumObjectsFound(cRink);
+        NumOfRinks = inputProcessor->getNumObjectsFound(cRink);
         int NumOfResurfacers = inputProcessor->getNumObjectsFound(cResurfacer);
         if (NumOfRinks <= 0) ShowFatalError("No Rink objects found in input.");
         GetInput = false;
@@ -234,14 +237,14 @@ namespace IceRink {
                 ErrorsFound = true;
             }
 
-            if (Surface(Rink(Item).SurfacePtr).Zone != Rink(Item).ZonePtr) {
+            /*if (Surface(Rink(Item).SurfacePtr).Zone != Rink(Item).ZonePtr) {
                 ShowSevereError("Surface referenced in " + cCurrentModuleObject +
                                 " not in same zone as Refrigeration System, surface=" + Surface(Rink(Item).SurfacePtr).Name);
                 ShowContinueError("Surface in Zone=" + Zone(Surface(Rink(Item).SurfacePtr).Zone).Name + " Direct refrigeration System in " +
                                   cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
-            }
+            }*/
 
             Rink(Item).TubeDiameter = rNumericArgs(1);
             Rink(Item).TubeLength = rNumericArgs(2);
@@ -398,9 +401,9 @@ namespace IceRink {
             }
         }
 
-        if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in input. Preceding conditions cause termination.");
-        }
+        /*if (ErrorsFound) {
+            ShowFatalError("Errors found in input.");
+        }*/
     }
 
     void IceRinkData::initialize()
@@ -420,13 +423,14 @@ namespace IceRink {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
+        
 
-        if (this->MyFlag) {
+        if ((this->MyFlag) && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(
                 this->Name, DataPlant::TypeOf_IceRink, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
-                ShowFatalError("InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
+                ShowFatalError("Initialize: Program terminated due to previous condition(s).");
             }
             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                            DataPrecisionGlobals::constant_zero,
@@ -445,16 +449,15 @@ namespace IceRink {
             this->MyFlag = false;
         }
 
-        if (this->oneTimeFlag && DataGlobals::BeginEnvrnFlag) {
+        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag) {
             this->QSrc = 0.0;
             this->QSrcAvg = 0.0;
             this->LastQSrc = 0.0;
             this->LastSysTimeElapsed = 0.0;
             this->LastTimeStepSys = 0.0;
-            this->oneTimeFlag = false;
         }
 
-        if (!(DataGlobals::BeginEnvrnFlag)) this->oneTimeFlag = true;
+        if (!(DataGlobals::BeginEnvrnFlag)) this->MyEnvrnFlag = true;
 
         this->TotalSurfaceArea = this->LengthRink * this->WidthRink;
         InletTemp = DataLoopNode::Node(this->InNode).Temp;
@@ -475,6 +478,10 @@ namespace IceRink {
             SetupOutputVariable("Rink Cooling Rate", OutputProcessor::Unit::W, this->CoolPower, "System", "Average", this->Name);
             SetupOutputVariable("Rink Cooling Energy", OutputProcessor::Unit::J, this->CoolEnergy, "System", "Average", this->Name);
         }
+        for (auto &R : Resurfacer) {
+            SetupOutputVariable(
+                "Resurfacer heat rate", OutputProcessor::Unit::J, R.QResurfacing, "System", "Average", this->Name);
+        }
     }
 
     Real64 IceRinkData::IceRinkFreezing(Real64 &FreezingLoad)
@@ -492,7 +499,7 @@ namespace IceRink {
                                ((CpWater * FloodWaterTemp) + (QFusion) - (CpIce * ScheduleManager::GetCurrentScheduleValue(this->IceSetptSchedPtr)));
             FreezingLoad = QFreezing;
         }
-
+        
         return (FreezingLoad);
     }
 

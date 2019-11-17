@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -78,6 +79,8 @@ namespace IceRink {
     // Operating Mode:
     extern int NotOperating; // Parameter for use with OperatingMode variable, set for not operating
     extern int CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
+
+    extern int NumOfRinks;
 
     struct IceRinkData : PlantComponent
     {
@@ -141,7 +144,7 @@ namespace IceRink {
         Real64 RefrigConc;
 
         bool MyFlag;
-        bool oneTimeFlag;
+        bool MyEnvrnFlag;
         Real64 QSrc;
         Real64 QSrcAvg;
         Real64 LastQSrc;
@@ -198,11 +201,10 @@ namespace IceRink {
         Real64 ResurfacingHeatLoad;
         Real64 QResurfacing;
         Real64 EHeatingWater;
-        Real64 QHumidity;
         // Default Constructor
         ResurfacerData()
             : CompIndex(0), WaterIndex(0), ResurfacingSchedPtr(0), NoOfResurfEvents(0), ResurfacingWaterTemp(0.0), InitWaterTemp(0.0),
-              TankCapacity(0.0), QResurfacing(0.0), EHeatingWater(0.0), QHumidity(0.0), ResurfacingHeatLoad(0.0)
+              TankCapacity(0.0), QResurfacing(0.0), EHeatingWater(0.0), ResurfacingHeatLoad(0.0)
         {
         }
 

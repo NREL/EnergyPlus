@@ -1,195 +1,113 @@
-// EnergyPlus::IndoorIceRink Unit Tests
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+// EnergyPlus::Indoor Ice Rink Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/IndoorIceRink.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::IceRink;
-using namespace EnergyPlus::DataPlant;
-using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::DataSurfaceLists;
-using namespace EnergyPlus::HeatBalanceManager;
-using namespace EnergyPlus::ScheduleManager;
-using namespace EnergyPlus::SurfaceGeometry;
+using namespace EnergyPlus::DataGlobalConstants;
 
-/*TEST_F(EnergyPlusFixture, IndoorIceRink_DRinkEff)
+TEST_F(EnergyPlusFixture, IceRink_GetInput)
 {
-    Real64 Temperature;
-    Real64 RefrigMassFlow;
-    Real64 TubeLength;
-    Real64 TubeDiameter;
-    int NumCircs;
-    int SysNum;
-    Real64 Effectiveness;
+    std::string const idf_objects = delimited_string({
+        "   IceRink:Indoor,                                                                ",
+        "       Indoor Ice Rink,         !- Name                                           ",
+        "       AlwaysOnSchedule,        !- Availability Schedule Name                     ",
+        "       Main Floor,              !- Zone Name                                      ",
+        "       Floor,                   !- Surface Name                                   ",
+        "       0.013,                   !- Tube Diameter {m}                              ",
+        "       100,                     !- Tube Length {m}                                ",
+        "       STC,                     !- Ice Rink Control Strategy                      ",
+        "       0.718,                   !- Maximum Refrigerant Volume Flow Rate {m3/s}    ",
+        "       0.1,                     !- Minimum Refrigerant Volume Flow Rate {m3/s}    ",
+        "       Rink Inlet Node,         !- Refrigerant Inlet Node Name                    ",
+        "       Rink Outlet Node,        !- Refrigerant Outlet Node Name                   ",
+        "       RefrigSched,             !- Refrigerant Outlet Temperature Schedule Name   ",
+        "       IceSched,                !- Ice Surface Temperature Schedule Name          ",
+        "       PeopleHGSched,           !- People Heat Gain Schedule Name                 ",
+        "       PeopleSched,             !- People Schedule Name                           ",
+        "       100,                     !- Maximum Number of People {dimensionless}       ",
+        "       60,                      !- Rink Length {m}                                ",
+        "       30,                      !- Rink Width {m}                                 ",
+        "       1,                       !- Rink Depth {m}                                 ",
+        "       0.0254,                  !- Ice Thickness {m}                              ",
+        "       15;                      !- Flood Water Temperature {C}                    ",
 
-    PlantLoop.allocate(1);
-    DRink.allocate(1);
-    DRink(1).RefrigLoopNum = 1;
-    PlantLoop(1).FluidName = "NH3";
-    PlantLoop(1).FluidIndex = 1;
+    });
 
-    // Set values of items that will stay constant for all calls to the HX Effectiveness function
+    ASSERT_TRUE(process_idf(idf_objects, false));
 
-    RefrigMassFlow = 0.1;
-    TubeLength = 10;
-    TubeDiameter = 0.1;
-    SysNum = 1;
-    NumCircs = 1;
+    GetIndoorIceRink();
 
-    // Test 1: Cooling for Direct Refrigeration System
-    Effectiveness = 0.0;
-    Temperature = -10;
-    // DRink(SysNum).CRefrigLoopNum = 1;
-
-    Effectiveness = CalcEffectivenessDRink(SysNum, Temperature, RefrigMassFlow, NumCircs, TubeLength, TubeDiameter);
-    EXPECT_NEAR(Effectiveness, 0.733, 0.001);
+    EXPECT_EQ(Rink(NumOfRinks).Name, "INDOOR ICE RINK");
+    EXPECT_EQ(Rink(NumOfRinks).SchedName, "ALWAYSONSCHEDULE");
+    EXPECT_EQ(Rink(NumOfRinks).ZoneName, "MAIN FLOOR");
+    EXPECT_EQ(Rink(NumOfRinks).SurfaceName, "FLOOR");
+    EXPECT_EQ(Rink(NumOfRinks).TubeDiameter, 0.013);
+    EXPECT_EQ(Rink(NumOfRinks).TubeLength, 100);
+    //EXPECT_EQ(Rink(NumOfRinks).ControlStrategy, SurfaceTempControl);
+    EXPECT_EQ(Rink(NumOfRinks).MaxRefrigMassFlow, 0.718);
+    EXPECT_EQ(Rink(NumOfRinks).MinRefrigMassFlow, 0.1);
+    EXPECT_EQ(Rink(NumOfRinks).RefrigSetptSched, "REFRIGSCHED");
+    EXPECT_EQ(Rink(NumOfRinks).IceSetptSched, "ICESCHED");
+    EXPECT_EQ(Rink(NumOfRinks).PeopleHeatGainSchedName, "PEOPLEHGSCHED");
+    EXPECT_EQ(Rink(NumOfRinks).PeopleSchedName, "PEOPLESCHED");
+    EXPECT_EQ(Rink(NumOfRinks).MaxNumOfPeople, 100);
+    EXPECT_EQ(Rink(NumOfRinks).LengthRink, 60);
+    EXPECT_EQ(Rink(NumOfRinks).WidthRink, 30);
+    EXPECT_EQ(Rink(NumOfRinks).DepthRink, 1);
+    EXPECT_EQ(Rink(NumOfRinks).IceThickness, 0.0254);
+    EXPECT_EQ(Rink(NumOfRinks).FloodWaterTemp, 15);
 }
-
-TEST_F(EnergyPlusFixture, IndoorIceRink_IRinkEff)
-{
-    Real64 Temperature;
-    Real64 RefrigMassFlow;
-    Real64 TubeLength;
-    Real64 TubeDiameter;
-    int SysNum;
-    int NumCircs;
-    Real64 Effectiveness;
-    int RefrigType;
-    Real64 Concentration;
-
-    // Set values of items that will stay constant for all calls to the HX Effectiveness function
-
-    RefrigMassFlow = 0.1;
-    TubeLength = 10;
-    TubeDiameter = 0.1;
-    SysNum = 1;
-    NumCircs = 1;
-
-    // Test 1: Cooling for Indirect Refrigeration System with Calcium Chloride solution
-    Effectiveness = 0.0;
-    Temperature = -9.5;
-    RefrigType = 1;
-    Concentration = 25.00;
-
-    Effectiveness = CalcEffectivenessIRink(SysNum, Temperature, RefrigMassFlow, NumCircs, TubeLength, TubeDiameter, RefrigType, Concentration);
-    EXPECT_NEAR(Effectiveness, 0.1919, 0.01);
-
-    // Test 2: Cooling for Indirect Refrigeration System with Ethylene Glycol solution
-    Effectiveness = 0.0;
-    Temperature = -9.5;
-    RefrigType = 2;
-    Concentration = 25.00;
-
-    Effectiveness = CalcEffectivenessIRink(SysNum, Temperature, RefrigMassFlow, NumCircs, TubeLength, TubeDiameter, RefrigType, Concentration);
-    EXPECT_NEAR(Effectiveness, 0.1303, 0.01);
-}
-
-TEST_F(EnergyPlusFixture, Resurfacing)
-{
-    Real64 HeatLoad;
-    int SysNum;
-    int SystemType;
-    int MachineNum;
-    DRink.allocate(1);
-    IRink.allocate(1);
-    Resurfacer.allocate(1);
-    Schedule.allocate(1);
-
-    // Set values of items that will stay constant
-    SysNum = 1;
-    MachineNum = 1;
-
-    Schedule(1).CurrentValue = 3;
-    Resurfacer(MachineNum).InitWaterTemp = 10.00;
-    Resurfacer(MachineNum).TankCapacity = 3.00;
-    Resurfacer(MachineNum).ResurfacingSchedPtr = 1;
-    Resurfacer(MachineNum).ResurfacingWaterTemp = 15.00;
-    Resurfacer(MachineNum).NoOfResurfEvents = 3;
-    Resurfacer(MachineNum).GlycolIndex = 1;
-
-    DRink(SysNum).IceSetptTemp = -3.00;
-    DRink(SysNum).LengthRink = 60.00;
-    DRink(SysNum).WidthRink = 30.00;
-    DRink(SysNum).DepthRink = 0.1;
-
-    IRink(SysNum).IceSetptTemp = -3.00;
-    IRink(SysNum).LengthRink = 60.00;
-    IRink(SysNum).WidthRink = 30.00;
-    IRink(SysNum).DepthRink = 0.1;
-
-    // Test 1: Resurfacing for DRink
-    SystemType = 1;
-    IceRinkResurfacer(HeatLoad, SysNum, SystemType, MachineNum);
-    EXPECT_NEAR(HeatLoad, 3625796.78, 0.1);
-
-    // Test 2: Resurfacing for IRink
-    SystemType = 2;
-    IceRinkResurfacer(HeatLoad, SysNum, SystemType, MachineNum);
-    EXPECT_NEAR(HeatLoad, 3625796.78, 0.1);
-}
-
-TEST_F(EnergyPlusFixture, RinkFreezing)
-{
-    Real64 FreezingLoad;
-    int SysNum;
-    int SystemType;
-
-    SysNum = 1;
-    DRink.allocate(1);
-    IRink.allocate(1);
-
-    // Set values of items that will stay constant
-    DRink(SysNum).LengthRink = 60.00;
-    DRink(SysNum).WidthRink = 30.00;
-    DRink(SysNum).IceThickness = 0.02;
-    DRink(SysNum).IceSetptTemp = -3.00;
-    DRink(SysNum).FloodWaterTemp = 15.00;
-    DRink(SysNum).WaterIndex = 1;
-
-    IRink(SysNum).LengthRink = 60.00;
-    IRink(SysNum).WidthRink = 30.00;
-    IRink(SysNum).IceThickness = 0.02;
-    IRink(SysNum).IceSetptTemp = -3.00;
-    IRink(SysNum).FloodWaterTemp = 15.00;
-    IRink(SysNum).WaterIndex = 1;
-
-    // Test 1: Freezing of DRink
-    SystemType = 1;
-    IceRinkFreezing(FreezingLoad, SysNum, SystemType);
-    EXPECT_NEAR(FreezingLoad, 14482318172.4, 0.001);
-
-    // Test 2: Freezing of IRink
-    SystemType = 2;
-    IceRinkFreezing(FreezingLoad, SysNum, SystemType);
-    EXPECT_NEAR(FreezingLoad, 14482318172.4, 0.1);
-}*/
