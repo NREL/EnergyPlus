@@ -54,10 +54,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/IndoorIceRink.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::IceRink;
 using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, IceRink_GetInput)
 {
@@ -84,14 +86,6 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
         "       1,                       !- Rink Depth {m}                                 ",
         "       0.0254,                  !- Ice Thickness {m}                              ",
         "       15;                      !- Flood Water Temperature {C}                    ",
-        "   IceRink:Resurfacer,                                                            ",
-        "       Resurfacer,              !- Name                                           ",
-        "       ResurfSched,             !- Resurfacing Schedule Name                      ",
-        "       1,                       !- Number Of Resurfacing Events                   ",
-        "       15,                      !- Resurfacing Water Temperature {C}              ",
-        "       10,                      !- Initial Water Temperature {C}                  ",
-        "       3;                       !- Resurfacer Tank Capacity ",
-
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
@@ -141,7 +135,31 @@ TEST_F(EnergyPlusFixture, IceRink_Resurfacer_GetInput)
 
     // For Resurfacer Input:
     EXPECT_EQ(Resurfacer(NumOfResurfacers).Name, "RESURFACER");
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).ResurfacingSchedName, "RESURFSCHED");
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).NoOfResurfEvents, 1);
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).ResurfacingWaterTemp, 15);
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).InitWaterTemp, 10);
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).TankCapacity, 3);
 
+}
+
+TEST_F(EnergyPlusFixture, IceRink_Freezing)
+{
+    Real64 Q;
+    Rink.allocate(1);
+    Schedule.allocate(1);
+
+    Rink(1).FloodWaterTemp = 15.0;
+    Rink(1).WaterIndex = 1;
+    Rink(1).LengthRink = 60.0;
+    Rink(1).WidthRink = 30.0;
+    Rink(1).IceThickness = 0.0254;
+    Schedule(1).CurrentValue = -3.0;
+    Rink(1).IceSetptSchedPtr = 1;
+
+    Rink(1).IceRinkFreezing(Q);
+
+    EXPECT_NEAR(Q, 18392544.07, 1);
 }
 
 

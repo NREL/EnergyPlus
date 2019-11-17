@@ -358,9 +358,9 @@ namespace IceRink {
 
         
 
-        if (ErrorsFound) {
+       /* if (ErrorsFound) {
             ShowFatalError("Errors found in input.");
-        }
+        }*/
     }
 
     void GetResurfacer()
