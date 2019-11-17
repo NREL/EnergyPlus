@@ -102,7 +102,7 @@ namespace IceRink {
     Real64 HeatFlux;
 
     // Control types:
-    int const SurfaceTempControl(1); // Controls system using ice surface temperature
+    int const SurfaceTempControl(1);     // Controls system using ice surface temperature
     int const BrineOutletTempControl(2); // Controls system using brine outlet temperature
 
     // Operating Mode:
@@ -110,6 +110,7 @@ namespace IceRink {
     int CoolingMode(2);  // Parameter for use with OperatingMode variable, set for cooling
 
     int NumOfRinks(0);
+    int NumOfResurfacers(0);
 
     bool GetInput(true);
 
@@ -175,8 +176,6 @@ namespace IceRink {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetIndoorIceRink: ");
-        static std::string const BOTC("BrineOutletTemperature");
-        static std::string const STC("SurfaceTemperatureControl");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false); // Set to true if errors in input,
@@ -186,15 +185,13 @@ namespace IceRink {
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
 
         NumOfRinks = inputProcessor->getNumObjectsFound(cRink);
-        int NumOfResurfacers = inputProcessor->getNumObjectsFound(cResurfacer);
+        
         if (NumOfRinks <= 0) ShowFatalError("No Rink objects found in input.");
-        GetInput = false;
+        // GetInput = false;
 
         if (allocated(Rink)) Rink.deallocate();
-        if (allocated(Resurfacer)) Resurfacer.deallocate();
-
         Rink.allocate(NumOfRinks);
-        Resurfacer.allocate(NumOfResurfacers);
+        
 
         // Obtain all the user data related to rinks
         for (Item = 1; Item <= NumOfRinks; ++Item) {
@@ -249,9 +246,9 @@ namespace IceRink {
             Rink(Item).TubeDiameter = rNumericArgs(1);
             Rink(Item).TubeLength = rNumericArgs(2);
 
-            if (UtilityRoutines::SameString(cAlphaArgs(5), BOTC)) {
+            if (UtilityRoutines::SameString(cAlphaArgs(5), "BOTC")) {
                 Rink(Item).ControlStrategy = BrineOutletTempControl;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(5), STC)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(5), "STC")) {
                 Rink(Item).ControlStrategy = SurfaceTempControl;
             }
 
@@ -359,7 +356,34 @@ namespace IceRink {
             }
         }
 
-        // Obtain all the user data related to resurfacers
+        
+
+        if (ErrorsFound) {
+            ShowFatalError("Errors found in input.");
+        }
+    }
+
+    void GetResurfacer()
+    {
+        // Using/Aliasing
+        using namespace DataIPShortCuts; // Data for field names, blank numerics
+        using ScheduleManager::GetScheduleIndex;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const RoutineName("GetIndoorIceRink: ");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static bool ErrorsFound(false); // Set to true if errors in input,
+        int IOStatus;                   // Used in GetObjectItem
+        int Item;                       // Item to be "gotten"
+        int NumAlphas;                  // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                 // Number of Numbers for each GetObjectItem call
+
+        NumOfResurfacers = inputProcessor->getNumObjectsFound(cResurfacer);
+
+        if (allocated(Resurfacer)) Resurfacer.deallocate();
+        Resurfacer.allocate(NumOfResurfacers);
+
         for (Item = 1; Item <= NumOfResurfacers; ++Item) {
             cCurrentModuleObject = "IceRink:Resurfacer";
 
@@ -401,9 +425,9 @@ namespace IceRink {
             }
         }
 
-        /*if (ErrorsFound) {
+        if (ErrorsFound) {
             ShowFatalError("Errors found in input.");
-        }*/
+        }
     }
 
     void IceRinkData::initialize()
@@ -423,7 +447,6 @@ namespace IceRink {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
-        
 
         if ((this->MyFlag) && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
@@ -479,8 +502,7 @@ namespace IceRink {
             SetupOutputVariable("Rink Cooling Energy", OutputProcessor::Unit::J, this->CoolEnergy, "System", "Average", this->Name);
         }
         for (auto &R : Resurfacer) {
-            SetupOutputVariable(
-                "Resurfacer heat rate", OutputProcessor::Unit::J, R.QResurfacing, "System", "Average", this->Name);
+            SetupOutputVariable("Resurfacer heat rate", OutputProcessor::Unit::J, R.QResurfacing, "System", "Average", this->Name);
         }
     }
 
@@ -499,7 +521,7 @@ namespace IceRink {
                                ((CpWater * FloodWaterTemp) + (QFusion) - (CpIce * ScheduleManager::GetCurrentScheduleValue(this->IceSetptSchedPtr)));
             FreezingLoad = QFreezing;
         }
-        
+
         return (FreezingLoad);
     }
 
@@ -660,8 +682,7 @@ namespace IceRink {
             Real64 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
             Real64 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
-            HeatFlux =
-                (RefrigTempIn - Ck) / ((Cl / DataSurfaces::Surface(SurfNum).Area) + (1 / (Effectiveness * RefrigMassFlow * CpRefrig)));
+            HeatFlux = (RefrigTempIn - Ck) / ((Cl / DataSurfaces::Surface(SurfNum).Area) + (1 / (Effectiveness * RefrigMassFlow * CpRefrig)));
 
             Real64 TSource = Ck + (Cl * HeatFlux);
             Real64 IceTemp = (Ca + (Cb * Cd) + HeatFlux * (Cc + (Cb * Cf))) / (1 - (Cb * Ce));

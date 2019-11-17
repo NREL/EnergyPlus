@@ -81,11 +81,12 @@ namespace IceRink {
     extern int CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
 
     extern int NumOfRinks;
+    extern int NumOfResurfacers;
 
     struct IceRinkData : PlantComponent
     {
-        std::string Name;     // User identifier
-        int RinkType; // Type of ice rink: Direct or indirect
+        std::string Name; // User identifier
+        int RinkType;     // Type of ice rink: Direct or indirect
         int RinkType_Num;
         std::string SchedName;               // availability schedule
         int SchedPtr;                        // index to schedule
@@ -101,12 +102,12 @@ namespace IceRink {
         Real64 MaxNumOfPeople;               // Number of people in the rink as defined by user input
         int WaterIndex;
         Real64 FloodWaterTemp;
-        int NumOfSurfaces;        // Total number of surfaces in the ice rink arena
+        int NumOfSurfaces;         // Total number of surfaces in the ice rink arena
         Real64 DesignMassFlowRate; // Design flow rate through the rink HX [kg/s]
         Real64 DesignCapacity;     // design cooling capacity
-        Real64 MinRefrigMassFlow; // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
-        Real64 MaxRefrigMassFlow; // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
-        int ControlStrategy;      // Control strategy for the ice rink (BOTC or STC)
+        Real64 MinRefrigMassFlow;  // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        Real64 MaxRefrigMassFlow;  // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        int ControlStrategy;       // Control strategy for the ice rink (BOTC or STC)
 
         // Rink geometry details
         Real64 LengthRink;
@@ -159,10 +160,8 @@ namespace IceRink {
         Real64 CoolEnergy;       // Cooling sent to rink floor in Joules
 
         // Default Constructor
-        IceRinkData()
-            : RinkType_Num(0)
+        IceRinkData() : RinkType_Num(0)
         {
-
         }
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -217,12 +216,13 @@ namespace IceRink {
     extern Array1D<ResurfacerData> Resurfacer;
 
     // Functions:
-    
+
     void clear_state();
 
     void GetIndoorIceRink();
 
-    
+    void GetResurfacer();
+
 } // namespace IceRink
 } // namespace EnergyPlus
 

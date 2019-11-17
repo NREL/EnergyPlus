@@ -84,6 +84,13 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
         "       1,                       !- Rink Depth {m}                                 ",
         "       0.0254,                  !- Ice Thickness {m}                              ",
         "       15;                      !- Flood Water Temperature {C}                    ",
+        "   IceRink:Resurfacer,                                                            ",
+        "       Resurfacer,              !- Name                                           ",
+        "       ResurfSched,             !- Resurfacing Schedule Name                      ",
+        "       1,                       !- Number Of Resurfacing Events                   ",
+        "       15,                      !- Resurfacing Water Temperature {C}              ",
+        "       10,                      !- Initial Water Temperature {C}                  ",
+        "       3;                       !- Resurfacer Tank Capacity ",
 
     });
 
@@ -91,13 +98,15 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 
     GetIndoorIceRink();
 
+
+    // For Ice Rink Input:
     EXPECT_EQ(Rink(NumOfRinks).Name, "INDOOR ICE RINK");
     EXPECT_EQ(Rink(NumOfRinks).SchedName, "ALWAYSONSCHEDULE");
     EXPECT_EQ(Rink(NumOfRinks).ZoneName, "MAIN FLOOR");
     EXPECT_EQ(Rink(NumOfRinks).SurfaceName, "FLOOR");
     EXPECT_EQ(Rink(NumOfRinks).TubeDiameter, 0.013);
     EXPECT_EQ(Rink(NumOfRinks).TubeLength, 100);
-    //EXPECT_EQ(Rink(NumOfRinks).ControlStrategy, SurfaceTempControl);
+    EXPECT_EQ(Rink(NumOfRinks).ControlStrategy, SurfaceTempControl);
     EXPECT_EQ(Rink(NumOfRinks).MaxRefrigMassFlow, 0.718);
     EXPECT_EQ(Rink(NumOfRinks).MinRefrigMassFlow, 0.1);
     EXPECT_EQ(Rink(NumOfRinks).RefrigSetptSched, "REFRIGSCHED");
@@ -110,4 +119,30 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
     EXPECT_EQ(Rink(NumOfRinks).DepthRink, 1);
     EXPECT_EQ(Rink(NumOfRinks).IceThickness, 0.0254);
     EXPECT_EQ(Rink(NumOfRinks).FloodWaterTemp, 15);
+
+    
 }
+
+TEST_F(EnergyPlusFixture, IceRink_Resurfacer_GetInput)
+{
+    std::string const idf_objects = delimited_string({
+        "IceRink:Resurfacer,                                                            ",
+            "Resurfacer,              !- Name                                           ",
+            "ResurfSched,             !- Resurfacing Schedule Name                      ",
+            "1,                       !- Number Of Resurfacing Events                   ",
+            "15,                      !- Resurfacing Water Temperature {C}              ",
+            "10,                      !- Initial Water Temperature {C}                  ",
+            "3;                       !- Resurfacer Tank Capacity                       ",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects, false));
+
+    GetResurfacer();
+
+    // For Resurfacer Input:
+    EXPECT_EQ(Resurfacer(NumOfResurfacers).Name, "RESURFACER");
+
+}
+
+
+
