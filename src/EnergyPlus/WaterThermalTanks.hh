@@ -596,7 +596,6 @@ namespace WaterThermalTanks {
         bool MyEnvrnFlag;
         bool WarmupFlag;
         bool SetLoopIndexFlag;
-        bool MyOneTimeSetupFlag;
         bool AlreadyReported;
         bool AlreadyRated;
         bool MyHPSizeFlag;
@@ -641,7 +640,7 @@ namespace WaterThermalTanks {
               OffCycParaFuelEnergy(0.0), OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0),
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
               ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0), FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true),
-              MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), MyOneTimeSetupFlag(true), AlreadyReported(false), AlreadyRated(false),
+              MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), AlreadyReported(false), AlreadyRated(false),
               MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true)
         {
         }

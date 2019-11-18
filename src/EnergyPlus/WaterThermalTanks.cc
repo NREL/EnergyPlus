@@ -12246,9 +12246,9 @@ namespace WaterThermalTanks {
         // Formats
         static ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
 
-        if (this->MyOneTimeSetupFlag) {
+        if (this->myOneTimeInitFlag) {
             this->setupOutputVars();
-            this->MyOneTimeSetupFlag = false;
+            this->myOneTimeInitFlag = false;
         }
 
         if (this->AlreadyReported) { // bail we already did this one
