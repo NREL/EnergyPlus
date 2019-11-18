@@ -302,13 +302,10 @@ namespace WaterThermalTanks {
             Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
-                if (((Tank->SrcSide.loopNum == LoopNum) &&
-                     (Tank->SrcSide.loopSideNum == LoopSideNum)) ||
-                    ((Tank->UseSide.loopNum == LoopNum) &&
-                     (Tank->UseSide.loopSideNum == LoopSideNum))) {
+                if ((Tank->SrcSide.loopNum == LoopNum) || (Tank->UseSide.loopNum == LoopNum)) {
                     Tank->SizeTankForDemandSide();
                     Tank->SizeDemandSidePlantConnections();
-                    Tank->SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    Tank->SizeSupplySidePlantConnections(LoopNum);
                     Tank->SizeTankForSupplySide();
                 } else {
                     return;
@@ -348,12 +345,6 @@ namespace WaterThermalTanks {
         } else {
             Tank->UseCurrentFlowLock = 1;
         }
-        tmpLoopNum = Tank->SrcSide.loopNum;
-        if (tmpLoopNum > 0 && Tank->SrcSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            Tank->SourceCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
-        } else {
-            Tank->SourceCurrentFlowLock = 1;
-        }
         Tank->InitWaterThermalTank(FirstHVACIteration);
         //       Plant connected water heaters may have a desuperheater heating coil attached
         if (Tank->DesuperheaterNum == 0) {
@@ -382,7 +373,7 @@ namespace WaterThermalTanks {
                                       Real64 &OptCap,
                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
                                       Optional_int_const LoopNum,
-                                      Optional_int_const LoopSideNum)
+                                      Optional_int_const EP_UNUSED(LoopSideNum))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -433,13 +424,10 @@ namespace WaterThermalTanks {
             Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
-                if (((Tank->SrcSide.loopNum == LoopNum) &&
-                     (Tank->SrcSide.loopSideNum == LoopSideNum)) ||
-                    ((Tank->UseSide.loopNum == LoopNum) &&
-                     (Tank->UseSide.loopSideNum == LoopSideNum))) {
+                if ((Tank->SrcSide.loopNum == LoopNum) || (Tank->UseSide.loopNum == LoopNum)) {
                     Tank->SizeTankForDemandSide();
                     Tank->SizeDemandSidePlantConnections();
-                    Tank->SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    Tank->SizeSupplySidePlantConnections(LoopNum);
                     Tank->SizeTankForSupplySide();
                 } else {
                     return;
@@ -470,11 +458,9 @@ namespace WaterThermalTanks {
             }
         }
         Tank->UseSideLoadRequested = std::abs(MyLoad);
-        int tmpLoopNum = Tank->UseSide.loopNum;
-        int tmpLoopSideNum = Tank->UseSide.loopSideNum;
-        if (tmpLoopNum > 0 && tmpLoopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+        if (Tank->UseSide.loopNum > 0 && Tank->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
             Tank->UseCurrentFlowLock =
-                    DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+                    DataPlant::PlantLoop(Tank->UseSide.loopNum).LoopSide(Tank->UseSide.loopSideNum).FlowLock;
         } else {
             Tank->UseCurrentFlowLock = 1;
         }
@@ -493,12 +479,8 @@ namespace WaterThermalTanks {
             IntegratedHeatPump::IntegratedHeatPumps(HPWH->DXCoilNum).WHtankType = CompType;
             IntegratedHeatPump::IntegratedHeatPumps(HPWH->DXCoilNum).WHtankName = CompName;
             IntegratedHeatPump::IntegratedHeatPumps(HPWH->DXCoilNum).WHtankID = CompIndex;
-            if (present(LoopNum)) {
-                IntegratedHeatPump::IntegratedHeatPumps(HPWH->DXCoilNum).LoopNum = LoopNum;
-                IntegratedHeatPump::IntegratedHeatPumps(HPWH->DXCoilNum).LoopSideNum = LoopSideNum;
-            }
-
             IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(HPWH->DXCoilNum);
+
             if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
                 (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
                 (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
@@ -919,8 +901,8 @@ namespace WaterThermalTanks {
             if (!UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cMixedWHModuleObj) &&
                 !UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankType, cStratifiedWHModuleObj)) {
 
-                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWaterHeater(DesuperheaterNum).Name + ':');
-                ShowContinueError("Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.');
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWaterHeater(DesuperheaterNum).Name + ":");
+                ShowContinueError("Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + ".");
                 ErrorsFound = true;
             }
 
@@ -2369,7 +2351,7 @@ namespace WaterThermalTanks {
                     ErrorsFound = true;
                 } else {
                     bool IsValid;
-                    Tank->ValidatePLFCurve(Tank->PLFCurve, IsValid);
+                    EnergyPlus::WaterThermalTanks::WaterThermalTankData::ValidatePLFCurve(Tank->PLFCurve, IsValid);
 
                     if (!IsValid) {
                         ShowSevereError(
@@ -7535,8 +7517,8 @@ namespace WaterThermalTanks {
         Real64 Runtime1 = 0.0;              // Time that heater 1 is running (s)
         Real64 Runtime2 = 0.0;              // Time that heater 2 is running (s)
         bool SetPointRecovered = false;     // Flag to indicate when set point is recovered for the first time
-        //Added three variables for desuperheater sourceinlet temperature update
-        Real64 MdotDesuperheaterWater = 0.0;      // mass flow rate of desuperheater source side water, kg/s
+        // Added three variables for desuperheater source inlet temperature update
+        Real64 MdotDesuperheaterWater;      // mass flow rate of desuperheater source side water, kg/s
         Real64 DesuperheaterPLR = 0.0;            // Desuperheater part load ratio
         Real64 DesuperheaterHeaterRate = 0.0;     // Desuperheater heater rate (W)
         Real64 SourceInletTempSum = 0.0;          // Sum the source inlet temperature in sub time step to calculate average tempearature
@@ -7893,7 +7875,7 @@ namespace WaterThermalTanks {
 
                 // Bookkeeping for reporting variables, mostly for Qunmet.
                 Real64 Qloss_node = (this->AmbientTemp - Tavg[i]);
-                Real64 Qheat_node = 0.0;
+                Real64 Qheat_node;
                 const Real64 Quse_node = node.UseMassFlowRate * Cp * (this->UseInletTemp - Tavg[i]);
                 const Real64 Qsource_node = [&]{
                     if (this->HeatPumpNum > 0) {
@@ -10416,7 +10398,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum, Optional_int_const EP_UNUSED(LoopSideNum))
+    void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:

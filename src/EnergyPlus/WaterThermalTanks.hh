@@ -461,7 +461,6 @@ namespace WaterThermalTanks {
         int UseSideAvailSchedNum;                 // use side availability schedule
         Real64 UseSideLoadRequested;              // hold MyLoad request from plant management.
         PlantLocation UseSide;
-        int SourceCurrentFlowLock;                // current flow lock setting on source side
         int SourceInletNode;                      // Inlet node for the source side; hot water from supply
         Real64 SourceInletTemp;                   // Source side inlet temperature (C)
         int SourceOutletNode;                     // Outlet node for the source side; colder tank water
@@ -610,7 +609,7 @@ namespace WaterThermalTanks {
               UseOutletNode(0), UseOutletTemp(0.0), UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0),
               SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0), UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(2),
               UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0),
-              SourceCurrentFlowLock(0), SourceInletNode(0),
+              SourceInletNode(0),
               SourceInletTemp(0.0), SourceOutletNode(0), SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0),
               PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0), SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
               SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint),
@@ -668,7 +667,7 @@ namespace WaterThermalTanks {
 
         void MinePlantStructForInfo();
 
-        void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
+        void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _);
 
         void CalcWaterThermalTank();
 
