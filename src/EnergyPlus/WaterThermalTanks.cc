@@ -254,8 +254,7 @@ namespace WaterThermalTanks {
                                        Real64 &MinCap,
                                        Real64 &OptCap,
                                        bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                                       Optional_int_const LoopNum,
-                                       Optional_int_const LoopSideNum)
+                                       Optional_int_const LoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -339,9 +338,8 @@ namespace WaterThermalTanks {
             }
         }
         Tank->UseSideLoadRequested = std::abs(MyLoad);
-        int tmpLoopNum = Tank->UseSide.loopNum;
-        if (tmpLoopNum > 0 && Tank->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            Tank->UseCurrentFlowLock = DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
+        if (Tank->UseSide.loopNum > 0 && Tank->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            Tank->UseCurrentFlowLock = DataPlant::PlantLoop(Tank->UseSide.loopNum).LoopSide(Tank->UseSide.loopSideNum).FlowLock;
         } else {
             Tank->UseCurrentFlowLock = 1;
         }
@@ -372,8 +370,7 @@ namespace WaterThermalTanks {
                                       Real64 &MinCap,
                                       Real64 &OptCap,
                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                                      Optional_int_const LoopNum,
-                                      Optional_int_const EP_UNUSED(LoopSideNum))
+                                      Optional_int_const LoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson

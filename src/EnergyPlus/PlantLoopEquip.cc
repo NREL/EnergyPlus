@@ -644,8 +644,7 @@ namespace PlantLoopEquip {
                                     MinLoad,
                                     OptLoad,
                                     FirstHVACIteration,
-                                    LoopNum,
-                                    LoopSideNum); // DSU
+                                    LoopNum); // DSU
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;
@@ -668,8 +667,7 @@ namespace PlantLoopEquip {
                                     MinLoad,
                                     OptLoad,
                                     FirstHVACIteration,
-                                    LoopNum,
-                                    LoopSideNum); // DSU
+                                    LoopNum); // DSU
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;
@@ -780,8 +778,7 @@ namespace PlantLoopEquip {
                                     MinLoad,
                                     OptLoad,
                                     FirstHVACIteration,
-                                    LoopNum,
-                                    LoopSideNum); // DSU
+                                    LoopNum); // DSU
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;

@@ -881,8 +881,7 @@ namespace WaterThermalTanks {
                              Real64 &MinCap,
                              Real64 &OptCap,
                              bool FirstHVACIteration, // TRUE if First iteration of simulation
-                             Optional_int_const LoopNum = _,
-                             Optional_int_const LoopSideNum = _);
+                             Optional_int_const LoopNum = _);
 
     void SimWaterThermalTank_HeatPump(int CompType,
                              std::string const &CompName,
@@ -894,8 +893,7 @@ namespace WaterThermalTanks {
                              Real64 &MinCap,
                              Real64 &OptCap,
                              bool FirstHVACIteration, // TRUE if First iteration of simulation
-                             Optional_int_const LoopNum = _,
-                             Optional_int_const LoopSideNum = _);
+                             Optional_int_const LoopNum = _);
 
     void SimulateWaterHeaterStandAlone(int WaterHeaterNum, bool FirstHVACIteration);
 

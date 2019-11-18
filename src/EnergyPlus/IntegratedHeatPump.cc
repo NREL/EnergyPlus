@@ -2249,8 +2249,7 @@ namespace IntegratedHeatPump {
                                     MinCap,
                                     OptCap,
                                     true,
-                                    IntegratedHeatPumps(DXCoilNum).LoopNum,
-                                    IntegratedHeatPumps(DXCoilNum).LoopSideNum);
+                                    IntegratedHeatPumps(DXCoilNum).LoopNum);
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
                 WaterThermalTanks::SimWaterThermalTank_HeatPump(IntegratedHeatPumps(DXCoilNum).WHtankType,
                                                                 IntegratedHeatPumps(DXCoilNum).WHtankName,
@@ -2262,8 +2261,7 @@ namespace IntegratedHeatPump {
                                                                 MinCap,
                                                                 OptCap,
                                                                 true,
-                                                                IntegratedHeatPumps(DXCoilNum).LoopNum,
-                                                                IntegratedHeatPumps(DXCoilNum).LoopSideNum);
+                                                                IntegratedHeatPumps(DXCoilNum).LoopNum);
             }
         }
         IntegratedHeatPumps(DXCoilNum).CheckWHCall = false; // clear checking flag
@@ -2306,7 +2304,7 @@ namespace IntegratedHeatPump {
             } else {
                 if (1 == IntegratedHeatPumps(DXCoilNum).ModeMatchSCWH) // water heating priority
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCWHMatchWHMode;
-                else // space cooling piority
+                else // space cooling priority
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCWHMatchSCMode;
             };
 
