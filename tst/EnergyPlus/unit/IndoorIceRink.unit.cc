@@ -54,9 +54,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/IndoorIceRink.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::IceRink;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::ScheduleManager;
@@ -160,6 +162,30 @@ TEST_F(EnergyPlusFixture, IceRink_Freezing)
     Rink(1).IceRinkFreezing(Q);
 
     EXPECT_NEAR(Q, 18392544.07, 1);
+}
+
+TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
+{
+    Rink.allocate(1);
+    PlantLoop.allocate(1);
+
+    Rink(1).LoopNum = 1;
+    Rink(1).TubeDiameter = 0.05;
+    Rink(1).TubeLength = 10.0;
+    Rink(1).NumCircuits = 1;
+
+    Real64 Temperature;
+    Real64 MassFlowRate;
+    Temperature = 10.0;
+    MassFlowRate = 0.1;
+
+    PlantLoop(Rink(1).LoopNum).FluidName = "WATER";
+    PlantLoop(Rink(1).LoopNum).FluidIndex = 1;
+
+    Real64 Result = Rink(1).calcEffectiveness(Temperature, MassFlowRate);
+
+    EXPECT_NEAR(Result, 0.147, 0.1);
+
 }
 
 

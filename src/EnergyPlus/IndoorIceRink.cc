@@ -570,7 +570,7 @@ namespace IceRink {
             FluidProperties::GetDensityGlycol(PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        Real64 ReynoldsNum = 4.0 * RefrigMassFlow / (Pi * Viscosity * TubeDiameter * NumCircuits);
+        Real64 ReynoldsNum = 4.0 * RefrigMassFlow / (Pi * Viscosity * this->TubeDiameter * this->NumCircuits);
 
         Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
