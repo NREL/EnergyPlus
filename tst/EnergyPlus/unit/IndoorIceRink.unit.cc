@@ -154,8 +154,6 @@ TEST_F(EnergyPlusFixture, IceRink_PeopleHG)
     Real64 Q_people = Rink(1).PeopleHG();
 
     EXPECT_EQ(Q_people, 25.0);
-
-
 }
 
 TEST_F(EnergyPlusFixture, IceRink_Freezing)
@@ -189,8 +187,10 @@ TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
 
     Real64 Temperature;
     Real64 MassFlowRate;
+    Real64 MassFlowrate1;
     Temperature = 10.0;
     MassFlowRate = 0.1;
+    MassFlowrate1 = 5;
 
     PlantLoop(Rink(1).LoopNum).FluidName = "WATER";
     PlantLoop(Rink(1).LoopNum).FluidIndex = 1;
@@ -198,4 +198,8 @@ TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
     Real64 Result = Rink(1).calcEffectiveness(Temperature, MassFlowRate);
 
     EXPECT_NEAR(Result, 0.147, 0.1);
+
+    Real64 Result1 = Rink(1).calcEffectiveness(Temperature, MassFlowrate1);
+
+    EXPECT_NEAR(Result1, 0.319, 0.1);
 }
