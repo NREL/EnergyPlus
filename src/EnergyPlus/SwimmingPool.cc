@@ -116,32 +116,14 @@ namespace SwimmingPool {
     // MODULE VARIABLE DECLARATIONS:
     int NumSwimmingPools(0); // Number of swimming pools
     Array1D_bool CheckEquipName;
-    Array1D_int modSurfaceToPoolIndex;
-    Array1D<Real64> modQPoolSrcAvg;          // Average source over the time step for a particular radiant surface
-    Array1D<Real64> modHeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-    Array1D<Real64> modZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-    Array1D<Real64> modLastQPoolSrc;       // Need to keep the last value in case we are still iterating
-    Array1D<Real64> modLastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> modLastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> modLastTimeStepSys;    // Need to keep the last value in case we are still iterating
     bool getSwimmingPoolInput = true;
-
     Array1D<SwimmingPoolData> Pool;
 
     void clear_state()
     {
         NumSwimmingPools = 0;
         getSwimmingPoolInput = true;
-        CheckEquipName.deallocate();
-        modSurfaceToPoolIndex.deallocate();
-        modQPoolSrcAvg.deallocate();
-        modHeatTransCoefsAvg.deallocate();
-        modZeroSourceSumHATsurf.deallocate();
-        modLastQPoolSrc.deallocate();
-        modLastHeatTransCoefs.deallocate();
-        modLastSysTimeElapsed.deallocate();
-        modLastTimeStepSys.deallocate();
+        CheckEquipName.deallocate();        
         Pool.deallocate();
     }
 
@@ -248,8 +230,10 @@ namespace SwimmingPool {
         CheckEquipName = true;
 
         Pool.allocate(NumSwimmingPools);
-        modSurfaceToPoolIndex.allocate(DataSurfaces::TotSurfaces);
-        modSurfaceToPoolIndex = 0;
+        for (Item = 1; Item <= NumSwimmingPools; ++Item) {
+            Pool(Item).modSurfaceToPoolIndex.allocate(DataSurfaces::TotSurfaces);
+            Pool(Item).modSurfaceToPoolIndex = 0;
+        }
 
         // Obtain all of the user data related to indoor swimming pools...
         CurrentModuleObject = "SwimmingPool:Indoor";
@@ -309,7 +293,7 @@ namespace SwimmingPool {
             } else { // ( Pool( Item ).SurfacePtr > 0 )
                 DataSurfaces::Surface(Pool(Item).SurfacePtr).PartOfVentSlabOrRadiantSurface = true;
                 DataSurfaces::Surface(Pool(Item).SurfacePtr).IsPool = true;
-                modSurfaceToPoolIndex(Pool(Item).SurfacePtr) = Item;
+                Pool(Item).modSurfaceToPoolIndex(Pool(Item).SurfacePtr) = Item;
                 // Check to make sure pool surface is a floor
                 if (DataSurfaces::Surface(Pool(Item).SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + " contains a surface name that is NOT a floor.");
@@ -624,32 +608,32 @@ namespace SwimmingPool {
         Real64 Density;
 
         if (Pool(PoolNum).MyOneTimeFlag) {
-            modZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
-            modZeroSourceSumHATsurf = 0.0;
-            modQPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
-            modQPoolSrcAvg = 0.0;
-            modHeatTransCoefsAvg.allocate(DataSurfaces::TotSurfaces);
-            modHeatTransCoefsAvg = 0.0;
-            modLastQPoolSrc.allocate(DataSurfaces::TotSurfaces);
-            modLastQPoolSrc = 0.0;
-            modLastHeatTransCoefs.allocate(DataSurfaces::TotSurfaces);
-            modLastHeatTransCoefs = 0.0;
-            modLastSysTimeElapsed.allocate(DataSurfaces::TotSurfaces);
-            modLastSysTimeElapsed = 0.0;
-            modLastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
-            modLastTimeStepSys = 0.0;
+            Pool(PoolNum).modZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
+            Pool(PoolNum).modZeroSourceSumHATsurf = 0.0;
+            Pool(PoolNum).modQPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modQPoolSrcAvg = 0.0;
+            Pool(PoolNum).modHeatTransCoefsAvg.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modHeatTransCoefsAvg = 0.0;
+            Pool(PoolNum).modLastQPoolSrc.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modLastQPoolSrc = 0.0;
+            Pool(PoolNum).modLastHeatTransCoefs.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modLastHeatTransCoefs = 0.0;
+            Pool(PoolNum).modLastSysTimeElapsed.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modLastSysTimeElapsed = 0.0;
+            Pool(PoolNum).modLastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
+            Pool(PoolNum).modLastTimeStepSys = 0.0;
         }
 
         InitSwimmingPoolPlantLoopIndex(PoolNum, Pool(PoolNum).MyPlantScanFlagPool);
 
         if (DataGlobals::BeginEnvrnFlag && Pool(PoolNum).MyEnvrnFlagGeneral) {
-            modZeroSourceSumHATsurf = 0.0;
-            modQPoolSrcAvg = 0.0;
-            modHeatTransCoefsAvg = 0.0;
-            modLastQPoolSrc = 0.0;
-            modLastHeatTransCoefs = 0.0;
-            modLastSysTimeElapsed = 0.0;
-            modLastTimeStepSys = 0.0;
+            Pool(PoolNum).modZeroSourceSumHATsurf = 0.0;
+            Pool(PoolNum).modQPoolSrcAvg = 0.0;
+            Pool(PoolNum).modHeatTransCoefsAvg = 0.0;
+            Pool(PoolNum).modLastQPoolSrc = 0.0;
+            Pool(PoolNum).modLastHeatTransCoefs = 0.0;
+            Pool(PoolNum).modLastSysTimeElapsed = 0.0;
+            Pool(PoolNum).modLastTimeStepSys = 0.0;
             Pool(PoolNum).MyEnvrnFlagGeneral = false;
         }
 
@@ -674,13 +658,13 @@ namespace SwimmingPool {
         if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             ZoneNum = Pool(PoolNum).ZonePtr;
-            modZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+            Pool(PoolNum).modZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
             SurfNum = Pool(PoolNum).SurfacePtr;
-            modQPoolSrcAvg(SurfNum) = 0.0;        // Initialize this variable to zero (pool parameters "off")
-            modHeatTransCoefsAvg(SurfNum) = 0.0;  // Initialize this variable to zero (pool parameters "off")
-            modLastQPoolSrc(SurfNum) = 0.0;       // At the start of a time step, reset to zero so average calculation can begin again
-            modLastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-            modLastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+            Pool(PoolNum).modQPoolSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
+            Pool(PoolNum).modHeatTransCoefsAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
+            Pool(PoolNum).modLastQPoolSrc(SurfNum) = 0.0;      // At the start of a time step, reset to zero so average calculation can begin again
+            Pool(PoolNum).modLastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+            Pool(PoolNum).modLastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
         }
 
         // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
@@ -1042,21 +1026,24 @@ namespace SwimmingPool {
 
         SurfNum = Pool(PoolNum).SurfacePtr;
 
-        if (modLastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
+        if (Pool(PoolNum).modLastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
-            modQPoolSrcAvg(SurfNum) -= modLastQPoolSrc(SurfNum) * modLastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
-            modHeatTransCoefsAvg(SurfNum) -= modLastHeatTransCoefs(SurfNum) * modLastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
+            Pool(PoolNum).modQPoolSrcAvg(SurfNum) -=
+                Pool(PoolNum).modLastQPoolSrc(SurfNum) * Pool(PoolNum).modLastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
+            Pool(PoolNum).modHeatTransCoefsAvg(SurfNum) -=
+                Pool(PoolNum).modLastHeatTransCoefs(SurfNum) * Pool(PoolNum).modLastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        modQPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
-        modHeatTransCoefsAvg(SurfNum) += DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
+        Pool(PoolNum).modQPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
+        Pool(PoolNum).modHeatTransCoefsAvg(SurfNum) +=
+            DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
 
-        modLastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
-        modLastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
-        modLastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
-        modLastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
+        Pool(PoolNum).modLastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
+        Pool(PoolNum).modLastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
+        Pool(PoolNum).modLastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
+        Pool(PoolNum).modLastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
 
         WaterInletNode = Pool(PoolNum).WaterInletNode;
         WaterOutletNode = Pool(PoolNum).WaterOutletNode;
@@ -1088,22 +1075,26 @@ namespace SwimmingPool {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surface index
+        int PoolNum; // Pool number index
 
         SwimmingPoolOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(modQPoolSrcAvg)) return;
+        
+        for (PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
+            if (!allocated(Pool(PoolNum).modQPoolSrcAvg)) return;
 
-        // If it was allocated, then we have to check to see if this was running at all
-        for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
-            if (modQPoolSrcAvg(SurfNum) != 0.0) {
-                SwimmingPoolOn = true;
-                break; // DO loop
+            // If it was allocated, then we have to check to see if this was running at all
+            for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+                if (Pool(PoolNum).modQPoolSrcAvg(SurfNum) != 0.0) {
+                    SwimmingPoolOn = true;
+                    break; // DO loop
+                }
             }
-        }
 
-        DataHeatBalFanSys::QPoolSurfNumerator = modQPoolSrcAvg;
-        DataHeatBalFanSys::PoolHeatTransCoefs = modHeatTransCoefsAvg;
+            DataHeatBalFanSys::QPoolSurfNumerator = Pool(PoolNum).modQPoolSrcAvg;
+            DataHeatBalFanSys::PoolHeatTransCoefs = Pool(PoolNum).modHeatTransCoefsAvg;
+        }
 
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
