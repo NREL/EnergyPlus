@@ -211,6 +211,34 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
+    void WaterThermalTankData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+//        this->InitWaterThermalTank(FirstHVACIteration);
+        this->MinePlantStructForInfo();
+        this->SizeTankForDemandSide();
+        this->SizeDemandSidePlantConnections();
+        this->SizeSupplySidePlantConnections();
+        this->SizeTankForSupplySide();
+
+        if (DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (!this->IsChilledWaterTank) {
+                this->CalcStandardRatings();
+            } else {
+                this->ReportCWTankInits();
+            }
+        }
+    }
+
+    void WaterThermalTankData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                                    Real64 &MaxLoad,
+                                                    Real64 &MinLoad,
+                                                    Real64 &OptLoad)
+    {
+        MinLoad = 0.0;
+        MaxLoad = this->MaxCapacity;
+        OptLoad = this->MaxCapacity;
+    }
+
     void WaterThermalTankData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
             bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
@@ -271,18 +299,13 @@ namespace WaterThermalTanks {
         }
 
         if (InitLoopEquip) {
-            if (present(LoopNum)) {
-                Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
-            } else {
-                Tank->InitWaterThermalTank(CompNum, FirstHVACIteration);
-            }
+            Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
                 if (((Tank->SrcSide.loopNum == LoopNum) &&
                      (Tank->SrcSide.loopSideNum == LoopSideNum)) ||
                     ((Tank->UseSide.loopNum == LoopNum) &&
                      (Tank->UseSide.loopSideNum == LoopSideNum))) {
-
                     Tank->SizeTankForDemandSide();
                     Tank->SizeDemandSidePlantConnections();
                     Tank->SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
@@ -297,7 +320,6 @@ namespace WaterThermalTanks {
                 Tank->SizeTankForSupplySide();
             }
 
-            // Calculate and report water heater standard ratings to EIO file (now that sizing is done)
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (!Tank->IsChilledWaterTank) {
                     Tank->CalcStandardRatings();
@@ -308,11 +330,6 @@ namespace WaterThermalTanks {
             MinCap = 0.0;
             MaxCap = Tank->MaxCapacity;
             OptCap = Tank->MaxCapacity;
-            if (present(LoopNum)) {
-                Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
-            } else {
-                Tank->InitWaterThermalTank(FirstHVACIteration);
-            }
             return;
         }
 
@@ -413,12 +430,7 @@ namespace WaterThermalTanks {
         }
 
         if (InitLoopEquip) {
-            // CompNum is index to heatpump model, not tank so get the tank index
-            if (present(LoopNum)) {
-                Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
-            } else {
-                Tank->InitWaterThermalTank(FirstHVACIteration);
-            }
+            Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
                 if (((Tank->SrcSide.loopNum == LoopNum) &&
@@ -446,7 +458,6 @@ namespace WaterThermalTanks {
             MinCap = 0.0;
             MaxCap = HPWH->Capacity;
             OptCap = HPWH->Capacity;
-
             return;
         }
 
@@ -467,11 +478,8 @@ namespace WaterThermalTanks {
         } else {
             Tank->UseCurrentFlowLock = 1;
         }
-        if (present(LoopNum)) {
-            Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
-        } else {
-            Tank->InitWaterThermalTank(FirstHVACIteration);
-        }
+
+        Tank->InitWaterThermalTank(FirstHVACIteration);
 
         int InletNodeSav = HPWH->HeatPumpAirInletNode;
         int OutletNodeSav = HPWH->HeatPumpAirOutletNode;
@@ -522,7 +530,6 @@ namespace WaterThermalTanks {
         HPWH->FanNum = IHPFanIndexSav;
         HPWH->FanName = IHPFanNameSave;
         HPWH->FanPlacement = IHPFanplaceSav;
-
     }
 
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
@@ -5750,9 +5757,7 @@ namespace WaterThermalTanks {
         } // NodeNum
     }
 
-    void WaterThermalTankData::InitWaterThermalTank(bool const FirstHVACIteration,
-                              Optional_int_const EP_UNUSED(LoopNum),
-                              Optional_int_const EP_UNUSED(LoopSideNum))
+    void WaterThermalTankData::InitWaterThermalTank(bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:

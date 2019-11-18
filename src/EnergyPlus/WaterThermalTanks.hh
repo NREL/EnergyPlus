@@ -654,9 +654,7 @@ namespace WaterThermalTanks {
 
         void SetupStratifiedNodes();
 
-        void InitWaterThermalTank(bool FirstHVACIteration,
-                                  Optional_int_const LoopNum = _,
-                                  Optional_int_const LoopSideNum = _);
+        void InitWaterThermalTank(bool FirstHVACIteration);
 
         bool SourceHeatNeed(Real64 OutletTemp,
                             Real64 DeadBandTemp,
@@ -779,6 +777,13 @@ namespace WaterThermalTanks {
         );
 
         static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
     };
 
     struct WaterHeaterDesuperheaterData
