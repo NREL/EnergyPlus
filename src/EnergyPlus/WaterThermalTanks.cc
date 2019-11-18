@@ -1792,7 +1792,7 @@ namespace WaterThermalTanks {
                                                                           DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                           1,
                                                                           DataLoopNode::ObjectIsParent);
-                if (hpwhAlpha[9 + nAlphaOffset] != "") {
+                if (!hpwhAlpha[9 + nAlphaOffset].empty()) {
                     bool Okay;
                     OutAirNodeManager::CheckAndAddAirNodeNumber(HPWH.OutsideAirNode, Okay);
                     if (!Okay) {
@@ -2412,7 +2412,7 @@ namespace WaterThermalTanks {
             // Validate Off-Cycle Parasitic Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(6));
-                if (SELECT_CASE_var == "") { // If blank, default to Fuel Type for heater
+                if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank->OffCycParaFuelType = Tank->FuelType;
 
                 } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
@@ -2469,7 +2469,7 @@ namespace WaterThermalTanks {
             // Validate On-Cycle Parasitic Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
-                if (SELECT_CASE_var == "") { // If blank, default to Fuel Type for heater
+                if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank->OnCycParaFuelType = Tank->FuelType;
 
                 } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
@@ -2552,7 +2552,7 @@ namespace WaterThermalTanks {
                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
-                    if (DataIPShortCuts::cAlphaArgs(11) != "") {
+                    if (!DataIPShortCuts::cAlphaArgs(11).empty()) {
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank->AmbientTempOutsideAirNode)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                             ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
@@ -2867,7 +2867,7 @@ namespace WaterThermalTanks {
             Tank->HeaterHeight1 = DataIPShortCuts::rNumericArgs(7);
 
             // adjust tank height used in these calculations for testing heater height
-            Real64 tankHeightForTesting = 0.0;
+            Real64 tankHeightForTesting;
             if (Tank->Shape == TankShapeEnum::HorizCylinder) {
                 tankHeightForTesting =
                         2.0 *
@@ -2975,7 +2975,7 @@ namespace WaterThermalTanks {
             // Validate Off-Cycle Parasitic Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
-                if (SELECT_CASE_var == "") { // If blank, default to Fuel Type for heater
+                if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank->OffCycParaFuelType = Tank->FuelType;
 
                 } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
@@ -3033,7 +3033,7 @@ namespace WaterThermalTanks {
             // Validate On-Cycle Parasitic Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(9));
-                if (SELECT_CASE_var == "") { // If blank, default to Fuel Type for heater
+                if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank->OnCycParaFuelType = Tank->FuelType;
 
                 } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
@@ -3116,7 +3116,7 @@ namespace WaterThermalTanks {
                                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
                                                                                                                           1,
                                                                                                                           DataLoopNode::ObjectIsNotParent);
-                    if (DataIPShortCuts::cAlphaArgs(13) != "") {
+                    if (!DataIPShortCuts::cAlphaArgs(13).empty()) {
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(Tank->AmbientTempOutsideAirNode)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                             ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
@@ -6663,7 +6663,6 @@ namespace WaterThermalTanks {
 
         Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         Real64 TimeRemaining = SecInTimeStep;
-        Real64 TimeNeeded = 0.0;
         int CycleOnCount_loc = 0;
         int MaxCycles = SecInTimeStep;
         Real64 Runtime = 0.0;
@@ -6704,14 +6703,14 @@ namespace WaterThermalTanks {
 
         Real64 Qheatpump;
         Real64 Qsource;
-        this->CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp_loc, Cp, SetPointTemp_loc, SourceMassFlowRate_loc, Qheatpump, Qsource);
+        EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp_loc, Cp, SetPointTemp_loc, SourceMassFlowRate_loc, Qheatpump, Qsource);
 
         // Calculate steady-state use heat rate.
         Real64 Quse = UseMassFlowRate_loc * Cp * (UseInletTemp_loc - SetPointTemp_loc);
 
         while (TimeRemaining > 0.0) {
 
-            TimeNeeded = 0.0;
+            Real64 TimeNeeded = 0.0;
 
             Real64 NewTankTemp = TankTemp_loc;
             Real64 LossCoeff_loc = 0.0;
@@ -6746,7 +6745,7 @@ namespace WaterThermalTanks {
                         Qheat = Qoncycheat + Qheater + Qheatpump;
 
                         // Calculate time needed to recover to the setpoint at maximum heater capacity
-                        TimeNeeded = this->CalcTimeNeeded(TankTemp_loc,
+                        TimeNeeded = EnergyPlus::WaterThermalTanks::WaterThermalTankData::CalcTimeNeeded(TankTemp_loc,
                                                     SetPointTemp_loc,
                                                     AmbientTemp_loc,
                                                     UseInletTemp_loc,
@@ -10443,7 +10442,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum, Optional_int_const LoopSideNum)
+    void WaterThermalTankData::SizeSupplySidePlantConnections(Optional_int_const LoopNum, Optional_int_const EP_UNUSED(LoopSideNum))
     {
 
         // SUBROUTINE INFORMATION:
@@ -10464,17 +10463,10 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("SizeSupplySidePlantConnections");
 
-        bool ErrorsFound = false; // If errors detected in input
         Real64 tmpUseDesignVolFlowRate = this->UseDesignVolFlowRate;
         Real64 tmpSourceDesignVolFlowRate = this->SourceDesignVolFlowRate;
 
         int tmpLoopNum;
-        int tmpLoopSideNum;
-        if (!present(LoopSideNum)) {
-            tmpLoopSideNum = DataPlant::SupplySide;
-        } else {
-            tmpLoopSideNum = LoopSideNum;
-        }
         if (!present(LoopNum)) {
             tmpLoopNum = this->SrcSide.loopNum;
         } else {
@@ -10619,10 +10611,6 @@ namespace WaterThermalTanks {
                 }
             } // autosizing needed.
         }     // connected to plant
-
-        if (ErrorsFound) {
-            ShowFatalError("Preceding sizing errors cause program termination");
-        }
     }
 
     void WaterThermalTankData::SizeTankForDemandSide()
@@ -11849,7 +11837,7 @@ namespace WaterThermalTanks {
         bool bIsVSCoil = false;
         Real64 RecoveryEfficiency;
         Real64 EnergyFactor;
-        Real64 RatedDXCoilTotalCapacity;
+        Real64 RatedDXCoilTotalCapacity = 0.0;
         if (this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
             // Set test conditions
             this->AmbientTemp = 19.7222;   // 67.5 F
