@@ -67,14 +67,12 @@ namespace WaterThermalTanks {
     extern int const ventMode;  // tank temp is above maximum temperature and water is venting
     extern int const coolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
 
-    struct AmbientTemp
+    enum struct AmbientTempEnum
     {
-        enum {
-            Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
-            TempZone,       // tank is located in a zone or HPWH inlet air is zone air only
-            OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
-            ZoneAndOA   // applicable to HPWH only, inlet air is mixture of OA and zone air
-        };
+        Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
+        TempZone,       // tank is located in a zone or HPWH inlet air is zone air only
+        OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
+        ZoneAndOA   // applicable to HPWH only, inlet air is mixture of OA and zone air
     };
 
     enum struct CrankTempEnum
@@ -113,17 +111,15 @@ namespace WaterThermalTanks {
     };
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
-    struct CoilObj
+    enum struct CoilObjEnum
     {
-        enum {
-            CompressorRackRefrigeratedCase,  // reclaim heating source is refrigerated case compressor rack
-            DXCooling,                       // reclaim heating source is DX cooling coil
-            DXMultiSpeed,                    // reclaim heating source is DX multispeed coil
-            DXMultiMode,                     // reclaim heating source is DX multimode coil
-            CondenserRefrigeration,          // reclaim heating source is detailed refrigeration system condenser
-            DXVariableCooling,               // reclaim heating source is Variable Speed DX cooling coil
-            AirWaterHeatPumpEQ               // reclaim heating source is Water to air heat pump cooling coil
-        };
+        CompressorRackRefrigeratedCase,  // reclaim heating source is refrigerated case compressor rack
+        DXCooling,                       // reclaim heating source is DX cooling coil
+        DXMultiSpeed,                    // reclaim heating source is DX multispeed coil
+        DXMultiMode,                     // reclaim heating source is DX multimode coil
+        CondenserRefrigeration,          // reclaim heating source is detailed refrigeration system condenser
+        DXVariableCooling,               // reclaim heating source is Variable Speed DX cooling coil
+        AirWaterHeatPumpEQ               // reclaim heating source is Water to air heat pump cooling coil
     };
 
     enum struct SideEnum
@@ -132,27 +128,22 @@ namespace WaterThermalTanks {
         Source // Indicates Source side of water heater
     };
 
-    struct SizeEnum
+    enum struct SizeEnum
     {
-        enum
-        {
-            NotSet,
-            PeakDraw,
-            ResidentialMin,
-            PerPerson,
-            PerFloorArea,
-            PerUnit,
-            PerSolarColArea
-        };
+        NotSet,
+        PeakDraw,
+        ResidentialMin,
+        PerPerson,
+        PerFloorArea,
+        PerUnit,
+        PerSolarColArea
     };
 
-    struct SourceSide
+    enum struct SourceSideEnum
     {
-        enum {
-            StorageTank,
-            IndirectHeatPrimarySetpoint,
-            IndirectHeatAltSetpoint
-        };
+        StorageTank,
+        IndirectHeatPrimarySetpoint,
+        IndirectHeatAltSetpoint
     };
 
     // MODULE VARIABLE DECLARATIONS:
@@ -213,7 +204,7 @@ namespace WaterThermalTanks {
     {
         // Members
         // input data
-        int DesignMode;                           // what sizing method to use
+        SizeEnum DesignMode;                           // what sizing method to use
         Real64 TankDrawTime;                      // in hours, time storage can meet peak demand
         Real64 RecoveryTime;                      // time for tank to recover
         Real64 NominalVolForSizingDemandSideFlow; // nominal tank size to use in sizing demand side connections
@@ -313,7 +304,7 @@ namespace WaterThermalTanks {
         int InletAirMixerNode;                              // Inlet air mixer node number of HP water heater
         int OutletAirSplitterNode;                          // Outlet air splitter node number of HP water heater
         Real64 SourceMassFlowRate;                          // Maximum mass flow rate on the source side (kg/s)
-        int InletAirConfiguration;                          // Identifies source of HPWH inlet air
+        AmbientTempEnum InletAirConfiguration;                          // Identifies source of HPWH inlet air
         int AmbientTempSchedule;                            // Schedule index pointer for ambient air temp at HPWH inlet
         int AmbientRHSchedule;                              // Schedule index pointer for ambient air RH at HPWH inlet
         int AmbientTempZone;                                // Index of ambient zone for ambient air at HPWH inlet
@@ -322,7 +313,7 @@ namespace WaterThermalTanks {
         int CrankcaseTempZone;                              // Index of zone where compressor/crankcase heater is located
         Real64 OffCycParaLoad;                              // Rate for off-cycle parasitic load (W)
         Real64 OnCycParaLoad;                               // Rate for on-cycle parasitic load (W)
-        int ParasiticTempIndicator;                         // Indicator for HPWH parasitic heat rejection location
+        AmbientTempEnum ParasiticTempIndicator;                         // Indicator for HPWH parasitic heat rejection location
         Real64 OffCycParaFuelRate;                          // Electric consumption rate for off-cycle parasitic load (W)
         Real64 OnCycParaFuelRate;                           // Electric consumption rate for on-cycle parasitic load (W)
         Real64 OffCycParaFuelEnergy;                        // Electric energy consumption for off-cycle parasitic load (J)
@@ -389,9 +380,9 @@ namespace WaterThermalTanks {
                   WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0), FanNum(0),
                   FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
                   SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
-                  MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
+                  MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(AmbientTempEnum::OutsideAir),
                   AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(CrankTempEnum::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
-                  OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
+                  OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(AmbientTempEnum::OutsideAir), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
                   OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
                   HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
                   IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
@@ -422,7 +413,7 @@ namespace WaterThermalTanks {
         Real64 Mass;                       // Total mass of fluid in the tank (kg)
         Real64 TimeElapsed;                // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        int AmbientTempIndicator;              // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
+        AmbientTempEnum AmbientTempIndicator;              // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
         int AmbientTempSchedule;               // Schedule index pointer
         int AmbientTempZone;                   // Number of ambient zone around tank
         int AmbientTempOutsideAirNode;         // Number of outside air node
@@ -486,7 +477,7 @@ namespace WaterThermalTanks {
         bool SourceSideSeries;
         int SourceSideAvailSchedNum;       // source side availability schedule.
         PlantLocation SrcSide;
-        int SourceSideControlMode;         // flag for how source side flow is controlled
+        SourceSideEnum SourceSideControlMode;         // flag for how source side flow is controlled
         int SourceSideAltSetpointSchedNum; // schedule of alternate temperature setpoint values
         Real64 SizingRecoveryTime;         // sizing parameter for autosizing indirect water heaters (hr)
         Real64 MassFlowRateMax;            // Maximum flow rate for scheduled DHW (kg/s)
@@ -611,7 +602,7 @@ namespace WaterThermalTanks {
         // Default Constructor
         WaterThermalTankData()
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
-              TimeElapsed(0.0), AmbientTempIndicator(0), AmbientTempSchedule(0), AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0),
+              TimeElapsed(0.0), AmbientTempIndicator(AmbientTempEnum::OutsideAir), AmbientTempSchedule(0), AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0),
               AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0), OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0),
               Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0), Efficiency(0.0), PLFCurve(0),
               SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0), IgnitionDelay(0.0), OffCycParaLoad(0.0),
@@ -622,7 +613,7 @@ namespace WaterThermalTanks {
               SourceCurrentFlowLock(0), SourceInletNode(0),
               SourceInletTemp(0.0), SourceOutletNode(0), SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0),
               PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0), SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
-              SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(0),
+              SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint),
               SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
               FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
               HeightWasAutoSized(false), Perimeter(0.0), Shape(TankShapeEnum::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false),
@@ -835,7 +826,7 @@ namespace WaterThermalTanks {
         Real64 BackupElementCapacity;         // Tank backup element capacity (W)
         Real64 DXSysPLR;                      // runtime fraction of desuperheater heating coil
         int ReclaimHeatingSourceIndexNum;     // Index to reclaim heating source (condenser) of a specific type
-        int ReclaimHeatingSource;             // The source for the Desuperheater Heating Coil
+        CoilObjEnum ReclaimHeatingSource;             // The source for the Desuperheater Heating Coil
         int SetPointError;           // Used when temp SP in tank and desuperheater are reversed
         int SetPointErrIndex1;       // Index to recurring error for tank/desuperheater set point temp
         int IterLimitErrIndex1;      // Index for recurring iteration limit warning messages
@@ -862,7 +853,7 @@ namespace WaterThermalTanks {
               OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0), SetPointTemp(0.0), WaterHeaterTankNum(0), DesuperheaterPLR(0.0),
               OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0), OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0),
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
-              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
+              ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(CoilObjEnum::DXCooling), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
               IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0),
               RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
         {
