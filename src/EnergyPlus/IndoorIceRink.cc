@@ -185,13 +185,12 @@ namespace IceRink {
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
 
         NumOfRinks = inputProcessor->getNumObjectsFound(cRink);
-        
+
         if (NumOfRinks <= 0) ShowFatalError("No Rink objects found in input.");
         // GetInput = false;
 
         if (allocated(Rink)) Rink.deallocate();
         Rink.allocate(NumOfRinks);
-        
 
         // Obtain all the user data related to rinks
         for (Item = 1; Item <= NumOfRinks; ++Item) {
@@ -356,11 +355,9 @@ namespace IceRink {
             }
         }
 
-        
-
-       /* if (ErrorsFound) {
-            ShowFatalError("Errors found in input.");
-        }*/
+        /* if (ErrorsFound) {
+             ShowFatalError("Errors found in input.");
+         }*/
     }
 
     void GetResurfacer()
@@ -450,6 +447,7 @@ namespace IceRink {
 
         if ((this->MyFlag) && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
+            this->setupOutputVariables();
             PlantUtilities::ScanPlantLoopsForObject(
                 this->Name, DataPlant::TypeOf_IceRink, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
@@ -504,6 +502,31 @@ namespace IceRink {
         for (auto &R : Resurfacer) {
             SetupOutputVariable("Resurfacer heat rate", OutputProcessor::Unit::J, R.QResurfacing, "System", "Average", this->Name);
         }
+    }
+
+    Real64 IceRinkData::PeopleHG()
+    {
+        static std::string const RoutineName("PeopleHG");
+
+        this->PeopleHeatGain = ScheduleManager::GetCurrentScheduleValue(this->PeopleHeatGainSchedPtr);
+        if (this->PeopleHeatGain < 0.0) {
+            ShowWarningError(RoutineName + ": Ice Rink =\"" + this->Name + " People Heat Gain Schedule =\"" + this->PeopleHeatGainSchedName +
+                             " has a negative value.  This is not allowed.");
+            ShowContinueError("The heat gain per person has been reset to zero.");
+            this->PeopleHeatGain = 0.0;
+        }
+
+        this->NumOfPeople = ScheduleManager::GetCurrentScheduleValue(this->PeopleSchedPtr);
+        if (this->NumOfPeople < 0.0) {
+            ShowWarningError(RoutineName + ": Ice Rink =\"" + this->Name + " People Schedule =\"" + this->PeopleSchedName +
+                             " has a negative value.  This is not allowed.");
+            ShowContinueError("The number of people has been reset maximum people capacity.");
+            this->NumOfPeople = this->MaxNumOfPeople;
+        }
+
+        this->TotalPeopleHG = this->PeopleHeatGain * this->NumOfPeople;
+
+        return (this->TotalPeopleHG);
     }
 
     Real64 IceRinkData::IceRinkFreezing(Real64 &FreezingLoad)

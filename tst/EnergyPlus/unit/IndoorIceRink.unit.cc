@@ -53,8 +53,8 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
@@ -94,7 +94,6 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
 
     GetIndoorIceRink();
 
-
     // For Ice Rink Input:
     EXPECT_EQ(Rink(NumOfRinks).Name, "INDOOR ICE RINK");
     EXPECT_EQ(Rink(NumOfRinks).SchedName, "ALWAYSONSCHEDULE");
@@ -115,20 +114,18 @@ TEST_F(EnergyPlusFixture, IceRink_GetInput)
     EXPECT_EQ(Rink(NumOfRinks).DepthRink, 1);
     EXPECT_EQ(Rink(NumOfRinks).IceThickness, 0.0254);
     EXPECT_EQ(Rink(NumOfRinks).FloodWaterTemp, 15);
-
-    
 }
 
 TEST_F(EnergyPlusFixture, IceRink_Resurfacer_GetInput)
 {
     std::string const idf_objects = delimited_string({
         "IceRink:Resurfacer,                                                            ",
-            "Resurfacer,              !- Name                                           ",
-            "ResurfSched,             !- Resurfacing Schedule Name                      ",
-            "1,                       !- Number Of Resurfacing Events                   ",
-            "15,                      !- Resurfacing Water Temperature {C}              ",
-            "10,                      !- Initial Water Temperature {C}                  ",
-            "3;                       !- Resurfacer Tank Capacity                       ",
+        "Resurfacer,              !- Name                                           ",
+        "ResurfSched,             !- Resurfacing Schedule Name                      ",
+        "1,                       !- Number Of Resurfacing Events                   ",
+        "15,                      !- Resurfacing Water Temperature {C}              ",
+        "10,                      !- Initial Water Temperature {C}                  ",
+        "3;                       !- Resurfacer Tank Capacity                       ",
     });
 
     ASSERT_TRUE(process_idf(idf_objects, false));
@@ -142,6 +139,22 @@ TEST_F(EnergyPlusFixture, IceRink_Resurfacer_GetInput)
     EXPECT_EQ(Resurfacer(NumOfResurfacers).ResurfacingWaterTemp, 15);
     EXPECT_EQ(Resurfacer(NumOfResurfacers).InitWaterTemp, 10);
     EXPECT_EQ(Resurfacer(NumOfResurfacers).TankCapacity, 3);
+}
+
+TEST_F(EnergyPlusFixture, IceRink_PeopleHG)
+{
+    Rink.allocate(1);
+    Schedule.allocate(2);
+    Schedule(1).CurrentValue = 1.0;
+    Schedule(2).CurrentValue = 25;
+    Rink(1).PeopleHeatGainSchedPtr = 1;
+    Rink(1).PeopleSchedPtr = 2;
+    Rink(1).Name = "INDOORICERINK";
+
+    Real64 Q_people = Rink(1).PeopleHG();
+
+    EXPECT_EQ(Q_people, 25.0);
+
 
 }
 
@@ -185,8 +198,4 @@ TEST_F(EnergyPlusFixture, IceRink_Effectiveness)
     Real64 Result = Rink(1).calcEffectiveness(Temperature, MassFlowRate);
 
     EXPECT_NEAR(Result, 0.147, 0.1);
-
 }
-
-
-

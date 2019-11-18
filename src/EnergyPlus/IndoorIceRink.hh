@@ -86,7 +86,6 @@ namespace IceRink {
     struct IceRinkData : PlantComponent
     {
         std::string Name; // User identifier
-        int RinkType;     // Type of ice rink: Direct or indirect
         int RinkType_Num;
         std::string SchedName;               // availability schedule
         int SchedPtr;                        // index to schedule
@@ -99,6 +98,8 @@ namespace IceRink {
         std::string PeopleSchedName;         // Name of people schedule
         int PeopleSchedPtr;                  // People schedule index
         Real64 PeopleHeatGain;               // Current heat gain from people
+        Real64 NumOfPeople;
+        Real64 TotalPeopleHG;
         Real64 MaxNumOfPeople;               // Number of people in the rink as defined by user input
         int WaterIndex;
         Real64 FloodWaterTemp;
@@ -168,6 +169,8 @@ namespace IceRink {
         void initialize();
 
         void setupOutputVariables();
+
+        Real64 PeopleHG();
 
         Real64 IceRinkFreezing(Real64 &FreezingLoad);
 
