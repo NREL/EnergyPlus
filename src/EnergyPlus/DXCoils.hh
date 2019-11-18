@@ -419,6 +419,7 @@ namespace DXCoils {
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
         Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
         Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
+        Array1D<Real64> MSRatedTotCapDes;           // Autosized Gross total cooling capacity at rated conditions [watts]
         Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
         Array1D<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
         Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]

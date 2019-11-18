@@ -4840,7 +4840,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
@@ -4909,7 +4909,7 @@ namespace OutputReportTabular {
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+                    SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto & cooler : SimpleFluidCooler) {
             SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;

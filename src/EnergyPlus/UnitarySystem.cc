@@ -1526,6 +1526,14 @@ namespace UnitarySystems {
 
         bool anyEMSRan;
         EMSManager::ManageEMS(DataGlobals::emsCallFromUnitarySystemSizing, anyEMSRan); // calling point
+        bool HardSizeNoDesRun;                  // Indicator to a hard-sized field with no design sizing data
+
+        // Initiate all reporting variables
+        if (DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone) {
+            HardSizeNoDesRun = false;
+        } else {
+            HardSizeNoDesRun = true;
+        }
 
         std::string SizingString("");
         std::string CompName = this->Name;
@@ -1663,7 +1671,26 @@ namespace UnitarySystems {
                 EqSizing.CoolingCapacity = true;
                 EqSizing.DesCoolingLoad = CoolCapAtPeak;
             } else {
-                CoolCapAtPeak = this->m_DesignCoolingCapacity;
+                if ( !HardSizeNoDesRun && (CoolingSAFlowMethod != FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
+                    if ( this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ) {
+                        DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex( this->m_CoolingCoilIndex, ErrFound );
+                        DataSizing::DataIsDXCoil = true;
+                    }
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        DataSizing::DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(this->m_CoolingCoilIndex, ErrFound);
+                        DataSizing::DataIsDXCoil = true;
+                    }
+                    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                    DataSizing::DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
+                    TempSize = DataSizing::AutoSize;
+                    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    CoolCapAtPeak = TempSize;
+                    DataSizing::DXCoolCap = CoolCapAtPeak;
+                    EqSizing.CoolingCapacity = true;
+                    EqSizing.DesCoolingLoad = CoolCapAtPeak;
+                } else {
+                    CoolCapAtPeak = this->m_DesignCoolingCapacity;
+                }
             }
             DataSizing::DataIsDXCoil = false;
             DataSizing::DataTotCapCurveIndex = 0;
@@ -1744,7 +1771,26 @@ namespace UnitarySystems {
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
-                HeatCapAtPeak = this->m_DesignHeatingCapacity;
+                if ( !HardSizeNoDesRun && (HeatingSAFlowMethod != FlowPerHeatingCapacity && this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
+                    if ( this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ) {
+                        SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                        DataSizing::DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
+                        TempSize = DataSizing::AutoSize;
+                        DataSizing::DataHeatSizeRatio = this->m_HeatingSizingRatio;
+                        DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(this->m_HeatingCoilIndex, ErrFound);
+                        DataSizing::DataIsDXCoil = true;
+                        if (DataSizing::CurSysNum > 0)
+                            DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
+                            false; // set to false to allow calculation of actual heating capacity
+                        ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        if (DataSizing::CurSysNum > 0) DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
+                        HeatCapAtPeak = TempSize;
+                        EqSizing.HeatingCapacity = true;
+                        EqSizing.DesHeatingLoad = HeatCapAtPeak;
+                    }
+                } else {
+                   HeatCapAtPeak = this->m_DesignHeatingCapacity;
+                }
             }
             //			if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
             DataSizing::DataIsDXCoil = false;
@@ -2019,8 +2065,13 @@ namespace UnitarySystems {
                 EqSizing.CoolingAirVolFlow *
                 DataEnvironment::StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
             DXCoils::SimDXCoilMultiSpeed(blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, 0);
-            DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType(this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound);
-            EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
+            if ( !HardSizeNoDesRun && EqSizing.Capacity ) {
+                // do nothing, the vars EqSizing.DesCoolingLoad and DataSizing::DXCoolCap are already set earlier and the values could be max of the
+                // cooling and heating austosized values. Thus reseting them here to user specified value may not be the design size used else where 
+            } else {
+                DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType( this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound );
+                EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
+            }
             MSHPIndex = this->m_DesignSpecMSHPIndex;
 
             if (MSHPIndex > -1) {
@@ -2410,7 +2461,14 @@ namespace UnitarySystems {
             DataSizing::DataHeatSizeRatio = 1.0;
         }
 
-        DataSizing::UnitaryHeatCap = this->m_DesignHeatingCapacity;
+        if ( !HardSizeNoDesRun && (EqSizing.Capacity && EqSizing.DesHeatingLoad > 0.0)) {
+            // vars EqSizing.DesHeatingLoad is already set earlier and supplemental heating coil should
+            // be sized to design value instead of user specified value if HardSizeNoDesRun is false
+            DataSizing::UnitaryHeatCap = EqSizing.DesHeatingLoad;
+
+        } else {
+            DataSizing::UnitaryHeatCap = this->m_DesignHeatingCapacity;
+        }
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
 
