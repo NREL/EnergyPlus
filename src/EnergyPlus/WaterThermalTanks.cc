@@ -414,34 +414,33 @@ namespace WaterThermalTanks {
 
         if (InitLoopEquip) {
             // CompNum is index to heatpump model, not tank so get the tank index
-            int TankNum = HPWH->WaterHeaterTankNum;
             if (present(LoopNum)) {
-                WaterThermalTank(TankNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
+                Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
             } else {
-                WaterThermalTank(TankNum).InitWaterThermalTank(FirstHVACIteration);
+                Tank->InitWaterThermalTank(FirstHVACIteration);
             }
-            WaterThermalTank(TankNum).MinePlantStructForInfo();
+            Tank->MinePlantStructForInfo();
             if (present(LoopNum)) {
-                if (((WaterThermalTank(TankNum).SrcSide.loopNum == LoopNum) &&
-                     (WaterThermalTank(TankNum).SrcSide.loopSideNum == LoopSideNum)) ||
-                    ((WaterThermalTank(TankNum).UseSide.loopNum == LoopNum) &&
-                     (WaterThermalTank(TankNum).UseSide.loopSideNum == LoopSideNum))) {
-                    WaterThermalTank(TankNum).SizeTankForDemandSide();
-                    WaterThermalTank(TankNum).SizeDemandSidePlantConnections();
-                    WaterThermalTank(TankNum).SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
-                    WaterThermalTank(TankNum).SizeTankForSupplySide();
+                if (((Tank->SrcSide.loopNum == LoopNum) &&
+                     (Tank->SrcSide.loopSideNum == LoopSideNum)) ||
+                    ((Tank->UseSide.loopNum == LoopNum) &&
+                     (Tank->UseSide.loopSideNum == LoopSideNum))) {
+                    Tank->SizeTankForDemandSide();
+                    Tank->SizeDemandSidePlantConnections();
+                    Tank->SizeSupplySidePlantConnections(LoopNum, LoopSideNum);
+                    Tank->SizeTankForSupplySide();
                 } else {
                     return;
                 }
             } else {
-                WaterThermalTank(TankNum).SizeTankForDemandSide();
-                WaterThermalTank(TankNum).SizeDemandSidePlantConnections();
-                WaterThermalTank(TankNum).SizeSupplySidePlantConnections();
-                WaterThermalTank(TankNum).SizeTankForSupplySide();
+                Tank->SizeTankForDemandSide();
+                Tank->SizeDemandSidePlantConnections();
+                Tank->SizeSupplySidePlantConnections();
+                Tank->SizeTankForSupplySide();
             }
 
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                WaterThermalTank(TankNum).CalcStandardRatings();
+                Tank->CalcStandardRatings();
                 DataSizing::DataNonZoneNonAirloopValue = 0.0;
             }
             MinCap = 0.0;
@@ -455,23 +454,23 @@ namespace WaterThermalTanks {
             HPWH->MyOneTimeFlagHP = false;
         } else {
             if (HPWH->MyTwoTimeFlagHP) {
-                WaterThermalTank(HPWH->WaterHeaterTankNum).MinePlantStructForInfo(); // call it again to get control types filled out
+                Tank->MinePlantStructForInfo(); // call it again to get control types filled out
                 HPWH->MyTwoTimeFlagHP = false;
             }
         }
-        WaterThermalTank(HPWH->WaterHeaterTankNum).UseSideLoadRequested = std::abs(MyLoad);
-        int tmpLoopNum = WaterThermalTank(HPWH->WaterHeaterTankNum).UseSide.loopNum;
-        int tmpLoopSideNum = WaterThermalTank(HPWH->WaterHeaterTankNum).UseSide.loopSideNum;
+        Tank->UseSideLoadRequested = std::abs(MyLoad);
+        int tmpLoopNum = Tank->UseSide.loopNum;
+        int tmpLoopSideNum = Tank->UseSide.loopSideNum;
         if (tmpLoopNum > 0 && tmpLoopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            WaterThermalTank(HPWH->WaterHeaterTankNum).UseCurrentFlowLock =
+            Tank->UseCurrentFlowLock =
                     DataPlant::PlantLoop(tmpLoopNum).LoopSide(LoopSideNum).FlowLock;
         } else {
-            WaterThermalTank(HPWH->WaterHeaterTankNum).UseCurrentFlowLock = 1;
+            Tank->UseCurrentFlowLock = 1;
         }
         if (present(LoopNum)) {
-            WaterThermalTank(HPWH->WaterHeaterTankNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
+            Tank->InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
         } else {
-            WaterThermalTank(HPWH->WaterHeaterTankNum).InitWaterThermalTank(FirstHVACIteration);
+            Tank->InitWaterThermalTank(FirstHVACIteration);
         }
 
         int InletNodeSav = HPWH->HeatPumpAirInletNode;
@@ -513,9 +512,9 @@ namespace WaterThermalTanks {
             }
         }
 
-        WaterThermalTank(HPWH->WaterHeaterTankNum).CalcHeatPumpWaterHeater(FirstHVACIteration);
-        WaterThermalTank(HPWH->WaterHeaterTankNum).UpdateWaterThermalTank();
-        WaterThermalTank(HPWH->WaterHeaterTankNum).ReportWaterThermalTank();
+        Tank->CalcHeatPumpWaterHeater(FirstHVACIteration);
+        Tank->UpdateWaterThermalTank();
+        Tank->ReportWaterThermalTank();
 
         HPWH->HeatPumpAirInletNode = InletNodeSav;
         HPWH->HeatPumpAirOutletNode = OutletNodeSav;
@@ -627,32 +626,6 @@ namespace WaterThermalTanks {
             }
         }
     }
-
-//    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
-//    {
-//        // Process the input data
-//        if (getWaterThermalTankInputFlag) {
-//            GetWaterThermalTankInput();
-//            getWaterThermalTankInputFlag = false;
-//        }
-//
-//        // Now look for this object in the list
-//        for (auto &HPWtrHtr : HPWaterHeater) {
-//            if (HPWtrHtr.Name == objectName) {
-//                return &HPWtrHtr;
-//            }
-//        }
-//        // If we didn't find it, fatal
-//        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for heat pump water heater named: " + objectName); // LCOV_EXCL_LINE
-//        // Shut up the compiler
-//        return nullptr; // LCOV_EXCL_LINE
-//    }
-//
-//    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
-//                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
-//    {
-//
-//    }
 
     void SimHeatPumpWaterHeater(std::string const &CompName,
                                 bool const FirstHVACIteration,
@@ -2389,7 +2362,7 @@ namespace WaterThermalTanks {
                     ErrorsFound = true;
                 } else {
                     bool IsValid;
-                    ValidatePLFCurve(Tank->PLFCurve, IsValid);
+                    Tank->ValidatePLFCurve(Tank->PLFCurve, IsValid);
 
                     if (!IsValid) {
                         ShowSevereError(
@@ -3435,6 +3408,7 @@ namespace WaterThermalTanks {
             if (Tank->Volume == DataSizing::AutoSize) {
                 Tank->VolumeWasAutoSized = true;
             }
+
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 // Set volume to a really small number to continue simulation
                 Tank->Volume = 0.000001; // = 1 cm3
@@ -5532,7 +5506,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void ValidatePLFCurve(int const CurveIndex, bool &IsValid)
+    void WaterThermalTankData::ValidatePLFCurve(int const CurveIndex, bool &IsValid)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9345,8 +9319,6 @@ namespace WaterThermalTanks {
                         //           (water heaters source inlet node temperature/mdot are set in Init, set it here after DXCoils::CalcHPWHDXCoil has been
                         //           called)
                         this->SourceInletTemp = DataLoopNode::Node(HPWaterInletNode).Temp + CondenserDeltaT;
-                        //				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
-
                         //           this CALL does not update node temps, must use WaterThermalTank variables
                         // select tank type
                         {
@@ -9475,8 +9447,6 @@ namespace WaterThermalTanks {
                     //           move the full load outlet temperature rate to the water heater structure variables
                     //           (water heaters source inlet node temperature/mdot are set in Init, set it here after DXCoils::CalcHPWHDXCoil has been called)
                     this->SourceInletTemp = DataLoopNode::Node(HPWaterInletNode).Temp + CondenserDeltaT;
-                    //				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
-
                     //           this CALL does not update node temps, must use WaterThermalTank variables
                     // select tank type
                     {
@@ -10392,7 +10362,6 @@ namespace WaterThermalTanks {
 
         bool ErrorsFound = false;
 
-        // IF (WaterThermalTank(WaterThermalTankNum)%PlantStructureCheck .AND. ALLOCATED(PlantLoop)) THEN
         if (allocated(DataPlant::PlantLoop) && this->UseSide.loopNum > 0) {
 
             // check plant structure for useful data.

@@ -778,6 +778,7 @@ namespace WaterThermalTanks {
                                     Array1<Real64> const &Par //
         );
 
+        static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
     };
 
     struct WaterHeaterDesuperheaterData
@@ -914,10 +915,6 @@ namespace WaterThermalTanks {
 
     bool GetWaterThermalTankInput();
 
-    // used by: GetWaterThermalTankInput
-    void ValidatePLFCurve(int CurveIndex, bool &IsValid);
-
-    // used by: InternalHeatGains.cc
     void CalcWaterThermalTankZoneGains();
 
     void clear_state();
