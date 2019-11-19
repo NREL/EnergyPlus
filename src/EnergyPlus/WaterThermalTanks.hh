@@ -598,6 +598,8 @@ namespace WaterThermalTanks {
 
         bool myOneTimeInitFlag;
 
+        int callerLoopNum;
+
         // Default Constructor
         WaterThermalTankData()
             : TypeNum(0), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0), VolumeWasAutoSized(false), Mass(0.0),
@@ -631,7 +633,7 @@ namespace WaterThermalTanks {
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
               ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0), FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true),
               MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), AlreadyReported(false), AlreadyRated(false),
-              MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true)
+              MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), callerLoopNum(0)
         {
         }
 
@@ -881,8 +883,7 @@ namespace WaterThermalTanks {
                              Real64 &MaxCap,
                              Real64 &MinCap,
                              Real64 &OptCap,
-                             bool FirstHVACIteration, // TRUE if First iteration of simulation
-                             Optional_int_const LoopNum = _);
+                             bool FirstHVACIteration);
 
     void SimWaterThermalTank_HeatPump(int CompType,
                              std::string const &CompName,
@@ -893,8 +894,7 @@ namespace WaterThermalTanks {
                              Real64 &MaxCap,
                              Real64 &MinCap,
                              Real64 &OptCap,
-                             bool FirstHVACIteration, // TRUE if First iteration of simulation
-                             Optional_int_const LoopNum = _);
+                             bool FirstHVACIteration);
 
     void SimulateWaterHeaterStandAlone(int WaterHeaterNum, bool FirstHVACIteration);
 

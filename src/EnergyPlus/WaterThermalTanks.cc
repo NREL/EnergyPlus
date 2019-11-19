@@ -320,8 +320,7 @@ namespace WaterThermalTanks {
                                        Real64 &MaxCap,
                                        Real64 &MinCap,
                                        Real64 &OptCap,
-                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                                       Optional_int_const LoopNum)
+                                       bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -341,11 +340,11 @@ namespace WaterThermalTanks {
         if (InitLoopEquip) {
             Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
-            if (present(LoopNum)) {
-                if ((Tank->SrcSide.loopNum == LoopNum) || (Tank->UseSide.loopNum == LoopNum)) {
+            if (Tank->callerLoopNum > 0) {
+                if ((Tank->SrcSide.loopNum == Tank->callerLoopNum) || (Tank->UseSide.loopNum == Tank->callerLoopNum)) {
                     Tank->SizeTankForDemandSide();
                     Tank->SizeDemandSidePlantConnections();
-                    Tank->SizeSupplySidePlantConnections(LoopNum);
+                    Tank->SizeSupplySidePlantConnections(Tank->callerLoopNum);
                     Tank->SizeTankForSupplySide();
                 } else {
                     return;
@@ -410,8 +409,7 @@ namespace WaterThermalTanks {
                                       Real64 &MaxCap,
                                       Real64 &MinCap,
                                       Real64 &OptCap,
-                                      bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                                      Optional_int_const LoopNum)
+                                      bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -435,11 +433,11 @@ namespace WaterThermalTanks {
         if (InitLoopEquip) {
             Tank->InitWaterThermalTank(FirstHVACIteration);
             Tank->MinePlantStructForInfo();
-            if (present(LoopNum)) {
-                if ((Tank->SrcSide.loopNum == LoopNum) || (Tank->UseSide.loopNum == LoopNum)) {
+            if (Tank->callerLoopNum > 0) {
+                if ((Tank->SrcSide.loopNum == Tank->callerLoopNum) || (Tank->UseSide.loopNum == Tank->callerLoopNum)) {
                     Tank->SizeTankForDemandSide();
                     Tank->SizeDemandSidePlantConnections();
-                    Tank->SizeSupplySidePlantConnections(LoopNum);
+                    Tank->SizeSupplySidePlantConnections(Tank->callerLoopNum);
                     Tank->SizeTankForSupplySide();
                 } else {
                     return;

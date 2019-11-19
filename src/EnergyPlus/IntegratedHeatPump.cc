@@ -2240,6 +2240,9 @@ namespace IntegratedHeatPump {
             if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
                 (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
 
+                int tankIDX = WaterThermalTanks::getTankIDX(IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
+                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
+
                 WaterThermalTanks::SimWaterThermalTank_WaterTank(tankType,
                         IntegratedHeatPumps(DXCoilNum).WHtankName,
                                     IntegratedHeatPumps(DXCoilNum).WHtankID,
@@ -2249,10 +2252,16 @@ namespace IntegratedHeatPump {
                                     MaxCap,
                                     MinCap,
                                     OptCap,
-                                    true,
-                                    IntegratedHeatPumps(DXCoilNum).LoopNum);
+                                    true);
+
+                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
 
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
+
+                int hpIDX = WaterThermalTanks::getHPTankIDX(IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
+                auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
+                int tankIDX = HPWH.WaterHeaterTankNum;
+                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
 
                 WaterThermalTanks::SimWaterThermalTank_HeatPump(tankType,
                                                                 IntegratedHeatPumps(DXCoilNum).WHtankName,
@@ -2263,8 +2272,9 @@ namespace IntegratedHeatPump {
                                                                 MaxCap,
                                                                 MinCap,
                                                                 OptCap,
-                                                                true,
-                                                                IntegratedHeatPumps(DXCoilNum).LoopNum);
+                                                                true);
+
+                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
 
             }
         }
