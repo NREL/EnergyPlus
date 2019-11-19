@@ -636,7 +636,10 @@ namespace PlantLoopEquip {
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
 
                 int tankIDX = WaterThermalTanks::getTankIDX(sim_component.Name, EquipNum);
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = LoopNum;
+                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                tank.callerLoopNum = LoopNum;
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 SimWaterThermalTank_WaterTank(EquipTypeNum,
                                     sim_component.Name,
@@ -649,7 +652,7 @@ namespace PlantLoopEquip {
                                     OptLoad,
                                     FirstHVACIteration); // DSU
 
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
+                tank.callerLoopNum = 0;
 
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
@@ -781,7 +784,10 @@ namespace PlantLoopEquip {
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
 
                 int tankIDX = WaterThermalTanks::getTankIDX(sim_component.Name, EquipNum);
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = LoopNum;
+                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                tank.callerLoopNum = LoopNum;
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 SimWaterThermalTank_WaterTank(EquipTypeNum,
                                     sim_component.Name,
