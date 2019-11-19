@@ -110,20 +110,38 @@ int getActuatorHandle(const char* uniqueKey, const char* componentType, const ch
 }
 
 double getVariableValue(const int handle) {
+    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
+    // out of range too high.  I'm inclined to just let it fail?  Maybe?
+    // If it is to be checked, just do
+    //    if (handle < 0) {
+    //        return -999;
+    //    }
     return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
 }
 
 double getMeterValue(int handle) {
+    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
+    // out of range too high.  I'm inclined to just let it fail?  Maybe?
+    // If it is to be checked, just do
+    //    if (handle < 0) {
+    //        return -999;
+    //    }
     return EnergyPlus::GetCurrentMeterValue(handle);
 }
 
 void setActuatorValue(const int handle, const double value) {
+    // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
     theActuator.RealValue = value;
     theActuator.Actuated = true;
 }
 
+void resetActuator(int handle) {
+    // resets the actuator so that E+ will use the internally calculated value again
+    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
+    theActuator.Actuated = false;
+}
 
 
 int getPluginGlobalVariableHandle(const char* name) {

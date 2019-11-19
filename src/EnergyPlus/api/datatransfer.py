@@ -46,6 +46,8 @@ class DataExchange:
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_void_p
+        self.api.resetActuator.argtypes = [c_int]
+        self.api.resetActuator.restype = c_void_p
         self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getInternalVariableHandle.restype = c_int
         self.api.getInternalVariableValue.argtypes = [c_int]
@@ -213,6 +215,17 @@ class DataExchange:
         :return: Nothing
         """
         self.api.setActuatorValue(actuator_handle, actuator_value)
+
+    def reset_actuator(self, actuator_handle: int) -> None:
+        """
+        Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator
+        instead of the externally set actuator value.
+        // TODO: Add a call to this in the test
+
+        :param actuator_handle: An integer returned from the `get_actuator_handle` function.
+        :return: Nothing
+        """
+        self.api.resetActuator(actuator_handle)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
