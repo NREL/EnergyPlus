@@ -891,11 +891,18 @@ namespace ZoneAirLoopEquipmentManager {
             //                  SysOutputProvided >0 Zone is heated
             SpecHumOut = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).HumRat;
             SpecHumIn = Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat;
-            Real64 CpAirAvg =
-                PsyCpAirFnWTdb(0.5 * (SpecHumOut + SpecHumOut),
-                               0.5 * (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp + Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp));
-            SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
-                                (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
+            if (AirDistUnit(AirDistUnitNum).EquipType_Num(1) == SingleDuctConstVolNoReheat)
+            SysOutputProvided =
+                Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate *
+                (Psychrometrics::PsyHFnTdbW(Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp, Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat) -
+                    Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp, Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat));
+            else {
+                Real64 CpAirAvg =
+                    PsyCpAirFnWTdb(0.5 * (SpecHumOut + SpecHumOut),
+                        0.5 * (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp + Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp));
+                SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
+                    (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
+            }
             // AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
             // AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
 
