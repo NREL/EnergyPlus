@@ -3341,21 +3341,6 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void getFuelCellGeneratorHeatRecoveryInfo(std::string const &GeneratorName, // user specified name of Generator
-                                              std::string &heatRecoveryCompName)
-    {
-
-        if (getFuelCellInputFlag) {
-            getFuelCellInput();
-            getFuelCellInputFlag = false;
-        }
-
-        int thisFuelCell = UtilityRoutines::FindItemInList(GeneratorName, FuelCell);
-        if (thisFuelCell > 0) {
-            heatRecoveryCompName = FuelCell(thisFuelCell).ExhaustHX.Name;
-        }
-    }
-
     void FigureFuelCellZoneGains()
     {
 

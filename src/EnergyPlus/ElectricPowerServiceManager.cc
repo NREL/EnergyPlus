@@ -2107,8 +2107,12 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(runFlag, tempLoad);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
-        electricPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
-        thermalPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
+        electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
+        electricityProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecEnergyGenerated;
+        thermProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
+        thermalProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->TotalHeatEnergyRec;
+        electricPowerOutput = electProdRate;
+        thermalPowerOutput = thermProdRate;
         break;
     }
     case GeneratorType::combTurbine: {
@@ -2122,8 +2126,12 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         thisCTE->simulate(L, FirstHVACIteration, tempLoad, runFlag);
         dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
         dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
-        electricPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
-        thermalPowerOutput = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->QTotalHeatRecovered;
+        electProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
+        electricityProd = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecEnergyGenerated;
+        thermProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->QTotalHeatRecovered;
+        thermalProd = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->TotalHeatEnergyRec;
+        electricPowerOutput = electProdRate;
+        thermalPowerOutput = thermProdRate;
         break;
     }
     case GeneratorType::pV: {
