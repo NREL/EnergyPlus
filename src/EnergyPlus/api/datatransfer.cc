@@ -133,7 +133,12 @@ void setActuatorValue(const int handle, const double value) {
     // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    theActuator.RealValue = value;
+    if (theActuator.RealValue.associated()) {
+        theActuator.RealValue = value;
+    } else {
+        // try falling back to integer assignment; // TODO: Address this later
+        theActuator.IntValue = value;
+    }
     theActuator.Actuated = true;
 }
 

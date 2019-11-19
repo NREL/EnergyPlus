@@ -11,18 +11,18 @@ class CollectTrendVariable(EnergyPlusPlugin):
 
     def main(self) -> int:
         if not self.handles_set:
-            self.handle_whole_building_demand_power = self.exchange.get_variable_handle(
+            self.handle_whole_building_demand_power = self.api.exchange.get_variable_handle(
                 "Facility Total Electric Demand Power", "Whole Building"
             )
-            self.handle_electric_storage_simple_charge_state = self.exchange.get_variable_handle(
+            self.handle_electric_storage_simple_charge_state = self.api.exchange.get_variable_handle(
                 "Electric Storage Simple Charge State", "Battery"
             )
             self.handles_set = True
-        hour = self.exchange.hour()
-        if hour < 7:
-            self.exchange.set_actuator_value(self.handle, 15)
-        elif hour < 18:
-            self.exchange.set_actuator_value(self.handle, 23)
-        else:
-            self.exchange.set_actuator_value(self.handle, 15)
+        # hour = self.api.exchange.hour()
+        # if hour < 7:
+        #     self.api.exchange.set_actuator_value(self.handle, 15)
+        # elif hour < 18:
+        #     self.api.exchange.set_actuator_value(self.handle, 23)
+        # else:
+        #     self.api.exchange.set_actuator_value(self.handle, 15)
         return 0
