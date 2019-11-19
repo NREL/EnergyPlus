@@ -635,7 +635,8 @@ namespace PlantLoopEquip {
 
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
 
-                SimWaterThermalTank_WaterTank(sim_component.Name,
+                SimWaterThermalTank_WaterTank(EquipTypeNum,
+                                    sim_component.Name,
                                     EquipNum,
                                     RunFlag,
                                     InitLoopEquip,
@@ -645,6 +646,7 @@ namespace PlantLoopEquip {
                                     OptLoad,
                                     FirstHVACIteration,
                                     LoopNum); // DSU
+
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;
@@ -655,7 +657,6 @@ namespace PlantLoopEquip {
                 // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 SimWaterThermalTank_HeatPump(EquipTypeNum,
                                     sim_component.Name,
@@ -668,6 +669,7 @@ namespace PlantLoopEquip {
                                     OptLoad,
                                     FirstHVACIteration,
                                     LoopNum); // DSU
+
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;
@@ -769,7 +771,8 @@ namespace PlantLoopEquip {
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
 
-                SimWaterThermalTank_WaterTank(sim_component.Name,
+                SimWaterThermalTank_WaterTank(EquipTypeNum,
+                                    sim_component.Name,
                                     EquipNum,
                                     RunFlag,
                                     InitLoopEquip,
@@ -779,6 +782,7 @@ namespace PlantLoopEquip {
                                     OptLoad,
                                     FirstHVACIteration,
                                     LoopNum); // DSU
+
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;

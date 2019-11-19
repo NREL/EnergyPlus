@@ -872,7 +872,8 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimWaterThermalTank_WaterTank(std::string const &CompName,
+    void SimWaterThermalTank_WaterTank(int CompType,
+                             std::string const &CompName,
                              int &CompIndex,
                              bool RunFlag, // unused1208
                              bool InitLoopEquip,
@@ -918,6 +919,10 @@ namespace WaterThermalTanks {
     bool GetWaterThermalTankInput();
 
     void CalcWaterThermalTankZoneGains();
+
+    int getTankIDX(std::string const &CompName, int &CompIndex);
+
+    int getHPTankIDX(std::string const &CompName, int &CompIndex);
 
     void clear_state();
 

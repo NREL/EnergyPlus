@@ -2240,7 +2240,8 @@ namespace IntegratedHeatPump {
             if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
                 (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
 
-                WaterThermalTanks::SimWaterThermalTank_WaterTank(IntegratedHeatPumps(DXCoilNum).WHtankName,
+                WaterThermalTanks::SimWaterThermalTank_WaterTank(tankType,
+                        IntegratedHeatPumps(DXCoilNum).WHtankName,
                                     IntegratedHeatPumps(DXCoilNum).WHtankID,
                                     false,
                                     false,
@@ -2250,8 +2251,10 @@ namespace IntegratedHeatPump {
                                     OptCap,
                                     true,
                                     IntegratedHeatPumps(DXCoilNum).LoopNum);
+
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-                WaterThermalTanks::SimWaterThermalTank_HeatPump(IntegratedHeatPumps(DXCoilNum).WHtankType,
+
+                WaterThermalTanks::SimWaterThermalTank_HeatPump(tankType,
                                                                 IntegratedHeatPumps(DXCoilNum).WHtankName,
                                                                 IntegratedHeatPumps(DXCoilNum).WHtankID,
                                                                 false,
@@ -2262,6 +2265,7 @@ namespace IntegratedHeatPump {
                                                                 OptCap,
                                                                 true,
                                                                 IntegratedHeatPumps(DXCoilNum).LoopNum);
+
             }
         }
         IntegratedHeatPumps(DXCoilNum).CheckWHCall = false; // clear checking flag

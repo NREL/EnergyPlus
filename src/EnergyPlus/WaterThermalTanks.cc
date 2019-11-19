@@ -245,23 +245,8 @@ namespace WaterThermalTanks {
 
     }
 
-    void SimWaterThermalTank_WaterTank(std::string const &CompName,
-                                       int &CompIndex,
-                                       bool const EP_UNUSED(RunFlag), // unused1208
-                                       bool const InitLoopEquip,
-                                       Real64 &MyLoad,
-                                       Real64 &MaxCap,
-                                       Real64 &MinCap,
-                                       Real64 &OptCap,
-                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                                       Optional_int_const LoopNum)
+    int getTankIDX(std::string const &CompName, int &CompIndex)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       FSEC, July 2005
-        //       RE-ENGINEERED  na
-
         if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             getWaterThermalTankInputFlag = false;
@@ -289,6 +274,62 @@ namespace WaterThermalTanks {
                 WaterThermalTank(CompNum).CheckWTTEquipName = false;
             }
         }
+
+        return CompNum;
+    }
+
+    int getHPTankIDX(std::string const &CompName, int &CompIndex)
+    {
+        if (getWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput();
+            getWaterThermalTankInputFlag = false;
+        }
+
+        int CompNum;
+
+        if (CompIndex == 0) {
+            CompNum = UtilityRoutines::FindItem(CompName, HPWaterHeater);
+            if (CompNum == 0) {
+                ShowFatalError("SimWaterThermalTank_HeatPump:  Unit not found=" + CompName);
+            }
+            CompIndex = CompNum;
+        } else {
+            CompNum = CompIndex;
+            if (CompNum > numWaterThermalTank || CompNum < 1) {
+                ShowFatalError("SimWaterThermalTank_HeatPump:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
+                               ", Number of Units=" + General::TrimSigDigits(numHeatPumpWaterHeater) + ", Entered Unit name=" + CompName);
+            }
+            if (HPWaterHeater(CompNum).CheckHPWHEquipName) {
+                if (CompName != HPWaterHeater(CompNum).Name) {
+                    ShowFatalError("SimWaterThermalTank_HeatPump: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
+                                   ", stored Unit Name for that index=" + HPWaterHeater(CompNum).Name);
+                }
+                HPWaterHeater(CompNum).CheckHPWHEquipName = false;
+            }
+        }
+
+        return CompNum;
+    }
+
+    void SimWaterThermalTank_WaterTank(int const EP_UNUSED(CompType),
+                                       std::string const &CompName,
+                                       int &CompIndex,
+                                       bool const EP_UNUSED(RunFlag), // unused1208
+                                       bool const InitLoopEquip,
+                                       Real64 &MyLoad,
+                                       Real64 &MaxCap,
+                                       Real64 &MinCap,
+                                       Real64 &OptCap,
+                                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                                       Optional_int_const LoopNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brandon Anderson
+        //       DATE WRITTEN   May 2000
+        //       MODIFIED       FSEC, July 2005
+        //       RE-ENGINEERED  na
+
+        int CompNum = getTankIDX(CompName, CompIndex);
 
         auto Tank = &WaterThermalTank(CompNum);
 
@@ -378,33 +419,7 @@ namespace WaterThermalTanks {
         //       MODIFIED       FSEC, July 2005
         //       RE-ENGINEERED  na
 
-        if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
-            getWaterThermalTankInputFlag = false;
-        }
-
-        int CompNum;
-
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItem(CompName, HPWaterHeater);
-            if (CompNum == 0) {
-                ShowFatalError("SimWaterThermalTank_HeatPump:  Unit not found=" + CompName);
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum > numWaterThermalTank || CompNum < 1) {
-                ShowFatalError("SimWaterThermalTank_HeatPump:  Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                               ", Number of Units=" + General::TrimSigDigits(numHeatPumpWaterHeater) + ", Entered Unit name=" + CompName);
-            }
-            if (HPWaterHeater(CompNum).CheckHPWHEquipName) {
-                if (CompName != HPWaterHeater(CompNum).Name) {
-                    ShowFatalError("SimWaterThermalTank_HeatPump: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + HPWaterHeater(CompNum).Name);
-                }
-                HPWaterHeater(CompNum).CheckHPWHEquipName = false;
-            }
-        }
+        int CompNum = getHPTankIDX(CompName, CompIndex);
 
         auto HPWH = &HPWaterHeater(CompNum);
         auto Tank = &WaterThermalTank(HPWH->WaterHeaterTankNum);
@@ -547,7 +562,8 @@ namespace WaterThermalTanks {
             bool LocalRunFlag = true;
             bool LocalInitLoopEquip = false;
             int TestNum = WaterHeaterNum;
-            SimWaterThermalTank_WaterTank(Tank->Name,
+            SimWaterThermalTank_WaterTank(Tank->TypeNum,
+                                Tank->Name,
                                 TestNum,
                                 LocalRunFlag,
                                 LocalInitLoopEquip,
@@ -595,7 +611,8 @@ namespace WaterThermalTanks {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
                 int TestNum = WaterHeaterNum;
-                SimWaterThermalTank_WaterTank(Tank->Name,
+                SimWaterThermalTank_WaterTank(Tank->TypeNum,
+                                    Tank->Name,
                                     TestNum,
                                     LocalRunFlag,
                                     LocalInitLoopEquip,
@@ -10495,8 +10512,7 @@ namespace WaterThermalTanks {
             } // autosizing needed.
         }     // connected to plant
 
-        if ((this->SourceInletNode > 0) &&
-            (tmpLoopNum == this->SrcSide.loopNum)) {
+        if ((this->SourceInletNode > 0) && (tmpLoopNum == this->SrcSide.loopNum)) {
             if (this->SourceDesignVolFlowRateWasAutoSized) {
                 int PltSizNum = this->SourceSidePlantSizNum;
                 if (PltSizNum > 0) {
