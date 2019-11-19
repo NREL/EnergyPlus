@@ -185,7 +185,6 @@ namespace PlantLoopEquip {
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
-        using WaterThermalTanks::SimWaterThermalTank_WaterTank;
         using WaterThermalTanks::SimWaterThermalTank_HeatPump;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
@@ -639,27 +638,7 @@ namespace PlantLoopEquip {
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = LoopNum;
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-
-                SimWaterThermalTank_WaterTank(EquipTypeNum,
-                                    sim_component.Name,
-                                    EquipNum,
-                                    RunFlag,
-                                    InitLoopEquip,
-                                    CurLoad,
-                                    MaxLoad,
-                                    MinLoad,
-                                    OptLoad,
-                                    FirstHVACIteration); // DSU
-
-                tank.callerLoopNum = 0;
-
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
@@ -787,27 +766,27 @@ namespace PlantLoopEquip {
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = LoopNum;
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                SimWaterThermalTank_WaterTank(EquipTypeNum,
-                                    sim_component.Name,
-                                    EquipNum,
-                                    RunFlag,
-                                    InitLoopEquip,
-                                    CurLoad,
-                                    MaxLoad,
-                                    MinLoad,
-                                    OptLoad,
-                                    FirstHVACIteration); // DSU
+//                SimWaterThermalTank_WaterTank(EquipTypeNum,
+//                                    sim_component.Name,
+//                                    EquipNum,
+//                                    RunFlag,
+//                                    InitLoopEquip,
+//                                    CurLoad,
+//                                    MaxLoad,
+//                                    MinLoad,
+//                                    OptLoad,
+//                                    FirstHVACIteration); // DSU
 
                 WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
 
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+//                if (InitLoopEquip) {
+//                    sim_component.MaxLoad = MaxLoad;
+//                    sim_component.MinLoad = MinLoad;
+//                    sim_component.OptLoad = OptLoad;
+//                    sim_component.CompNum = EquipNum;
+//                }
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Chilled/Ice Thermal Storage Type=" + sim_component.TypeOf);

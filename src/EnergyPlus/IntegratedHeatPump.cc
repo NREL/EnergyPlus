@@ -2244,19 +2244,8 @@ namespace IntegratedHeatPump {
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
 
-//                PlantLocation A(0, 0, 0, 0);
-//                tank.simulate(A, true, MyLoad, true);
-
-                WaterThermalTanks::SimWaterThermalTank_WaterTank(tankType,
-                        IntegratedHeatPumps(DXCoilNum).WHtankName,
-                                    IntegratedHeatPumps(DXCoilNum).WHtankID,
-                                    false,
-                                    false,
-                                    MyLoad,
-                                    MaxCap,
-                                    MinCap,
-                                    OptCap,
-                                    true);
+                PlantLocation A(0, 0, 0, 0);
+                tank.simulate(A, true, MyLoad, true);
 
                 tank.callerLoopNum = 0;
 

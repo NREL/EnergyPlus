@@ -874,17 +874,6 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimWaterThermalTank_WaterTank(int CompType,
-                             std::string const &CompName,
-                             int &CompIndex,
-                             bool RunFlag, // unused1208
-                             bool InitLoopEquip,
-                             Real64 &MyLoad,
-                             Real64 &MaxCap,
-                             Real64 &MinCap,
-                             Real64 &OptCap,
-                             bool FirstHVACIteration);
-
     void SimWaterThermalTank_HeatPump(int CompType,
                              std::string const &CompName,
                              int &CompIndex,

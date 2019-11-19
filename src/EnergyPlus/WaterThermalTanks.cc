@@ -211,14 +211,15 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterThermalTankData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void WaterThermalTankData::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        this->InitWaterThermalTank(true);
         this->MinePlantStructForInfo();
-        if (this->callerLoopNum > 0) {
-            if ((this->SrcSide.loopNum == this->callerLoopNum) || (this->UseSide.loopNum == this->callerLoopNum)) {
+        if (calledFromLocation.loopNum > 0) {
+            if ((this->SrcSide.loopNum == calledFromLocation.loopNum) || (this->UseSide.loopNum == calledFromLocation.loopNum)) {
                 this->SizeTankForDemandSide();
                 this->SizeDemandSidePlantConnections();
-                this->SizeSupplySidePlantConnections(this->callerLoopNum);
+                this->SizeSupplySidePlantConnections(calledFromLocation.loopNum);
                 this->SizeTankForSupplySide();
             } else {
                 return;
@@ -329,8 +330,6 @@ namespace WaterThermalTanks {
             this->myOneTimeInitFlag = false;
         }
 
-        this->InitWaterThermalTank(FirstHVACIteration);
-
         if (this->MyOneTimeFlagWH) {
             this->MyOneTimeFlagWH = false;
         } else {
@@ -359,95 +358,6 @@ namespace WaterThermalTanks {
         }
         this->UpdateWaterThermalTank();
         this->ReportWaterThermalTank();
-    }
-
-    void SimWaterThermalTank_WaterTank(int const EP_UNUSED(CompType),
-                                       std::string const &CompName,
-                                       int &CompIndex,
-                                       bool const EP_UNUSED(RunFlag), // unused1208
-                                       bool const InitLoopEquip,
-                                       Real64 &MyLoad,
-                                       Real64 &MaxCap,
-                                       Real64 &MinCap,
-                                       Real64 &OptCap,
-                                       bool const FirstHVACIteration)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       FSEC, July 2005
-        //       RE-ENGINEERED  na
-
-        int CompNum = getTankIDX(CompName, CompIndex);
-
-        auto Tank = &WaterThermalTank(CompNum);
-
-        if (Tank->myOneTimeInitFlag) {
-            Tank->setupOutputVars();
-            Tank->myOneTimeInitFlag = false;
-        }
-
-        if (InitLoopEquip) {
-            Tank->InitWaterThermalTank(FirstHVACIteration);
-            Tank->MinePlantStructForInfo();
-            if (Tank->callerLoopNum > 0) {
-                if ((Tank->SrcSide.loopNum == Tank->callerLoopNum) || (Tank->UseSide.loopNum == Tank->callerLoopNum)) {
-                    Tank->SizeTankForDemandSide();
-                    Tank->SizeDemandSidePlantConnections();
-                    Tank->SizeSupplySidePlantConnections(Tank->callerLoopNum);
-                    Tank->SizeTankForSupplySide();
-                } else {
-                    return;
-                }
-            } else {
-                Tank->SizeTankForDemandSide();
-                Tank->SizeDemandSidePlantConnections();
-                Tank->SizeSupplySidePlantConnections();
-                Tank->SizeTankForSupplySide();
-            }
-
-            if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (!Tank->IsChilledWaterTank) {
-                    Tank->CalcStandardRatings();
-                } else {
-                    Tank->ReportCWTankInits();
-                }
-            }
-            MinCap = 0.0;
-            MaxCap = Tank->MaxCapacity;
-            OptCap = Tank->MaxCapacity;
-            return;
-        }
-
-        if (Tank->MyOneTimeFlagWH) {
-            Tank->MyOneTimeFlagWH = false;
-        } else {
-            if (Tank->MyTwoTimeFlagWH) {
-                Tank->MinePlantStructForInfo(); // call it again to get control types filled out
-                Tank->MyTwoTimeFlagWH = false;
-            }
-        }
-        Tank->UseSideLoadRequested = std::abs(MyLoad);
-        if (Tank->UseSide.loopNum > 0 && Tank->UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            Tank->UseCurrentFlowLock = DataPlant::PlantLoop(Tank->UseSide.loopNum).LoopSide(Tank->UseSide.loopSideNum).FlowLock;
-        } else {
-            Tank->UseCurrentFlowLock = 1;
-        }
-        Tank->InitWaterThermalTank(FirstHVACIteration);
-        //       Plant connected water heaters may have a desuperheater heating coil attached
-        if (Tank->DesuperheaterNum == 0) {
-            if ((Tank->TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (Tank->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
-                Tank->CalcWaterThermalTankMixed();
-            } else if ((Tank->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
-                       (Tank->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-                Tank->CalcWaterThermalTankStratified();
-            }
-        } else if (Tank->DesuperheaterNum > 0) {
-            Tank->CalcDesuperheaterWaterHeater(FirstHVACIteration);
-        }
-        Tank->UpdateWaterThermalTank();
-        Tank->ReportWaterThermalTank();
-
     }
 
     void SimWaterThermalTank_HeatPump(int const CompType,
@@ -611,23 +521,6 @@ namespace WaterThermalTanks {
             PlantLocation A(0, 0, 0, 0);
             Tank->simulate(A, FirstHVACIteration, MyLoad, localRunFlag);
 
-//            SimWaterThermalTank_WaterTank(Tank->TypeNum,
-//                                Tank->Name,
-//                                TestNum,
-//                                LocalRunFlag,
-//                                LocalInitLoopEquip,
-//                                MyLoad,
-//                                MinCap,
-//                                MaxCap,
-//                                OptCap,
-//                                FirstHVACIteration);
-
-//            if (testNum != WaterHeaterNum) {
-//                ShowFatalError("SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + General::TrimSigDigits(WaterHeaterNum) +
-//                               "] does not match returned WaterHeater Num[" + General::TrimSigDigits(testNum) + "] Name=\"" +
-//                               Tank->Name + "\".");
-//            }
-
             // HPWHs with inlet air from a zone and not connected to a plant loop are simulated through a CALL from ZoneEquipmentManager.
             // HPWHs that are plant connected are always simulated through a CALL from PlantLoopEquipments directly to SimWaterThermalTank.
 
@@ -661,22 +554,6 @@ namespace WaterThermalTanks {
                 bool localRunFlag = true;
                 PlantLocation A(0, 0, 0, 0);
                 Tank->simulate(A, FirstHVACIteration, MyLoad, localRunFlag);
-
-//                SimWaterThermalTank_WaterTank(Tank->TypeNum,
-//                                    Tank->Name,
-//                                    TestNum,
-//                                    LocalRunFlag,
-//                                    LocalInitLoopEquip,
-//                                    MyLoad,
-//                                    MinCap,
-//                                    MaxCap,
-//                                    OptCap,
-//                                    FirstHVACIteration);
-//                if (testNum != WaterHeaterNum) {
-//                    ShowFatalError("SimulateWaterHeaterStandAlone: Input WaterHeater Num [" + General::TrimSigDigits(WaterHeaterNum) +
-//                                   "] does not match returned WaterHeater Num[" + General::TrimSigDigits(testNum) + "] Name=\"" +
-//                                   Tank->Name + "\".");
-//                }
             }
         }
     }
