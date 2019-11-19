@@ -786,6 +786,13 @@ if( BUILD_TESTING )
     add_test(NAME "API.TestDataTransferPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/plugin_tester_tester")
+    file(MAKE_DIRECTORY ${TEST_DIR})
+    configure_file( "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${API_TEST_TARGET_DIR}/plugin_tester.py" )
+    add_test(NAME "API.PluginTesterTester"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${CMAKE_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
   endif()
 
 endif()

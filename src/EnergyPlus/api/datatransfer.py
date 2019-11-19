@@ -247,7 +247,7 @@ class DataExchange:
             variable_key = variable_key.encode('utf-8')
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
-    def get_internal_variable_value(self, variable_handle: int):
+    def get_internal_variable_value(self, variable_handle: int) -> float:
         """
         Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is
         first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this

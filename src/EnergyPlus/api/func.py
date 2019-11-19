@@ -89,13 +89,13 @@ class Refrigerant:
     def saturation_temperature(self, pressure: float) -> float:
         return self.api.refrigerantSaturationTemperature(self.instance, pressure)
 
-    def saturated_enthalpy(self, temperature: float, quality: float):
+    def saturated_enthalpy(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedEnthalpy(self.instance, temperature, quality)
 
-    def saturated_density(self, temperature: float, quality: float):
+    def saturated_density(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedDensity(self.instance, temperature, quality)
 
-    def saturated_specific_heat(self, temperature: float, quality: float):
+    def saturated_specific_heat(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedSpecificHeat(self.instance, temperature, quality)
 
 
@@ -302,7 +302,7 @@ class Functional:
         self.api.registerErrorCallback(cb_ptr)
 
     @staticmethod
-    def clear_callbacks():
+    def clear_callbacks() -> None:
         """
         This function is only used if you are running this script continually making many calls into the E+ library in
         one thread, each with many new and different error handler callbacks, and you need to clean up.
