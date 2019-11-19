@@ -1129,7 +1129,7 @@ namespace UnitarySystems {
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(
                     this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, initUnitarySystemsQActual);
-                this->m_DesignCoolingCapacity = initUnitarySystemsQActual;
+                    this->m_DesignCoolingCapacity = initUnitarySystemsQActual;
 
             } // from IF(UnitarySystem(UnitarySysNum)%CoolingCoilType_Num == Coil_CoolingWater .OR. Coil_CoolingWaterDetailed
             if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -2840,13 +2840,13 @@ namespace UnitarySystems {
                 }
 
                 Real64 loc_m_NoCoolHeatSAFMethod_FracOfAutosizedCoolingSAFlow(-999.0);
-                if (fields.find("no_load_fraction_of_autosized_cooling_supply_air_flow") != fields.end()) { // not required field
-                    loc_m_NoCoolHeatSAFMethod_FracOfAutosizedCoolingSAFlow = fields.at("no_load_fraction_of_autosized_cooling_supply_air_flow");
+                if (fields.find("no_load_fraction_of_autosized_cooling_supply_air_flow_rate") != fields.end()) { // not required field
+                    loc_m_NoCoolHeatSAFMethod_FracOfAutosizedCoolingSAFlow = fields.at("no_load_fraction_of_autosized_cooling_supply_air_flow_rate");
                 }
 
                 Real64 loc_m_NoCoolHeatSAFMethod_FracOfAutosizedHeatingSAFlow(-999.0);
-                if (fields.find("no_load_fraction_of_autosized_heating_supply_air_flow") != fields.end()) { // not required field
-                    loc_m_NoCoolHeatSAFMethod_FracOfAutosizedHeatingSAFlow = fields.at("no_load_fraction_of_autosized_heating_supply_air_flow");
+                if (fields.find("no_load_fraction_of_autosized_heating_supply_air_flow_rate") != fields.end()) { // not required field
+                    loc_m_NoCoolHeatSAFMethod_FracOfAutosizedHeatingSAFlow = fields.at("no_load_fraction_of_autosized_heating_supply_air_flow_rate");
                 }
 
                 Real64 loc_m_NoCoolHeatSAFMethod_FlowPerCoolingCapacity(-999.0);
@@ -14838,9 +14838,14 @@ namespace UnitarySystems {
         } else {
 
             DataLoopNode::Node(AirControlNode).MassFlowRate = airMdot;
-            thisSys.FanPartLoadRatio =
-                max(0.0, ((airMdot - (systemMaxAirFlowRate * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * systemMaxAirFlowRate)));
-
+            if ( lowSpeedRatio != 1.0 ) {
+                // division by zero when lowSpeedRatio == 1.0
+                thisSys.FanPartLoadRatio =
+                    max( 0.0, ((airMdot - (systemMaxAirFlowRate * lowSpeedRatio)) / ((1.0 - lowSpeedRatio) * systemMaxAirFlowRate)) );
+            }
+            else {
+                thisSys.FanPartLoadRatio = 1.0;
+            }
             if (WaterControlNode > 0) {
                 Real64 waterMdot = highWaterMdot * PartLoadRatio;
                 DataLoopNode::Node(WaterControlNode).MassFlowRate = waterMdot;
