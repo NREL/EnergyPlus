@@ -3,12 +3,12 @@ Enhance Outdoor Air Reporting
 
 **Jason Glazer and Mike Witte, GARD Analytics**
 
- - November 13, 2019
+ - November 20, 2019
  
 
 ## Justification for New Feature ##
 
-Currently, users seeking to use EnergyPlus for LEED work needs to document the use of Outdoor Air (OA) in their models. While 
+Currently, users seeking to use EnergyPlus for LEED work need to document the use of Outdoor Air (OA) in their models. While 
 the current Outdoor Air Summary in EnergyPlus provides some information to help these users, it does not provide enough information. 
 Users often find it difficult to compare the OA delivered for proposed vs. baseline simulations, especially with economizers 
 and zone equipment. 
@@ -44,7 +44,7 @@ the issue and provided comments:
 
 - The total minimum OA for the building needs to be compared between the Baseline and Proposed Case models.
 
-- The Controller:OutdoorAir component sizing summary only shows values if the min/mas were autosized. If the user enters a hard value 
+- The Controller:OutdoorAir component sizing summary only shows values if the min/max were autosized. If the user enters a hard value 
 the table is empty. The hard value should be reported as well when not autosized.
 
 - Include design (not including the economizer mode where OA may equal SA) and minimum (to check that area ventilation requirement is 
@@ -217,18 +217,18 @@ will appear as shown below.
 <p>Timestamp: <b>2019-11-13
     07:52:15</b></p>
 
-<b>Parameters Related to Outdoor Air</b><br><br>
+<b>Mechanical Ventilation Parameters by Zone</b><br><br>
 <!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Average Number of Occupants</td>
     <td align="right">Nominal Number of Occupants</td>
     <td align="right">Zone Volume [ft3]</td>
-    <td align="right">Minimum Outdoor Air (ACH)</td>
-    <td align="right">Minimum Outdoor Air (ft3/min)</td>
-    <td align="right">Maximum Outdoor Air (ACH)</td>
-    <td align="right">Maximum Outdoor Air (ft3/min)</td>
-    <td align="right">Time Below Minimum Outside Air [Hours]</td>
+    <td align="right">Zone Area [ft2]</td>
+    <td align="right">Minimum Outdoor Air [ACH]</td>
+    <td align="right">Minimum Outdoor Air [ft3/min]</td>
+    <td align="right">Design Outdoor Air [ACH</td>
+    <td align="right">Design Outdoor Air [ft3/min]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
@@ -297,21 +297,103 @@ will appear as shown below.
     <td align="right">        0.00</td>
   </tr>
 </table>
-<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
+<br><br>
 
 
-<b>Average Outdoor Air During Occupied Hours - Air Changes</b><br><br>
+<b>Total Outdoor Air by Zone</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3]</td>
+    <td align="right">Natural Ventilation [ft3]</td>
+    <td align="right">Total Ventilation [ft3]</td>
+    <td align="right">Minimum Required Ventilation [ft3]</td>
+    <td align="right">Time Below Minimum [Hours]</td>
+    <td align="right">Infiltration [ft3]</td>
+    <td align="right">Total Ventilation and Infiltration [ft3]</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE2-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE4-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
+<br><br>
+
+
+<b>Average Outdoor Air During Occupied Hours by Zone - Air Changes</b><br><br>
 <!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Natural Ventilation [ACH]</td>
+    <td align="right">Total Ventilation [ACH]</td>
+    <td align="right">Minimum Required Ventilation [ACH]</td>
+    <td align="right">Time Below Minimum [Hours]</td>
     <td align="right">Infiltration [ACH]</td>
-    <td align="right">AFN Infiltration [ACH]</td>
-    <td align="right">Simple Ventilation [ACH]</td>
-    <td align="right">Zone HVAC Ventilation [ACH</td>
+    <td align="right">Total Ventilation and Infiltration [ACH]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -325,9 +407,13 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -341,9 +427,13 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -357,22 +447,24 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
 </table>
-<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
 <br><br>
 
-<b>Average Outdoor Air During Occupied Hours - Flow Rates</b><br><br>
+<b>Average Outdoor Air During Occupied Hours by Zone - Flow Rates</b><br><br>
 <!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Natural Ventilation [ft3/min]</td>
+    <td align="right">Total Ventilation [ft3/min]</td>
+    <td align="right">Minimum Required Ventilation [ft3/min]</td>
+    <td align="right">Time Below Minimum Outdoor Air [Hours]</td>
     <td align="right">Infiltration [ft3/min]</td>
-    <td align="right">AFN Infiltration [ft3/min]</td>
-    <td align="right">Simple Ventilation [ft3/min]</td>
-    <td align="right">Zone HVAC Ventilation [ft3/min]/td>
-    <td align="right">Total Outdoor Air Volume [ft3]</td>
-    <td align="right">Total Outdoor Air Volume when Economizer is Off [ft3]</td>
+    <td align="right">Total Ventilation and Infiltration [ft3/min]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
@@ -435,22 +527,24 @@ will appear as shown below.
     <td align="right">        0.00</td>
   </tr>
 </table>
-<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
 <br><br>
 
 
-<b>Minimum Outdoor Air During Occupied Hours - Air Changes</b><br><br>
+<b>Minimum Outdoor Air During Occupied Hours by Zone - Air Changes</b><br><br>
 <!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Natural Ventilation [ACH]</td>
+    <td align="right">Total Ventilation [ACH]</td>
+    <td align="right">Minimum Required Ventilation [ACH]</td>
     <td align="right">Infiltration [ACH]</td>
-    <td align="right">AFN Infiltration [ACH]</td>
-    <td align="right">Simple Ventilation [ACH]</td>
-    <td align="right">Zone HVAC Ventilation[ACH]</td>
+    <td align="right">Total Ventilation and Infiltration [ACH]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -464,9 +558,11 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE3-1</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -480,9 +576,11 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE5-1</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -496,27 +594,26 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
   </tr>
 </table>
-<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
 <br><br>
 
 
-<b>Minimum Outdoor Air During Occupied Hours - Flow Rates</b><br><br>
+<b>Minimum Outdoor Air During Occupied Hours by Zone - Flow Rates</b><br><br>
 <!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Natural Ventilation [ft3/min]</td>
+    <td align="right">Total Ventilation [ft3/min]</td>
+    <td align="right">Minimum Required Ventilation [ft3/min]</td>
     <td align="right">Infiltration [ft3/min]</td>
-    <td align="right">AFN Infiltration [ft3/min]</td>
-    <td align="right">Simple Ventilation [ft3/min]</td>
-    <td align="right">Zone HVAC Ventilation[ft3/min]</td>
-    <td align="right">Total Outdoor Air Volume [ft3]</td>
-    <td align="right">Total Outdoor Air Volume when Economizer is Off [ft3]</td>
+    <td align="right">Total Ventilation and Infiltration [ft3/min]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
-    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -532,11 +629,9 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
-    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE3-1</td>
-    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -552,11 +647,9 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
-    <td align="right">        0.00</td>
   </tr>
   <tr>
     <td align="right">SPACE5-1</td>
-    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
@@ -572,11 +665,120 @@ will appear as shown below.
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
     <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Zone values shown for a single zone without multipliers at standard air density. The Totals row includes zone multipliers.</i>
+<br><br>
+
+<b>Total Outdoor Air by Airloop</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3]</td>
+    <td align="right">Minimum Required Ventilation [ft3]</td>
+    <td align="right">Time Below Minimum [Hours]</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-2</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
     <td align="right">        0.00</td>
   </tr>
 </table>
-<i>Zone values shown for a single zone without multipliers. The Totals row includes zone multipliers.</i>
+<i>Values shown at standard air density. Infiltration and natural ventilation are not included.</i>
 <br><br>
+
+
+<b>Average Outdoor Air During Occupied Hours by Airloop</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Average Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Minimum Required Ventilation [ft3/min]</td>
+    <td align="right">Minimum Required Ventilation [ACH]</td>
+    <td align="right">Time Below Minimum [Hours]</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-2</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Values shown at standard air density. Infiltration and natural ventilation are not included.</i>
+<br><br>
+
+
+<b>Minimum Outdoor Air During Occupied Hours by Airloop</b><br><br>
+<!-- FullName:Outdoor Air Summary_Entire Facility_Minimum Outdoor Air During Occupied Hours-->
+<table border="1" cellpadding="4" cellspacing="0">
+  <tr><td></td>
+    <td align="right">Mechanical Ventilation [ft3/min]</td>
+    <td align="right">Mechanical Ventilation [ACH]</td>
+    <td align="right">Minimum Required Ventilation [ft3/min]</td>
+    <td align="right">Minimum Required Ventilation [ACH]</td>
+    <td align="right">Time Below Minimum [Hours]</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-1</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Loop-2</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+  <tr>
+    <td align="right">Totals</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+    <td align="right">        0.00</td>
+  </tr>
+</table>
+<i>Values shown at standard air density. Infiltration and natural ventilation are not included.</i>
+<br><br>
+
+
 
 ## Testing/Validation/Data Sources ##
 
