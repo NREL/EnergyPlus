@@ -360,6 +360,15 @@ namespace SimulationManager {
 
         ManageBranchInput(); // just gets input and returns.
 
+        // Create a new plugin manager which starts up the Python interpreter
+        // Note this cannot be done if we are running within the library environment, nor would you really to do so
+        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
+        // Note that some setup is deferred until later such as setting up output variables
+        if (!eplusRunningViaAPI) {
+            EnergyPlus::PluginManagement::pluginManager =
+                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+        }
+
         DoingSizing = true;
         ManageSizing();
 
@@ -456,14 +465,13 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // Create a new plugin manager which starts up the Python interpreter
-        // Note this cannot be done if we are running within the library environment, nor would you really to do so
-        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
-        if (!eplusRunningViaAPI) {
-            EnergyPlus::PluginManagement::pluginManager =
-                    std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
-        }
+        // need to think about this...for AfterSystemSizing, and maybe others, main() is called before initialize()
+        // I think I will fatal error in this case because it could prove problematic...
         EnergyPlus::PluginManagement::PluginManager::initAllRegisteredPlugins();
+
+        if (EnergyPlus::PluginManagement::pluginManager) {
+            EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+        }
 
         GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 

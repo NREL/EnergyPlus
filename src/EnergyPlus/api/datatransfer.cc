@@ -71,6 +71,9 @@ int getVariableHandle(const char* type, const char* key) {
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle;
     handle = 0;
+    if (!EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
+        return -2;
+    }
     for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
         handle++;
         if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {

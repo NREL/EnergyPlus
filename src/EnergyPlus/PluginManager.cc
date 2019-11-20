@@ -97,141 +97,7 @@ namespace PluginManagement {
         }
     }
 
-    void clear_state()
-    {
-        callbacks.clear();
-        plugins.clear();
-        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
-    }
-
-    // Python Plugin stuff here
-
-    PluginManager::PluginManager()
-    {
-        // from https://docs.python.org/3/c-api/init.html
-        // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-        Py_InitializeEx(0);
-
-        PyRun_SimpleString("import sys"); // allows us to report sys.path later
-
-        // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
-        // we will then optionally add the current working directory to allow Python to find scripts in the current directory
-        // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
-        // we will then optionally add any additional paths the user specifies on the search paths object
-        std::string programPath = FileSystem::getProgramPath();
-        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
-        std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
-        PluginManager::addToPythonPath(sanitizedDir, false);
-
-        // Read all the additional search paths next
-        std::string const sPaths = "PythonPlugin:SearchPaths";
-        int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
-        if (searchPaths == 0) {
-            // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
-            PluginManager::addToPythonPath(".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
-            PluginManager::addToPythonPath(sanitizedInputFileDir, false);
-        }
-        if (searchPaths > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPaths);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(                                                                             // LCOV_EXCL_LINE
-                    "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                // This is a unique object, so we should have one, but this is fine
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
-                if (workingDirFlagUC == "YES") {
-                    PluginManager::addToPythonPath(".", false);
-                }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
-                if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
-                    PluginManager::addToPythonPath(sanitizedInputFileDir, false);
-                }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
-                }
-            }
-        }
-
-        // Now read all the actual plugins and interpret them
-        std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
-        if (pluginInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPlugins);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(                                                                          // LCOV_EXCL_LINE
-                    "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-                std::string fileName = fields.at("python_module_name");
-                std::string className = fields.at("plugin_class_name");
-                std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
-                std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
-                bool warmup = false;
-                if (sWarmup == "YES") {
-                    warmup = true;
-                }
-                int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
-                auto thisInstance = PluginInstance(fileName, className, thisObjectName, warmup);
-                plugins[iCalledFrom].push_back(thisInstance);
-                //plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
-                int i = 1;
-            }
-        }
-
-        std::string const sGlobals = "PythonPlugin:Variables";
-        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
-        if (globalVarInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sGlobals);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-                if (fields.find("variable_name_1") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
-                }
-                if (fields.find("variable_name_2") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
-                }
-                if (fields.find("variable_name_3") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
-                }
-                if (fields.find("variable_name_4") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
-                }
-                if (fields.find("variable_name_5") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
-                }
-            }
-
-        }
-
+    void PluginManager::setupOutputVariables() {
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
         int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
@@ -442,18 +308,18 @@ namespace PluginManagement {
                         sEndUse = "HeatRecoveryForHeating";
                     } else {
                         ShowSevereError(
-                                "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
-                                groupType);
+                            "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
+                            groupType);
                         ShowFatalError("Python plugin output variable input problem causes program termination");
                     }
 
                     // Additional End Use Types Only Used for EnergyTransfer
                     if ((sResourceType != "EnergyTransfer") &&
                         (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" ||
-                                sEndUse == "Chillers" ||
-                                sEndUse == "Boilers" || sEndUse == "Baseboard" ||
-                                sEndUse == "HeatRecoveryForCooling" ||
-                                sEndUse == "HeatRecoveryForHeating")) {
+                         sEndUse == "Chillers" ||
+                         sEndUse == "Boilers" || sEndUse == "Baseboard" ||
+                         sEndUse == "HeatRecoveryForCooling" ||
+                         sEndUse == "HeatRecoveryForHeating")) {
                         ShowWarningError("Inconsistent resource type input for PythonPlugin:OutputVariable = " + thisObjectName);
                         ShowContinueError("For end use subcategory = " + sEndUse + ", resource type must be EnergyTransfer");
                         ShowContinueError("Resource type is being reset to EnergyTransfer and the simulation continues...");
@@ -493,6 +359,144 @@ namespace PluginManagement {
                 }
             }
         }
+    }
+
+    void clear_state()
+    {
+        callbacks.clear();
+        plugins.clear();
+        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
+    }
+
+    // Python Plugin stuff here
+
+    PluginManager::PluginManager()
+    {
+        // from https://docs.python.org/3/c-api/init.html
+        // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
+        Py_InitializeEx(0);
+
+        PyRun_SimpleString("import sys"); // allows us to report sys.path later
+
+        // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
+        // we will then optionally add the current working directory to allow Python to find scripts in the current directory
+        // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
+        // we will then optionally add any additional paths the user specifies on the search paths object
+        std::string programPath = FileSystem::getProgramPath();
+        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
+        std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
+        PluginManager::addToPythonPath(sanitizedDir, false);
+
+        // Read all the additional search paths next
+        std::string const sPaths = "PythonPlugin:SearchPaths";
+        int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
+        if (searchPaths == 0) {
+            // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
+            PluginManager::addToPythonPath(".", false);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            PluginManager::addToPythonPath(sanitizedInputFileDir, false);
+        }
+        if (searchPaths > 0) {
+            auto const instances = inputProcessor->epJSON.find(sPaths);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(                                                                             // LCOV_EXCL_LINE
+                    "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                // This is a unique object, so we should have one, but this is fine
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
+                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                if (workingDirFlagUC == "YES") {
+                    PluginManager::addToPythonPath(".", false);
+                }
+                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                if (inputFileDirFlagUC == "YES") {
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    PluginManager::addToPythonPath(sanitizedInputFileDir, false);
+                }
+                if (fields.find("search_path_1") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
+                }
+                if (fields.find("search_path_2") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
+                }
+                if (fields.find("search_path_3") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
+                }
+                if (fields.find("search_path_4") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
+                }
+                if (fields.find("search_path_5") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
+                }
+            }
+        }
+
+        // Now read all the actual plugins and interpret them
+        std::string const sPlugins = "PythonPlugin:Instance";
+        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
+        if (pluginInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sPlugins);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(                                                                          // LCOV_EXCL_LINE
+                    "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
+                std::string fileName = fields.at("python_module_name");
+                std::string className = fields.at("plugin_class_name");
+                std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
+                std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
+                bool warmup = false;
+                if (sWarmup == "YES") {
+                    warmup = true;
+                }
+                int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
+                auto thisInstance = PluginInstance(fileName, className, thisObjectName, warmup);
+                plugins[iCalledFrom].push_back(thisInstance);
+                //plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
+                int i = 1;
+            }
+        }
+
+        std::string const sGlobals = "PythonPlugin:Variables";
+        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
+        if (globalVarInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sGlobals);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                if (fields.find("variable_name_1") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
+                }
+                if (fields.find("variable_name_2") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
+                }
+                if (fields.find("variable_name_3") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
+                }
+                if (fields.find("variable_name_4") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
+                }
+                if (fields.find("variable_name_5") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
+                }
+            }
+
+        }
+
+        // setting up output variables deferred until later in the simulation setup process
 
     }
 

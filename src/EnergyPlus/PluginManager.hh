@@ -97,6 +97,7 @@ namespace PluginManagement {
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static int calledFromFromString(std::string const &calledFrom);
         static void initAllRegisteredPlugins();
+        void setupOutputVariables();
         void addGlobalVariable(const std::string& name);
         int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         Real64 getGlobalVariableValue(int handle);

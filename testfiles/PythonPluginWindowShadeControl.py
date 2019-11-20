@@ -28,6 +28,10 @@ class SetShadeControlState(EnergyPlusPlugin):
             self.handle_global_shading_actuator_status = self.api.exchange.get_global_handle(
                 "Zn001_Wall001_Win001_Shading_Deploy_Status"
             )
+            print("*********** %s,%s,%s,%s" % (
+                self.handle_zone_sensible_cooling_rate, self.handle_solar_beam_incident_cosine,
+                self.handle_shading_deploy_status, self.handle_global_shading_actuator_status
+            ))
             self.handles_set = True
         current_incident_angle = self.api.exchange.get_variable_value(self.handle_solar_beam_incident_cosine)
         current_sensible_cool_rate = self.api.exchange.get_variable_value(self.handle_zone_sensible_cooling_rate)
