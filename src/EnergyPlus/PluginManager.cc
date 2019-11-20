@@ -194,7 +194,10 @@ namespace PluginManagement {
                     warmup = true;
                 }
                 int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
-                plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
+                auto thisInstance = PluginInstance(fileName, className, thisObjectName, warmup);
+                plugins[iCalledFrom].push_back(thisInstance);
+                //plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
+                int i = 1;
             }
         }
 
