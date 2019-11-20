@@ -902,21 +902,12 @@ namespace SwimmingPool {
         Real64 TLoopInletTemp = DataLoopNode::Node(Pool(PoolNum).WaterInletNode).Temp; // Inlet water temperature from the plant loop
         Pool(PoolNum).WaterInletTemp = TLoopInletTemp;
 
-        Real64 CondTerms = DataHeatBalSurface::CTFConstInPart(SurfNum) + DataHeatBalance::Construct(ConstrNum).CTFCross(0) * TH11 -
-                    DataHeatBalance::Construct(ConstrNum).CTFInside(0) * TInSurf; // Conduction terms for the "surface" heat balance
-        Real64 ConvTerm = HConvIn * (DataHeatBalFanSys::MAT(ZoneNum) - TInSurf); // Convection term for the "surface" heat balance
-        Real64 PoolMassTerm = Pool(PoolNum).WaterMass * Cp * (TH22 - TInSurf) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour) /
-            DataSurfaces::Surface(SurfNum).Area; // Pool mass * Cp / Time Step. Use TimeStepSys here because this is a calculation for how much heat to add at the system time step
-                                              // and it is not a surface heat balance being done at the zone time step level
-        Real64 MUWTerm = EvapRate * Cp * (Tmuw - TInSurf) / DataSurfaces::Surface(SurfNum).Area; // Makeup water term for the "surface" heat balance
         if (TLoopInletTemp <= TInSurf) {
             CpDeltaTi = 0.0;
         } else {
             CpDeltaTi = 1.0 / (Cp * (TInSurf - TLoopInletTemp));
         }
-        // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
-        // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
-        // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
+
         Real64 MassFlowRate =
             (Pool(PoolNum).WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) * ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > Pool(PoolNum).WaterMassFlowRateMax) {
