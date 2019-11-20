@@ -136,15 +136,15 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D_int modSurfaceToPoolIndex;
-        Array1D<Real64> modQPoolSrcAvg;         // Average source over the time step for a particular radiant surface
-        Array1D<Real64> modHeatTransCoefsAvg;   // Average denominator term over the time step for a particular pool
-        Array1D<Real64> modZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+        Array1D_int SurfaceToPoolIndex;
+        Array1D<Real64> QPoolSrcAvg;         // Average source over the time step for a particular radiant surface
+        Array1D<Real64> HeatTransCoefsAvg;   // Average denominator term over the time step for a particular pool
+        Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
         // Record keeping variables used to calculate QRadSysSrcAvg locally
-        Array1D<Real64> modLastQPoolSrc;         // Need to keep the last value in case we are still iterating
-        Array1D<Real64> modLastHeatTransCoefs;   // Need to keep the last value in case we are still iterating
-        Array1D<Real64> modLastSysTimeElapsed;   // Need to keep the last value in case we are still iterating
-        Array1D<Real64> modLastTimeStepSys;      // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastQPoolSrc;         // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastHeatTransCoefs;   // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastSysTimeElapsed;   // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastTimeStepSys;      // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         SwimmingPoolData()
