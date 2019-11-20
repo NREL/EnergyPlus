@@ -414,6 +414,7 @@ namespace CurveManager {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
+        int NumTableLookup;
         std::string CurrentModuleObject; // for ease in renaming.
         static int MaxTableNums(0);      // Maximum number of numeric input fields in Tables
         //   certain object in the input file
@@ -433,7 +434,7 @@ namespace CurveManager {
         NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
         NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
         NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
-        int NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
+        NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
         NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");                    // cpw22Aug2010
         NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");               // cpw22Aug2010
         NumSigmoid = inputProcessor->getNumObjectsFound("Curve:Sigmoid");                                 // cpw22Aug2010
@@ -2086,27 +2087,18 @@ namespace CurveManager {
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
                         // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
-                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor)*normalizationDivisor*normalizationDivisor;
+                        normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
                     }
                 }
 
                 // Perform Divisor Normalization for methods: NM_DIVISOR_ONLY || NM_AUTO_WITH_DIVISOR
                 PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;
 
-                if (normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMaxPresent) {
+                if ((normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMaxPresent) || (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMaxPresent)){
                     PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
                 }
-                if (normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMinPresent) {
+                if ((normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMinPresent) || (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMinPresent)){
                     PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
-                }
-
-                if (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMaxPresent) {
-                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
-                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
-                }
-                if (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMinPresent) {
-                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
-                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
                 }
             }
         }
