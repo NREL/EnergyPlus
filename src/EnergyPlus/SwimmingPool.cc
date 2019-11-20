@@ -895,8 +895,6 @@ namespace SwimmingPool {
 
         Real64 TH22 =
             DataHeatBalSurface::TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
-        Real64 TH11 = DataHeatBalSurface::TH(1, 1, SurfNum); // outside surface temperature at the current time step
-        int ConstrNum = DataSurfaces::Surface(SurfNum).Construction; // construction number index
         Real64 TInSurf = Pool(PoolNum).CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
         Real64 Tmuw = Pool(PoolNum).CurMakeupWaterTemp; // Inlet makeup water temperature
         Real64 TLoopInletTemp = DataLoopNode::Node(Pool(PoolNum).WaterInletNode).Temp; // Inlet water temperature from the plant loop
@@ -907,7 +905,9 @@ namespace SwimmingPool {
         } else {
             CpDeltaTi = 1.0 / (Cp * (TInSurf - TLoopInletTemp));
         }
-
+        // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
+        // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
+        // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
         Real64 MassFlowRate =
             (Pool(PoolNum).WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) * ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
         if (MassFlowRate > Pool(PoolNum).WaterMassFlowRateMax) {
