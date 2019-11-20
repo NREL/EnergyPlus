@@ -102,8 +102,8 @@ namespace PluginManagement {
         int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         Real64 getGlobalVariableValue(int handle);
         void setGlobalVariableValue(int handle, Real64 value);
-        std::pair<int, int> getLocationOfUserDefinedPlugin(std::string const &programName);
-        void runSingleUserDefinedPlugin(int callingPoint, int index);
+        static std::pair<int, int> getLocationOfUserDefinedPlugin(std::string const &programName);
+        static void runSingleUserDefinedPlugin(int callingPoint, int index);
         std::vector<std::string> globalVariableNames;
         std::vector<Real64> globalVariableValues;
     };
