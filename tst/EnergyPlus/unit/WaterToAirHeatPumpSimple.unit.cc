@@ -264,6 +264,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     EXPECT_NEAR(SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.221888, 0.00001);
 
     PartLoadRatio = 0.5;
+    RuntimeFrac = 0.5;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPCoolingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -273,6 +274,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     SimpleWatertoAirHP(HPNum).WaterCyclingMode = WaterCycling;
     PartLoadRatio = 1.0;
+    RuntimeFrac = 1.0;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPCoolingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -281,6 +283,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     EXPECT_NEAR(SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.221888, 0.00001);
 
     PartLoadRatio = 0.5;
+    RuntimeFrac = 0.5;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPCoolingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -290,6 +293,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     // test reduced flow at coil water inlet node
     PartLoadRatio = 0.25;
+    RuntimeFrac = 0.25;
     Node(SimpleWatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = 3.75;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
@@ -331,6 +335,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
                            FirstHVACIteration);
 
     PartLoadRatio = 1.0;
+    RuntimeFrac = 1.0;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPHeatingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -339,6 +344,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     EXPECT_NEAR(SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.514131, 0.00001);
 
     PartLoadRatio = 0.5;
+    RuntimeFrac = 0.5;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPHeatingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -348,6 +354,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     SimpleWatertoAirHP(HPNum).WaterCyclingMode = WaterCycling;
     PartLoadRatio = 1.0;
+    RuntimeFrac = 1.0;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPHeatingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -356,6 +363,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     EXPECT_NEAR(SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.514131, 0.00001);
 
     PartLoadRatio = 0.5;
+    RuntimeFrac = 0.5;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
     CalcHPHeatingSimple(HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
@@ -365,6 +373,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     // test reduced flow at coil water inlet node
     PartLoadRatio = 0.25;
+    RuntimeFrac = 0.25;
     Node(SimpleWatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = 3.75;
     InitSimpleWatertoAirHP(HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);
