@@ -2254,7 +2254,12 @@ namespace IntegratedHeatPump {
                 int hpIDX = WaterThermalTanks::getHPTankIDX(IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
                 auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
                 int tankIDX = HPWH.WaterHeaterTankNum;
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
+                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
+//                IntegratedHeatPump::IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
+//
+//                PlantLocation A(0, 0, 0, 0);
+//                HPWH.simulate(A, true, MyLoad, true);
 
                 WaterThermalTanks::SimWaterThermalTank_HeatPump(tankType,
                                                                 IntegratedHeatPumps(DXCoilNum).WHtankName,
@@ -2267,7 +2272,7 @@ namespace IntegratedHeatPump {
                                                                 OptCap,
                                                                 true);
 
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
+                tank.callerLoopNum = 0;
 
             }
         }

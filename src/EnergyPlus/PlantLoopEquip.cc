@@ -640,13 +640,18 @@ namespace PlantLoopEquip {
 
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
+                tank.callerLoopNum = 0;
+
                 // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
 
                 int hpIDX = WaterThermalTanks::getHPTankIDX(sim_component.Name, EquipNum);
                 auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
                 int tankIDX = HPWH.WaterHeaterTankNum;
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = LoopNum;
+                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                tank.callerLoopNum = LoopNum;
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 SimWaterThermalTank_HeatPump(EquipTypeNum,
                                              sim_component.Name,
@@ -659,7 +664,7 @@ namespace PlantLoopEquip {
                                              OptLoad,
                                              FirstHVACIteration); // DSU
 
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
+                tank.callerLoopNum = 0;
 
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;

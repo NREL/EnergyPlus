@@ -236,7 +236,7 @@ namespace WaterThermalTanks {
         }
     };
 
-    struct HeatPumpWaterHeaterData
+    struct HeatPumpWaterHeaterData // : PlantComponent
     {
         // Members
         std::string Name;                                   // Name of heat pump water heater
@@ -396,6 +396,16 @@ namespace WaterThermalTanks {
         {
         }
 
+//        static PlantComponent *factory(std::string const &objectName);
+//
+//        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+//
+//        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+//
+//        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+//                                 Real64 &MaxLoad,
+//                                 Real64 &MinLoad,
+//                                 Real64 &OptLoad) override;
     };
 
     struct WaterThermalTankData : PlantComponent

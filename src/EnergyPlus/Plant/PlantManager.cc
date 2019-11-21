@@ -1153,13 +1153,13 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-//                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
+//                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "WaterHeater:HeatPump:WrappedCondenser")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-//                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
+//                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
