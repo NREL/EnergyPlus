@@ -2204,9 +2204,9 @@ namespace IntegratedHeatPump {
         using WaterThermalTanks::GetWaterThermalTankInput;
 
         Real64 MyLoad(0.0);
-        Real64 MaxCap(0.0);
-        Real64 MinCap(0.0);
-        Real64 OptCap(0.0);
+//        Real64 MaxCap(0.0);
+//        Real64 MinCap(0.0);
+//        Real64 OptCap(0.0);
         Real64 WHHeatTimeSav(0.0); // time accumulation for water heating
         Real64 WHHeatVolSave(0.0); // volume accumulation for water heating
 
@@ -2256,21 +2256,21 @@ namespace IntegratedHeatPump {
                 int tankIDX = HPWH.WaterHeaterTankNum;
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
-//                IntegratedHeatPump::IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
-//
-//                PlantLocation A(0, 0, 0, 0);
-//                HPWH.simulate(A, true, MyLoad, true);
+                IntegratedHeatPump::IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
 
-                WaterThermalTanks::SimWaterThermalTank_HeatPump(tankType,
-                                                                IntegratedHeatPumps(DXCoilNum).WHtankName,
-                                                                IntegratedHeatPumps(DXCoilNum).WHtankID,
-                                                                false,
-                                                                false,
-                                                                MyLoad,
-                                                                MaxCap,
-                                                                MinCap,
-                                                                OptCap,
-                                                                true);
+                PlantLocation A(0, 0, 0, 0);
+                HPWH.simulate(A, true, MyLoad, true);
+
+//                WaterThermalTanks::SimWaterThermalTank_HeatPump(tankType,
+//                                                                IntegratedHeatPumps(DXCoilNum).WHtankName,
+//                                                                IntegratedHeatPumps(DXCoilNum).WHtankID,
+//                                                                false,
+//                                                                false,
+//                                                                MyLoad,
+//                                                                MaxCap,
+//                                                                MinCap,
+//                                                                OptCap,
+//                                                                true);
 
                 tank.callerLoopNum = 0;
 

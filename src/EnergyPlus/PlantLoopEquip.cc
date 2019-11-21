@@ -651,27 +651,27 @@ namespace PlantLoopEquip {
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = LoopNum;
 
-//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                SimWaterThermalTank_HeatPump(EquipTypeNum,
-                                             sim_component.Name,
-                                             EquipNum,
-                                             RunFlag,
-                                             InitLoopEquip,
-                                             CurLoad,
-                                             MaxLoad,
-                                             MinLoad,
-                                             OptLoad,
-                                             FirstHVACIteration); // DSU
+//                SimWaterThermalTank_HeatPump(EquipTypeNum,
+//                                             sim_component.Name,
+//                                             EquipNum,
+//                                             RunFlag,
+//                                             InitLoopEquip,
+//                                             CurLoad,
+//                                             MaxLoad,
+//                                             MinLoad,
+//                                             OptLoad,
+//                                             FirstHVACIteration); // DSU
 
                 tank.callerLoopNum = 0;
 
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+//                if (InitLoopEquip) {
+//                    sim_component.MaxLoad = MaxLoad;
+//                    sim_component.MinLoad = MinLoad;
+//                    sim_component.OptLoad = OptLoad;
+//                    sim_component.CompNum = EquipNum;
+//                }
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Water Heater Type=" + sim_component.TypeOf);

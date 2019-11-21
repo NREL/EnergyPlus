@@ -360,122 +360,122 @@ namespace WaterThermalTanks {
         this->ReportWaterThermalTank();
     }
 
-//    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
-//    {
-//        // Process the input data
-//        if (getWaterThermalTankInputFlag) {
-//            GetWaterThermalTankInput();
-//            getWaterThermalTankInputFlag = false;
-//        }
-//
-//        // Now look for this object in the list
-//        for (auto &HPWH : HPWaterHeater) {
-//            if (HPWH.Name == objectName) {
-//                return &HPWH;
-//            }
-//        }
-//        // If we didn't find it, fatal
-//        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-//        // Shut up the compiler
-//        return nullptr; // LCOV_EXCL_LINE
-//    }
-//
-//    void HeatPumpWaterHeaterData::onInitLoopEquip(const PlantLocation &calledFromLocation)
-//    {
-//        auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
-//        Tank.onInitLoopEquip(calledFromLocation);
-//    }
-//
-//    void HeatPumpWaterHeaterData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-//                                                   Real64 &MaxLoad,
-//                                                   Real64 &MinLoad,
-//                                                   Real64 &OptLoad)
-//    {
-//        MinLoad = 0.0;
-//        MaxLoad = this->Capacity;
-//        OptLoad = this->Capacity;
-//    }
-//
-//    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
-//                                           bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
-//    {
-//        // SUBROUTINE INFORMATION:
-//        //       AUTHOR         Brandon Anderson
-//        //       DATE WRITTEN   May 2000
-//        //       MODIFIED       FSEC, July 2005
-//        //       RE-ENGINEERED  na
-//
-//        auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
-//
-//        if (this->myOneTimeInitFlag) {
-//            if (Tank.myOneTimeInitFlag) {
-//                Tank.setupOutputVars();
-//                Tank.myOneTimeInitFlag = false;
-//            }
-//            this->myOneTimeInitFlag = false;
-//        }
-//
-//        if (this->MyOneTimeFlagHP) {
-//            this->MyOneTimeFlagHP = false;
-//        } else {
-//            if (this->MyTwoTimeFlagHP) {
-//                Tank.MinePlantStructForInfo(); // call it again to get control types filled out
-//                this->MyTwoTimeFlagHP = false;
-//            }
-//        }
-//        Tank.UseSideLoadRequested = std::abs(CurLoad);
-//        if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-//            Tank.UseCurrentFlowLock =
-//                    DataPlant::PlantLoop(Tank.UseSide.loopNum).LoopSide(Tank.UseSide.loopSideNum).FlowLock;
-//        } else {
-//            Tank.UseCurrentFlowLock = 1;
-//        }
-//
-//        Tank.InitWaterThermalTank(FirstHVACIteration);
-//
-//        int InletNodeSav = this->HeatPumpAirInletNode;
-//        int OutletNodeSav = this->HeatPumpAirOutletNode;
-//        int DXINletNodeSav = this->DXCoilAirInletNode;
-//        int IHPFanIndexSav = this->FanNum;
-//        std::string IHPFanNameSave = this->FanName;
-//        int IHPFanplaceSav = this->FanPlacement;
-//
-//        if (this->bIsIHP) // pass the tank indexes to the IHP object
-//        {
-//            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(this->DXCoilNum);
-//
-//            if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
-//                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
-//                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
-//                bool bDWHCoilReading = false;
-//                this->HeatPumpAirInletNode =
-//                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-//                                                                          IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
-//                                                                          bDWHCoilReading);
-//                this->HeatPumpAirOutletNode =
-//                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-//                                                                           IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
-//                                                                           bDWHCoilReading);
-//                this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
-//            } else // default is to input outdoor fan to the the this
-//            {
-//                this->FanNum = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanID;
-//                this->FanName = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanName;
-//                this->FanPlacement = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanPlace;
-//            }
-//        }
-//
-//        Tank.CalcHeatPumpWaterHeater(FirstHVACIteration);
-//        Tank.UpdateWaterThermalTank();
-//        Tank.ReportWaterThermalTank();
-//
-//        this->HeatPumpAirInletNode = InletNodeSav;
-//        this->HeatPumpAirOutletNode = OutletNodeSav;
-//        this->DXCoilAirInletNode = DXINletNodeSav;
-//        this->FanNum = IHPFanIndexSav;
-//        this->FanName = IHPFanNameSave;
-//        this->FanPlacement = IHPFanplaceSav;
-//    }
+    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput();
+            getWaterThermalTankInputFlag = false;
+        }
+
+        // Now look for this object in the list
+        for (auto &HPWH : HPWaterHeater) {
+            if (HPWH.Name == objectName) {
+                return &HPWH;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalHeatPumpWaterHeaterFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void HeatPumpWaterHeaterData::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {
+        auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
+        Tank.onInitLoopEquip(calledFromLocation);
+    }
+
+    void HeatPumpWaterHeaterData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                                   Real64 &MaxLoad,
+                                                   Real64 &MinLoad,
+                                                   Real64 &OptLoad)
+    {
+        MinLoad = 0.0;
+        MaxLoad = this->Capacity;
+        OptLoad = this->Capacity;
+    }
+
+    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                           bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brandon Anderson
+        //       DATE WRITTEN   May 2000
+        //       MODIFIED       FSEC, July 2005
+        //       RE-ENGINEERED  na
+
+        auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
+
+        if (this->myOneTimeInitFlag) {
+            if (Tank.myOneTimeInitFlag) {
+                Tank.setupOutputVars();
+                Tank.myOneTimeInitFlag = false;
+            }
+            this->myOneTimeInitFlag = false;
+        }
+
+        if (this->MyOneTimeFlagHP) {
+            this->MyOneTimeFlagHP = false;
+        } else {
+            if (this->MyTwoTimeFlagHP) {
+                Tank.MinePlantStructForInfo(); // call it again to get control types filled out
+                this->MyTwoTimeFlagHP = false;
+            }
+        }
+        Tank.UseSideLoadRequested = std::abs(CurLoad);
+        if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
+            Tank.UseCurrentFlowLock =
+                    DataPlant::PlantLoop(Tank.UseSide.loopNum).LoopSide(Tank.UseSide.loopSideNum).FlowLock;
+        } else {
+            Tank.UseCurrentFlowLock = 1;
+        }
+
+        Tank.InitWaterThermalTank(FirstHVACIteration);
+
+        int InletNodeSav = this->HeatPumpAirInletNode;
+        int OutletNodeSav = this->HeatPumpAirOutletNode;
+        int DXINletNodeSav = this->DXCoilAirInletNode;
+        int IHPFanIndexSav = this->FanNum;
+        std::string IHPFanNameSave = this->FanName;
+        int IHPFanplaceSav = this->FanPlacement;
+
+        if (this->bIsIHP) // pass the tank indexes to the IHP object
+        {
+            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(this->DXCoilNum);
+
+            if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
+                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
+                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
+                bool bDWHCoilReading = false;
+                this->HeatPumpAirInletNode =
+                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                                                                          IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
+                                                                          bDWHCoilReading);
+                this->HeatPumpAirOutletNode =
+                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                                                                           IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
+                                                                           bDWHCoilReading);
+                this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
+            } else // default is to input outdoor fan to the the this
+            {
+                this->FanNum = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanID;
+                this->FanName = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanName;
+                this->FanPlacement = IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).IDFanPlace;
+            }
+        }
+
+        Tank.CalcHeatPumpWaterHeater(FirstHVACIteration);
+        Tank.UpdateWaterThermalTank();
+        Tank.ReportWaterThermalTank();
+
+        this->HeatPumpAirInletNode = InletNodeSav;
+        this->HeatPumpAirOutletNode = OutletNodeSav;
+        this->DXCoilAirInletNode = DXINletNodeSav;
+        this->FanNum = IHPFanIndexSav;
+        this->FanName = IHPFanNameSave;
+        this->FanPlacement = IHPFanplaceSav;
+    }
 
     void SimWaterThermalTank_HeatPump(int const CompType,
                                       std::string const &CompName,
