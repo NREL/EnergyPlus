@@ -71,6 +71,7 @@
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>

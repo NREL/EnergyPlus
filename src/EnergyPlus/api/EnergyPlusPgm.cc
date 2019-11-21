@@ -298,6 +298,10 @@ int initializeEnergyPlus(std::string const & filepath) {
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+        if (DataGlobals::outputEpJSONConversionOnly) {
+            DisplayString("Converted input file format. Exiting.");
+            return EndEnergyPlus();
+        }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus();

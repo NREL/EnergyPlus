@@ -63,6 +63,7 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -247,6 +248,7 @@ void EnergyPlus::clearAllStates()
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
+    CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
