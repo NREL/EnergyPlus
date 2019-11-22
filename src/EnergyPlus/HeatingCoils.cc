@@ -353,8 +353,6 @@ namespace HeatingCoils {
         int ElecCoilNum;
         int FuelCoilNum;
         int DesuperheaterCoilNum;        // Index to desuperheater heating coil
-        int RemainingCoils;              // Index for error checking DO loop for desuperheater coils on remaining heating coil
-        static int SourceIndexNum(0);    // Index to reclaim heating source (condenser) of a specific type
         std::string SourceTypeString;    // character string used in error message for desuperheating coil
         std::string SourceNameString;    // character string used in error message for desuperheating coil
         std::string CurrentModuleObject; // for ease in getting objects

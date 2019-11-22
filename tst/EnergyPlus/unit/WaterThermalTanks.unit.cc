@@ -3108,10 +3108,10 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
     //if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
-    //total available capacity is substrated by used desuperheater reclaim heat
-    EXPECT_EQ(DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower, DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate);
+    //used desuperheater reclaim heat is successfully stored in HeatReclaimDXCoil data struct
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(Tank.DesuperheaterNum), Desuperheater.HeaterRate);
     //Desuperheater heater rate is correctly calculated
-    EXPECT_EQ(Desuperheater.HeaterRate, (DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity + Desuperheater.HeaterRate) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25);
+    EXPECT_EQ(Desuperheater.HeaterRate, (DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25);
 
     //Test the float mode
     Tank.SavedTankTemp = 61.0;
