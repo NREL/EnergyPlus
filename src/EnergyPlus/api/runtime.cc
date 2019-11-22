@@ -93,7 +93,7 @@ void callbackBeginNewEnvironment(std::function<void ()> f) {
 }
 
 void callbackBeginNewEnvironment(void (*f)()) {
-    callbackBeginNewEnvironment(f);
+    callbackBeginNewEnvironment(std::function<void ()>(f));
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f) {
@@ -101,7 +101,7 @@ void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f) {
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(void (*f)()) {
-  callbackAfterNewEnvironmentWarmupComplete(f);
+  callbackAfterNewEnvironmentWarmupComplete(std::function<void ()>(f));
 }
 
 void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f) {
@@ -109,7 +109,7 @@ void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f) {
 }
 
 void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)()) {
-    callbackBeginZoneTimeStepBeforeInitHeatBalance(f);
+    callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()>(f));
 }
 
 void callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()> f) {
@@ -117,7 +117,7 @@ void callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()> f) {
 }
 
 void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)()) {
-    callbackBeginZoneTimeStepAfterInitHeatBalance(f);
+    callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()>(f));
 }
 
 void callbackBeginTimeStepBeforePredictor(std::function<void ()> f) {
@@ -125,7 +125,7 @@ void callbackBeginTimeStepBeforePredictor(std::function<void ()> f) {
 }
 
 void callbackBeginTimeStepBeforePredictor(void (*f)()) {
-    callbackBeginTimeStepBeforePredictor(f);
+    callbackBeginTimeStepBeforePredictor(std::function<void ()>(f));
 }
 
 void callbackAfterPredictorBeforeHVACManagers(std::function<void ()> f) {
@@ -133,7 +133,7 @@ void callbackAfterPredictorBeforeHVACManagers(std::function<void ()> f) {
 }
 
 void callbackAfterPredictorBeforeHVACManagers(void (*f)()) {
-    callbackAfterPredictorBeforeHVACManagers(f);
+    callbackAfterPredictorBeforeHVACManagers(std::function<void ()>(f));
 }
 
 void callbackAfterPredictorAfterHVACManagers(std::function<void ()> f) {
@@ -141,7 +141,7 @@ void callbackAfterPredictorAfterHVACManagers(std::function<void ()> f) {
 }
 
 void callbackAfterPredictorAfterHVACManagers(void (*f)()) {
-    callbackAfterPredictorAfterHVACManagers(f);
+    callbackAfterPredictorAfterHVACManagers(std::function<void ()>(f));
 }
 
 void callbackInsideSystemIterationLoop(std::function<void ()> f) {
@@ -149,7 +149,7 @@ void callbackInsideSystemIterationLoop(std::function<void ()> f) {
 }
 
 void callbackInsideSystemIterationLoop(void (*f)()) {
-    callbackInsideSystemIterationLoop(f);
+    callbackInsideSystemIterationLoop(std::function<void ()>(f));
 }
 
 void callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()> f) {
@@ -157,7 +157,7 @@ void callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()> f) {
 }
 
 void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)()) {
-    callbackEndOfZoneTimeStepBeforeZoneReporting(f);
+    callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()>(f));
 }
 
 void callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()> f) {
@@ -165,7 +165,7 @@ void callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()> f) {
 }
 
 void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)()) {
-    callbackEndOfZoneTimeStepAfterZoneReporting(f);
+    callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()>(f));
 }
 
 void callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()> f) {
@@ -173,7 +173,7 @@ void callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()> f) {
 }
 
 void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)()) {
-    callbackEndOfSystemTimeStepBeforeHVACReporting(f);
+    callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()>(f));
 }
 
 void callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()> f) {
@@ -181,7 +181,7 @@ void callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()> f) {
 }
 
 void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)()) {
-    callbackEndOfSystemTimeStepAfterHVACReporting(f);
+    callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()>(f));
 }
 
 void callbackEndOfZoneSizing(std::function<void ()> f) {
@@ -189,7 +189,7 @@ void callbackEndOfZoneSizing(std::function<void ()> f) {
 }
 
 void callbackEndOfZoneSizing(void (*f)()) {
-    callbackEndOfZoneSizing(f);
+    callbackEndOfZoneSizing(std::function<void ()>(f));
 }
 
 void callbackEndOfSystemSizing(std::function<void ()> f) {
@@ -197,7 +197,7 @@ void callbackEndOfSystemSizing(std::function<void ()> f) {
 }
 
 void callbackEndOfSystemSizing(void (*f)()) {
-    callbackEndOfSystemSizing(f);
+    callbackEndOfSystemSizing(std::function<void ()>(f));
 }
 
 void callbackEndOfAfterComponentGetInput(std::function<void ()> f) {
@@ -205,7 +205,7 @@ void callbackEndOfAfterComponentGetInput(std::function<void ()> f) {
 }
 
 void callbackEndOfAfterComponentGetInput(void (*f)()) {
-    callbackEndOfAfterComponentGetInput(f);
+    callbackEndOfAfterComponentGetInput(std::function<void ()>(f));
 }
 
 void callbackUserDefinedComponentModel(std::function<void ()> f) {
@@ -213,7 +213,7 @@ void callbackUserDefinedComponentModel(std::function<void ()> f) {
 }
 
 void callbackUserDefinedComponentModel(void (*f)()) {
-    callbackUserDefinedComponentModel(f);
+    callbackUserDefinedComponentModel(std::function<void ()>(f));
 }
 
 void callbackUnitarySystemSizing(std::function<void ()> f) {
@@ -221,6 +221,6 @@ void callbackUnitarySystemSizing(std::function<void ()> f) {
 }
 
 void callbackUnitarySystemSizing(void (*f)()) {
-    callbackUnitarySystemSizing(f);
+    callbackUnitarySystemSizing(std::function<void ()>(f));
 }
 
