@@ -59,8 +59,6 @@ namespace EnergyPlus {
 
 namespace SwimmingPool {
 
-    // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables
     extern int NumSwimmingPools;                 // Number of swimming pools
 
     struct SwimmingPoolData
@@ -160,6 +158,25 @@ namespace SwimmingPool {
               MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
+        void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
+        );
+
+        void InitSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        );
+
+        void InitSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        );
+
+        void CalcSwimmingPool();
+
+        void CalcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+                                  int SurfNum,      // Surface index
+                                  Real64 MAT,       // mean air temperature
+                                  Real64 HumRat     // zone air humidity ratio
+        );
+                          
+        void UpdateSwimmingPool();
+        
     };
 
     // Object Data
@@ -172,31 +189,6 @@ namespace SwimmingPool {
     void SimSwimmingPool(bool FirstHVACIteration);
 
     void GetSwimmingPool();
-
-    void InitSwimmingPool(bool FirstHVACIteration, // true during the first HVAC iteration
-                          int PoolNum              // Index of the swimming pool under consideration within the derived types
-    );
-
-    void InitSwimmingPoolPlantLoopIndex(int PoolNum,        // number of the swimming pool
-                                        bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    );
-
-    void InitSwimmingPoolPlantNodeFlow(int PoolNum,             // number of the swimming pool
-                                       bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    );
-    
-    void CalcSwimmingPool(int PoolNum // Index of the swimming pool under consideration within the derived types
-    );
-
-    void CalcSwimmingPoolEvap(Real64 &EvapRate,   // Evaporation rate
-                              int PoolNum,  // Pool index
-                              int SurfNum,  // Surface index
-                              Real64 MAT,   // mean air temperature
-                              Real64 HumRat // zone air humidity ratio
-    );
-
-    void UpdateSwimmingPool(int PoolNum // Index of the swimming pool under consideration within the derived types
-    );
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 

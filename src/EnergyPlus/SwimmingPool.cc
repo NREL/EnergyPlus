@@ -152,11 +152,13 @@ namespace SwimmingPool {
 
         for (int PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
 
-            InitSwimmingPool(FirstHVACIteration, PoolNum);
+            auto &thisPool = Pool(PoolNum);
+            
+            thisPool.InitSwimmingPool(FirstHVACIteration);
 
-            CalcSwimmingPool(PoolNum);
+            thisPool.CalcSwimmingPool();
 
-            UpdateSwimmingPool(PoolNum);
+            thisPool.UpdateSwimmingPool();
         }
 
         if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
@@ -577,8 +579,7 @@ namespace SwimmingPool {
         }
     }
 
-    void InitSwimmingPool(bool const FirstHVACIteration, // true during the first HVAC iteration
-                          int const PoolNum              // Index for the low temperature radiant system under consideration within the derived types
+    void SwimmingPoolData::InitSwimmingPool(bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -594,122 +595,122 @@ namespace SwimmingPool {
         Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).PeopleHeatGainSchedPtr);
-        Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).PeopleSchedPtr);
+        Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(this->PeopleHeatGainSchedPtr);
+        Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(this->PeopleSchedPtr);
 
-        if (Pool(PoolNum).MyOneTimeFlag) {
-            Pool(PoolNum).ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
-            Pool(PoolNum).ZeroSourceSumHATsurf = 0.0;
-            Pool(PoolNum).QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).QPoolSrcAvg = 0.0;
-            Pool(PoolNum).HeatTransCoefsAvg.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).HeatTransCoefsAvg = 0.0;
-            Pool(PoolNum).LastQPoolSrc.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).LastQPoolSrc = 0.0;
-            Pool(PoolNum).LastHeatTransCoefs.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).LastHeatTransCoefs = 0.0;
-            Pool(PoolNum).LastSysTimeElapsed.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).LastSysTimeElapsed = 0.0;
-            Pool(PoolNum).LastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
-            Pool(PoolNum).LastTimeStepSys = 0.0;
+        if (this->MyOneTimeFlag) {
+            this->ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
+            this->ZeroSourceSumHATsurf = 0.0;
+            this->QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
+            this->QPoolSrcAvg = 0.0;
+            this->HeatTransCoefsAvg.allocate(DataSurfaces::TotSurfaces);
+            this->HeatTransCoefsAvg = 0.0;
+            this->LastQPoolSrc.allocate(DataSurfaces::TotSurfaces);
+            this->LastQPoolSrc = 0.0;
+            this->LastHeatTransCoefs.allocate(DataSurfaces::TotSurfaces);
+            this->LastHeatTransCoefs = 0.0;
+            this->LastSysTimeElapsed.allocate(DataSurfaces::TotSurfaces);
+            this->LastSysTimeElapsed = 0.0;
+            this->LastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
+            this->LastTimeStepSys = 0.0;
         }
 
-        InitSwimmingPoolPlantLoopIndex(PoolNum, Pool(PoolNum).MyPlantScanFlagPool);
+        SwimmingPoolData::InitSwimmingPoolPlantLoopIndex(this->MyPlantScanFlagPool);
 
-        if (DataGlobals::BeginEnvrnFlag && Pool(PoolNum).MyEnvrnFlagGeneral) {
-            Pool(PoolNum).ZeroSourceSumHATsurf = 0.0;
-            Pool(PoolNum).QPoolSrcAvg = 0.0;
-            Pool(PoolNum).HeatTransCoefsAvg = 0.0;
-            Pool(PoolNum).LastQPoolSrc = 0.0;
-            Pool(PoolNum).LastHeatTransCoefs = 0.0;
-            Pool(PoolNum).LastSysTimeElapsed = 0.0;
-            Pool(PoolNum).LastTimeStepSys = 0.0;
-            Pool(PoolNum).MyEnvrnFlagGeneral = false;
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
+            this->ZeroSourceSumHATsurf = 0.0;
+            this->QPoolSrcAvg = 0.0;
+            this->HeatTransCoefsAvg = 0.0;
+            this->LastQPoolSrc = 0.0;
+            this->LastHeatTransCoefs = 0.0;
+            this->LastSysTimeElapsed = 0.0;
+            this->LastTimeStepSys = 0.0;
+            this->MyEnvrnFlagGeneral = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) Pool(PoolNum).MyEnvrnFlagGeneral = true;
+        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlagGeneral = true;
 
         if (DataGlobals::BeginEnvrnFlag) {
-            Pool(PoolNum).PoolWaterTemp = 23.0;
-            Pool(PoolNum).HeatPower = 0.0;
-            Pool(PoolNum).HeatEnergy = 0.0;
-            Pool(PoolNum).MiscEquipPower = 0.0;
-            Pool(PoolNum).MiscEquipEnergy = 0.0;
-            Pool(PoolNum).WaterInletTemp = 0.0;
-            Pool(PoolNum).WaterOutletTemp = 0.0;
-            Pool(PoolNum).WaterMassFlowRate = 0.0;
-            Pool(PoolNum).PeopleHeatGain = 0.0;
-            Real64 Density = FluidProperties::GetDensityGlycol("WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName);
-            Pool(PoolNum).WaterMass = DataSurfaces::Surface(Pool(PoolNum).SurfacePtr).Area * Pool(PoolNum).AvgDepth * Density;
-            Pool(PoolNum).WaterMassFlowRateMax = Pool(PoolNum).WaterVolFlowMax * Density;
-            InitSwimmingPoolPlantNodeFlow(PoolNum, Pool(PoolNum).MyPlantScanFlagPool);
+            this->PoolWaterTemp = 23.0;
+            this->HeatPower = 0.0;
+            this->HeatEnergy = 0.0;
+            this->MiscEquipPower = 0.0;
+            this->MiscEquipEnergy = 0.0;
+            this->WaterInletTemp = 0.0;
+            this->WaterOutletTemp = 0.0;
+            this->WaterMassFlowRate = 0.0;
+            this->PeopleHeatGain = 0.0;
+            Real64 Density = FluidProperties::GetDensityGlycol("WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
+            this->WaterMass = DataSurfaces::Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
+            this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
+            InitSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
         }
 
         if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
-            int ZoneNum = Pool(PoolNum).ZonePtr;
-            Pool(PoolNum).ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
-            int SurfNum = Pool(PoolNum).SurfacePtr;
-            Pool(PoolNum).QPoolSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
-            Pool(PoolNum).HeatTransCoefsAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
-            Pool(PoolNum).LastQPoolSrc(SurfNum) = 0.0;      // At the start of a time step, reset to zero so average calculation can begin again
-            Pool(PoolNum).LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-            Pool(PoolNum).LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+            int ZoneNum = this->ZonePtr;
+            this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+            int SurfNum = this->SurfacePtr;
+            this->QPoolSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
+            this->HeatTransCoefsAvg(SurfNum) = 0.0; // Initialize this variable to zero (pool parameters "off")
+            this->LastQPoolSrc(SurfNum) = 0.0;      // At the start of a time step, reset to zero so average calculation can begin again
+            this->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+            this->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
         }
 
         // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
         // radiant systems)
         Real64 mdot = 0.0;
         PlantUtilities::SetComponentFlowRate(mdot,
-                             Pool(PoolNum).WaterInletNode,
-                             Pool(PoolNum).WaterOutletNode,
-                             Pool(PoolNum).HWLoopNum,
-                             Pool(PoolNum).HWLoopSide,
-                             Pool(PoolNum).HWBranchNum,
-                             Pool(PoolNum).HWCompNum);
-        Pool(PoolNum).WaterInletTemp = DataLoopNode::Node(Pool(PoolNum).WaterInletNode).Temp;
+                             this->WaterInletNode,
+                             this->WaterOutletNode,
+                             this->HWLoopNum,
+                             this->HWLoopSide,
+                             this->HWBranchNum,
+                             this->HWCompNum);
+        this->WaterInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
 
         // get the schedule values for different scheduled parameters
-        if (Pool(PoolNum).ActivityFactorSchedPtr > 0) {
-            Pool(PoolNum).CurActivityFactor = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).ActivityFactorSchedPtr);
-            if (Pool(PoolNum).CurActivityFactor < MinActivityFactor) {
-                Pool(PoolNum).CurActivityFactor = MinActivityFactor;
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " Activity Factor Schedule =\"" +
-                                 Pool(PoolNum).ActivityFactorSchedName + " has a negative value.  This is not allowed.");
+        if (this->ActivityFactorSchedPtr > 0) {
+            this->CurActivityFactor = ScheduleManager::GetCurrentScheduleValue(this->ActivityFactorSchedPtr);
+            if (this->CurActivityFactor < MinActivityFactor) {
+                this->CurActivityFactor = MinActivityFactor;
+                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" +
+                                 this->ActivityFactorSchedName + " has a negative value.  This is not allowed.");
                 ShowContinueError("The activity factor has been reset to zero.");
             }
-            if (Pool(PoolNum).CurActivityFactor > MaxActivityFactor) {
-                Pool(PoolNum).CurActivityFactor = 1.0;
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " Activity Factor Schedule =\"" +
-                                 Pool(PoolNum).ActivityFactorSchedName + " has a value larger than 10.  This is not allowed.");
+            if (this->CurActivityFactor > MaxActivityFactor) {
+                this->CurActivityFactor = 1.0;
+                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" +
+                                 this->ActivityFactorSchedName + " has a value larger than 10.  This is not allowed.");
                 ShowContinueError("The activity factor has been reset to unity.");
             }
         } else {
             // default is activity factor of 1.0
-            Pool(PoolNum).CurActivityFactor = 1.0;
+            this->CurActivityFactor = 1.0;
         }
 
-        Pool(PoolNum).CurSetPtTemp = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).SetPtTempSchedPtr);
+        this->CurSetPtTemp = ScheduleManager::GetCurrentScheduleValue(this->SetPtTempSchedPtr);
 
-        if (Pool(PoolNum).MakeupWaterSupplySchedPtr > 0) {
-            Pool(PoolNum).CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).MakeupWaterSupplySchedPtr);
+        if (this->MakeupWaterSupplySchedPtr > 0) {
+            this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(this->MakeupWaterSupplySchedPtr);
         } else {
             // use water main temperaure if no schedule present in input
-            Pool(PoolNum).CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
+            this->CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
         }
 
         // determine the current heat gain from people
-        if (Pool(PoolNum).PeopleHeatGainSchedPtr > 0) {
+        if (this->PeopleHeatGainSchedPtr > 0) {
             if (HeatGainPerPerson < 0.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " Heat Gain Schedule =\"" +
-                                 Pool(PoolNum).PeopleHeatGainSchedName + " has a negative value.  This is not allowed.");
+                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Heat Gain Schedule =\"" +
+                                 this->PeopleHeatGainSchedName + " has a negative value.  This is not allowed.");
                 ShowContinueError("The heat gain per person has been reset to zero.");
                 HeatGainPerPerson = 0.0;
             }
-            if (Pool(PoolNum).PeopleSchedPtr > 0) {
+            if (this->PeopleSchedPtr > 0) {
                 if (PeopleModifier < 0.0) {
-                    ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " People Schedule =\"" +
-                                     Pool(PoolNum).PeopleSchedName + " has a negative value.  This is not allowed.");
+                    ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " People Schedule =\"" +
+                                     this->PeopleSchedName + " has a negative value.  This is not allowed.");
                     ShowContinueError("The number of people has been reset to zero.");
                     PeopleModifier = 0.0;
                 }
@@ -720,25 +721,25 @@ namespace SwimmingPool {
             HeatGainPerPerson = 0.0;
             PeopleModifier = 0.0;
         }
-        Pool(PoolNum).PeopleHeatGain = PeopleModifier * HeatGainPerPerson * Pool(PoolNum).MaxNumOfPeople;
+        this->PeopleHeatGain = PeopleModifier * HeatGainPerPerson * this->MaxNumOfPeople;
 
         // once cover schedule value is established, define the current values of the cover heat transfer factors
-        if (Pool(PoolNum).CoverSchedPtr > 0) {
-            Pool(PoolNum).CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(Pool(PoolNum).CoverSchedPtr);
-            if (Pool(PoolNum).CurCoverSchedVal > 1.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " Cover Schedule =\"" + Pool(PoolNum).CoverSchedName +
+        if (this->CoverSchedPtr > 0) {
+            this->CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(this->CoverSchedPtr);
+            if (this->CurCoverSchedVal > 1.0) {
+                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
                                  " has a value greater than 1.0 (100%).  This is not allowed.");
                 ShowContinueError("The cover has been reset to one or fully covered.");
-                Pool(PoolNum).CurCoverSchedVal = 1.0;
-            } else if (Pool(PoolNum).CurCoverSchedVal < 0.0) {
-                ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool(PoolNum).Name + " Cover Schedule =\"" + Pool(PoolNum).CoverSchedName +
+                this->CurCoverSchedVal = 1.0;
+            } else if (this->CurCoverSchedVal < 0.0) {
+                ShowWarningError(RoutineName + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
                                  " has a negative value.  This is not allowed.");
                 ShowContinueError("The cover has been reset to zero or uncovered.");
-                Pool(PoolNum).CurCoverSchedVal = 0.0;
+                this->CurCoverSchedVal = 0.0;
             }
         } else {
             // default is NO pool cover
-            Pool(PoolNum).CurCoverSchedVal = 0.0;
+            this->CurCoverSchedVal = 0.0;
         }
         // for the current cover factors, a value of 1.0 means that the pool is open (not covered)
         // the user input values determine the amount the pool cover degrades one of the factors
@@ -750,14 +751,13 @@ namespace SwimmingPool {
         // in the surface heat balance is not accounted for elsewhere.  thus, these terms will dump
         // any reduced radiation into the air heat balance as an additional convective gain to avoid
         // any loss of energy in the overall heat balance.
-        Pool(PoolNum).CurCoverEvapFac = 1.0 - (Pool(PoolNum).CurCoverSchedVal * Pool(PoolNum).CoverEvapFactor);
-        Pool(PoolNum).CurCoverConvFac = 1.0 - (Pool(PoolNum).CurCoverSchedVal * Pool(PoolNum).CoverConvFactor);
-        Pool(PoolNum).CurCoverSWRadFac = 1.0 - (Pool(PoolNum).CurCoverSchedVal * Pool(PoolNum).CoverSWRadFactor);
-        Pool(PoolNum).CurCoverLWRadFac = 1.0 - (Pool(PoolNum).CurCoverSchedVal * Pool(PoolNum).CoverLWRadFactor);
+        this->CurCoverEvapFac = 1.0 - (this->CurCoverSchedVal * this->CoverEvapFactor);
+        this->CurCoverConvFac = 1.0 - (this->CurCoverSchedVal * this->CoverConvFactor);
+        this->CurCoverSWRadFac = 1.0 - (this->CurCoverSchedVal * this->CoverSWRadFactor);
+        this->CurCoverLWRadFac = 1.0 - (this->CurCoverSchedVal * this->CoverLWRadFactor);
     }
 
-    void InitSwimmingPoolPlantLoopIndex(int const PoolNum,        // number of the swimming pool
-                                        bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    void SwimmingPoolData::InitSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
         // SUBROUTINE INFORMATION:
@@ -769,18 +769,18 @@ namespace SwimmingPool {
 
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
-            if (Pool(PoolNum).WaterInletNode > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(Pool(PoolNum).Name,
+            if (this->WaterInletNode > 0) {
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                         DataPlant::TypeOf_SwimmingPool_Indoor,
-                                        Pool(PoolNum).HWLoopNum,
-                                        Pool(PoolNum).HWLoopSide,
-                                        Pool(PoolNum).HWBranchNum,
-                                        Pool(PoolNum).HWCompNum,
+                                        this->HWLoopNum,
+                                        this->HWLoopSide,
+                                        this->HWBranchNum,
+                                        this->HWCompNum,
                                         errFlag,
                                         _,
                                         _,
                                         _,
-                                        Pool(PoolNum).WaterInletNode,
+                                        this->WaterInletNode,
                                         _);
                 if (errFlag) {
                     ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
@@ -792,28 +792,26 @@ namespace SwimmingPool {
         }
     }
 
-    void InitSwimmingPoolPlantNodeFlow(int const PoolNum,             // number of the swimming pool
-                                       bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    void SwimmingPoolData::InitSwimmingPoolPlantNodeFlow(bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
         
         if (!MyPlantScanFlagPool) {
-            if (Pool(PoolNum).WaterInletNode > 0) {
+            if (this->WaterInletNode > 0) {
                 PlantUtilities::InitComponentNodes(0.0,
-                                   Pool(PoolNum).WaterMassFlowRateMax,
-                                   Pool(PoolNum).WaterInletNode,
-                                   Pool(PoolNum).WaterOutletNode,
-                                   Pool(PoolNum).HWLoopNum,
-                                   Pool(PoolNum).HWLoopSide,
-                                   Pool(PoolNum).HWBranchNum,
-                                   Pool(PoolNum).HWCompNum);
-                PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
+                                   this->WaterMassFlowRateMax,
+                                   this->WaterInletNode,
+                                   this->WaterOutletNode,
+                                   this->HWLoopNum,
+                                   this->HWLoopSide,
+                                   this->HWBranchNum,
+                                   this->HWCompNum);
+                PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNode, this->WaterVolFlowMax);
             }
         }
     }
     
-    void CalcSwimmingPool(int const PoolNum // number of the swimming pool
-    )
+    void SwimmingPoolData::CalcSwimmingPool()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
@@ -863,42 +861,42 @@ namespace SwimmingPool {
         Real64 CpDeltaTi;             // inverse of specific heat of water times the plant loop temperature difference
 
         // initialize local variables
-        int SurfNum = Pool(PoolNum).SurfacePtr;                // surface number of floor that is the pool
+        int SurfNum = this->SurfacePtr;                // surface number of floor that is the pool
         int ZoneNum = DataSurfaces::Surface(SurfNum).Zone;     // index to zone array
 
         // Convection coefficient calculation
         Real64 HConvIn =
-            0.22 * std::pow(std::abs(Pool(PoolNum).PoolWaterTemp - DataHeatBalFanSys::MAT(ZoneNum)), 1.0 / 3.0) * Pool(PoolNum).CurCoverConvFac; // convection coefficient for pool
-        CalcSwimmingPoolEvap(EvapRate, PoolNum, SurfNum, DataHeatBalFanSys::MAT(ZoneNum), DataHeatBalFanSys::ZoneAirHumRat(ZoneNum));
-        Pool(PoolNum).MakeUpWaterMassFlowRate = EvapRate;
+            0.22 * std::pow(std::abs(this->PoolWaterTemp - DataHeatBalFanSys::MAT(ZoneNum)), 1.0 / 3.0) * this->CurCoverConvFac; // convection coefficient for pool
+        CalcSwimmingPoolEvap(EvapRate, SurfNum, DataHeatBalFanSys::MAT(ZoneNum), DataHeatBalFanSys::ZoneAirHumRat(ZoneNum));
+        this->MakeUpWaterMassFlowRate = EvapRate;
         Real64 EvapEnergyLossPerArea = -EvapRate *
                                 Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum)) /
                                 DataSurfaces::Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
-        Pool(PoolNum).EvapHeatLossRate = EvapEnergyLossPerArea * DataSurfaces::Surface(SurfNum).Area;
+        this->EvapHeatLossRate = EvapEnergyLossPerArea * DataSurfaces::Surface(SurfNum).Area;
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum = (DataHeatBalance::QRadThermInAbs(SurfNum) + DataHeatBalSurface::NetLWRadToSurf(SurfNum) +
                        DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
                  DataHeatBalFanSys::QHWBaseboardSurf(SurfNum) + DataHeatBalFanSys::QSteamBaseboardSurf(SurfNum) +
                  DataHeatBalFanSys::QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface        
-        Real64 LWtotal = Pool(PoolNum).CurCoverLWRadFac * LWsum; // total flux from long-wavelength radiation to surface
+        Real64 LWtotal = this->CurCoverLWRadFac * LWsum; // total flux from long-wavelength radiation to surface
         Real64 SWtotal =
-            Pool(PoolNum).CurCoverSWRadFac * DataHeatBalSurface::QRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
-        Pool(PoolNum).RadConvertToConvect =
-            ((1.0 - Pool(PoolNum).CurCoverLWRadFac) * LWsum) + ((1.0 - Pool(PoolNum).CurCoverSWRadFac) * DataHeatBalSurface::QRadSWInAbs(SurfNum));
+            this->CurCoverSWRadFac * DataHeatBalSurface::QRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
+        this->RadConvertToConvect =
+            ((1.0 - this->CurCoverLWRadFac) * LWsum) + ((1.0 - this->CurCoverSWRadFac) * DataHeatBalSurface::QRadSWInAbs(SurfNum));
 
         // Heat gain from people (assumed to be all convective to pool water)
-        Real64 PeopleGain = Pool(PoolNum).PeopleHeatGain / DataSurfaces::Surface(SurfNum).Area; // heat gain from people in pool (assumed to be all convective)
+        Real64 PeopleGain = this->PeopleHeatGain / DataSurfaces::Surface(SurfNum).Area; // heat gain from people in pool (assumed to be all convective)
 
         // Get an estimate of the pool water specific heat
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", Pool(PoolNum).PoolWaterTemp, Pool(PoolNum).GlycolIndex, RoutineName); // specific heat of pool water
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
         Real64 TH22 =
             DataHeatBalSurface::TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
-        Real64 TInSurf = Pool(PoolNum).CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
-        Real64 Tmuw = Pool(PoolNum).CurMakeupWaterTemp; // Inlet makeup water temperature
-        Real64 TLoopInletTemp = DataLoopNode::Node(Pool(PoolNum).WaterInletNode).Temp; // Inlet water temperature from the plant loop
-        Pool(PoolNum).WaterInletTemp = TLoopInletTemp;
+        Real64 TInSurf = this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
+        Real64 Tmuw = this->CurMakeupWaterTemp; // Inlet makeup water temperature
+        Real64 TLoopInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
+        this->WaterInletTemp = TLoopInletTemp;
 
         if (TLoopInletTemp <= TInSurf) {
             CpDeltaTi = 0.0;
@@ -909,40 +907,39 @@ namespace SwimmingPool {
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
         Real64 MassFlowRate =
-            (Pool(PoolNum).WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) * ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
-        if (MassFlowRate > Pool(PoolNum).WaterMassFlowRateMax) {
-            MassFlowRate = Pool(PoolNum).WaterMassFlowRateMax;
+            (this->WaterMass / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)) * ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
+        if (MassFlowRate > this->WaterMassFlowRateMax) {
+            MassFlowRate = this->WaterMassFlowRateMax;
         } else if (MassFlowRate < 0.0) {
             MassFlowRate = 0.0;
         }
         PlantUtilities::SetComponentFlowRate(MassFlowRate,
-                             Pool(PoolNum).WaterInletNode,
-                             Pool(PoolNum).WaterOutletNode,
-                             Pool(PoolNum).HWLoopNum,
-                             Pool(PoolNum).HWLoopSide,
-                             Pool(PoolNum).HWBranchNum,
-                             Pool(PoolNum).HWCompNum);
-        Pool(PoolNum).WaterMassFlowRate = MassFlowRate;
+                             this->WaterInletNode,
+                             this->WaterOutletNode,
+                             this->HWLoopNum,
+                             this->HWLoopSide,
+                             this->HWBranchNum,
+                             this->HWCompNum);
+        this->WaterMassFlowRate = MassFlowRate;
 
         // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
         DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
             SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * DataHeatBalFanSys::MAT(ZoneNum) +
-            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (Pool(PoolNum).WaterMass * TH22 / DataGlobals::TimeStepZoneSec)) * Cp /
+            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / DataGlobals::TimeStepZoneSec)) * Cp /
                 DataSurfaces::Surface(SurfNum).Area;
         DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-            HConvIn + (EvapRate + MassFlowRate + (Pool(PoolNum).WaterMass / DataGlobals::TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
+            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / DataGlobals::TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
 
         // Finally take care of the latent and convective gains resulting from the pool
-        DataHeatBalFanSys::SumConvPool(ZoneNum) += Pool(PoolNum).RadConvertToConvect;
+        DataHeatBalFanSys::SumConvPool(ZoneNum) += this->RadConvertToConvect;
         DataHeatBalFanSys::SumLatentPool(ZoneNum) +=
             EvapRate * Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum));
     }
 
-    void CalcSwimmingPoolEvap(Real64 &EvapRate,   // evaporation rate of pool
-                              int const PoolNum,  // pool index
-                              int const SurfNum,  // surface index
-                              Real64 const MAT,   // mean air temperature
-                              Real64 const HumRat // zone air humidity ratio
+    void SwimmingPoolData::CalcSwimmingPoolEvap(Real64 &EvapRate,   // evaporation rate of pool
+                                                int const SurfNum,  // surface index
+                                                Real64 const MAT,   // mean air temperature
+                                                Real64 const HumRat // zone air humidity ratio
     )
     {
         static std::string const RoutineName("CalcSwimmingPoolEvap");
@@ -953,19 +950,18 @@ namespace SwimmingPool {
         // So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
         // Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
 
-        Real64 PSatPool = Psychrometrics::PsyPsatFnTemp(Pool(PoolNum).PoolWaterTemp, RoutineName);
+        Real64 PSatPool = Psychrometrics::PsyPsatFnTemp(this->PoolWaterTemp, RoutineName);
         Real64 PParAir = Psychrometrics::PsyPsatFnTemp(MAT, RoutineName) * Psychrometrics::PsyRhFnTdbWPb(MAT, HumRat, DataEnvironment::OutBaroPress);
         if (PSatPool < PParAir) PSatPool = PParAir;
-        Pool(PoolNum).SatPressPoolWaterTemp = PSatPool;
-        Pool(PoolNum).PartPressZoneAirTemp = PParAir;
+        this->SatPressPoolWaterTemp = PSatPool;
+        this->PartPressZoneAirTemp = PParAir;
         EvapRate =
-            (0.1 * (DataSurfaces::Surface(SurfNum).Area / DataConversions::CFA) * Pool(PoolNum).CurActivityFactor * ((PSatPool - PParAir) * CFinHg)) *
+            (0.1 * (DataSurfaces::Surface(SurfNum).Area / DataConversions::CFA) * this->CurActivityFactor * ((PSatPool - PParAir) * CFinHg)) *
             DataConversions::CFMF *
-                   Pool(PoolNum).CurCoverEvapFac;
+                   this->CurCoverEvapFac;
     }
 
-    void UpdateSwimmingPool(int const PoolNum // number of the swimming pool
-    )
+    void SwimmingPoolData::UpdateSwimmingPool()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
@@ -977,33 +973,33 @@ namespace SwimmingPool {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateSwimmingPool");
 
-        int SurfNum = Pool(PoolNum).SurfacePtr; // surface number/pointer
+        int SurfNum = this->SurfacePtr; // surface number/pointer
 
-        if (Pool(PoolNum).LastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
+        if (this->LastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
-            Pool(PoolNum).QPoolSrcAvg(SurfNum) -=
-                Pool(PoolNum).LastQPoolSrc(SurfNum) * Pool(PoolNum).LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
-            Pool(PoolNum).HeatTransCoefsAvg(SurfNum) -=
-                Pool(PoolNum).LastHeatTransCoefs(SurfNum) * Pool(PoolNum).LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
+            this->QPoolSrcAvg(SurfNum) -=
+                this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
+            this->HeatTransCoefsAvg(SurfNum) -=
+                this->LastHeatTransCoefs(SurfNum) * this->LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        Pool(PoolNum).QPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
-        Pool(PoolNum).HeatTransCoefsAvg(SurfNum) +=
+        this->QPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
+        this->HeatTransCoefsAvg(SurfNum) +=
             DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
 
-        Pool(PoolNum).LastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
-        Pool(PoolNum).LastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
-        Pool(PoolNum).LastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
-        Pool(PoolNum).LastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
+        this->LastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
+        this->LastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
+        this->LastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
+        this->LastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
 
-        int WaterInletNode = Pool(PoolNum).WaterInletNode; // inlet node number
-        int WaterOutletNode = Pool(PoolNum).WaterOutletNode; // outlet node number
+        int WaterInletNode = this->WaterInletNode; // inlet node number
+        int WaterOutletNode = this->WaterOutletNode; // outlet node number
         PlantUtilities::SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
 
         Real64 WaterMassFlow = DataLoopNode::Node(WaterInletNode).MassFlowRate; // water mass flow rate
-        if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = Pool(PoolNum).PoolWaterTemp;
+        if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = this->PoolWaterTemp;
     }
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
