@@ -60,7 +60,9 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-class FuelCellGenFixture : public EnergyPlusFixture {};
+class FuelCellGenFixture : public EnergyPlusFixture
+{
+};
 
 TEST_F(FuelCellGenFixture, FuelCellTest_LowInletEnthalySover1)
 {
