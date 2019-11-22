@@ -442,6 +442,9 @@ namespace WaterThermalTanks {
 
         if (this->bIsIHP) // pass the tank indexes to the IHP object
         {
+            IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankType = this->TypeNum;
+            IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankName = this->Name;
+            IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankID = this->WaterHeaterTankNum;
             IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(this->DXCoilNum);
 
             if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
@@ -477,130 +480,6 @@ namespace WaterThermalTanks {
         this->FanPlacement = IHPFanplaceSav;
     }
 
-    void SimWaterThermalTank_HeatPump(int const CompType,
-                                      std::string const &CompName,
-                                      int &CompIndex,
-                                      bool const EP_UNUSED(RunFlag), // unused1208
-                                      bool const InitLoopEquip,
-                                      Real64 &MyLoad,
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap,
-                                      bool const FirstHVACIteration)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson
-        //       DATE WRITTEN   May 2000
-        //       MODIFIED       FSEC, July 2005
-        //       RE-ENGINEERED  na
-
-        int CompNum = getHPTankIDX(CompName, CompIndex);
-
-        auto &HPWH = HPWaterHeater(CompNum);
-        auto &Tank = WaterThermalTank(HPWH.WaterHeaterTankNum);
-
-        if (HPWH.myOneTimeInitFlag) {
-            if (Tank.myOneTimeInitFlag) {
-                Tank.setupOutputVars();
-                Tank.myOneTimeInitFlag = false;
-            }
-            HPWH.myOneTimeInitFlag = false;
-        }
-
-        if (InitLoopEquip) {
-            Tank.InitWaterThermalTank(FirstHVACIteration);
-            Tank.MinePlantStructForInfo();
-            if (Tank.callerLoopNum > 0) {
-                if ((Tank.SrcSide.loopNum == Tank.callerLoopNum) || (Tank.UseSide.loopNum == Tank.callerLoopNum)) {
-                    Tank.SizeTankForDemandSide();
-                    Tank.SizeDemandSidePlantConnections();
-                    Tank.SizeSupplySidePlantConnections(Tank.callerLoopNum);
-                    Tank.SizeTankForSupplySide();
-                } else {
-                    return;
-                }
-            } else {
-                Tank.SizeTankForDemandSide();
-                Tank.SizeDemandSidePlantConnections();
-                Tank.SizeSupplySidePlantConnections();
-                Tank.SizeTankForSupplySide();
-            }
-
-            if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                Tank.CalcStandardRatings();
-                DataSizing::DataNonZoneNonAirloopValue = 0.0;
-            }
-            MinCap = 0.0;
-            MaxCap = HPWH.Capacity;
-            OptCap = HPWH.Capacity;
-            return;
-        }
-
-        if (HPWH.MyOneTimeFlagHP) {
-            HPWH.MyOneTimeFlagHP = false;
-        } else {
-            if (HPWH.MyTwoTimeFlagHP) {
-                Tank.MinePlantStructForInfo(); // call it again to get control types filled out
-                HPWH.MyTwoTimeFlagHP = false;
-            }
-        }
-        Tank.UseSideLoadRequested = std::abs(MyLoad);
-        if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum > 0 && !DataGlobals::KickOffSimulation) {
-            Tank.UseCurrentFlowLock =
-                    DataPlant::PlantLoop(Tank.UseSide.loopNum).LoopSide(Tank.UseSide.loopSideNum).FlowLock;
-        } else {
-            Tank.UseCurrentFlowLock = 1;
-        }
-
-        Tank.InitWaterThermalTank(FirstHVACIteration);
-
-        int InletNodeSav = HPWH.HeatPumpAirInletNode;
-        int OutletNodeSav = HPWH.HeatPumpAirOutletNode;
-        int DXINletNodeSav = HPWH.DXCoilAirInletNode;
-        int IHPFanIndexSav = HPWH.FanNum;
-        std::string IHPFanNameSave = HPWH.FanName;
-        int IHPFanplaceSav = HPWH.FanPlacement;
-
-        if (HPWH.bIsIHP) // pass the tank indexes to the IHP object
-        {
-            IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).WHtankType = CompType;
-            IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).WHtankName = CompName;
-            IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).WHtankID = CompIndex;
-            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(HPWH.DXCoilNum);
-
-            if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
-                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
-                (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
-                bool bDWHCoilReading = false;
-                HPWH.HeatPumpAirInletNode =
-                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-                                                                          IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).DWHCoilName,
-                                                                          bDWHCoilReading);
-                HPWH.HeatPumpAirOutletNode =
-                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-                                                                           IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).DWHCoilName,
-                                                                           bDWHCoilReading);
-                HPWH.DXCoilAirInletNode = HPWH.HeatPumpAirInletNode;
-            } else // default is to input outdoor fan to the the HPWH
-            {
-                HPWH.FanNum = IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).IDFanID;
-                HPWH.FanName = IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).IDFanName;
-                HPWH.FanPlacement = IntegratedHeatPump::IntegratedHeatPumps(HPWH.DXCoilNum).IDFanPlace;
-            }
-        }
-
-        Tank.CalcHeatPumpWaterHeater(FirstHVACIteration);
-        Tank.UpdateWaterThermalTank();
-        Tank.ReportWaterThermalTank();
-
-        HPWH.HeatPumpAirInletNode = InletNodeSav;
-        HPWH.HeatPumpAirOutletNode = OutletNodeSav;
-        HPWH.DXCoilAirInletNode = DXINletNodeSav;
-        HPWH.FanNum = IHPFanIndexSav;
-        HPWH.FanName = IHPFanNameSave;
-        HPWH.FanPlacement = IHPFanplaceSav;
-    }
-
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
     {
 
@@ -620,11 +499,7 @@ namespace WaterThermalTanks {
         // called from NonZoneEquipmentManager.
 
         Real64 MyLoad;
-        Real64 MinCap;
-        Real64 MaxCap;
-        Real64 OptCap;
 
-        // FLOW:
         if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             getWaterThermalTankInputFlag = false;
@@ -645,26 +520,15 @@ namespace WaterThermalTanks {
         } else if (Tank.HeatPumpNum > 0) {
             //   Only HPWHs with inlet air from outdoors or scheduled HPWHs (not connected to a plant loop) are simulated here.
 
-            auto HPWaterHtr = &HPWaterHeater(Tank.HeatPumpNum);
+            auto &HPWaterHtr = HPWaterHeater(Tank.HeatPumpNum);
 
-            if (HPWaterHtr->StandAlone &&
-                (HPWaterHtr->InletAirConfiguration == AmbientTempEnum::OutsideAir ||
-                 HPWaterHtr->InletAirConfiguration == AmbientTempEnum::Schedule)) {
+            if (HPWaterHtr.StandAlone &&
+                (HPWaterHtr.InletAirConfiguration == AmbientTempEnum::OutsideAir ||
+                 HPWaterHtr.InletAirConfiguration == AmbientTempEnum::Schedule)) {
                 bool LocalRunFlag = true;
-                bool LocalInitLoopEquip = false;
-//                PlantLocation A(0, 0, 0, 0);
-//                HPWaterHtr->simulate(A, FirstHVACIteration, MyLoad, localRunFlag);
+                PlantLocation A(0, 0, 0, 0);
+                HPWaterHtr.simulate(A, FirstHVACIteration, MyLoad, LocalRunFlag);
 
-                SimWaterThermalTank_HeatPump(HPWaterHtr->TypeNum,
-                                    HPWaterHtr->Name,
-                                    Tank.HeatPumpNum,
-                                    LocalRunFlag,
-                                    LocalInitLoopEquip,
-                                    MyLoad,
-                                    MinCap,
-                                    MaxCap,
-                                    OptCap,
-                                    FirstHVACIteration);
             }
 
             // Only simulate stand-alone water heaters with desuperheater water heating coils here.  Plant connected water heaters
@@ -729,21 +593,11 @@ namespace WaterThermalTanks {
         // For HPWHs, StandAlone means not connected to a plant loop (use nodes are not used, source nodes are connected to a HPWH)
         if (HPWaterHeater(HeatPumpNum).StandAlone) {
             bool LocalRunFlag = true;
-            bool LocalInitLoopEquip = false;
             Real64 MyLoad;
-            Real64 MinCap;
-            Real64 MaxCap;
-            Real64 OptCap;
-            SimWaterThermalTank_HeatPump(HPWaterHeater(HeatPumpNum).TypeNum,
-                                HPWaterHeater(HeatPumpNum).Name,
-                                HeatPumpNum,
-                                LocalRunFlag,
-                                LocalInitLoopEquip,
-                                MyLoad,
-                                MinCap,
-                                MaxCap,
-                                OptCap,
-                                FirstHVACIteration);
+
+            PlantLocation A(0, 0, 0, 0);
+            HPWaterHeater(HeatPumpNum).simulate(A, FirstHVACIteration, MyLoad, LocalRunFlag);
+
             SensLoadMet = HPWaterHeater(HeatPumpNum).HPWaterHeaterSensibleCapacity;
             LatLoadMet = HPWaterHeater(HeatPumpNum).HPWaterHeaterLatentCapacity;
         } else {

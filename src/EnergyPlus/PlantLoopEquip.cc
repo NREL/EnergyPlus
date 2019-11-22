@@ -185,7 +185,6 @@ namespace PlantLoopEquip {
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
-        using WaterThermalTanks::SimWaterThermalTank_HeatPump;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
@@ -634,19 +633,15 @@ namespace PlantLoopEquip {
 
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
 
-                int tankIDX = WaterThermalTanks::getTankIDX(sim_component.Name, EquipNum);
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
-                tank.callerLoopNum = LoopNum;
+                dynamic_cast<WaterThermalTanks::WaterThermalTankData*> (sim_component.compPtr)->callerLoopNum = LoopNum;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-                tank.callerLoopNum = 0;
+                dynamic_cast<WaterThermalTanks::WaterThermalTankData*> (sim_component.compPtr)->callerLoopNum = 0;
 
                 // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
 
-                int hpIDX = WaterThermalTanks::getHPTankIDX(sim_component.Name, EquipNum);
-                auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
-                int tankIDX = HPWH.WaterHeaterTankNum;
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                int tankIdx = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (sim_component.compPtr)->WaterHeaterTankNum;
+                auto &tank = WaterThermalTanks::WaterThermalTank(tankIdx);
                 tank.callerLoopNum = LoopNum;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
                 tank.callerLoopNum = 0;
