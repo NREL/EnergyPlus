@@ -1298,6 +1298,36 @@ namespace WaterThermalTanks {
                                   cAlphaArgs(6),
                                   cAlphaArgs(5));
 
+                    if((UtilityRoutines::SameString(cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
+                               (UtilityRoutines::SameString(cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
+                               (UtilityRoutines::SameString(cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))){
+                        if (lNumericFieldBlanks(2)) {
+                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
+                        } else {
+                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = rNumericArgs(2);
+                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
+                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.9) {
+                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                                cNumericFieldNames(2) + " must be > 0.0 and <= 0.9, " + cNumericFieldNames(2) + " = " +
+                                                TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                    } else {
+                        if (lNumericFieldBlanks(2)) {
+                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.25;
+                        } else {
+                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = rNumericArgs(2);
+                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
+                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.3) {
+                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
+                                                cNumericFieldNames(2) + " must be > 0.0 and <= 0.3, " + cNumericFieldNames(2) + " = " +
+                                                TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
+
                     //       Find the Refrigeration equipment index associated with the desuperheater heating coil.
                     errFlag = false;
                     WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = cAlphaArgs(9);
@@ -1307,7 +1337,21 @@ namespace WaterThermalTanks {
                         for (RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum) {
                             if (!UtilityRoutines::SameString(HeatReclaimRefrigeratedRack(RackNum).Name, cAlphaArgs(10))) continue;
                             WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = RackNum;
-                            if (allocated(HeatReclaimRefrigeratedRack)) ValidSourceType(DesuperheaterNum) = true;
+                            if (allocated(HeatReclaimRefrigeratedRack)){
+                                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimRefrigeratedRack(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                                if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
+                                    HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
+                                    for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                                }
+                                ValidSourceType(DesuperheaterNum) = true;
+                                HeatReclaim.ReclaimEfficiencyTotal += WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                                if (HeatReclaim.ReclaimEfficiencyTotal > 0.3){
+                                    ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": "
+                                                    " sum of heat reclaim recovery efficiencies from the same source coil: \"" + 
+                                                    WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName + "\" cannot be over 0.3");
+                                    ErrorsFound = true;
+                                }
+                            }
                             break;
                         }
                     } else if ((UtilityRoutines::SameString(cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
@@ -1315,37 +1359,88 @@ namespace WaterThermalTanks {
                                (UtilityRoutines::SameString(cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CONDENSER_REFRIGERATION;
                         for (CondNum = 1; CondNum <= NumRefrigCondensers; ++CondNum) {
-                            if (!UtilityRoutines::SameString(HeatReclaimRefrigCondenser(CondNum).Name, cAlphaArgs(10))) continue;
-                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
-                            if (allocated(HeatReclaimRefrigCondenser)) ValidSourceType(DesuperheaterNum) = true;
-                            break;
+                           if (!UtilityRoutines::SameString(HeatReclaimRefrigCondenser(CondNum).Name, cAlphaArgs(10))) continue;
+                           WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
+                           if (allocated(HeatReclaimRefrigCondenser)) {
+                               DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimRefrigCondenser(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                               if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
+                                   HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
+                                   for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                               }
+                               ValidSourceType(DesuperheaterNum) = true;
+                               HeatReclaim.ReclaimEfficiencyTotal += WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                               if (HeatReclaim.ReclaimEfficiencyTotal > 0.9){
+                                   ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": "
+                                                   " sum of heat reclaim recovery efficiencies from the same source coil: \"" + 
+                                                   WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName + "\" cannot be over 0.9");
+                                   ErrorsFound = true;
+                               }
+                           }
+                           break;
                         }
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_COOLING;
+                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")
+                        || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed")
+                        || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")
+                        || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+
+                        if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
+                            WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_COOLING;
+                        }else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")){ 
+                           WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTIMODE;
+                        }else{
+                           WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTISPEED;
+                        }
                         GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
-                        if (allocated(HeatReclaimDXCoil)) ValidSourceType(DesuperheaterNum) = true;
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTISPEED;
-                        GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
-                        if (allocated(HeatReclaimDXCoil)) ValidSourceType(DesuperheaterNum) = true;
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTIMODE;
-                        GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
-                        if (allocated(HeatReclaimDXCoil)) ValidSourceType(DesuperheaterNum) = true;
+                        if (allocated(HeatReclaimDXCoil)) {
+                           DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimDXCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                           if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
+                               HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
+                               for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                           }
+                           ValidSourceType(DesuperheaterNum) = true;
+                           HeatReclaim.ReclaimEfficiencyTotal += WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                           if (HeatReclaim.ReclaimEfficiencyTotal > 0.3){
+                               ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": "
+                                               " sum of heat reclaim recovery efficiencies from the same source coil: \"" + 
+                                               WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName + "\" cannot be over 0.3");
+                               ErrorsFound = true;
+                           }
+                        }
                     } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(cAlphaArgs(9), cAlphaArgs(10), errFlag);
-                        if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) ValidSourceType(DesuperheaterNum) = true;
+                        if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) {
+                            DataHeatBalance::HeatReclaimDataBase &HeatReclaim = DataHeatBalance::HeatReclaimVS_DXCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                            if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
+                                HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
+                                for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                            }
+                            ValidSourceType(DesuperheaterNum) = true;
+                            HeatReclaim.ReclaimEfficiencyTotal += WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                            if (HeatReclaim.ReclaimEfficiencyTotal > 0.3){
+                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": "
+                                                " sum of heat reclaim recovery efficiencies from the same source coil: \"" + 
+                                                WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName + "\" cannot be over 0.3");
+                                ErrorsFound = true;
+                            }
+                        }
                     } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_AIR_WATER_HEATPUMP_EQ;
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(cAlphaArgs(9), cAlphaArgs(10), errFlag);
                         if (allocated(DataHeatBalance::HeatReclaimSimple_WAHPCoil)) {
-                            DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                            DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
                             if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)){
-                            HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
-                            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
+                                HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(NumWaterHeaterDesuperheater);
+                                for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) num = 0.0;
                             }
                             ValidSourceType(DesuperheaterNum) = true;
+                            HeatReclaim.ReclaimEfficiencyTotal += WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                            if (HeatReclaim.ReclaimEfficiencyTotal > 0.3){
+                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": "
+                                                " sum of heat reclaim recovery efficiencies from the same source coil: \"" + 
+                                                WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName + "\" cannot be over 0.3");
+                                ErrorsFound = true;
+                            }
                         }
                     } else {
                         ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
@@ -1368,35 +1463,6 @@ namespace WaterThermalTanks {
                                         "\" desuperheater heat source object not found: " + cAlphaArgs(9) + " \"" + cAlphaArgs(10) + "\"");
                         ErrorsFound = true;
                     }
-
-                    // Now have source type, so set limits on heat recovery efficiency
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
-                        if (lNumericFieldBlanks(2)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
-                        } else {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = rNumericArgs(2);
-                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.9) {
-                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                                cNumericFieldNames(2) + " must be > 0.0 and <= 0.9, Efficiency = " +
-                                                TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
-                                ErrorsFound = true;
-                            }
-                        }    // Blank Num(2)
-                    } else { // max is 0.3 for all other sources
-                        if (lNumericFieldBlanks(2)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.25;
-                        } else {
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = rNumericArgs(2);
-                            if (WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                                WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.3) {
-                                ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ": " +
-                                                cNumericFieldNames(2) + " must be > 0.0 and <= 0.3, " + cNumericFieldNames(2) + " = " +
-                                                TrimSigDigits(WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff, 3));
-                                ErrorsFound = true;
-                            }
-                        } // Blank Num(2)
-                    }     // setting limits on heat recovery efficiency
 
                     WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate = rNumericArgs(6);
                     if (WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate <= 0.0) {
@@ -8898,21 +8964,21 @@ namespace WaterThermalTanks {
             if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE) {
                 // Refrigeration systems are solved outside the time step iteration, so the
                 //  appropriate decrement for other waste heat applications is handled differently
-                AverageWasteHeat = HeatReclaimRefrigeratedRack(SourceID).AvailCapacity - HeatReclaimRefrigeratedRack(SourceID).UsedHVACCoil;
+                AverageWasteHeat = HeatReclaimRefrigeratedRack(SourceID).AvailCapacity - HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeatTotal;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
-                AverageWasteHeat = HeatReclaimRefrigCondenser(SourceID).AvailCapacity - HeatReclaimRefrigCondenser(SourceID).UsedHVACCoil;
+                AverageWasteHeat = HeatReclaimRefrigCondenser(SourceID).AvailCapacity - HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeatTotal;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_COOLING ||
                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                AverageWasteHeat = HeatReclaimDXCoil(SourceID).AvailCapacity;
+                AverageWasteHeat = HeatReclaimDXCoil(SourceID).AvailCapacity - HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = DXCoil(SourceID).PartLoadRatio;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity;
+                AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity - DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity;
+                AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity - HeatReclaimSimple_WAHPCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = WaterToAirHeatPumpSimple::SimpleWatertoAirHP(SourceID).PartLoadRatio;
             }
         } else {
@@ -9204,23 +9270,33 @@ namespace WaterThermalTanks {
         WaterHeaterDesuperheater(DesuperheaterNum).PumpPower = WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower * (PartLoadRatio);
         WaterHeaterDesuperheater(DesuperheaterNum).PumpEnergy = WaterHeaterDesuperheater(DesuperheaterNum).PumpPower * TimeStepSys * SecInHour;
 
-        // Update remaining waste heat (just in case multiple users of waste heat use same source)
+        // Update used waste heat (just in case multiple users of waste heat use same source)
         if (ValidSourceType(DesuperheaterNum)) {
             SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
             if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE) {
-                //    Refrigeration systems are simulated at the zone time step, do not decrement available capacity
-                HeatReclaimRefrigeratedRack(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+                for (auto& num : HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeat) 
+                    HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
-                HeatReclaimRefrigCondenser(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+                for (auto& num : HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeat) 
+                    HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_COOLING ||
                 WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                 WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                HeatReclaimDXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+                for (auto& num : HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat) 
+                    HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+                HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+                for (auto& num : HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat) 
+                    HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal += num;
             }
         }
     }

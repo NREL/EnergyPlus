@@ -9242,8 +9242,8 @@ namespace RefrigeratedCase {
             }
             if (NumRefrigeratedRacks > 0) {
                 for (auto &e : HeatReclaimRefrigeratedRack) {
-                    e.UsedHVACCoil = 0.0;
-                    e.UsedWaterHeater = 0.0;
+                    e.HVACDesuperheaterReclaimedHeatTotal = 0.0;
+                    e.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
                 }
                 for (auto &e : RefrigRack) {
                     e.LaggedUsedWaterHeater = 0.0;
@@ -9252,8 +9252,8 @@ namespace RefrigeratedCase {
             }
             if (NumRefrigCondensers > 0) {
                 for (auto &e : HeatReclaimRefrigCondenser) {
-                    e.UsedHVACCoil = 0.0;
-                    e.UsedWaterHeater = 0.0;
+                    e.HVACDesuperheaterReclaimedHeatTotal = 0.0;
+                    e.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
                 }
                 for (auto &e : Condenser) {
                     e.LaggedUsedWaterHeater = 0.0;
@@ -9355,14 +9355,14 @@ namespace RefrigeratedCase {
                     // Following lagged variables set for consistency to value calculated prev time through HVAC time step loops
                     if (allocated(HeatReclaimRefrigeratedRack)) {
                         for (IRack = 1; IRack <= NumRefrigeratedRacks; ++IRack) {
-                            RefrigRack(IRack).LaggedUsedHVACCoil = HeatReclaimRefrigeratedRack(IRack).UsedHVACCoil;
-                            RefrigRack(IRack).LaggedUsedWaterHeater = HeatReclaimRefrigeratedRack(IRack).UsedWaterHeater;
+                            RefrigRack(IRack).LaggedUsedHVACCoil = HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedWaterHeater = HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                     if (allocated(HeatReclaimRefrigCondenser)) {
                         for (ICond = 1; ICond <= NumRefrigCondensers; ++ICond) {
-                            Condenser(ICond).LaggedUsedHVACCoil = HeatReclaimRefrigCondenser(ICond).UsedHVACCoil;
-                            Condenser(ICond).LaggedUsedWaterHeater = HeatReclaimRefrigCondenser(ICond).UsedWaterHeater;
+                            Condenser(ICond).LaggedUsedHVACCoil = HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedWaterHeater = HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                 } // repeating same time step
@@ -9390,14 +9390,14 @@ namespace RefrigeratedCase {
                     // Following lagged variables set for consistency to value calculated prev time through HVAC time step loops
                     if (allocated(HeatReclaimRefrigeratedRack)) {
                         for (IRack = 1; IRack <= NumRefrigeratedRacks; ++IRack) {
-                            RefrigRack(IRack).LaggedUsedHVACCoil = HeatReclaimRefrigeratedRack(IRack).UsedHVACCoil;
-                            RefrigRack(IRack).LaggedUsedWaterHeater = HeatReclaimRefrigeratedRack(IRack).UsedWaterHeater;
+                            RefrigRack(IRack).LaggedUsedHVACCoil = HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedWaterHeater = HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                     if (allocated(HeatReclaimRefrigCondenser)) {
                         for (ICond = 1; ICond <= NumRefrigCondensers; ++ICond) {
-                            Condenser(ICond).LaggedUsedHVACCoil = HeatReclaimRefrigCondenser(ICond).UsedHVACCoil;
-                            Condenser(ICond).LaggedUsedWaterHeater = HeatReclaimRefrigCondenser(ICond).UsedWaterHeater;
+                            Condenser(ICond).LaggedUsedHVACCoil = HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedWaterHeater = HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                 } // if first time

@@ -2388,7 +2388,7 @@ namespace WaterToAirHeatPumpSimple {
         DXElecCoolingPower = Winput;
 
         ReportingConstant = TimeStepSys * SecInHour;
-        DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
+        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
         if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
             for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
