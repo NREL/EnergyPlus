@@ -244,19 +244,19 @@ namespace SolarCollectors {
 
     void CalcICSSolarCollector(int ColleNum);
 
-    void ICSCollectorAnalyticalSoluton(int ColleNum,             // solar collector index
-                                       Real64 SecInTimeStep,     // seconds in a time step
-                                       Real64 a1,                // coefficient of ODE for Tp
-                                       Real64 a2,                // coefficient of ODE for Tp
-                                       Real64 a3,                // coefficient of ODE for Tp
-                                       Real64 b1,                // coefficient of ODE for TW
-                                       Real64 b2,                // coefficient of ODE for TW
-                                       Real64 b3,                // coefficient of ODE for TW
-                                       Real64 TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
-                                       Real64 TempWaterOld,      // collector water temperature at previous time step [C]
+    void ICSCollectorAnalyticalSolution(const int ColleNum,             // solar collector index
+                                       const Real64 SecInTimeStep,     // seconds in a time step
+                                       const Real64 a1,                // coefficient of ODE for Tp
+                                       const Real64 a2,                // coefficient of ODE for Tp
+                                       const Real64 a3,                // coefficient of ODE for Tp
+                                       const Real64 b1,                // coefficient of ODE for TW
+                                       const Real64 b2,                // coefficient of ODE for TW
+                                       const Real64 b3,                // coefficient of ODE for TW
+                                       const Real64 TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
+                                       const Real64 TempWaterOld,      // collector water temperature at previous time step [C]
                                        Real64 &TempAbsPlate,           // absorber plate temperature at current time step [C]
                                        Real64 &TempWater,              // collector water temperature at current time step [C]
-                                       bool AbsorberPlateHasMass // flag for absober thermal mass
+                                       const bool AbsorberPlateHasMass // flag for absober thermal mass
     );
 
     void CalcTransAbsorProduct(int ColleNum,     // Collector object number
