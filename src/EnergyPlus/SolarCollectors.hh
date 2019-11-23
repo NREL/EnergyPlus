@@ -60,34 +60,43 @@ namespace EnergyPlus {
 
 namespace SolarCollectors {
 
-    extern int const WATER;
-    extern int const AIR;
-
-    extern int const INLET;
-    extern int const AVERAGE;
-    extern int const OUTLET;
-
-    extern int const ICSRectangularTank;
-
     extern Array1D_bool CheckEquipName;
 
     extern int NumOfParameters;
     extern int NumOfCollectors;
+
+    enum struct FluidEnum
+    {
+        WATER,
+        AIR
+    };
+
+    enum struct TestTypeEnum
+    {
+        INLET,
+        AVERAGE,
+        OUTLET
+    };
+
+    enum struct TankTypeEnum
+    {
+        ICSRectangularTank
+    };
 
     struct ParametersData
     {
         // Members
         std::string Name;                      // Name of solar collector parameters
         Real64 Area;                           // Gross area of collector (m2)
-        int TestFluid;                         // Test fluid (only WATER for now)
+        FluidEnum TestFluid;                         // Test fluid (only WATER for now)
         Real64 TestMassFlowRate;               // Test volumetric flow rate (m3/s)
-        int TestType;                          // Test correlation type (INLET | AVERAGE | OUTLET)
+        TestTypeEnum TestType;                          // Test correlation type (INLET | AVERAGE | OUTLET)
         Real64 eff0;                           // Coefficient 1 of efficiency equation (Y-intercept)
         Real64 eff1;                           // Coefficient 2 of efficiency equation (1st order)
         Real64 eff2;                           // Coefficient 3 of efficiency equation (2nd order)
         Real64 iam1;                           // Coefficient 2 of incident angle modifier (1st order)
         Real64 iam2;                           // Coefficient 3 of incident angle modifier (2nd order)
-        int ICSType_Num;                       // ICS collector type
+        TankTypeEnum ICSType_Num;                       // ICS collector type
         Real64 Volume;                         // collector water net volume (m3)
         Real64 SideHeight;                     // collector side height (m)
         Real64 ThermalMass;                    // thermal mass of the absorber plate (J/m2C)
@@ -104,8 +113,9 @@ namespace SolarCollectors {
 
         // Default Constructor
         ParametersData()
-            : Area(0.0), TestFluid(WATER), TestMassFlowRate(0.0), TestType(INLET), eff0(0.0), eff1(0.0), eff2(0.0), iam1(0.0), iam2(0.0),
-              ICSType_Num(0), Volume(0.0), SideHeight(0.0), ThermalMass(0.0),
+            : Area(0.0), TestFluid(FluidEnum::WATER), TestMassFlowRate(0.0), TestType(TestTypeEnum::INLET), eff0(0.0),
+              eff1(0.0), eff2(0.0), iam1(0.0), iam2(0.0),
+              ICSType_Num(TankTypeEnum::ICSRectangularTank), Volume(0.0), SideHeight(0.0), ThermalMass(0.0),
               ULossSide(0.0), ULossBottom(0.0), AspectRatio(0.0), NumOfCovers(0), CoverSpacing(0.0), RefractiveIndex(2, 0.0),
               ExtCoefTimesThickness(2, 0.0), EmissOfCover(2, 0.0), EmissOfAbsPlate(0.0), AbsorOfAbsPlate(0.0)
         {
@@ -119,7 +129,7 @@ namespace SolarCollectors {
         std::string BCType;     // Boundary condition Type
         std::string OSCMName;   // OtherSideConditionsModel
         int VentCavIndex;       // index of ventilated cavity object
-        int ICSType_Num;        // ICS collector type number
+        TankTypeEnum ICSType_Num;        // ICS collector type number
         int TypeNum;            // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
         int WLoopNum;           // Water plant loop index number                      !DSU
         int WLoopSideNum;       // Water plant loop side index                        !DSU
@@ -196,7 +206,7 @@ namespace SolarCollectors {
 
         // Default Constructor
         CollectorData()
-            : VentCavIndex(0), ICSType_Num(0), TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true),
+            : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true),
               Parameters(0), Surface(0), InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0), MassFlowRate(0.0), MassFlowRateMax(0.0),
               VolFlowRateMax(0.0), ErrIndex(0), IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0), Power(0.0), HeatGain(0.0),
               HeatLoss(0.0), Energy(0.0), HeatRate(0.0), HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0), HeatGainRate(0.0),

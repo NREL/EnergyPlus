@@ -92,32 +92,27 @@ namespace SolarCollectors {
     // must be connected to a WATER HEATER object on the supply side of the plant loop.  Water is assumed to be
     // the heat transfer fluid.
 
-    int const WATER(1);
-    int const AIR(2);
-
-    int const INLET(1);
-    int const AVERAGE(2);
-    int const OUTLET(3);
-
-    int const ICSRectangularTank(1);
-
     static std::string const fluidNameWater("WATER");
 
     Array1D_bool CheckEquipName;
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumOfParameters(0);
     int NumOfCollectors(0);
+    int NumOfParameters(0);
     bool GetInputFlag(true);
 
     Array1D<ParametersData> Parameters;
-    std::unordered_map<std::string, std::string> UniqueParametersNames;
     Array1D<CollectorData> Collector;
+    std::unordered_map<std::string, std::string> UniqueParametersNames;
     std::unordered_map<std::string, std::string> UniqueCollectorNames;
 
     void clear_state()
     {
+        NumOfCollectors = 0;
+        NumOfParameters = 0;
         GetInputFlag = false;
+        Parameters.deallocate();
+        Collector.deallocate();
         UniqueCollectorNames.clear();
         UniqueParametersNames.clear();
     }
@@ -304,7 +299,7 @@ namespace SolarCollectors {
                 {
                     auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
                     if (SELECT_CASE_var == "WATER") {
-                        Parameters(ParametersNum).TestFluid = WATER;
+                        Parameters(ParametersNum).TestFluid = FluidEnum::WATER;
                         // CASE('AIR')
                         //  Parameters(ParametersNum)%TestFluid = AIR
                     } else {
@@ -325,11 +320,11 @@ namespace SolarCollectors {
                 {
                     auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(3));
                     if (SELECT_CASE_var == "INLET") {
-                        Parameters(ParametersNum).TestType = INLET;
+                        Parameters(ParametersNum).TestType = TestTypeEnum::INLET;
                     } else if (SELECT_CASE_var == "AVERAGE") {
-                        Parameters(ParametersNum).TestType = AVERAGE;
+                        Parameters(ParametersNum).TestType = TestTypeEnum::AVERAGE;
                     } else if (SELECT_CASE_var == "OUTLET") {
-                        Parameters(ParametersNum).TestType = OUTLET;
+                        Parameters(ParametersNum).TestType = TestTypeEnum::OUTLET;
                     } else {
                         ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  " + DataIPShortCuts::cAlphaArgs(3) + " is  not supported for " +
                                                 DataIPShortCuts::cAlphaFieldNames(3));
@@ -525,7 +520,7 @@ namespace SolarCollectors {
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
                 //        added
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "RectangularTank")) {
-                    Parameters(ParametersNum).ICSType_Num = ICSRectangularTank;
+                    Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
                 } else {
                     ShowSevereError(DataIPShortCuts::cAlphaFieldNames(2) + " not found=" + DataIPShortCuts::cAlphaArgs(2) + " in " + CurrentModuleParamObject + " =" +
                                     Parameters(ParametersNum).Name);
@@ -1133,16 +1128,16 @@ namespace SolarCollectors {
             // Modify coefficients depending on test correlation type
             {
                 auto const SELECT_CASE_var(Parameters(ParamNum).TestType);
-                if (SELECT_CASE_var == INLET) {
+                if (SELECT_CASE_var == TestTypeEnum::INLET) {
                     FRULpTest = Parameters(ParamNum).eff1 + Parameters(ParamNum).eff2 * (InletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0;
 
-                } else if (SELECT_CASE_var == AVERAGE) {
+                } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
                     FRULpTest =
                         Parameters(ParamNum).eff1 + Parameters(ParamNum).eff2 * ((InletTemp + OutletTemp) * 0.5 - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
 
-                } else if (SELECT_CASE_var == OUTLET) {
+                } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
                     FRULpTest = Parameters(ParamNum).eff1 + Parameters(ParamNum).eff2 * (OutletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
                 }
@@ -1226,7 +1221,7 @@ namespace SolarCollectors {
                 }
             }
 
-            if (Parameters(ParamNum).TestType == INLET) break; // Inlet temperature test correlations do not need to iterate
+            if (Parameters(ParamNum).TestType == TestTypeEnum::INLET) break; // Inlet temperature test correlations do not need to iterate
 
             if (Iteration > 100) {
                 if (Collector(CollectorNum).IterErrIndex == 0) {
