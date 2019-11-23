@@ -60,30 +60,17 @@ namespace EnergyPlus {
 
 namespace SolarCollectors {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Fluid Type Flags
     extern int const WATER;
     extern int const AIR;
 
-    // Test Correlation Type Flags
     extern int const INLET;
     extern int const AVERAGE;
     extern int const OUTLET;
 
-    // ICS Collector Type Flag
     extern int const ICSRectangularTank;
-    // INTEGER, PARAMETER :: ICSProgressiveTube = 2
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
 
     extern Array1D_bool CheckEquipName;
 
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumOfParameters;
     extern int NumOfCollectors;
 
@@ -91,10 +78,6 @@ namespace SolarCollectors {
     extern Array1D<Real64> TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
     extern Array1D<Real64> RefSysSkyDiff;   // reflectance of cover system for sky diffuse solar rad.
     extern Array1D<Real64> RefSysGrnDiff;   // reflectance of cover system for ground diffuse solar rad.
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Types
 
     struct ParametersData
     {

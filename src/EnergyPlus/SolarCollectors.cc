@@ -93,7 +93,6 @@ namespace SolarCollectors {
     // must be connected to a WATER HEATER object on the supply side of the plant loop.  Water is assumed to be
     // the heat transfer fluid.
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using DataSurfaces::Surface;
@@ -104,26 +103,16 @@ namespace SolarCollectors {
     using DataSurfaces::SurfSunlitFrac;
     using PlantUtilities::SetComponentFlowRate;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Fluid Type Flags
     int const WATER(1);
     int const AIR(2);
 
-    // Test Correlation Type Flags
     int const INLET(1);
     int const AVERAGE(2);
     int const OUTLET(3);
 
-    // ICS Collector Type Flag
     int const ICSRectangularTank(1);
-    // INTEGER, PARAMETER :: ICSProgressiveTube = 2
 
     static std::string const fluidNameWater("WATER");
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
 
     Array1D_bool CheckEquipName;
 
@@ -137,17 +126,10 @@ namespace SolarCollectors {
     Array1D<Real64> RefSysSkyDiff;   // reflectance of cover system for sky diffuse solar rad.
     Array1D<Real64> RefSysGrnDiff;   // reflectance of cover system for ground diffuse solar rad.
 
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Object Data
     Array1D<ParametersData> Parameters;
     std::unordered_map<std::string, std::string> UniqueParametersNames;
     Array1D<CollectorData> Collector;
     std::unordered_map<std::string, std::string> UniqueCollectorNames;
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     void clear_state()
     {
@@ -244,10 +226,6 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the solar collector input from the input file and sets up the parameters and collector objects.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
         using namespace DataHeatBalance;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
@@ -259,8 +237,6 @@ namespace SolarCollectors {
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
         int IOStatus;                         // Used in GetObjectItem
         int NumAlphas;                        // Number of Alphas for each GetObjectItem call
@@ -898,7 +874,6 @@ namespace SolarCollectors {
         // METHODOLOGY EMPLOYED:
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
-        // Using/Aliasing
         using DataGlobals::DegToRadians;
         using DataGlobals::HourOfDay;
         using DataGlobals::SysSizingCalc;
@@ -912,10 +887,6 @@ namespace SolarCollectors {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitSolarCollector");
         int InletNode;
         int OutletNode;
@@ -925,8 +896,6 @@ namespace SolarCollectors {
         static bool MyOneTimeFlag(true);      // one time flag
         static Array1D_bool SetLoopIndexFlag; // get loop number flag
         Real64 rho;
-        // LOGICAL     :: errFlag
-        //  REAL(r64)                                :: Density                ! density of fluid
         bool errFlag;                       // local error flag
         static Array1D_bool SetDiffRadFlag; // get diffuse radiation flag
 
@@ -1138,7 +1107,6 @@ namespace SolarCollectors {
         // components are less than zero but the net adds up to greater than zero.  The EnergyPlus subroutine, on the other
         // hand, requires each component incident angle modifier always to be greater than zero.
 
-        // Using/Aliasing
         using DataGlobals::DegToRadians;
         using DataHeatBalance::CosIncidenceAngle;
         using DataHeatBalance::QRadSWOutIncident;
@@ -1150,10 +1118,6 @@ namespace SolarCollectors {
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalcSolarCollector");
         int SurfNum;                  // Surface object number for collector
         int ParamNum;                 // Collector parameters object number
@@ -1374,18 +1338,13 @@ namespace SolarCollectors {
         //   Liquid-Type Solar Collectors".
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.  Wiley-Interscience:
         //   New York (1991).
-        // Using/Aliasing
+
         using DataGlobals::DegToRadians;
 
-        // Return value
         Real64 IAM;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 s;           // Intermediate variable
         std::string String; // Dummy string for converting numbers to strings
         Real64 CutoffAngle;
@@ -1444,7 +1403,6 @@ namespace SolarCollectors {
         // New York (1991).
         // NOTES:
 
-        // Using/Aliasing
         using DataGlobals::DegToRadians;
         using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
@@ -1459,14 +1417,8 @@ namespace SolarCollectors {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcICSSolarCollector");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  REAL(r64) :: TimeElapsed             ! Fraction of the current hour that has elapsed (h)
         int SurfNum;            // Surface object number for collector
         int ParamNum;           // Collector parameters object number
         Real64 ThetaBeam;       // Incident angle of beam radiation (radians)
@@ -1484,18 +1436,9 @@ namespace SolarCollectors {
         Real64 Rhow;            // density of colloctor fluid (kg/m3)
         Real64 Area;            // Gross area of collector (m2)
         Real64 aw;              // thermal mass of the collector water [J/K]
-        //  REAL(r64) :: bw                      ! coefficients of the ODE of water heat balance
-        //  REAL(r64) :: cw                      ! coefficients of the ODE of water heat balance
         Real64 ap; // thermal mass of the absorber plate [J/K]
-        //  REAL(r64) :: bp                      ! coefficients of the ODE of abs plate heat balance
-        //  REAL(r64) :: cp                      ! coefficients of the ODE of abs plate heat balance
         Real64 SecInTimeStep; // Seconds in one timestep (s)
-
-        //  REAL(r64) :: Q                       ! Heat gain or loss to collector fluid (W)
         Real64 Efficiency; // Thermal efficiency of solar energy conversion
-        //  REAL(r64) :: StoredHeatRate          ! collector heat storage rate (-ve, or +ve) [W]
-        //  REAL(r64) :: HeatLossRate            ! heat loss through the top, bottom and side of collector
-        //  REAL(r64) :: CollectorHeatRate       ! collector net heat gain rate
         Real64 QHeatRate;      // heat gain rate (W)
         Real64 a1;             // coefficient of ODE for absorber temperature Tp
         Real64 a2;             // coefficient of ODE for absorber temperature Tw
@@ -1505,7 +1448,6 @@ namespace SolarCollectors {
         Real64 b3;             // conatant term of ODE for water temperature
         bool AbsPlateMassFlag; // flag if the absober has thermal mass or not
 
-        // FLOW:
         Efficiency = 0.0;
         QHeatRate = 0.0;
 
@@ -1618,23 +1560,13 @@ namespace SolarCollectors {
         // The general solution of these coupled equation with real routes has the following form:
         //          Tp = ConstantC1*exp(lamda1*t) + ConstantC2*exp(lamda2*t) + ConstOfTpSln
         //          Tw = r1*ConstantC2*exp(lamda1*t) + r2*ConstantC2*exp(lamda2*t) + ConstOfTwSln
-        // REFERENCES:
-        // NOTES:
 
-        // Using/Aliasing
         using DataGlobals::DegToRadians;
         using DataGlobals::HourOfDay;
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BSquareM4TimesATimesC; // intermediate variable
         Real64 r1;                    // ratio of the ODE solution constant coefficients
         Real64 r2;                    // ratio of the ODE solution constant coefficients
@@ -1648,7 +1580,6 @@ namespace SolarCollectors {
         Real64 a;                     // coefficients of quadratic equation a*m2+b*m+c=0
         Real64 b;                     // coefficients of quadratic equation a*m2+b*m+c=0
         Real64 c;                     // coefficients of quadratic equation a*m2+b*m+c=0
-        // FLOW:
 
         if (AbsorberPlateHasMass) {
             a = 1.0;
@@ -1705,20 +1636,13 @@ namespace SolarCollectors {
         // REFERENCES:
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
-        // Using/Aliasing
+
         using DataGlobals::DegToRadians;
         using DataHeatBalance::QRadSWOutIncident;
         using DataHeatBalance::QRadSWOutIncidentBeam;
         using DataHeatBalance::QRadSWOutIncidentGndDiffuse;
         using DataHeatBalance::QRadSWOutIncidentSkyDiffuse;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ParamNum;                     // Collector parameters object number
         int SurfNum;                      // Surface object number for collector
         int Num;                          // covers counter
@@ -1729,9 +1653,7 @@ namespace SolarCollectors {
         Real64 AbsCover1;                 // Inner cover solar absorbtance
         Real64 AbsCover2;                 // Outer cover solar absorbtance
         Array1D<Real64> CoversAbsBeam(2); // Inner and Outer Cover absorptance
-        // FLOW:
 
-        // set
         TransSys = 1.0;
         ReflSys = 0.0;
         AbsCover1 = 0.0;
@@ -1812,17 +1734,11 @@ namespace SolarCollectors {
         // REFERENCES:
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
-        // Using/Aliasing
+
         using DataGlobals::DegToRadians;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const AirRefIndex(1.0003); // refractive index of air
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength):: String       ! Dummy string for converting numbers to strings
         int nCover;                      // covers count
         int ParamNum;                    // Collector parameters object number
         Real64 IncAngle;                 // angle of incidence
@@ -1839,10 +1755,7 @@ namespace SolarCollectors {
         Real64 CoverRefrIndex;           // refractive index of collector cover
         Real64 TransSysDiff;             // cover system solar transmittance from inner to outer cover
         bool DiffRefFlag;                // flag for calc. diffuse refl of cover from inside to outside
-        //  LOGICAL      :: OneTimeFlag                 ! allows to run only once
-        // FLOW:
 
-        // set
         TransPerp = 1.0;
         TransPara = 1.0;
         ReflPerp = 0.0;
@@ -1933,7 +1846,7 @@ namespace SolarCollectors {
         // REFERENCES:
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
-        // Using/Aliasing
+
         using DataEnvironment::GroundTemp;
         using DataEnvironment::GroundTempKelvin;
         using DataEnvironment::SkyTemp;
@@ -1942,13 +1855,6 @@ namespace SolarCollectors {
         using DataGlobals::StefanBoltzmann;
         using DataHeatBalance::QRadSWOutIncident;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  CHARACTER(len=MaxNameLength):: String        ! Dummy string for converting numbers to strings
         int ParamNum;             // collector parameters object number
         int CoverNum;             // counter for number of covers
         int NumCovers;            // number of covers
@@ -1974,8 +1880,6 @@ namespace SolarCollectors {
         Real64 hRadCoefA2C;       // radiation coeff. between abs plate and cover [W/m2C]
         Real64 hRadCoefC2C;       // radiation coeff. between covers [W/m2C]
         Real64 hRadCoefC2O;       // radiation coeff. between outer covers and the ambient [W/m2C]
-
-        // flow
 
         UTopLoss = 0.0;
         ParamNum = Collector(ColleNum).Parameters;
@@ -2142,13 +2046,8 @@ namespace SolarCollectors {
         using DataGlobals::KelvinConv;
         using DataGlobals::StefanBoltzmann;
 
-        // Return value
         Real64 hConvCoef; // convection coefficient
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
 
         int const NumOfPropDivisions(11);
@@ -2165,13 +2064,6 @@ namespace SolarCollectors {
         static Array1D<Real64> const Density(NumOfPropDivisions,
                                              {1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}); // Density, in kg/m3
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 CondOfAir;    // thermal conductivity of air [W/mK]
         Real64 VisDOfAir;    // dynamic viscosity of air [kg/m.s]
         Real64 DensOfAir;    // density of air [W/mK]
@@ -2186,7 +2078,6 @@ namespace SolarCollectors {
         int Index;         // property range index
         Real64 InterpFrac; // fraction
 
-        // Flow
         DeltaT = std::abs(TempSurf1 - TempSurf2);
         Tref = 0.5 * (TempSurf1 + TempSurf2);
         Index = 1;
@@ -2257,7 +2148,7 @@ namespace SolarCollectors {
         // REFERENCES:
         //  T.Fujii, and H.Imura,Natural convection heat transfer from aplate with arbitrary inclination.
         //  International Journal of Heat and Mass Transfer: 15(4), (1972), 755-764.
-        // Using/Aliasing
+
         using DataGlobals::DegToRadians;
         using DataGlobals::KelvinConv;
         using DataGlobals::StefanBoltzmann;
@@ -2268,36 +2159,22 @@ namespace SolarCollectors {
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetViscosityGlycol;
 
-        // Return value
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
         static std::string const CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DensOfWater;   // density of water [kg/m3]
         Real64 CondOfWater;   // thermal conductivity of water [W/mK]
         Real64 VolExpWater;   // volumetric expansion of water, [1/K]
         Real64 VisOfWater;    // dynamic viscosity of water [Ns/m2]
         Real64 WaterSpecHeat; // specific heat of water
         Real64 PrOfWater;     // Prantle number of water
-        //  REAL(r64)          :: RaNumCosTilt           ! Rayleigh number of air times cosine of collector tilt []
         Real64 CosTilt;    // cosine of collector tilt angle []
         Real64 DeltaT;     // temperature difference between absober plate and water
         Real64 TReference; // reference temperature for fluid properties [c]
         Real64 RaNum;      // Rayleigh number
         Real64 GrNum;      // Grashof number
-        //  REAL(r64)          :: GrcPr                  ! critical Grashof number
         Real64 NuL;     // Nusselt number
         int WaterIndex; // fluid type index
 
@@ -2365,25 +2242,16 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS: na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("UpdateSolarCollector");
         int InletNode;
         int OutletNode;
         Real64 Cp;
 
-        // FLOW:
         InletNode = Collector(CollectorNum).InletNode;
         OutletNode = Collector(CollectorNum).OutletNode;
 
@@ -2409,20 +2277,11 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TimeStepInSecond;
 
-        // FLOW:
         TimeStepInSecond = TimeStepSys * SecInHour;
 
         Collector(CollectorNum).Energy = Collector(CollectorNum).Power * TimeStepInSecond;
@@ -2450,12 +2309,10 @@ namespace SolarCollectors {
         // mine  ExtVentedCavity derived type that has the surface.
         // Adapated from Photovoltaics module, originally developed by Brent G. (2004)
 
-        // Using/Aliasing
         using DataSurfaces::ExtVentedCavity;
         using DataSurfaces::Surface;
         using DataSurfaces::TotExtVentCav;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CavNum;   // temporary
         int ThisSurf; // temporary
         int thisCav;
@@ -2501,7 +2358,6 @@ namespace SolarCollectors {
         // METHODOLOGY EMPLOYED:
         // access derived type
 
-        // Using/Aliasing
         using DataSurfaces::ExtVentedCavity;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
