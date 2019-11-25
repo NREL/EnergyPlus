@@ -11441,7 +11441,6 @@ TEST_F( ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest )
     EXPECT_EQ("MULTISPEED PERFORMANCE", thisSys->m_DesignSpecMultispeedHPName );  // checks design_specification_multispeed_object_name value
 
 }
-
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 {
     // Test #7601
