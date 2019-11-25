@@ -159,7 +159,6 @@ namespace PlantChillers {
     int NumEngineDrivenChillers(0); // number of EngineDriven chillers specified in input
     Real64 HeatRecInletTemp(0.0);   // Inlet Temperature of the heat recovery fluid
     Real64 HeatRecMdotActual(0.0);  // reporting: Heat Recovery Loop Mass flow rate
-    Real64 HeatRecMdotDesign(0.0);
     Real64 QTotalHeatRecovered(0.0); // total heat recovered (W)
     Real64 QJacketRecovered(0.0);    // heat recovered from jacket (W)
     Real64 QLubeOilRecovered(0.0);   // heat recovered from lube (W)
@@ -218,7 +217,6 @@ namespace PlantChillers {
         NumEngineDrivenChillers = 0;
         HeatRecInletTemp = 0.0;
         HeatRecMdotActual = 0.0;
-        HeatRecMdotDesign = 0.0;
         QTotalHeatRecovered = 0.0;
         QJacketRecovered = 0.0;
         QLubeOilRecovered = 0.0;
@@ -2895,8 +2893,6 @@ namespace PlantChillers {
         int CondOutletNode; // node number of water outlet node from the condenser
         int EvapInletNode;
         int EvapOutletNode;
-        int HeatRecInNode;
-        int HeatRecOutNode;
         bool errFlag;
         Real64 rho;                   // local fluid density
         Real64 mdot;                  // local mass flow rate
@@ -2924,11 +2920,6 @@ namespace PlantChillers {
         CondOutletNode = ElectricChiller(ChillNum).Base.CondOutletNodeNum;
         EvapInletNode = ElectricChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = ElectricChiller(ChillNum).Base.EvapOutletNodeNum;
-
-        if (ElectricChiller(ChillNum).HeatRecActive) {
-            HeatRecInNode = ElectricChiller(ChillNum).HeatRecInletNodeNum;
-            HeatRecOutNode = ElectricChiller(ChillNum).HeatRecOutletNodeNum;
-        }
 
         // Init more variables
         if (MyFlag(ChillNum)) {
@@ -3276,8 +3267,6 @@ namespace PlantChillers {
         int CondOutletNode;
         int EvapInletNode;
         int EvapOutletNode;
-        int HeatRecInNode;
-        int HeatRecOutNode;
         Real64 rho;      // local fluid density
         Real64 mdot;     // local mass flow rate
         Real64 mdotCond; // local mass flow rate for condenser
@@ -3304,11 +3293,6 @@ namespace PlantChillers {
         CondOutletNode = EngineDrivenChiller(ChillNum).Base.CondOutletNodeNum;
         EvapInletNode = EngineDrivenChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = EngineDrivenChiller(ChillNum).Base.EvapOutletNodeNum;
-
-        if (EngineDrivenChiller(ChillNum).HeatRecActive) {
-            HeatRecInNode = EngineDrivenChiller(ChillNum).HeatRecInletNodeNum;
-            HeatRecOutNode = EngineDrivenChiller(ChillNum).HeatRecOutletNodeNum;
-        }
 
         // Init more variables
         if (MyFlag(ChillNum)) {
@@ -3600,8 +3584,6 @@ namespace PlantChillers {
         int CondOutletNode; // node number of water outlet node from the condenser
         int EvapInletNode;
         int EvapOutletNode;
-        int HeatRecInNode;
-        int HeatRecOutNode;
         Real64 rho;      // local fluid density
         Real64 mdot;     // local mass flow rate
         Real64 mdotCond; // local mass flow rate for condenser
@@ -3628,11 +3610,6 @@ namespace PlantChillers {
         CondOutletNode = GTChiller(ChillNum).Base.CondOutletNodeNum;
         EvapInletNode = GTChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = GTChiller(ChillNum).Base.EvapOutletNodeNum;
-
-        if (GTChiller(ChillNum).HeatRecActive) {
-            HeatRecInNode = GTChiller(ChillNum).HeatRecInletNodeNum;
-            HeatRecOutNode = GTChiller(ChillNum).HeatRecOutletNodeNum;
-        }
 
         // Init more variables
         if (MyFlag(ChillNum)) {
@@ -5449,8 +5426,8 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         // Locals
-        Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
-        Real64 CondInletTemp; // C - condenser inlet temperature, water side
+        Real64 _EvapInletTemp; // C - evaporator inlet temperature, water side
+        Real64 _CondInletTemp; // C - condenser inlet temperature, water side
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
@@ -5511,7 +5488,7 @@ namespace PlantChillers {
         LoopSideNum = ElectricChiller(ChillNum).Base.CWLoopSideNum;
         BranchNum = ElectricChiller(ChillNum).Base.CWBranchNum;
         CompNum = ElectricChiller(ChillNum).Base.CWCompNum;
-        EvapInletTemp = Node(EvapInletNode).Temp;
+        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         //   calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -5589,7 +5566,7 @@ namespace PlantChillers {
         }
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        CondInletTemp = Node(CondInletNode).Temp;
+        _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
         if (ElectricChiller(ChillNum).Base.CondenserType == WaterCooled) {
@@ -5684,7 +5661,7 @@ namespace PlantChillers {
             }
         } // End of the Air Cooled/Evap Cooled Logic block
 
-        CondInletTemp = Node(CondInletNode).Temp;
+        _CondInletTemp = Node(CondInletNode).Temp;
 
         // correct inlet temperature if using heat recovery
         if (ElectricChiller(ChillNum).HeatRecActive) {
@@ -5693,10 +5670,10 @@ namespace PlantChillers {
                                    ElectricChillerReport(ChillNum).Base.QCond * ElectricChillerReport(ChillNum).Base.CondInletTemp) /
                                   (ElectricChillerReport(ChillNum).QHeatRecovery + ElectricChillerReport(ChillNum).Base.QCond);
             } else {
-                AvgCondSinkTemp = CondInletTemp;
+                AvgCondSinkTemp = _CondInletTemp;
             }
         } else {
-            AvgCondSinkTemp = CondInletTemp;
+            AvgCondSinkTemp = _CondInletTemp;
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
@@ -5762,11 +5739,9 @@ namespace PlantChillers {
 
             // ElectricChiller(ChillNum)%PossibleSubcooling = .FALSE.
             // PossibleSubcooling = .NOT. PlantLoop(PlantLoopNum)%TempSetPtCtrl
-            if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-                ElectricChiller(ChillNum).Base.PossibleSubcooling = false;
-            } else {
-                ElectricChiller(ChillNum).Base.PossibleSubcooling = true;
-            }
+            ElectricChiller(ChillNum).Base.PossibleSubcooling =
+                !(DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
+                  DataPlant::CompSetPtBasedSchemeType);
             QEvaporator = AvailChillerCap * OperPartLoadRat;
             if (OperPartLoadRat < MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
@@ -6027,12 +6002,12 @@ namespace PlantChillers {
             if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
                 if (ElectricChiller(ChillNum).HeatRecActive)
-                    CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered);
+                    CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, _CondInletTemp, QHeatRecovered);
                 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidName,
-                                               CondInletTemp,
+                                                                _CondInletTemp,
                                                DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
+                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + ElectricChiller(ChillNum).Base.Name);
                 ShowContinueErrorTimeStamp("");
@@ -6047,12 +6022,12 @@ namespace PlantChillers {
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (ElectricChiller(ChillNum).HeatRecActive)
-                CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered);
+                CalcElectricChillerHeatRecovery(ChillNum, QCondenser, CondMassFlowRate, _CondInletTemp, QHeatRecovered);
             if (CondMassFlowRate > 0.0) {
-                CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, CondInletTemp);
-                CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
+                CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
+                CondOutletTemp = _CondInletTemp + QCondenser / CondMassFlowRate / CpCond;
             } else {
-                CondOutletTemp = CondInletTemp;
+                CondOutletTemp = _CondInletTemp;
             }
         }
 
@@ -6066,11 +6041,11 @@ namespace PlantChillers {
 
             if (ElectricChiller(ChillNum).Base.CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
-                if (CondInletTemp > 70.0) {
+                if (_CondInletTemp > 70.0) {
                     ShowSevereError("CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" +
                                     ElectricChiller(ChillNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
 
@@ -6082,7 +6057,7 @@ namespace PlantChillers {
                     ShowSevereError("CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + ElectricChiller(ChillNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
-                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
                     ShowFatalError("Program Terminates due to previous error condition");
                 }
@@ -6119,8 +6094,8 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         // Locals
-        Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
-        Real64 CondInletTemp; // C - condenser inlet temperature, water side
+        Real64 _EvapInletTemp; // C - evaporator inlet temperature, water side
+        Real64 _CondInletTemp; // C - condenser inlet temperature, water side
 
         Real64 const ExhaustCP(1.047);    // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
@@ -6208,7 +6183,6 @@ namespace PlantChillers {
         if (EngineDrivenChiller(ChillerNum).HeatRecActive) {
             HeatRecInletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
             HeatRecOutletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
-            HeatRecMdotDesign = EngineDrivenChiller(ChillerNum).DesignHeatRecMassFlowRate;
         }
 
         EvapInletNode = EngineDrivenChiller(ChillerNum).Base.EvapInletNodeNum;
@@ -6217,7 +6191,7 @@ namespace PlantChillers {
         CondOutletNode = EngineDrivenChiller(ChillerNum).Base.CondOutletNodeNum;
         LoopNum = EngineDrivenChiller(ChillerNum).Base.CWLoopNum;
         LoopSideNum = EngineDrivenChiller(ChillerNum).Base.CWLoopSideNum;
-        EvapInletTemp = Node(EvapInletNode).Temp;
+        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         //   calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -6329,7 +6303,7 @@ namespace PlantChillers {
         } // End of the Air Cooled/Evap Cooled Logic block
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        CondInletTemp = Node(CondInletNode).Temp;
+        _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
         if (EngineDrivenChiller(ChillerNum).Base.CondenserType == WaterCooled) {
@@ -6702,10 +6676,10 @@ namespace PlantChillers {
 
             if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).Base.CDLoopNum).FluidName,
-                                               CondInletTemp,
+                                                                _CondInletTemp,
                                                DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
+                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" +
                                 EngineDrivenChiller(ChillerNum).Base.Name);
@@ -6715,7 +6689,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled
-            CondOutletTemp = CondInletTemp;
+            CondOutletTemp = _CondInletTemp;
         }
 
         // EngineDriven Portion of the Engine Driven Chiller:
@@ -6797,11 +6771,11 @@ namespace PlantChillers {
         if (Energy < 0.0) { // there is a serious problem
             if (EngineDrivenChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
-                if (CondInletTemp > 70.0) {
+                if (_CondInletTemp > 70.0) {
                     ShowSevereError("CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller=" +
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
 
@@ -6814,7 +6788,7 @@ namespace PlantChillers {
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
-                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
                     ShowFatalError("Program Terminates due to previous error condition");
                 }
@@ -6851,9 +6825,9 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         // Locals
-        Real64 ExhaustStackTemp(0.0); // Temperature of Exhaust Gases
-        Real64 EvapInletTemp;         // C - evaporator inlet temperature, water side
-        Real64 CondInletTemp;         // C - condenser inlet temperature, water side
+        Real64 _ExhaustStackTemp(0.0); // Temperature of Exhaust Gases
+        Real64 _EvapInletTemp;         // C - evaporator inlet temperature, water side
+        Real64 _CondInletTemp;         // C - condenser inlet temperature, water side
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
@@ -6906,7 +6880,6 @@ namespace PlantChillers {
         static std::string OutputChar;         // character string for warning messages
 
         int HeatRecInNode;          // Heat Recovery Fluid Inlet Node Num
-        int HeatRecOutNode;         // Heat Recovery Fluid Outlet Node Num
         Real64 HeatRecInTemp(0.0);  // Heat Recovery Fluid Inlet Temperature
         Real64 HeatRecOutTemp(0.0); // Heat Recovery Fluid Outlet Temperature
         Real64 HeatRecMdot(0.0);    // Heat Recovery Fluid Mass FlowRate
@@ -6935,12 +6908,11 @@ namespace PlantChillers {
         CondInletNode = GTChiller(ChillerNum).Base.CondInletNodeNum;
         CondOutletNode = GTChiller(ChillerNum).Base.CondOutletNodeNum;
         HeatRecInNode = GTChiller(ChillerNum).HeatRecInletNodeNum;
-        HeatRecOutNode = GTChiller(ChillerNum).HeatRecOutletNodeNum;
         QHeatRecLube = 0.0;
         FRAC = 1.0;
         LoopNum = GTChiller(ChillerNum).Base.CWLoopNum;
         LoopSideNum = GTChiller(ChillerNum).Base.CWLoopSideNum;
-        EvapInletTemp = Node(EvapInletNode).Temp;
+        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         // calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -7051,7 +7023,7 @@ namespace PlantChillers {
         } // End of the Air Cooled/Evap Cooled Logic block
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        CondInletTemp = Node(CondInletNode).Temp;
+        _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
         if (GTChiller(ChillerNum).Base.CondenserType == WaterCooled) {
@@ -7418,10 +7390,10 @@ namespace PlantChillers {
 
             if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillerNum).Base.CDLoopNum).FluidName,
-                                               CondInletTemp,
+                                                                _CondInletTemp,
                                                DataPlant::PlantLoop(GTChiller(ChillerNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + CondInletTemp;
+                CondOutletTemp = QCondenser / CondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + GTChiller(ChillerNum).Base.Name);
                 ShowContinueErrorTimeStamp("");
@@ -7430,7 +7402,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled and there is no CondMassFlowRate and would divide by zero
-            CondOutletTemp = CondInletTemp;
+            CondOutletTemp = _CondInletTemp;
         }
 
         // Special GT Chiller Variables
@@ -7524,7 +7496,7 @@ namespace PlantChillers {
                 //                               GTDSLCAP(IS,TypeIndex,IPLCTR)) * 1.047))
 
                 DesignSteamSatTemp = GTChiller(ChillerNum).DesignSteamSatTemp;
-                ExhaustStackTemp =
+                _ExhaustStackTemp =
                     DesignSteamSatTemp + (ExhaustTemp - DesignSteamSatTemp) /
                                              std::exp(UAtoCapRat / (max(ExhaustFlow, MaxExhaustperGTPower * GTEngineCapacity) * ExhaustCP));
 
@@ -7605,7 +7577,7 @@ namespace PlantChillers {
 
         GTChillerReport(ChillerNum).FuelMassUsedRate = std::abs(FuelEnergyIn) / (FuelHeatingValue * KJtoJ);
 
-        GTChiller(ChillerNum).ExhaustStackTemp = ExhaustStackTemp;
+        GTChiller(ChillerNum).ExhaustStackTemp = _ExhaustStackTemp;
 
         // Calculate Energy
         CondenserEnergy = QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -7617,11 +7589,11 @@ namespace PlantChillers {
 
             if (GTChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
-                if (CondInletTemp > 70.0) {
+                if (_CondInletTemp > 70.0) {
                     ShowSevereError("CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" +
                                     GTChiller(ChillerNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
 
@@ -7633,7 +7605,7 @@ namespace PlantChillers {
                     ShowSevereError("CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + GTChiller(ChillerNum).Base.Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
-                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(CondInletTemp, 2));
+                    ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Evaporator inlet temperature: " + RoundSigDigits(Node(EvapInletNode).Temp, 2));
                     ShowFatalError("Program Terminates due to previous error condition");
                 }
@@ -7660,7 +7632,6 @@ namespace PlantChillers {
         //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
         //       RE-ENGINEERED  na
 
-        Real64 const DeltaTempTol(0.0001); // C - minimum significant mass flow rate
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcConstCOPChillerModel");
 
@@ -8169,7 +8140,7 @@ namespace PlantChillers {
     void CalcElectricChillerHeatRecovery(int const ChillNum,         // number of the current electric chiller being simulated
                                          Real64 &QCond,              // current condenser load
                                          Real64 const CondMassFlow,  // current condenser Mass Flow
-                                         Real64 const CondInletTemp, // current condenser Inlet Temp
+                                         Real64 const _CondInletTemp, // current condenser Inlet Temp
                                          Real64 &QHeatRec            // amount of heat recovered
     )
     {
@@ -8181,7 +8152,7 @@ namespace PlantChillers {
         // Calculate the heat recovered from the chiller condenser
 
         // Locals
-        Real64 HeatRecInletTemp;
+        Real64 _HeatRecInletTemp;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ChillerHeatRecovery");
@@ -8206,33 +8177,33 @@ namespace PlantChillers {
         HeatRecOutNode = ElectricChiller(ChillNum).HeatRecOutletNodeNum;
         CondInletNode = ElectricChiller(ChillNum).Base.CondInletNodeNum;
         CondOutletNode = ElectricChiller(ChillNum).Base.CondOutletNodeNum;
-        HeatRecInletTemp = Node(HeatRecInNode).Temp;
+        _HeatRecInletTemp = Node(HeatRecInNode).Temp;
         HeatRecMassFlowRate = Node(HeatRecInNode).MassFlowRate;
 
         CpHeatRec = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricChiller(ChillNum).HRLoopNum).FluidName,
-                                          HeatRecInletTemp,
+                                                           _HeatRecInletTemp,
                                           DataPlant::PlantLoop(ElectricChiller(ChillNum).HRLoopNum).FluidIndex,
                                           RoutineName);
 
         if (ElectricChiller(ChillNum).Base.CondenserType == WaterCooled) {
             CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidName,
-                                           CondInletTemp,
+                                                            _CondInletTemp,
                                            DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                            RoutineName);
         } else {
-            CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, CondInletTemp);
+            CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
         }
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot
         QTotal = QCond;
 
         if (ElectricChiller(ChillNum).HeatRecSetPointNodeNum == 0) { // use original algorithm that blends temps
-            TAvgIn = (HeatRecMassFlowRate * CpHeatRec * HeatRecInletTemp + CondMassFlow * CpCond * CondInletTemp) /
+            TAvgIn = (HeatRecMassFlowRate * CpHeatRec * _HeatRecInletTemp + CondMassFlow * CpCond * _CondInletTemp) /
                      (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond);
 
             TAvgOut = QTotal / (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond) + TAvgIn;
 
-            QHeatRec = HeatRecMassFlowRate * CpHeatRec * (TAvgOut - HeatRecInletTemp);
+            QHeatRec = HeatRecMassFlowRate * CpHeatRec * (TAvgOut - _HeatRecInletTemp);
             QHeatRec = max(QHeatRec, 0.0); // ensure non negative
             // check if heat flow too large for physical size of bundle
             QHeatRec = min(QHeatRec, ElectricChiller(ChillNum).HeatRecMaxCapacityLimit);
@@ -8247,7 +8218,7 @@ namespace PlantChillers {
                 }
             }
 
-            QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * (THeatRecSetPoint - HeatRecInletTemp);
+            QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * (THeatRecSetPoint - _HeatRecInletTemp);
             QHeatRecToSetPoint = max(QHeatRecToSetPoint, 0.0);
             QHeatRec = min(QTotal, QHeatRecToSetPoint);
             // check if heat flow too large for physical size of bundle
@@ -8256,7 +8227,7 @@ namespace PlantChillers {
         // check if limit on inlet is present and exceeded.
         if (ElectricChiller(ChillNum).HeatRecInletLimitSchedNum > 0) {
             HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(ElectricChiller(ChillNum).HeatRecInletLimitSchedNum);
-            if (HeatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
+            if (_HeatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
                 QHeatRec = 0.0;
             }
         }
@@ -8265,9 +8236,9 @@ namespace PlantChillers {
 
         // Calculate a new Heat Recovery Coil Outlet Temp
         if (HeatRecMassFlowRate > 0.0) {
-            HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
+            HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + _HeatRecInletTemp;
         } else {
-            HeatRecOutletTemp = HeatRecInletTemp;
+            HeatRecOutletTemp = _HeatRecInletTemp;
         }
     }
 
@@ -8293,7 +8264,6 @@ namespace PlantChillers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;
-        int HeatRecOutNode;
         Real64 HeatRecMdot;
         Real64 MinHeatRecMdot(0.0);
         Real64 HeatRecInTemp;
@@ -8302,7 +8272,6 @@ namespace PlantChillers {
 
         // Load inputs to local structure
         HeatRecInNode = EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum;
-        HeatRecOutNode = EngineDrivenChiller(ChillerNum).HeatRecOutletNodeNum;
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HeatRecRatio = 1.0;
