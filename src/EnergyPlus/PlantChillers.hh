@@ -72,48 +72,43 @@ namespace PlantChillers {
     extern int const LeavingSetPointModulated;
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumElectricChillers;    // number of Electric chillers specified in input
-    extern Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
-    extern Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
-    extern Real64 CondOutletTemp;      // C - condenser outlet temperature, air or water side
-    extern Real64 CondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
-    extern Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
-    extern Real64 Power;               // W - rate of chiller energy use
-    extern Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
-    extern Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
-    extern Real64 Energy;              // J - chiller energy use
-    extern Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
-    extern Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
-    extern Real64 QHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
-    extern Real64 HeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
-    extern Real64 AvgCondSinkTemp;     // condenser temperature value for use in curves [C]
-    extern Real64 ChillerCyclingRatio; // Cycling ratio for chiller when load is below MinPLR
-    extern Real64 BasinHeaterPower;    // Basin heater power (W)
+//    extern Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
+//    extern Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
+//    extern Real64 CondOutletTemp;      // C - condenser outlet temperature, air or water side
+//    extern Real64 CondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
+//    extern Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
+//    extern Real64 Power;               // W - rate of chiller energy use
+//    extern Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
+//    extern Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
+//    extern Real64 Energy;              // J - chiller energy use
+//    extern Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
+//    extern Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
+//    extern Real64 QHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
+//    extern Real64 HeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
+//    extern Real64 AvgCondSinkTemp;     // condenser temperature value for use in curves [C]
+//    extern Real64 ChillerCyclingRatio; // Cycling ratio for chiller when load is below MinPLR
+//    extern Real64 BasinHeaterPower;    // Basin heater power (W)
 
     // engine driven:
+//    extern Real64 HeatRecInletTemp;     // Inlet Temperature of the heat recovery fluid
+//    extern Real64 HeatRecMdotActual;    // reporting: Heat Recovery Loop Mass flow rate
+//    extern Real64 QTotalHeatRecovered; // total heat recovered (W)
+//    extern Real64 QJacketRecovered;    // heat recovered from jacket (W)
+//    extern Real64 QLubeOilRecovered;   // heat recovered from lube (W)
+//    extern Real64 QExhaustRecovered;   // exhaust gas heat recovered (W)
+//    extern Real64 FuelEnergyUseRate;   // Fuel Energy used (W)
+//    extern Real64 TotalHeatEnergyRec;  // total heat recovered (J)
+//    extern Real64 JacketEnergyRec;     // heat recovered from jacket (J)
+//    extern Real64 LubeOilEnergyRec;    // heat recovered from lube (J)
+//    extern Real64 ExhaustEnergyRec;    // exhaust gas heat recovered (J)
+//    extern Real64 FuelEnergy;          // Fuel Energy used (J)
+//    extern Real64 FuelMdot;            // Fuel Amount used (Kg/s)
+//    extern Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
+
+    extern int NumElectricChillers;    // number of Electric chillers specified in input
     extern int NumEngineDrivenChillers; // number of EngineDriven chillers specified in input
-    extern Real64 HeatRecInletTemp;     // Inlet Temperature of the heat recovery fluid
-    extern Real64 HeatRecMdotActual;    // reporting: Heat Recovery Loop Mass flow rate
-    extern Real64 QTotalHeatRecovered; // total heat recovered (W)
-    extern Real64 QJacketRecovered;    // heat recovered from jacket (W)
-    extern Real64 QLubeOilRecovered;   // heat recovered from lube (W)
-    extern Real64 QExhaustRecovered;   // exhaust gas heat recovered (W)
-    extern Real64 FuelEnergyUseRate;   // Fuel Energy used (W)
-    extern Real64 TotalHeatEnergyRec;  // total heat recovered (J)
-    extern Real64 JacketEnergyRec;     // heat recovered from jacket (J)
-    extern Real64 LubeOilEnergyRec;    // heat recovered from lube (J)
-    extern Real64 ExhaustEnergyRec;    // exhaust gas heat recovered (J)
-    extern Real64 FuelEnergy;          // Fuel Energy used (J)
-    extern Real64 FuelMdot;            // Fuel Amount used (Kg/s)
-    extern Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
-
-    // gas turbine
     extern int NumGTChillers; // number of GT chillers specified in input
-
-    // const COP
     extern int NumConstCOPChillers;
-    extern Real64 EvapInletTemp;
-    extern Real64 CondInletTemp;
 
     extern bool GetEngineDrivenInput; // then TRUE, calls subroutine to read input file.
     extern bool GetElectricInput;     // then TRUE, calls subroutine to read input file.
