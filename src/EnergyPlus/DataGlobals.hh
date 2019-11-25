@@ -71,6 +71,7 @@ namespace DataGlobals {
     extern bool isCBOR;
     extern bool isMsgPack;
     extern bool preserveIDFOrder;
+    extern bool stopSimulation;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;

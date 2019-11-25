@@ -70,6 +70,10 @@ int energyplus(int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(argc, argv);
 }
 
+void stopSimulation() {
+  energyplus::DataGlobals::stopSimulation = true;
+}
+
 void issueWarning(const char * message) {
     EnergyPlus::ShowWarningError(message);
 }
