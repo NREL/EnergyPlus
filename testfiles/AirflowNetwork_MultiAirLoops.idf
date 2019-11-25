@@ -2583,7 +2583,7 @@
 
   AirflowNetwork:Distribution:Component:Duct,
     Zone1Supply2Link ATInlet Duct,  !- Name
-    0.01,                    !- Duct Length {m}
+    0.0001,                  !- Duct Length {m}
     0.4,                     !- Hydraulic Diameter {m}
     0.1256,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
@@ -3019,7 +3019,7 @@
 
   AirflowNetwork:Distribution:Component:Duct,
     Heat Pump 1 Zone1InletlLink ATInlet Duct,  !- Name
-    0.01,                    !- Duct Length {m}
+    0.0001,                  !- Duct Length {m}
     0.4,                     !- Hydraulic Diameter {m}
     0.1256,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}

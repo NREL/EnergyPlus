@@ -766,7 +766,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      CALL GetNewObjectDefInIDD('AirflowNetwork:Distribution:Component:Duct',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
                      POutArgs = Blank
                      POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet Duct'
-                     POutArgs(2) = '0.01'
+                     POutArgs(2) = '0.0001'
                      PNumArgs = NumNumbers + 1
                      ! First, copy all the same values for remaining fields
                      POutArgs(3:PNumArgs) = Numbers(2:NumNumbers)

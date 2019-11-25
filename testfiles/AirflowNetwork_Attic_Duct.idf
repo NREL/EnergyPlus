@@ -1103,7 +1103,7 @@
 
   AirflowNetwork:Distribution:Component:Duct,
     ZoneSupply1Link2 ATInlet Duct,  !- Name
-    0.01,                    !- Duct Length {m}
+    0.0001,                  !- Duct Length {m}
     0.1524,                  !- Hydraulic Diameter {m}
     0.0182,                  !- Cross Section Area {m2}
     0.0009,                  !- Surface Roughness {m}
