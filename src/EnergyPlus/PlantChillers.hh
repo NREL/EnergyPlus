@@ -173,6 +173,8 @@ namespace PlantChillers {
         Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
         bool MyFlag;
         bool MyEnvrnFlag;
+        Real64 TimeStepSysLast;
+        Real64 CurrentEndTimeLast;
 
         // Default Constructor
         BaseChillerSpecs()
@@ -183,7 +185,8 @@ namespace PlantChillers {
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), SizFac(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
               BasinHeaterSchedulePtr(0), ErrCount1(0), ErrCount2(0), MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), CheckEquipName(true),
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
-              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true)
+              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
+              TimeStepSysLast(0.0), CurrentEndTimeLast(0.0)
         {
         }
     };

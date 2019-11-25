@@ -5415,9 +5415,7 @@ namespace PlantChillers {
         int LoopSideNum;
         int BranchNum;
         int CompNum;
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         std::string OutputChar;         // character string for warning messages
         Real64 Cp;                             // local for fluid specif heat, for evaporator
         Real64 CpCond;                         // local for fluid specif heat, for condenser
@@ -5450,7 +5448,7 @@ namespace PlantChillers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > ElectricChiller(ChillNum).Base.CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= ElectricChiller(ChillNum).Base.TimeStepSysLast) {
             if (ElectricChiller(ChillNum).Base.PrintMessage) {
                 ++ElectricChiller(ChillNum).Base.MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -5470,8 +5468,8 @@ namespace PlantChillers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        ElectricChiller(ChillNum).Base.TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        ElectricChiller(ChillNum).Base.CurrentEndTimeLast = CurrentEndTime;
 
         // If no loop demand or chiller OFF, return
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
@@ -6085,9 +6083,7 @@ namespace PlantChillers {
         Real64 FRAC;
         int LoopNum;
         int LoopSideNum;
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         std::string OutputChar;         // character string for warning messages
         Real64 Cp;                             // local for fluid specif heat, for evaporator
         Real64 CpCond;                         // local for fluid specif heat, for condenser
@@ -6153,7 +6149,7 @@ namespace PlantChillers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > EngineDrivenChiller(ChillerNum).Base.CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= EngineDrivenChiller(ChillerNum).Base.TimeStepSysLast) {
             if (EngineDrivenChiller(ChillerNum).Base.PrintMessage) {
                 ++EngineDrivenChiller(ChillerNum).Base.MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -6173,8 +6169,8 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        EngineDrivenChiller(ChillerNum).Base.TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        EngineDrivenChiller(ChillerNum).Base.CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
@@ -6827,9 +6823,7 @@ namespace PlantChillers {
         Real64 UAtoCapRat;                     // (UACGC) Heat Exchanger UA to Capacity
         Real64 AmbientDeltaT;                  // (ATAIR) Difference between ambient actual and ambient design temperatures
         Real64 DesignSteamSatTemp;             // Saturization Temperature of Steam in Stack
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         std::string OutputChar;         // character string for warning messages
 
         int HeatRecInNode;          // Heat Recovery Fluid Inlet Node Num
@@ -6874,7 +6868,7 @@ namespace PlantChillers {
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > GTChiller(ChillerNum).Base.CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= GTChiller(ChillerNum).Base.TimeStepSysLast) {
             if (GTChiller(ChillerNum).Base.PrintMessage) {
                 ++GTChiller(ChillerNum).Base.MsgErrorCount;
                 // Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -6894,8 +6888,8 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        GTChiller(ChillerNum).Base.TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        GTChiller(ChillerNum).Base.CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.Before leaving
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
@@ -7598,9 +7592,7 @@ namespace PlantChillers {
         //  LOGICAL,SAVE           :: PossibleSubcooling=.FALSE.
         int LoopNum;
         int LoopSideNum;
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         std::string OutputChar;         // character string for warning messages
         Real64 COP;                            // coefficient of performance
         Real64 Cp;                             // local for fluid specif heat, for evaporator
@@ -7740,7 +7732,7 @@ namespace PlantChillers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > ConstCOPChiller(ChillNum).Base.CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= ConstCOPChiller(ChillNum).Base.TimeStepSysLast) {
             if (ConstCOPChiller(ChillNum).Base.PrintMessage) {
                 ++ConstCOPChiller(ChillNum).Base.MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -7760,8 +7752,8 @@ namespace PlantChillers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        ConstCOPChiller(ChillNum).Base.TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        ConstCOPChiller(ChillNum).Base.CurrentEndTimeLast = CurrentEndTime;
 
         // otherwise the chiller is running...
 
