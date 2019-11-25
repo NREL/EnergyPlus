@@ -633,7 +633,7 @@ namespace PlantChillers {
         int NumAlphas;  // Number of elements in the alpha array
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool Okay;
 
         // FLOW
@@ -1191,7 +1191,7 @@ namespace PlantChillers {
         int NumAlphas;  // Number of elements in the alpha array
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool Okay;
 
         // FLOW
@@ -1882,7 +1882,7 @@ namespace PlantChillers {
         int NumAlphas;  // Number of elements in the alpha array
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool Okay;
 
         // FLOW
@@ -2501,7 +2501,7 @@ namespace PlantChillers {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool Okay;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
@@ -2886,9 +2886,6 @@ namespace PlantChillers {
         static std::string const RoutineName("InitElectricChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyFlag;
-        static Array1D_bool MyEnvrnFlag;
         int CondInletNode;  // node number of water inlet node to the condenser
         int CondOutletNode; // node number of water outlet node from the condenser
         int EvapInletNode;
@@ -2907,22 +2904,13 @@ namespace PlantChillers {
         int CompIndex;
         bool FatalError;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumElectricChillers);
-            MyEnvrnFlag.allocate(NumElectricChillers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
         CondInletNode = ElectricChiller(ChillNum).Base.CondInletNodeNum;
         CondOutletNode = ElectricChiller(ChillNum).Base.CondOutletNodeNum;
         EvapInletNode = ElectricChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = ElectricChiller(ChillNum).Base.EvapOutletNodeNum;
 
         // Init more variables
-        if (MyFlag(ChillNum)) {
+        if (ElectricChiller(ChillNum).Base.MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ElectricChiller(ChillNum).Base.Name,
@@ -3051,10 +3039,10 @@ namespace PlantChillers {
                     }
                 }
             }
-            MyFlag(ChillNum) = false;
+            ElectricChiller(ChillNum).Base.MyFlag = false;
         }
 
-        if (MyEnvrnFlag(ChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (ElectricChiller(ChillNum).Base.MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -3168,10 +3156,10 @@ namespace PlantChillers {
                 }         // IF(ElectricChiller(ChillNum)%HeatRecSetpointNodeNum > 0)THEN
             }             // IF (ElectricChiller(ChillNum)%HeatRecActive) THEN
 
-            MyEnvrnFlag(ChillNum) = false;
+            ElectricChiller(ChillNum).Base.MyEnvrnFlag = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(ChillNum) = true;
+            ElectricChiller(ChillNum).Base.MyEnvrnFlag = true;
         }
 
         if ((ElectricChiller(ChillNum).Base.FlowMode == LeavingSetPointModulated) && (ElectricChiller(ChillNum).Base.ModulatedFlowSetToLoop)) {
@@ -3260,9 +3248,6 @@ namespace PlantChillers {
         static std::string const RoutineName("InitEngineDrivenChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyFlag;
         int CondInletNode; // node number of water inlet node to the condenser
         int CondOutletNode;
         int EvapInletNode;
@@ -3279,15 +3264,6 @@ namespace PlantChillers {
         int CompIndex;
         bool FatalError;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumEngineDrivenChillers);
-            MyEnvrnFlag.allocate(NumEngineDrivenChillers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
         // Load inputs to local structure
         CondInletNode = EngineDrivenChiller(ChillNum).Base.CondInletNodeNum;
         CondOutletNode = EngineDrivenChiller(ChillNum).Base.CondOutletNodeNum;
@@ -3295,7 +3271,7 @@ namespace PlantChillers {
         EvapOutletNode = EngineDrivenChiller(ChillNum).Base.EvapOutletNodeNum;
 
         // Init more variables
-        if (MyFlag(ChillNum)) {
+        if (EngineDrivenChiller(ChillNum).Base.MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Base.Name,
@@ -3350,7 +3326,7 @@ namespace PlantChillers {
                                               TypeOf_Chiller_EngineDriven,
                                               true);
             }
-            MyFlag(ChillNum) = false;
+
             if (EngineDrivenChiller(ChillNum).Base.CondenserType != AirCooled && EngineDrivenChiller(ChillNum).Base.CondenserType != EvapCooled &&
                 EngineDrivenChiller(ChillNum).HeatRecActive) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).Base.CDLoopNum,
@@ -3417,13 +3393,13 @@ namespace PlantChillers {
                 }
             }
 
-            MyFlag(ChillNum) = false;
+            EngineDrivenChiller(ChillNum).Base.MyFlag = false;
         }
 
         // Initialize critical Demand Side Variables
         //  IF((MyEnvrnFlag(ChillNum) .and. BeginEnvrnFlag) &
         //     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
-        if (MyEnvrnFlag(ChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (EngineDrivenChiller(ChillNum).Base.MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).Base.CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -3492,11 +3468,11 @@ namespace PlantChillers {
                                    EngineDrivenChiller(ChillNum).HRCompNum);
             }
 
-            MyEnvrnFlag(ChillNum) = false;
+            EngineDrivenChiller(ChillNum).Base.MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(ChillNum) = true;
+            EngineDrivenChiller(ChillNum).Base.MyEnvrnFlag = true;
         }
 
         if ((EngineDrivenChiller(ChillNum).Base.FlowMode == LeavingSetPointModulated) &&
@@ -3577,9 +3553,6 @@ namespace PlantChillers {
         static std::string const RoutineName("InitGTChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyFlag;
         int CondInletNode;  // node number of water inlet node to the condenser
         int CondOutletNode; // node number of water outlet node from the condenser
         int EvapInletNode;
@@ -3597,22 +3570,13 @@ namespace PlantChillers {
         bool errFlag;
         // FLOW:
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumGTChillers);
-            MyEnvrnFlag.allocate(NumGTChillers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
         CondInletNode = GTChiller(ChillNum).Base.CondInletNodeNum;
         CondOutletNode = GTChiller(ChillNum).Base.CondOutletNodeNum;
         EvapInletNode = GTChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = GTChiller(ChillNum).Base.EvapOutletNodeNum;
 
         // Init more variables
-        if (MyFlag(ChillNum)) {
+        if (GTChiller(ChillNum).Base.MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(GTChiller(ChillNum).Base.Name,
@@ -3734,10 +3698,10 @@ namespace PlantChillers {
                         Node(DataPlant::PlantLoop(GTChiller(ChillNum).Base.CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            MyFlag(ChillNum) = false;
+            GTChiller(ChillNum).Base.MyFlag = false;
         }
 
-        if (MyEnvrnFlag(ChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (GTChiller(ChillNum).Base.MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).Base.CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -3805,11 +3769,11 @@ namespace PlantChillers {
                                    GTChiller(ChillNum).HRCompNum);
             }
 
-            MyEnvrnFlag(ChillNum) = false;
+            GTChiller(ChillNum).Base.MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(ChillNum) = true;
+            GTChiller(ChillNum).Base.MyEnvrnFlag = true;
         }
 
         if ((GTChiller(ChillNum).Base.FlowMode == LeavingSetPointModulated) && (GTChiller(ChillNum).Base.ModulatedFlowSetToLoop)) {
@@ -3894,9 +3858,6 @@ namespace PlantChillers {
         Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool OneTimeFlag(true);
-        static Array1D_bool MyFlag;
-        static Array1D_bool MyEnvironFlag;
         int CondInletNode;  // node number of water inlet node to the condenser
         int CondOutletNode; // node number of water outlet node from the condenser
         int EvapInletNode;
@@ -3906,14 +3867,6 @@ namespace PlantChillers {
         Real64 mdotCond; // local mass flow rate for condenser
         bool FatalError;
         bool errFlag;
-        
-        if (OneTimeFlag) {
-            MyFlag.allocate(NumConstCOPChillers);
-            MyEnvironFlag.allocate(NumConstCOPChillers);
-            MyFlag = true;
-            MyEnvironFlag = true;
-            OneTimeFlag = false;
-        }
 
         EvapInletNode = ConstCOPChiller(ChillNum).Base.EvapInletNodeNum;
         EvapOutletNode = ConstCOPChiller(ChillNum).Base.EvapOutletNodeNum;
@@ -3921,7 +3874,7 @@ namespace PlantChillers {
         CondOutletNode = ConstCOPChiller(ChillNum).Base.CondOutletNodeNum;
 
         // Init more variables
-        if (MyFlag(ChillNum)) {
+        if (ConstCOPChiller(ChillNum).Base.MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ConstCOPChiller(ChillNum).Base.Name,
@@ -4013,11 +3966,11 @@ namespace PlantChillers {
                         Node(DataPlant::PlantLoop(ConstCOPChiller(ChillNum).Base.CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            MyFlag(ChillNum) = false;
+            ConstCOPChiller(ChillNum).Base.MyFlag = false;
         }
 
         // Initialize critical Demand Side Variables at the beginning of each environment
-        if (MyEnvironFlag(ChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (ConstCOPChiller(ChillNum).Base.MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ConstCOPChiller(ChillNum).Base.CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -4066,11 +4019,11 @@ namespace PlantChillers {
                 Node(CondOutletNode).MassFlowRateMinAvail = 0.0;
                 Node(CondOutletNode).MassFlowRateMin = 0.0;
             }
-            MyEnvironFlag(ChillNum) = false;
+            ConstCOPChiller(ChillNum).Base.MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvironFlag(ChillNum) = true;
+            ConstCOPChiller(ChillNum).Base.MyEnvrnFlag = true;
         }
         if ((ConstCOPChiller(ChillNum).Base.FlowMode == LeavingSetPointModulated) && (ConstCOPChiller(ChillNum).Base.ModulatedFlowSetToLoop)) {
             // fix for clumsy old input that worked because loop setpoint was spread.
@@ -5465,7 +5418,7 @@ namespace PlantChillers {
         static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
         static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
-        static std::string OutputChar;         // character string for warning messages
+        std::string OutputChar;         // character string for warning messages
         Real64 Cp;                             // local for fluid specif heat, for evaporator
         Real64 CpCond;                         // local for fluid specif heat, for condenser
 
@@ -6135,7 +6088,7 @@ namespace PlantChillers {
         static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
         static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
-        static std::string OutputChar;         // character string for warning messages
+        std::string OutputChar;         // character string for warning messages
         Real64 Cp;                             // local for fluid specif heat, for evaporator
         Real64 CpCond;                         // local for fluid specif heat, for condenser
 
@@ -6857,7 +6810,7 @@ namespace PlantChillers {
         int EvapOutletNode;                     // evaporator outlet node number, water side
         int CondInletNode;                      // condenser inlet node number, water side
         int CondOutletNode;                     // condenser outlet node number, water side
-        static Real64 EvapMassFlowRateMax(0.0); // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
+        Real64 EvapMassFlowRateMax(0.0); // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
         Real64 TempLowLimitEout;                // C - Evaporator low temp. limit cut off
         // Special variables for GT Chiller
         Real64 RPLoad;
@@ -6877,7 +6830,7 @@ namespace PlantChillers {
         static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
         static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
-        static std::string OutputChar;         // character string for warning messages
+        std::string OutputChar;         // character string for warning messages
 
         int HeatRecInNode;          // Heat Recovery Fluid Inlet Node Num
         Real64 HeatRecInTemp(0.0);  // Heat Recovery Fluid Inlet Temperature
@@ -7648,7 +7601,7 @@ namespace PlantChillers {
         static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
         static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
-        static std::string OutputChar;         // character string for warning messages
+        std::string OutputChar;         // character string for warning messages
         Real64 COP;                            // coefficient of performance
         Real64 Cp;                             // local for fluid specif heat, for evaporator
         Real64 CpCond;                         // local for fluid specif heat, for condenser

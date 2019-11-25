@@ -171,6 +171,8 @@ namespace PlantChillers {
         bool FaultyChillerFoulingFlag;     // True if the chiller has fouling fault
         int FaultyChillerFoulingIndex;     // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
+        bool MyFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         BaseChillerSpecs()
@@ -181,7 +183,7 @@ namespace PlantChillers {
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), SizFac(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
               BasinHeaterSchedulePtr(0), ErrCount1(0), ErrCount2(0), MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), CheckEquipName(true),
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
-              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0)
+              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true)
         {
         }
     };
