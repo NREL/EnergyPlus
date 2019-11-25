@@ -11442,7 +11442,7 @@ TEST_F( ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest )
 
 }
 
-TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTadeOff)
+TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 {
     // Test #7601
     bool ErrorsFound(false);
