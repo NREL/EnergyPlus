@@ -59,10 +59,6 @@ namespace EnergyPlus {
 
 namespace PlantChillers {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Parameters for use in Chillers
     extern int const AirCooled;
     extern int const WaterCooled;
@@ -120,24 +116,10 @@ namespace PlantChillers {
     extern Real64 EvapInletTemp;
     extern Real64 CondInletTemp;
 
-    // DERIVED TYPE DEFINITIONS
-
     extern bool GetEngineDrivenInput; // then TRUE, calls subroutine to read input file.
     extern bool GetElectricInput;     // then TRUE, calls subroutine to read input file.
     extern bool GetGasTurbineInput;   // then TRUE, calls subroutine to read input file.
     extern bool GetConstCOPInput;
-
-    // Merged routines
-
-    // Electric Chiller
-
-    // Engine Driven Chiller
-
-    // Gas Turbine Chiller
-
-    // Const COP
-
-    // Types
 
     struct BaseChillerSpecs
     {
@@ -601,12 +583,6 @@ namespace PlantChillers {
                                       int const Num        // chiller number
     );
 
-    // End of EngineDriven Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the EngineDriven Chiller Module
-    // *****************************************************************************
-
     void UpdateEngineDrivenChiller(Real64 const MyLoad, // current load
                                    bool const RunFlag,  // TRUE if chiller operating
                                    int const Num        // chiller number
@@ -620,9 +596,6 @@ namespace PlantChillers {
     void UpdateConstCOPChillerRecords(Real64 const MyLoad, // unused1208
                                       bool const RunFlag,  // unused1208
                                       int const Num);
-
-    // End of Record Keeping subroutines for the Const COP Chiller Module
-    // *****************************************************************************
 
 } // namespace PlantChillers
 

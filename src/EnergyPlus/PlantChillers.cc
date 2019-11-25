@@ -181,22 +181,10 @@ namespace PlantChillers {
     Real64 EvapInletTemp(0.0);
     Real64 CondInletTemp(0.0);
 
-    // DERIVED TYPE DEFINITIONS
-
     bool GetEngineDrivenInput(true); // then TRUE, calls subroutine to read input file.
     bool GetElectricInput(true);     // then TRUE, calls subroutine to read input file.
     bool GetGasTurbineInput(true);   // then TRUE, calls subroutine to read input file.
     bool GetConstCOPInput(true);
-
-    // Merged routines
-
-    // Electric Chiller
-
-    // Engine Driven Chiller
-
-    // Gas Turbine Chiller
-
-    // Const COP
 
     // Object Data
     Array1D<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
@@ -207,13 +195,6 @@ namespace PlantChillers {
     Array1D<GasTurbineReportVars> GTChillerReport;
     Array1D<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
     Array1D<ConstCOPReportVars> ConstCOPChillerReport;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Electric Chiller Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
 
     void clear_state()
     {
@@ -658,11 +639,8 @@ namespace PlantChillers {
         int NumAlphas;  // Number of elements in the alpha array
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
-        //  CHARACTER(len=MaxNameLength),DIMENSION(9)   :: AlphArray !character string data
-        //  REAL(r64),                        DIMENSION(22)  :: NumArray  !numeric data
         static bool ErrorsFound(false);
         bool Okay;
-        //  CHARACTER(len=MaxNameLength) :: cCurrentModuleObject  ! for ease in renaming.
 
         // FLOW
         cCurrentModuleObject = "Chiller:Electric";
@@ -2955,7 +2933,6 @@ namespace PlantChillers {
         int BranchIndex;
         int CompIndex;
         bool FatalError;
-        // FLOW:
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
@@ -4582,9 +4559,6 @@ namespace PlantChillers {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -4929,9 +4903,6 @@ namespace PlantChillers {
         // Obtains evaporator flow rate from the plant sizing array. Calculates nominal capacity from
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace DataSizing;
@@ -5312,9 +5283,6 @@ namespace PlantChillers {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -5640,19 +5608,8 @@ namespace PlantChillers {
         Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
         Real64 CondInletTemp; // C - condenser inlet temperature, water side
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // INTEGER, INTENT(IN)    :: FlowLock        ! TRUE when flow resolver has calculated branch flow
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;           // min allowed operating frac full load
@@ -5679,7 +5636,6 @@ namespace PlantChillers {
         int CondInletNode;               // condenser inlet node number, water side
         int CondOutletNode;              // condenser outlet node number, water side
         Real64 FRAC;
-        //  LOGICAL,SAVE           :: PossibleSubcooling=.FALSE.
         int PlantLoopNum;
         int LoopNum;
         int LoopSideNum;
@@ -6350,23 +6306,12 @@ namespace PlantChillers {
         Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
         Real64 CondInletTemp; // C - condenser inlet temperature, water side
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // INTEGER, INTENT(IN)    :: FlowLock        ! TRUE when flow resolver has calculated branch flow
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         Real64 const ExhaustCP(1.047);    // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcEngineDrivenChillerModel");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;           // min allowed operating frac full load
@@ -6417,7 +6362,6 @@ namespace PlantChillers {
         Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
         Real64 EngineDrivenFuelEnergy;
         Real64 HeatRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
-        //  LOGICAL,SAVE :: PossibleSubcooling=.FALSE.
 
         // set module level inlet and outlet nodes
         EvapMassFlowRate = 0.0;
@@ -6626,8 +6570,6 @@ namespace PlantChillers {
             COP = COP_ff * EngineDrivenChiller(ChillerNum).Base.FaultyChillerFoulingFactor;
         }
 
-        //*********************************
-
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
         if (EngineDrivenChiller(ChillerNum).Base.FaultyChillerSWTFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             int FaultIndex = EngineDrivenChiller(ChillerNum).Base.FaultyChillerSWTIndex;
@@ -6670,7 +6612,7 @@ namespace PlantChillers {
         } else {
             OperPartLoadRat = 0.0;
         }
-        //*********************************
+
         Cp = GetSpecificHeatGlycol(PlantLoop(EngineDrivenChiller(ChillerNum).Base.CWLoopNum).FluidName,
                                    Node(EvapInletNode).Temp,
                                    PlantLoop(EngineDrivenChiller(ChillerNum).Base.CWLoopNum).FluidIndex,
@@ -6775,7 +6717,6 @@ namespace PlantChillers {
                 // update corresponding variables at faulty case
                 PartLoadRat = (AvailChillerCap > 0.0) ? (QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
-                // ChillerPartLoadRatio = PartLoadRat;
                 EvapDeltaTemp = Node(EvapInletNode).Temp - EvapOutletTemp;
             }
 
@@ -7126,20 +7067,10 @@ namespace PlantChillers {
         Real64 EvapInletTemp;         // C - evaporator inlet temperature, water side
         Real64 CondInletTemp;         // C - condenser inlet temperature, water side
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcGTChillerModel");
         static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;                  // min allowed operating frac full load
@@ -7196,7 +7127,6 @@ namespace PlantChillers {
         Real64 MinHeatRecMdot(0.0); // Mass Flow rate that keeps from exceeding max temp
         Real64 HeatRecRatio;        // Reduced ratio to multiply recovered heat terms by
         Real64 FRAC;
-        //  LOGICAL,SAVE      :: PossibleSubcooling=.FALSE.
 
         int LoopNum;
         int LoopSideNum;
@@ -7390,8 +7320,6 @@ namespace PlantChillers {
             COP = COP_ff * GTChiller(ChillerNum).Base.FaultyChillerFoulingFactor;
         }
 
-        //*********************************
-
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
         if (GTChiller(ChillerNum).Base.FaultyChillerSWTFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             int FaultIndex = GTChiller(ChillerNum).Base.FaultyChillerSWTIndex;
@@ -7435,7 +7363,7 @@ namespace PlantChillers {
         } else {
             OperPartLoadRat = 0.0;
         }
-        //*********************************
+
         Cp = GetSpecificHeatGlycol(PlantLoop(GTChiller(ChillerNum).Base.CWLoopNum).FluidName,
                                    Node(EvapInletNode).Temp,
                                    PlantLoop(GTChiller(ChillerNum).Base.CWLoopNum).FluidIndex,
@@ -7976,17 +7904,9 @@ namespace PlantChillers {
         using PlantUtilities::PullCompInterconnectTrigger;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         Real64 const DeltaTempTol(0.0001); // C - minimum significant mass flow rate
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcConstCOPChillerModel");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EvapDeltaTemp;
@@ -8504,10 +8424,6 @@ namespace PlantChillers {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the heat recovered from the chiller condenser
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
         // Using/Aliasing
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
@@ -8519,13 +8435,8 @@ namespace PlantChillers {
         // Locals
         Real64 HeatRecInletTemp;
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ChillerHeatRecovery");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode;  // condenser inlet node number, water side
@@ -8629,22 +8540,13 @@ namespace PlantChillers {
         // The chiller sets the flow on the loop first by the input design flowrate and then
         // performs a check to verify that
 
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnWTdb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ChillerHeatRecovery");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;
@@ -8713,29 +8615,12 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
         // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;  // evaporator inlet node number, water side
@@ -8841,12 +8726,6 @@ namespace PlantChillers {
         }
     }
 
-    // End of EngineDriven Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the EngineDriven Chiller Module
-    // *****************************************************************************
-
     void UpdateEngineDrivenChiller(Real64 const MyLoad, // current load
                                    bool const RunFlag,  // TRUE if chiller operating
                                    int const Num        // chiller number
@@ -8856,28 +8735,10 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;  // evaporator inlet node number, water side
@@ -8981,27 +8842,10 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // reporting
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
         // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;  // evaporator inlet node number, water side
@@ -9115,26 +8959,9 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // REFERENCES:
-
         // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;
@@ -9201,9 +9028,6 @@ namespace PlantChillers {
             Node(CondOutletNode).Temp = CondOutletTemp;
         }
     }
-
-    // End of Record Keeping subroutines for the Const COP Chiller Module
-    // *****************************************************************************
 
 } // namespace PlantChillers
 
