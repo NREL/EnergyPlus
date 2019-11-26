@@ -226,7 +226,9 @@ namespace SolarCollectors {
         {
         }
 
-        void InitSolarCollector();
+        void setupOutputVars();
+
+        void initialize();
 
         void CalcTransRefAbsOfCover(Real64 IncidentAngle,        // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance
@@ -256,7 +258,7 @@ namespace SolarCollectors {
                                             Real64 TempWaterOld,      // collector water temperature at previous time step [C]
                                             Real64 &TempAbsPlate,           // absorber plate temperature at current time step [C]
                                             Real64 &TempWater,              // collector water temperature at current time step [C]
-                                            bool AbsorberPlateHasMass // flag for absober thermal mass
+                                            bool AbsorberPlateHasMass // flag for absorber thermal mass
         );
 
         static Real64 CalcConvCoeffBetweenPlates(Real64 TempSurf1, // temperature of surface 1
@@ -274,9 +276,9 @@ namespace SolarCollectors {
 
         static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
 
-        void UpdateSolarCollector();
+        void update();
 
-        void ReportSolarCollector();
+        void report();
     };
 
     // Object Data
