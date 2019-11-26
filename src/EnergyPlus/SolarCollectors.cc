@@ -116,72 +116,24 @@ namespace SolarCollectors {
         UniqueCollectorNames.clear();
         UniqueParametersNames.clear();
     }
-    void SimSolarCollector(int const EP_UNUSED(EquipTypeNum),
-                           std::string const &CompName,
-                           int &CompIndex,
-                           bool const EP_UNUSED(InitLoopEquip),
-                           bool const EP_UNUSED(FirstHVACIteration))
+
+    PlantComponent *CollectorData::factory(std::string const &objectName)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   December 2003
-        //       MODIFIED       Brent Griffith, March 2010
-        //                      Bereket Nigusse, March 2012 Added ICS collector
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Simulates solar collector objects.
-
-        int CollectorNum;
-
-        // FLOW:
+        // Process the input data
         if (GetInputFlag) {
             GetSolarCollectorInput();
             GetInputFlag = false;
         }
-
-        if (CompIndex == 0) {
-            CollectorNum = UtilityRoutines::FindItemInList(CompName, Collector);
-            if (CollectorNum == 0) {
-                ShowFatalError("SimSolarCollector: Specified solar collector not Valid =" + CompName);
-            }
-            CompIndex = CollectorNum;
-        } else {
-            CollectorNum = CompIndex;
-            if (CollectorNum > NumOfCollectors || CollectorNum < 1) {
-                ShowFatalError("SimSolarCollector: Invalid CompIndex passed=" + General::TrimSigDigits(CollectorNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumOfCollectors) + ", Entered Unit name=" + CompName);
-            }
-            if (CheckEquipName(CollectorNum)) {
-                if (CompName != Collector(CollectorNum).Name) {
-                    ShowFatalError("SimSolarCollector: Invalid CompIndex passed=" + General::TrimSigDigits(CollectorNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + Collector(CollectorNum).Name);
-                }
-                CheckEquipName(CollectorNum) = false;
+        // Now look for this particular object
+        for (auto &thisSC : Collector) {
+            if (thisSC.Name == objectName) {
+                return &thisSC;
             }
         }
-
-        Collector(CollectorNum).initialize();
-
-        {
-            auto const SELECT_CASE_var(Collector(CollectorNum).TypeNum);
-            // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
-
-                Collector(CollectorNum).CalcSolarCollector();
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
-
-                Collector(CollectorNum).CalcICSSolarCollector();
-
-            } else {
-            }
-        }
-
-        Collector(CollectorNum).update();
-
-        Collector(CollectorNum).report();
+        // If we didn't find it, fatal
+        ShowFatalError("LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void GetSolarCollectorInput()
@@ -424,54 +376,6 @@ namespace SolarCollectors {
                     Collector(CollectorNum).VolFlowRateMax = 0.0;       // Max vol flow rate is not specified; no flow for plant sizing calculation
                     Collector(CollectorNum).MassFlowRateMax = 999999.9; // But...set a very high value so that it demands as much as possible
                 }
-
-                // Setup report variables
-                SetupOutputVariable("Solar Collector Incident Angle Modifier",
-                                    OutputProcessor::Unit::None,
-                                    Collector(CollectorNum).IncidentAngleModifier,
-                                    "System",
-                                    "Average",
-                                    Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Efficiency",
-                                    OutputProcessor::Unit::None,
-                                    Collector(CollectorNum).Efficiency,
-                                    "System",
-                                    "Average",
-                                    Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    Collector(CollectorNum).Power,
-                                    "System",
-                                    "Average",
-                                    Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
-                                    Collector(CollectorNum).HeatGain,
-                                    "System",
-                                    "Average",
-                                    Collector(CollectorNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Loss Rate",
-                                    OutputProcessor::Unit::W,
-                                    Collector(CollectorNum).HeatLoss,
-                                    "System",
-                                    "Average",
-                                    Collector(FlatPlateUnitsNum).Name);
-
-                SetupOutputVariable("Solar Collector Heat Transfer Energy",
-                                    OutputProcessor::Unit::J,
-                                    Collector(CollectorNum).Energy,
-                                    "System",
-                                    "Sum",
-                                    Collector(FlatPlateUnitsNum).Name,
-                                    _,
-                                    "SolarWater",
-                                    "HeatProduced",
-                                    _,
-                                    "Plant");
 
                 BranchNodeConnections::TestCompSet(CurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5), "Water Nodes");
 
@@ -717,116 +621,148 @@ namespace SolarCollectors {
 
     void CollectorData::setupOutputVars()
     {
-        SetupOutputVariable("Solar Collector Transmittance Absorptance Product",
-                            OutputProcessor::Unit::None,
-                            this->TauAlpha,
-                            "System",
-                            "Average",
-                            this->Name);
+        if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+            // Setup report variables
+            SetupOutputVariable("Solar Collector Incident Angle Modifier",
+                                OutputProcessor::Unit::None,
+                                this->IncidentAngleModifier,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Overall Top Heat Loss Coefficient",
-                            OutputProcessor::Unit::W_m2C,
-                            this->UTopLoss,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Efficiency",
+                                OutputProcessor::Unit::None,
+                                this->Efficiency,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Absorber Plate Temperature",
-                            OutputProcessor::Unit::C,
-                            this->TempOfAbsPlate,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Power,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Storage Water Temperature",
-                            OutputProcessor::Unit::C,
-                            this->TempOfWater,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Heat Gain Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatGain,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Thermal Efficiency",
-                            OutputProcessor::Unit::None,
-                            this->Efficiency,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Heat Loss Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatLoss,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Storage Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->StoredHeatRate,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->Energy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarWater",
+                                "HeatProduced",
+                                _,
+                                "Plant");
+        } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
 
-        SetupOutputVariable("Solar Collector Storage Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
-                            this->StoredHeatEnergy,
-                            "System",
-                            "Sum",
-                            this->Name,
-                            _,
-                            "SolarWater",
-                            "HeatProduced",
-                            _,
-                            "Plant");
+            SetupOutputVariable("Solar Collector Transmittance Absorptance Product",
+                                OutputProcessor::Unit::None,
+                                this->TauAlpha,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Skin Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->SkinHeatLossRate,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Overall Top Heat Loss Coefficient",
+                                OutputProcessor::Unit::W_m2C,
+                                this->UTopLoss,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Skin Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
-                            this->CollHeatLossEnergy,
-                            "System",
-                            "Sum",
-                            this->Name,
-                            _,
-                            "SolarWater",
-                            "HeatProduced",
-                            _,
-                            "Plant");
+            SetupOutputVariable("Solar Collector Absorber Plate Temperature",
+                                OutputProcessor::Unit::C,
+                                this->TempOfAbsPlate,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->HeatRate,
-                            "System",
-                            "Average",
-                            this->Name);
+            SetupOutputVariable("Solar Collector Storage Water Temperature",
+                                OutputProcessor::Unit::C,
+                                this->TempOfWater,
+                                "System",
+                                "Average",
+                                this->Name);
 
-        SetupOutputVariable("Solar Collector Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
-                            this->HeatEnergy,
-                            "System",
-                            "Sum",
-                            this->Name,
-                            _,
-                            "SolarWater",
-                            "HeatProduced",
-                            _,
-                            "Plant");
-    }
+            SetupOutputVariable("Solar Collector Thermal Efficiency",
+                                OutputProcessor::Unit::None,
+                                this->Efficiency,
+                                "System",
+                                "Average",
+                                this->Name);
 
-    PlantComponent *CollectorData::factory(std::string const &objectName)
-    {
-        // Process the input data
-        if (GetInputFlag) {
-            GetSolarCollectorInput();
-            GetInputFlag = false;
+            SetupOutputVariable("Solar Collector Storage Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->StoredHeatRate,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Solar Collector Storage Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->StoredHeatEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarWater",
+                                "HeatProduced",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Solar Collector Skin Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->SkinHeatLossRate,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Solar Collector Skin Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->CollHeatLossEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarWater",
+                                "HeatProduced",
+                                _,
+                                "Plant");
+
+            SetupOutputVariable("Solar Collector Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->HeatRate,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->HeatEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarWater",
+                                "HeatProduced",
+                                _,
+                                "Plant");
         }
-        // Now look for this particular object
-        for (auto &thisSC : Collector) {
-            if (thisSC.Name == objectName) {
-                return &thisSC;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError("LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
     }
 
     void CollectorData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -834,7 +770,23 @@ namespace SolarCollectors {
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag))
     {
+        this->initialize();
 
+        {
+            auto const SELECT_CASE_var(this->TypeNum);
+            // Select and CALL models based on collector type
+            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+                this->CalcSolarCollector();
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
+                this->CalcICSSolarCollector();
+            } else {
+                assert(false);  // LCOV_EXCL_LINE
+            }
+        }
+
+        this->update();
+
+        this->report();
     }
 
 
@@ -898,9 +850,9 @@ namespace SolarCollectors {
                                        RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
-            } else {                                                 // CR7425
-                this->MassFlowRateMax = BigNumber; // CR7425
-            }                                                        // CR7425
+            } else {
+                this->MassFlowRateMax = BigNumber;
+            }
 
             PlantUtilities::InitComponentNodes(0.0,
                                this->MassFlowRateMax,
@@ -1318,13 +1270,13 @@ namespace SolarCollectors {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the heat transfered (gain or loss), energy stored, skin heat loss, outlet temperature, solar energy
+        // Calculates the heat transferred (gain or loss), energy stored, skin heat loss, outlet temperature, solar energy
         // conversion efficiency, and transmittance-absorptance product of an ICS solar collector.
 
         // METHODOLOGY EMPLOYED:
         // The governing equations for the absorber and collector water heat balance equations are solved simultaneously.
         // The two coupled first ODE are solved analytically.
-        // The transmittance-absorptance product of the collector cover-absorber system is calcuated using ray tracing
+        // The transmittance-absorptance product of the collector cover-absorber system is calculated using ray tracing
         // method according to Duffie and Beckman(1991).
         // REFERENCES:
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, 2nd. Edition.  Wiley-Interscience:

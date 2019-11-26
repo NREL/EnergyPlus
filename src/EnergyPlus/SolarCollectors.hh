@@ -289,13 +289,9 @@ namespace SolarCollectors {
     // Object Data
     extern Array1D<ParametersData> Parameters;
     extern Array1D<CollectorData> Collector;
-
+    
     // Functions
-
     void clear_state();
-
-    void SimSolarCollector(int EquipTypeNum, std::string const &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
-
     void GetSolarCollectorInput();
 
 } // namespace SolarCollectors
