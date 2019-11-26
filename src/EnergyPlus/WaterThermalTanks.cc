@@ -9031,94 +9031,98 @@ namespace WaterThermalTanks {
                 {
                     auto const SELECT_CASE_var1(WaterHeaterDesuperheater(DesuperheaterNum).Mode);
                     if (SELECT_CASE_var1 == HeatMode) {
-
-                        PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
-
-                        //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
-                        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(WaterOutletNode).Temp;
-
-                        //         set the source mass flow rate for the tank
-                        WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
-
-                        WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                        WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                        WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                        WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-                        CalcWaterThermalTank(WaterThermalTankNum);
-                        NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-
-                        if (NewTankTemp > SetPointTemp) {
-                            //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
-                            if (NewTankTemp > WaterHeaterDesuperheater(DesuperheaterNum).SetPointTemp) {
-                                WaterHeaterDesuperheater(DesuperheaterNum).Mode = FloatMode;
-                            }
-                            Par(1) = SetPointTemp;
-                            Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
-                            Par(3) = WaterThermalTankNum;
-                            if (FirstHVACIteration) {
-                                Par(4) = 1.0;
-                            } else {
-                                Par(4) = 0.0;
-                            }
-                            Par(5) = MdotWater;
-                            SolveRoot(Acc,
-                                      MaxIte,
-                                      SolFla,
-                                      PartLoadRatio,
-                                      PLRResidualWaterThermalTank,
-                                      0.0,
-                                      WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                      Par);
-                            if (SolFla == -1) {
-                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                strip(IterNum);
-                                if (!WarmupFlag) {
-                                    ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1;
-                                    if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1 == 1) {
-                                        ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                         WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
-                                        ShowContinueError(
-                                            "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
-                                            IterNum + ". Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
-                                        ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                                "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.",
-                                            WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex1,
-                                            PartLoadRatio,
-                                            PartLoadRatio);
-                                    }
-                                }
-                            } else if (SolFla == -2) {
-                                PartLoadRatio = max(
-                                    0.0,
-                                    min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
-                                if (!WarmupFlag) {
-                                    ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1;
-                                    if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1 == 1) {
-                                        ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                         WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
-                                        ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
-                                                          "Part-load ratio used = " +
-                                                          RoundSigDigits(PartLoadRatio, 3));
-                                        ShowContinueError("Please send this information to the EnergyPlus support group.");
-                                        ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                                                           "\":  Part-load ratio calculation failed in heating mode warning "
-                                                                           "continues. Part-load ratio statistics follow.",
-                                                                       WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex1,
-                                                                       PartLoadRatio,
-                                                                       PartLoadRatio);
-                                    }
-                                }
-                            }
-                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-                        } else {
+                        // Calculate twice for consistency of desuperheater and tank source side energy transfer
+                        for (int i = 0; i < 2; i++){
                             PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
+
+                            //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
+                            WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(WaterOutletNode).Temp;
+
+                            //         set the source mass flow rate for the tank
+                            WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
+
+                            WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
+                            WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
+                            WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
+                            WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
+                            CalcWaterThermalTank(WaterThermalTankNum);
+                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+
+                            if (NewTankTemp > SetPointTemp) {
+                                //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
+                                if (NewTankTemp > WaterHeaterDesuperheater(DesuperheaterNum).SetPointTemp) {
+                                    WaterHeaterDesuperheater(DesuperheaterNum).Mode = FloatMode;
+                                }
+                                Par(1) = SetPointTemp;
+                                Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                                Par(3) = WaterThermalTankNum;
+                                if (FirstHVACIteration) {
+                                    Par(4) = 1.0;
+                                } else {
+                                    Par(4) = 0.0;
+                                }
+                                Par(5) = MdotWater;
+                                SolveRoot(Acc,
+                                          MaxIte,
+                                          SolFla,
+                                          PartLoadRatio,
+                                          PLRResidualWaterThermalTank,
+                                          0.0,
+                                          WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                          Par);
+                                if (SolFla == -1) {
+                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
+                                    strip(IterNum);
+                                    if (!WarmupFlag) {
+                                        ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1;
+                                        if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum1 == 1) {
+                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                            ShowContinueError(
+                                                "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
+                                                IterNum + ". Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
+                                            ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+                                        } else {
+                                            ShowRecurringWarningErrorAtEnd(
+                                                WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                    WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                                    "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.",
+                                                WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex1,
+                                                PartLoadRatio,
+                                                PartLoadRatio);
+                                        }
+                                    }
+                                } else if (SolFla == -2) {
+                                    PartLoadRatio = max(
+                                        0.0,
+                                        min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
+                                    if (!WarmupFlag) {
+                                        ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1;
+                                        if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum1 == 1) {
+                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                            ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
+                                                              "Part-load ratio used = " +
+                                                              RoundSigDigits(PartLoadRatio, 3));
+                                            ShowContinueError("Please send this information to the EnergyPlus support group.");
+                                            ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+                                        } else {
+                                            ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                                               WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                                                               "\":  Part-load ratio calculation failed in heating mode warning "
+                                                                               "continues. Part-load ratio statistics follow.",
+                                                                           WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex1,
+                                                                           PartLoadRatio,
+                                                                           PartLoadRatio);
+                                        }
+                                    }
+                                }
+                                NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                            } else {
+                                PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
+                            }
+                        // Update inlet temperature and calculate again
+                        Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                         }
 
                     } else if (SELECT_CASE_var1 == FloatMode) {
@@ -9141,91 +9145,95 @@ namespace WaterThermalTanks {
                         NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
 
                         if (NewTankTemp <= (SetPointTemp - DeadBandTempDiff)) {
-                            WaterHeaterDesuperheater(DesuperheaterNum).Mode = HeatMode;
-                            WaterThermalTank(WaterThermalTankNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
-                            if ((TankTemp - NewTankTemp) != 0.0) {
-                                PartLoadRatio = min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                                    max(0.0, ((SetPointTemp - DeadBandTempDiff) - NewTankTemp) / (TankTemp - NewTankTemp)));
-                            } else {
-                                PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
-                            }
-
-                            //           set the full load outlet temperature on the water heater source inlet node
-                            WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(WaterOutletNode).Temp;
-
-                            //           set the source mass flow rate for the tank and enable backup heating element
-                            WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
-                            WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                            WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
-                            WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
-                            WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
-                            CalcWaterThermalTank(WaterThermalTankNum);
-                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-                            if (NewTankTemp > SetPointTemp) {
-                                Par(1) = SetPointTemp;
-                                Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
-                                Par(3) = WaterThermalTankNum;
-                                if (FirstHVACIteration) {
-                                    Par(4) = 1.0;
+                            for (int i = 0; i < 2; i++){
+                                WaterHeaterDesuperheater(DesuperheaterNum).Mode = HeatMode;
+                                WaterThermalTank(WaterThermalTankNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                                if ((TankTemp - NewTankTemp) != 0.0) {
+                                    PartLoadRatio = min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                                        max(0.0, ((SetPointTemp - DeadBandTempDiff) - NewTankTemp) / (TankTemp - NewTankTemp)));
                                 } else {
-                                    Par(4) = 0.0;
+                                    PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
                                 }
-                                Par(5) = MdotWater;
-                                SolveRoot(Acc,
-                                          MaxIte,
-                                          SolFla,
-                                          PartLoadRatio,
-                                          PLRResidualWaterThermalTank,
-                                          0.0,
-                                          WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                          Par);
-                                if (SolFla == -1) {
-                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                    strip(IterNum);
-                                    if (!WarmupFlag) {
-                                        ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2;
-                                        if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2 == 1) {
-                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
-                                            ShowContinueError(
-                                                "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
-                                                IterNum + ". Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
-                                            ShowContinueErrorTimeStamp("This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                               WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                                                               "\":  Iteration limit exceeded in float mode warning continues. "
-                                                                               "Part-load ratio statistics follow.",
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex2,
-                                                                           PartLoadRatio,
-                                                                           PartLoadRatio);
+
+                                //           set the full load outlet temperature on the water heater source inlet node
+                                WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(WaterOutletNode).Temp;
+
+                                //           set the source mass flow rate for the tank and enable backup heating element
+                                WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = MdotWater * PartLoadRatio;
+                                WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
+                                WaterThermalTank(WaterThermalTankNum).MinCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
+                                WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = PartLoadRatio;
+                                WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate = QHeatRate * PartLoadRatio;
+                                CalcWaterThermalTank(WaterThermalTankNum);
+                                NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                                if (NewTankTemp > SetPointTemp) {
+                                    Par(1) = SetPointTemp;
+                                    Par(2) = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
+                                    Par(3) = WaterThermalTankNum;
+                                    if (FirstHVACIteration) {
+                                        Par(4) = 1.0;
+                                    } else {
+                                        Par(4) = 0.0;
+                                    }
+                                    Par(5) = MdotWater;
+                                    SolveRoot(Acc,
+                                              MaxIte,
+                                              SolFla,
+                                              PartLoadRatio,
+                                              PLRResidualWaterThermalTank,
+                                              0.0,
+                                              WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                              Par);
+                                    if (SolFla == -1) {
+                                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
+                                        strip(IterNum);
+                                        if (!WarmupFlag) {
+                                            ++WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2;
+                                            if (WaterHeaterDesuperheater(DesuperheaterNum).IterLimitExceededNum2 == 1) {
+                                                ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                                 WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                                ShowContinueError(
+                                                    "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
+                                                    IterNum + ". Part-load ratio returned = " + RoundSigDigits(PartLoadRatio, 3));
+                                                ShowContinueErrorTimeStamp("This error occurred in float mode.");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                                                   WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                                                                   "\":  Iteration limit exceeded in float mode warning continues. "
+                                                                                   "Part-load ratio statistics follow.",
+                                                                               WaterHeaterDesuperheater(DesuperheaterNum).IterLimitErrIndex2,
+                                                                               PartLoadRatio,
+                                                                               PartLoadRatio);
+                                            }
+                                        }
+                                    } else if (SolFla == -2) {
+                                        PartLoadRatio = max(0.0,
+                                                            min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
+                                                                (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
+                                        if (!WarmupFlag) {
+                                            ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2;
+                                            if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2 == 1) {
+                                                ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                                 WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
+                                                ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
+                                                                  "Part-load ratio used = " +
+                                                                  RoundSigDigits(PartLoadRatio, 3));
+                                                ShowContinueError("Please send this information to the EnergyPlus support group.");
+                                                ShowContinueErrorTimeStamp("This error occurred in float mode.");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
+                                                                                   WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                                                                   "\": Part-load ratio calculation failed in float mode warning "
+                                                                                   "continues. Part-load ratio statistics follow.",
+                                                                               WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
+                                                                               PartLoadRatio,
+                                                                               PartLoadRatio);
+                                            }
                                         }
                                     }
-                                } else if (SolFla == -2) {
-                                    PartLoadRatio = max(0.0,
-                                                        min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
-                                                            (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
-                                    if (!WarmupFlag) {
-                                        ++WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2;
-                                        if (WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedNum2 == 1) {
-                                            ShowWarningError(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                             WaterHeaterDesuperheater(DesuperheaterNum).Name + "\"");
-                                            ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
-                                                              "Part-load ratio used = " +
-                                                              RoundSigDigits(PartLoadRatio, 3));
-                                            ShowContinueError("Please send this information to the EnergyPlus support group.");
-                                            ShowContinueErrorTimeStamp("This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(WaterHeaterDesuperheater(DesuperheaterNum).Type + " \"" +
-                                                                               WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                                                               "\": Part-load ratio calculation failed in float mode warning "
-                                                                               "continues. Part-load ratio statistics follow.",
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
-                                                                           PartLoadRatio,
-                                                                           PartLoadRatio);
-                                        }
-                                    }
                                 }
+                                // Update inlet temperature and calculate again
+                                Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                             }
                         } else {
                             WaterThermalTank(WaterThermalTankNum).MaxCapacity = WaterHeaterDesuperheater(DesuperheaterNum).BackupElementCapacity;
