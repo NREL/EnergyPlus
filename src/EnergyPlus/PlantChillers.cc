@@ -137,7 +137,6 @@ namespace PlantChillers {
     static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 modCondOutletTemp(0.0);      // C - condenser outlet temperature, air or water side
     Real64 modEvapOutletTemp(0.0);      // C - evaporator outlet temperature, water side
     Real64 modPower(0.0);               // W - rate of chiller energy use
     Real64 modQEvaporator(0.0);         // W - rate of heat transfer to the evaporator coil
@@ -175,7 +174,6 @@ namespace PlantChillers {
     void clear_state()
     {
         NumElectricChillers = 0;
-        modCondOutletTemp = 0.0;
         modEvapOutletTemp = 0.0;
         modPower = 0.0;
         modQEvaporator = 0.0;
@@ -5916,7 +5914,7 @@ namespace PlantChillers {
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(ElectricChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                modCondOutletTemp = modQCondenser / ElectricChiller(ChillNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
+                ElectricChiller(ChillNum).Base.modCondOutletTemp = modQCondenser / ElectricChiller(ChillNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + ElectricChiller(ChillNum).Base.Name);
                 ShowContinueErrorTimeStamp("");
@@ -5934,9 +5932,9 @@ namespace PlantChillers {
                 CalcElectricChillerHeatRecovery(ChillNum, modQCondenser, ElectricChiller(ChillNum).Base.modCondMassFlowRate, _CondInletTemp, modQHeatRecovered);
             if (ElectricChiller(ChillNum).Base.modCondMassFlowRate > 0.0) {
                 CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
-                modCondOutletTemp = _CondInletTemp + modQCondenser / ElectricChiller(ChillNum).Base.modCondMassFlowRate / CpCond;
+                ElectricChiller(ChillNum).Base.modCondOutletTemp = _CondInletTemp + modQCondenser / ElectricChiller(ChillNum).Base.modCondMassFlowRate / CpCond;
             } else {
-                modCondOutletTemp = _CondInletTemp;
+                ElectricChiller(ChillNum).Base.modCondOutletTemp = _CondInletTemp;
             }
         }
 
@@ -6586,7 +6584,7 @@ namespace PlantChillers {
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                modCondOutletTemp = modQCondenser / EngineDrivenChiller(ChillerNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
+                EngineDrivenChiller(ChillerNum).Base.modCondOutletTemp = modQCondenser / EngineDrivenChiller(ChillerNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" +
                                 EngineDrivenChiller(ChillerNum).Base.Name);
@@ -6596,7 +6594,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled
-            modCondOutletTemp = _CondInletTemp;
+            EngineDrivenChiller(ChillerNum).Base.modCondOutletTemp = _CondInletTemp;
         }
 
         // EngineDriven Portion of the Engine Driven Chiller:
@@ -7298,7 +7296,7 @@ namespace PlantChillers {
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(GTChiller(ChillerNum).Base.CDLoopNum).FluidIndex,
                                                RoutineName);
-                modCondOutletTemp = modQCondenser / GTChiller(ChillerNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
+                GTChiller(ChillerNum).Base.modCondOutletTemp = modQCondenser / GTChiller(ChillerNum).Base.modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + GTChiller(ChillerNum).Base.Name);
                 ShowContinueErrorTimeStamp("");
@@ -7307,7 +7305,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled and there is no CondMassFlowRate and would divide by zero
-            modCondOutletTemp = _CondInletTemp;
+            GTChiller(ChillerNum).Base.modCondOutletTemp = _CondInletTemp;
         }
 
         // Special GT Chiller Variables
@@ -7663,7 +7661,7 @@ namespace PlantChillers {
             }
 
             modEvapOutletTemp = Node(EvapInletNode).Temp;
-            modCondOutletTemp = Node(CondInletNode).Temp;
+            ConstCOPChiller(ChillNum).Base.modCondOutletTemp = Node(CondInletNode).Temp;
 
             modPower = 0.0;
             modQEvaporator = 0.0;
@@ -8000,7 +7998,7 @@ namespace PlantChillers {
                                            DataPlant::PlantLoop(ConstCOPChiller(ChillNum).Base.CDLoopNum).FluidIndex,
                                            RoutineName);
             if (ConstCOPChiller(ChillNum).Base.modCondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                modCondOutletTemp = modQCondenser / ConstCOPChiller(ChillNum).Base.modCondMassFlowRate / CpCond + CondInletTemp;
+                ConstCOPChiller(ChillNum).Base.modCondOutletTemp = modQCondenser / ConstCOPChiller(ChillNum).Base.modCondMassFlowRate / CpCond + CondInletTemp;
             } else {
                 ShowSevereError("CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller=" + ConstCOPChiller(ChillNum).Base.Name);
                 ShowContinueErrorTimeStamp("");
@@ -8008,7 +8006,7 @@ namespace PlantChillers {
         } else { // Air Cooled or Evap Cooled
             //  Set condenser outlet temp to condenser inlet temp for Air Cooled or Evap Cooled
             //  since there is no CondMassFlowRate and would divide by zero
-            modCondOutletTemp = CondInletTemp;
+            ConstCOPChiller(ChillNum).Base.modCondOutletTemp = CondInletTemp;
         }
 
         // Calculate Energy
@@ -8290,10 +8288,10 @@ namespace PlantChillers {
         } else { // Chiller is running, so pass calculated values
             // set node temperatures
             Node(EvapOutletNode).Temp = modEvapOutletTemp;
-            Node(CondOutletNode).Temp = modCondOutletTemp;
+            Node(CondOutletNode).Temp = ElectricChiller(Num).Base.modCondOutletTemp;
             if (ElectricChiller(Num).Base.CondenserType != WaterCooled) {
                 Node(CondOutletNode).HumRat = ElectricChiller(Num).modCondOutletHumRat;
-                Node(CondOutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(modCondOutletTemp, ElectricChiller(Num).modCondOutletHumRat);
+                Node(CondOutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(ElectricChiller(Num).Base.modCondOutletTemp, ElectricChiller(Num).modCondOutletHumRat);
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
@@ -8386,7 +8384,7 @@ namespace PlantChillers {
         } else { // Chiller is running
             // set node temperatures
             Node(EvapOutletNode).Temp = modEvapOutletTemp;
-            Node(CondOutletNode).Temp = modCondOutletTemp;
+            Node(CondOutletNode).Temp = EngineDrivenChiller(Num).Base.modCondOutletTemp;
 
             EngineDrivenChillerReport(Num).Base.Power = modPower;
             EngineDrivenChillerReport(Num).Base.QEvap = modQEvaporator;
@@ -8506,7 +8504,7 @@ namespace PlantChillers {
         } else { // Chiller is running so report calculated values
             // set node temperatures
             Node(EvapOutletNode).Temp = modEvapOutletTemp;
-            Node(CondOutletNode).Temp = modCondOutletTemp;
+            Node(CondOutletNode).Temp = GTChiller(Num).Base.modCondOutletTemp;
 
             if (GTChiller(Num).HeatRecActive) {
                 PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
@@ -8602,7 +8600,7 @@ namespace PlantChillers {
             ConstCOPChillerReport(Num).Base.CondEnergy = modCondenserEnergy;
             ConstCOPChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
             ConstCOPChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.CondOutletTemp = modCondOutletTemp;
+            ConstCOPChillerReport(Num).Base.CondOutletTemp = ConstCOPChiller(Num).Base.modCondOutletTemp;
             ConstCOPChillerReport(Num).Base.EvapOutletTemp = modEvapOutletTemp;
             ConstCOPChillerReport(Num).Base.Evapmdot = ConstCOPChiller(Num).Base.modEvapMassFlowRate;
             ConstCOPChillerReport(Num).Base.Condmdot = ConstCOPChiller(Num).Base.modCondMassFlowRate;
@@ -8618,7 +8616,7 @@ namespace PlantChillers {
 
             // set outlet node temperatures
             Node(EvapOutletNode).Temp = modEvapOutletTemp;
-            Node(CondOutletNode).Temp = modCondOutletTemp;
+            Node(CondOutletNode).Temp = ConstCOPChiller(Num).Base.modCondOutletTemp;
         }
     }
 
