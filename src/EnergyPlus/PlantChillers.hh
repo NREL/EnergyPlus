@@ -136,6 +136,8 @@ namespace PlantChillers {
         bool MyEnvrnFlag;
         Real64 TimeStepSysLast;
         Real64 CurrentEndTimeLast;
+        Real64 modCondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
+        Real64 modEvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
 
         // Default Constructor
         BaseChillerSpecs()
@@ -147,7 +149,8 @@ namespace PlantChillers {
               BasinHeaterSchedulePtr(0), ErrCount1(0), ErrCount2(0), MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), CheckEquipName(true),
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
-              TimeStepSysLast(0.0), CurrentEndTimeLast(0.0)
+              TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), modCondMassFlowRate(0.0), modEvapMassFlowRate(0.0)
+
         {
         }
     };
