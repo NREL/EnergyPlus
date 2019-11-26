@@ -148,7 +148,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
         input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
-        if (lAlphaFieldBlanks(6)) {
+        if (!lAlphaFieldBlanks(6)) {
             input_specs.alternate_operating_mode_name = cAlphaArgs(6);
         }
 
