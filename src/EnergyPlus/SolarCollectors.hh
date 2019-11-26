@@ -272,6 +272,8 @@ namespace SolarCollectors {
                                              Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
         );
 
+        static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
+
         void UpdateSolarCollector();
 
         void ReportSolarCollector();
@@ -288,8 +290,6 @@ namespace SolarCollectors {
     void SimSolarCollector(int EquipTypeNum, std::string const &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
     void GetSolarCollectorInput();
-
-    void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
 
 } // namespace SolarCollectors
 

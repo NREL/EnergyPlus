@@ -687,7 +687,7 @@ namespace SolarCollectors {
                 if (Collector(CollectorNum).OSCM_ON) {
                     // get index of ventilated cavity object
                     int VentCavIndex = 0;
-                    GetExtVentedCavityIndex(SurfNum, VentCavIndex);
+                    SolarCollectors::CollectorData::GetExtVentedCavityIndex(SurfNum, VentCavIndex);
                     Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
@@ -2046,7 +2046,7 @@ namespace SolarCollectors {
         this->StoredHeatEnergy = this->StoredHeatRate * TimeStepInSecond;
     }
 
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
+    void CollectorData::GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
     {
 
         // SUBROUTINE INFORMATION:
