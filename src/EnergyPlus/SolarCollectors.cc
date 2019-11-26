@@ -810,6 +810,34 @@ namespace SolarCollectors {
                             "Plant");
     }
 
+    PlantComponent *CollectorData::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (GetInputFlag) {
+            GetSolarCollectorInput();
+            GetInputFlag = false;
+        }
+        // Now look for this particular object
+        for (auto &thisSC : Collector) {
+            if (thisSC.Name == objectName) {
+                return &thisSC;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void CollectorData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                               bool const EP_UNUSED(FirstHVACIteration),
+                               Real64 &EP_UNUSED(CurLoad),
+                               bool const EP_UNUSED(RunFlag))
+    {
+
+    }
+
+
     void CollectorData::initialize()
     {
 

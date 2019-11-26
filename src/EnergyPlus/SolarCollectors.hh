@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -125,7 +126,7 @@ namespace SolarCollectors {
         );
     };
 
-    struct CollectorData
+    struct CollectorData : PlantComponent
     {
         // Members
         std::string Name;       // Name of solar collector
@@ -226,9 +227,13 @@ namespace SolarCollectors {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void setupOutputVars();
 
         void initialize();
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void CalcTransRefAbsOfCover(Real64 IncidentAngle,        // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance
