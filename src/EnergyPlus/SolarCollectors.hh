@@ -245,7 +245,7 @@ namespace SolarCollectors {
 
         void CalcHeatTransCoeffAndCoverTemp();
 
-        void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
+        static void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
                                             Real64 a1,                // coefficient of ODE for Tp
                                             Real64 a2,                // coefficient of ODE for Tp
                                             Real64 a3,                // coefficient of ODE for Tp
@@ -259,6 +259,22 @@ namespace SolarCollectors {
                                             bool AbsorberPlateHasMass // flag for absober thermal mass
         );
 
+        static Real64 CalcConvCoeffBetweenPlates(Real64 TempSurf1, // temperature of surface 1
+                                          Real64 TempSurf2, // temperature of surface 1
+                                          Real64 AirGap,    // characteristic length [m]
+                                          Real64 CosTilt,   // cosine of surface tilt angle relative to the horizontal
+                                          Real64 SinTilt    // sine of surface tilt angle relative to the horizontal
+        );
+
+        static Real64 CalcConvCoeffAbsPlateAndWater(Real64 TAbsorber, // temperature of absorber plate [C]
+                                             Real64 TWater,    // temperature of water [C]
+                                             Real64 Lc,        // characteristic length [m]
+                                             Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
+        );
+
+        void UpdateSolarCollector();
+
+        void ReportSolarCollector();
     };
 
     // Object Data
@@ -269,31 +285,11 @@ namespace SolarCollectors {
 
     void clear_state();
 
-    void
-    SimSolarCollector(int EquipTypeNum, std::string const &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
+    void SimSolarCollector(int EquipTypeNum, std::string const &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
     void GetSolarCollectorInput();
 
-    Real64 CalcConvCoeffBetweenPlates(Real64 TempSurf1, // temperature of surface 1
-                                      Real64 TempSurf2, // temperature of surface 1
-                                      Real64 AirGap,    // characteristic length [m]
-                                      Real64 CosTilt,   // cosine of surface tilt angle relative to the horizontal
-                                      Real64 SinTilt    // sine of surface tilt angle relative to the horizontal
-    );
-
-    Real64 CalcConvCoeffAbsPlateAndWater(Real64 TAbsorber, // temperature of absorber plate [C]
-                                         Real64 TWater,    // temperature of water [C]
-                                         Real64 Lc,        // characteristic length [m]
-                                         Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
-    );
-
-    void UpdateSolarCollector(int CollectorNum);
-
-    void ReportSolarCollector(int CollectorNum);
-
     void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
-
-    void GetExtVentedCavityTsColl(int VentModNum, Real64 &TsColl);
 
 } // namespace SolarCollectors
 
