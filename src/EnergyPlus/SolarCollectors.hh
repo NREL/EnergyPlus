@@ -120,6 +120,9 @@ namespace SolarCollectors {
               ExtCoefTimesThickness(2, 0.0), EmissOfCover(2, 0.0), EmissOfAbsPlate(0.0), AbsorOfAbsPlate(0.0)
         {
         }
+
+        Real64 IAM(Real64 IncidentAngle // Angle of incidence (radians)
+        );
     };
 
     struct CollectorData
@@ -203,6 +206,9 @@ namespace SolarCollectors {
         Real64 Volume;                 // collector net volume (m3)
         bool OSCM_ON;                  // Boundary condition is OSCM
         bool InitICS;                  // used to initialize ICS variables only
+        bool SetLoopIndexFlag;
+        bool SetDiffRadFlag;
+        bool MyOneTimeFlag;
 
         // Default Constructor
         CollectorData()
@@ -216,9 +222,43 @@ namespace SolarCollectors {
               CoverAbs(2, 0.0), TimeElapsed(0.0), UbLoss(0.0), UsLoss(0.0), AreaRatio(0.0), RefSkyDiffInnerCover(0.0), RefGrnDiffInnerCover(0.0),
               RefDiffInnerCover(0.0), SavedTempOfWater(0.0), SavedTempOfAbsPlate(0.0), SavedTempOfInnerCover(0.0), SavedTempOfOuterCover(0.0),
               SavedTempCollectorOSCM(0.0), Length(1.0), TiltR2V(0.0), Tilt(0.0), CosTilt(0.0), SinTilt(0.0), SideArea(0.0), Area(0.0), Volume(0.0),
-              OSCM_ON(false), InitICS(false)
+              OSCM_ON(false), InitICS(false), SetLoopIndexFlag(true), SetDiffRadFlag(true), MyOneTimeFlag(true)
         {
         }
+
+        void InitSolarCollector();
+
+        void CalcTransRefAbsOfCover(Real64 IncidentAngle,        // Angle of incidence (radians)
+                                    Real64 &TransSys,                  // cover system solar transmittance
+                                    Real64 &ReflSys,                   // cover system solar reflectance
+                                    Real64 &AbsCover1,                 // Inner cover solar absorbtance
+                                    Real64 &AbsCover2,                 // Outer cover solar absorbtance
+                                    Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
+                                    Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
+        );
+
+        void CalcSolarCollector();
+
+        void CalcICSSolarCollector();
+
+        void CalcTransAbsorProduct(Real64 IncidAngle);
+
+        void CalcHeatTransCoeffAndCoverTemp();
+
+        void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
+                                            Real64 a1,                // coefficient of ODE for Tp
+                                            Real64 a2,                // coefficient of ODE for Tp
+                                            Real64 a3,                // coefficient of ODE for Tp
+                                            Real64 b1,                // coefficient of ODE for TW
+                                            Real64 b2,                // coefficient of ODE for TW
+                                            Real64 b3,                // coefficient of ODE for TW
+                                            Real64 TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
+                                            Real64 TempWaterOld,      // collector water temperature at previous time step [C]
+                                            Real64 &TempAbsPlate,           // absorber plate temperature at current time step [C]
+                                            Real64 &TempWater,              // collector water temperature at current time step [C]
+                                            bool AbsorberPlateHasMass // flag for absober thermal mass
+        );
+
     };
 
     // Object Data
@@ -233,47 +273,6 @@ namespace SolarCollectors {
     SimSolarCollector(int EquipTypeNum, std::string const &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
     void GetSolarCollectorInput();
-
-    void InitSolarCollector(int CollectorNum);
-
-    void CalcSolarCollector(int CollectorNum);
-
-    Real64 IAM(int ParamNum,        // Collector parameters object number
-               Real64 IncidentAngle // Angle of incidence (radians)
-    );
-
-    void CalcICSSolarCollector(int ColleNum);
-
-    void ICSCollectorAnalyticalSolution(const int ColleNum,             // solar collector index
-                                       const Real64 SecInTimeStep,     // seconds in a time step
-                                       const Real64 a1,                // coefficient of ODE for Tp
-                                       const Real64 a2,                // coefficient of ODE for Tp
-                                       const Real64 a3,                // coefficient of ODE for Tp
-                                       const Real64 b1,                // coefficient of ODE for TW
-                                       const Real64 b2,                // coefficient of ODE for TW
-                                       const Real64 b3,                // coefficient of ODE for TW
-                                       const Real64 TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
-                                       const Real64 TempWaterOld,      // collector water temperature at previous time step [C]
-                                       Real64 &TempAbsPlate,           // absorber plate temperature at current time step [C]
-                                       Real64 &TempWater,              // collector water temperature at current time step [C]
-                                       const bool AbsorberPlateHasMass // flag for absober thermal mass
-    );
-
-    void CalcTransAbsorProduct(int ColleNum,     // Collector object number
-                               Real64 IncidAngle // Angle of incidence (radians)
-    );
-
-    void CalcTransRefAbsOfCover(int ColleNum,                // Collector object number
-                                Real64 IncidentAngle,        // Angle of incidence (radians)
-                                Real64 &TransSys,                  // cover system solar transmittance
-                                Real64 &ReflSys,                   // cover system solar reflectance
-                                Real64 &AbsCover1,                 // Inner cover solar absorbtance
-                                Real64 &AbsCover2,                 // Outer cover solar absorbtance
-                                Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
-                                Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
-    );
-
-    void CalcHeatTransCoeffAndCoverTemp(int ColleNum); // Collector object number
 
     Real64 CalcConvCoeffBetweenPlates(Real64 TempSurf1, // temperature of surface 1
                                       Real64 TempSurf2, // temperature of surface 1
