@@ -186,6 +186,7 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
+        Real64 modCondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
 
         // Default Constructor
         ElectricChillerSpecs()
@@ -193,7 +194,7 @@ namespace PlantChillers {
               CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
-              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0)
+              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), modCondOutletHumRat(0.0)
         {
         }
     };

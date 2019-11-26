@@ -138,7 +138,6 @@ namespace PlantChillers {
 
     // MODULE VARIABLE DECLARATIONS:
     Real64 modCondOutletTemp(0.0);      // C - condenser outlet temperature, air or water side
-    Real64 modCondOutletHumRat(0.0);    // kg/kg - condenser outlet humditiy ratio, air side
     Real64 modEvapOutletTemp(0.0);      // C - evaporator outlet temperature, water side
     Real64 modPower(0.0);               // W - rate of chiller energy use
     Real64 modQEvaporator(0.0);         // W - rate of heat transfer to the evaporator coil
@@ -177,7 +176,6 @@ namespace PlantChillers {
     {
         NumElectricChillers = 0;
         modCondOutletTemp = 0.0;
-        modCondOutletHumRat = 0.0;
         modEvapOutletTemp = 0.0;
         modPower = 0.0;
         modQEvaporator = 0.0;
@@ -5536,7 +5534,7 @@ namespace PlantChillers {
         }
 
         // initialize outlet air humidity ratio of air or evap cooled chillers
-        modCondOutletHumRat = Node(CondInletNode).HumRat;
+        ElectricChiller(ChillNum).modCondOutletHumRat = Node(CondInletNode).HumRat;
 
         if (ElectricChiller(ChillNum).Base.CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirDryBulb;
@@ -5556,7 +5554,7 @@ namespace PlantChillers {
         } else if (ElectricChiller(ChillNum).Base.CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirWetBulb;
             //  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-            modCondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(Node(CondInletNode).Temp, Node(CondInletNode).Temp, Node(CondInletNode).Press);
+            ElectricChiller(ChillNum).modCondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(Node(CondInletNode).Temp, Node(CondInletNode).Temp, Node(CondInletNode).Press);
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 ElectricChiller(ChillNum).Base.PrintMessage = true;
@@ -8294,8 +8292,8 @@ namespace PlantChillers {
             Node(EvapOutletNode).Temp = modEvapOutletTemp;
             Node(CondOutletNode).Temp = modCondOutletTemp;
             if (ElectricChiller(Num).Base.CondenserType != WaterCooled) {
-                Node(CondOutletNode).HumRat = modCondOutletHumRat;
-                Node(CondOutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(modCondOutletTemp, modCondOutletHumRat);
+                Node(CondOutletNode).HumRat = ElectricChiller(Num).modCondOutletHumRat;
+                Node(CondOutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(modCondOutletTemp, ElectricChiller(Num).modCondOutletHumRat);
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
