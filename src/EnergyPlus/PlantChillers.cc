@@ -154,22 +154,6 @@ namespace PlantChillers {
     Real64 modChillerCyclingRatio(0.0); // Cycling ratio for chiller when load is below MinPLR
     Real64 modBasinHeaterPower(0.0);    // Basin heater power (W)
 
-    // engine driven:
-    Real64 modHeatRecInletTemp(0.0);   // Inlet Temperature of the heat recovery fluid
-    Real64 modHeatRecMdotActual(0.0);  // reporting: Heat Recovery Loop Mass flow rate
-    Real64 modQTotalHeatRecovered(0.0); // total heat recovered (W)
-    Real64 modQJacketRecovered(0.0);    // heat recovered from jacket (W)
-    Real64 modQLubeOilRecovered(0.0);   // heat recovered from lube (W)
-    Real64 modQExhaustRecovered(0.0);   // exhaust gas heat recovered (W)
-    Real64 modFuelEnergyUseRate(0.0);   // Fuel Energy used (W)
-    Real64 modTotalHeatEnergyRec(0.0);  // total heat recovered (J)
-    Real64 modJacketEnergyRec(0.0);     // heat recovered from jacket (J)
-    Real64 modLubeOilEnergyRec(0.0);    // heat recovered from lube (J)
-    Real64 modExhaustEnergyRec(0.0);    // exhaust gas heat recovered (J)
-    Real64 modFuelEnergy(0.0);          // Fuel Energy used (J)
-    Real64 modFuelMdot(0.0);            // Fuel Amount used (Kg/s)
-    Real64 modExhaustStackTemp(0.0);    // Exhaust Stack Temperature (C)
-
     // const COP
     int NumElectricChillers(0);      // number of Electric chillers specified in input
     int NumEngineDrivenChillers(0); // number of EngineDriven chillers specified in input
@@ -211,20 +195,6 @@ namespace PlantChillers {
         modChillerCyclingRatio = 0.0;
         modBasinHeaterPower = 0.0;
         NumEngineDrivenChillers = 0;
-        modHeatRecInletTemp = 0.0;
-        modHeatRecMdotActual = 0.0;
-        modQTotalHeatRecovered = 0.0;
-        modQJacketRecovered = 0.0;
-        modQLubeOilRecovered = 0.0;
-        modQExhaustRecovered = 0.0;
-        modFuelEnergyUseRate = 0.0;
-        modTotalHeatEnergyRec = 0.0;
-        modJacketEnergyRec = 0.0;
-        modLubeOilEnergyRec = 0.0;
-        modExhaustEnergyRec = 0.0;
-        modFuelEnergy = 0.0;
-        modFuelMdot = 0.0;
-        modExhaustStackTemp = 0.0;
         NumGTChillers = 0;
         NumConstCOPChillers = 0;
         GetEngineDrivenInput = true;
@@ -6107,24 +6077,24 @@ namespace PlantChillers {
         modCondenserEnergy = 0.0;
         modEvaporatorEnergy = 0.0;
         HeatRecCp = 0.0;
-        modHeatRecMdotActual = 0.0;
-        modQTotalHeatRecovered = 0.0;
-        modQJacketRecovered = 0.0;
-        modQLubeOilRecovered = 0.0;
-        modQExhaustRecovered = 0.0;
+        EngineDrivenChiller(ChillerNum).modHeatRecMdotActual = 0.0;
+        EngineDrivenChiller(ChillerNum).modQTotalHeatRecovered = 0.0;
+        EngineDrivenChiller(ChillerNum).modQJacketRecovered = 0.0;
+        EngineDrivenChiller(ChillerNum).modQLubeOilRecovered = 0.0;
+        EngineDrivenChiller(ChillerNum).modQExhaustRecovered = 0.0;
         EngineDrivenFuelEnergy = 0.0;
-        modFuelEnergyUseRate = 0.0;
-        modTotalHeatEnergyRec = 0.0;
-        modJacketEnergyRec = 0.0;
-        modLubeOilEnergyRec = 0.0;
-        modExhaustEnergyRec = 0.0;
-        modFuelEnergy = 0.0;
-        modFuelMdot = 0.0;
-        modExhaustStackTemp = 0.0;
+        EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = 0.0;
+        EngineDrivenChiller(ChillerNum).modTotalHeatEnergyRec = 0.0;
+        EngineDrivenChiller(ChillerNum).modJacketEnergyRec = 0.0;
+        EngineDrivenChiller(ChillerNum).modLubeOilEnergyRec = 0.0;
+        EngineDrivenChiller(ChillerNum).modExhaustEnergyRec = 0.0;
+        EngineDrivenChiller(ChillerNum).modFuelEnergy = 0.0;
+        EngineDrivenChiller(ChillerNum).modFuelMdot = 0.0;
+        EngineDrivenChiller(ChillerNum).modExhaustStackTemp = 0.0;
         FRAC = 1.0;
 
         if (EngineDrivenChiller(ChillerNum).HeatRecActive) {
-            modHeatRecInletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
+            EngineDrivenChiller(ChillerNum).modHeatRecInletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
             modHeatRecOutletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
         }
 
@@ -6653,13 +6623,13 @@ namespace PlantChillers {
         // particular part load.
 
         RecJacHeattoFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).RecJacHeattoFuelCurve, PartLoadRat);
-        modQJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
+        EngineDrivenChiller(ChillerNum).modQJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant Energy.  This curve calculates the lube energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         RecLubeHeattoFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).RecLubeHeattoFuelCurve, PartLoadRat);
-        modQLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
+        EngineDrivenChiller(ChillerNum).modQLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
@@ -6677,38 +6647,38 @@ namespace PlantChillers {
             UA = EngineDrivenChiller(ChillerNum).UACoef(1) * std::pow(ChillerNomCap, EngineDrivenChiller(ChillerNum).UACoef(2));
 
             DesignMinExitGasTemp = EngineDrivenChiller(ChillerNum).DesignMinExitGasTemp;
-            modExhaustStackTemp = DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
+            EngineDrivenChiller(ChillerNum).modExhaustStackTemp = DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
                                                           std::exp(UA / (max(ExhaustGasFlow, MaxExhaustperPowerOutput * ChillerNomCap) * ExhaustCP));
 
-            modQExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (ExhaustTemp - modExhaustStackTemp), 0.0);
+            EngineDrivenChiller(ChillerNum).modQExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (ExhaustTemp - EngineDrivenChiller(ChillerNum).modExhaustStackTemp), 0.0);
         } else {
-            modQExhaustRecovered = 0.0;
+            EngineDrivenChiller(ChillerNum).modQExhaustRecovered = 0.0;
         }
 
-        modQTotalHeatRecovered = modQExhaustRecovered + modQLubeOilRecovered + modQJacketRecovered;
+        EngineDrivenChiller(ChillerNum).modQTotalHeatRecovered = EngineDrivenChiller(ChillerNum).modQExhaustRecovered + EngineDrivenChiller(ChillerNum).modQLubeOilRecovered + EngineDrivenChiller(ChillerNum).modQJacketRecovered;
 
         // Update Heat Recovery temperatures
         if (EngineDrivenChiller(ChillerNum).HeatRecActive) {
-            CalcEngineChillerHeatRec(ChillerNum, modQTotalHeatRecovered, HeatRecRatio);
-            modQExhaustRecovered *= HeatRecRatio;
-            modQLubeOilRecovered *= HeatRecRatio;
-            modQJacketRecovered *= HeatRecRatio;
+            CalcEngineChillerHeatRec(ChillerNum, EngineDrivenChiller(ChillerNum).modQTotalHeatRecovered, HeatRecRatio);
+            EngineDrivenChiller(ChillerNum).modQExhaustRecovered *= HeatRecRatio;
+            EngineDrivenChiller(ChillerNum).modQLubeOilRecovered *= HeatRecRatio;
+            EngineDrivenChiller(ChillerNum).modQJacketRecovered *= HeatRecRatio;
         }
 
         // Calculate Energy
         modCondenserEnergy = modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         modEnergy = modPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         modEvaporatorEnergy = modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        modFuelEnergyUseRate = EngineDrivenFuelEnergy;
-        modFuelEnergy = modFuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        modJacketEnergyRec = modQJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        modLubeOilEnergyRec = modQLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        modExhaustEnergyRec = modQExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        modQTotalHeatRecovered = modQExhaustRecovered + modQLubeOilRecovered + modQJacketRecovered;
-        modTotalHeatEnergyRec = modExhaustEnergyRec + modLubeOilEnergyRec + modJacketEnergyRec;
-        modFuelEnergyUseRate = std::abs(modFuelEnergyUseRate);
-        modFuelEnergy = std::abs(modFuelEnergy);
-        modFuelMdot = std::abs(modFuelEnergyUseRate) / (EngineDrivenChiller(ChillerNum).FuelHeatingValue * KJtoJ);
+        EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = EngineDrivenFuelEnergy;
+        EngineDrivenChiller(ChillerNum).modFuelEnergy = EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).modJacketEnergyRec = EngineDrivenChiller(ChillerNum).modQJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).modLubeOilEnergyRec = EngineDrivenChiller(ChillerNum).modQLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).modExhaustEnergyRec = EngineDrivenChiller(ChillerNum).modQExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).modQTotalHeatRecovered = EngineDrivenChiller(ChillerNum).modQExhaustRecovered + EngineDrivenChiller(ChillerNum).modQLubeOilRecovered + EngineDrivenChiller(ChillerNum).modQJacketRecovered;
+        EngineDrivenChiller(ChillerNum).modTotalHeatEnergyRec = EngineDrivenChiller(ChillerNum).modExhaustEnergyRec + EngineDrivenChiller(ChillerNum).modLubeOilEnergyRec + EngineDrivenChiller(ChillerNum).modJacketEnergyRec;
+        EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = std::abs(EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate);
+        EngineDrivenChiller(ChillerNum).modFuelEnergy = std::abs(EngineDrivenChiller(ChillerNum).modFuelEnergy);
+        EngineDrivenChiller(ChillerNum).modFuelMdot = std::abs(EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate) / (EngineDrivenChiller(ChillerNum).FuelHeatingValue * KJtoJ);
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (modEnergy < 0.0) { // there is a serious problem
@@ -8219,7 +8189,7 @@ namespace PlantChillers {
 
         HeatRecInTemp = Node(HeatRecInNode).Temp;
         HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).HRLoopNum).FluidName,
-                                                           modHeatRecInletTemp,
+                                                           EngineDrivenChiller(ChillerNum).modHeatRecInletTemp,
                                           DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).HRLoopNum).FluidIndex,
                                           RoutineName);
 
@@ -8251,9 +8221,9 @@ namespace PlantChillers {
         }
 
         // Update global variables for reporting later
-        modHeatRecInletTemp = HeatRecInTemp;
+        EngineDrivenChiller(ChillerNum).modHeatRecInletTemp = HeatRecInTemp;
         modHeatRecOutletTemp = HeatRecOutTemp;
-        modHeatRecMdotActual = HeatRecMdot;
+        EngineDrivenChiller(ChillerNum).modHeatRecMdotActual = HeatRecMdot;
     }
 
     void UpdateElectricChillerRecords(Real64 const MyLoad, // current load
@@ -8436,8 +8406,8 @@ namespace PlantChillers {
             EngineDrivenChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
             EngineDrivenChillerReport(Num).Base.Evapmdot = modEvapMassFlowRate;
             EngineDrivenChillerReport(Num).Base.Condmdot = modCondMassFlowRate;
-            if (modFuelEnergyUseRate != 0.0) {
-                EngineDrivenChillerReport(Num).FuelCOP = modQEvaporator / modFuelEnergyUseRate;
+            if (EngineDrivenChiller(Num).modFuelEnergyUseRate != 0.0) {
+                EngineDrivenChillerReport(Num).FuelCOP = modQEvaporator / EngineDrivenChiller(Num).modFuelEnergyUseRate;
             } else {
                 EngineDrivenChillerReport(Num).FuelCOP = 0.0;
             }
@@ -8448,21 +8418,21 @@ namespace PlantChillers {
         }
 
         // Update Heat Recovery Stuff whether running or not, variables should be set correctly
-        EngineDrivenChillerReport(Num).QJacketRecovered = modQJacketRecovered;
-        EngineDrivenChillerReport(Num).QLubeOilRecovered = modQLubeOilRecovered;
-        EngineDrivenChillerReport(Num).QExhaustRecovered = modQExhaustRecovered;
-        EngineDrivenChillerReport(Num).QTotalHeatRecovered = modQTotalHeatRecovered;
-        EngineDrivenChillerReport(Num).FuelEnergyUseRate = modFuelEnergyUseRate;
-        EngineDrivenChillerReport(Num).JacketEnergyRec = modJacketEnergyRec;
-        EngineDrivenChillerReport(Num).LubeOilEnergyRec = modLubeOilEnergyRec;
-        EngineDrivenChillerReport(Num).ExhaustEnergyRec = modExhaustEnergyRec;
-        EngineDrivenChillerReport(Num).TotalHeatEnergyRec = modTotalHeatEnergyRec;
-        EngineDrivenChillerReport(Num).FuelEnergy = modFuelEnergy;
-        EngineDrivenChillerReport(Num).FuelMdot = modFuelMdot;
-        EngineDrivenChillerReport(Num).ExhaustStackTemp = modExhaustStackTemp;
-        EngineDrivenChillerReport(Num).HeatRecInletTemp = modHeatRecInletTemp;
+        EngineDrivenChillerReport(Num).QJacketRecovered = EngineDrivenChiller(Num).modQJacketRecovered;
+        EngineDrivenChillerReport(Num).QLubeOilRecovered = EngineDrivenChiller(Num).modQLubeOilRecovered;
+        EngineDrivenChillerReport(Num).QExhaustRecovered = EngineDrivenChiller(Num).modQExhaustRecovered;
+        EngineDrivenChillerReport(Num).QTotalHeatRecovered = EngineDrivenChiller(Num).modQTotalHeatRecovered;
+        EngineDrivenChillerReport(Num).FuelEnergyUseRate = EngineDrivenChiller(Num).modFuelEnergyUseRate;
+        EngineDrivenChillerReport(Num).JacketEnergyRec = EngineDrivenChiller(Num).modJacketEnergyRec;
+        EngineDrivenChillerReport(Num).LubeOilEnergyRec = EngineDrivenChiller(Num).modLubeOilEnergyRec;
+        EngineDrivenChillerReport(Num).ExhaustEnergyRec = EngineDrivenChiller(Num).modExhaustEnergyRec;
+        EngineDrivenChillerReport(Num).TotalHeatEnergyRec = EngineDrivenChiller(Num).modTotalHeatEnergyRec;
+        EngineDrivenChillerReport(Num).FuelEnergy = EngineDrivenChiller(Num).modFuelEnergy;
+        EngineDrivenChillerReport(Num).FuelMdot = EngineDrivenChiller(Num).modFuelMdot;
+        EngineDrivenChillerReport(Num).ExhaustStackTemp = EngineDrivenChiller(Num).modExhaustStackTemp;
+        EngineDrivenChillerReport(Num).HeatRecInletTemp = EngineDrivenChiller(Num).modHeatRecInletTemp;
         EngineDrivenChillerReport(Num).HeatRecOutletTemp = modHeatRecOutletTemp;
-        EngineDrivenChillerReport(Num).HeatRecMdot = modHeatRecMdotActual;
+        EngineDrivenChillerReport(Num).HeatRecMdot = EngineDrivenChiller(Num).modHeatRecMdotActual;
 
         // Update the Heat Recovery outlet
         if (EngineDrivenChiller(Num).HeatRecActive) {
