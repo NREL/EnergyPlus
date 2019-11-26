@@ -101,7 +101,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     EXPECT_NEAR( outletNode.Temp, 17.791, 0.001 );
     EXPECT_NEAR( outletNode.HumRat, 0.00754, 0.0001 );
     EXPECT_NEAR( outletNode.Enthalpy, 37000.0, 0.1 );
-    EXPECT_NEAR( thisSpeed.FullLoadPower, 900.0, 0.1 );
+    EXPECT_NEAR( thisSpeed.fullLoadPower, 900.0, 0.1 );
     EXPECT_NEAR( thisSpeed.RTF, 1.0, 0.01 );
 
 }
