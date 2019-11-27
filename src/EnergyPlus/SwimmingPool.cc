@@ -495,6 +495,7 @@ namespace SwimmingPool {
             this->LastSysTimeElapsed = 0.0;
             this->LastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
             this->LastTimeStepSys = 0.0;
+            this->MyOneTimeFlag = false;
         }
 
         SwimmingPoolData::InitSwimmingPoolPlantLoopIndex(this->MyPlantScanFlagPool);
