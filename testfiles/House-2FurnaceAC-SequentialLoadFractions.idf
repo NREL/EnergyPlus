@@ -1093,15 +1093,9 @@
 
                              !- Field 4
 
-  Schedule:Constant,
-    SeventyFivePercent,
-    Fraction,
-    0.75;
+  Schedule:Constant,SeventyFivePercent,Fraction,0.75;
 
-  Schedule:Constant,
-    OneHundredPercent,
-    Fraction,
-    1.0;
+  Schedule:Constant,OneHundredPercent,Fraction,1.0;
 
   ThermostatSetpoint:DualSetpoint,
     Main Tstat Dual SP Control,  !- Name
@@ -1187,14 +1181,14 @@
     LIVING ZONE Air Terminal 1,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    SeventyFivePercent,                    !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    SeventyFivePercent,                    !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    SeventyFivePercent,      !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    SeventyFivePercent,      !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     LIVING ZONE Air Terminal 2,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    OneHundredPercent,                    !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    OneHundredPercent;                    !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    OneHundredPercent,       !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    OneHundredPercent;       !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     LIVING ZONE Air Terminal 1,  !- Name
