@@ -253,9 +253,6 @@ TEST(SizingManagerTest, TimeIndexToHrMinString_test)
 TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest)
 {
     // checks DOAS Control Strategy default setpoint values test
-
-    bool ErrorsFound(false);
-
     std::string const idf_objects = delimited_string({
 
         " Zone,",
@@ -308,6 +305,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements();

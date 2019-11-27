@@ -3179,7 +3179,6 @@ namespace SizingManager {
                         {
                             ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = rNumericArgs(18);
                         }
-
                         if (rNumericArgs(17) > 0.0 && rNumericArgs(18) > 0.0 && rNumericArgs(17) >= rNumericArgs(18)) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                             ShowContinueError("... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
