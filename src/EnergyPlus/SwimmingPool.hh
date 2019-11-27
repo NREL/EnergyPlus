@@ -161,6 +161,8 @@ namespace SwimmingPool {
         void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
         );
 
+        void SetupOutputVars();
+
         void InitSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );
 
@@ -181,8 +183,6 @@ namespace SwimmingPool {
 
     // Object Data
     extern Array1D<SwimmingPoolData> Pool;
-
-    // Functions
 
     void clear_state();
 
