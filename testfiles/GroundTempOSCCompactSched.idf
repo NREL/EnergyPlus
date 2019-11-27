@@ -397,7 +397,7 @@
   InternalMass,
     OSCTest:PartitionIntMass,!- Name
     InteriorWall,            !- Construction Name
-    OSCTest,                 !- Zone Name
+    OSCTest,                 !- Zone or ZoneList Name
     92.9;                    !- Surface Area {m2}
 
   SurfaceProperty:OtherSideCoefficients,
@@ -631,8 +631,8 @@
     OSCTest-Air,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     OSCTest-Air,             !- Name
