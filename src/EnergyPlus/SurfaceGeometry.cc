@@ -872,15 +872,11 @@ namespace SurfaceGeometry {
         static std::string const RoutineName("GetSurfaceData: ");
 
         int ConstrNum;                // Construction number
-        int SubSurfNum;               // DO loop counter/index for sub-surface number
-        int SurfNum;                  // DO loop counter/index for surface number
-        int ZoneNum;                  // DO loop counter (zones)
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
         static bool NonMatch(false);  // Error for non-matching interzone surfaces
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
         static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
-        int Loop;
         int BaseSurfNum;
         int TotLay;               // Total layers in a construction
         int TotLayFound;          // Total layers in the construction of a matching interzone surface
@@ -971,7 +967,7 @@ namespace SurfaceGeometry {
 
         if (WorldCoordSystem) {
             if (BuildingAzimuth != 0.0) RelWarning = true;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
             }
             if (RelWarning && !WarningDisplayed) {
@@ -981,7 +977,7 @@ namespace SurfaceGeometry {
                 WarningDisplayed = true;
             }
             RelWarning = false;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
                 if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
@@ -1039,19 +1035,19 @@ namespace SurfaceGeometry {
         UniqueSurfaceNames.reserve(TotSurfaces);
         // SurfaceTmp structure is allocated via derived type initialization.
 
-        SurfNum = 0;
+        int NumSurfs = 0;
         AddedSubSurfaces = 0;
         AskForSurfacesReport = true;
 
-        GetDetShdSurfaceData(ErrorsFound, SurfNum, TotDetachedFixed, TotDetachedBldg);
+        GetDetShdSurfaceData(ErrorsFound, NumSurfs, TotDetachedFixed, TotDetachedBldg);
 
-        GetRectDetShdSurfaceData(ErrorsFound, SurfNum, TotRectDetachedFixed, TotRectDetachedBldg);
+        GetRectDetShdSurfaceData(ErrorsFound, NumSurfs, TotRectDetachedFixed, TotRectDetachedBldg);
 
         GetHTSurfaceData(
-            ErrorsFound, SurfNum, TotHTSurfs, TotDetailedWalls, TotDetailedRoofs, TotDetailedFloors, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+            ErrorsFound, NumSurfs, TotHTSurfs, TotDetailedWalls, TotDetailedRoofs, TotDetailedFloors, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
         GetRectSurfaces(ErrorsFound,
-                        SurfNum,
+                        NumSurfs,
                         TotRectExtWalls,
                         TotRectIntWalls,
                         TotRectIZWalls,
@@ -1065,10 +1061,10 @@ namespace SurfaceGeometry {
                         BaseSurfIDs,
                         NeedToAddSurfaces);
 
-        GetHTSubSurfaceData(ErrorsFound, SurfNum, TotHTSubs, SubSurfCls, SubSurfIDs, AddedSubSurfaces, NeedToAddSubSurfaces);
+        GetHTSubSurfaceData(ErrorsFound, NumSurfs, TotHTSubs, SubSurfCls, SubSurfIDs, AddedSubSurfaces, NeedToAddSubSurfaces);
 
         GetRectSubSurfaces(ErrorsFound,
-                           SurfNum,
+                           NumSurfs,
                            TotRectWindows,
                            TotRectDoors,
                            TotRectGlazedDoors,
@@ -1079,24 +1075,24 @@ namespace SurfaceGeometry {
                            AddedSubSurfaces,
                            NeedToAddSubSurfaces);
 
-        GetAttShdSurfaceData(ErrorsFound, SurfNum, TotShdSubs);
+        GetAttShdSurfaceData(ErrorsFound, NumSurfs, TotShdSubs);
 
-        GetSimpleShdSurfaceData(ErrorsFound, SurfNum, TotOverhangs, TotOverhangsProjection, TotFins, TotFinsProjection);
+        GetSimpleShdSurfaceData(ErrorsFound, NumSurfs, TotOverhangs, TotOverhangsProjection, TotFins, TotFinsProjection);
 
-        GetIntMassSurfaceData(ErrorsFound, SurfNum);
+        GetIntMassSurfaceData(ErrorsFound, NumSurfs);
 
         GetMovableInsulationData(ErrorsFound);
 
         if (CalcSolRefl) GetShadingSurfReflectanceData(ErrorsFound);
 
-        TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
+        TotSurfaces = NumSurfs + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors discovered, program terminates.");
         }
 
         // Have to make room for added surfaces, if needed
-        FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
+        FirstTotalSurfaces = NumSurfs + AddedSubSurfaces;
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) {
             SurfaceTmp.redimension(TotSurfaces);
         }
@@ -1106,7 +1102,7 @@ namespace SurfaceGeometry {
         // add the "need to add" surfaces
         // Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) CurNewSurf = FirstTotalSurfaces;
-        for (SurfNum = 1; SurfNum <= FirstTotalSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= FirstTotalSurfaces; ++SurfNum) {
             if (SurfaceTmp(SurfNum).ExtBoundCond != UnenteredAdjacentZoneSurface) continue;
             // Need to add surface
             ++CurNewSurf;
@@ -1221,7 +1217,7 @@ namespace SurfaceGeometry {
         // After all of the surfaces have been defined then the base surfaces for the
         // sub-surfaces can be defined.  Loop through surfaces and match with the sub-surface
         // names.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!SurfaceTmp(SurfNum).HeatTransSurf) continue;
 
             // why are we doing this again?  this should have already been done.
@@ -1268,7 +1264,7 @@ namespace SurfaceGeometry {
 
         // Move all Detached Surfaces to Front
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (SurfaceTmp(SurfNum).Class != SurfaceClass_Detached_F && SurfaceTmp(SurfNum).Class != SurfaceClass_Detached_B &&
                 SurfaceTmp(SurfNum).Class != SurfaceClass_Shading)
                 continue;
@@ -1282,13 +1278,13 @@ namespace SurfaceGeometry {
 
         //  For each zone
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
-            //  For each Base Surface Type (Wall, Floor, Roof)
+            //  For each Base Surface Type (Wall, Floor, Roof) - put these first
 
-            for (Loop = 1; Loop <= 3; ++Loop) {
+            for (int Loop = 1; Loop <= 3; ++Loop) {
 
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
                     if (SurfaceTmp(SurfNum).Zone == 0) continue;
 
@@ -1302,30 +1298,54 @@ namespace SurfaceGeometry {
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
 
-                    //  Find all subsurfaces to this surface
-                    for (SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+                    //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
+                    for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                         if (SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
-
-                        ++MovedSurfs;
-                        Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
-                        SurfaceTmp(SubSurfNum).Class = SurfaceClass_Moved; // 'Moved'
-                        Surface(MovedSurfs).BaseSurf = BaseSurfNum;
-                        SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                        SurfaceTmp(SubSurfNum).BaseSurf = BaseSurfNum;
                     }
                 }
             }
 
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            // Internal mass goes next
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-                if (SurfaceTmp(SurfNum).ZoneName != Zone(ZoneNum).Name) continue;
+                if (!UtilityRoutines::SameString(SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
                 if (SurfaceTmp(SurfNum).Class != SurfaceClass_IntMass) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SurfNum);
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
                 SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; // 'Moved'
+            }
+
+            // Opaque subsurfaces are next (anything left in this zone that's not a window or a glass door)
+            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
+                if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Window) continue;
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_GlassDoor) continue;
+                
+
+                ++MovedSurfs;
+                Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
+                SurfaceTmp(SubSurfNum).Class = SurfaceClass_Moved; // 'Moved'
+                SurfaceTmp(SubSurfNum).BaseSurf = -1;
+            }
+
+            // Last but not least, then window subsurfaces
+            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+
+                if (SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
+                if (SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
+                if ((SurfaceTmp(SubSurfNum).Class != SurfaceClass_Window) && (SurfaceTmp(SubSurfNum).Class != SurfaceClass_GlassDoor)) continue;
+
+                ++MovedSurfs;
+                Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
+                SurfaceTmp(SubSurfNum).Class = SurfaceClass_Moved; // 'Moved'
+                SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
         }
 
@@ -1336,7 +1356,7 @@ namespace SurfaceGeometry {
             strip(Msg2);
             ShowSevereError(RoutineName + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')');
             SurfError = true;
-            for (Loop = 1; Loop <= TotSurfaces; ++Loop) {
+            for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
                 if (SurfaceTmp(Loop).Class != SurfaceClass_Moved) {
                     if (SurfaceTmp(Loop).Class > 100) {
                         ShowSevereError(RoutineName + "Error in Surface= \"" + SurfaceTmp(Loop).Name + "\" Class=" +
@@ -1351,16 +1371,16 @@ namespace SurfaceGeometry {
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
-        for (Loop = 1; Loop <= 3; ++Loop) {
+        for (int Loop = 1; Loop <= 3; ++Loop) {
 
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
                 if (Surface(SurfNum).Zone == 0) continue;
 
                 if (Surface(SurfNum).Class != BaseSurfIDs(Loop)) continue;
 
                 //  Find all subsurfaces to this surface
-                for (SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+                for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                     if (SurfNum == SubSurfNum) continue;
                     if (Surface(SubSurfNum).Zone == 0) continue;
@@ -1377,7 +1397,7 @@ namespace SurfaceGeometry {
         // Now, match up interzone surfaces
         NonMatch = false;
         izConstDiffMsg = false;
-        for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+        for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
             //  Clean up Shading Surfaces, make sure they don't go through here.
             if (!Surface(SurfNum).HeatTransSurf) continue;
             //   If other surface, match it up
@@ -1657,7 +1677,7 @@ namespace SurfaceGeometry {
         //**********************************************************************************
         // Warn about interzone surfaces that have adiabatic windows/vice versa
         SubSurfaceSevereDisplayed = false;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).BaseSurf == SurfNum) continue; // base surface
             // not base surface.  Check it.
@@ -1724,8 +1744,8 @@ namespace SurfaceGeometry {
 
         //**********************************************************************************
         //   Set up Zone Surface Pointers
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-            for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 if (Surface(SurfNum).Zone == ZoneNum) {
                     if (Zone(ZoneNum).SurfaceFirst == 0) {
                         Zone(ZoneNum).SurfaceFirst = SurfNum;
@@ -1738,11 +1758,11 @@ namespace SurfaceGeometry {
         if (NumOfZones > 0) {
             Zone(NumOfZones).SurfaceLast = TotSurfaces;
         }
-        for (ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
             Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
         }
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).SurfaceFirst == 0) {
                 ShowSevereError(RoutineName + "Zone has no surfaces, Zone=" + Zone(ZoneNum).Name);
                 SurfError = true;
@@ -1751,8 +1771,8 @@ namespace SurfaceGeometry {
 
         // Set up Floor Areas for Zones
         if (!SurfError) {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-                for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class == SurfaceClass_Floor) {
                         Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).HasFloor = true;
@@ -1764,7 +1784,7 @@ namespace SurfaceGeometry {
                 }
             }
             ErrCount = 0;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 Zone(ZoneNum).CalcFloorArea = Zone(ZoneNum).FloorArea;
                 if (Zone(ZoneNum).UserEnteredFloorArea != AutoCalculate) {
                     // Check entered vs calculated
@@ -1797,7 +1817,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+        for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
             if (Surface(SurfNum).Area < 1.e-06) {
                 ShowSevereError(RoutineName + "Zero or negative surface area[" + RoundSigDigits(Surface(SurfNum).Area, 5) +
                                 "], Surface=" + Surface(SurfNum).Name);
@@ -1809,7 +1829,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+        for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
             // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
             // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
 
@@ -1827,7 +1847,7 @@ namespace SurfaceGeometry {
 
         errFlag = false;
         if (!SurfError) {
-            for (SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
                 // Set ShadedConstruction numbers for windows whose shaded constructions were created
                 // when shading device was specified in the WindowShadingControl for the window
                 if (Surface(SurfNum).ShadedConstruction != 0) SurfaceWindow(SurfNum).ShadedConstruction = Surface(SurfNum).ShadedConstruction;
@@ -1897,12 +1917,12 @@ namespace SurfaceGeometry {
         }
 
         // Check for zones with not enough surfaces
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             OpaqueHTSurfs = 0;
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
             if (Zone(ZoneNum).SurfaceFirst == 0) continue; // Zone with no surfaces
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Floor || Surface(SurfNum).Class == SurfaceClass_Wall ||
                     Surface(SurfNum).Class == SurfaceClass_Roof)
                     ++OpaqueHTSurfs;
@@ -1925,7 +1945,7 @@ namespace SurfaceGeometry {
         SetupShadeSurfacesForSolarCalcs(); // if shading surfaces are solar collectors or PV, then we need full solar calc.
 
         LayNumOutside = 0;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             // Check for EcoRoof and only 1 allowed to be used.
             if (!Surface(SurfNum).ExtEcoRoof) continue;
             if (LayNumOutside == 0) {
@@ -1943,7 +1963,7 @@ namespace SurfaceGeometry {
 
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
             if (Surface(SurfNum).HeatTransSurf) {
                 DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
@@ -1996,7 +2016,7 @@ namespace SurfaceGeometry {
         // Check for IRT surfaces in invalid places.
         iTmp1 = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsIRT; })) {
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
                 if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
