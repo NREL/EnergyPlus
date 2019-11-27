@@ -73,70 +73,70 @@ namespace DataGlobals {
     extern bool preserveIDFOrder;
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const BeginDay;
-    extern int const DuringDay;
-    extern int const EndDay;
-    extern int const EndZoneSizingCalc;
-    extern int const EndSysSizingCalc;
+    int const BeginDay(1);
+    int const DuringDay(2);
+    int const EndDay(3);
+    int const EndZoneSizingCalc(4);
+    int const EndSysSizingCalc(5);
 
     // Parameters for KindOfSim
-    extern int const ksDesignDay;
-    extern int const ksRunPeriodDesign;
-    extern int const ksRunPeriodWeather;
-    extern int const ksHVACSizeDesignDay;       // a regular design day run during HVAC Sizing Simulation
-    extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-    extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
+    int const ksDesignDay(1);
+    int const ksRunPeriodDesign(2);
+    int const ksRunPeriodWeather(3);
+    int const ksHVACSizeDesignDay(4);       // a regular design day run during HVAC Sizing Simulation
+    int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
+    int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
 
-    extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
-    extern Real64 const Pi;        // Pi 3.1415926535897932384626435
-    extern Real64 const PiOvr2;    // Pi/2
-    extern Real64 const TwoPi;     // 2*Pi 6.2831853071795864769252868
-    extern Real64 const GravityConstant;
-    extern Real64 const DegToRadians;                  // Conversion for Degrees to Radians
-    extern Real64 const RadToDeg;                      // Conversion for Radians to Degrees
-    extern Real64 const SecInHour;                     // Conversion for hours to seconds
-    extern Real64 const HoursInDay;                    // Number of Hours in Day
-    extern Real64 const SecsInDay;                     // Number of seconds in Day
-    extern Real64 const BigNumber;                     // Max Number real used for initializations
-    extern Real64 const rTinyValue;                    // Tiny value to replace use of TINY(x)
-    extern std::string::size_type const MaxNameLength; // Maximum Name Length in Characters -- should be the same
+    Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
+    Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
+    Real64 const PiOvr2(Pi / 2.0);        // Pi/2
+    Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
+    Real64 const GravityConstant(9.807);
+    Real64 const DegToRadians(Pi / 180.0);           // Conversion for Degrees to Radians
+    Real64 const RadToDeg(180.0 / Pi);               // Conversion for Radians to Degrees
+    Real64 const SecInHour(3600.0);                  // Conversion for hours to seconds
+    Real64 const HoursInDay(24.0);                   // Number of Hours in Day
+    Real64 const SecsInDay(SecInHour* HoursInDay);   // Number of seconds in Day
+    Real64 const BigNumber(HUGE_(1.0));              // Max Number real used for initializations
+    Real64 const rTinyValue(EPSILON(1.0));           // Tiny value to replace use of TINY(x)
+    std::string::size_type const MaxNameLength(100); // Maximum Name Length in Characters -- should be the same
     // as MaxAlphaArgLength in InputProcessor module
 
-    extern Real64 const KelvinConv;        // Conversion factor for C to K and K to C
-    extern Real64 const InitConvTemp;      // [deg C], standard init vol to mass flow conversion temp
-    extern Real64 const AutoCalculate;     // automatically calculate some fields.
-    extern Real64 const CWInitConvTemp;    // [deg C], standard init chilled water vol to mass flow conversion temp
-    extern Real64 const HWInitConvTemp;    // [deg C], standard init hot water vol to mass flow conversion temp
-    extern Real64 const SteamInitConvTemp; // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 const KelvinConv(273.15);       // Conversion factor for C to K and K to C
+    Real64 const InitConvTemp(5.05);       // [deg C], standard init vol to mass flow conversion temp
+    Real64 const AutoCalculate(-99999.0);  // automatically calculate some fields.
+    Real64 const CWInitConvTemp(5.05);     // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 const HWInitConvTemp(60.0);     // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 const SteamInitConvTemp(100.0); // [deg C], standard init steam vol to mass flow conversion temp
 
-    extern Real64 const StefanBoltzmann;   // Stefan-Boltzmann constant in W/(m2*K4)
-    extern Real64 const UniversalGasConst; // (J/mol*K)
+    Real64 const StefanBoltzmann(5.6697E-8);     // Stefan-Boltzmann constant in W/(m2*K4)
+    Real64 const UniversalGasConst(8314.462175); // (J/mol*K)
 
-    extern Real64 const convertJtoGJ; // Conversion factor for J to GJ
+    Real64 const convertJtoGJ(1.0E-9); // Conversion factor for J to GJ
 
     // Parameters for EMS Calling Points
-    extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
-    extern int const emsCallFromSystemSizing;                         // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironmentAfterWarmUp;        // Identity where EMS called from
-    extern int const emsCallFromBeginTimestepBeforePredictor;         // Identity where EMS called from
-    extern int const emsCallFromBeforeHVACManagers;                   // Identity where EMS called from
-    extern int const emsCallFromAfterHVACManagers;                    // Identity where EMS called from
-    extern int const emsCallFromHVACIterationLoop;                    // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepBeforeHVACReporting; // Identity where EMS called from
-    extern int const emsCallFromEndSystemTimestepAfterHVACReporting;  // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepBeforeZoneReporting;   // Identity where EMS called from
-    extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
-    extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
+    int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
+    int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
+    int const emsCallFromBeginNewEvironment(3);                   // Identity where EMS called from
+    int const emsCallFromBeginNewEvironmentAfterWarmUp(4);        // Identity where EMS called from
+    int const emsCallFromBeginTimestepBeforePredictor(5);         // Identity where EMS called from
+    int const emsCallFromBeforeHVACManagers(6);                   // Identity where EMS called from
+    int const emsCallFromAfterHVACManagers(7);                    // Identity where EMS called from
+    int const emsCallFromHVACIterationLoop(8);                    // Identity where EMS called from
+    int const emsCallFromEndSystemTimestepBeforeHVACReporting(9); // Identity where EMS called from
+    int const emsCallFromEndSystemTimestepAfterHVACReporting(10); // Identity where EMS called from
+    int const emsCallFromEndZoneTimestepBeforeZoneReporting(11);  // Identity where EMS called from
+    int const emsCallFromEndZoneTimestepAfterZoneReporting(12);   // Identity where EMS called from
+    int const emsCallFromSetupSimulation(13);                     // identify where EMS called from,
     // this is for input processing only
-    extern int const emsCallFromExternalInterface;         // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;         // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel; // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;       // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance; // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance; // Identity where EMS called from
+    int const emsCallFromExternalInterface(14);         // Identity where EMS called from
+    int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
+    int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
+    int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
+    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
 
-    extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
+    int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 
     // DERIVED TYPE DEFINITIONS:
     // na
