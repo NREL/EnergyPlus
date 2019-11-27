@@ -5852,7 +5852,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace Psychrometrics;
         using DataSizing::CurOverallSimDay;
 
-        Real64 const Sigma(5.6697e-08);              // Stefan-Boltzmann constant
         Real64 const IterDampConst(5.0);             // Damping constant for inside surface temperature iterations
         int const ItersReevalConvCoeff(30);          // Number of iterations between inside convection coefficient reevaluations
         Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
@@ -6397,7 +6396,7 @@ namespace HeatBalanceSurfaceManager {
                                                                // conduction from the outside surface | Coefficient for conduction (current
                                                                // time) | Convection and damping term
 
-                    Real64 const Sigma_Temp_4(Sigma * pow_4(TempSurfIn(SurfNum)));
+                    Real64 const Sigma_Temp_4(DataGlobals::StefanBoltzmann * pow_4(TempSurfIn(SurfNum)));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                     WinHeatGain(SurfNum) =
@@ -6753,7 +6752,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace Psychrometrics;
         using DataSizing::CurOverallSimDay;
 
-        Real64 const Sigma(5.6697e-08);              // Stefan-Boltzmann constant
         Real64 const IterDampConst(5.0);             // Damping constant for inside surface temperature iterations
         int const ItersReevalConvCoeff(30);          // Number of iterations between inside convection coefficient reevaluations
         Real64 const MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
@@ -7143,7 +7141,7 @@ namespace HeatBalanceSurfaceManager {
                                                                // conduction from the outside surface | Coefficient for conduction (current
                                                                // time) | Convection and damping term
 
-                    Real64 const Sigma_Temp_4(Sigma * pow_4(TempSurfIn(SurfNum)));
+                    Real64 const Sigma_Temp_4(DataGlobals::StefanBoltzmann * pow_4(TempSurfIn(SurfNum)));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                     WinHeatGain(SurfNum) =
