@@ -558,7 +558,7 @@
   InternalMass,
     HALLWAY WALL,            !- Name
     INTWALL,                 !- Construction Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or ZoneList Name
     54.24;                   !- Surface Area {m2}
 
 ! 54.24 = 4 * ( 2.7 * 6 - 2.2 * 1.2 )
