@@ -501,54 +501,64 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
 
     //	enum surfaceShape:Triangle = 1
-    //	Surface( 11 ).Name = "Surface 1 - Triangle"
-    ProcessSurfaceVertices(11, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Triangle, Surface(11).Shape);
+    //	"Surface 1 - Triangle"
+    int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Triangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
-    //	Surface( 12 ).Name = "Surface 2 - Quadrilateral"
-    ProcessSurfaceVertices(12, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(12).Shape);
+    //	"Surface 2 - Quadrilateral"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Rectangle = 3
-    //	Surface( 7 ).Name = "Surface 3 - Rectangle"
-    ProcessSurfaceVertices(7, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Rectangle, Surface(7).Shape);
+    //	"Surface 3 - Rectangle"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Rectangle, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
-    //	Surface( 8 ).Name = "Surface 4 - RectangularDoorWindow"
-    ProcessSurfaceVertices(8, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(8).Shape);
+    //	"Surface 4 - RectangularDoorWindow"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
-    //	Surface( 1 ).Name = "Surface 5 - RectangularOverhang"
-    ProcessSurfaceVertices(1, dummy1, dummy2, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(1).Shape); // fins and overhangs will not get set to the proper surface shape.
+    //	"Surface 5 - RectangularOverhang"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
-    //	Surface( 3 ).Name = "Surface 6 - RectangularLeftFin"
-    ProcessSurfaceVertices(3, dummy1, dummy2, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(3).Shape); // fins and overhangs will not get set to the proper surface shape.
+    //	"Surface 6 - RectangularLeftFin"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
-    //	Surface( 5 ).Name = "Surface 7 - RectangularRightFin"
-    ProcessSurfaceVertices(5, dummy1, dummy2, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(5).Shape); // fins and overhangs will not get set to the proper surface shape.
+    //	"Surface 7 - RectangularRightFin"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
-    //	Surface( 9 ).Name = "Surface 8 - TriangularWindow"
-    ProcessSurfaceVertices(9, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(9).Shape);
+    //	"Surface 8 - TriangularWindow"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(surfNum).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
-    //	Surface( 10 ).Name = "Surface 9 - TriangularDoor"
-    ProcessSurfaceVertices(10, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(10).Shape);
+    //	"Surface 9 - TriangularDoor"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(surfNum).Shape);
 
     //	enum surfaceShape:Polygonal = 10
-    //	Surface( 13 ).Name = "Surface 10 - Polygonal"
-    ProcessSurfaceVertices(13, dummy1, dummy2, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Polygonal, Surface(13).Shape);
+    //	"Surface 10 - Polygonal"
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", DataSurfaces::Surface);
+    ProcessSurfaceVertices(surfNum, dummy1, dummy2, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Polygonal, Surface(surfNum).Shape);
 }
 
 TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
@@ -934,22 +944,25 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    // Run the test
-    for (int SurfNum = 2; SurfNum < 5; SurfNum++) {
-        MakeEquivalentRectangle(SurfNum, ErrorsFound);
-        EXPECT_FALSE(ErrorsFound); // expect no errors
-    }
-
-    // Check the result
+    // For each surface Run the test then Check the result
     // (1) rectangle window
-    EXPECT_NEAR(7.60, Surface(2).Width, 0.01);
-    EXPECT_NEAR(1.20, Surface(2).Height, 0.01);
+    int surfNum = UtilityRoutines::FindItemInList("SURFACE-1-RECTANGLE", DataSurfaces::Surface);
+    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_NEAR(7.60, Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.20, Surface(surfNum).Height, 0.01);
     // (2) trapzoid window
-    EXPECT_NEAR(7.80, Surface(3).Width, 0.01);
-    EXPECT_NEAR(1.17, Surface(3).Height, 0.01);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE-2-TRAPZOID", DataSurfaces::Surface);
+    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_NEAR(7.80, Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.17, Surface(surfNum).Height, 0.01);
     // (3) parallelogram window
-    EXPECT_NEAR(8.08, Surface(4).Width, 0.01);
-    EXPECT_NEAR(1.13, Surface(4).Height, 0.01);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE-3-PARALLELOGRAM", DataSurfaces::Surface);
+    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    EXPECT_NEAR(8.08, Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.13, Surface(surfNum).Height, 0.01);
 }
 
 TEST(SurfaceGeometryUnitTests, distance)
