@@ -1303,7 +1303,8 @@ namespace SurfaceGeometry {
 
                         if (SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
-                        SurfaceTmp(SubSurfNum).BaseSurf = BaseSurfNum;
+                        // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
+                        SurfaceTmp(SubSurfNum).BaseSurf = -BaseSurfNum;
                     }
                 }
             }
@@ -1332,6 +1333,8 @@ namespace SurfaceGeometry {
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
                 SurfaceTmp(SubSurfNum).Class = SurfaceClass_Moved; // 'Moved'
+                // Reset BaseSurf to it's positive value (set to negative earlier)
+                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
 
@@ -1345,6 +1348,8 @@ namespace SurfaceGeometry {
                 ++MovedSurfs;
                 Surface(MovedSurfs) = SurfaceTmp(SubSurfNum);
                 SurfaceTmp(SubSurfNum).Class = SurfaceClass_Moved; // 'Moved'
+                // Reset BaseSurf to it's positive value (set to negative earlier)
+                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 SurfaceTmp(SubSurfNum).BaseSurf = -1;
             }
         }
