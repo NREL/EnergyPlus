@@ -90,6 +90,7 @@
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
@@ -1336,7 +1337,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
                                 this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-
+                                this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(CompNames(CompNum));
                                 // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:RadiantConvective:Water")) {
@@ -1813,7 +1814,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp.TypeOf,
                                                                    "PlantComponent:TemperatureSource")) {
                                 GeneralEquipType = GenEquipTypes_HeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CENTRALHEATPUMPSYSTEM")) {
+                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CentralHeatPumpSystem")) {
                                 GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
                             } else {
                                 ShowSevereError("GetPlantInput: PlantLoop=\"" + PlantLoop(LoopNum).Name +

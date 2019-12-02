@@ -71,6 +71,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -159,126 +160,80 @@ namespace PlantCentralGSHP {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WrapperSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation,
+                             Real64 &MaxLoad,
+                             Real64 &MinLoad,
+                             Real64 &OptLoad)
     {
+        this->initialize(0.0, calledFromLocation.loopNum);
+        MinLoad = 0.0;
+        MaxLoad = 0.0;
+        OptLoad = 0.0;
+        if (calledFromLocation.loopNum == this->CWLoopNum) { // Chilled water loop
+            this->SizeWrapper();
+            if (this->ControlMode == SmartMixing) { // control mode is SmartMixing
+                for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
+                    MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling *
+                              this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
 
+                    OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling *
+                              this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
+
+                    MinLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling *
+                              this->ChillerHeater(NumChillerHeater).MinPartLoadRatCooling;
+                }
+            }
+        } else if (calledFromLocation.loopNum == this->HWLoopNum) {    // Hot water loop
+            if (this->ControlMode == SmartMixing) { // control mode is SmartMixing
+                for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
+                    MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg *
+                              this->ChillerHeater(NumChillerHeater).MaxPartLoadRatClgHtg;
+
+                    OptLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg *
+                              this->ChillerHeater(NumChillerHeater).OptPartLoadRatClgHtg;
+
+                    MinLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg *
+                              this->ChillerHeater(NumChillerHeater).MinPartLoadRatClgHtg;
+                }
+            } // End of control mode determination
+        }
     }
 
-    void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
-                                        int const EP_UNUSED(EquipFlowCtrl),        // Flow control mode for the equipment
-                                        int &CompIndex,                 // Chiller number pointer
-                                        int const LoopNum,              // plant loop index pointer
-                                        bool const EP_UNUSED(RunFlag),             // Simulate chiller when TRUE
-                                        bool const FirstIteration,      // Initialize variables when TRUE
-                                        bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                                        Real64 &MyLoad,                 // Loop demand component will meet [W]
-                                        Real64 &MaxCap,                 // Maximum operating capacity of chiller [W]
-                                        Real64 &MinCap,                 // Minimum operating capacity of chiller [W]
-                                        Real64 &OptCap,                 // Optimal operating capacity of chiller [W]
-                                        bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
-                                        Real64 &SizingFactor            // sizing factor
-    )
+    void WrapperSpecs::getSizingFactor(Real64 &SizFac)
     {
-        int WrapperNum;        // Wrapper number pointer
+        SizFac = 1.0;
+    }
 
-        // Get user input values
-        if (getWrapperInputFlag) {
-            GetWrapperInput();
-            getWrapperInputFlag = false;
-        }
+    void WrapperSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    {
+        if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
-        // Find the correct wrapper
-        if (CompIndex == 0) {
-            WrapperNum = UtilityRoutines::FindItemInList(WrapperName, Wrapper);
-            if (WrapperNum == 0) {
-                ShowFatalError("SimCentralGroundSourceHeatPump: Specified Wrapper not one of Valid Wrappers=" + WrapperName);
-            }
-            CompIndex = WrapperNum;
-        } else {
-            WrapperNum = CompIndex;
-            if (WrapperNum > numWrappers || WrapperNum < 1) {
-                ShowFatalError("SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + General::TrimSigDigits(WrapperNum) +
-                               ", Number of Units=" + General::TrimSigDigits(numWrappers) + ", Entered Unit name=" + WrapperName);
-            }
-            if (CheckEquipName(WrapperNum)) {
-                if (WrapperName != Wrapper(WrapperNum).Name) {
-                    ShowFatalError("SimCentralGroundSourceHeatPump:  Invalid CompIndex passed=" + General::TrimSigDigits(WrapperNum) +
-                                   ", Unit name=" + WrapperName + ", stored Unit Name for that index=" + Wrapper(WrapperNum).Name);
-                }
-                CheckEquipName(WrapperNum) = false;
-            }
-        }
+            this->initialize(CurLoad, calledFromLocation.loopNum);
+            this->CalcWrapperModel(CurLoad, calledFromLocation.loopNum);
 
-        if (InitLoopEquip) { // Initialization loop if not done
-            Wrapper(WrapperNum).initialize(MyLoad, LoopNum);
-            MinCap = 0.0;
-            MaxCap = 0.0;
-            OptCap = 0.0;
-            if (LoopNum == Wrapper(WrapperNum).CWLoopNum) { // Chilled water loop
-                Wrapper(WrapperNum).SizeWrapper();
-                if (Wrapper(WrapperNum).ControlMode == SmartMixing) { // control mode is SmartMixing
-                    for (int NumChillerHeater = 1; NumChillerHeater <= Wrapper(WrapperNum).ChillerHeaterNums; ++NumChillerHeater) {
-                        MaxCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
-
-                        OptCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
-
-                        MinCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapCooling *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).MinPartLoadRatCooling;
-                    }
-                }
-            } else if (LoopNum == Wrapper(WrapperNum).HWLoopNum) {    // Hot water loop
-                if (Wrapper(WrapperNum).ControlMode == SmartMixing) { // control mode is SmartMixing
-                    for (int NumChillerHeater = 1; NumChillerHeater <= Wrapper(WrapperNum).ChillerHeaterNums; ++NumChillerHeater) {
-                        MaxCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).MaxPartLoadRatClgHtg;
-
-                        OptCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).OptPartLoadRatClgHtg;
-
-                        MinCap += Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).RefCapClgHtg *
-                                  Wrapper(WrapperNum).ChillerHeater(NumChillerHeater).MinPartLoadRatClgHtg;
-                    }
-                } // End of control mode determination
-            }     // End of loop determination
-
-            if (GetSizingFactor) {
-                SizingFactor = 1.0; // Always equal to one now. The component may have its own sizing factor
-            }
-
-            return;
-
-        } // End of initialization
-
-        if (LoopNum != Wrapper(WrapperNum).GLHELoopNum) {
-
-            Wrapper(WrapperNum).initialize(MyLoad, LoopNum);
-            Wrapper(WrapperNum).CalcWrapperModel(MyLoad, LoopNum);
-
-        } else if (LoopNum == Wrapper(WrapperNum).GLHELoopNum) {
-            PlantUtilities::UpdateChillerComponentCondenserSide(LoopNum,
-                                                                Wrapper(WrapperNum).GLHELoopSideNum,
-                                                DataPlant::TypeOf_CentralGroundSourceHeatPump,
-                                                Wrapper(WrapperNum).GLHEInletNodeNum,
-                                                Wrapper(WrapperNum).GLHEOutletNodeNum,
-                                                Wrapper(WrapperNum).Report.GLHERate,
-                                                Wrapper(WrapperNum).Report.GLHEInletTemp,
-                                                Wrapper(WrapperNum).Report.GLHEOutletTemp,
-                                                Wrapper(WrapperNum).Report.GLHEmdot,
-                                                FirstIteration);
+        } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
+            PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
+                                                                this->GLHELoopSideNum,
+                                                                DataPlant::TypeOf_CentralGroundSourceHeatPump,
+                                                                this->GLHEInletNodeNum,
+                                                                this->GLHEOutletNodeNum,
+                                                                this->Report.GLHERate,
+                                                                this->Report.GLHEInletTemp,
+                                                                this->Report.GLHEOutletTemp,
+                                                                this->Report.GLHEmdot,
+                                                                FirstHVACIteration);
 
             // Use the first chiller heater's evaporator capacity ratio to determine dominant load
-            Wrapper(WrapperNum).SimulClgDominant = false;
-            Wrapper(WrapperNum).SimulHtgDominant = false;
-            if (Wrapper(WrapperNum).WrapperCoolingLoad > 0 && Wrapper(WrapperNum).WrapperHeatingLoad > 0) {
-                Real64 SimulLoadRatio = Wrapper(WrapperNum).WrapperCoolingLoad / Wrapper(WrapperNum).WrapperHeatingLoad;
-                if (SimulLoadRatio > Wrapper(WrapperNum).ChillerHeater(1).ClgHtgToCoolingCapRatio) {
-                    Wrapper(WrapperNum).SimulClgDominant = true;
-                    Wrapper(WrapperNum).SimulHtgDominant = false;
+            this->SimulClgDominant = false;
+            this->SimulHtgDominant = false;
+            if (this->WrapperCoolingLoad > 0 && this->WrapperHeatingLoad > 0) {
+                Real64 SimulLoadRatio = this->WrapperCoolingLoad / this->WrapperHeatingLoad;
+                if (SimulLoadRatio > this->ChillerHeater(1).ClgHtgToCoolingCapRatio) {
+                    this->SimulClgDominant = true;
+                    this->SimulHtgDominant = false;
                 } else {
-                    Wrapper(WrapperNum).SimulHtgDominant = true;
-                    Wrapper(WrapperNum).SimulClgDominant = false;
+                    this->SimulHtgDominant = true;
+                    this->SimulClgDominant = false;
                 }
             }
         }

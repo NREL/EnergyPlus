@@ -60,14 +60,15 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
+class PlantCentralGSHPFixture : public EnergyPlusFixture {};
+
+TEST_F(PlantCentralGSHPFixture, ChillerHeater_Autosize)
 {
     // Allocate One Wrapper with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
     int NumWrappers = 1;
     PlantCentralGSHP::numWrappers = NumWrappers;
     PlantCentralGSHP::Wrapper.allocate(NumWrappers);
-    PlantCentralGSHP::WrapperReport.allocate(NumWrappers);
 
     int NumberOfComp = 1;
     PlantCentralGSHP::Wrapper(1).NumOfComp = NumberOfComp;
@@ -78,14 +79,12 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobals::ScheduleAlwaysOn;
     PlantCentralGSHP::Wrapper(1).ChillerHeaterNums = 2;
     PlantCentralGSHP::Wrapper(1).ChillerHeater.allocate(2);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport.allocate(2);
     // First test in SizeWrapper, so need to set that
     PlantCentralGSHP::Wrapper(1).ControlMode = PlantCentralGSHP::SmartMixing;
 
     int NumChillerHeaters = 1;
     PlantCentralGSHP::numChillerHeaters = NumChillerHeaters;
     PlantCentralGSHP::ChillerHeater.allocate(NumChillerHeaters);
-    PlantCentralGSHP::ChillerHeaterReport.allocate(NumChillerHeaters);
     PlantCentralGSHP::ChillerHeater(1).ConstantFlow = false;
     PlantCentralGSHP::ChillerHeater(1).VariableFlow = true;
     PlantCentralGSHP::ChillerHeater(1).CondenserType = PlantCentralGSHP::WaterCooled;
@@ -111,11 +110,8 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Add the References onto the wrapper
     PlantCentralGSHP::Wrapper(1).ChillerHeater(1) = PlantCentralGSHP::ChillerHeater(1);
     PlantCentralGSHP::Wrapper(1).ChillerHeater(2) = PlantCentralGSHP::ChillerHeater(1);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport(1) = PlantCentralGSHP::ChillerHeaterReport(1);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport(2) = PlantCentralGSHP::ChillerHeaterReport(1);
 
     // De-allocate temporary arrays (happens in GetInput too...)
-    PlantCentralGSHP::ChillerHeaterReport.deallocate();
     PlantCentralGSHP::ChillerHeater.deallocate();
 
 
@@ -180,7 +176,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // now call sizing routine
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    PlantCentralGSHP::SizeWrapper(1);
+    PlantCentralGSHP::Wrapper(1).SizeWrapper();
 
     // Careful of actually using PlantCentralGSHP::Wrapper(1).ChillerHeater(1) and not PlantCentralGSHP::ChillerHeater since this array isn't used
     // anymore by the module
