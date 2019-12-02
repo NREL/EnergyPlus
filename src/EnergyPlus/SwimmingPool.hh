@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -61,7 +62,7 @@ namespace SwimmingPool {
 
     extern int NumSwimmingPools;                 // Number of swimming pools
 
-    struct SwimmingPoolData
+    struct SwimmingPoolData : PlantComponent
     {
         // Members
         // Input data
@@ -158,6 +159,8 @@ namespace SwimmingPool {
               MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
         void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
         );
 
