@@ -325,7 +325,6 @@ namespace PlantCentralGSHP {
         Real64 HWVolFlowRate;                      // Hot water volume flow rate [kg/s]
         Real64 GLHEVolFlowRate;                    // Geo-field volume flow rate [kg/s]
         bool MyWrapperFlag;
-        bool MyWrapperOneTimeFlag;
         bool MyWrapperEnvrnFlag;
         bool SimulClgDominant;
         bool SimulHtgDominant;
@@ -338,7 +337,7 @@ namespace PlantCentralGSHP {
               HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
               HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0),
               HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0),
-              MyWrapperFlag(true), MyWrapperOneTimeFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false)
+              MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false)
         {
         }
     };
