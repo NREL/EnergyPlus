@@ -340,6 +340,24 @@ namespace PlantCentralGSHP {
               MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false)
         {
         }
+
+        void InitWrapper(bool RunFlag,        // TRUE when chiller operating
+                         bool FirstIteration, // Initialize variables when TRUE
+                         Real64 MyLoad,       // Demand Load
+                         int LoopNum          // Loop Number Index
+        );
+
+        void SizeWrapper();
+
+        void CalcWrapperModel(int WrapperNum, Real64 &MyLoad, int LoopNum);
+
+        void CalcChillerModel();
+
+        void CalcChillerHeaterModel();
+
+        void UpdateChillerHeaterRecords();
+
+        void UpdateChillerRecords();
     };
 
     struct WrapperReportVars
@@ -411,43 +429,9 @@ namespace PlantCentralGSHP {
                                         Real64 &SizingFactor            // sizing factor
     );
 
-    void SizeWrapper(int WrapperNum);
-
     void GetWrapperInput();
 
     void GetChillerHeaterInput();
-
-    void InitWrapper(int WrapperNum,      // Number of the current wrapper being simulated
-                     bool RunFlag,        // TRUE when chiller operating
-                     bool FirstIteration, // Initialize variables when TRUE
-                     Real64 MyLoad,       // Demand Load
-                     int LoopNum          // Loop Number Index
-    );
-
-    void CalcChillerModel(int WrapperNum,      // Number of wrapper
-                          int OpMode,          // Operation mode
-                          Real64 &MyLoad,            // Operating load
-                          bool RunFlag,        // TRUE when chiller operating
-                          bool FirstIteration, // TRUE when first iteration of timestep
-                          int EquipFlowCtrl,   // Flow control mode for the equipment
-                          int LoopNum          // Plant loop number
-    );
-
-    void CalcChillerHeaterModel(int WrapperNum,      // Wrapper number pointor
-                                int OpMode,          // Operation mode
-                                Real64 &MyLoad,            // Heating load plant should meet
-                                bool RunFlag,        // TRUE when chiller operating
-                                bool FirstIteration, // TRUE when first iteration of timestep
-                                int EquipFlowCtrl,   // Flow control mode for the equipment
-                                int LoopNum          // Loop number
-    );
-
-    void
-    CalcWrapperModel(int WrapperNum, Real64 &MyLoad, bool RunFlag, bool FirstIteration, int EquipFlowCtrl, int LoopNum);
-
-    void UpdateChillerRecords(int WrapperNum); // Wrapper number
-
-    void UpdateChillerHeaterRecords(int WrapperNum); // Wrapper number
 
 } // namespace PlantCentralGSHP
 
