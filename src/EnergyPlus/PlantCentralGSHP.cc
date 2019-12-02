@@ -612,37 +612,30 @@ namespace PlantCentralGSHP {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Wrapper model.
 
-        static int NumChillerHeaters(0); // total number of chiller heater (without identical multiplier)
-
-        static std::string CompName;        // component name
-        static bool ErrorsFound(false);     // True when input errors are found
-        static bool AllocatedFlag(false);   // True when arrays are allocated
-        static bool CHAllocatedFlag(false); // True when arrays are allocated
+        std::string CompName;        // component name
+        bool ErrorsFound(false);     // True when input errors are found
         int NumAlphas;                      // Number of elements in the alpha array
         int NumNums;                        // Number of elements in the numeric array
         int IOStat;                         // IO Status when calling get input subroutine
         int i_CH;                           // chiller heater index pointer
-        static int WrapperNum(0);           // wrapper number
-        static int NumberOfComp(0);         // number of components under each wrapper
-        static int Comp(0);                 // an index number for input all the components
-        static int loop(0);                 // an index number for read in all the parameters of a component
-        static int CompIndex(0);            // component index in the sequence of internal input array
-        static int ChillerHeaterNum(1);     // chiller heater index pointer for current wrapper object
-        static int NumChHtrPerWrapper(0);   // total number of chiller heaters (including identical units) per wrapper
+        int WrapperNum(0);           // wrapper number
+        int NumberOfComp(0);         // number of components under each wrapper
+        int Comp(0);                 // an index number for input all the components
+        int loop(0);                 // an index number for read in all the parameters of a component
+        int CompIndex(0);            // component index in the sequence of internal input array
+        int ChillerHeaterNum(1);     // chiller heater index pointer for current wrapper object
+        int NumChHtrPerWrapper(0);   // total number of chiller heaters (including identical units) per wrapper
 
-        if (AllocatedFlag) return;
         DataIPShortCuts::cCurrentModuleObject = "CentralHeatPumpSystem";
         NumWrappers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         if (NumWrappers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
-            ErrorsFound = true;
         }
 
         Wrapper.allocate(NumWrappers);
         WrapperReport.allocate(NumWrappers);
         CheckEquipName.dimension(NumWrappers, true);
-        AllocatedFlag = true;
 
         // Load arrays with electric EIR chiller data
         for (WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum) {
@@ -660,7 +653,7 @@ namespace PlantCentralGSHP {
 
             Wrapper(WrapperNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
-            // intialize nth chiller heater index (including identical units) for current wrapper
+            // initialize nth chiller heater index (including identical units) for current wrapper
             NumChHtrPerWrapper = 0;
             if (UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) {
                 continue;
@@ -761,18 +754,16 @@ namespace PlantCentralGSHP {
         }
 
         if (NumChillerHeaters > 0) {
-            if (CHAllocatedFlag) return;
 
             for (WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum) {
                 Wrapper(WrapperNum).ChillerHeater.allocate(Wrapper(WrapperNum).ChillerHeaterNums);
                 Wrapper(WrapperNum).ChillerHeaterReport.allocate(Wrapper(WrapperNum).ChillerHeaterNums);
             }
             GetChillerHeaterInput();
-            CHAllocatedFlag = true;
         }
 
         for (WrapperNum = 1; WrapperNum <= NumWrappers; ++WrapperNum) {
-            ChillerHeaterNum = 0; // intialize nth chiller heater index (including identical units) for current wrapper
+            ChillerHeaterNum = 0; // initialize nth chiller heater index (including identical units) for current wrapper
             for (Comp = 1; Comp <= Wrapper(WrapperNum).NumOfComp; ++Comp) {
                 if (Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
                     CompName = Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName;
@@ -1142,10 +1133,10 @@ namespace PlantCentralGSHP {
         //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
         std::string StringVar;             // Used for EIRFPLR warning messages
-        static bool CHErrorsFound(false);  // True when input errors are found
-        static bool FoundNegValue(false);  // Used to evaluate PLFFPLR curve objects
+        bool CHErrorsFound(false);  // True when input errors are found
+        bool FoundNegValue(false);  // Used to evaluate PLFFPLR curve objects
         int CurveValPtr;                   // Index to EIRFPLR curve output
-        static int CurveCheck(0);          // Used to evaluate PLFFPLR curve objects
+        int CurveCheck(0);          // Used to evaluate PLFFPLR curve objects
         int ChillerHeaterNum;              // Chiller counter
         int NumAlphas;                     // Number of elements in the alpha array
         int NumNums;                       // Number of elements in the numeric array
@@ -1488,9 +1479,6 @@ namespace PlantCentralGSHP {
 
         static std::string const RoutineName("InitCGSHPHeatPump");
 
-        static bool MyWrapperOneTimeFlag(true); // Flag used to execute code only once
-        static Array1D_bool MyWrapperFlag;      // TRUE in order to set component location
-        static Array1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
         int ChillerHeaterNum;                   // Chiller Heater index
         bool errFlag;                           // Err flag
         bool FatalError;                        // Fatal error indicator
@@ -1506,15 +1494,11 @@ namespace PlantCentralGSHP {
         Real64 mdotGLHE;                        // Condenser water mass flow rate
 
         // Do the one time initializations
-        if (MyWrapperOneTimeFlag) {
-            MyWrapperEnvrnFlag.allocate(NumWrappers);
-            MyWrapperFlag.allocate(NumWrappers);
-            MyWrapperEnvrnFlag = true;
-            MyWrapperFlag = true;
-            MyWrapperOneTimeFlag = false;
+        if (Wrapper(WrapperNum).MyWrapperOneTimeFlag) {
+            Wrapper(WrapperNum).MyWrapperOneTimeFlag = false;
         }
 
-        if (MyWrapperFlag(WrapperNum)) {
+        if (Wrapper(WrapperNum).MyWrapperFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(Wrapper(WrapperNum).Name,
@@ -1656,7 +1640,7 @@ namespace PlantCentralGSHP {
                         DataLoopNode::Node(DataPlant::PlantLoop(Wrapper(WrapperNum).HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
             }
-            MyWrapperFlag(WrapperNum) = false;
+            Wrapper(WrapperNum).MyWrapperFlag = false;
         }
 
         CHWInletNodeNum = Wrapper(WrapperNum).CHWInletNodeNum;
@@ -1666,7 +1650,7 @@ namespace PlantCentralGSHP {
         GLHEInletNodeNum = Wrapper(WrapperNum).GLHEInletNodeNum;
         GLHEOutletNodeNum = Wrapper(WrapperNum).GLHEOutletNodeNum;
 
-        if (MyWrapperEnvrnFlag(WrapperNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (Wrapper(WrapperNum).MyWrapperEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             if (Wrapper(WrapperNum).ControlMode == SmartMixing) {
 
@@ -1733,11 +1717,11 @@ namespace PlantCentralGSHP {
                     Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).CondInletNode.MassFlowRateRequest = 0.0;
                 }
             }
-            MyWrapperEnvrnFlag(WrapperNum) = false;
+            Wrapper(WrapperNum).MyWrapperEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyWrapperEnvrnFlag(WrapperNum) = true;
+            Wrapper(WrapperNum).MyWrapperEnvrnFlag = true;
         }
 
         if (Wrapper(WrapperNum).CoolSetPointSetToLoop) {
@@ -1855,8 +1839,8 @@ namespace PlantCentralGSHP {
         static std::string const RoutineName("CalcChillerHeaterModel");
         static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-        static bool IsLoadCoolRemaining(true);
-        static bool NextCompIndicator(false); // Component indicator when identical chiller heaters exist
+        bool IsLoadCoolRemaining(true);
+        bool NextCompIndicator(false); // Component indicator when identical chiller heaters exist
         int CompNum(0);                       // Component number in the loop  REAL(r64) :: FRAC
         int ChillerHeaterNum;                 // Chiller heater number
         int CurrentMode;                      // Current operational mode, cooling or simultaneous cooling and heating mode
@@ -1877,8 +1861,8 @@ namespace PlantCentralGSHP {
         Real64 Cp;                            // Local fluid specific heat
         Real64 CondTempforCurve;              // Condenser temp used for performance curve
         Real64 CoolingLoadToMeet;             // Remaining cooling load the other chiller heaters should meet
-        Real64 GLHEDensityRatio;              // Fraction between starndarized density and local density in the condenser side
-        Real64 CHWDensityRatio;               // Fraction between starndarized density and local density in the chilled water side
+        Real64 GLHEDensityRatio;              // Fraction between standardized density and local density in the condenser side
+        Real64 CHWDensityRatio;               // Fraction between standardized density and local density in the chilled water side
         Real64 EvaporatorCapMin;              // Minimum capacity of the evaporator
         Real64 EvaporatorLoad(0.0);           // Cooling load evaporator should meet
         Real64 HeatingPower;                  // Electric power use for heating
@@ -1912,8 +1896,6 @@ namespace PlantCentralGSHP {
             ChillerPartLoadRatio = 0.0;
             ChillerCyclingRatio = 0.0;
             ChillerFalseLoadRate = 0.0;
-            EvapMassFlowRate = 0.0;
-            CondMassFlowRate = 0.0;
             CHPower = 0.0;
             HeatingPower = 0.0;
             QCondenser = 0.0;
@@ -1931,7 +1913,6 @@ namespace PlantCentralGSHP {
             if (Wrapper(WrapperNum).NumOfComp != Wrapper(WrapperNum).ChillerHeaterNums) { // Identical units exist
                 if (ChillerHeaterNum == 1) {
                     IdenticalUnitCounter = 0;
-                    IdenticalUnitRemaining = 0;
                     NextCompIndicator = false;
                     CompNum = ChillerHeaterNum;
                 }
@@ -2113,10 +2094,6 @@ namespace PlantCentralGSHP {
 
                 // Available chiller capacity as a function of temperature
                 AvailChillerCap = ChillerRefCap * ChillerCapFT;
-
-                if (Wrapper(WrapperNum).ChillerHeater(ChillerHeaterNum).PossibleSubcooling) {
-                    QEvaporator = CoolingLoadToMeet;
-                }
 
                 // Set load this chiller heater should meet
                 QEvaporator = min(CoolingLoadToMeet, (AvailChillerCap * MaxPartLoadRat));
@@ -2331,8 +2308,8 @@ namespace PlantCentralGSHP {
         static std::string const RoutineName("CalcChillerHeaterModel");
         static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-        static bool IsLoadHeatRemaining(true); // Ture if heating load remains for this chiller heater
-        static bool NextCompIndicator(false);  // Component indicator when identical chiller heaters exist
+        bool IsLoadHeatRemaining(true); // Ture if heating load remains for this chiller heater
+        bool NextCompIndicator(false);  // Component indicator when identical chiller heaters exist
         int CompNum(0);                        // Component number
         int ChillerHeaterNum;                  // Chiller heater number
         int CurrentMode;                       // Current operational mode, heating or simultaneous cooling and heating mode
@@ -2387,14 +2364,12 @@ namespace PlantCentralGSHP {
             ChillerPartLoadRatio = 0.0;
             ChillerCyclingRatio = 0.0;
             ChillerFalseLoadRate = 0.0;
-            CondMassFlowRate = 0.0;
             CHPower = 0.0;
             QCondenser = 0.0;
             QEvaporator = 0.0;
             CondenserFanPower = 0.0;
             FRAC = 1.0;
             CondDeltaTemp = 0.0;
-            EvapDeltaTemp = 0.0;
             CoolingPower = 0.0;
             ActualCOP = 0.0;
             EvapInletTemp = DataLoopNode::Node(Wrapper(WrapperNum).GLHEInletNodeNum).Temp;
