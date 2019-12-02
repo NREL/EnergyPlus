@@ -1014,7 +1014,6 @@ namespace EnergyPlus {
             }
 
             // Get the requested total flow rate
-            // 11-17-2006 BG Added multipliers in next block
             if (this->Zone > 0) {
                 if (this->FlowRateFracSchedule > 0) {
                     this->TotalVolFlowRate =
@@ -1490,24 +1489,25 @@ namespace EnergyPlus {
             // Calculates report variables for stand alone water use
 
             for (int WaterEquipNum = 1; WaterEquipNum <= numWaterEquipment; ++WaterEquipNum) {
-                WaterEquipment(WaterEquipNum).ColdVolFlowRate = WaterEquipment(WaterEquipNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-                WaterEquipment(WaterEquipNum).HotVolFlowRate = WaterEquipment(WaterEquipNum).HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
-                WaterEquipment(WaterEquipNum).TotalVolFlowRate = WaterEquipment(WaterEquipNum).ColdVolFlowRate + WaterEquipment(WaterEquipNum).HotVolFlowRate;
+                auto &thisWEq = WaterEquipment(WaterEquipNum);
+                thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
 
-                WaterEquipment(WaterEquipNum).ColdVolume = WaterEquipment(WaterEquipNum).ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                WaterEquipment(WaterEquipNum).HotVolume = WaterEquipment(WaterEquipNum).HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                WaterEquipment(WaterEquipNum).TotalVolume = WaterEquipment(WaterEquipNum).TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.HotVolume = thisWEq.HotVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-                if (WaterEquipment(WaterEquipNum).Connections == 0) {
-                    WaterEquipment(WaterEquipNum).Power = WaterEquipment(WaterEquipNum).HotMassFlowRate *
+                if (thisWEq.Connections == 0) {
+                    thisWEq.Power = thisWEq.HotMassFlowRate *
                                                           Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
-                                                          (WaterEquipment(WaterEquipNum).HotTemp - WaterEquipment(WaterEquipNum).ColdTemp);
+                                                          (thisWEq.HotTemp - thisWEq.ColdTemp);
                 } else {
-                    WaterEquipment(WaterEquipNum).Power = WaterEquipment(WaterEquipNum).HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
-                            (WaterEquipment(WaterEquipNum).HotTemp - WaterConnections(WaterEquipment(WaterEquipNum).Connections).ReturnTemp);
+                    thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(DataGlobals::InitConvTemp) *
+                            (thisWEq.HotTemp - WaterConnections(thisWEq.Connections).ReturnTemp);
                 }
 
-                WaterEquipment(WaterEquipNum).Energy = WaterEquipment(WaterEquipNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                thisWEq.Energy = thisWEq.Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             }
         }
 
