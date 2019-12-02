@@ -105,7 +105,7 @@ namespace PlantCentralGSHP {
     int const WaterCooled(2);
     int const SmartMixing(1);
 
-    bool getInputWrapper(true);       // When TRUE, calls subroutine to read input file.
+    bool getWrapperInputFlag(true);       // When TRUE, calls subroutine to read input file.
 
     int numWrappers(0);               // Number of Wrappers specified in input
     int numChillerHeaters(0);         // Number of Chiller/heaters specified in input
@@ -124,7 +124,7 @@ namespace PlantCentralGSHP {
 
     void clear_state()
     {
-        getInputWrapper = true;
+        getWrapperInputFlag = true;
         numWrappers = 0;
         numChillerHeaters = 0;
 
@@ -137,6 +137,31 @@ namespace PlantCentralGSHP {
 
         Wrapper.deallocate();
         ChillerHeater.deallocate();
+    }
+
+    PlantComponent *WrapperSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getWrapperInputFlag) {
+            GetWrapperInput();
+            getWrapperInputFlag = false;
+        }
+
+        // Now look for this particular object
+        for (auto &thisWrapper : Wrapper) {
+            if (thisWrapper.Name == objectName) {
+                return &thisWrapper;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalPlantCentralGSHPFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void WrapperSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
     }
 
     void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
@@ -157,9 +182,9 @@ namespace PlantCentralGSHP {
         int WrapperNum;        // Wrapper number pointer
 
         // Get user input values
-        if (getInputWrapper) {
+        if (getWrapperInputFlag) {
             GetWrapperInput();
-            getInputWrapper = false;
+            getWrapperInputFlag = false;
         }
 
         // Find the correct wrapper

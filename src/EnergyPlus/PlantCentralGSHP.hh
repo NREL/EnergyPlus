@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -62,7 +63,7 @@ namespace PlantCentralGSHP {
     extern int const WaterCooled;
     extern int const SmartMixing;
 
-    extern bool getInputWrapper;        // When TRUE, calls subroutine to read input file.
+    extern bool getWrapperInputFlag;        // When TRUE, calls subroutine to read input file.
     extern int numWrappers;             // Number of Wrappers specified in input
     extern int numChillerHeaters;       // Number of Chiller/heaters specified in input
     extern Real64 CondenserFanPower;    // Condenser Fan Power (fan cycles with compressor) [W]
@@ -322,7 +323,7 @@ namespace PlantCentralGSHP {
         }
     };
 
-    struct WrapperSpecs // This will be used for Wrapper Object. This object will decide the mode of Chiller
+    struct WrapperSpecs : PlantComponent
     {
         std::string Name;                 // User identifier
         bool VariableFlowCH;              // True if all chiller heaters are variable flow control
@@ -390,11 +391,15 @@ namespace PlantCentralGSHP {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void setupOutputVars();
 
         void initialize(Real64 MyLoad,       // Demand Load
                          int LoopNum          // Loop Number Index
         );
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void SizeWrapper();
 
