@@ -65,7 +65,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Allocate One Wrapper with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
     int NumWrappers = 1;
-    PlantCentralGSHP::NumWrappers = NumWrappers;
+    PlantCentralGSHP::numWrappers = NumWrappers;
     PlantCentralGSHP::Wrapper.allocate(NumWrappers);
     PlantCentralGSHP::WrapperReport.allocate(NumWrappers);
 
@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::Wrapper(1).ControlMode = PlantCentralGSHP::SmartMixing;
 
     int NumChillerHeaters = 1;
-    PlantCentralGSHP::NumChillerHeaters = NumChillerHeaters;
+    PlantCentralGSHP::numChillerHeaters = NumChillerHeaters;
     PlantCentralGSHP::ChillerHeater.allocate(NumChillerHeaters);
     PlantCentralGSHP::ChillerHeaterReport.allocate(NumChillerHeaters);
     PlantCentralGSHP::ChillerHeater(1).ConstantFlow = false;

@@ -61,12 +61,10 @@ namespace PlantCentralGSHP {
 
     extern int const WaterCooled;
     extern int const SmartMixing;
-    extern bool SimulClgDominant;
-    extern bool SimulHtgDominant;
 
-    extern bool GetInputWrapper;        // When TRUE, calls subroutine to read input file.
-    extern int NumWrappers;             // Number of Wrappers specified in input
-    extern int NumChillerHeaters;       // Number of Chiller/heaters specified in input
+    extern bool getInputWrapper;        // When TRUE, calls subroutine to read input file.
+    extern int numWrappers;             // Number of Wrappers specified in input
+    extern int numChillerHeaters;       // Number of Chiller/heaters specified in input
     extern Real64 CondenserFanPower;    // Condenser Fan Power (fan cycles with compressor) [W]
     extern Real64 ChillerCapFT;         // Chiller/heater capacity fraction (evaluated as a function of temperature)
     extern Real64 ChillerEIRFT;         // Chiller/heater electric input ratio (EIR = 1 / COP) as a function of temperature
@@ -126,15 +124,15 @@ namespace PlantCentralGSHP {
         bool PossibleSubcooling;          // flag to indicate chiller is doing less cooling that requested
         int ChillerHeaterNum;             // Chiller heater number
         int CondenserType;                // Type of Condenser - only water cooled is allowed
-        int ChillerCapFTCooling;          // Cooling capacity function of temperature curve index
-        int ChillerEIRFTCooling;          // Elec Input to Cooling Output ratio function of temperature curve index
-        int ChillerEIRFPLRCooling;        // Elec Input to cooling output ratio function of PLR curve index
-        int ChillerCapFTHeating;          // Clg/Htg capacity function of temperature curve index
-        int ChillerEIRFTHeating;          // Elec Input to Clg/Htg Output ratio function of temperature curve index
-        int ChillerEIRFPLRHeating;        // Elec Input to Clg/Htg output ratio function of PLR curve index
-        int ChillerCapFT;                 // Capacity function of temperature curve index
-        int ChillerEIRFT;                 // Elec Input to demand output ratio function of temperature curve index
-        int ChillerEIRFPLR;               // Elec Input to demand output ratio function of PLR curve index
+        int ChillerCapFTCoolingIDX;          // Cooling capacity function of temperature curve index
+        int ChillerEIRFTCoolingIDX;          // Elec Input to Cooling Output ratio function of temperature curve index
+        int ChillerEIRFPLRCoolingIDX;        // Elec Input to cooling output ratio function of PLR curve index
+        int ChillerCapFTHeatingIDX;          // Clg/Htg capacity function of temperature curve index
+        int ChillerEIRFTHeatingIDX;          // Elec Input to Clg/Htg Output ratio function of temperature curve index
+        int ChillerEIRFPLRHeatingIDX;        // Elec Input to Clg/Htg output ratio function of PLR curve index
+        int ChillerCapFTIDX;                 // Capacity function of temperature curve index
+        int ChillerEIRFTIDX;                 // Elec Input to demand output ratio function of temperature curve index
+        int ChillerEIRFPLRIDX;               // Elec Input to demand output ratio function of PLR curve index
         int EvapInletNodeNum;             // Node number on the inlet side of the plant (evaporator side)
         int EvapOutletNodeNum;            // Node number on the outlet side of the plant (evaporator side)
         int CondInletNodeNum;             // Node number on the inlet side of the condenser
@@ -198,9 +196,9 @@ namespace PlantCentralGSHP {
 
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
-              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(0), ChillerCapFTCooling(0),
-              ChillerEIRFTCooling(0), ChillerEIRFPLRCooling(0), ChillerCapFTHeating(0), ChillerEIRFTHeating(0), ChillerEIRFPLRHeating(0),
-              ChillerCapFT(0), ChillerEIRFT(0), ChillerEIRFPLR(0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
+              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(0), ChillerCapFTCoolingIDX(0),
+              ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0), ChillerEIRFPLRHeatingIDX(0),
+              ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0),
               ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerEIRRefTempErrorIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0),
               CondMassFlowIndex(0), RefCapCooling(0.0), RefCapCoolingWasAutoSized(false), RefCOPCooling(0.0), TempRefEvapOutCooling(0.0),
@@ -243,7 +241,6 @@ namespace PlantCentralGSHP {
         Real64 ChillerEIRFPLR;                // Chiller EIRFPLR curve output value
         Real64 CondenserFanPowerUse;          // Air-cooled condenser fan power [W]
         Real64 CondenserFanEnergy;            // Air-cooled condenser fan energy [J]
-        Real64 CondenserFanEnergyConsumption; // ""Should be checked"" For now, leave it
         Real64 ChillerPartLoadRatioSimul;     // Chiller PLR (Load/Capacity) for simul clg/htg mode
         Real64 ChillerCyclingRatioSimul;      // Chiller cycling ratio (time on/time step) for simul clg/htg mode
         Real64 ChillerFalseLoadSimul;         // Chiller false load for simul clg/htg mode [J]
@@ -269,7 +266,7 @@ namespace PlantCentralGSHP {
               CoolingPower(0.0), HeatingPower(0.0), QEvap(0.0), QCond(0.0), CoolingEnergy(0.0), HeatingEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), ActualCOP(0.0),
               ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0), CondenserFanPowerUse(0.0), CondenserFanEnergy(0.0),
-              CondenserFanEnergyConsumption(0.0), ChillerPartLoadRatioSimul(0.0), ChillerCyclingRatioSimul(0.0), ChillerFalseLoadSimul(0.0),
+              ChillerPartLoadRatioSimul(0.0), ChillerCyclingRatioSimul(0.0), ChillerFalseLoadSimul(0.0),
               ChillerFalseLoadRateSimul(0.0), CoolingPowerSimul(0.0), QEvapSimul(0.0), QCondSimul(0.0), CoolingEnergySimul(0.0), EvapEnergySimul(0.0),
               CondEnergySimul(0.0), EvapInletTempSimul(0.0), EvapOutletTempSimul(0.0), EvapmdotSimul(0.0), CondInletTempSimul(0.0),
               CondOutletTempSimul(0.0), CondmdotSimul(0.0), ChillerCapFTSimul(0.0), ChillerEIRFTSimul(0.0), ChillerEIRFPLRSimul(0.0)
@@ -330,6 +327,8 @@ namespace PlantCentralGSHP {
         bool MyWrapperFlag;
         bool MyWrapperOneTimeFlag;
         bool MyWrapperEnvrnFlag;
+        bool SimulClgDominant;
+        bool SimulHtgDominant;
 
         WrapperSpecs()
             : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
@@ -339,7 +338,7 @@ namespace PlantCentralGSHP {
               HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
               HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0),
               HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0),
-              MyWrapperFlag(true), MyWrapperOneTimeFlag(true), MyWrapperEnvrnFlag(true)
+              MyWrapperFlag(true), MyWrapperOneTimeFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false)
         {
         }
     };
