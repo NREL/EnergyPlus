@@ -57,24 +57,14 @@
 
 namespace EnergyPlus {
 
-// Contents:
-// CentralHeatPumpSystem (CGSHP) System
-// ChillerHeaterPerformance:Electric:EIR
-
 namespace PlantCentralGSHP {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Chiller type parameters: Only water cooled chiller is allowed
     extern int const WaterCooled;
     extern int const SmartMixing;
     extern int const FullyMixed;
     extern bool SimulClgDominant;
     extern bool SimulHtgDominant;
 
-    // MODULE VARIABLE DECLARATIONS:
     extern bool GetInputWrapper;        // When TRUE, calls subroutine to read input file.
     extern int NumWrappers;             // Number of Wrappers specified in input
     extern int NumChillerHeaters;       // Number of Chiller/heaters specified in input
@@ -86,15 +76,9 @@ namespace PlantCentralGSHP {
     extern Real64 ChillerCyclingRatio;  // Chiller/heater cycling ratio
     extern Real64 ChillerFalseLoadRate; // Chiller/heater false load over and above the water-side load [W]
 
-    // Type defining the component specifications
-
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool CHCheckEquipName;
     extern Array1D_bool HPCheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
-
-    // Types
 
     struct CGSHPNodeData
     {
@@ -110,7 +94,6 @@ namespace PlantCentralGSHP {
         Real64 MassFlowRateSetPoint; // {kg/s}
         Real64 MassFlowRateRequest;  // {kg/s}
 
-        // Default Constructor
         CGSHPNodeData()
             : Temp(0.0), TempMin(0.0), TempSetPoint(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), MassFlowRateMinAvail(0.0),
               MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), MassFlowRateRequest(0.0)
@@ -120,7 +103,6 @@ namespace PlantCentralGSHP {
 
     struct WrapperComponentSpecs
     {
-        // Members
         std::string WrapperPerformanceObjectType; // Component type
         std::string WrapperComponentName;         // Component name
         int WrapperPerformanceObjectIndex;        // Component index in the input array
@@ -128,7 +110,6 @@ namespace PlantCentralGSHP {
         int WrapperIdenticalObjectNum;            // Number of identical objects
         int CHSchedPtr;                           // Index to schedule
 
-        // Default Constructor
         WrapperComponentSpecs() : WrapperPerformanceObjectIndex(0), WrapperIdenticalObjectNum(0), CHSchedPtr(0)
         {
         }
@@ -136,7 +117,6 @@ namespace PlantCentralGSHP {
 
     struct ChillerHeaterSpecs
     {
-        // Members
         std::string Name;                 // Name of the Chiller Heater object
         std::string CondModeCooling;      // Cooling mode temperature curve input variable
         std::string CondModeHeating;      // Clg/Htg mode temperature curve input variable
@@ -220,7 +200,6 @@ namespace PlantCentralGSHP {
         Real64 ChillerEIRFPLRMin;         // Minimum value of PLR from EIRFPLR curve
         Real64 ChillerEIRFPLRMax;         // Maximum value of PLR from EIRFPLR curve
 
-        // Default Constructor
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
               HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(0), ChillerCapFTCooling(0),
@@ -243,7 +222,6 @@ namespace PlantCentralGSHP {
 
     struct CHReportVars
     {
-        // Members
         int CurrentMode;                      // 0-off; 1-cooling only; 2-heating-only; 3-simutaneouls heat/cool
         Real64 ChillerPartLoadRatio;          // Chiller PLR (Load/Capacity)
         Real64 ChillerCyclingRatio;           // Chiller cycling ratio (time on/time step)
@@ -290,7 +268,6 @@ namespace PlantCentralGSHP {
         Real64 ChillerEIRFTSimul;             // Chiller EIRFT curve output value for simul clg/htg mode
         Real64 ChillerEIRFPLRSimul;           // Chiller EIRFPLR curve output value for simul clg/htg mode
 
-        // Default Constructor
         CHReportVars()
             : CurrentMode(0), ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoad(0.0), ChillerFalseLoadRate(0.0),
               CoolingPower(0.0), HeatingPower(0.0), QEvap(0.0), QCond(0.0), CoolingEnergy(0.0), HeatingEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
@@ -306,11 +283,10 @@ namespace PlantCentralGSHP {
 
     struct WrapperSpecs // This will be used for Wrapper Object. This object will decide the mode of Chiller
     {
-        // Members
         std::string Name;                 // User identifier
-        std::string AncilliaryPwSchedule; // Ancilliary Power Schedule Name
-        bool VariableFlowCH;              // True if all chiller heters are variable flow control
-        int SchedPtr;                     // Schedule value for ancilliar power control
+        std::string AncilliaryPwSchedule; // Ancillary Power Schedule Name
+        bool VariableFlowCH;              // True if all chiller heaters are variable flow control
+        int SchedPtr;                     // Schedule value for ancillary power control
         int CHSchedPtr;                   // Schedule value for individual chiller heater control
         int ControlMode;                  // SmartMixing or FullyMixing
         int CHWInletNodeNum;              // Node number on the inlet side of the plant (Chilled Water side)
@@ -328,7 +304,7 @@ namespace PlantCentralGSHP {
         Real64 GLHEMassFlowRateMax;       // Maximum condenser water mass flow rate
         Real64 WrapperCoolingLoad;        // Cooling demand for the central heat pump system
         Real64 WrapperHeatingLoad;        // Heating demand for the central heat pump system
-        Real64 AncilliaryPower;           // Wrapper Ancilliary Power
+        Real64 AncilliaryPower;           // Wrapper Ancillary Power
         Array1D<WrapperComponentSpecs> WrapperComp;
         Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
         Array1D<CHReportVars> ChillerHeaterReport; // Dimension to number of machines
@@ -357,7 +333,6 @@ namespace PlantCentralGSHP {
         Real64 HWVolFlowRate;                      // Hot water volume flow rate [kg/s]
         Real64 GLHEVolFlowRate;                    // Geo-field volume flow rate [kg/s]
 
-        // Default Constructor
         WrapperSpecs()
             : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
               HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0), HWMassFlowRate(0.0),
@@ -372,7 +347,6 @@ namespace PlantCentralGSHP {
 
     struct WrapperReportVars
     {
-        // Members
         Real64 Power;                  // Wrapper power, W
         Real64 QCHW;                   // Chilled water heat transfer rate [W]
         Real64 QHW;                    // Hot Water heat transfer rate [W]
@@ -407,7 +381,6 @@ namespace PlantCentralGSHP {
         Real64 CHWmdotSimul;           // Chilled water mass flow rate [kg/s]
         Real64 GLHEmdotSimul;          // Geo-field mass flow rate [kg/s]
 
-        // Default Constructor
         WrapperReportVars()
             : Power(0.0), QCHW(0.0), QHW(0.0), QGLHE(0.0), TotElecCooling(0.0), TotElecHeating(0.0), CoolingEnergy(0.0), HeatingEnergy(0.0),
               GLHEEnergy(0.0), TotElecCoolingPwr(0.0), TotElecHeatingPwr(0.0), CoolingRate(0.0), HeatingRate(0.0), GLHERate(0.0), CHWInletTemp(0.0),
@@ -419,13 +392,10 @@ namespace PlantCentralGSHP {
         }
     };
 
-    // Object Data
     extern Array1D<WrapperSpecs> Wrapper;
     extern Array1D<ChillerHeaterSpecs> ChillerHeater;
     extern Array1D<CHReportVars> ChillerHeaterReport;
     extern Array1D<WrapperReportVars> WrapperReport;
-
-    // Functions
 
     void clear_state();
 

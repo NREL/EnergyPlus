@@ -96,16 +96,14 @@ namespace PlantCentralGSHP {
     // This module simulates the performance of the Central Plant GSHP systems
     // It currently includes one object: ChillerHeaterPerformance:Electric:EIR.
     // The other object available for this central CGSHP system such as HeatPumpPerformance:WaterToWater:EIR
-    //      will be impletemented later.
+    //      will be implemented later.
+
     // METHODOLOGY EMPLOYED:
     //  Once the PlantLoopManager determines that the Central Plant GSHP
     //  is available to meet a loop cooling and heating demands, it calls SimCentralGroundSourceHeatPump
     //  which in turn calls the electric PlantCentralGSHP model. The PlantCentralGSHP model is based on
     //  polynomial fits of chiller/heater or heat pump performance data.
-    // REFERENCES:
-    // USE STATEMENTS:
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataPlant::PlantLoop;
@@ -114,16 +112,12 @@ namespace PlantCentralGSHP {
     using Psychrometrics::PsyCpAirFnWTdb;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Chiller type parameters: Only water cooled chiller is allowed
     int const WaterCooled(2);
     int const SmartMixing(1);
     int const FullyMixed(2);
     bool SimulClgDominant(false);
     bool SimulHtgDominant(false);
 
-    // MODULE VARIABLE DECLARATIONS:
     bool GetInputWrapper(true);       // When TRUE, calls subroutine to read input file.
     int NumWrappers(0);               // Number of Wrappers specified in input
     int NumChillerHeaters(0);         // Number of Chiller/heaters specified in input
@@ -135,28 +129,14 @@ namespace PlantCentralGSHP {
     Real64 ChillerCyclingRatio(0.0);  // Chiller/heater cycling ratio
     Real64 ChillerFalseLoadRate(0.0); // Chiller/heater false load over and above the water-side load [W]
 
-    // Type defining the component specifications
-
     Array1D_bool CheckEquipName;
     Array1D_bool CHCheckEquipName;
     Array1D_bool HPCheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
-
-    // Object Data
     Array1D<WrapperSpecs> Wrapper;
     Array1D<WrapperReportVars> WrapperReport;
     Array1D<ChillerHeaterSpecs> ChillerHeater;
     Array1D<CHReportVars> ChillerHeaterReport;
-
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Chiller/Heater Module Driver Subroutine
-    //*************************************************************************
-
-    // Functions
-
 
     void clear_state()
     {
@@ -194,8 +174,6 @@ namespace PlantCentralGSHP {
                                         Real64 &SizingFactor            // sizing factor
     )
     {
-
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
@@ -204,8 +182,6 @@ namespace PlantCentralGSHP {
         using General::TrimSigDigits;
         using PlantUtilities::UpdateChillerComponentCondenserSide;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         int WrapperNum;        // Wrapper number pointer
         int NumChillerHeater;  // Chiller heater number pointer
         int LoopSide;          // Plant loop side
@@ -239,7 +215,7 @@ namespace PlantCentralGSHP {
             }
         }
 
-        if (InitLoopEquip) { // Initializagion loop if not done
+        if (InitLoopEquip) { // Initialization loop if not done
             InitWrapper(WrapperNum, RunFlag, FirstIteration, MyLoad, LoopNum);
             MinCap = 0.0;
             MaxCap = 0.0;
@@ -274,7 +250,7 @@ namespace PlantCentralGSHP {
             }     // End of loop determination
 
             if (GetSizingFactor) {
-                SizingFactor = 1.0; // Always equal to one now. The conponent may have its own sizing factor
+                SizingFactor = 1.0; // Always equal to one now. The component may have its own sizing factor
             }
 
             return;
@@ -330,10 +306,9 @@ namespace PlantCentralGSHP {
         // METHODOLOGY EMPLOYED:
         //  Obtains evaporator flow rate from the plant sizing array. Calculates reference capacity from
         //  the evaporator (or load side) flow rate and the chilled water loop design delta T. The condenser
-        //  flow (or sourse side) rate is calculated from the reference capacity, the COP, and the condenser
+        //  flow (or source side) rate is calculated from the reference capacity, the COP, and the condenser
         //  loop design delta T.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DataGlobals::DisplayExtraWarnings;
         using DataHVACGlobals::SmallWaterVolFlow;
@@ -345,10 +320,8 @@ namespace PlantCentralGSHP {
         using namespace OutputReportPredefined;
         using General::RoundSigDigits;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeCGSHPChillerHeater");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // Plant Sizing index corresponding to CurLoopNum
         int PltSizCondNum; // Plant Sizing index for condenser loop
         bool ErrorsFound;  // If errors detected in input
@@ -688,7 +661,6 @@ namespace PlantCentralGSHP {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Wrapper model.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
@@ -700,10 +672,8 @@ namespace PlantCentralGSHP {
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
-        // Locals
         static int NumChillerHeaters(0); // total number of chiller heater (without identical multiplier)
 
-        // LOCAL VARIABLES
         static std::string CompName;        // component name
         static bool ErrorsFound(false);     // True when input errors are found
         static bool AllocatedFlag(false);   // True when arrays are allocated
@@ -729,7 +699,6 @@ namespace PlantCentralGSHP {
             ErrorsFound = true;
         }
 
-        // ALLOCATE ARRAYS
         Wrapper.allocate(NumWrappers);
         WrapperReport.allocate(NumWrappers);
         CheckEquipName.dimension(NumWrappers, true);
@@ -1234,7 +1203,6 @@ namespace PlantCentralGSHP {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using BranchNodeConnections::TestCompSet;
         using CurveManager::CurveValue;
@@ -1247,7 +1215,6 @@ namespace PlantCentralGSHP {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetScheduleIndex;
 
-        // LOCAL VARIABLES
         std::string StringVar;             // Used for EIRFPLR warning messages
         static bool CHErrorsFound(false);  // True when input errors are found
         static bool FoundNegValue(false);  // Used to evaluate PLFFPLR curve objects
@@ -1261,7 +1228,6 @@ namespace PlantCentralGSHP {
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
 
-        // Formats
         static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
         static ObjexxFCL::gio::Fmt Format_550("('Curve Output = ',11(F7.2))");
 
@@ -1594,7 +1560,6 @@ namespace PlantCentralGSHP {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
@@ -1610,10 +1575,8 @@ namespace PlantCentralGSHP {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitCGSHPHeatPump");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyWrapperOneTimeFlag(true); // Flag used to execute code only once
         static Array1D_bool MyWrapperFlag;      // TRUE in order to set component location
         static Array1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
@@ -1978,7 +1941,6 @@ namespace PlantCentralGSHP {
         // REFERENCES:
         // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -1989,11 +1951,9 @@ namespace PlantCentralGSHP {
         using General::TrimSigDigits;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcChillerHeaterModel");
         static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool IsLoadCoolRemaining(true);
         static bool NextCompIndicator(false); // Component indicator when identical chiller heaters exist
         int LoopSideNum;                      // Plant loop side which contains the current chiller (usually supply side)
@@ -2485,7 +2445,6 @@ namespace PlantCentralGSHP {
         // REFERENCES:
         // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -2496,11 +2455,9 @@ namespace PlantCentralGSHP {
         using General::TrimSigDigits;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcChillerHeaterModel");
         static std::string const RoutineNameElecEIRChiller("CalcElectricEIRChillerModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool IsLoadHeatRemaining(true); // Ture if heating load remains for this chiller heater
         static bool NextCompIndicator(false);  // Component indicator when identical chiller heaters exist
         int LoopSideNum;                       // Plant loop side which contains the current chiller (usually supply side)
@@ -3030,9 +2987,6 @@ namespace PlantCentralGSHP {
         // METHODOLOGY EMPLOYED:
         //  Use empirical curve fits to model performance at off-reference conditions
 
-        // REFERENCES:
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataGlobals::WarmupFlag;
@@ -3042,10 +2996,6 @@ namespace PlantCentralGSHP {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // LOCAL VARIABLES
         int ChillerHeaterNum;              // Chiller heater number
         int CHWInletNodeNum;               // Chiller heater bank chilled water inlet node number
         int CHWOutletNodeNum;              // Chiller heater bank chilled water Outlet node number
@@ -3778,10 +3728,6 @@ namespace PlantCentralGSHP {
                     }
 
                 } // Heating loop calculation
-
-                //! Node(CHWOutletNodeNum)%Temp  = CHWOutletTemp
-                //! Node(HWOutletNodeNum)%Temp   = HWOutletTemp
-                //! Node(GLHEOutletNodeNum)%Temp = GLHEOutletTemp
             }
         }
     }
@@ -3794,28 +3740,11 @@ namespace PlantCentralGSHP {
         //       DATE WRITTEN:    Feb 2013
 
         // PURPOSE OF THIS SUBROUTINE:
-        //  Update cihller heater variables
+        //  Update chiller heater variables
 
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
         int ChillerHeaterNum; // Chiller heater number
 
@@ -3852,29 +3781,9 @@ namespace PlantCentralGSHP {
         //       AUTHOR:          Daeho Kang, PNNL
         //       DATE WRITTEN:    Feb 2013
 
-        // PURPOSE OF THIS SUBROUTINE:
-        //  Reporting
-
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
         int ChillerHeaterNum; // Chiller heater number
 
