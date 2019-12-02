@@ -6,6 +6,9 @@ Condenser hot gas reheat model for DX Cooling Coil System
 **Florida Solar Energy Center**
 
 
+ - Fifth edition
+ - Add idd change and design document based on new coil model 
+ - Revision Date: 11/27/19
  - Foruth Edition
  - Add design document
  - Revision Date: 10/29/19
@@ -654,6 +657,47 @@ A new choice of cooling coil type will be added to allow these two parent object
        \note Enter the name of the cooling coil if included in the unitary system.
 	......
 
+## Input Description based on new coil model ##
+
+When the new coil model as Coil:Cooling:DX is used, all modifications will be made based on the new coil model.
+
+### <span style="color:red">Coil:Cooling:DX </span>###
+
+No change.
+
+### Coil:Cooling:DX:CurveFit:Performance ###
+
+An addiitonal option field is proposed as A7 to provide 3 operation modes. The existing structure only allows two operation modes.
+
+	Coil:Cooling:DX:CurveFit:Performance,
+       \memo DX cooling coil performance specification referencing one or more
+       \memo operating modes. Mode 1 is always the base design operating mode.
+       \memo Additional modes are optional states such as subcool reheat for humidity control.
+       \min-fields 11
+       ....
+
+ 	  A6, \field Alternative Operating Mode 1
+       \note The alternative operating mode is used for enhanced dehumidification.
+       \note If this is blank, the coil will always operate in the base operating mode.
+       \note If an alternate mode is defined here, the coil will use the enhanced mode as needed.
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+
+<span style="color:red">
+
+	   A7; \field Alternative Operating Mode 2
+       \note The alternative operating mode is used for enhanced dehumidification.
+       \note If this is blank, the coil will always operate in the base operating mode.
+       \note If both Alternative Operating Mode 1 and Alternative Operating Mode 2 are defined here, 
+       \note the coil will perform both Subcool and Reheat modes for enhance dehumidification.
+       \note Alternative Operating Mode 1 is used as Subcool mode, and Alternative Operating Mode 2 
+       \note is used as Reheat mode. 
+       \type object-list
+       \object-list DXCoolingOperatingModeNames
+</span>
+
+
+
 ## Outputs Description ##
 
 insert text
@@ -798,3 +842,146 @@ The function outputs coil capacity based on sensible and latent loads, and Speed
 3. Calculate coil capacity with the mode ratio
 4. Output sensible capacity 
 
+### <span style="color:red">CoilCoolingDX (New coil model) </span>###
+
+The modifications are made to struct CoilCoolingDX and simulate().
+
+#### struct CoilCoolingDX ####
+
+Add a new variable to setup coil type as SubcooReatCooling under struct CoilCoolingDX:
+
+CoolingCoilType
+
+If (both Alternative Operating Modes are not blank) {
+
+	CoolingCoilType = SubcooReatCooling;
+}
+
+The cooling coil type will provide information to parent objects, such as UnitarySystem, that this cooiling coil is a coil with 3 operation modes: Normal, Subcool, and Reheat based on different system load SHR.
+
+#### Add two more optional arguments in simulate()
+
+Current:
+
+    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
+
+Proposed:
+
+Two additional option argument are added to allow SubcoolReatCoil cooling
+
+    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, 
+<span style="color:red">int CoilOpMode, Real64 ModeRatio</span>);
+
+CoilOpMode: Present cooling coil operation mode: 1 Noreml; 2 Subcool; 3 Reheat
+
+ModeRatio: A mode ratio with the same SHR between subcooling or reheat and normal operation. The SHR is determined by the system sensible and latent loads. 
+
+### CoilCoolingDXCurveFitOperatingMode ###
+
+The modification is made to GetInput(). 
+
+#### CoilCoolingDXCurveFitOperatingMode ####
+
+Read a new fields as cAlphaArgs(7)
+
+### CoilCoolingDXCurveFitPerformance ###
+
+The modifications are made to simulate() and calculate() by adding two more optional arguments. 
+
+#### simulate ####
+
+Current:
+
+void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
+                                                DataLoopNode::NodeData &outletNode,
+                                                bool useAlternateMode,
+                                                Real64 &PLR,
+                                                int &speedNum,
+                                                Real64 &speedRatio,
+                                                int &fanOpMode,
+                                                DataLoopNode::NodeData &condInletNode,
+                                                DataLoopNode::NodeData &condOutletNode)
+{
+
+    if (useAlternateMode) {
+        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    } else {
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    }
+
+}
+
+Proposed:
+
+Two additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
+
+void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
+                                                DataLoopNode::NodeData &outletNode,
+                                                bool useAlternateMode,
+                                                Real64 &PLR,
+                                                int &speedNum,
+                                                Real64 &speedRatio,
+                                                int &fanOpMode,
+                                                DataLoopNode::NodeData &condInletNode,
+                                                DataLoopNode::NodeData &condOutletNode,
+<span style="color:red">
+                                                int CoilOpMode,
+                                                Real64 ModeRatio)
+</span>
+
+{
+
+<span style="color:red">
+
+	if (CoolingCoilType == SubcooReatCooling) {
+        	this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, CoilOpMode, ModeRatio);
+	} else {
+</span>
+
+    	if (useAlternateMode) {
+        	this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    	} else {
+        	this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    	}
+	}
+
+}
+
+#### calculate ####
+
+Two additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
+
+Current:
+
+    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+                   const DataLoopNode::NodeData &inletNode,
+                   DataLoopNode::NodeData &outletNode,
+                   Real64 &PLR,
+                   int &speedNum,
+                   Real64 &speedRatio,
+                   int &fanOpMode,
+                   DataLoopNode::NodeData &condInletNode,
+                   DataLoopNode::NodeData &condOutletNode);
+
+Proposed:
+
+    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+                   const DataLoopNode::NodeData &inletNode,
+                   DataLoopNode::NodeData &outletNode,
+                   Real64 &PLR,
+                   int &speedNum,
+                   Real64 &speedRatio,
+                   int &fanOpMode,
+                   DataLoopNode::NodeData &condInletNode,
+                   DataLoopNode::NodeData &condOutletNode,
+                   int CoilOpMode,
+                   Real64 ModeRatio);
+
+
+Add sections to deal with Subcool and Reheat modes.
+
+#### UnitarySystem ####
+
+There are multiple HACKATHON example files available. The example files are based on UnitarySystem. Therefore, the present feature are limited to the UnitarySystem object as parent.
+
+The psudeo code in the UnitarySystem will be based on Simulation Logic provide above.
