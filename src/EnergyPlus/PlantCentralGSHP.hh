@@ -61,7 +61,6 @@ namespace PlantCentralGSHP {
 
     extern int const WaterCooled;
     extern int const SmartMixing;
-    extern int const FullyMixed;
     extern bool SimulClgDominant;
     extern bool SimulHtgDominant;
 
@@ -77,8 +76,6 @@ namespace PlantCentralGSHP {
     extern Real64 ChillerFalseLoadRate; // Chiller/heater false load over and above the water-side load [W]
 
     extern Array1D_bool CheckEquipName;
-    extern Array1D_bool CHCheckEquipName;
-    extern Array1D_bool HPCheckEquipName;
 
     struct CGSHPNodeData
     {
@@ -106,7 +103,6 @@ namespace PlantCentralGSHP {
         std::string WrapperPerformanceObjectType; // Component type
         std::string WrapperComponentName;         // Component name
         int WrapperPerformanceObjectIndex;        // Component index in the input array
-        std::string WrapperPerformanceObjectSch;  // Component operation schedule
         int WrapperIdenticalObjectNum;            // Number of identical objects
         int CHSchedPtr;                           // Index to schedule
 
@@ -284,7 +280,6 @@ namespace PlantCentralGSHP {
     struct WrapperSpecs // This will be used for Wrapper Object. This object will decide the mode of Chiller
     {
         std::string Name;                 // User identifier
-        std::string AncilliaryPwSchedule; // Ancillary Power Schedule Name
         bool VariableFlowCH;              // True if all chiller heaters are variable flow control
         int SchedPtr;                     // Schedule value for ancillary power control
         int CHSchedPtr;                   // Schedule value for individual chiller heater control
@@ -304,7 +299,7 @@ namespace PlantCentralGSHP {
         Real64 GLHEMassFlowRateMax;       // Maximum condenser water mass flow rate
         Real64 WrapperCoolingLoad;        // Cooling demand for the central heat pump system
         Real64 WrapperHeatingLoad;        // Heating demand for the central heat pump system
-        Real64 AncilliaryPower;           // Wrapper Ancillary Power
+        Real64 AncillaryPower;           // Wrapper Ancillary Power
         Array1D<WrapperComponentSpecs> WrapperComp;
         Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
         Array1D<CHReportVars> ChillerHeaterReport; // Dimension to number of machines
@@ -337,8 +332,8 @@ namespace PlantCentralGSHP {
             : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
               HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0), HWMassFlowRate(0.0),
               GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0), WrapperCoolingLoad(0.0),
-              WrapperHeatingLoad(0.0), AncilliaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false), CoolSetPointSetToLoop(false),
-              HeatSetPointSetToLoop(false), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
+              WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false), CoolSetPointSetToLoop(false),
+              HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
               HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0),
               HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0)
         {
@@ -400,57 +395,57 @@ namespace PlantCentralGSHP {
     void clear_state();
 
     void SimCentralGroundSourceHeatPump(std::string const &WrapperName, // User specified name of wrapper
-                                        int const EquipFlowCtrl,        // Flow control mode for the equipment
+                                        int EquipFlowCtrl,        // Flow control mode for the equipment
                                         int &CompIndex,                 // Chiller number pointer
-                                        int const LoopNum,              // plant loop index pointer
-                                        bool const RunFlag,             // Simulate chiller when TRUE
-                                        bool const FirstIteration,      // Initialize variables when TRUE
+                                        int LoopNum,              // plant loop index pointer
+                                        bool RunFlag,             // Simulate chiller when TRUE
+                                        bool FirstIteration,      // Initialize variables when TRUE
                                         bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
                                         Real64 &MyLoad,                 // Loop demand component will meet [W]
                                         Real64 &MaxCap,                 // Maximum operating capacity of chiller [W]
                                         Real64 &MinCap,                 // Minimum operating capacity of chiller [W]
                                         Real64 &OptCap,                 // Optimal operating capacity of chiller [W]
-                                        bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                        bool GetSizingFactor,     // TRUE when just the sizing factor is requested
                                         Real64 &SizingFactor            // sizing factor
     );
 
-    void SizeWrapper(int const WrapperNum);
+    void SizeWrapper(int WrapperNum);
 
     void GetWrapperInput();
 
     void GetChillerHeaterInput();
 
-    void InitWrapper(int const WrapperNum,      // Number of the current wrapper being simulated
-                     bool const RunFlag,        // TRUE when chiller operating
-                     bool const FirstIteration, // Initialize variables when TRUE
-                     Real64 const MyLoad,       // Demand Load
-                     int const LoopNum          // Loop Number Index
+    void InitWrapper(int WrapperNum,      // Number of the current wrapper being simulated
+                     bool RunFlag,        // TRUE when chiller operating
+                     bool FirstIteration, // Initialize variables when TRUE
+                     Real64 MyLoad,       // Demand Load
+                     int LoopNum          // Loop Number Index
     );
 
-    void CalcChillerModel(int const WrapperNum,      // Number of wrapper
-                          int const OpMode,          // Operation mode
+    void CalcChillerModel(int WrapperNum,      // Number of wrapper
+                          int OpMode,          // Operation mode
                           Real64 &MyLoad,            // Operating load
-                          bool const RunFlag,        // TRUE when chiller operating
-                          bool const FirstIteration, // TRUE when first iteration of timestep
-                          int const EquipFlowCtrl,   // Flow control mode for the equipment
-                          int const LoopNum          // Plant loop number
+                          bool RunFlag,        // TRUE when chiller operating
+                          bool FirstIteration, // TRUE when first iteration of timestep
+                          int EquipFlowCtrl,   // Flow control mode for the equipment
+                          int LoopNum          // Plant loop number
     );
 
-    void CalcChillerHeaterModel(int const WrapperNum,      // Wrapper number pointor
-                                int const OpMode,          // Operation mode
+    void CalcChillerHeaterModel(int WrapperNum,      // Wrapper number pointor
+                                int OpMode,          // Operation mode
                                 Real64 &MyLoad,            // Heating load plant should meet
-                                bool const RunFlag,        // TRUE when chiller operating
-                                bool const FirstIteration, // TRUE when first iteration of timestep
-                                int const EquipFlowCtrl,   // Flow control mode for the equipment
-                                int const LoopNum          // Loop number
+                                bool RunFlag,        // TRUE when chiller operating
+                                bool FirstIteration, // TRUE when first iteration of timestep
+                                int EquipFlowCtrl,   // Flow control mode for the equipment
+                                int LoopNum          // Loop number
     );
 
     void
-    CalcWrapperModel(int const WrapperNum, Real64 &MyLoad, bool const RunFlag, bool const FirstIteration, int const EquipFlowCtrl, int const LoopNum);
+    CalcWrapperModel(int WrapperNum, Real64 &MyLoad, bool RunFlag, bool FirstIteration, int EquipFlowCtrl, int LoopNum);
 
-    void UpdateChillerRecords(int const WrapperNum); // Wrapper number
+    void UpdateChillerRecords(int WrapperNum); // Wrapper number
 
-    void UpdateChillerHeaterRecords(int const WrapperNum); // Wrapper number
+    void UpdateChillerHeaterRecords(int WrapperNum); // Wrapper number
 
 } // namespace PlantCentralGSHP
 
