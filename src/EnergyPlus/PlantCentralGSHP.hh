@@ -376,6 +376,7 @@ namespace PlantCentralGSHP {
         bool SimulClgDominant;
         bool SimulHtgDominant;
         WrapperReportVars Report;
+        bool setupOutputVarsFlag;
 
         WrapperSpecs()
             : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
@@ -385,13 +386,13 @@ namespace PlantCentralGSHP {
               HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
               HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0),
               HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0),
-              MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false)
+              MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false), setupOutputVarsFlag(true)
         {
         }
 
-        void InitWrapper(bool RunFlag,        // TRUE when chiller operating
-                         bool FirstIteration, // Initialize variables when TRUE
-                         Real64 MyLoad,       // Demand Load
+        void setupOutputVars();
+
+        void initialize(Real64 MyLoad,       // Demand Load
                          int LoopNum          // Loop Number Index
         );
 
