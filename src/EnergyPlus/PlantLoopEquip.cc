@@ -196,7 +196,6 @@ namespace PlantLoopEquip {
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
         using RefrigeratedCase::SimRefrigCondenser;
-        using SolarCollectors::SimSolarCollector;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using UserDefinedComponents::SimUserDefinedPlantComponent;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
@@ -219,7 +218,7 @@ namespace PlantLoopEquip {
         // set up a reference for this component
         auto &sim_component(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(Num));
 
-        static std::vector<int> compsToSimAfterInitLoopEquip = {TypeOf_Pipe, TypeOf_PipeSteam};
+        static std::vector<int> compsToSimAfterInitLoopEquip = {TypeOf_Pipe, TypeOf_PipeSteam, TypeOf_SolarCollectorICS, TypeOf_SolarCollectorFlatPlate};
 
         // set local variables
         EquipTypeNum = sim_component.TypeOf_Num;
@@ -948,7 +947,7 @@ namespace PlantLoopEquip {
 
             if ((EquipTypeNum == TypeOf_SolarCollectorFlatPlate) || (EquipTypeNum == TypeOf_SolarCollectorICS)) {
 
-                SimSolarCollector(EquipTypeNum, sim_component.Name, EquipNum, InitLoopEquip, FirstHVACIteration);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;

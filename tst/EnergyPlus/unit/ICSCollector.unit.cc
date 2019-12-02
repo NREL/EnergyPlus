@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 {
     // ICS collector un-allocated collector data bug fix test.  This unit test
     // does not test ICS collector performance but it does test a bug fix for
-    // issue #4723 (crash) occured due to unallocated ICS collector data.
+    // issue #4723 (crash) occurred due to unallocated ICS collector data.
     // ! Collector.allocated()
 
     int const NumOfSurf(1);

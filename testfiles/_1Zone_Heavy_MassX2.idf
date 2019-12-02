@@ -452,7 +452,7 @@
   InternalMass,
     WallMass,                !- Name
     Interior,                !- Construction Name
-    Zone1,                   !- Zone Name
+    Zone1,                   !- Zone or ZoneList Name
     18.5806;                 !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========

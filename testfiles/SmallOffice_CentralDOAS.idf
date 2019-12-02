@@ -1968,31 +1968,31 @@
   InternalMass,
     Core_ZN Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_ZN,                 !- Zone Name
+    Core_ZN,                 !- Zone or ZoneList Name
     299.3148;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_1,          !- Zone Name
+    Perimeter_ZN_1,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_2,          !- Zone Name
+    Perimeter_ZN_2,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_3,          !- Zone Name
+    Perimeter_ZN_3,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_4,          !- Zone Name
+    Perimeter_ZN_4,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -2348,8 +2348,8 @@
     Core_ZN Direct Air,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_1 Equipment,!- Name
@@ -2358,8 +2358,8 @@
     Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_2 Equipment,!- Name
@@ -2368,8 +2368,8 @@
     Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_3 Equipment,!- Name
@@ -2378,8 +2378,8 @@
     Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_4 Equipment,!- Name
@@ -2388,8 +2388,8 @@
     Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 
@@ -4569,7 +4569,7 @@
 
   AirLoopHVAC:Splitter,
     AirLoopDOASSplitter,     !- Name
-    AirLoopDOASSplitterInlet, !- Inlet Node Name
+    AirLoopDOASSplitterInlet,!- Inlet Node Name
     PSZ-AC:1_OAInlet Node,   !- Outlet 1 Node Name
     PSZ-AC:2_OAInlet Node,   !- Outlet 2 Node Name
     PSZ-AC:3_OAInlet Node,   !- Outlet 3 Node Name
@@ -4594,7 +4594,7 @@
     OA Air Temp Manager 1,   !- Name
     Temperature,             !- Control Variable
     OA Cooling Supply Air Temp Sch,  !- Schedule Name
-    AirLoopDOASSplitterInlet;  !- Setpoint Node or NodeList Name
+    AirLoopDOASSplitterInlet;!- Setpoint Node or NodeList Name
 
   SetpointManager:Scheduled,
     OA Air Temp Manager 2,   !- Name
@@ -4647,8 +4647,8 @@
   Fan:SystemModel,
     OA Supply Fan,           !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Outside Air Inlet Node 1,  !- Air Inlet Node Name
-    OA Supply Fan Outlet Node,   !- Air Outlet Node Name
+    Outside Air Inlet Node 1,!- Air Inlet Node Name
+    OA Supply Fan Outlet Node,  !- Air Outlet Node Name
     Autosize,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.25,                    !- Electric Power Minimum Flow Rate Fraction
@@ -4674,7 +4674,7 @@
     autosize,                !- Maximum Water Flow Rate {m3/s}
     OA Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     OA Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name
-    OA Supply Fan Outlet Node,!- Air Inlet Node Name
+    OA Supply Fan Outlet Node,  !- Air Inlet Node Name
     OA Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
@@ -4698,7 +4698,7 @@
     OA Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     OA Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name
     OA Heating Coil 1 Air Outlet Node,  !- Air Inlet Node Name
-    AirLoopDOASSplitterInlet, !- Air Outlet Node Name
+    AirLoopDOASSplitterInlet,!- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow,               !- Heat Exchanger Configuration
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -4720,7 +4720,7 @@
     Temperature,             !- Control Variable
     Reverse,                 !- Action
     FLOW,                    !- Actuator Variable
-    AirLoopDOASSplitterInlet,  !- Sensor Node Name
+    AirLoopDOASSplitterInlet,!- Sensor Node Name
     OA Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name
     0.002,                   !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
@@ -5013,9 +5013,9 @@
   BranchList,
     Cooling Demand Side Branches,  !- Name
     Cooling Demand Inlet,    !- Branch 1 Name
-    OA Cooling Coil Branch,  !- Branch 3 Name
-    Cooling Demand Bypass Branch,  !- Branch 4 Name
-    Cooling Demand Outlet;   !- Branch 5 Name
+    OA Cooling Coil Branch,  !- Branch 2 Name
+    Cooling Demand Bypass Branch,  !- Branch 3 Name
+    Cooling Demand Outlet;   !- Branch 4 Name
 
   ConnectorList,
     Cooling Supply Side Connectors,  !- Name
@@ -5141,8 +5141,8 @@
   Connector:Mixer,
     CW Demand Mixer,         !- Name
     Cooling Demand Outlet,   !- Outlet Branch Name
-    OA Cooling Coil Branch,  !- Inlet Branch 2 Name
-    Cooling Demand Bypass Branch;  !- Inlet Branch 3 Name
+    OA Cooling Coil Branch,  !- Inlet Branch 1 Name
+    Cooling Demand Bypass Branch;  !- Inlet Branch 2 Name
 
   PlantEquipmentOperationSchemes,
     CW Loop Operation,       !- Name
@@ -5315,9 +5315,9 @@
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 
-  Output:Variable,*,System Node Temperature,Timestep; !- HVAC Average [C]
-  
-  Output:Variable,*,System Node Mass Flow Rate,Timestep; !- HVAC Average [kg/s]
+  Output:Variable,*,System Node Temperature,Timestep;
+
+  Output:Variable,*,System Node Mass Flow Rate,Timestep;
 
 ! ***REPORT TABLES***
 
