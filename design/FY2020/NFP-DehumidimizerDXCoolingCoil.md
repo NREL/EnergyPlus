@@ -6,6 +6,9 @@ Condenser hot gas reheat model for DX Cooling Coil System
 **Florida Solar Energy Center**
 
 
+ - Sixth edition
+ - Revised design document based on new coil model 
+ - Revision Date: 11/27/19
  - Fifth edition
  - Add idd change and design document based on new coil model 
  - Revision Date: 11/27/19
@@ -663,7 +666,7 @@ When the new coil model as Coil:Cooling:DX is used, all modifications will be ma
 
 ### <span style="color:red">Coil:Cooling:DX </span>###
 
-No change.
+No change
 
 ### Coil:Cooling:DX:CurveFit:Performance ###
 
@@ -844,22 +847,23 @@ The function outputs coil capacity based on sensible and latent loads, and Speed
 
 ### <span style="color:red">CoilCoolingDX (New coil model) </span>###
 
-The modifications are made to struct CoilCoolingDX and simulate().
+The modifications are made to CoilCoolingDX::simulate().
 
-#### struct CoilCoolingDX ####
+#### Change argument type from bool to int
 
-Add a new variable to setup coil type as SubcooReatCooling under struct CoilCoolingDX:
+The argument type of useAlternateMode is changed from bool to int to represent 3 operation modes, instead of two operation modes.
 
-CoolingCoilType
+useAlternateMode
 
-If (both Alternative Operating Modes are not blank) {
+=0 Normal
+ 
+=1 Enhanced
 
-	CoolingCoilType = SubcooReatCooling;
-}
+<span style="color:red">=2 SubcoolReheat mode (new)</span>
 
-The cooling coil type will provide information to parent objects, such as UnitarySystem, that this cooiling coil is a coil with 3 operation modes: Normal, Subcool, and Reheat based on different system load SHR.
+#### Add one more optional arguments in simulate() 
 
-#### Add two more optional arguments in simulate()
+The new optional argument will be used to represent Mode ratio either between Normal and Subcool or between Normal and Reheat.
 
 Current:
 
@@ -869,10 +873,9 @@ Proposed:
 
 Two additional option argument are added to allow SubcoolReatCoil cooling
 
-    void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, 
-<span style="color:red">int CoilOpMode, Real64 ModeRatio</span>);
-
-CoilOpMode: Present cooling coil operation mode: 1 Noreml; 2 Subcool; 3 Reheat
+    void simulate(
+<span style="color:red">int useAlternateMode</span>, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, 
+<span style="color:red">Real64 ModeRatio</span>);
 
 ModeRatio: A mode ratio with the same SHR between subcooling or reheat and normal operation. The SHR is determined by the system sensible and latent loads. 
 
@@ -886,7 +889,22 @@ Read a new fields as cAlphaArgs(7)
 
 ### CoilCoolingDXCurveFitPerformance ###
 
-The modifications are made to simulate() and calculate() by adding two more optional arguments. 
+The modifications are made to struct CoilCoolingDXCurveFitPerformance and simulate() and calculate() by adding one more optional argument for each function. 
+
+#### struct CoilCoolingDXCurveFitPerformance
+
+Current
+
+    CoilCoolingDXCurveFitOperatingMode normalMode;
+    bool hasAlternateMode = false;
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
+
+Proposed
+
+    CoilCoolingDXCurveFitOperatingMode normalMode;
+    int hasAlternateMode = 1; // 1 = Normal; 2 = Enhanced; 3 = SubcoolReheat
+    CoilCoolingDXCurveFitOperatingMode alternateMode; // enhanced dehumidifcation
+<span style="color:red">    CoilCoolingDXCurveFitOperatingMode alternateMode2; // SubcoolReheat coil</span>
 
 #### simulate ####
 
@@ -913,11 +931,11 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
 Proposed:
 
-Two additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
+An aurment (useAlternateMode) type is changed from bool to int and an additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
 
 void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
-                                                bool useAlternateMode,
+<span style="color:red">                        int</span> useAlternateMode,
                                                 Real64 &PLR,
                                                 int &speedNum,
                                                 Real64 &speedRatio,
@@ -928,28 +946,24 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 int CoilOpMode,
                                                 Real64 ModeRatio)
 </span>
-
 {
 
 <span style="color:red">
 
-	if (CoolingCoilType == SubcooReatCooling) {
-        	this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, CoilOpMode, ModeRatio);
-	} else {
+	if (useAlternateMode == 2) {
+        	this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, ModeRatio); 
 </span>
-
-    	if (useAlternateMode) {
+	} else  if (useAlternateMode == 1) {
         	this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
-    	} else {
+    } else {
         	this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
-    	}
 	}
 
 }
 
 #### calculate ####
 
-Two additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
+An additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
 
 Current:
 
@@ -974,14 +988,19 @@ Proposed:
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
-                   int CoilOpMode,
-                   Real64 ModeRatio);
+                   Real64 &ModeRatio);
 
 
-Add sections to deal with Subcool and Reheat modes.
+Add sections to deal with Subcool and Reheat modes in the function.
 
 #### UnitarySystem ####
 
 There are multiple HACKATHON example files available. The example files are based on UnitarySystem. Therefore, the present feature are limited to the UnitarySystem object as parent.
 
-The psudeo code in the UnitarySystem will be based on Simulation Logic provide above.
+The pseudo code in the UnitarySystem will be based on Simulation Logic provide above.
+
+In order to make UnitarySystem recognize that the cooling coil type is SubcoolReheatCoil, the module will call CoilCoolingDX to check the coil type.
+
+If 3 fields are not empty(), the coil type is SubcoolReheatCoil as
+
+NotEmpty(base_operating_mode_name && alternate_operating_mode_name && alternate_operating_mode2_name)  
