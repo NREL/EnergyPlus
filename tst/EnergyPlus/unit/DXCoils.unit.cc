@@ -3557,8 +3557,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    EXPECT_NEAR(31888, DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944, DXCoil(1).MSRatedTotCap(1), 0.01);
     
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", DXCoil(2).Name);
@@ -3569,8 +3569,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(1.75, DXCoil(2).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, DXCoil(2).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(2).MSRatedAirVolFlowRate(1));
-    EXPECT_EQ(31899.037804634620, DXCoil(2).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(2).MSRatedTotCap(1));
+    EXPECT_NEAR(31888, DXCoil(2).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944, DXCoil(2).MSRatedTotCap(1), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
@@ -3810,12 +3810,12 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(2) * 0.5);
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
-    EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
+    EXPECT_NEAR(31888, DXCoil(1).MSRatedTotCapDes(2), 0.01);
+    EXPECT_NEAR(31888, DXCoil(1).MSRatedTotCap(2), 0.01);
+    EXPECT_NEAR(15944, DXCoil(1).MSRatedTotCap(1), 0.01);
     // Design SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.764997, DXCoil(1).MSRatedSHR(2), 0.01);
+    EXPECT_NEAR(0.764997, DXCoil(1).MSRatedSHR(1), 0.01);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
     DXCoil( 1 ).MSRatedTotCap( 1 ) = 17500.0; // DataSizing::AutoSize;
@@ -3823,10 +3823,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     SizeDXCoil(1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.764997, DXCoil(1).MSRatedSHR(2), 0.01);
+    EXPECT_NEAR(0.764997, DXCoil(1).MSRatedSHR(1), 0.01);
     // Design Capacity at speed 2 and speed 1
-    EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
+    EXPECT_NEAR(31888, DXCoil(1).MSRatedTotCapDes(2), 0.01);
     EXPECT_EQ(35000.0, DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(35000.0 * 0.5, DXCoil(1).MSRatedTotCap(1));
     // Design flow rate at speed 2 and speed 1
