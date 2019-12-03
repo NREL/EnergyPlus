@@ -43,11 +43,11 @@ The name of the schedule (ref: Schedule) that denotes whether the DX cooling coi
 
 \paragraph{Field: Condenser Zone Name}\label{field-condenser-zone-name-6-001}
 
-The name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modelled as internal sensible heat gain of the zone.
+The name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modelled as internal sensible heat gain of the zone.
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-6-001}
 
-The name of the HVAC system node from which the condenser of the DX cooling coil draws its inlet air.
+The name of the HVAC system node from which the condenser of the DX cooling coil draws its inlet air. If the condenser draws air from the outdoors, an \texttt{OutdoorAir:Node} object must be referenced.
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-6-001}
 
@@ -91,9 +91,9 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 If this coil is used with a Fan:VariableVolume to model a packaged variable-air-volume unit, then ratings for standard rated net capacity, EER, and IEER will be calculated per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2. This field is to specify the internal static air pressure, in units of Pascals, associated with the unit's supply air flow for rating purposes. This field does not affect the performance during operation. This field is optional. If this field is used, then the internal static air pressure is used with the associated fan characteristics when calculating standard rated net capacity, EER, and IEER. If this field is not used, then the standard ratings are still performed but use a default for specific fan power of 773.3 (W/(m\(^{3}\)/s)). The air pressure drop/rise input here should be internal in the sense that it is for the entire package of unitary equipment as it would be tested in a laboratory (including other non-cooling sections inside the package for filters, dampers, and/or heating coils) but none of the external pressure drop for distributing supply air throughout the building. This is different from the input field called Pressure Rise in the fan object which includes both the external static pressure and the internal static pressure. The results of standard rating calculations are reported to the EIO file and to predefined output tables called DX Cooling Coils and VAV DX Cooling Standard Rating Details.
 
-\paragraph{Field: Method for Switching Operating Modes}\label{field-method-for-switching-operating-modes}
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
 
-This choice field defines the approach to set when coil operating modes should change. Valid choices for this input field are \textbf{HumidityControl} or \textbf{Scheduled}. The default for this field is \textbf{HumidityControl}.
+This choice field defined the capacity control method. Valid choices for this input field are \textbf{Staged}, \textbf{VariableSpeed}, or \textbf{Multispeed}. The default for this field is \textbf{Multispeed}. \textbf{Staged} control mode.... <<<check this>>>. \textbf{VariableSpeed} control mode allows the coil performance to be operated at continuously variable speeds. \textbf{Multispeed} control mode allow the coil to operate at discrete speed levels.
 
 If the DX unit can switch operating modes to increase dehumidification based on a humidistat signal, then set this to \textbf{HumidityControl}. This field just specifies the availability of enhanced dehumidification. Actual control of the operating mode is handled by the coil's parent component.
 
