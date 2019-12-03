@@ -104,7 +104,6 @@ namespace ChillerAbsorption {
     // The Absorber program from the BLAST family of software can be used
     // to generate the coefficients for the model.
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
@@ -112,17 +111,11 @@ namespace ChillerAbsorption {
     using General::RoundSigDigits;
     using General::TrimSigDigits;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
     int const FlowModeNotSet(200);
     int const ConstantFlow(201);
     int const NotModulated(202);
     int const LeavingSetPointModulated(203);
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     int NumBLASTAbsorbers(0); // number of Absorption Chillers specified in input
 
     Real64 CondMassFlowRate(0.0);    // Kg/s - condenser mass flow rate, water side
@@ -151,18 +144,8 @@ namespace ChillerAbsorption {
 
     Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Object Data
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
     Array1D<ReportVars> BLASTAbsorberReport;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Absorption Chiller Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
 
     void SimBLASTAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                           std::string const &AbsorberName,            // user specified name of Absorber
@@ -191,12 +174,10 @@ namespace ChillerAbsorption {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Chiller_Absorption;
         using PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide;
         using PlantUtilities::UpdateChillerComponentCondenserSide;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ChillNum; // Chiller number pointer
 
         // Get Absorber data from input file
@@ -291,12 +272,6 @@ namespace ChillerAbsorption {
         }
     }
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetBLASTAbsorberInput()
     {
         // SUBROUTINE INFORMATION:
@@ -311,7 +286,6 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueChillerName;
@@ -322,8 +296,6 @@ namespace ChillerAbsorption {
         using FluidProperties::FindRefrigerant;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
 
         // LOCAL VARIABLES
@@ -333,9 +305,7 @@ namespace ChillerAbsorption {
         int IOStat;                           // IO Status when calling get input subroutine
         Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
         static bool ErrorsFound(false);
-        //  CHARACTER(len=MaxNameLength) :: CurrentModuleObject  ! for ease in renaming.
 
-        // FLOW
         cCurrentModuleObject = moduleObjectType;
 
         NumBLASTAbsorbers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -701,9 +671,6 @@ namespace ChillerAbsorption {
         if (allocated(GenInputOutputNodesUsed)) GenInputOutputNodesUsed.deallocate();
     }
 
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
     void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
                                 bool const RunFlag, // TRUE when chiller operating
                                 Real64 const MyLoad)
@@ -721,7 +688,6 @@ namespace ChillerAbsorption {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
@@ -738,10 +704,8 @@ namespace ChillerAbsorption {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitBLASTAbsorberModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
         static Array1D_bool MyFlag;
         static Array1D_bool MyEnvrnFlag;
@@ -900,10 +864,6 @@ namespace ChillerAbsorption {
         CondInletNode = BLASTAbsorber(ChillNum).CondInletNodeNum;
         CondOutletNode = BLASTAbsorber(ChillNum).CondOutletNodeNum;
 
-        // Initialize critical Demand Side Variables
-        //  IF((MyEnvrnFlag(ChillNum) .and. BeginEnvrnFlag) &
-        //     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
-
         if (MyEnvrnFlag(ChillNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
 
             rho = GetDensityGlycol(PlantLoop(BLASTAbsorber(ChillNum).CWLoopNum).FluidName,
@@ -1061,7 +1021,6 @@ namespace ChillerAbsorption {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -1073,14 +1032,11 @@ namespace ChillerAbsorption {
         using namespace OutputReportPredefined;
         using namespace FluidProperties;
 
-        // Locals
         Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeAbsorpChiller");
         static std::string const RoutineNameLong("SizeAbsorptionChiller");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizIndex;            // Plant Sizing Do loop index
         int PltSizNum(0);           // Plant Sizing index corresponding to CurLoopNum
         int PltSizCondNum(0);       // Plant Sizing index for condenser loop
@@ -1592,9 +1548,6 @@ namespace ChillerAbsorption {
         }
     }
 
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
     void CalcBLASTAbsorberModel(int &ChillNum,                        // Absorber number
                                 Real64 &MyLoad,                       // operating load
                                 bool const RunFlag,                   // TRUE when Absorber operating
@@ -1620,7 +1573,6 @@ namespace ChillerAbsorption {
         // 1.  BLAST User Manual
         // 2.  Absorber User Manual
 
-        // Using/Aliasing
         using namespace FluidProperties;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -1639,10 +1591,8 @@ namespace ChillerAbsorption {
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcBLASTAbsorberModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> SteamLoadFactor(3);    // coefficients to poly curve fit
         Array1D<Real64> ElectricLoadFactor(3); // coefficients to poly curve fit
         Real64 MinPartLoadRat;                 // min allowed operating frac full load
@@ -1673,7 +1623,6 @@ namespace ChillerAbsorption {
         static Array1D_bool MyEnvironFlag;
         static Array1D_bool MyEnvironSteamFlag;
         Real64 FRAC;
-        //  LOGICAL,SAVE           :: PossibleSubcooling
         Real64 CpFluid; // local specific heat of fluid
         Real64 SteamDeltaT;
         Real64 SteamOutletTemp;
@@ -2062,12 +2011,6 @@ namespace ChillerAbsorption {
         PumpingEnergy = PumpingPower * TimeStepSys * SecInHour;
     }
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
                                     bool const RunFlag,  // TRUE if Absorber operating
                                     int const Num        // Absorber number
@@ -2080,10 +2023,8 @@ namespace ChillerAbsorption {
         // PURPOSE OF THIS SUBROUTINE:
         // reporting
 
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;       // evaporator inlet node number, water side
         int EvapOutletNode;      // evaporator outlet node number, water side
         int CondInletNode;       // condenser inlet node number, water side
@@ -2158,9 +2099,6 @@ namespace ChillerAbsorption {
             }
         }
     }
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
 } // namespace ChillerAbsorption
 

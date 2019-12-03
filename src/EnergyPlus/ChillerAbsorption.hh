@@ -59,19 +59,11 @@ namespace EnergyPlus {
 
 namespace ChillerAbsorption {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
     extern int const FlowModeNotSet;
     extern int const ConstantFlow;
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumBLASTAbsorbers; // number of Absorption Chillers specified in input
 
     extern Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
@@ -93,10 +85,6 @@ namespace ChillerAbsorption {
     extern Array1D_bool CheckEquipName;
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Types
 
     struct BLASTAbsorberSpecs
     {
@@ -208,8 +196,6 @@ namespace ChillerAbsorption {
     extern Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
     extern Array1D<ReportVars> BLASTAbsorberReport;
 
-    // Functions
-
     void SimBLASTAbsorber(std::string const &AbsorberType, // type of Absorber
                           std::string const &AbsorberName, // user specified name of Absorber
                           int const EquipFlowCtrl,         // Flow control mode for the equipment
@@ -227,25 +213,13 @@ namespace ChillerAbsorption {
                           Real64 &SizingFactor,            // sizing factor
                           Real64 &TempCondInDesign);
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetBLASTAbsorberInput();
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
 
     void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
                                 bool const RunFlag, // TRUE when chiller operating
                                 Real64 const MyLoad);
 
     void SizeAbsorpChiller(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
 
     void CalcBLASTAbsorberModel(int &ChillNum,             // Absorber number
                                 Real64 &MyLoad,            // operating load
@@ -254,19 +228,10 @@ namespace ChillerAbsorption {
                                 int const EquipFlowCtrl    // Flow control mode for the equipment
     );
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
                                     bool const RunFlag,  // TRUE if Absorber operating
                                     int const Num        // Absorber number
     );
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
 } // namespace ChillerAbsorption
 
