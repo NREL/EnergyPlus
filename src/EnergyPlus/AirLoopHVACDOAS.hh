@@ -48,7 +48,7 @@
 #ifndef ENERGYPLUS_AIRLOOPHVACDOAS_HH
 #define ENERGYPLUS_AIRLOOPHVACDOAS_HH
 
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <string>
 #include <vector>
 

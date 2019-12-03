@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataHeatBalFanSys.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

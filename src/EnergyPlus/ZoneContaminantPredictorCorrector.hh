@@ -49,7 +49,7 @@
 #define ZoneContaminantPredictorCorrector_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

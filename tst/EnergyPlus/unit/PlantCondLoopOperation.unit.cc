@@ -51,11 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataPlant.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/SetPointManager.hh>
-#include <Plant/PlantManager.hh>
-#include <BranchInputManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

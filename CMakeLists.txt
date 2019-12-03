@@ -151,7 +151,6 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Sing
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
 
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
@@ -229,6 +228,8 @@ if( BUILD_TESTING )
     ADD_SUBDIRECTORY(performance_tests)
   endif()
 endif()
+
+ADD_SUBDIRECTORY(src/ConvertInputFormat)
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)

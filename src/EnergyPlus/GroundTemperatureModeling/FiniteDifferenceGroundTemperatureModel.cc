@@ -54,17 +54,17 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataReportingFlags.hh>
-#include <General.hh>
-#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 

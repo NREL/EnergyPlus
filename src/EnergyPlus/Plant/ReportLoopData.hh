@@ -48,7 +48,7 @@
 #ifndef PlantReportingReporting_hh_INCLUDED
 #define PlantReportingReporting_hh_INCLUDED
 
-#include <Plant/ReportBranchData.hh>
+#include <EnergyPlus/Plant/ReportBranchData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

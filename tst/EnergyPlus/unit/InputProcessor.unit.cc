@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <ConfiguredFunctions.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
