@@ -548,11 +548,6 @@ namespace ChillerElectricEIR {
                 auto const SELECT_CASE_var(cAlphaArgs(10));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
                     ElectricEIRChiller(EIRChillerNum).FlowMode = ConstantFlow;
-                } else if (SELECT_CASE_var == "VARIABLEFLOW") {
-                    ElectricEIRChiller(EIRChillerNum).FlowMode = LeavingSetPointModulated;
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
-                    ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
                     ElectricEIRChiller(EIRChillerNum).FlowMode = LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
