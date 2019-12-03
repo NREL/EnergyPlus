@@ -194,7 +194,6 @@ namespace PlantLoopEquip {
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
-        using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
         using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using UserDefinedComponents::SimUserDefinedPlantComponent;
