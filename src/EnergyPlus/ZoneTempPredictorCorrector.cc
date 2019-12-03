@@ -5022,7 +5022,7 @@ namespace ZoneTempPredictorCorrector {
                         if (TempDepCoef == 0.0) { // B=0
                             ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(max(-50.0,min(700.0, -TempDepCoef / AirCap))) +
                                           TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
@@ -5662,7 +5662,7 @@ namespace ZoneTempPredictorCorrector {
                 if (A == 0.0) { // B=0
                     ZoneAirHumRatTemp(ZoneNum) = ZoneW1(ZoneNum) + B / C;
                 } else {
-                    ZoneAirHumRatTemp(ZoneNum) = (ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
+                    ZoneAirHumRatTemp(ZoneNum) = (ZoneW1(ZoneNum) - B / A) * std::exp(max(-50.0,min(700.0, -A / C))) + B / A;
                 }
             } else if (SELECT_CASE_var == UseEulerMethod) {
                 ZoneAirHumRatTemp(ZoneNum) = (C * ZoneW1(ZoneNum) + B) / (C + A);
