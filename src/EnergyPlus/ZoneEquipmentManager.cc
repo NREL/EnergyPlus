@@ -3397,6 +3397,7 @@ namespace ZoneEquipmentManager {
 
         // Using/Aliasing
         using namespace DataHVACGlobals;
+        using namespace SwimmingPool;
         using BaseboardElectric::SimElectricBaseboard;
         using BaseboardRadiator::SimBaseboard;
         using CoolingPanelSimple::SimCoolingPanel;
@@ -3422,7 +3423,6 @@ namespace ZoneEquipmentManager {
         using ReturnAirPathManager::SimReturnAirPath;
         using SplitterComponent::SimAirLoopSplitter;
         using SteamBaseboardRadiator::SimSteamBaseboard;
-        using SwimmingPool::SimSwimmingPool;
         using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
         using UnitHeater::SimUnitHeater;
         using UnitVentilator::SimUnitVentilator;
@@ -3516,7 +3516,8 @@ namespace ZoneEquipmentManager {
 
         // Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
         // These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-        SimSwimmingPool(FirstHVACIteration);
+        SwimmingPool::SwimmingPoolData::factory(objectName);
+        SwimmingPool::SwimmingPoolData::simulate(FirstHVACIteration);
 
         // Loop over all the primary air loop; simulate their components (equipment)
         // and controllers

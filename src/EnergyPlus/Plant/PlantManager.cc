@@ -102,6 +102,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
@@ -1464,6 +1465,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
                                 this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = SwimmingPool::SwimmingPoolData::factory(CompNames(CompNum));
                             } else {
                                 // discover unsupported equipment on branches.
                                 ShowSevereError("GetPlantInput: Branch=\"" + BranchNames(BranchNum) +

@@ -127,47 +127,43 @@ namespace SwimmingPool {
         Pool.deallocate();
     }
 
-    void SimSwimmingPool(bool const FirstHVACIteration)
+    PlantComponent *SwimmingPoolData::factory(std::string const &objectName)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rick Strand, Ho-Sung Kim
-        //       DATE WRITTEN   October 2014
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages the simulation of SwimmingPool.
-        // This driver manages the calls to all of
-        // the other drivers and simulation algorithms.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology (Get, Init, Calc, Update, Report, etc.)
-
+        // Process the input data if it hasn't been done already
         if (getSwimmingPoolInput) {
             GetSwimmingPool();
             getSwimmingPoolInput = false;
         }
 
+        // Now look for this particular object
+        for (auto &pool : Pool) {
+            if (pool.Name == objectName) {
+                return &pool;
+            }
+        }
+
+        // If we didn't find it, fatal
+        ShowFatalError("LocalSwimmingPoolFactory: Error getting inputs for swimming pool named: " + objectName); // LCOV_EXCL_LINE
+
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void SwimmingPoolData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
         // System wide (for all pools) inits
         DataHeatBalFanSys::SumConvPool = 0.0;
         DataHeatBalFanSys::SumLatentPool = 0.0;
 
-        for (int PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
+        this->InitSwimmingPool(FirstHVACIteration);
 
-            auto &thisPool = Pool(PoolNum);
+        this->CalcSwimmingPool();
 
-            thisPool.InitSwimmingPool(FirstHVACIteration);
-
-            thisPool.CalcSwimmingPool();
-
-            thisPool.UpdateSwimmingPool();
-        }
+        this->UpdateSwimmingPool();
 
         if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
         ReportSwimmingPool();
-    }
-
-    void SwimmingPoolData::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
-    {
     }
 
     void GetSwimmingPool()

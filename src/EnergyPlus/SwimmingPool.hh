@@ -159,6 +159,9 @@ namespace SwimmingPool {
               MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+        
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
@@ -188,9 +191,7 @@ namespace SwimmingPool {
     extern Array1D<SwimmingPoolData> Pool;
 
     void clear_state();
-
-    void SimSwimmingPool(bool FirstHVACIteration);
-
+    
     void GetSwimmingPool();
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step

@@ -82,6 +82,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -996,7 +997,7 @@ namespace PlantLoopEquip {
             } else if (EquipTypeNum == TypeOf_UnitarySysRecovery) {
 
             } else if (EquipTypeNum == TypeOf_SwimmingPool_Indoor) {
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else {
 
                 ShowSevereError("SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf);
