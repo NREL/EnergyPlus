@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -100,7 +101,7 @@ namespace ChillerAbsorption {
         }
     };
 
-    struct BLASTAbsorberSpecs
+    struct BLASTAbsorberSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // user identifier
@@ -197,6 +198,16 @@ namespace ChillerAbsorption {
               GenInputOutputNodesUsed(false)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
 
         void initialize(bool RunFlag, Real64 MyLoad);
 

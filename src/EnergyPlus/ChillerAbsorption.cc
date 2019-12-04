@@ -129,6 +129,45 @@ namespace ChillerAbsorption {
         BLASTAbsorber.deallocate();
     }
 
+    PlantComponent *BLASTAbsorberSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (getInput) {
+            GetBLASTAbsorberInput();
+            getInput = false;
+        }
+        // Now look for this particular object
+        for (auto &thisAbs : BLASTAbsorber) {
+            if (thisAbs.Name == objectName) {
+                return &thisAbs;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalBlastAbsorberFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void BLASTAbsorberSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
+    void BLASTAbsorberSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+
+    }
+
+    void BLASTAbsorberSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &EP_UNUSED(MaxLoad), Real64 &EP_UNUSED(MinLoad), Real64 &EP_UNUSED(OptLoad))
+    {
+
+    }
+
+    void BLASTAbsorberSpecs::getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    {
+
+    }
+
     void SimBLASTAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                           std::string const &AbsorberName,            // user specified name of Absorber
                           int const EquipFlowCtrl,                    // Flow control mode for the equipment
