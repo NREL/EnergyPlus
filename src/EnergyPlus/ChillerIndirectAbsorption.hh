@@ -59,19 +59,11 @@ namespace EnergyPlus {
 
 namespace ChillerIndirectAbsorption {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
     extern int const FlowModeNotSet;
     extern int const ConstantFlow;
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumIndirectAbsorbers;       // number of Absorption Chillers specified in input
     extern Real64 CondMassFlowRate;        // Kg/s - condenser mass flow rate, water side
     extern Real64 EvapMassFlowRate;        // Kg/s - evaporator mass flow rate, water side
@@ -92,10 +84,6 @@ namespace ChillerIndirectAbsorption {
     extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Types
 
     struct IndirectAbsorberSpecs
     {
@@ -194,18 +182,18 @@ namespace ChillerIndirectAbsorption {
         Real64 PumpingPower;         // reporting: W - electric pumping power
         Real64 QGenerator;           // reporting: W - steam heat transfer rate
         Real64 QEvap;                // reporting: W - evaporator heat transfer rate
-        Real64 QCond;                // reporting: W - condensor heat transfer rate
+        Real64 QCond;                // reporting: W - condenser heat transfer rate
         Real64 PumpingEnergy;        // reporting: J - electric pumping power
         Real64 GeneratorEnergy;      // reporting: J - steam heat transfer rate
         Real64 EvapEnergy;           // reporting: J - evaporator heat transfer rate
-        Real64 CondEnergy;           // reporting: J - condensor heat transfer rate
+        Real64 CondEnergy;           // reporting: J - condenser heat transfer rate
         Real64 CondInletTemp;        // reporting: C - condenser inlet temperature
         Real64 EvapInletTemp;        // reporting: C - evaporator inlet temperature
         Real64 CondOutletTemp;       // reporting: C - condenser outlet temperature
         Real64 EvapOutletTemp;       // reporting: C - evaporator outlet temperature
         Real64 Evapmdot;             // reporting: kg/ - evaporator mass flow rate
         Real64 Condmdot;             // reporting: kg/ - condenser mass flow rate
-        Real64 Genmdot;              // reporting: generatore mass flow rate when connected to plant
+        Real64 Genmdot;              // reporting: generators mass flow rate when connected to plant
         Real64 SteamMdot;            // reporting: kg/s - steam mass flow rate
         Real64 ActualCOP;            // reporting: coefficient of performance = QEvap/QGenerator
         Real64 ChillerPartLoadRatio; // reporting: part-load ratio
@@ -225,8 +213,6 @@ namespace ChillerIndirectAbsorption {
     extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
     extern Array1D<ReportVars> IndirectAbsorberReport;
 
-    // Functions
-
     void SimIndirectAbsorber(std::string const &AbsorberType, // type of Absorber
                              std::string const &AbsorberName, // user specified name of Absorber
                              int const EquipFlowCtrl,         // Flow control mode for the equipment
@@ -244,16 +230,7 @@ namespace ChillerIndirectAbsorption {
                              Real64 &SizingFactor,            // sizing factor
                              Real64 &TempCondInDesign);
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetIndirectAbsorberInput();
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
 
     void InitIndirectAbsorpChiller(int const ChillNum, // number of the current electric chiller being simulated
                                    bool const RunFlag, // TRUE when chiller operating
@@ -262,9 +239,6 @@ namespace ChillerIndirectAbsorption {
 
     void SizeIndirectAbsorpChiller(int const ChillNum);
 
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
     void CalcIndirectAbsorberModel(int const ChillNum,        // Absorber number
                                    Real64 const MyLoad,       // operating load
                                    bool const RunFlag,        // TRUE when Absorber operating
@@ -272,19 +246,10 @@ namespace ChillerIndirectAbsorption {
                                    int const EquipFlowCtrl    // Flow control mode for the equipment
     );
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateIndirectAbsorberRecords(Real64 const MyLoad, // current load
                                        bool const RunFlag,  // TRUE if Absorber operating
                                        int const Num        // Absorber number
     );
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
     void clear_state();
 

@@ -113,9 +113,6 @@ namespace ChillerIndirectAbsorption {
     using General::RoundSigDigits;
     using General::TrimSigDigits;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
     int const FlowModeNotSet(200);
     int const ConstantFlow(201);
     int const NotModulated(202);
@@ -125,7 +122,6 @@ namespace ChillerIndirectAbsorption {
     static std::string const fluidNameWater("WATER");
     static std::string const calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
 
-    // MODULE VARIABLE DECLARATIONS:
     int NumIndirectAbsorbers(0);         // number of Absorption Chillers specified in input
     Real64 CondMassFlowRate(0.0);        // Kg/s - condenser mass flow rate, water side
     Real64 EvapMassFlowRate(0.0);        // Kg/s - evaporator mass flow rate, water side
@@ -147,18 +143,32 @@ namespace ChillerIndirectAbsorption {
 
     bool GetInput(true); // when TRUE, calls subroutine to read input file.
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Object Data
     Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
     Array1D<ReportVars> IndirectAbsorberReport;
 
-    // MODULE SUBROUTINES:
-
-    // Beginning of Absorption Chiller Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
+    void clear_state()
+    {
+        NumIndirectAbsorbers = 0;
+        CondMassFlowRate = 0.0;
+        EvapMassFlowRate = 0.0;
+        GenMassFlowRate = 0.0;
+        CondOutletTemp = 0.0;
+        EvapOutletTemp = 0.0;
+        GenOutletTemp = 0.0;
+        SteamOutletEnthalpy = 0.0;
+        PumpingPower = 0.0;
+        PumpingEnergy = 0.0;
+        QGenerator = 0.0;
+        GeneratorEnergy = 0.0;
+        QEvaporator = 0.0;
+        EvaporatorEnergy = 0.0;
+        QCondenser = 0.0;
+        CondenserEnergy = 0.0;
+        EnergyLossToEnvironment = 0.0;
+        ChillerONOFFCyclingFrac = 0.0;
+        IndirectAbsorber.deallocate();
+        IndirectAbsorberReport.deallocate();
+    }
 
     void SimIndirectAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                              std::string const &AbsorberName,            // user specified name of Absorber
@@ -187,12 +197,10 @@ namespace ChillerIndirectAbsorption {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Chiller_Indirect_Absorption;
         using PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide;
         using PlantUtilities::UpdateChillerComponentCondenserSide;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ChillNum; // Chiller number pointer
 
         if (CompIndex != 0) {
@@ -286,12 +294,6 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetIndirectAbsorberInput()
     {
         // SUBROUTINE INFORMATION:
@@ -305,7 +307,6 @@ namespace ChillerIndirectAbsorption {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueChillerName;
@@ -319,11 +320,8 @@ namespace ChillerIndirectAbsorption {
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetIndirectAbsorberInput: "); // include trailing blank space
 
-        // LOCAL VARIABLES
         int AbsorberNum; // Absorber counter
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
@@ -331,7 +329,6 @@ namespace ChillerIndirectAbsorption {
         static bool ErrorsFound(false);
         Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 
-        // FLOW
         cCurrentModuleObject = "Chiller:Absorption:Indirect";
         NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -807,9 +804,6 @@ namespace ChillerIndirectAbsorption {
         if (allocated(GenInputOutputNodesUsed)) GenInputOutputNodesUsed.deallocate();
     }
 
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
     void InitIndirectAbsorpChiller(int const ChillNum, // number of the current electric chiller being simulated
                                    bool const RunFlag, // TRUE when chiller operating
                                    Real64 const MyLoad // requested load
@@ -828,7 +822,6 @@ namespace ChillerIndirectAbsorption {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
@@ -844,10 +837,8 @@ namespace ChillerIndirectAbsorption {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitIndirectAbsorpChiller");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
         static Array1D_bool MyFlag;
         static Array1D_bool MyEnvrnFlag;
@@ -1134,7 +1125,6 @@ namespace ChillerIndirectAbsorption {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using CurveManager::CurveValue;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -1145,14 +1135,11 @@ namespace ChillerIndirectAbsorption {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using namespace OutputReportPredefined;
         using namespace FluidProperties;
-        //  USE BranchInputManager, ONLY: MyPlantSizingIndex
         using ReportSizingManager::ReportSizingOutput;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeIndirectAbsorpChiller");
         static std::string const SizeChillerAbsorptionIndirect("SIZE Chiller:Absorption:Indirect");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizIndex;            // Plant Sizing Do loop index
         int PltSizNum;              // Plant Sizing index corresponding to CurLoopNum
         int PltSizCondNum;          // Plant Sizing index for condenser loop
@@ -1728,9 +1715,6 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
     void CalcIndirectAbsorberModel(int const ChillNum,                   // Absorber number
                                    Real64 const MyLoad,                  // operating load
                                    bool const RunFlag,                   // TRUE when Absorber operating
@@ -1754,7 +1738,6 @@ namespace ChillerIndirectAbsorption {
         // 1.  BLAST User Manual
         // 2.  Absorber User Manual
 
-        // Using/Aliasing
         using namespace FluidProperties;
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -1777,21 +1760,10 @@ namespace ChillerIndirectAbsorption {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcIndirectAbsorberModel");
         static std::string const LoopLossesChillerAbsorptionIndirect("Loop Losses: Chiller:Absorption:Indirect");
         static std::string const LoopLossesChillerAbsorptionIndirectSpace("Loop Losses: Chiller:Absorption:Indirect ");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinPartLoadRat;           // min allowed operating frac full load
         Real64 MaxPartLoadRat;           // max allowed operating frac full load
         Real64 TempCondIn;               // C - (BLAST ADJTC(1)The design secondary loop fluid
@@ -2356,12 +2328,6 @@ namespace ChillerIndirectAbsorption {
         //         Enthalpy (H)
     }
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateIndirectAbsorberRecords(Real64 const MyLoad, // current load
                                        bool const RunFlag,  // TRUE if Absorber operating
                                        int const Num        // Absorber number
@@ -2374,10 +2340,8 @@ namespace ChillerIndirectAbsorption {
         // PURPOSE OF THIS SUBROUTINE:
         // reporting
 
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;       // evaporator inlet node number, water side
         int EvapOutletNode;      // evaporator outlet node number, water side
         int CondInletNode;       // condenser inlet node number, water side
@@ -2457,34 +2421,6 @@ namespace ChillerIndirectAbsorption {
                 Node(GeneratorOutletNode).Temp = GenOutletTemp;
             }
         }
-    }
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    // Clears the global data. Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumIndirectAbsorbers = 0;
-        CondMassFlowRate = 0.0;
-        EvapMassFlowRate = 0.0;
-        GenMassFlowRate = 0.0;
-        CondOutletTemp = 0.0;
-        EvapOutletTemp = 0.0;
-        GenOutletTemp = 0.0;
-        SteamOutletEnthalpy = 0.0;
-        PumpingPower = 0.0;
-        PumpingEnergy = 0.0;
-        QGenerator = 0.0;
-        GeneratorEnergy = 0.0;
-        QEvaporator = 0.0;
-        EvaporatorEnergy = 0.0;
-        QCondenser = 0.0;
-        CondenserEnergy = 0.0;
-        EnergyLossToEnvironment = 0.0;
-        ChillerONOFFCyclingFrac = 0.0;
-        IndirectAbsorber.deallocate();
-        IndirectAbsorberReport.deallocate();
     }
 
 } // namespace ChillerIndirectAbsorption
