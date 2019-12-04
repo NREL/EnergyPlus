@@ -65,23 +65,8 @@ namespace ChillerIndirectAbsorption {
     extern int const LeavingSetPointModulated;
 
     extern int NumIndirectAbsorbers;       // number of Absorption Chillers specified in input
-    extern Real64 CondMassFlowRate;        // Kg/s - condenser mass flow rate, water side
-    extern Real64 EvapMassFlowRate;        // Kg/s - evaporator mass flow rate, water side
-    extern Real64 GenMassFlowRate;         // Kg/s - steam mass flow rate, water side
-    extern Real64 CondOutletTemp;          // C - condenser outlet temperature, water side
-    extern Real64 EvapOutletTemp;          // C - evaporator outlet temperature, water side
-    extern Real64 GenOutletTemp;           // C - generator fluid outlet temperature
-    extern Real64 SteamOutletEnthalpy;     // J/kg - generator fluid outlet enthalpy
-    extern Real64 PumpingPower;            // W - rate of Absorber energy use
-    extern Real64 PumpingEnergy;           // J - Absorber energy use
-    extern Real64 QGenerator;              // W - rate of Absorber steam use
-    extern Real64 GeneratorEnergy;         // J - Absorber steam use
-    extern Real64 QEvaporator;             // W - rate of heat transfer to the evaporator coil
-    extern Real64 EvaporatorEnergy;        // J - heat transfer to the evaporator coil
-    extern Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
-    extern Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
     extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
-//    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
+    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
 
@@ -156,7 +141,21 @@ namespace ChillerIndirectAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
-        Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
+        Real64 CondMassFlowRate;        // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;        // Kg/s - evaporator mass flow rate, water side
+        Real64 GenMassFlowRate;         // Kg/s - steam mass flow rate, water side
+        Real64 CondOutletTemp;          // C - condenser outlet temperature, water side
+        Real64 EvapOutletTemp;          // C - evaporator outlet temperature, water side
+        Real64 GenOutletTemp;           // C - generator fluid outlet temperature
+        Real64 SteamOutletEnthalpy;     // J/kg - generator fluid outlet enthalpy
+        Real64 PumpingPower;            // W - rate of Absorber energy use
+        Real64 PumpingEnergy;           // J - Absorber energy use
+        Real64 QGenerator;              // W - rate of Absorber steam use
+        Real64 GeneratorEnergy;         // J - Absorber steam use
+        Real64 QEvaporator;             // W - rate of heat transfer to the evaporator coil
+        Real64 EvaporatorEnergy;        // J - heat transfer to the evaporator coil
+        Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
+        Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -172,7 +171,10 @@ namespace ChillerIndirectAbsorption {
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),
-              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), ChillerONOFFCyclingFrac(0.0)
+              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0),
+              GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
+              PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
+              CondenserEnergy(0.0)
         {
         }
     };
