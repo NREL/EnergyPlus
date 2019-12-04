@@ -215,40 +215,40 @@ namespace ChillerIndirectAbsorption {
 
     void SimIndirectAbsorber(std::string const &AbsorberType, // type of Absorber
                              std::string const &AbsorberName, // user specified name of Absorber
-                             int const EquipFlowCtrl,         // Flow control mode for the equipment
-                             int const LoopNum,               // Plant loop index for where called from
-                             int const LoopSide,              // Plant loop side index for where called from
+                             int EquipFlowCtrl,         // Flow control mode for the equipment
+                             int LoopNum,               // Plant loop index for where called from
+                             int LoopSide,              // Plant loop side index for where called from
                              int &CompIndex,                  // Chiller number pointer
-                             bool const RunFlag,              // simulate Absorber when TRUE
-                             bool const FirstIteration,       // initialize variables when TRUE
+                             bool RunFlag,              // simulate Absorber when TRUE
+                             bool FirstIteration,       // initialize variables when TRUE
                              bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
                              Real64 &MyLoad,                  // loop demand component will meet
                              Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
                              Real64 &MinCap,                  // W - minimum operating capacity of Absorber
                              Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                             bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
+                             bool GetSizingFactor,      // TRUE when just the sizing factor is requested
                              Real64 &SizingFactor,            // sizing factor
                              Real64 &TempCondInDesign);
 
     void GetIndirectAbsorberInput();
 
-    void InitIndirectAbsorpChiller(int const ChillNum, // number of the current electric chiller being simulated
-                                   bool const RunFlag, // TRUE when chiller operating
-                                   Real64 const MyLoad // requested load
+    void InitIndirectAbsorpChiller(int ChillNum, // number of the current electric chiller being simulated
+                                   bool RunFlag, // TRUE when chiller operating
+                                   Real64 MyLoad // requested load
     );
 
-    void SizeIndirectAbsorpChiller(int const ChillNum);
+    void SizeIndirectAbsorpChiller(int ChillNum);
 
-    void CalcIndirectAbsorberModel(int const ChillNum,        // Absorber number
-                                   Real64 const MyLoad,       // operating load
-                                   bool const RunFlag,        // TRUE when Absorber operating
-                                   bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                   int const EquipFlowCtrl    // Flow control mode for the equipment
+    void CalcIndirectAbsorberModel(int ChillNum,        // Absorber number
+                                   Real64 MyLoad,       // operating load
+                                   bool RunFlag,        // TRUE when Absorber operating
+                                   bool FirstIteration, // TRUE when first iteration of timestep !unused1208
+                                   int EquipFlowCtrl    // Flow control mode for the equipment
     );
 
-    void UpdateIndirectAbsorberRecords(Real64 const MyLoad, // current load
-                                       bool const RunFlag,  // TRUE if Absorber operating
-                                       int const Num        // Absorber number
+    void UpdateIndirectAbsorberRecords(Real64 MyLoad, // current load
+                                       bool RunFlag,  // TRUE if Absorber operating
+                                       int Num        // Absorber number
     );
 
     void clear_state();

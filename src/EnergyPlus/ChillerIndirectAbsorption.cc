@@ -1120,22 +1120,15 @@ namespace ChillerIndirectAbsorption {
         Real64 CondVolFlowRateUser;      // Hardsized local condenser design volume flow rate for reporting
         Real64 GeneratorVolFlowRateUser; // Hardsized local generator design volume flow rate for reporting
 
-        PltSizNum = 0;
         PltSizCondNum = 0;
         PltSizHeatingNum = 0;
         PltSizSteamNum = 0;
         ErrorsFound = false;
         // init local temporary version in case of partial/mixed autosizing
         tmpNomCap = IndirectAbsorber(ChillNum).NomCap;
-        tmpNomPumpPower = IndirectAbsorber(ChillNum).NomPumpPower;
         tmpEvapVolFlowRate = IndirectAbsorber(ChillNum).EvapVolFlowRate;
         tmpCondVolFlowRate = IndirectAbsorber(ChillNum).CondVolFlowRate;
         tmpGeneratorVolFlowRate = IndirectAbsorber(ChillNum).GeneratorVolFlowRate;
-        NomCapUser = 0.0;
-        NomPumpPowerUser = 0.0;
-        EvapVolFlowRateUser = 0.0;
-        CondVolFlowRateUser = 0.0;
-        GeneratorVolFlowRateUser = 0.0;
 
         if (IndirectAbsorber(ChillNum).GeneratorInputCurvePtr > 0) {
             SteamInputRatNom = CurveManager::CurveValue(IndirectAbsorber(ChillNum).GeneratorInputCurvePtr, 1.0);
@@ -1691,7 +1684,6 @@ namespace ChillerIndirectAbsorption {
         static std::string const LoopLossesChillerAbsorptionIndirectSpace("Loop Losses: Chiller:Absorption:Indirect ");
 
         Real64 MinPartLoadRat;           // min allowed operating frac full load
-        Real64 MaxPartLoadRat;           // max allowed operating frac full load
         Real64 TempCondIn;               // C - (BLAST ADJTC(1)The design secondary loop fluid
         Real64 EvapInletTemp;            // C - evaporator inlet temperature, water side
         Real64 CondInletTemp;            // C - condenser inlet temperature, water side
@@ -1708,7 +1700,6 @@ namespace ChillerIndirectAbsorption {
         int EvapInletNode;               // evaporator inlet node number, water side
         int EvapOutletNode;              // evaporator outlet node number, water side
         int CondInletNode;               // condenser inlet node number, water side
-        int CondOutletNode;              // condenser outlet node number, water side
         int GeneratorInletNode;          // generator inlet node number, steam/water side
         int GeneratorOutletNode;         // generator outlet node number, steam/water side
         Real64 EnthSteamOutDry;          // enthalpy of dry steam at generator inlet
@@ -1755,12 +1746,10 @@ namespace ChillerIndirectAbsorption {
         EvaporatorEnergy = 0.0;
         GeneratorEnergy = 0.0;
         PumpingPower = 0.0;
-        FRAC = 1.0;
         ChillerONOFFCyclingFrac = 0.0;
         EvapInletNode = IndirectAbsorber(ChillNum).EvapInletNodeNum;
         EvapOutletNode = IndirectAbsorber(ChillNum).EvapOutletNodeNum;
         CondInletNode = IndirectAbsorber(ChillNum).CondInletNodeNum;
-        CondOutletNode = IndirectAbsorber(ChillNum).CondOutletNodeNum;
         GeneratorInletNode = IndirectAbsorber(ChillNum).GeneratorInletNodeNum;
         GeneratorOutletNode = IndirectAbsorber(ChillNum).GeneratorOutletNodeNum;
 
@@ -1819,7 +1808,6 @@ namespace ChillerIndirectAbsorption {
 
         // LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         MinPartLoadRat = IndirectAbsorber(ChillNum).MinPartLoadRat;
-        MaxPartLoadRat = IndirectAbsorber(ChillNum).MaxPartLoadRat;
         AbsorberNomCap = IndirectAbsorber(ChillNum).NomCap;
         NomPumpPower = IndirectAbsorber(ChillNum).NomPumpPower;
         TempCondIn = DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp;
@@ -1950,7 +1938,6 @@ namespace ChillerIndirectAbsorption {
                 // PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
                 // PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
                 // ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = DataLoopNode::Node(EvapInletNode).Temp - EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -2046,7 +2033,6 @@ namespace ChillerIndirectAbsorption {
                                         EvapMassFlowRate,
                                         QEvaporator);
                 // update corresponding variables at faulty case
-                EvapDeltaTemp = DataLoopNode::Node(EvapInletNode).Temp - EvapOutletTemp;
             }
 
         } // This is the end of the FlowLock Block
