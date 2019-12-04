@@ -9025,14 +9025,18 @@ namespace WaterThermalTanks {
             auto const TankType(WaterHeaterDesuperheater(DesuperheaterNum).TankTypeNum);
 
             if (TankType == MixedWaterHeater||TankType == StratifiedWaterHeater) {
-
+                Real64 PreTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+                NewTankTemp = 0.0; // Initialization
+                bool firstThrough = true;
                 WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode = WaterThermalTank(WaterThermalTankNum).Mode;
 
                 {
                     auto const SELECT_CASE_var1(WaterHeaterDesuperheater(DesuperheaterNum).Mode);
                     if (SELECT_CASE_var1 == HeatMode) {
                         // Calculate twice for consistency of desuperheater and tank source side energy transfer
-                        for (int i = 0; i < 2; i++){
+                        while (std::abs(PreTankTemp - NewTankTemp) > DataHVACGlobals::SmallTempDiff || firstThrough){
+                            firstThrough = false;
+                            PreTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
                             PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
 
                             //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
@@ -9121,7 +9125,7 @@ namespace WaterThermalTanks {
                             } else {
                                 PartLoadRatio = WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR;
                             }
-                        // Update inlet temperature and calculate again
+                        // Update tank source inlet temperature and calculate again
                         Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                         }
 
@@ -9145,10 +9149,12 @@ namespace WaterThermalTanks {
                         NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
 
                         if (NewTankTemp <= (SetPointTemp - DeadBandTempDiff)) {
-                            for (int i = 0; i < 2; i++){
+                            while(std::abs(PreTankTemp - NewTankTemp) > DataHVACGlobals::SmallTempDiff || firstThrough){
+                                firstThrough = false;
+                                PreTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
                                 WaterHeaterDesuperheater(DesuperheaterNum).Mode = HeatMode;
                                 WaterThermalTank(WaterThermalTankNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveWHMode;
-                                if ((TankTemp - NewTankTemp) != 0.0) {
+                                if ((TankTemp - NewTankTemp) != 0.0 && TankTemp > NewTankTemp) {
                                     PartLoadRatio = min(WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR,
                                                         max(0.0, ((SetPointTemp - DeadBandTempDiff) - NewTankTemp) / (TankTemp - NewTankTemp)));
                                 } else {
@@ -9232,7 +9238,7 @@ namespace WaterThermalTanks {
                                         }
                                     }
                                 }
-                                // Update inlet temperature and calculate again
+                                // Update tank source inlet temperature and calculate again
                                 Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                             }
                         } else {

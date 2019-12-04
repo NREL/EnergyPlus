@@ -3462,3 +3462,332 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
 }
+
+
+TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource){
+    using DataLoopNode::Node;
+    using DataGlobals::HourOfDay;
+    using DataGlobals::TimeStep;
+    using DataGlobals::TimeStepZone;
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+    using WaterThermalTanks::WaterThermalTank;
+    using WaterThermalTanks::WaterHeaterDesuperheater;
+    using DXCoils::DXCoil;
+    using DataHeatBalance::HeatReclaimDXCoil;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
+        "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
+        "Schedule:Constant, Inlet Water Temperature, , 10.0;",
+        "Schedule:Constant, Desuperheater-Schedule, , 55.0;",
+        "Schedule:Constant, WH Setpoint Temp, , 50.0;",        
+
+        "  Schedule:Compact,",
+        "    ALWAYS_ON,               !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "WaterHeater:Mixed,",
+        "  Mixed tank with desuperheater,          !- Name",
+        "  0.136274824222915,                      !- Tank Volume {m3}",
+        "  WH Setpoint Temp,                       !- Setpoint Temperature Schedule Name",
+        "  2,                                      !- Deadband Temperature Difference {deltaC}",
+        "  99,                                     !- Maximum Temperature Limit {C}",
+        "  Cycle,                                  !- Heater Control Type",
+        "  5500,                       !- Heater Maximum Capacity {W}",
+        "  0,                                      !- Heater Minimum Capacity {W}",
+        "  0,                                      !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "  0,                                      !- Heater Ignition Delay {s}",
+        "  Electricity,                            !- Heater Fuel Type",
+        "  0.8,                                    !- Heater Thermal Efficiency",
+        "  ,                                       !- Part Load Factor Curve Name",
+        "  0,                                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  Electricity,                            !- Off Cycle Parasitic Fuel Type",
+        "  0,                                      !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  0,                                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  Electricity,                            !- On Cycle Parasitic Fuel Type",
+        "  0,                                      !- On Cycle Parasitic Heat Fraction to Tank",
+        "  Schedule,                               !- Ambient Temperature Indicator",
+        "  Ambient Temp Schedule,                  !- Ambient Temperature Schedule Name",
+        "  ,                                 	   !- Ambient Temperature Zone Name",
+        "  ,                                       !- Ambient Temperature Outdoor Air Node Name",
+        "  0.0,                      !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- Off Cycle Loss Fraction to Zone",
+        "  0.0,                      !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- On Cycle Loss Fraction to Zone",
+        "  ,                                       !- Peak Use Flow Rate {m3/s}",
+        "  ALWAYS_ON,                              !- Use Flow Rate Fraction Schedule Name",
+        "  ,                                       !- Cold Water Supply Temperature Schedule Name",
+        "  ,                                       !- Use Side Inlet Node Name",
+        "  ,                                       !- Use Side Outlet Node Name",
+        "  1,                                      !- Use Side Effectiveness",
+        "  DesuperheaterOut,			           !- Source Side Inlet Node Name",
+        "  DesuperheaterIn,         	           !- Source Side Outlet Node Name",
+        "  1,                                      !- Source Side Effectiveness",
+        "  0.00283433494640006,                    !- Use Side Design Flow Rate {m3/s}",
+        "  ,                                       !- Source Side Design Flow Rate {m3/s}",
+        "  1.5,                                    !- Indirect Water Heating Recovery Time {hr}",
+        "  IndirectHeatPrimarySetpoint,            !- Source Side Flow Control Mode",
+        "  ,                                       !- Indirect Alternate Setpoint Temperature Schedule Name",
+        "  General;                                !- End-Use Subcategory",
+
+        "WaterHeater:Mixed,",
+        "  Mixed tank 2 with desuperheater,          !- Name",
+        "  0.136274824222915,                      !- Tank Volume {m3}",
+        "  WH Setpoint Temp,                       !- Setpoint Temperature Schedule Name",
+        "  2,                                      !- Deadband Temperature Difference {deltaC}",
+        "  99,                                     !- Maximum Temperature Limit {C}",
+        "  Cycle,                                  !- Heater Control Type",
+        "  5500,                       !- Heater Maximum Capacity {W}",
+        "  0,                                      !- Heater Minimum Capacity {W}",
+        "  0,                                      !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "  0,                                      !- Heater Ignition Delay {s}",
+        "  Electricity,                            !- Heater Fuel Type",
+        "  0.8,                                    !- Heater Thermal Efficiency",
+        "  ,                                       !- Part Load Factor Curve Name",
+        "  0,                                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  Electricity,                            !- Off Cycle Parasitic Fuel Type",
+        "  0,                                      !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  0,                                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  Electricity,                            !- On Cycle Parasitic Fuel Type",
+        "  0,                                      !- On Cycle Parasitic Heat Fraction to Tank",
+        "  Schedule,                               !- Ambient Temperature Indicator",
+        "  Ambient Temp Schedule,                  !- Ambient Temperature Schedule Name",
+        "  ,                                 	   !- Ambient Temperature Zone Name",
+        "  ,                                       !- Ambient Temperature Outdoor Air Node Name",
+        "  0.0,                      !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- Off Cycle Loss Fraction to Zone",
+        "  0.0,                      !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                                      !- On Cycle Loss Fraction to Zone",
+        "  ,                                       !- Peak Use Flow Rate {m3/s}",
+        "  ALWAYS_ON,                              !- Use Flow Rate Fraction Schedule Name",
+        "  ,                                       !- Cold Water Supply Temperature Schedule Name",
+        "  ,                                       !- Use Side Inlet Node Name",
+        "  ,                                       !- Use Side Outlet Node Name",
+        "  1,                                      !- Use Side Effectiveness",
+        "  DesuperheaterOut2,			           !- Source Side Inlet Node Name",
+        "  DesuperheaterIn2,         	           !- Source Side Outlet Node Name",
+        "  1,                                      !- Source Side Effectiveness",
+        "  0.00283433494640006,                    !- Use Side Design Flow Rate {m3/s}",
+        "  ,                                       !- Source Side Design Flow Rate {m3/s}",
+        "  1.5,                                    !- Indirect Water Heating Recovery Time {hr}",
+        "  IndirectHeatPrimarySetpoint,            !- Source Side Flow Control Mode",
+        "  ,                                       !- Indirect Alternate Setpoint Temperature Schedule Name",
+        "  General;                                !- End-Use Subcategory",
+
+        "Coil:WaterHeating:Desuperheater,",
+        "    Desuperheater,           !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    Desuperheater-Schedule,  !- Setpoint Temperature Schedule Name",
+        "    2,                       !- Dead Band Temperature Difference {deltaC}",
+        "    0.1,                    !- Rated Heat Reclaim Recovery Efficiency",
+        "    50,                      !- Rated Inlet Water Temperature {C}",
+        "    35,                      !- Rated Outdoor Air Temperature {C}",
+        "    60,                      !- Maximum Inlet Water Temperature for Heat Reclaim {C}",
+        "    ,                        !- Heat Reclaim Efficiency Function of Temperature Curve Name",
+        "    DesuperheaterIn,         !- Water Inlet Node Name",
+        "    DesuperheaterOut,        !- Water Outlet Node Name",
+        "    WaterHeater:Mixed,       !- Tank Object Type",
+        "    Mixed tank with desuperheater,  !- Tank Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Heating Source Object Type",
+        "    SingleSpeed_COIL,              !- Heating Source Name",
+        "    0.0001,                  !- Water Flow Rate {m3/s}",
+        "    ,                        !- Water Pump Power {W}",
+        "    0.2;                     !- Fraction of Pump Heat to Water",
+
+        "Coil:WaterHeating:Desuperheater,",
+        "    Desuperheater2,           !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    Desuperheater-Schedule,  !- Setpoint Temperature Schedule Name",
+        "    2,                       !- Dead Band Temperature Difference {deltaC}",
+        "    0.15,                    !- Rated Heat Reclaim Recovery Efficiency",
+        "    50,                      !- Rated Inlet Water Temperature {C}",
+        "    35,                      !- Rated Outdoor Air Temperature {C}",
+        "    60,                      !- Maximum Inlet Water Temperature for Heat Reclaim {C}",
+        "    ,                        !- Heat Reclaim Efficiency Function of Temperature Curve Name",
+        "    DesuperheaterIn2,         !- Water Inlet Node Name",
+        "    DesuperheaterOut2,        !- Water Outlet Node Name",
+        "    WaterHeater:Mixed,       !- Tank Object Type",
+        "    Mixed tank 2 with desuperheater,  !- Tank Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Heating Source Object Type",
+        "    SingleSpeed_COIL,              !- Heating Source Name",
+        "    0.0001,                  !- Water Flow Rate {m3/s}",
+        "    ,                        !- Water Pump Power {W}",
+        "    0.2;                     !- Fraction of Pump Heat to Water",
+
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "  SingleSpeed_COIL,                        !- Name",
+        "  ALWAYS_ON,                     !- Availability Schedule Name",
+        "  14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
+        "  0.740402528813699,       !- Gross Rated Sensible Heat Ratio",
+        "  3.99990781858502,        !- Gross Rated Cooling COP {W/W}",
+        "  0.728875631277391,       !- Rated Air Flow Rate {m3/s}",
+        "  773.3912012006,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  central ac unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name",
+        "  Node 5,                  !- Air Outlet Node Name",
+        "  Cool-Cap-fT1,            !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  Cool-Cap-fFF1,           !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  Cool-EIR-fT1,            !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Cool-EIR-fFF1,           !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Cool-PLF-fPLR1,          !- Part Load Fraction Correlation Curve Name",
+        "  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
+        "  1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "  3,                       !- Maximum Cycling Rate {cycles/hr}",
+        "  45,                      !- Latent Capacity Time Constant {s}",
+        "  ,                        !- Condenser Air Inlet Node Name",
+        "  AirCooled,               !- Condenser Type",
+        "  0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
+        "  50,                      !- Crankcase Heater Capacity {W}",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        ",",
+        "  ,                        !- Supply Water Storage Tank Name",
+        "  ,                        !- Condensate Collection Water Storage Tank Name",
+        "  0,                       !- Basin Heater Capacity {W/K}",
+        "  10;                      !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Biquadratic,",
+        "  Cool-Cap-fT1,                           !- Name",
+        "  1.550902001,                             !- Coefficient1 Constant",
+        "  -0.0750500892,                          !- Coefficient2 x",
+        "  0.00309713544,                          !- Coefficient3 x**2",
+        "  0.00240111,                            !- Coefficient4 y",
+        "  -5.0544e-005,                          !- Coefficient5 y**2",
+        "  -0.00042728148,                         !- Coefficient6 x*y",
+        "  13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "  23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "  18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "  51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        "Curve:Quadratic,",
+        "  Cool-Cap-fFF1,                          !- Name",
+        "  0.718605468,                             !- Coefficient1 Constant",
+        "  0.410099989,                            !- Coefficient2 x",
+        "  -0.128705457,                           !- Coefficient3 x**2",
+        "  0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "  2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "  0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "  2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        "Curve:Biquadratic,",
+        "  Cool-EIR-fT1,                           !- Name",
+        "  -0.304282997000001,                             !- Coefficient1 Constant",
+        "  0.1180477062,                           !- Coefficient2 x",
+        "  -0.00342466704,                          !- Coefficient3 x**2",
+        "  -0.0062619138,                          !- Coefficient4 y",
+        "  0.00069542712,                          !- Coefficient5 y**2",
+        "  -0.00046997496,                         !- Coefficient6 x*y",
+        "  13.88,                                  !- Minimum Value of x {BasedOnField A2}",
+        "  23.88,                                  !- Maximum Value of x {BasedOnField A2}",
+        "  18.33,                                  !- Minimum Value of y {BasedOnField A3}",
+        "  51.66;                                  !- Maximum Value of y {BasedOnField A3}",
+
+        "Curve:Quadratic,",
+        "  Cool-EIR-fFF1,                          !- Name",
+        "  1.32299905,                            !- Coefficient1 Constant",
+        "  -0.477711207,                           !- Coefficient2 x",
+        "  0.154712157,                            !- Coefficient3 x**2",
+        "  0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "  2,                                      !- Maximum Value of x {BasedOnField A2}",
+        "  0,                                      !- Minimum Curve Output {BasedOnField A3}",
+        "  2;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+        "Curve:Quadratic,",
+        "  Cool-PLF-fPLR1,                         !- Name",
+        "  0.93,                                   !- Coefficient1 Constant",
+        "  0.07,                                   !- Coefficient2 x",
+        "  0,                                      !- Coefficient3 x**2",
+        "  0,                                      !- Minimum Value of x {BasedOnField A2}",
+        "  1,                                      !- Maximum Value of x {BasedOnField A2}",
+        "  0.7,                                    !- Minimum Curve Output {BasedOnField A3}",
+        "  1;                                      !- Maximum Curve Output {BasedOnField A3}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ScheduleInputProcessed = true;
+
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::Month = 7;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues();
+
+    //Inititate tank conditions
+    HourOfDay = 0;
+    TimeStep = 1;
+    TimeStepZone = 1;
+    TimeStepSys = TimeStepZone;
+    SysTimeElapsed = 0.0;
+
+    int DXNum = 1;
+    bool FirstHVAC = true;
+
+    bool ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    // first tank
+    WaterThermalTanks::WaterThermalTankData &Tank1 = WaterThermalTank(1);
+    int desuperheaterNum1 = Tank1.DesuperheaterNum;
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater1 = WaterHeaterDesuperheater(desuperheaterNum1);
+    // second tank
+    WaterThermalTanks::WaterThermalTankData &Tank2 = WaterThermalTank(2);
+    int desuperheaterNum2 = Tank2.DesuperheaterNum;
+    WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater2 = WaterHeaterDesuperheater(desuperheaterNum2);
+
+    for (auto &e : WaterThermalTank) {
+        e.TankTemp = 20; // previous time step temperature
+        e.UseInletTemp = 10;
+        e.UseMassFlowRate = 0.0; 
+        e.SourceOutletTemp = 20;
+        e.TimeElapsed = 0.0;
+        e.Mode = 0;
+        e.SetPointTemp = 50;
+    }
+    for (auto &desuperheater: WaterHeaterDesuperheater){
+        desuperheater.SetPointTemp = 55;
+        desuperheater.Mode = 1;
+    }
+
+    DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
+    DXCoil(DXNum).PartLoadRatio = 1.0;
+
+    // first tank heat reclaim
+    // Call desuperheater calculation function
+    WaterThermalTanks::CalcDesuperheaterWaterHeater(1,FirstHVAC);
+    // Reclaim efficiency applied correctly
+    EXPECT_EQ(Desuperheater1.HeaterRate, 500 * 0.1);
+    // Results stored in ata structs
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum1), Desuperheater1.HeaterRate);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal, Desuperheater1.HeaterRate);
+    // Energy balance through tank and desuperheater functions
+    EXPECT_NEAR(Tank1.SourceRate, Desuperheater1.HeaterRate, Tank1.SourceRate * 0.05);
+
+    // Call desuperheater calculation function
+    WaterThermalTanks::CalcDesuperheaterWaterHeater(2,FirstHVAC);
+    // Reclaim efficiency applied correctly
+    EXPECT_EQ(Desuperheater2.HeaterRate, 500 * 0.15);
+    // Results stored in ata structs
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum2), Desuperheater2.HeaterRate);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal, Desuperheater1.HeaterRate + Desuperheater2.HeaterRate);
+    // Energy balance through tank and desuperheater functions
+    EXPECT_NEAR(Tank2.SourceRate, Desuperheater2.HeaterRate, Tank2.SourceRate * 0.05);
+
+}
