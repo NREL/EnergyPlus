@@ -1592,31 +1592,31 @@
   InternalMass,
     Back_Space Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
-    Back_Space,              !- Zone Name
+    Back_Space,              !- Zone or ZoneList Name
     759.7800;                !- Surface Area {m2}
 
   InternalMass,
     Core_Retail Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or ZoneList Name
     3200.9658;               !- Surface Area {m2}
 
   InternalMass,
     Front_Entry Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Entry,             !- Zone Name
+    Front_Entry,             !- Zone or ZoneList Name
     24.0000;                 !- Surface Area {m2}
 
   InternalMass,
     Front_Retail Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Retail,            !- Zone Name
+    Front_Retail,            !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
   InternalMass,
     Point_Of_Sale Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Point_Of_Sale,           !- Zone Name
+    Point_Of_Sale,           !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -2003,8 +2003,8 @@
     Back_Space Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_Retail Equipment,   !- Name
@@ -2013,8 +2013,8 @@
     Core_Retail Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Entry Equipment,   !- Name
@@ -2023,8 +2023,8 @@
     Front_Entry Unit Heater, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Retail Equipment,  !- Name
@@ -2033,8 +2033,8 @@
     Front_Retail Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Point_Of_Sale Equipment, !- Name
@@ -2043,8 +2043,8 @@
     Point_Of_Sale Direct Air,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 

@@ -3116,7 +3116,7 @@ namespace EvaporativeCoolers {
         // latent heat transfer only.  For dry operation the humdity ratio remains constant.
 
         // REFERENCES:
-        // CalculateWaterUseage routine of cooling towers for wet operation mode
+        // CalculateWaterUsage routine of cooling towers for wet operation mode
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
