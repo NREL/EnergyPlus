@@ -161,9 +161,24 @@ namespace ChillerAbsorption {
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false),
               CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0),
               GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0),
-              QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(0.0)
+              QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true)
         {
         }
+
+        void InitBLASTAbsorberModel(bool RunFlag, Real64 MyLoad);
+
+        void SizeAbsorpChiller();
+
+        void CalcBLASTAbsorberModel(Real64 &MyLoad,            // operating load
+                                    bool RunFlag,        // TRUE when Absorber operating
+                                    bool FirstIteration, // TRUE when first iteration of timestep !unused1208
+                                    int EquipFlowCtrl    // Flow control mode for the equipment
+        );
+
+        void UpdateBLASTAbsorberRecords(Real64 MyLoad, // current load
+                                        bool RunFlag,  // TRUE if Absorber operating
+                                        int Num        // Absorber number
+        );
     };
 
     struct ReportVars
@@ -172,18 +187,18 @@ namespace ChillerAbsorption {
         Real64 PumpingPower;    // reporting: electric pumping power
         Real64 QGenerator;      // reporting: steam heat transfer rate
         Real64 QEvap;           // reporting: evaporator heat transfer rate
-        Real64 QCond;           // reporting: condensor heat transfer rate
+        Real64 QCond;           // reporting: condenser heat transfer rate
         Real64 PumpingEnergy;   // reporting: electric pumping power
         Real64 GeneratorEnergy; // reporting: steam heat transfer rate
         Real64 EvapEnergy;      // reporting: evaporator heat transfer rate
-        Real64 CondEnergy;      // reporting: condensor heat transfer rate
+        Real64 CondEnergy;      // reporting: condenser heat transfer rate
         Real64 CondInletTemp;   // reporting: condenser inlet temperature
         Real64 EvapInletTemp;   // reporting: evaporator inlet temperature
         Real64 CondOutletTemp;  // reporting: condenser outlet temperature
         Real64 EvapOutletTemp;  // reporting: evaporator outlet temperature
         Real64 Evapmdot;        // reporting: evaporator mass flow rate
         Real64 Condmdot;        // reporting: condenser mass flow rate
-        Real64 Genmdot;         // reporting: generatore mass flow rate when connected to plant
+        Real64 Genmdot;         // reporting: generator mass flow rate when connected to plant
         Real64 SteamMdot;       // reporting: steam mass flow rate
         Real64 ActualCOP;       // reporting: coefficient of performance = QEvap/QGenerator
 
@@ -202,40 +217,22 @@ namespace ChillerAbsorption {
 
     void SimBLASTAbsorber(std::string const &AbsorberType, // type of Absorber
                           std::string const &AbsorberName, // user specified name of Absorber
-                          int const EquipFlowCtrl,         // Flow control mode for the equipment
-                          int const LoopNum,               // Plant loop index for where called from
-                          int const LoopSide,              // Plant loop side index for where called from
+                          int EquipFlowCtrl,         // Flow control mode for the equipment
+                          int LoopNum,               // Plant loop index for where called from
+                          int LoopSide,              // Plant loop side index for where called from
                           int &CompIndex,                  // Chiller number pointer
-                          bool const RunFlag,              // simulate Absorber when TRUE
-                          bool const FirstIteration,       // initialize variables when TRUE
+                          bool RunFlag,              // simulate Absorber when TRUE
+                          bool FirstIteration,       // initialize variables when TRUE
                           bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
                           Real64 &MyLoad,                  // loop demand component will meet
                           Real64 &MaxCap,                  // Maximum operating capacity of chiller [W]
                           Real64 &MinCap,                  // Minimum operating capacity of chiller [W]
                           Real64 &OptCap,                  // Optimal operating capacity of chiller [W]
-                          bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
+                          bool GetSizingFactor,      // TRUE when just the sizing factor is requested
                           Real64 &SizingFactor,            // sizing factor
                           Real64 &TempCondInDesign);
 
     void GetBLASTAbsorberInput();
-
-    void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
-                                bool const RunFlag, // TRUE when chiller operating
-                                Real64 const MyLoad);
-
-    void SizeAbsorpChiller(int const ChillNum);
-
-    void CalcBLASTAbsorberModel(int &ChillNum,             // Absorber number
-                                Real64 &MyLoad,            // operating load
-                                bool const RunFlag,        // TRUE when Absorber operating
-                                bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                int const EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
-    void UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
-                                    bool const RunFlag,  // TRUE if Absorber operating
-                                    int const Num        // Absorber number
-    );
 
 } // namespace ChillerAbsorption
 

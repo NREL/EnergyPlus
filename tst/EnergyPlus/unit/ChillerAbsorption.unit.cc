@@ -49,15 +49,15 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1775,13 +1775,12 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(); // run the design day
 
     // set conditions for test
     int AbsChillNum = 1;
     int EquipFlowCtrl = 1;
-    Real64 AbsChillEvapLoad = 0.0;
+    Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     bool FirstIteration = true;
     // check chiller inputs
@@ -1819,7 +1818,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     int GenLoopSideNum = BLASTAbsorber(AbsChillNum).GenLoopSideNum;
     PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
     // run CalcBLASTAbsorberModel
-    ChillerAbsorption::CalcBLASTAbsorberModel(AbsChillNum, AbsChillEvapLoad, AbsChillRunFlag, FirstIteration, EquipFlowCtrl);
+    ChillerAbsorption::BLASTAbsorber(1).CalcBLASTAbsorberModel(AbsChillEvapLoad, AbsChillRunFlag, FirstIteration, EquipFlowCtrl);
     // check generator hot water mass flow rate is propotional to the chilled water flow rate
     EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
     EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);
