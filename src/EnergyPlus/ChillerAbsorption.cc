@@ -110,19 +110,24 @@ namespace ChillerAbsorption {
 
     int const waterIndex(1);
 
-    int NumBLASTAbsorbers(0); // number of Absorption Chillers specified in input
-
-    bool GetInput(true); // when TRUE, calls subroutine to read input file.
-
     static std::string const BlankString;
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
     static std::string const moduleObjectType("Chiller:Absorption");
     static std::string const calcChillerAbsorption("CALC Chiller:Absorption ");
 
+    int numBlastAbsorbers(0); // number of Absorption Chillers specified in input
+    bool getInput(true); // when TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
-
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
+
+    void clear_state()
+    {
+        numBlastAbsorbers = 0;
+        getInput = true;
+        CheckEquipName.deallocate();
+        BLASTAbsorber.deallocate();
+    }
 
     void SimBLASTAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                           std::string const &AbsorberName,            // user specified name of Absorber
@@ -154,9 +159,9 @@ namespace ChillerAbsorption {
         int ChillNum; // Chiller number pointer
 
         // Get Absorber data from input file
-        if (GetInput) {
+        if (getInput) {
             GetBLASTAbsorberInput();
-            GetInput = false;
+            getInput = false;
         }
 
         // Find the correct Chiller
@@ -168,9 +173,9 @@ namespace ChillerAbsorption {
             CompIndex = ChillNum;
         } else {
             ChillNum = CompIndex;
-            if (ChillNum > NumBLASTAbsorbers || ChillNum < 1) {
+            if (ChillNum > numBlastAbsorbers || ChillNum < 1) {
                 ShowFatalError("SimBLASTAbsorber:  Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumBLASTAbsorbers) + ", Entered Unit name=" + AbsorberName);
+                               ", Number of Units=" + General::TrimSigDigits(numBlastAbsorbers) + ", Entered Unit name=" + AbsorberName);
             }
             if (CheckEquipName(ChillNum)) {
                 if (AbsorberName != BLASTAbsorber(ChillNum).Name) {
@@ -184,10 +189,10 @@ namespace ChillerAbsorption {
         // Initialize Loop Equipment
         if (InitLoopEquip) {
             TempCondInDesign = BLASTAbsorber(ChillNum).TempDesCondIn;
-            BLASTAbsorber(ChillNum).InitBLASTAbsorberModel(RunFlag, MyLoad);
+            BLASTAbsorber(ChillNum).initialize(RunFlag, MyLoad);
 
             if (LoopNum == BLASTAbsorber(ChillNum).CWLoopNum) {
-                BLASTAbsorber(ChillNum).SizeAbsorpChiller();
+                BLASTAbsorber(ChillNum).sizeChiller();
                 MinCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).MinPartLoadRat;
                 MaxCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).MaxPartLoadRat;
                 OptCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).OptPartLoadRat;
@@ -208,9 +213,9 @@ namespace ChillerAbsorption {
             // called from dominant chilled water connection loop side
 
             // Calculate Load
-            BLASTAbsorber(ChillNum).InitBLASTAbsorberModel(RunFlag, MyLoad);
-            BLASTAbsorber(ChillNum).CalcBLASTAbsorberModel(MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
-            BLASTAbsorber(ChillNum).UpdateBLASTAbsorberRecords(MyLoad, RunFlag);
+            BLASTAbsorber(ChillNum).initialize(RunFlag, MyLoad);
+            BLASTAbsorber(ChillNum).calculate(MyLoad, RunFlag, EquipFlowCtrl);
+            BLASTAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
 
         } else if (LoopNum == BLASTAbsorber(ChillNum).CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
@@ -269,9 +274,9 @@ namespace ChillerAbsorption {
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 
-        NumBLASTAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        numBlastAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (NumBLASTAbsorbers <= 0) {
+        if (numBlastAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
@@ -279,11 +284,11 @@ namespace ChillerAbsorption {
 
         if (allocated(BLASTAbsorber)) return;
         // ALLOCATE ARRAYS
-        BLASTAbsorber.allocate(NumBLASTAbsorbers);
-        CheckEquipName.dimension(NumBLASTAbsorbers, true);
+        BLASTAbsorber.allocate(numBlastAbsorbers);
+        CheckEquipName.dimension(numBlastAbsorbers, true);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= numBlastAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -628,8 +633,8 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::InitBLASTAbsorberModel(bool const RunFlag, // TRUE when chiller operating
-                                Real64 const MyLoad)
+    void BLASTAbsorberSpecs::initialize(bool RunFlag, // TRUE when chiller operating
+                                Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -912,7 +917,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::SizeAbsorpChiller()
+    void BLASTAbsorberSpecs::sizeChiller()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1435,11 +1440,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::CalcBLASTAbsorberModel(Real64 &MyLoad,                       // operating load
-                                bool const RunFlag,                   // TRUE when Absorber operating
-                                bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep !unused1208
-                                int const EquipFlowCtrl               // Flow control mode for the equipment
-    )
+    void BLASTAbsorberSpecs::calculate(Real64 &MyLoad, bool RunFlag,  int EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -1810,7 +1811,7 @@ namespace ChillerAbsorption {
         this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
-    void BLASTAbsorberSpecs::UpdateBLASTAbsorberRecords(Real64 const MyLoad, bool const RunFlag)
+    void BLASTAbsorberSpecs::updateRecords(Real64 MyLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

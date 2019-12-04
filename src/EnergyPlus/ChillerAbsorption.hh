@@ -64,11 +64,11 @@ namespace ChillerAbsorption {
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    extern int NumBLASTAbsorbers; // number of Absorption Chillers specified in input
+    extern int numBlastAbsorbers; // number of Absorption Chillers specified in input
 
     extern Array1D_bool CheckEquipName;
 
-    extern bool GetInput; // When TRUE, calls subroutine to read input file
+    extern bool getInput; // When TRUE, calls subroutine to read input file
 
     struct ReportVars
     {
@@ -198,19 +198,15 @@ namespace ChillerAbsorption {
         {
         }
 
-        void InitBLASTAbsorberModel(bool RunFlag, Real64 MyLoad);
+        void initialize(bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
-        void SizeAbsorpChiller();
+        void sizeChiller();
 
-        void CalcBLASTAbsorberModel(Real64 &MyLoad,            // operating load
-                                    bool RunFlag,        // TRUE when Absorber operating
-                                    bool FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                    int EquipFlowCtrl    // Flow control mode for the equipment
-        );
+        void calculate(Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
 
-        void UpdateBLASTAbsorberRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
@@ -232,6 +228,8 @@ namespace ChillerAbsorption {
                           bool GetSizingFactor,      // TRUE when just the sizing factor is requested
                           Real64 &SizingFactor,            // sizing factor
                           Real64 &TempCondInDesign);
+
+    void clear_state();
 
     void GetBLASTAbsorberInput();
 
