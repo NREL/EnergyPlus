@@ -123,7 +123,6 @@ namespace ChillerAbsorption {
     Array1D_bool CheckEquipName;
 
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-    Array1D<ReportVars> BLASTAbsorberReport;
 
     void SimBLASTAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                           std::string const &AbsorberName,            // user specified name of Absorber
@@ -211,7 +210,7 @@ namespace ChillerAbsorption {
             // Calculate Load
             BLASTAbsorber(ChillNum).InitBLASTAbsorberModel(RunFlag, MyLoad);
             BLASTAbsorber(ChillNum).CalcBLASTAbsorberModel(MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
-            BLASTAbsorber(ChillNum).UpdateBLASTAbsorberRecords(MyLoad, RunFlag, ChillNum);
+            BLASTAbsorber(ChillNum).UpdateBLASTAbsorberRecords(MyLoad, RunFlag);
 
         } else if (LoopNum == BLASTAbsorber(ChillNum).CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
@@ -220,10 +219,10 @@ namespace ChillerAbsorption {
                                                 DataPlant::TypeOf_Chiller_Absorption,
                                                 BLASTAbsorber(ChillNum).CondInletNodeNum,
                                                 BLASTAbsorber(ChillNum).CondOutletNodeNum,
-                                                BLASTAbsorberReport(ChillNum).QCond,
-                                                BLASTAbsorberReport(ChillNum).CondInletTemp,
-                                                BLASTAbsorberReport(ChillNum).CondOutletTemp,
-                                                BLASTAbsorberReport(ChillNum).Condmdot,
+                                                BLASTAbsorber(ChillNum).Report.QCond,
+                                                BLASTAbsorber(ChillNum).Report.CondInletTemp,
+                                                BLASTAbsorber(ChillNum).Report.CondOutletTemp,
+                                                BLASTAbsorber(ChillNum).Report.Condmdot,
                                                 FirstIteration);
 
         } else if (LoopNum == BLASTAbsorber(ChillNum).GenLoopNum) {
@@ -234,8 +233,8 @@ namespace ChillerAbsorption {
                                                         BLASTAbsorber(ChillNum).GeneratorInletNodeNum,
                                                         BLASTAbsorber(ChillNum).GeneratorOutletNodeNum,
                                                         BLASTAbsorber(ChillNum).GenHeatSourceType,
-                                                        BLASTAbsorberReport(ChillNum).QGenerator,
-                                                        BLASTAbsorberReport(ChillNum).SteamMdot,
+                                                        BLASTAbsorber(ChillNum).Report.QGenerator,
+                                                        BLASTAbsorber(ChillNum).Report.SteamMdot,
                                                         FirstIteration);
 
         } else {
@@ -284,8 +283,6 @@ namespace ChillerAbsorption {
         BLASTAbsorber.allocate(NumBLASTAbsorbers);
         CheckEquipName.dimension(NumBLASTAbsorbers, true);
         GenInputOutputNodesUsed.dimension(NumBLASTAbsorbers, false);
-
-        BLASTAbsorberReport.allocate(NumBLASTAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum) {
@@ -474,13 +471,13 @@ namespace ChillerAbsorption {
         for (AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum) {
             SetupOutputVariable("Chiller Electric Power",
                                 OutputProcessor::Unit::W,
-                                BLASTAbsorberReport(AbsorberNum).PumpingPower,
+                                BLASTAbsorber(AbsorberNum).Report.PumpingPower,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                BLASTAbsorberReport(AbsorberNum).PumpingEnergy,
+                                BLASTAbsorber(AbsorberNum).Report.PumpingEnergy,
                                 "System",
                                 "Sum",
                                 BLASTAbsorber(AbsorberNum).Name,
@@ -491,13 +488,13 @@ namespace ChillerAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                BLASTAbsorberReport(AbsorberNum).QEvap,
+                                BLASTAbsorber(AbsorberNum).Report.QEvap,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                BLASTAbsorberReport(AbsorberNum).EvapEnergy,
+                                BLASTAbsorber(AbsorberNum).Report.EvapEnergy,
                                 "System",
                                 "Sum",
                                 BLASTAbsorber(AbsorberNum).Name,
@@ -508,32 +505,32 @@ namespace ChillerAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                BLASTAbsorberReport(AbsorberNum).EvapInletTemp,
+                                BLASTAbsorber(AbsorberNum).Report.EvapInletTemp,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                BLASTAbsorberReport(AbsorberNum).EvapOutletTemp,
+                                BLASTAbsorber(AbsorberNum).Report.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                BLASTAbsorberReport(AbsorberNum).Evapmdot,
+                                BLASTAbsorber(AbsorberNum).Report.Evapmdot,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                BLASTAbsorberReport(AbsorberNum).QCond,
+                                BLASTAbsorber(AbsorberNum).Report.QCond,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                BLASTAbsorberReport(AbsorberNum).CondEnergy,
+                                BLASTAbsorber(AbsorberNum).Report.CondEnergy,
                                 "System",
                                 "Sum",
                                 BLASTAbsorber(AbsorberNum).Name,
@@ -544,19 +541,19 @@ namespace ChillerAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                BLASTAbsorberReport(AbsorberNum).CondInletTemp,
+                                BLASTAbsorber(AbsorberNum).Report.CondInletTemp,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                BLASTAbsorberReport(AbsorberNum).CondOutletTemp,
+                                BLASTAbsorber(AbsorberNum).Report.CondOutletTemp,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                BLASTAbsorberReport(AbsorberNum).Condmdot,
+                                BLASTAbsorber(AbsorberNum).Report.Condmdot,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
@@ -564,13 +561,13 @@ namespace ChillerAbsorption {
             if (BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
                 SetupOutputVariable("Chiller Hot Water Consumption Rate",
                                     OutputProcessor::Unit::W,
-                                    BLASTAbsorberReport(AbsorberNum).QGenerator,
+                                    BLASTAbsorber(AbsorberNum).Report.QGenerator,
                                     "System",
                                     "Average",
                                     BLASTAbsorber(AbsorberNum).Name);
                 SetupOutputVariable("Chiller Source Hot Water Energy",
                                     OutputProcessor::Unit::J,
-                                    BLASTAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                    BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                     "System",
                                     "Sum",
                                     BLASTAbsorber(AbsorberNum).Name,
@@ -583,13 +580,13 @@ namespace ChillerAbsorption {
                 if (GenInputOutputNodesUsed(AbsorberNum)) {
                     SetupOutputVariable("Chiller Source Steam Rate",
                                         OutputProcessor::Unit::W,
-                                        BLASTAbsorberReport(AbsorberNum).QGenerator,
+                                        BLASTAbsorber(AbsorberNum).Report.QGenerator,
                                         "System",
                                         "Average",
                                         BLASTAbsorber(AbsorberNum).Name);
                     SetupOutputVariable("Chiller Source Steam Energy",
                                         OutputProcessor::Unit::J,
-                                        BLASTAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                        BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                         "System",
                                         "Sum",
                                         BLASTAbsorber(AbsorberNum).Name,
@@ -601,13 +598,13 @@ namespace ChillerAbsorption {
                 } else {
                     SetupOutputVariable("Chiller Source Steam Rate",
                                         OutputProcessor::Unit::W,
-                                        BLASTAbsorberReport(AbsorberNum).QGenerator,
+                                        BLASTAbsorber(AbsorberNum).Report.QGenerator,
                                         "System",
                                         "Average",
                                         BLASTAbsorber(AbsorberNum).Name);
                     SetupOutputVariable("Chiller Source Steam Energy",
                                         OutputProcessor::Unit::J,
-                                        BLASTAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                        BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                         "System",
                                         "Sum",
                                         BLASTAbsorber(AbsorberNum).Name,
@@ -621,7 +618,7 @@ namespace ChillerAbsorption {
 
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                BLASTAbsorberReport(AbsorberNum).ActualCOP,
+                                BLASTAbsorber(AbsorberNum).Report.ActualCOP,
                                 "System",
                                 "Average",
                                 BLASTAbsorber(AbsorberNum).Name);
@@ -1813,10 +1810,7 @@ namespace ChillerAbsorption {
         this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
 
-    void BLASTAbsorberSpecs::UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
-                                    bool const RunFlag,  // TRUE if Absorber operating
-                                    int const ChillNum        // Absorber number
-    )
+    void BLASTAbsorberSpecs::UpdateBLASTAbsorberRecords(Real64 const MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1830,22 +1824,22 @@ namespace ChillerAbsorption {
             PlantUtilities::SafeCopyPlantNode(this->EvapInletNodeNum, this->EvapOutletNodeNum);
             PlantUtilities::SafeCopyPlantNode(this->CondInletNodeNum, this->CondOutletNodeNum);
 
-            BLASTAbsorberReport(ChillNum).PumpingPower = 0.0;
-            BLASTAbsorberReport(ChillNum).QEvap = 0.0;
-            BLASTAbsorberReport(ChillNum).QCond = 0.0;
-            BLASTAbsorberReport(ChillNum).QGenerator = 0.0;
-            BLASTAbsorberReport(ChillNum).PumpingEnergy = 0.0;
-            BLASTAbsorberReport(ChillNum).EvapEnergy = 0.0;
-            BLASTAbsorberReport(ChillNum).CondEnergy = 0.0;
-            BLASTAbsorberReport(ChillNum).GeneratorEnergy = 0.0;
-            BLASTAbsorberReport(ChillNum).EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).Evapmdot = 0.0;
-            BLASTAbsorberReport(ChillNum).Condmdot = 0.0;
-            BLASTAbsorberReport(ChillNum).Genmdot = 0.0;
-            BLASTAbsorberReport(ChillNum).ActualCOP = 0.0;
+            this->Report.PumpingPower = 0.0;
+            this->Report.QEvap = 0.0;
+            this->Report.QCond = 0.0;
+            this->Report.QGenerator = 0.0;
+            this->Report.PumpingEnergy = 0.0;
+            this->Report.EvapEnergy = 0.0;
+            this->Report.CondEnergy = 0.0;
+            this->Report.GeneratorEnergy = 0.0;
+            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
+            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.Evapmdot = 0.0;
+            this->Report.Condmdot = 0.0;
+            this->Report.Genmdot = 0.0;
+            this->Report.ActualCOP = 0.0;
 
             if (this->GeneratorInletNodeNum > 0) {
                 PlantUtilities::SafeCopyPlantNode(this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
@@ -1858,25 +1852,25 @@ namespace ChillerAbsorption {
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
 
-            BLASTAbsorberReport(ChillNum).PumpingPower = this->PumpingPower;
-            BLASTAbsorberReport(ChillNum).QEvap = this->QEvaporator;
-            BLASTAbsorberReport(ChillNum).QCond = this->QCondenser;
-            BLASTAbsorberReport(ChillNum).QGenerator = this->QGenerator;
-            BLASTAbsorberReport(ChillNum).PumpingEnergy = this->PumpingEnergy;
-            BLASTAbsorberReport(ChillNum).EvapEnergy = this->EvaporatorEnergy;
-            BLASTAbsorberReport(ChillNum).CondEnergy = this->CondenserEnergy;
-            BLASTAbsorberReport(ChillNum).GeneratorEnergy = this->GeneratorEnergy;
-            BLASTAbsorberReport(ChillNum).EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            BLASTAbsorberReport(ChillNum).Evapmdot = this->EvapMassFlowRate;
-            BLASTAbsorberReport(ChillNum).Condmdot = this->CondMassFlowRate;
-            BLASTAbsorberReport(ChillNum).Genmdot = this->SteamMassFlowRate;
+            this->Report.PumpingPower = this->PumpingPower;
+            this->Report.QEvap = this->QEvaporator;
+            this->Report.QCond = this->QCondenser;
+            this->Report.QGenerator = this->QGenerator;
+            this->Report.PumpingEnergy = this->PumpingEnergy;
+            this->Report.EvapEnergy = this->EvaporatorEnergy;
+            this->Report.CondEnergy = this->CondenserEnergy;
+            this->Report.GeneratorEnergy = this->GeneratorEnergy;
+            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
+            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.Evapmdot = this->EvapMassFlowRate;
+            this->Report.Condmdot = this->CondMassFlowRate;
+            this->Report.Genmdot = this->SteamMassFlowRate;
             if (this->QGenerator != 0.0) {
-                BLASTAbsorberReport(ChillNum).ActualCOP = this->QEvaporator / this->QGenerator;
+                this->Report.ActualCOP = this->QEvaporator / this->QGenerator;
             } else {
-                BLASTAbsorberReport(ChillNum).ActualCOP = 0.0;
+                this->Report.ActualCOP = 0.0;
             }
 
             if (this->GeneratorInletNodeNum > 0) {
