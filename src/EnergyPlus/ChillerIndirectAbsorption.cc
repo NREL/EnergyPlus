@@ -2240,7 +2240,7 @@ namespace ChillerIndirectAbsorption {
 
     void UpdateIndirectAbsorberRecords(Real64 const MyLoad, // current load
                                        bool const RunFlag,  // TRUE if Absorber operating
-                                       int const Num        // Absorber number
+                                       int const ChillNum        // Absorber number
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2257,37 +2257,37 @@ namespace ChillerIndirectAbsorption {
         int GeneratorInletNode;  // generator inlet node number, steam/water side
         int GeneratorOutletNode; // generator outlet node number, steam/water side
 
-        EvapInletNode = IndirectAbsorber(Num).EvapInletNodeNum;
-        EvapOutletNode = IndirectAbsorber(Num).EvapOutletNodeNum;
-        CondInletNode = IndirectAbsorber(Num).CondInletNodeNum;
-        CondOutletNode = IndirectAbsorber(Num).CondOutletNodeNum;
-        GeneratorInletNode = IndirectAbsorber(Num).GeneratorInletNodeNum;
-        GeneratorOutletNode = IndirectAbsorber(Num).GeneratorOutletNodeNum;
+        EvapInletNode = IndirectAbsorber(ChillNum).EvapInletNodeNum;
+        EvapOutletNode = IndirectAbsorber(ChillNum).EvapOutletNodeNum;
+        CondInletNode = IndirectAbsorber(ChillNum).CondInletNodeNum;
+        CondOutletNode = IndirectAbsorber(ChillNum).CondOutletNodeNum;
+        GeneratorInletNode = IndirectAbsorber(ChillNum).GeneratorInletNodeNum;
+        GeneratorOutletNode = IndirectAbsorber(ChillNum).GeneratorOutletNodeNum;
 
         if (MyLoad >= 0 || !RunFlag) {
             // set node temperature
             PlantUtilities::SafeCopyPlantNode(EvapInletNode, EvapOutletNode);
             PlantUtilities::SafeCopyPlantNode(CondInletNode, CondOutletNode);
 
-            IndirectAbsorberReport(Num).PumpingPower = 0.0;
-            IndirectAbsorberReport(Num).QEvap = 0.0;
-            IndirectAbsorberReport(Num).QCond = 0.0;
-            IndirectAbsorberReport(Num).QGenerator = 0.0;
-            IndirectAbsorberReport(Num).PumpingEnergy = 0.0;
-            IndirectAbsorberReport(Num).EvapEnergy = 0.0;
-            IndirectAbsorberReport(Num).CondEnergy = 0.0;
-            IndirectAbsorberReport(Num).GeneratorEnergy = 0.0;
-            IndirectAbsorberReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            IndirectAbsorberReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
-            IndirectAbsorberReport(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorberReport(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
-            IndirectAbsorberReport(Num).Evapmdot = 0.0;
-            IndirectAbsorberReport(Num).Condmdot = 0.0;
-            IndirectAbsorberReport(Num).Genmdot = 0.0;
-            IndirectAbsorberReport(Num).ActualCOP = 0.0;
-            IndirectAbsorberReport(Num).ChillerPartLoadRatio = 0.0;
-            IndirectAbsorberReport(Num).LoopLoss = 0.0;
-            IndirectAbsorberReport(Num).ChillerCyclingFrac = 0.0;
+            IndirectAbsorberReport(ChillNum).PumpingPower = 0.0;
+            IndirectAbsorberReport(ChillNum).QEvap = 0.0;
+            IndirectAbsorberReport(ChillNum).QCond = 0.0;
+            IndirectAbsorberReport(ChillNum).QGenerator = 0.0;
+            IndirectAbsorberReport(ChillNum).PumpingEnergy = 0.0;
+            IndirectAbsorberReport(ChillNum).EvapEnergy = 0.0;
+            IndirectAbsorberReport(ChillNum).CondEnergy = 0.0;
+            IndirectAbsorberReport(ChillNum).GeneratorEnergy = 0.0;
+            IndirectAbsorberReport(ChillNum).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            IndirectAbsorberReport(ChillNum).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            IndirectAbsorberReport(ChillNum).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            IndirectAbsorberReport(ChillNum).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
+            IndirectAbsorberReport(ChillNum).Evapmdot = 0.0;
+            IndirectAbsorberReport(ChillNum).Condmdot = 0.0;
+            IndirectAbsorberReport(ChillNum).Genmdot = 0.0;
+            IndirectAbsorberReport(ChillNum).ActualCOP = 0.0;
+            IndirectAbsorberReport(ChillNum).ChillerPartLoadRatio = 0.0;
+            IndirectAbsorberReport(ChillNum).LoopLoss = 0.0;
+            IndirectAbsorberReport(ChillNum).ChillerCyclingFrac = 0.0;
 
             if (GeneratorInletNode > 0) {
                 PlantUtilities::SafeCopyPlantNode(GeneratorInletNode, GeneratorOutletNode);
@@ -2300,28 +2300,28 @@ namespace ChillerIndirectAbsorption {
             DataLoopNode::Node(EvapOutletNode).Temp = EvapOutletTemp;
             DataLoopNode::Node(CondOutletNode).Temp = CondOutletTemp;
 
-            IndirectAbsorberReport(Num).PumpingPower = PumpingPower;
-            IndirectAbsorberReport(Num).QEvap = QEvaporator;
-            IndirectAbsorberReport(Num).QCond = QCondenser;
-            IndirectAbsorberReport(Num).QGenerator = QGenerator;
-            IndirectAbsorberReport(Num).PumpingEnergy = PumpingEnergy;
-            IndirectAbsorberReport(Num).EvapEnergy = EvaporatorEnergy;
-            IndirectAbsorberReport(Num).CondEnergy = CondenserEnergy;
-            IndirectAbsorberReport(Num).GeneratorEnergy = GeneratorEnergy;
-            IndirectAbsorberReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            IndirectAbsorberReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
-            IndirectAbsorberReport(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorberReport(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
-            IndirectAbsorberReport(Num).Evapmdot = EvapMassFlowRate;
-            IndirectAbsorberReport(Num).Condmdot = CondMassFlowRate;
-            IndirectAbsorberReport(Num).Genmdot = GenMassFlowRate;
-            IndirectAbsorberReport(Num).LoopLoss = EnergyLossToEnvironment;
-            IndirectAbsorberReport(Num).ChillerCyclingFrac = ChillerONOFFCyclingFrac;
+            IndirectAbsorberReport(ChillNum).PumpingPower = PumpingPower;
+            IndirectAbsorberReport(ChillNum).QEvap = QEvaporator;
+            IndirectAbsorberReport(ChillNum).QCond = QCondenser;
+            IndirectAbsorberReport(ChillNum).QGenerator = QGenerator;
+            IndirectAbsorberReport(ChillNum).PumpingEnergy = PumpingEnergy;
+            IndirectAbsorberReport(ChillNum).EvapEnergy = EvaporatorEnergy;
+            IndirectAbsorberReport(ChillNum).CondEnergy = CondenserEnergy;
+            IndirectAbsorberReport(ChillNum).GeneratorEnergy = GeneratorEnergy;
+            IndirectAbsorberReport(ChillNum).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            IndirectAbsorberReport(ChillNum).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            IndirectAbsorberReport(ChillNum).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            IndirectAbsorberReport(ChillNum).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
+            IndirectAbsorberReport(ChillNum).Evapmdot = EvapMassFlowRate;
+            IndirectAbsorberReport(ChillNum).Condmdot = CondMassFlowRate;
+            IndirectAbsorberReport(ChillNum).Genmdot = GenMassFlowRate;
+            IndirectAbsorberReport(ChillNum).LoopLoss = EnergyLossToEnvironment;
+            IndirectAbsorberReport(ChillNum).ChillerCyclingFrac = ChillerONOFFCyclingFrac;
 
             if (QGenerator != 0.0) {
-                IndirectAbsorberReport(Num).ActualCOP = QEvaporator / QGenerator;
+                IndirectAbsorberReport(ChillNum).ActualCOP = QEvaporator / QGenerator;
             } else {
-                IndirectAbsorberReport(Num).ActualCOP = 0.0;
+                IndirectAbsorberReport(ChillNum).ActualCOP = 0.0;
             }
 
             if (GeneratorInletNode > 0) {

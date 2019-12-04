@@ -81,7 +81,7 @@ namespace ChillerIndirectAbsorption {
     extern Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
     extern Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
     extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
-    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
+//    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
 
@@ -156,6 +156,7 @@ namespace ChillerIndirectAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
+        Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -171,7 +172,7 @@ namespace ChillerIndirectAbsorption {
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),
-              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false)
+              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), ChillerONOFFCyclingFrac(0.0)
         {
         }
     };
