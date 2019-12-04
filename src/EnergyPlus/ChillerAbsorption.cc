@@ -265,7 +265,6 @@ namespace ChillerAbsorption {
         int NumAlphas;                        // Number of elements in the alpha array
         int NumNums;                          // Number of elements in the numeric array
         int IOStat;                           // IO Status when calling get input subroutine
-        Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
         static bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
@@ -282,7 +281,6 @@ namespace ChillerAbsorption {
         // ALLOCATE ARRAYS
         BLASTAbsorber.allocate(NumBLASTAbsorbers);
         CheckEquipName.dimension(NumBLASTAbsorbers, true);
-        GenInputOutputNodesUsed.dimension(NumBLASTAbsorbers, false);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum) {
@@ -345,7 +343,7 @@ namespace ChillerAbsorption {
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                GenInputOutputNodesUsed(AbsorberNum) = true;
+                BLASTAbsorber(AbsorberNum).GenInputOutputNodesUsed = true;
                 if (BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     BLASTAbsorber(AbsorberNum).GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
                                                                                          ErrorsFound,
@@ -467,168 +465,167 @@ namespace ChillerAbsorption {
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
+    }
 
-        for (AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum) {
-            SetupOutputVariable("Chiller Electric Power",
+    void BLASTAbsorberSpecs::setupOutputVars()
+    {
+        SetupOutputVariable("Chiller Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->Report.PumpingPower,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->Report.PumpingEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ELECTRICITY",
+                            "Cooling",
+                            _,
+                            "Plant");
+        SetupOutputVariable("Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.QEvap,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+                            OutputProcessor::Unit::J,
+                            this->Report.EvapEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "CHILLERS",
+                            _,
+                            "Plant");
+        SetupOutputVariable("Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.EvapInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.EvapOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.Evapmdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.QCond,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->Report.CondEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "HEATREJECTION",
+                            _,
+                            "Plant");
+        SetupOutputVariable("Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.CondInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Condenser Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.CondOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Chiller Condenser Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.Condmdot,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            SetupOutputVariable("Chiller Hot Water Consumption Rate",
                                 OutputProcessor::Unit::W,
-                                BLASTAbsorber(AbsorberNum).Report.PumpingPower,
+                                this->Report.QGenerator,
                                 "System",
                                 "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Electric Energy",
+                                this->Name);
+            SetupOutputVariable("Chiller Source Hot Water Energy",
                                 OutputProcessor::Unit::J,
-                                BLASTAbsorber(AbsorberNum).Report.PumpingEnergy,
+                                this->Report.GeneratorEnergy,
                                 "System",
                                 "Sum",
-                                BLASTAbsorber(AbsorberNum).Name,
+                                this->Name,
                                 _,
-                                "ELECTRICITY",
-                                "Cooling",
-                                _,
-                                "Plant");
-            SetupOutputVariable("Chiller Evaporator Cooling Rate",
-                                OutputProcessor::Unit::W,
-                                BLASTAbsorber(AbsorberNum).Report.QEvap,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Evaporator Cooling Energy",
-                                OutputProcessor::Unit::J,
-                                BLASTAbsorber(AbsorberNum).Report.EvapEnergy,
-                                "System",
-                                "Sum",
-                                BLASTAbsorber(AbsorberNum).Name,
-                                _,
-                                "ENERGYTRANSFER",
+                                "PLANTLOOPHEATINGDEMAND",
                                 "CHILLERS",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Chiller Evaporator Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                BLASTAbsorber(AbsorberNum).Report.EvapInletTemp,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Evaporator Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                BLASTAbsorber(AbsorberNum).Report.EvapOutletTemp,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                BLASTAbsorber(AbsorberNum).Report.Evapmdot,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-
-            SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                BLASTAbsorber(AbsorberNum).Report.QCond,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                BLASTAbsorber(AbsorberNum).Report.CondEnergy,
-                                "System",
-                                "Sum",
-                                BLASTAbsorber(AbsorberNum).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HEATREJECTION",
-                                _,
-                                "Plant");
-            SetupOutputVariable("Chiller Condenser Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                BLASTAbsorber(AbsorberNum).Report.CondInletTemp,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                BLASTAbsorber(AbsorberNum).Report.CondOutletTemp,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-            SetupOutputVariable("Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                BLASTAbsorber(AbsorberNum).Report.Condmdot,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-
-            if (BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                SetupOutputVariable("Chiller Hot Water Consumption Rate",
+        } else {
+            if (this->GenInputOutputNodesUsed) {
+                SetupOutputVariable("Chiller Source Steam Rate",
                                     OutputProcessor::Unit::W,
-                                    BLASTAbsorber(AbsorberNum).Report.QGenerator,
+                                    this->Report.QGenerator,
                                     "System",
                                     "Average",
-                                    BLASTAbsorber(AbsorberNum).Name);
-                SetupOutputVariable("Chiller Source Hot Water Energy",
+                                    this->Name);
+                SetupOutputVariable("Chiller Source Steam Energy",
                                     OutputProcessor::Unit::J,
-                                    BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
+                                    this->Report.GeneratorEnergy,
                                     "System",
                                     "Sum",
-                                    BLASTAbsorber(AbsorberNum).Name,
+                                    this->Name,
                                     _,
                                     "PLANTLOOPHEATINGDEMAND",
                                     "CHILLERS",
                                     _,
                                     "Plant");
             } else {
-                if (GenInputOutputNodesUsed(AbsorberNum)) {
-                    SetupOutputVariable("Chiller Source Steam Rate",
-                                        OutputProcessor::Unit::W,
-                                        BLASTAbsorber(AbsorberNum).Report.QGenerator,
-                                        "System",
-                                        "Average",
-                                        BLASTAbsorber(AbsorberNum).Name);
-                    SetupOutputVariable("Chiller Source Steam Energy",
-                                        OutputProcessor::Unit::J,
-                                        BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
-                                        "System",
-                                        "Sum",
-                                        BLASTAbsorber(AbsorberNum).Name,
-                                        _,
-                                        "PLANTLOOPHEATINGDEMAND",
-                                        "CHILLERS",
-                                        _,
-                                        "Plant");
-                } else {
-                    SetupOutputVariable("Chiller Source Steam Rate",
-                                        OutputProcessor::Unit::W,
-                                        BLASTAbsorber(AbsorberNum).Report.QGenerator,
-                                        "System",
-                                        "Average",
-                                        BLASTAbsorber(AbsorberNum).Name);
-                    SetupOutputVariable("Chiller Source Steam Energy",
-                                        OutputProcessor::Unit::J,
-                                        BLASTAbsorber(AbsorberNum).Report.GeneratorEnergy,
-                                        "System",
-                                        "Sum",
-                                        BLASTAbsorber(AbsorberNum).Name,
-                                        _,
-                                        "Steam",
-                                        "Cooling",
-                                        _,
-                                        "Plant");
-                }
-            }
-
-            SetupOutputVariable("Chiller COP",
-                                OutputProcessor::Unit::W_W,
-                                BLASTAbsorber(AbsorberNum).Report.ActualCOP,
-                                "System",
-                                "Average",
-                                BLASTAbsorber(AbsorberNum).Name);
-
-            if (DataGlobals::AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable("Chiller Nominal Capacity", BLASTAbsorber(AbsorberNum).Name, "[W]", BLASTAbsorber(AbsorberNum).NomCap);
+                SetupOutputVariable("Chiller Source Steam Rate",
+                                    OutputProcessor::Unit::W,
+                                    this->Report.QGenerator,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+                SetupOutputVariable("Chiller Source Steam Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->Report.GeneratorEnergy,
+                                    "System",
+                                    "Sum",
+                                    this->Name,
+                                    _,
+                                    "Steam",
+                                    "Cooling",
+                                    _,
+                                    "Plant");
             }
         }
 
-        if (allocated(GenInputOutputNodesUsed)) GenInputOutputNodesUsed.deallocate();
+        SetupOutputVariable("Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->Report.ActualCOP,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
+        }
     }
 
     void BLASTAbsorberSpecs::InitBLASTAbsorberModel(bool const RunFlag, // TRUE when chiller operating
@@ -651,6 +648,9 @@ namespace ChillerAbsorption {
 
         // Init more variables
         if (this->MyOneTimeFlag) {
+
+            this->setupOutputVars();
+
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
