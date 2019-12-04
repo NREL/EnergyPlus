@@ -116,7 +116,6 @@ namespace ChillerIndirectAbsorption {
 
     int NumIndirectAbsorbers(0);         // number of Absorption Chillers specified in input
     Real64 EnergyLossToEnvironment(0.0); // J - piping energy loss from generator outlet to pump inlet
-    Real64 ChillerONOFFCyclingFrac(0.0); // fraction of time chiller is on
 
     bool GetInput(true); // when TRUE, calls subroutine to read input file.
 
@@ -127,7 +126,6 @@ namespace ChillerIndirectAbsorption {
     {
         NumIndirectAbsorbers = 0;
         EnergyLossToEnvironment = 0.0;
-        ChillerONOFFCyclingFrac = 0.0;
         IndirectAbsorber.deallocate();
         IndirectAbsorberReport.deallocate();
     }
@@ -1716,7 +1714,7 @@ namespace ChillerIndirectAbsorption {
         IndirectAbsorber(ChillNum).EvaporatorEnergy = 0.0;
         IndirectAbsorber(ChillNum).GeneratorEnergy = 0.0;
         IndirectAbsorber(ChillNum).PumpingPower = 0.0;
-        ChillerONOFFCyclingFrac = 0.0;
+        IndirectAbsorber(ChillNum).ChillerONOFFCyclingFrac = 0.0;
         EvapInletNode = IndirectAbsorber(ChillNum).EvapInletNodeNum;
         EvapOutletNode = IndirectAbsorber(ChillNum).EvapOutletNodeNum;
         CondInletNode = IndirectAbsorber(ChillNum).CondInletNodeNum;
@@ -2017,7 +2015,7 @@ namespace ChillerIndirectAbsorption {
             FRAC = 1.0;
         }
 
-        ChillerONOFFCyclingFrac = FRAC;
+        IndirectAbsorber(ChillNum).ChillerONOFFCyclingFrac = FRAC;
 
         if (GeneratorInletNode > 0) {
             if (IndirectAbsorber(ChillNum).HeatInputFCondTempPtr > 0) {
@@ -2286,7 +2284,7 @@ namespace ChillerIndirectAbsorption {
             IndirectAbsorberReport(ChillNum).Condmdot = IndirectAbsorber(ChillNum).CondMassFlowRate;
             IndirectAbsorberReport(ChillNum).Genmdot = IndirectAbsorber(ChillNum).GenMassFlowRate;
             IndirectAbsorberReport(ChillNum).LoopLoss = EnergyLossToEnvironment;
-            IndirectAbsorberReport(ChillNum).ChillerCyclingFrac = ChillerONOFFCyclingFrac;
+            IndirectAbsorberReport(ChillNum).ChillerCyclingFrac = IndirectAbsorber(ChillNum).ChillerONOFFCyclingFrac;
 
             if (IndirectAbsorber(ChillNum).QGenerator != 0.0) {
                 IndirectAbsorberReport(ChillNum).ActualCOP = IndirectAbsorber(ChillNum).QEvaporator / IndirectAbsorber(ChillNum).QGenerator;

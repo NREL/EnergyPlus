@@ -65,8 +65,9 @@ namespace ChillerIndirectAbsorption {
     extern int const LeavingSetPointModulated;
 
     extern int NumIndirectAbsorbers;       // number of Absorption Chillers specified in input
+
+    // moving this to a member variable caused math diffs...
     extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
-    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
 
@@ -83,7 +84,7 @@ namespace ChillerIndirectAbsorption {
         Real64 CondVolFlowRate;           // m3/s - design nominal water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized; // true if condenser flow rate was autosize on input
         Real64 EvapMassFlowRateMax;       // kg/s - Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-        Real64 CondMassFlowRateMax;       // Max Design Condeneser Mass Flow Rate [kg/s]
+        Real64 CondMassFlowRateMax;       // Max Design Condenesor Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax;        // kg/s - Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 MinPartLoadRat;            // (BLAST MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat;            // (BLAST MAX) max allowed operating frac full load
@@ -118,7 +119,7 @@ namespace ChillerIndirectAbsorption {
         int SteamFluidIndex;                   // index to generator fluid type
         bool Available;                        // need an array of logicals--load identifiers of available equipment
         bool ON;                               // simulate the machine at it's operating part load ratio
-        int FlowMode;                          // one of 3 modes for componet flow during operation
+        int FlowMode;                          // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;           // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;             // true if setpoint warning issued
         int MinCondInletTempCtr;               // Low condenser temp warning message counter
@@ -156,6 +157,7 @@ namespace ChillerIndirectAbsorption {
         Real64 EvaporatorEnergy;        // J - heat transfer to the evaporator coil
         Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
         Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
+        Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -174,7 +176,7 @@ namespace ChillerIndirectAbsorption {
               FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0),
               GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
               PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0)
+              CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0)
         {
         }
     };
