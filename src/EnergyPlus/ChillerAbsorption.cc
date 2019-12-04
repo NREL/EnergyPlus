@@ -118,7 +118,7 @@ namespace ChillerAbsorption {
     static std::string const calcChillerAbsorption("CALC Chiller:Absorption ");
 
     int numBlastAbsorbers(0); // number of Absorption Chillers specified in input
-    bool getInput(true); // when TRUE, calls subroutine to read input file.
+    bool getInput(true);      // when TRUE, calls subroutine to read input file.
     Array1D_bool CheckEquipName;
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
 
@@ -185,8 +185,8 @@ namespace ChillerAbsorption {
                                                                         FirstHVACIteration);
 
         } else {
-            ShowFatalError("SimBLASTAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) + ", Unit name=" + this->Name +
-                           ", stored chilled water loop=" + General::TrimSigDigits(this->CWLoopNum) +
+            ShowFatalError("SimBLASTAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) +
+                           ", Unit name=" + this->Name + ", stored chilled water loop=" + General::TrimSigDigits(this->CWLoopNum) +
                            ", stored condenser water loop=" + General::TrimSigDigits(this->CDLoopNum) +
                            ", stored generator loop=" + General::TrimSigDigits(this->GenLoopNum));
         }
@@ -244,10 +244,10 @@ namespace ChillerAbsorption {
 
         static std::string const RoutineName("GetBLASTAbsorberInput: "); // include trailing blank space
 
-        int AbsorberNum;                      // Absorber counter
-        int NumAlphas;                        // Number of elements in the alpha array
-        int NumNums;                          // Number of elements in the numeric array
-        int IOStat;                           // IO Status when calling get input subroutine
+        int AbsorberNum; // Absorber counter
+        int NumAlphas;   // Number of elements in the alpha array
+        int NumNums;     // Number of elements in the numeric array
+        int IOStat;      // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
@@ -281,7 +281,8 @@ namespace ChillerAbsorption {
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueChillerName(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueChillerName(
+                DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
             BLASTAbsorber(AbsorberNum).Name = DataIPShortCuts::cAlphaArgs(1);
             BLASTAbsorber(AbsorberNum).NomCap = DataIPShortCuts::rNumericArgs(1);
@@ -293,25 +294,59 @@ namespace ChillerAbsorption {
                 BLASTAbsorber(AbsorberNum).NomPumpPowerWasAutoSized = true;
             }
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ErrorsFound = true;
             }
             // Assign Node Numbers to specified nodes
-            BLASTAbsorber(AbsorberNum).EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            BLASTAbsorber(AbsorberNum).EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(3), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3), "Chilled Water Nodes");
+            BLASTAbsorber(AbsorberNum).EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                                                              ErrorsFound,
+                                                                                              DataIPShortCuts::cCurrentModuleObject,
+                                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
+            BLASTAbsorber(AbsorberNum).EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                                                               ErrorsFound,
+                                                                                               DataIPShortCuts::cCurrentModuleObject,
+                                                                                               DataIPShortCuts::cAlphaArgs(1),
+                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               1,
+                                                                                               DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                               DataIPShortCuts::cAlphaArgs(1),
+                                               DataIPShortCuts::cAlphaArgs(2),
+                                               DataIPShortCuts::cAlphaArgs(3),
+                                               "Chilled Water Nodes");
 
-            BLASTAbsorber(AbsorberNum).CondInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(4), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 2, DataLoopNode::ObjectIsNotParent);
-            BLASTAbsorber(AbsorberNum).CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(5), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5), "Condenser (not tested) Nodes");
+            BLASTAbsorber(AbsorberNum).CondInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                                                                                              ErrorsFound,
+                                                                                              DataIPShortCuts::cCurrentModuleObject,
+                                                                                              DataIPShortCuts::cAlphaArgs(1),
+                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeConnectionType_Inlet,
+                                                                                              2,
+                                                                                              DataLoopNode::ObjectIsNotParent);
+            BLASTAbsorber(AbsorberNum).CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
+                                                                                               ErrorsFound,
+                                                                                               DataIPShortCuts::cCurrentModuleObject,
+                                                                                               DataIPShortCuts::cAlphaArgs(1),
+                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeConnectionType_Outlet,
+                                                                                               2,
+                                                                                               DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                               DataIPShortCuts::cAlphaArgs(1),
+                                               DataIPShortCuts::cAlphaArgs(4),
+                                               DataIPShortCuts::cAlphaArgs(5),
+                                               "Condenser (not tested) Nodes");
 
             if (NumAlphas > 8) {
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater") || UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater")) {
+                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater") ||
+                    UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater")) {
                     BLASTAbsorber(AbsorberNum).GenHeatSourceType = DataLoopNode::NodeType_Water;
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Steam") || DataIPShortCuts::cAlphaArgs(9).empty()) {
                     BLASTAbsorber(AbsorberNum).GenHeatSourceType = DataLoopNode::NodeType_Steam;
@@ -329,43 +364,52 @@ namespace ChillerAbsorption {
                 BLASTAbsorber(AbsorberNum).GenInputOutputNodesUsed = true;
                 if (BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     BLASTAbsorber(AbsorberNum).GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
-                                                                                         ErrorsFound,
-                                                                                         DataIPShortCuts::cCurrentModuleObject,
-                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
-                                                                                         3,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                                                                                                           ErrorsFound,
+                                                                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                                                                           DataLoopNode::NodeType_Water,
+                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           3,
+                                                                                                           DataLoopNode::ObjectIsNotParent);
                     BLASTAbsorber(AbsorberNum).GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
-                                                                                          ErrorsFound,
-                                                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                          DataLoopNode::NodeType_Water,
-                                                                                          DataLoopNode::NodeConnectionType_Outlet,
-                                                                                          3,
-                                                                                          DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(6), DataIPShortCuts::cAlphaArgs(7), "Hot Water Nodes");
+                                                                                                            ErrorsFound,
+                                                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                                                            DataLoopNode::NodeType_Water,
+                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            3,
+                                                                                                            DataLoopNode::ObjectIsNotParent);
+                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                                       DataIPShortCuts::cAlphaArgs(1),
+                                                       DataIPShortCuts::cAlphaArgs(6),
+                                                       DataIPShortCuts::cAlphaArgs(7),
+                                                       "Hot Water Nodes");
                 } else {
                     BLASTAbsorber(AbsorberNum).SteamFluidIndex = FluidProperties::FindRefrigerant("STEAM");
                     BLASTAbsorber(AbsorberNum).GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
-                                                                                         ErrorsFound,
-                                                                                         DataIPShortCuts::cCurrentModuleObject,
-                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Steam,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
-                                                                                         3,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                                                                                                           ErrorsFound,
+                                                                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                                                                           DataLoopNode::NodeType_Steam,
+                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                           3,
+                                                                                                           DataLoopNode::ObjectIsNotParent);
                     BLASTAbsorber(AbsorberNum).GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
-                                                                                          ErrorsFound,
-                                                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                          DataLoopNode::NodeType_Steam,
-                                                                                          DataLoopNode::NodeConnectionType_Outlet,
-                                                                                          3,
-                                                                                          DataLoopNode::ObjectIsNotParent);
-                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(6), DataIPShortCuts::cAlphaArgs(7), "Steam Nodes");
+                                                                                                            ErrorsFound,
+                                                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                                                            DataLoopNode::NodeType_Steam,
+                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                            3,
+                                                                                                            DataLoopNode::ObjectIsNotParent);
+                    BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                                       DataIPShortCuts::cAlphaArgs(1),
+                                                       DataIPShortCuts::cAlphaArgs(6),
+                                                       DataIPShortCuts::cAlphaArgs(7),
+                                                       "Steam Nodes");
                 }
-            } else if ((DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) || (!DataIPShortCuts::lAlphaFieldBlanks(6) && DataIPShortCuts::lAlphaFieldBlanks(7))) {
+            } else if ((DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) ||
+                       (!DataIPShortCuts::lAlphaFieldBlanks(6) && DataIPShortCuts::lAlphaFieldBlanks(7))) {
                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("...Generator fluid nodes must both be entered (or both left blank).");
                 ShowContinueError("..." + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
@@ -425,8 +469,10 @@ namespace ChillerAbsorption {
                 }
             }
 
-            if (BLASTAbsorber(AbsorberNum).GeneratorVolFlowRate == 0.0 && BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(16) + '=' + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(16), 2));
+            if (BLASTAbsorber(AbsorberNum).GeneratorVolFlowRate == 0.0 &&
+                BLASTAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(16) + '=' +
+                                General::RoundSigDigits(DataIPShortCuts::rNumericArgs(16), 2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
                 ErrorsFound = true;
@@ -452,12 +498,7 @@ namespace ChillerAbsorption {
 
     void BLASTAbsorberSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Chiller Electric Power",
-                            OutputProcessor::Unit::W,
-                            this->Report.PumpingPower,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Electric Energy",
                             OutputProcessor::Unit::J,
                             this->Report.PumpingEnergy,
@@ -469,12 +510,7 @@ namespace ChillerAbsorption {
                             "Cooling",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Cooling Rate",
-                            OutputProcessor::Unit::W,
-                            this->Report.QEvap,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->Report.QEvap, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->Report.EvapEnergy,
@@ -486,31 +522,13 @@ namespace ChillerAbsorption {
                             "CHILLERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Evaporator Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->Report.EvapInletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Chiller Evaporator Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->Report.EvapOutletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->Report.Evapmdot,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->Report.EvapInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->Report.EvapOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Evapmdot, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->Report.QCond,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.QCond, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->Report.CondEnergy,
@@ -522,32 +540,15 @@ namespace ChillerAbsorption {
                             "HEATREJECTION",
                             _,
                             "Plant");
-        SetupOutputVariable("Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->Report.CondInletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Chiller Condenser Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->Report.CondOutletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Chiller Condenser Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->Report.Condmdot,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->Report.CondInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->Report.CondOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Condmdot, "System", "Average", this->Name);
 
         if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
-            SetupOutputVariable("Chiller Hot Water Consumption Rate",
-                                OutputProcessor::Unit::W,
-                                this->Report.QGenerator,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
             SetupOutputVariable("Chiller Source Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
@@ -561,12 +562,7 @@ namespace ChillerAbsorption {
                                 "Plant");
         } else {
             if (this->GenInputOutputNodesUsed) {
-                SetupOutputVariable("Chiller Source Steam Rate",
-                                    OutputProcessor::Unit::W,
-                                    this->Report.QGenerator,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable("Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
                 SetupOutputVariable("Chiller Source Steam Energy",
                                     OutputProcessor::Unit::J,
                                     this->Report.GeneratorEnergy,
@@ -579,12 +575,7 @@ namespace ChillerAbsorption {
                                     _,
                                     "Plant");
             } else {
-                SetupOutputVariable("Chiller Source Steam Rate",
-                                    OutputProcessor::Unit::W,
-                                    this->Report.QGenerator,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable("Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
                 SetupOutputVariable("Chiller Source Steam Energy",
                                     OutputProcessor::Unit::J,
                                     this->Report.GeneratorEnergy,
@@ -599,12 +590,7 @@ namespace ChillerAbsorption {
             }
         }
 
-        SetupOutputVariable("Chiller COP",
-                            OutputProcessor::Unit::W_W,
-                            this->Report.ActualCOP,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->Report.ActualCOP, "System", "Average", this->Name);
 
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
@@ -612,7 +598,7 @@ namespace ChillerAbsorption {
     }
 
     void BLASTAbsorberSpecs::initialize(bool RunFlag, // TRUE when chiller operating
-                                Real64 MyLoad)
+                                        Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -637,92 +623,73 @@ namespace ChillerAbsorption {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    DataPlant::TypeOf_Chiller_Absorption,
-                                    this->CWLoopNum,
-                                    this->CWLoopSideNum,
-                                    this->CWBranchNum,
-                                    this->CWCompNum,
-                                    errFlag,
-                                    this->TempLowLimitEvapOut,
-                                    _,
-                                    _,
-                                    this->EvapInletNodeNum,
-                                    _);
+                                                    DataPlant::TypeOf_Chiller_Absorption,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    this->TempLowLimitEvapOut,
+                                                    _,
+                                                    _,
+                                                    this->EvapInletNodeNum,
+                                                    _);
             if (this->CondInletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        DataPlant::TypeOf_Chiller_Absorption,
-                                        this->CDLoopNum,
-                                        this->CDLoopSideNum,
-                                        this->CDBranchNum,
-                                        this->CDCompNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        this->CondInletNodeNum,
-                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
-                                              this->CWLoopSideNum,
-                                              this->CDLoopNum,
-                                              this->CDLoopSideNum,
-                                              DataPlant::TypeOf_Chiller_Absorption,
-                                              true);
+                                                        DataPlant::TypeOf_Chiller_Absorption,
+                                                        this->CDLoopNum,
+                                                        this->CDLoopSideNum,
+                                                        this->CDBranchNum,
+                                                        this->CDCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->CondInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
             if (this->GeneratorInletNodeNum > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        DataPlant::TypeOf_Chiller_Absorption,
-                                        this->GenLoopNum,
-                                        this->GenLoopSideNum,
-                                        this->GenBranchNum,
-                                        this->GenCompNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        this->GeneratorInletNodeNum,
-                                        _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
-                                              this->CWLoopSideNum,
-                                              this->GenLoopNum,
-                                              this->GenCompNum,
-                                              DataPlant::TypeOf_Chiller_Absorption,
-                                              true);
+                                                        DataPlant::TypeOf_Chiller_Absorption,
+                                                        this->GenLoopNum,
+                                                        this->GenLoopSideNum,
+                                                        this->GenBranchNum,
+                                                        this->GenCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->GeneratorInletNodeNum,
+                                                        _);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
 
             // Fill in connection data
             if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(this->CDLoopNum,
-                                              this->CDLoopSideNum,
-                                              this->GenLoopNum,
-                                              this->GenCompNum,
-                                              DataPlant::TypeOf_Chiller_Absorption,
-                                              false);
+                PlantUtilities::InterConnectTwoPlantLoopSides(
+                    this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Absorption, false);
             }
             if (errFlag) {
                 ShowFatalError("InitBLASTAbsorberModel: Program terminated due to previous condition(s).");
             }
 
             if (this->FlowMode == ConstantFlow) {
-                DataPlant::PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                    DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
             if (this->FlowMode == LeavingSetPointModulated) {
-                DataPlant::PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+                DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                    DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                             this->Name);
+                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
@@ -734,8 +701,7 @@ namespace ChillerAbsorption {
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                                 this->Name);
+                                ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                                 ShowContinueError(
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -760,80 +726,80 @@ namespace ChillerAbsorption {
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
-                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
-                                   RoutineName);
+                                                           DataGlobals::CWInitConvTemp,
+                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           RoutineName);
 
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
 
             PlantUtilities::InitComponentNodes(0.0,
-                               this->EvapMassFlowRateMax,
-                               this->EvapInletNodeNum,
-                               this->EvapOutletNodeNum,
-                               this->CWLoopNum,
-                               this->CWLoopSideNum,
-                               this->CWBranchNum,
-                               this->CWCompNum);
+                                               this->EvapMassFlowRateMax,
+                                               this->EvapInletNodeNum,
+                                               this->EvapOutletNodeNum,
+                                               this->CWLoopNum,
+                                               this->CWLoopSideNum,
+                                               this->CWBranchNum,
+                                               this->CWCompNum);
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                   DataGlobals::CWInitConvTemp,
-                                   DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
-                                   RoutineName);
+                                                    DataGlobals::CWInitConvTemp,
+                                                    DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                    RoutineName);
 
             this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
             PlantUtilities::InitComponentNodes(0.0,
-                               this->CondMassFlowRateMax,
-                               this->CondInletNodeNum,
-                               this->CondOutletNodeNum,
-                               this->CDLoopNum,
-                               this->CDLoopSideNum,
-                               this->CDBranchNum,
-                               this->CDCompNum);
+                                               this->CondMassFlowRateMax,
+                                               this->CondInletNodeNum,
+                                               this->CondOutletNodeNum,
+                                               this->CDLoopNum,
+                                               this->CDLoopSideNum,
+                                               this->CDBranchNum,
+                                               this->CDCompNum);
             DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
 
             if (this->GeneratorInletNodeNum > 0) {
 
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
-                                           DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
-                                           RoutineName);
+                                                            DataGlobals::HWInitConvTemp,
+                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                            RoutineName);
 
                     this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
                 } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
 
-                    this->QGenerator = (this->SteamLoadCoef(1) + this->SteamLoadCoef(2) +
-                                  this->SteamLoadCoef(3)) * this->NomCap;
+                    this->QGenerator = (this->SteamLoadCoef(1) + this->SteamLoadCoef(2) + this->SteamLoadCoef(3)) * this->NomCap;
 
                     // dry enthalpy of steam (quality = 1)
                     Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                           DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
-                                                           1.0,
-                                                           this->SteamFluidIndex,
-                                                           calcChillerAbsorption + this->Name);
+                                                                                   DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                                   1.0,
+                                                                                   this->SteamFluidIndex,
+                                                                                   calcChillerAbsorption + this->Name);
 
                     // wet enthalpy of steam (quality = 0)
                     Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                           DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
-                                                           0.0,
-                                                           this->SteamFluidIndex,
-                                                           calcChillerAbsorption + this->Name);
+                                                                                   DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                                   0.0,
+                                                                                   this->SteamFluidIndex,
+                                                                                   calcChillerAbsorption + this->Name);
                     Real64 SteamDeltaT = this->GeneratorSubcool;
                     Real64 SteamOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
                     Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-                    Real64 CpWater = FluidProperties::GetDensityGlycol(fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+                    Real64 CpWater = FluidProperties::GetDensityGlycol(
+                        fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
                     this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
                 }
 
                 PlantUtilities::InitComponentNodes(0.0,
-                                   this->GenMassFlowRateMax,
-                                   this->GeneratorInletNodeNum,
-                                   this->GeneratorOutletNodeNum,
-                                   this->GenLoopNum,
-                                   this->GenLoopSideNum,
-                                   this->GenBranchNum,
-                                   this->GenCompNum);
+                                                   this->GenMassFlowRateMax,
+                                                   this->GeneratorInletNodeNum,
+                                                   this->GeneratorOutletNodeNum,
+                                                   this->GenLoopNum,
+                                                   this->GenLoopSideNum,
+                                                   this->GenBranchNum,
+                                                   this->GenCompNum);
             }
 
             this->MyEnvrnFlag = false;
@@ -867,31 +833,21 @@ namespace ChillerAbsorption {
             mdotGen = 0.0;
         }
 
-        PlantUtilities::SetComponentFlowRate(mdotEvap,
-                             this->EvapInletNodeNum,
-                             this->EvapOutletNodeNum,
-                             this->CWLoopNum,
-                             this->CWLoopSideNum,
-                             this->CWBranchNum,
-                             this->CWCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
-        PlantUtilities::SetComponentFlowRate(mdotCond,
-                             this->CondInletNodeNum,
-                             this->CondOutletNodeNum,
-                             this->CDLoopNum,
-                             this->CDLoopSideNum,
-                             this->CDBranchNum,
-                             this->CDCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
 
         if (this->GeneratorInletNodeNum > 0) {
 
             PlantUtilities::SetComponentFlowRate(mdotGen,
-                                 this->GeneratorInletNodeNum,
-                                 this->GeneratorOutletNodeNum,
-                                 this->GenLoopNum,
-                                 this->GenLoopSideNum,
-                                 this->GenBranchNum,
-                                 this->GenCompNum);
+                                                 this->GeneratorInletNodeNum,
+                                                 this->GeneratorOutletNodeNum,
+                                                 this->GenLoopNum,
+                                                 this->GenLoopSideNum,
+                                                 this->GenBranchNum,
+                                                 this->GenCompNum);
         }
     }
 
@@ -914,14 +870,14 @@ namespace ChillerAbsorption {
         // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-//        Real64 SteamMassFlowRate; // steam mass flow rate through generator
+        //        Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
         static std::string const RoutineName("SizeAbsorpChiller");
         static std::string const RoutineNameLong("SizeAbsorptionChiller");
 
-        int PltSizSteamNum(0);      // Plant Sizing index for steam heating loop
-        int PltSizHeatingNum(0);    // Plant Sizing index for how water heating loop
-        bool ErrorsFound(false);    // If errors detected in input
+        int PltSizSteamNum(0);   // Plant Sizing index for steam heating loop
+        int PltSizHeatingNum(0); // Plant Sizing index for how water heating loop
+        bool ErrorsFound(false); // If errors detected in input
         bool LoopErrorsFound;
 
         // nominal energy input ratio (steam or hot water)
@@ -946,11 +902,8 @@ namespace ChillerAbsorption {
 
         if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
-                PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(moduleObjectType,
-                                                    this->Name,
-                                                    this->GeneratorInletNodeNum,
-                                                    this->GeneratorOutletNodeNum,
-                                                    LoopErrorsFound);
+                PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(
+                    moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
                 for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
                     if (DataSizing::PlantSizData(PltSizIndex).LoopType == DataSizing::SteamLoop) {
@@ -960,11 +913,8 @@ namespace ChillerAbsorption {
             }
         } else {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
-                PltSizHeatingNum = PlantUtilities::MyPlantSizingIndex(moduleObjectType,
-                                                      this->Name,
-                                                      this->GeneratorInletNodeNum,
-                                                      this->GeneratorOutletNodeNum,
-                                                      LoopErrorsFound);
+                PltSizHeatingNum = PlantUtilities::MyPlantSizingIndex(
+                    moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
                 for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
                     if (DataSizing::PlantSizData(PltSizIndex).LoopType == DataSizing::HeatingLoop) {
@@ -978,14 +928,14 @@ namespace ChillerAbsorption {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::TimeStepSys) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                           DataGlobals::CWInitConvTemp,
-                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
-                                           RoutineName);
+                                                                   DataGlobals::CWInitConvTemp,
+                                                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                   RoutineName);
 
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
-                                       RoutineName);
+                                                               DataGlobals::CWInitConvTemp,
+                                                               DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                               RoutineName);
                 tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
                 if (!this->NomCapWasAutoSized) tmpNomCap = this->NomCap;
             } else {
@@ -1005,16 +955,17 @@ namespace ChillerAbsorption {
                         Real64 NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                               this->Name,
-                                               "Design Size Nominal Capacity [W]",
-                                               tmpNomCap,
-                                               "User-Specified Nominal Capacity [W]",
-                                               NomCapUser);
+                                                                    this->Name,
+                                                                    "Design Size Nominal Capacity [W]",
+                                                                    tmpNomCap,
+                                                                    "User-Specified Nominal Capacity [W]",
+                                                                    NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) + " [W]");
+                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
+                                                      " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1031,8 +982,7 @@ namespace ChillerAbsorption {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && this->NomCap > 0.0) {
-                ReportSizingManager::ReportSizingOutput(
-                    moduleObjectType, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                ReportSizingManager::ReportSizingOutput(moduleObjectType, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -1057,16 +1007,17 @@ namespace ChillerAbsorption {
 
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                           this->Name,
-                                           "Design Size Nominal Pumping Power [W]",
-                                           tmpNomPumpPower,
-                                           "User-Specified Nominal Pumping Power [W]",
-                                           NomPumpPowerUser);
+                                                                this->Name,
+                                                                "Design Size Nominal Pumping Power [W]",
+                                                                tmpNomPumpPower,
+                                                                "User-Specified Nominal Pumping Power [W]",
+                                                                NomPumpPowerUser);
                         if (DataGlobals::DisplayExtraWarnings) {
                             if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError("User-Specified Nominal Pumping Power of " + General::RoundSigDigits(NomPumpPowerUser, 2) + " [W]");
-                                ShowContinueError("differs from Design Size Nominal Pumping Power of " + General::RoundSigDigits(tmpNomPumpPower, 2) + " [W]");
+                                ShowContinueError("differs from Design Size Nominal Pumping Power of " + General::RoundSigDigits(tmpNomPumpPower, 2) +
+                                                  " [W]");
                                 ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1092,10 +1043,8 @@ namespace ChillerAbsorption {
                             moduleObjectType, this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                           this->Name,
-                                           "Initial Design Size Design Chilled Water Flow Rate [m3/s]",
-                                           tmpEvapVolFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            moduleObjectType, this->Name, "Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -1103,16 +1052,17 @@ namespace ChillerAbsorption {
                         Real64 EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                               this->Name,
-                                               "Design Size Design Chilled Water Flow Rate [m3/s]",
-                                               tmpEvapVolFlowRate,
-                                               "User-Specified Design Chilled Water Flow Rate [m3/s]",
-                                               EvapVolFlowRateUser);
+                                                                    this->Name,
+                                                                    "Design Size Design Chilled Water Flow Rate [m3/s]",
+                                                                    tmpEvapVolFlowRate,
+                                                                    "User-Specified Design Chilled Water Flow Rate [m3/s]",
+                                                                    EvapVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
-                                if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
+                                    DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Design Chilled Water Flow Rate of " + General::RoundSigDigits(EvapVolFlowRateUser, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError("User-Specified Design Chilled Water Flow Rate of " +
+                                                      General::RoundSigDigits(EvapVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
                                                       General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -1130,12 +1080,9 @@ namespace ChillerAbsorption {
                 ShowContinueError("Occurs in CHILLER:ABSORPTION object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                this->EvapVolFlowRate > 0.0) {
-                ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                   this->Name,
-                                   "User-Specified Design Chilled Water Flow Rate [m3/s]",
-                                   this->EvapVolFlowRate);
+            if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && this->EvapVolFlowRate > 0.0) {
+                ReportSizingManager::ReportSizingOutput(
+                    moduleObjectType, this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
 
@@ -1146,14 +1093,14 @@ namespace ChillerAbsorption {
                 //       QCondenser = QEvaporator + QGenerator + PumpingPower
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                           this->TempDesCondIn,
-                                           DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
-                                           RoutineName);
+                                                                   this->TempDesCondIn,
+                                                                   DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                                   RoutineName);
 
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                       DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
-                                       RoutineName);
+                                                               DataGlobals::CWInitConvTemp,
+                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                               RoutineName);
                 tmpCondVolFlowRate =
                     tmpNomCap * (1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
                 if (!this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = this->CondVolFlowRate;
@@ -1165,16 +1112,12 @@ namespace ChillerAbsorption {
                 if (this->CondVolFlowRateWasAutoSized) {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                           this->Name,
-                                           "Design Size Design Condenser Water Flow Rate [m3/s]",
-                                           tmpCondVolFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            moduleObjectType, this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                           this->Name,
-                                           "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
-                                           tmpCondVolFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            moduleObjectType, this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
@@ -1182,16 +1125,17 @@ namespace ChillerAbsorption {
                         Real64 CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                               this->Name,
-                                               "Design Size Design Condenser Water Flow Rate [m3/s]",
-                                               tmpCondVolFlowRate,
-                                               "User-Specified Design Condenser Water Flow Rate [m3/s]",
-                                               CondVolFlowRateUser);
+                                                                    this->Name,
+                                                                    "Design Size Design Condenser Water Flow Rate [m3/s]",
+                                                                    tmpCondVolFlowRate,
+                                                                    "User-Specified Design Condenser Water Flow Rate [m3/s]",
+                                                                    CondVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
-                                if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
+                                    DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError("User-Specified Design Condenser Water Flow Rate of " + General::RoundSigDigits(CondVolFlowRateUser, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError("User-Specified Design Condenser Water Flow Rate of " +
+                                                      General::RoundSigDigits(CondVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
                                                       General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -1210,12 +1154,9 @@ namespace ChillerAbsorption {
                 ShowContinueError("Occurs in CHILLER:ABSORPTION object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize &&
-                (this->CondVolFlowRate > 0.0)) {
-                ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                   this->Name,
-                                   "User-Specified Design Condenser Water Flow Rate [m3/s]",
-                                   this->CondVolFlowRate);
+            if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize && (this->CondVolFlowRate > 0.0)) {
+                ReportSizingManager::ReportSizingOutput(
+                    moduleObjectType, this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
 
@@ -1227,31 +1168,28 @@ namespace ChillerAbsorption {
             if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                                    DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp,
-                                                    DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
-                                                    RoutineName);
+                                                                            DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp,
+                                                                            DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                            RoutineName);
                     Real64 SteamDeltaT = max(0.5, DataSizing::PlantSizData(PltSizHeatingNum).DeltaT);
                     Real64 RhoWater = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                                (DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp - SteamDeltaT),
-                                                DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
-                                                RoutineName);
+                                                                        (DataSizing::PlantSizData(PltSizHeatingNum).ExitTemp - SteamDeltaT),
+                                                                        DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                        RoutineName);
                     tmpGeneratorVolFlowRate = (this->NomCap * SteamInputRatNom) / (CpWater * SteamDeltaT * RhoWater);
-                    if (!this->GeneratorVolFlowRateWasAutoSized)
-                        tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
+                    if (!this->GeneratorVolFlowRateWasAutoSized) tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                   this->Name,
-                                                   "Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                   tmpGeneratorVolFlowRate);
+                                ReportSizingManager::ReportSizingOutput(
+                                    moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
                                 ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                   this->Name,
-                                                   "Iniital Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                   tmpGeneratorVolFlowRate);
+                                                                        this->Name,
+                                                                        "Iniital Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                                        tmpGeneratorVolFlowRate);
                             }
                         } else {
                             if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
@@ -1259,16 +1197,15 @@ namespace ChillerAbsorption {
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
                                     ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                       this->Name,
-                                                       "Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                       tmpGeneratorVolFlowRate,
-                                                       "User-Specified Design Generator Fluid Flow Rate [m3/s]",
-                                                       GeneratorVolFlowRateUser);
+                                                                            this->Name,
+                                                                            "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                                            tmpGeneratorVolFlowRate,
+                                                                            "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                                            GeneratorVolFlowRateUser);
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " +
-                                                        this->Name);
+                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
                                             ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +
@@ -1288,39 +1225,30 @@ namespace ChillerAbsorption {
                     Real64 SteamDeltaT = DataSizing::PlantSizData(PltSizSteamNum).DeltaT;
                     Real64 GeneratorOutletTemp = DataSizing::PlantSizData(PltSizSteamNum).ExitTemp - SteamDeltaT;
 
-                    Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                           DataSizing::PlantSizData(PltSizSteamNum).ExitTemp,
-                                                           1.0,
-                                                           this->SteamFluidIndex,
-                                                           moduleObjectType + this->Name);
-                    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                           DataSizing::PlantSizData(PltSizSteamNum).ExitTemp,
-                                                           0.0,
-                                                           this->SteamFluidIndex,
-                                                           moduleObjectType + this->Name);
-                    Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, GeneratorOutletTemp,
-                                                                     const_cast<int &>(waterIndex), RoutineName);
+                    Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(
+                        fluidNameSteam, DataSizing::PlantSizData(PltSizSteamNum).ExitTemp, 1.0, this->SteamFluidIndex, moduleObjectType + this->Name);
+                    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
+                        fluidNameSteam, DataSizing::PlantSizData(PltSizSteamNum).ExitTemp, 0.0, this->SteamFluidIndex, moduleObjectType + this->Name);
+                    Real64 CpWater =
+                        FluidProperties::GetSpecificHeatGlycol(fluidNameWater, GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
                     Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                     this->SteamMassFlowRate = (this->NomCap * SteamInputRatNom) / ((HfgSteam) + (SteamDeltaT * CpWater));
                     tmpGeneratorVolFlowRate = this->SteamMassFlowRate / SteamDensity;
 
-                    if (!this->GeneratorVolFlowRateWasAutoSized)
-                        tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
+                    if (!this->GeneratorVolFlowRateWasAutoSized) tmpGeneratorVolFlowRate = this->GeneratorVolFlowRate;
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
 
                         if (this->GeneratorVolFlowRateWasAutoSized) {
                             this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                   this->Name,
-                                                   "Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                   tmpGeneratorVolFlowRate);
+                                ReportSizingManager::ReportSizingOutput(
+                                    moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
                                 ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                   this->Name,
-                                                   "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                   tmpGeneratorVolFlowRate);
+                                                                        this->Name,
+                                                                        "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                                        tmpGeneratorVolFlowRate);
                             }
                         } else {
                             if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
@@ -1328,16 +1256,15 @@ namespace ChillerAbsorption {
                                 Real64 GeneratorVolFlowRateUser = this->GeneratorVolFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
                                     ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                                       this->Name,
-                                                       "Design Size Design Generator Fluid Flow Rate [m3/s]",
-                                                       tmpGeneratorVolFlowRate,
-                                                       "User-Specified Design Generator Fluid Flow Rate [m3/s]",
-                                                       GeneratorVolFlowRateUser);
+                                                                            this->Name,
+                                                                            "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                                            tmpGeneratorVolFlowRate,
+                                                                            "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                                            GeneratorVolFlowRateUser);
                                     if (DataGlobals::DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                             DataSizing::AutoVsHardSizingThreshold) {
-                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " +
-                                                        this->Name);
+                                            ShowMessage("SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError("User-Specified Design Generator Fluid Flow Rate of " +
                                                               General::RoundSigDigits(GeneratorVolFlowRateUser, 5) + " [m3/s]");
                                             ShowContinueError("differs from Design Size Design Generator Fluid Flow Rate of " +
@@ -1369,12 +1296,9 @@ namespace ChillerAbsorption {
                 ShowContinueError("Occurs in Chiller:Absorption object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!this->GeneratorVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (this->GeneratorVolFlowRate > 0.0)) {
-                ReportSizingManager::ReportSizingOutput(moduleObjectType,
-                                   this->Name,
-                                   "User-Specified Design Generator Fluid Flow Rate [m3/s]",
-                                   this->GeneratorVolFlowRate);
+            if (!this->GeneratorVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->GeneratorVolFlowRate > 0.0)) {
+                ReportSizingManager::ReportSizingOutput(
+                    moduleObjectType, this->Name, "User-Specified Design Generator Fluid Flow Rate [m3/s]", this->GeneratorVolFlowRate);
             }
         }
 
@@ -1391,16 +1315,15 @@ namespace ChillerAbsorption {
             } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
-                                               RoutineName);
+                                                                       DataGlobals::HWInitConvTemp,
+                                                                       DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                       RoutineName);
                     Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
-                                           DataGlobals::HWInitConvTemp,
-                                           DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
-                                           RoutineName);
+                                                                   DataGlobals::HWInitConvTemp,
+                                                                   DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
+                                                                   RoutineName);
 
-                    this->GeneratorDeltaTemp =
-                        (SteamInputRatNom * this->NomCap) / (Cp * rho * this->GeneratorVolFlowRate);
+                    this->GeneratorDeltaTemp = (SteamInputRatNom * this->NomCap) / (Cp * rho * this->GeneratorVolFlowRate);
                 }
             }
         }
@@ -1440,11 +1363,12 @@ namespace ChillerAbsorption {
 
         static std::string const RoutineName("CalcBLASTAbsorberModel");
 
-        Real64 EvapDeltaTemp(0.0);             // C - evaporator temperature difference, water side
+        Real64 EvapDeltaTemp(0.0); // C - evaporator temperature difference, water side
 
         // If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) { // off or heating
-            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive)
+                this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             return;
         }
 
@@ -1454,9 +1378,9 @@ namespace ChillerAbsorption {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                        DataLoopNode::Node(this->EvapInletNodeNum).Temp,
-                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
-                                        RoutineName);
+                                                                DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                RoutineName);
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
         if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
@@ -1483,8 +1407,8 @@ namespace ChillerAbsorption {
             if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
 
-                if ( this->EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = this->QEvaporator /  this->EvapMassFlowRate / CpFluid;
+                if (this->EvapMassFlowRate != 0.0) {
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
@@ -1505,17 +1429,17 @@ namespace ChillerAbsorption {
                 if (EvapDeltaTemp != 0) {
 
                     this->EvapMassFlowRate = std::abs(this->QEvaporator / CpFluid / EvapDeltaTemp);
-                    if (( this->EvapMassFlowRate - this->EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance)
+                    if ((this->EvapMassFlowRate - this->EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance)
                         this->PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
-                    this->EvapMassFlowRate = min(this->EvapMassFlowRateMax,  this->EvapMassFlowRate);
-                    PlantUtilities::SetComponentFlowRate( this->EvapMassFlowRate,
-                                         this->EvapInletNodeNum,
-                                         this->EvapOutletNodeNum,
-                                         this->CWLoopNum,
-                                         this->CWLoopSideNum,
-                                         this->CWBranchNum,
-                                         this->CWCompNum);
+                    this->EvapMassFlowRate = min(this->EvapMassFlowRateMax, this->EvapMassFlowRate);
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                                         this->EvapInletNodeNum,
+                                                         this->EvapOutletNodeNum,
+                                                         this->CWLoopNum,
+                                                         this->CWLoopSideNum,
+                                                         this->CWBranchNum,
+                                                         this->CWCompNum);
                     {
                         auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -1536,7 +1460,8 @@ namespace ChillerAbsorption {
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) && ( this->EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == LeavingSetPointModulated);
@@ -1559,10 +1484,10 @@ namespace ChillerAbsorption {
             this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             if (this->PossibleSubcooling) {
                 this->QEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = this->QEvaporator /  this->EvapMassFlowRate / CpFluid;
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                 this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
-                Real64 TempEvapOutSetPoint(0.0);       // C - evaporator outlet temperature setpoint
+                Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
 
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
@@ -1595,7 +1520,7 @@ namespace ChillerAbsorption {
                     }
                 }
                 EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - TempEvapOutSetPoint;
-                this->QEvaporator = std::abs( this->EvapMassFlowRate * CpFluid * EvapDeltaTemp);
+                this->QEvaporator = std::abs(this->EvapMassFlowRate * CpFluid * EvapDeltaTemp);
                 this->EvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
@@ -1603,30 +1528,31 @@ namespace ChillerAbsorption {
                 if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->TempLowLimitEvapOut) > DataPlant::DeltaTempTol) {
                     this->EvapOutletTemp = this->TempLowLimitEvapOut;
                     EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
-                    this->QEvaporator =  this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
                     this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
                     EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
-                    this->QEvaporator =  this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
             if (this->EvapOutletTemp < DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) {
-                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) > DataPlant::DeltaTempTol) {
+                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) >
+                    DataPlant::DeltaTempTol) {
                     this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempMin;
                     EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
-                    this->QEvaporator =  this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
                     this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
                     EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
-                    this->QEvaporator =  this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
 
             // Checks QEvaporator on the basis of the machine limits.
             if (this->QEvaporator > std::abs(MyLoad)) {
-                if ( this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     this->QEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = this->QEvaporator /  this->EvapMassFlowRate / CpFluid;
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                     this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
                 } else {
                     this->QEvaporator = 0.0;
@@ -1635,7 +1561,8 @@ namespace ChillerAbsorption {
             }
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) && ( this->EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
@@ -1679,7 +1606,7 @@ namespace ChillerAbsorption {
         // Calculate steam load
         this->QGenerator = SteamInputRat * this->QEvaporator * FRAC;
 
-        if ( this->EvapMassFlowRate == 0.0) {
+        if (this->EvapMassFlowRate == 0.0) {
             this->QGenerator = 0.0;
             this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->PumpingPower = 0.0;
@@ -1688,9 +1615,9 @@ namespace ChillerAbsorption {
         this->QCondenser = this->QEvaporator + this->QGenerator + this->PumpingPower;
 
         CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
-                                        DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                        DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
-                                        RoutineName);
+                                                         DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                         RoutineName);
 
         if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpFluid + DataLoopNode::Node(this->CondInletNodeNum).Temp;
@@ -1707,27 +1634,29 @@ namespace ChillerAbsorption {
             if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                 Real64 GenMassFlowRate;
                 //  Hot water plant is used for the generator
-                CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->GenLoopNum).FluidName, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp, DataPlant::PlantLoop(GenLoopSideNum).FluidIndex, RoutineName);
+                CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                                 DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                 DataPlant::PlantLoop(GenLoopSideNum).FluidIndex,
+                                                                 RoutineName);
                 if (DataPlant::PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == 0) {
                     if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                         GenMassFlowRate = this->GenMassFlowRateMax;
                     } else { // LeavingSetpointModulated
                         // since the .FlowMode applies to the chiller evaporator, the generater mass flow rate will be proportional to the evaporator
                         // mass flow rate
-                        Real64 GenFlowRatio =  this->EvapMassFlowRate / this->EvapMassFlowRateMax;
+                        Real64 GenFlowRatio = this->EvapMassFlowRate / this->EvapMassFlowRateMax;
                         GenMassFlowRate = min(this->GenMassFlowRateMax, GenFlowRatio * this->GenMassFlowRateMax);
                     }
                 } else { // If FlowLock is True
                     GenMassFlowRate = DataLoopNode::Node(this->GeneratorInletNodeNum).MassFlowRate;
                 }
                 PlantUtilities::SetComponentFlowRate(GenMassFlowRate,
-                                     this->GeneratorInletNodeNum,
-                                     this->GeneratorOutletNodeNum,
+                                                     this->GeneratorInletNodeNum,
+                                                     this->GeneratorOutletNodeNum,
                                                      this->GenLoopNum,
                                                      this->GenLoopSideNum,
-                                     this->GenBranchNum,
-                                     this->GenCompNum);
+                                                     this->GenBranchNum,
+                                                     this->GenCompNum);
 
                 if (GenMassFlowRate <= 0.0) {
                     this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;
@@ -1744,31 +1673,30 @@ namespace ChillerAbsorption {
 
                 // enthalpy of dry steam at generator inlet
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
-                                                       1.0,
-                                                       this->SteamFluidIndex,
-                                                       calcChillerAbsorption + this->Name);
+                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               1.0,
+                                                                               this->SteamFluidIndex,
+                                                                               calcChillerAbsorption + this->Name);
 
                 // enthalpy of wet steam at generator inlet
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
-                                                       0.0,
-                                                       this->SteamFluidIndex,
-                                                       calcChillerAbsorption + this->Name);
+                                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                                               0.0,
+                                                                               this->SteamFluidIndex,
+                                                                               calcChillerAbsorption + this->Name);
                 Real64 SteamDeltaT = this->GeneratorSubcool;
                 Real64 SteamOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-                CpFluid =
-                    FluidProperties::GetSpecificHeatGlycol(fluidNameWater, SteamOutletTemp,
-                                                           const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+                CpFluid = FluidProperties::GetSpecificHeatGlycol(
+                    fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
                 this->SteamMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
                 PlantUtilities::SetComponentFlowRate(this->SteamMassFlowRate,
-                                     this->GeneratorInletNodeNum,
-                                     this->GeneratorOutletNodeNum,
-                                     this->GenLoopNum,
-                                     this->GenLoopSideNum,
-                                     this->GenBranchNum,
-                                     this->GenCompNum);
+                                                     this->GeneratorInletNodeNum,
+                                                     this->GeneratorOutletNodeNum,
+                                                     this->GenLoopNum,
+                                                     this->GenLoopSideNum,
+                                                     this->GenBranchNum,
+                                                     this->GenCompNum);
 
                 if (this->SteamMassFlowRate <= 0.0) {
                     this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;

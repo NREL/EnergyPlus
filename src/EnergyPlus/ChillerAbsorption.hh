@@ -94,9 +94,9 @@ namespace ChillerAbsorption {
 
         // Default Constructor
         ReportVars()
-                : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-                  CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
-                  SteamMdot(0.0), ActualCOP(0.0)
+            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
+              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
+              SteamMdot(0.0), ActualCOP(0.0)
         {
         }
     };
@@ -160,21 +160,21 @@ namespace ChillerAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
-        Real64 CondMassFlowRate;  // Kg/s - condenser mass flow rate, water side
-        Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
-        Real64 SteamMassFlowRate;   // Kg/s - steam mass flow rate, water side
-        Real64 CondOutletTemp;      // C - condenser outlet temperature, water side
-        Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
-        Real64 GenOutletTemp;       // C - generator fluid outlet temperature
-        Real64 SteamOutletEnthalpy; // J/kg - generator fluid outlet enthalpy
-        Real64 PumpingPower;        // W - rate of Absorber energy use
-        Real64 PumpingEnergy;       // J - Absorber energy use
-        Real64 QGenerator;          // W - rate of Absorber steam use
-        Real64 GeneratorEnergy;     // J - Absorber steam use
-        Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
-        Real64 EvaporatorEnergy;    // J - heat transfer to the evaporator coil
-        Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
-        Real64 CondenserEnergy;     // J - heat transfer to the condenser coil
+        Real64 CondMassFlowRate;               // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;               // Kg/s - evaporator mass flow rate, water side
+        Real64 SteamMassFlowRate;              // Kg/s - steam mass flow rate, water side
+        Real64 CondOutletTemp;                 // C - condenser outlet temperature, water side
+        Real64 EvapOutletTemp;                 // C - evaporator outlet temperature, water side
+        Real64 GenOutletTemp;                  // C - generator fluid outlet temperature
+        Real64 SteamOutletEnthalpy;            // J/kg - generator fluid outlet enthalpy
+        Real64 PumpingPower;                   // W - rate of Absorber energy use
+        Real64 PumpingEnergy;                  // J - Absorber energy use
+        Real64 QGenerator;                     // W - rate of Absorber steam use
+        Real64 GeneratorEnergy;                // J - Absorber steam use
+        Real64 QEvaporator;                    // W - rate of heat transfer to the evaporator coil
+        Real64 EvaporatorEnergy;               // J - heat transfer to the evaporator coil
+        Real64 QCondenser;                     // W - rate of heat transfer to the condenser coil
+        Real64 CondenserEnergy;                // J - heat transfer to the condenser coil
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
@@ -192,11 +192,10 @@ namespace ChillerAbsorption {
               GenHeatSourceType(0), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false), GeneratorSubcool(0.0), SteamFluidIndex(0),
               GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false),
-              CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0),
-              GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0),
-              QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
-              GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
+              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
+              EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
+              PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
+              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
         {
         }
 
