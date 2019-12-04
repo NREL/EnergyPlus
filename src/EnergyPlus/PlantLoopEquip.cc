@@ -177,7 +177,6 @@ namespace PlantLoopEquip {
         // na
 
         // Using/Aliasing
-        using ChillerAbsorption::SimBLASTAbsorber;
         using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
@@ -345,32 +344,9 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
-                SimBLASTAbsorber(sim_component.TypeOf,
-                                 sim_component.Name,
-                                 EquipFlowCtrl,
-                                 LoopNum,
-                                 LoopSideNum,
-                                 EquipNum,
-                                 RunFlag,
-                                 FirstHVACIteration,
-                                 InitLoopEquip,
-                                 CurLoad,
-                                 MaxLoad,
-                                 MinLoad,
-                                 OptLoad,
-                                 GetCompSizFac,
-                                 SizingFac,
-                                 TempCondInDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+
+                dynamic_cast<ChillerAbsorption::BLASTAbsorberSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {
                 SimIndirectAbsorber(sim_component.TypeOf,

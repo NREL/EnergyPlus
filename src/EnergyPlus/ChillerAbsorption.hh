@@ -179,6 +179,7 @@ namespace ChillerAbsorption {
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
         ReportVars Report;
+        int EquipFlowCtrl;
 
         // Default Constructor
         BLASTAbsorberSpecs()
@@ -195,7 +196,7 @@ namespace ChillerAbsorption {
               CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0),
               GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0),
               QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
-              GenInputOutputNodesUsed(false)
+              GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
         {
         }
 
@@ -203,11 +204,13 @@ namespace ChillerAbsorption {
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void getSizingFactor(Real64 &SizFac) override;
+        void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void getSizingFactor(Real64 &sizFac) override;
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
@@ -215,30 +218,13 @@ namespace ChillerAbsorption {
 
         void sizeChiller();
 
-        void calculate(Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
+        void calculate(Real64 &MyLoad, bool RunFlag);
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
     extern Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-
-    void SimBLASTAbsorber(std::string const &AbsorberType, // type of Absorber
-                          std::string const &AbsorberName, // user specified name of Absorber
-                          int EquipFlowCtrl,         // Flow control mode for the equipment
-                          int LoopNum,               // Plant loop index for where called from
-                          int LoopSide,              // Plant loop side index for where called from
-                          int &CompIndex,                  // Chiller number pointer
-                          bool RunFlag,              // simulate Absorber when TRUE
-                          bool FirstIteration,       // initialize variables when TRUE
-                          bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
-                          Real64 &MyLoad,                  // loop demand component will meet
-                          Real64 &MaxCap,                  // Maximum operating capacity of chiller [W]
-                          Real64 &MinCap,                  // Minimum operating capacity of chiller [W]
-                          Real64 &OptCap,                  // Optimal operating capacity of chiller [W]
-                          bool GetSizingFactor,      // TRUE when just the sizing factor is requested
-                          Real64 &SizingFactor,            // sizing factor
-                          Real64 &TempCondInDesign);
 
     void clear_state();
 

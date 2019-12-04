@@ -71,6 +71,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -148,145 +149,83 @@ namespace ChillerAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BLASTAbsorberSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void BLASTAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-
-    }
-
-    void BLASTAbsorberSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
-    {
-
-    }
-
-    void BLASTAbsorberSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &EP_UNUSED(MaxLoad), Real64 &EP_UNUSED(MinLoad), Real64 &EP_UNUSED(OptLoad))
-    {
-
-    }
-
-    void BLASTAbsorberSpecs::getSizingFactor(Real64 &EP_UNUSED(SizFac))
-    {
-
-    }
-
-    void SimBLASTAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
-                          std::string const &AbsorberName,            // user specified name of Absorber
-                          int const EquipFlowCtrl,                    // Flow control mode for the equipment
-                          int const LoopNum,                          // Plant loop index for where called from
-                          int const LoopSide,                         // Plant loop side index for where called from
-                          int &CompIndex,                             // Chiller number pointer
-                          bool const RunFlag,                         // simulate Absorber when TRUE
-                          bool const FirstIteration,                  // initialize variables when TRUE
-                          bool &InitLoopEquip,                        // If not zero, calculate the max load for operating conditions
-                          Real64 &MyLoad,                             // loop demand component will meet
-                          Real64 &MaxCap,                             // Maximum operating capacity of chiller [W]
-                          Real64 &MinCap,                             // Minimum operating capacity of chiller [W]
-                          Real64 &OptCap,                             // Optimal operating capacity of chiller [W]
-                          bool const GetSizingFactor,                 // TRUE when just the sizing factor is requested
-                          Real64 &SizingFactor,                       // sizing factor
-                          Real64 &TempCondInDesign)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Dan Fisher
-        //       DATE WRITTEN   Nov. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        int ChillNum; // Chiller number pointer
-
-        // Get Absorber data from input file
-        if (getInput) {
-            GetBLASTAbsorberInput();
-            getInput = false;
-        }
-
-        // Find the correct Chiller
-        if (CompIndex == 0) {
-            ChillNum = UtilityRoutines::FindItemInList(AbsorberName, BLASTAbsorber);
-            if (ChillNum == 0) {
-                ShowFatalError("SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName);
-            }
-            CompIndex = ChillNum;
-        } else {
-            ChillNum = CompIndex;
-            if (ChillNum > numBlastAbsorbers || ChillNum < 1) {
-                ShowFatalError("SimBLASTAbsorber:  Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) +
-                               ", Number of Units=" + General::TrimSigDigits(numBlastAbsorbers) + ", Entered Unit name=" + AbsorberName);
-            }
-            if (CheckEquipName(ChillNum)) {
-                if (AbsorberName != BLASTAbsorber(ChillNum).Name) {
-                    ShowFatalError("SimBLASTAbsorber: Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) + ", Unit name=" + AbsorberName +
-                                   ", stored Unit Name for that index=" + BLASTAbsorber(ChillNum).Name);
-                }
-                CheckEquipName(ChillNum) = false;
-            }
-        }
-
-        // Initialize Loop Equipment
-        if (InitLoopEquip) {
-            TempCondInDesign = BLASTAbsorber(ChillNum).TempDesCondIn;
-            BLASTAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-
-            if (LoopNum == BLASTAbsorber(ChillNum).CWLoopNum) {
-                BLASTAbsorber(ChillNum).sizeChiller();
-                MinCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = BLASTAbsorber(ChillNum).NomCap * BLASTAbsorber(ChillNum).OptPartLoadRat;
-            } else {
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            }
-            if (GetSizingFactor) {
-                SizingFactor = BLASTAbsorber(ChillNum).SizFac;
-            }
-            return;
-        }
-
-        // different actions depending on which loop the component was called from
-
-        if (LoopNum == BLASTAbsorber(ChillNum).CWLoopNum) {
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
             // called from dominant chilled water connection loop side
 
             // Calculate Load
-            BLASTAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-            BLASTAbsorber(ChillNum).calculate(MyLoad, RunFlag, EquipFlowCtrl);
-            BLASTAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
+            this->initialize(RunFlag, CurLoad);
+            this->calculate(CurLoad, RunFlag);
+            this->updateRecords(CurLoad, RunFlag);
 
-        } else if (LoopNum == BLASTAbsorber(ChillNum).CDLoopNum) {
+        } else if (calledFromLocation.loopNum == this->CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
-            PlantUtilities::UpdateChillerComponentCondenserSide(LoopNum,
-                                                LoopSide,
-                                                DataPlant::TypeOf_Chiller_Absorption,
-                                                BLASTAbsorber(ChillNum).CondInletNodeNum,
-                                                BLASTAbsorber(ChillNum).CondOutletNodeNum,
-                                                BLASTAbsorber(ChillNum).Report.QCond,
-                                                BLASTAbsorber(ChillNum).Report.CondInletTemp,
-                                                BLASTAbsorber(ChillNum).Report.CondOutletTemp,
-                                                BLASTAbsorber(ChillNum).Report.Condmdot,
-                                                FirstIteration);
+            PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
+                                                                calledFromLocation.loopSideNum,
+                                                                DataPlant::TypeOf_Chiller_Absorption,
+                                                                this->CondInletNodeNum,
+                                                                this->CondOutletNodeNum,
+                                                                this->Report.QCond,
+                                                                this->Report.CondInletTemp,
+                                                                this->Report.CondOutletTemp,
+                                                                this->Report.Condmdot,
+                                                                FirstHVACIteration);
 
-        } else if (LoopNum == BLASTAbsorber(ChillNum).GenLoopNum) {
+        } else if (calledFromLocation.loopNum == this->GenLoopNum) {
             // Called from non-dominant generator hot water or steam connection loop side
-            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(LoopNum,
-                                                        LoopSide,
-                                                        DataPlant::TypeOf_Chiller_Absorption,
-                                                        BLASTAbsorber(ChillNum).GeneratorInletNodeNum,
-                                                        BLASTAbsorber(ChillNum).GeneratorOutletNodeNum,
-                                                        BLASTAbsorber(ChillNum).GenHeatSourceType,
-                                                        BLASTAbsorber(ChillNum).Report.QGenerator,
-                                                        BLASTAbsorber(ChillNum).Report.SteamMdot,
-                                                        FirstIteration);
+            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(calledFromLocation.loopNum,
+                                                                        calledFromLocation.loopSideNum,
+                                                                        DataPlant::TypeOf_Chiller_Absorption,
+                                                                        this->GeneratorInletNodeNum,
+                                                                        this->GeneratorOutletNodeNum,
+                                                                        this->GenHeatSourceType,
+                                                                        this->Report.QGenerator,
+                                                                        this->Report.SteamMdot,
+                                                                        FirstHVACIteration);
 
         } else {
-            ShowFatalError("SimBLASTAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(LoopNum) + ", Unit name=" + AbsorberName +
-                           ", stored chilled water loop=" + General::TrimSigDigits(BLASTAbsorber(ChillNum).CWLoopNum) +
-                           ", stored condenser water loop=" + General::TrimSigDigits(BLASTAbsorber(ChillNum).CDLoopNum) +
-                           ", stored generator loop=" + General::TrimSigDigits(BLASTAbsorber(ChillNum).GenLoopNum));
+            ShowFatalError("SimBLASTAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) + ", Unit name=" + this->Name +
+                           ", stored chilled water loop=" + General::TrimSigDigits(this->CWLoopNum) +
+                           ", stored condenser water loop=" + General::TrimSigDigits(this->CDLoopNum) +
+                           ", stored generator loop=" + General::TrimSigDigits(this->GenLoopNum));
         }
+    }
+
+    void BLASTAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {
+        bool runFlag = true;
+        Real64 myLoad = 0.0;
+
+        this->initialize(runFlag, myLoad);
+
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            this->sizeChiller();
+        }
+    }
+
+    void BLASTAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            this->sizeChiller();
+            MinLoad = this->NomCap * this->MinPartLoadRat;
+            MaxLoad = this->NomCap * this->MaxPartLoadRat;
+            OptLoad = this->NomCap * this->OptPartLoadRat;
+        } else {
+            MinLoad = 0.0;
+            MaxLoad = 0.0;
+            OptLoad = 0.0;
+        }
+    }
+
+    void BLASTAbsorberSpecs::getSizingFactor(Real64 &sizFac)
+    {
+        sizFac = this->SizFac;
+    }
+
+    void BLASTAbsorberSpecs::getDesignTemperatures(Real64 &tempDesCondIn, Real64 &EP_UNUSED(TempDesEvapOut))
+    {
+        tempDesCondIn = this->TempDesCondIn;
     }
 
     void GetBLASTAbsorberInput()
@@ -1479,7 +1418,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::calculate(Real64 &MyLoad, bool RunFlag,  int EquipFlowCtrl)
+    void BLASTAbsorberSpecs::calculate(Real64 &MyLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -1505,7 +1444,7 @@ namespace ChillerAbsorption {
 
         // If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) { // off or heating
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             return;
         }
 
