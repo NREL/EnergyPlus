@@ -114,48 +114,20 @@ namespace PondGroundHeatExchanger {
     //   With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::KelvinConv;
     using DataPlant::PlantLoop;
     using General::TrimSigDigits;
-    // Use statements for access to subroutines in other modules
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
     static std::string const fluidNameWater("WATER");
     Real64 const SmallNum(1.0e-30);         // Very small number to avoid div0 errors
     Real64 const StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
-    //  REAL(r64), PARAMETER :: KelvinConv    = KelvinConv           ! Conversion from Celsius to Kelvin
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // utility variables initialized once
     int NumOfPondGHEs(0); // Number of pond ground heat exchangers
-    // Utility variables - initialized for each instance of a pond
-    // Real64 nsvOutletTemp( 0.0 ); // water outlet temperature
-    // Real64 PondTemp( 0.0 ); // pond temperature
-    // Real64 PastPondTemp( 0.0 ); // past pond temperature
-    // Real64 TubeInDiameter( 0.0 ); // hydronic tube inside diameter
-    // Real64 TubeOutDiameter( 0.0 ); // hydronic tube outside diameter
-    // Real64 TubeConductivity( 0.0 ); // hydronic tube thermal conductivity
-    // Real64 GrndConductivity( 0.0 ); // ground thermal conductivity
-    // Real64 Concentration( 0.0 ); // fluid/glycol concentration 0.0-1.0 proportion.
-    // int NumCircuits( 0 ); // number of circuits in total
-    // int InletNodeNum( 0 ); // inlet node number
-    // int OutletNodeNum( 0 ); // oulet node number
-    // temperature object was input.
+
     bool GetInputFlag(true);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
-
-    // Object Data
     Array1D<PondGroundHeatExchangerData> PondGHE;
 
     void PondGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -211,10 +183,6 @@ namespace PondGroundHeatExchanger {
         // from the user input file.  This will contain all of the information
         // needed to define and simulate the pond.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using DataEnvironment::GroundTemp_Deep;
@@ -225,9 +193,8 @@ namespace PondGroundHeatExchanger {
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false); // Set to true if errors in input,
-        // fatal at end of routine
+
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -406,12 +373,6 @@ namespace PondGroundHeatExchanger {
         // Also set module variables to data structure for this pond. Set flow rate
         // from node data and hypothetical design flow.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Using/Aliasing
         using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::OutDryBulbTempAt;
         using DataGlobals::BeginTimeStepFlag;
@@ -427,26 +388,11 @@ namespace PondGroundHeatExchanger {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        //  INTEGER, INTENT(IN) :: FlowLock            ! flow initialization/condition flag    !DSU
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
         Real64 const PondHeight(0.0);     // for now
         static std::string const RoutineName("InitPondGroundHeatExchanger");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Real64 DesignFlow; // Hypothetical design flow rate
-        // int PondNum; // loop counter
         int LoopNum;
         int LoopSideNum;
         Real64 rho;
@@ -495,17 +441,8 @@ namespace PondGroundHeatExchanger {
             this->PastBulkTemperature = this->BulkTemperature;
         }
 
-        // initialize - module variables
-        // InletNodeNum = this->InletNodeNum;
-        // OutletNodeNum = this->OutletNodeNum;
         this->InletTemp = Node(InletNodeNum).Temp;
         OutletTemp = Node(OutletNodeNum).Temp;
-        // TubeInDiameter = this->TubeInDiameter;
-        // TubeOutDiameter = this->TubeOutDiameter;
-        // TubeConductivity = this->TubeConductivity;
-        // GrndConductivity = this->GrndConductivity;
-        // NumCircuits = this->NumCircuits;
-        // temperatures
         PondTemp = this->BulkTemperature;
 
         DesignFlow = RegulateCondenserCompFlowReqOp(this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
@@ -552,19 +489,7 @@ namespace PondGroundHeatExchanger {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcPondGroundHeatExchanger");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 PondTempStar;
         Real64 PondTempStarStar;
@@ -598,8 +523,6 @@ namespace PondGroundHeatExchanger {
 
         PondTemp = NewPondTemp;
     }
-
-    //==============================================================================
 
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
     )
@@ -639,7 +562,6 @@ namespace PondGroundHeatExchanger {
         //   Dependence of Ground Heat Losses Upon Solar Pond Size and Perimeter
         //   Insulation Calculated and Experimental Results. Solar Energy,33(1):25-33.
 
-        // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
         using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::IsRain;
@@ -656,25 +578,13 @@ namespace PondGroundHeatExchanger {
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbTwbPb;
 
-        // Return value
         Real64 CalcTotalFLux; // function return variable
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const PrantlAir(0.71); // Prantl number for air - assumed constant
         Real64 const SchmidtAir(0.6); // Schmidt number for air - assumed constant
         Real64 const PondHeight(0.0); // for now
         static std::string const RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ConvCoef;        // convection coefficient
         Real64 ExternalTemp;    // external environmental temp - drybulb or wetbulb
         Real64 FluxSolAbsorbed; // absorbed solar flux
@@ -757,8 +667,6 @@ namespace PondGroundHeatExchanger {
         return CalcTotalFLux;
     }
 
-    //==============================================================================
-
     Real64 PondGroundHeatExchangerData::CalcSolarFlux()
     {
 
@@ -787,30 +695,16 @@ namespace PondGroundHeatExchanger {
         //   Rejecter With Closed-Loop Ground-Source Heat Pump Systems.
         //   ASHRAE Transactions.  106(2):107-121.
 
-        // Using/Aliasing
         using DataEnvironment::BeamSolarRad;
         using DataEnvironment::DifSolarRad;
         using DataEnvironment::SOLCOS;
         using DataEnvironment::SunIsUp;
 
-        // Return value
         Real64 CalcSolarFlux; // Function return variable
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const WaterRefIndex(1.33); // refractive index of water
         Real64 const AirRefIndex(1.0003); // refractive index of air
         Real64 const PondExtCoef(0.3);    // extinction coefficent of water
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 IncidAngle;   // angle of incidence of beam
         Real64 RefractAngle; // angle of refraction of beam
@@ -820,8 +714,6 @@ namespace PondGroundHeatExchanger {
 
         Real64 ParallelRad; // parallel component of irradiation
         Real64 PerpendRad;  // parallel component of irradiation
-
-        // FLOW:
 
         // check for sun up.
         if (!SunIsUp) {
@@ -851,8 +743,6 @@ namespace PondGroundHeatExchanger {
 
         return CalcSolarFlux;
     }
-
-    //==============================================================================
 
     Real64 PondGroundHeatExchangerData::CalcEffectiveness(Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                                           Real64 const PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
@@ -887,7 +777,6 @@ namespace PondGroundHeatExchanger {
         //   International Journal of Heat and Mass Transfer, 18: 1049-1053.
         // See also RadiantSystemLowTemp module.
 
-        // Using/Aliasing
         using DataGlobals::NumOfTimeStepInHour;
         using DataGlobals::Pi;
         using FluidProperties::GetConductivityGlycol;
@@ -896,24 +785,11 @@ namespace PondGroundHeatExchanger {
         using FluidProperties::GetViscosityGlycol;
         using General::RoundSigDigits;
 
-        // Return value
         Real64 CalcEffectiveness; // Function return variable
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
         static std::string const CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 NuseltNum;       // Nuselt number (dimensionless)
         Real64 PrantlNum;       // Prandtl number (dimensionless)
@@ -931,8 +807,6 @@ namespace PondGroundHeatExchanger {
         Real64 ConvCoefIn;      // convection coefficient at inside of pipe
         Real64 PipeResistance;  // pipe wall thermal resistance
         Real64 TotalResistance; // total pipe thermal resistance - conduction and convection
-        //  INTEGER, SAVE ::ErrCount=0
-        //  INTEGER, SAVE ::ConsecutiveFrozen=0
 
         // evaluate properties at pipe fluid temperature for given pipe fluid
 
@@ -1026,8 +900,6 @@ namespace PondGroundHeatExchanger {
         return CalcEffectiveness;
     }
 
-    //==============================================================================
-
     void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger()
     {
 
@@ -1042,29 +914,12 @@ namespace PondGroundHeatExchanger {
         // ground heat exchangers.   This routine must also set the outlet water
         // conditions.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("PondGroundHeatExchanger:Update");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid; // Specific heat of working fluid
 
         // Calculate the water side outlet conditions and set the
@@ -1098,32 +953,9 @@ namespace PondGroundHeatExchanger {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simply produces output for Pond ground heat exchangers
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
 
         // update flows and temps from node data
         this->InletTemp = Node(this->InletNodeNum).Temp;
@@ -1132,7 +964,6 @@ namespace PondGroundHeatExchanger {
 
         // update other variables from module variables
         this->Energy = this->HeatTransferRate * TimeStepSys * SecInHour;
-        // this->PondTemp = PondTemp;
     }
 
 } // namespace PondGroundHeatExchanger
