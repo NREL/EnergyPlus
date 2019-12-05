@@ -2240,10 +2240,10 @@ namespace WaterThermalTanks {
             // Validate Heater Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
-                if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                if (SELECT_CASE_var == "ELECTRICITY") {
                     Tank.FuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Tank.FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -2255,15 +2255,13 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.FuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Tank.FuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Tank.FuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -2328,10 +2326,10 @@ namespace WaterThermalTanks {
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     Tank.OffCycParaFuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Tank.OffCycParaFuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -2343,15 +2341,13 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.OffCycParaFuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Tank.OffCycParaFuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Tank.OffCycParaFuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -2385,11 +2381,11 @@ namespace WaterThermalTanks {
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
-                    Tank.OnCycParaFuelType = "Electric";
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
+                    Tank.OffCycParaFuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
-                    Tank.OnCycParaFuelType = "Gas";
+                } else if (SELECT_CASE_var == "NATURALGAS") {
+                    Tank.OffCycParaFuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -2400,16 +2396,14 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.OnCycParaFuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
+                    Tank.OffCycParaFuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
+                    Tank.OffCycParaFuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
-                    Tank.OnCycParaFuelType = "Propane";
+                } else if (SELECT_CASE_var == "PROPANE") {
+                    Tank.OffCycParaFuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
                     Tank.OnCycParaFuelType = "OtherFuel1";
@@ -2837,10 +2831,10 @@ namespace WaterThermalTanks {
             // Validate Heater Fuel Type
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
-                if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                if (SELECT_CASE_var == "ELECTRICITY") {
                     Tank.FuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Tank.FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -2852,15 +2846,13 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.FuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Tank.FuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Tank.FuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -2900,10 +2892,10 @@ namespace WaterThermalTanks {
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     Tank.OffCycParaFuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Tank.OffCycParaFuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -2915,15 +2907,13 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.OffCycParaFuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Tank.OffCycParaFuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Tank.OffCycParaFuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -2958,10 +2948,10 @@ namespace WaterThermalTanks {
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     Tank.OnCycParaFuelType = "Electric";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Tank.OnCycParaFuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -2973,15 +2963,13 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == "COAL") {
                     Tank.OnCycParaFuelType = "Coal";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Tank.OnCycParaFuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Tank.OnCycParaFuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
