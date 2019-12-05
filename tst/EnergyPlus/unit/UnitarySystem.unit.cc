@@ -3265,7 +3265,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
 
     UnitarySys thisSys;
-    UnitarySys *mySys;
+    UnitarySys *mySys(&thisSys);
     UnitarySystems::numUnitarySystems = 1;
 
     thisSys.UnitType = "AirLoopHVAC:UnitarySystem";
@@ -3310,7 +3310,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         // for FlowPerCoolingCapacity, do the division so sizing will yield 1.005
         if (iSizingType == DataSizing::FlowPerCoolingCapacity) thisSys.m_MaxCoolAirVolFlow = 1.005 / 18827.616766698276;
 
-        mySys = &thisSys;
         mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
 
         EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
@@ -3330,7 +3329,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
 
-    mySys = &thisSys;
     mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
 
     EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
@@ -3372,7 +3370,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         // for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
         if (iSizingType == DataSizing::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 15148.243236712493;
 
-        mySys = &thisSys;
         mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
 
         EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
@@ -3392,7 +3389,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
 
-    mySys = &thisSys;
     mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
 
     EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
@@ -3449,7 +3445,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         // for FlowPerHeatingCapacity, do the division so sizing will yield 1.005
         if (iHeatingSizingType == DataSizing::FlowPerHeatingCapacity) thisSys.m_MaxHeatAirVolFlow = 1.005 / 1431.9234900374995;
 
-        mySys = &thisSys;
         mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
 
         EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
@@ -10376,7 +10371,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     int AirLoopNum(1);
     bool FirstHVACIteration(true);
     UnitarySys thisSys;
-    UnitarySys *mySys;
+    UnitarySys *mySys(&thisSys);
     UnitarySystems::numUnitarySystems = 1;
 
     DataEnvironment::StdRhoAir = 1.2; // Prevent divide by zero in ReportSizingManager
@@ -10404,9 +10399,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
     thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
     Real64 expectedSize = 18976.394 + locDesignHeatGain3;
-    mySys = &thisSys;
+
     mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
-    thisSys = *mySys;
 
     EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_NEAR(expectedSize, thisSys.m_DesignCoolingCapacity, 0.001);
@@ -10423,9 +10417,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
     expectedSize = 18976.394 + locDesignHeatGain4;
 
-    mySys = &thisSys;
     mySys->sizeSystem(FirstHVACIteration, AirLoopNum);
-    thisSys = *mySys;
 
     EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_NEAR(expectedSize, thisSys.m_DesignCoolingCapacity, 0.001);
@@ -11088,11 +11080,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";   
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    UnitarySys *thisSys;
-    thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySys *thisSys = UnitarySys::factory(compTypeOfNum, compName, zoneEquipment, 0);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
@@ -11120,7 +11110,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
 
     bool FirstHVACIteration = true;
     int AirLoopNum = 0;
-    thisSys->sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
     // check autosized cooling and heating flow rates
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
@@ -11233,11 +11223,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";   
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    UnitarySys *thisSys;
-    thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySys *thisSys = UnitarySys::factory(compTypeOfNum, compName, zoneEquipment, 0);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
@@ -11264,7 +11252,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
 
     bool FirstHVACIteration = true;
     int AirLoopNum = 0;
-    thisSys->sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
     // check autosized cooling and heating flow rates
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.5);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.5);
@@ -11272,10 +11260,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, userspecifiedFlowPerCoolingCapacityValue * thisSys->m_DesignCoolingCapacity);
 }
 
-TEST_F( ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest )
+TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
 {
 
-    std::string const idf_objects = delimited_string( {
+    std::string const idf_objects = delimited_string({
 
         "  AirLoopHVAC:UnitarySystem,",
         "    Unitary System Model,                   !- Name",
@@ -11400,64 +11388,63 @@ TEST_F( ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest )
         "    Supplemental Heating Coil Inlet Node,   !- Air Inlet Node Name",
         "    Node 30;                                !- Air Outlet Node Name",
 
-        } );
+    });
 
-    ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
     // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    UnitarySys *thisSys;
-    thisSys = mySys.factory( compTypeOfNum, compName, zoneEquipment, 0 );
+    UnitarySys *thisSys = UnitarySys::factory(compTypeOfNum, compName, zoneEquipment, 0);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;                               // indicate zone data is available
-    thisSys->getUnitarySystemInputData( compName, zoneEquipment, 0, ErrorsFound ); // get UnitarySystem input from object above
-    EXPECT_FALSE( ErrorsFound );                                                   // expect no errors
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
+    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
     // check each input fields of unitary system
-    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name );  // checks object name
-    EXPECT_EQ(UnitarySys::ControlType::Load, thisSys->m_ControlType );  // checks control type
-    EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num );  // checks Dehumidification Control type type
-    EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone), thisSys->ControlZoneNum );  // checks zone ID
-    EXPECT_EQ(DataGlobals::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr );  // checks availability schedule name
-    EXPECT_EQ("NODE 29", DataLoopNode::NodeID(thisSys->AirInNode) );  // checks air inlet node name
-    EXPECT_EQ("NODE 30", DataLoopNode::NodeID(thisSys->AirOutNode) );  // checks air outlet node name
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num );  // checks fan object type "FAN:ONOFF"
-    EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName );  // checks fan object name
-    EXPECT_EQ(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace );  // checks fan placement, "DrawThrough"
-    EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr ); // checks Supply Air Fan Operating Mode Schedule Name 
-    EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName );  // checks heating coil object type
-    EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName );  // checks heating coil object type
-    EXPECT_EQ(1, thisSys->m_HeatingSizingRatio );  // checks dx heating coil sizing ratio
-    EXPECT_EQ(DataHVACGlobals::Coil_CoolingWater, thisSys->m_CoolingCoilType_Num );  // checks cooling coil object type
-    EXPECT_EQ("WATER COOLING COIL", thisSys->m_CoolingCoilName );  // checks cooling coil name
-    EXPECT_FALSE( thisSys->m_ISHundredPercentDOASDXCoil );  // checks DX Coil is for DOAS use
-    EXPECT_EQ(7.0, thisSys->DesignMinOutletTemp );  // checks minimum supply air temperature
-    EXPECT_TRUE( thisSys->m_RunOnSensibleLoad );  // checks for "SENSIBLEONLYLOADCONTROL"
-    EXPECT_EQ("COIL:HEATING:FUEL", thisSys->m_SuppHeatCoilTypeName );  // checks supplemental heating coil object type
-    EXPECT_EQ("SUPPLEMENTAL HEATING COIL", thisSys->m_SuppHeatCoilName );  // checks supplemental heating coil name
-    EXPECT_EQ(4, thisSys->m_CoolingSAFMethod );  // checks cooling supply air flow rate sizing method, FractionOfAutosizedCoolingAirflow
-    EXPECT_EQ(0.5, thisSys->m_MaxCoolAirVolFlow );  // checks Cooling Fraction of Autosized Cooling Supply Air Flow Rate value
-    EXPECT_EQ(5, thisSys->m_HeatingSAFMethod );  // checks cooling supply air flow rate sizing method, FractionOfAutosizedHeatingAirflow
-    EXPECT_EQ(0.8, thisSys->m_MaxHeatAirVolFlow );  // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
-    EXPECT_EQ(6, thisSys->m_NoCoolHeatSAFMethod );  // checks cooling supply air flow rate sizing method, FlowPerCoolingCapacity
-    EXPECT_EQ(0.0000462180155978106, thisSys->m_MaxNoCoolHeatAirVolFlow );  // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
-    EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp );  // checks Maximum Supply Air Temperature value
-    EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat );  // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
-    EXPECT_EQ("SYSTEM OUTDOOR AIR NODE", DataLoopNode::NodeID(thisSys->m_CondenserNodeNum) );  // checks condenser air inlet node name
-    EXPECT_EQ(3.0, thisSys->m_MaxONOFFCyclesperHour );  // checks Maximum Cycling Rate value
-    EXPECT_EQ(120.0, thisSys->m_HPTimeConstant );  // checks Heat Pump Time Constant value
-    EXPECT_EQ(0.02, thisSys->m_OnCyclePowerFraction );  // checks Fraction of On-Cycle Power Use value
-    EXPECT_EQ(90.0, thisSys->m_FanDelayTime );  // checks Heat Pump Fan Delay Time value
-    EXPECT_EQ(40.0, thisSys->m_AncillaryOnPower );  // checks Ancillary On-Cycle Electric Power value
-    EXPECT_EQ(10.0, thisSys->m_AncillaryOffPower );  // checks Ancillary Off-Cycle Electric Power value
-    EXPECT_EQ(0.005, thisSys->m_DesignHRWaterVolumeFlow );  // checks Design Heat Recovery Water Flow Rate value
-    EXPECT_EQ(75.0, thisSys->m_MaxHROutletWaterTemp );  // checks Maximum Temperature for Heat Recovery value
-    EXPECT_EQ("WATER INLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryInletNodeNum) );  // checks Heat Recovery Water Inlet Node Name ID
-    EXPECT_EQ("WATER OUTLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryOutletNodeNum) );  // checks Heat Recovery Water Outlet Node Name ID
-    EXPECT_EQ("UNITARYSYSTEMPERFORMANCE:MULTISPEED", thisSys->m_DesignSpecMultispeedHPType );  // checks design_specification_multispeed_object_type value
-    EXPECT_EQ("MULTISPEED PERFORMANCE", thisSys->m_DesignSpecMultispeedHPName );  // checks design_specification_multispeed_object_name value
+    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                              // checks object name
+    EXPECT_EQ(UnitarySys::ControlType::Load, thisSys->m_ControlType);              // checks control type
+    EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num); // checks Dehumidification Control type type
+    EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone), thisSys->ControlZoneNum); // checks zone ID
+    EXPECT_EQ(DataGlobals::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                   // checks availability schedule name
+    EXPECT_EQ("NODE 29", DataLoopNode::NodeID(thisSys->AirInNode));                                          // checks air inlet node name
+    EXPECT_EQ("NODE 30", DataLoopNode::NodeID(thisSys->AirOutNode));                                         // checks air outlet node name
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                 // checks fan object type "FAN:ONOFF"
+    EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                             // checks fan object name
+    EXPECT_EQ(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace);                                          // checks fan placement, "DrawThrough"
+    EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
+    EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName);               // checks heating coil object type
+    EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName);                   // checks heating coil object type
+    EXPECT_EQ(1, thisSys->m_HeatingSizingRatio);                                   // checks dx heating coil sizing ratio
+    EXPECT_EQ(DataHVACGlobals::Coil_CoolingWater, thisSys->m_CoolingCoilType_Num); // checks cooling coil object type
+    EXPECT_EQ("WATER COOLING COIL", thisSys->m_CoolingCoilName);                   // checks cooling coil name
+    EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);                           // checks DX Coil is for DOAS use
+    EXPECT_EQ(7.0, thisSys->DesignMinOutletTemp);                                  // checks minimum supply air temperature
+    EXPECT_TRUE(thisSys->m_RunOnSensibleLoad);                                     // checks for "SENSIBLEONLYLOADCONTROL"
+    EXPECT_EQ("COIL:HEATING:FUEL", thisSys->m_SuppHeatCoilTypeName);               // checks supplemental heating coil object type
+    EXPECT_EQ("SUPPLEMENTAL HEATING COIL", thisSys->m_SuppHeatCoilName);           // checks supplemental heating coil name
+    EXPECT_EQ(4, thisSys->m_CoolingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedCoolingAirflow
+    EXPECT_EQ(0.5, thisSys->m_MaxCoolAirVolFlow); // checks Cooling Fraction of Autosized Cooling Supply Air Flow Rate value
+    EXPECT_EQ(5, thisSys->m_HeatingSAFMethod);    // checks cooling supply air flow rate sizing method, FractionOfAutosizedHeatingAirflow
+    EXPECT_EQ(0.8, thisSys->m_MaxHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
+    EXPECT_EQ(6, thisSys->m_NoCoolHeatSAFMethod); // checks cooling supply air flow rate sizing method, FlowPerCoolingCapacity
+    EXPECT_EQ(0.0000462180155978106, thisSys->m_MaxNoCoolHeatAirVolFlow); // checks Heating Fraction of Autosized Heating Supply Air Flow Rate value
+    EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp);                        // checks Maximum Supply Air Temperature value
+    EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat); // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
+    EXPECT_EQ("SYSTEM OUTDOOR AIR NODE", DataLoopNode::NodeID(thisSys->m_CondenserNodeNum)); // checks condenser air inlet node name
+    EXPECT_EQ(3.0, thisSys->m_MaxONOFFCyclesperHour);                                        // checks Maximum Cycling Rate value
+    EXPECT_EQ(120.0, thisSys->m_HPTimeConstant);                                             // checks Heat Pump Time Constant value
+    EXPECT_EQ(0.02, thisSys->m_OnCyclePowerFraction);                                        // checks Fraction of On-Cycle Power Use value
+    EXPECT_EQ(90.0, thisSys->m_FanDelayTime);                                                // checks Heat Pump Fan Delay Time value
+    EXPECT_EQ(40.0, thisSys->m_AncillaryOnPower);                                            // checks Ancillary On-Cycle Electric Power value
+    EXPECT_EQ(10.0, thisSys->m_AncillaryOffPower);                                           // checks Ancillary Off-Cycle Electric Power value
+    EXPECT_EQ(0.005, thisSys->m_DesignHRWaterVolumeFlow);                                    // checks Design Heat Recovery Water Flow Rate value
+    EXPECT_EQ(75.0, thisSys->m_MaxHROutletWaterTemp);                                        // checks Maximum Temperature for Heat Recovery value
+    EXPECT_EQ("WATER INLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryInletNodeNum));   // checks Heat Recovery Water Inlet Node Name ID
+    EXPECT_EQ("WATER OUTLET NODE NAME", DataLoopNode::NodeID(thisSys->m_HeatRecoveryOutletNodeNum)); // checks Heat Recovery Water Outlet Node Name ID
+    EXPECT_EQ("UNITARYSYSTEMPERFORMANCE:MULTISPEED",
+              thisSys->m_DesignSpecMultispeedHPType);                           // checks design_specification_multispeed_object_type value
+    EXPECT_EQ("MULTISPEED PERFORMANCE", thisSys->m_DesignSpecMultispeedHPName); // checks design_specification_multispeed_object_name value
 
 }

@@ -5388,6 +5388,7 @@ namespace HVACVariableRefrigerantFlow {
                 bool errorsFound = false;
                 bool AirNodeFound = false;
                 int AirLoopNumber = 0;
+                int ctrlZoneNum = 0;
                 std::string const cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
                 for (TUListNum = 1; TUListNum <= NumVRFTULists; ++TUListNum) {
                     for (NumTULoop = 1; NumTULoop <= TerminalUnitList(TUListNum).NumTUInList; ++NumTULoop) {
@@ -5408,7 +5409,6 @@ namespace HVACVariableRefrigerantFlow {
                                 }
                             }
                         }
-                        int ctrlZoneNum = 0;
                         // check if the TU is connected to an air loop
                         for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
                             for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
