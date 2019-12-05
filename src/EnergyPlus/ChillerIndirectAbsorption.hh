@@ -218,11 +218,13 @@ namespace ChillerIndirectAbsorption {
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
+        void setupOutputVars();
+
         void sizeChiller();
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
 
-        void CalcIndirectAbsorberModel(Real64 MyLoad, bool RunFlag, int EquipFlowCtrl);
+        void calculate(Real64 MyLoad, bool RunFlag, int EquipFlowCtrl);
     };
 
     // Object Data
