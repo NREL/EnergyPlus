@@ -1715,18 +1715,18 @@ namespace ChillerIndirectAbsorption {
 
         Real64 CapacityfEvaporatorTemp; // performance curve output
 
-        if (IndirectAbsorber(ChillNum).CapFEvaporatorTempPtr > 0) {
-            CapacityfEvaporatorTemp = CurveManager::CurveValue(IndirectAbsorber(ChillNum).CapFEvaporatorTempPtr, TempEvapOut);
+        if (this->CapFEvaporatorTempPtr > 0) {
+            CapacityfEvaporatorTemp = CurveManager::CurveValue(this->CapFEvaporatorTempPtr, TempEvapOut);
         } else {
             CapacityfEvaporatorTemp = 1.0;
         }
 
         Real64 CapacityfGeneratorTemp;  // performance curve output
 
-        if (IndirectAbsorber(ChillNum).CapFGeneratorTempPtr > 0) {
-            if (IndirectAbsorber(ChillNum).GeneratorInletNodeNum > 0) {
-                if (IndirectAbsorber(ChillNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
-                    CapacityfGeneratorTemp = CurveManager::CurveValue(IndirectAbsorber(ChillNum).CapFGeneratorTempPtr, DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp);
+        if (this->CapFGeneratorTempPtr > 0) {
+            if (this->GeneratorInletNodeNum > 0) {
+                if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                    CapacityfGeneratorTemp = CurveManager::CurveValue(this->CapFGeneratorTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
                 } else {
                     CapacityfGeneratorTemp = 1.0;
                 }
@@ -1741,78 +1741,78 @@ namespace ChillerIndirectAbsorption {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).LoopSide(IndirectAbsorber(ChillNum).CWLoopSideNum).FlowLock == 0) {
-            IndirectAbsorber(ChillNum).PossibleSubcooling = false;
-            IndirectAbsorber(ChillNum).QEvaporator = std::abs(MyLoad);
+        if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 0) {
+            this->PossibleSubcooling = false;
+            this->QEvaporator = std::abs(MyLoad);
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((IndirectAbsorber(ChillNum).FlowMode == ConstantFlow) || (IndirectAbsorber(ChillNum).FlowMode == NotModulated)) {
-                IndirectAbsorber(ChillNum).EvapMassFlowRate = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).MassFlowRate;
+            if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
+                this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
 
-                if (IndirectAbsorber(ChillNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = IndirectAbsorber(ChillNum).QEvaporator / IndirectAbsorber(ChillNum).EvapMassFlowRate / CpFluid;
+                if (this->EvapMassFlowRate != 0.0) {
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
-                IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
 
-            } else if (IndirectAbsorber(ChillNum).FlowMode == LeavingSetPointModulated) {
+            } else if (this->FlowMode == LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                        EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPoint;
+                        EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                        EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPointHi;
+                        EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                     } else {
                         assert(false);
                     }
                 }
 
                 if (EvapDeltaTemp != 0) {
-                    IndirectAbsorber(ChillNum).EvapMassFlowRate = std::abs(IndirectAbsorber(ChillNum).QEvaporator / CpFluid / EvapDeltaTemp);
-                    if ((IndirectAbsorber(ChillNum).EvapMassFlowRate - IndirectAbsorber(ChillNum).EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) IndirectAbsorber(ChillNum).PossibleSubcooling = true;
+                    this->EvapMassFlowRate = std::abs(this->QEvaporator / CpFluid / EvapDeltaTemp);
+                    if ((this->EvapMassFlowRate - this->EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) this->PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
-                    IndirectAbsorber(ChillNum).EvapMassFlowRate = min(IndirectAbsorber(ChillNum).EvapMassFlowRateMax, IndirectAbsorber(ChillNum).EvapMassFlowRate);
-                    PlantUtilities::SetComponentFlowRate(IndirectAbsorber(ChillNum).EvapMassFlowRate,
-                                         IndirectAbsorber(ChillNum).EvapInletNodeNum,
-                                         IndirectAbsorber(ChillNum).EvapOutletNodeNum,
-                                         IndirectAbsorber(ChillNum).CWLoopNum,
-                                         IndirectAbsorber(ChillNum).CWLoopSideNum,
-                                         IndirectAbsorber(ChillNum).CWBranchNum,
-                                         IndirectAbsorber(ChillNum).CWCompNum);
+                    this->EvapMassFlowRate = min(this->EvapMassFlowRateMax, this->EvapMassFlowRate);
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                         this->EvapInletNodeNum,
+                                         this->EvapOutletNodeNum,
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                     {
-                        auto const SELECT_CASE_var(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).LoopDemandCalcScheme);
+                        auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                            IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPoint;
+                            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                            IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPointHi;
+                            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                         }
                     }
                 } else {
-                    IndirectAbsorber(ChillNum).EvapMassFlowRate = 0.0;
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
+                    this->EvapMassFlowRate = 0.0;
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
 
-                    ShowRecurringWarningErrorAtEnd("CalcIndirectAbsorberModel: Name=\"" + IndirectAbsorber(ChillNum).Name +
+                    ShowRecurringWarningErrorAtEnd("CalcIndirectAbsorberModel: Name=\"" + this->Name +
                                                        "\" Evaporative Condenser Delta Temperature = 0 in mass flow calculation.",
-                                                   IndirectAbsorber(ChillNum).ErrCount2);
+                                                   this->ErrCount2);
                 }
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (IndirectAbsorber(ChillNum).FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (IndirectAbsorber(ChillNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = IndirectAbsorber(ChillNum).FaultyChillerSWTIndex;
-                bool VarFlowFlag = (IndirectAbsorber(ChillNum).FlowMode == LeavingSetPointModulated);
+                int FaultIndex = this->FaultyChillerSWTIndex;
+                bool VarFlowFlag = (this->FlowMode == LeavingSetPointModulated);
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        IndirectAbsorber(ChillNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         CpFluid,
-                                        DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp,
-                                        IndirectAbsorber(ChillNum).EvapOutletTemp,
-                                        IndirectAbsorber(ChillNum).EvapMassFlowRate,
-                                        IndirectAbsorber(ChillNum).QEvaporator);
+                                        DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
                 // PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
                 // PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
@@ -1821,111 +1821,111 @@ namespace ChillerIndirectAbsorption {
 
         } else { // If FlowLock is True
 
-            IndirectAbsorber(ChillNum).EvapMassFlowRate = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).MassFlowRate;
-            if (IndirectAbsorber(ChillNum).PossibleSubcooling) {
-                IndirectAbsorber(ChillNum).QEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = IndirectAbsorber(ChillNum).QEvaporator / IndirectAbsorber(ChillNum).EvapMassFlowRate / CpFluid;
-                IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+            this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+            if (this->PossibleSubcooling) {
+                this->QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                        if ((IndirectAbsorber(ChillNum).FlowMode == LeavingSetPointModulated) ||
-                            (DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum)
-                                 .LoopSide(IndirectAbsorber(ChillNum).CWLoopSideNum)
-                                 .Branch(IndirectAbsorber(ChillNum).CWBranchNum)
-                                 .Comp(IndirectAbsorber(ChillNum).CWCompNum)
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
+                            (DataPlant::PlantLoop(this->CWLoopNum)
+                                 .LoopSide(this->CWLoopSideNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                            (DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
-                            TempEvapOutSetPoint = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPoint;
+                            (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
+                            TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                        if ((IndirectAbsorber(ChillNum).FlowMode == LeavingSetPointModulated) ||
-                            (DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum)
-                                 .LoopSide(IndirectAbsorber(ChillNum).CWLoopSideNum)
-                                 .Branch(IndirectAbsorber(ChillNum).CWBranchNum)
-                                 .Comp(IndirectAbsorber(ChillNum).CWCompNum)
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
+                            (DataPlant::PlantLoop(this->CWLoopNum)
+                                 .LoopSide(this->CWLoopSideNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                            (DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
-                            TempEvapOutSetPoint = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempSetPointHi;
+                            (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
+                            TempEvapOutSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                         } else {
-                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                            TempEvapOutSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                         }
                     } else {
                         assert(false);
                     }
                 }
-                EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - TempEvapOutSetPoint;
-                IndirectAbsorber(ChillNum).QEvaporator = std::abs(IndirectAbsorber(ChillNum).EvapMassFlowRate * CpFluid * EvapDeltaTemp);
-                IndirectAbsorber(ChillNum).EvapOutletTemp = TempEvapOutSetPoint;
+                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - TempEvapOutSetPoint;
+                this->QEvaporator = std::abs(this->EvapMassFlowRate * CpFluid * EvapDeltaTemp);
+                this->EvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
-            if (IndirectAbsorber(ChillNum).EvapOutletTemp < TempLowLimitEout) {
-                if ((DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = TempLowLimitEout;
-                    EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - IndirectAbsorber(ChillNum).EvapOutletTemp;
-                    IndirectAbsorber(ChillNum).QEvaporator = IndirectAbsorber(ChillNum).EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+            if (this->EvapOutletTemp < TempLowLimitEout) {
+                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
+                    this->EvapOutletTemp = TempLowLimitEout;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
-                    EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - IndirectAbsorber(ChillNum).EvapOutletTemp;
-                    IndirectAbsorber(ChillNum).QEvaporator = IndirectAbsorber(ChillNum).EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
-            if (IndirectAbsorber(ChillNum).EvapOutletTemp < DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempMin) {
-                if ((DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempMin) > DataPlant::DeltaTempTol) {
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).TempMin;
-                    EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - IndirectAbsorber(ChillNum).EvapOutletTemp;
-                    IndirectAbsorber(ChillNum).QEvaporator = IndirectAbsorber(ChillNum).EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+            if (this->EvapOutletTemp < DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) {
+                if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) > DataPlant::DeltaTempTol) {
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempMin;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 } else {
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
-                    EvapDeltaTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - IndirectAbsorber(ChillNum).EvapOutletTemp;
-                    IndirectAbsorber(ChillNum).QEvaporator = IndirectAbsorber(ChillNum).EvapMassFlowRate * CpFluid * EvapDeltaTemp;
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * CpFluid * EvapDeltaTemp;
                 }
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (IndirectAbsorber(ChillNum).QEvaporator > std::abs(MyLoad)) {
-                if (IndirectAbsorber(ChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    IndirectAbsorber(ChillNum).QEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = IndirectAbsorber(ChillNum).QEvaporator / IndirectAbsorber(ChillNum).EvapMassFlowRate / CpFluid;
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+            if (this->QEvaporator > std::abs(MyLoad)) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    this->QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
                 } else {
-                    IndirectAbsorber(ChillNum).QEvaporator = 0.0;
-                    IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
+                    this->QEvaporator = 0.0;
+                    this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
                 }
             }
 
             // If there is a fault of Chiller SWT Sensor
-            if (IndirectAbsorber(ChillNum).FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (IndirectAbsorber(ChillNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = IndirectAbsorber(ChillNum).FaultyChillerSWTIndex;
+                int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        IndirectAbsorber(ChillNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         CpFluid,
-                                        DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp,
-                                        IndirectAbsorber(ChillNum).EvapOutletTemp,
-                                        IndirectAbsorber(ChillNum).EvapMassFlowRate,
-                                        IndirectAbsorber(ChillNum).QEvaporator);
+                                        DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
             }
 
         } // This is the end of the FlowLock Block
 
         // Operating part load ratio
-        Real64 OperPartLoadRat = IndirectAbsorber(ChillNum).QEvaporator / AbsorberNomCap;
+        Real64 OperPartLoadRat = this->QEvaporator / AbsorberNomCap;
 
         // part load ratio for efficiency calc
-        Real64 PartLoadRat = max(IndirectAbsorber(ChillNum).MinPartLoadRat, OperPartLoadRat);
-        IndirectAbsorber(ChillNum).Report.ChillerPartLoadRatio = OperPartLoadRat;
+        Real64 PartLoadRat = max(this->MinPartLoadRat, OperPartLoadRat);
+        this->Report.ChillerPartLoadRatio = OperPartLoadRat;
 
         Real64 FRAC;                    // fraction of time step chiller cycles
         if (OperPartLoadRat < PartLoadRat) {
-            FRAC = min(1.0, OperPartLoadRat / IndirectAbsorber(ChillNum).MinPartLoadRat);
+            FRAC = min(1.0, OperPartLoadRat / this->MinPartLoadRat);
         } else {
             FRAC = 1.0;
         }
