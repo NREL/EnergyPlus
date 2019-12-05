@@ -214,7 +214,7 @@ namespace ChillerIndirectAbsorption {
         if (LoopNum == IndirectAbsorber(ChillNum).CWLoopNum) {
 
             IndirectAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-            IndirectAbsorber(ChillNum).CalcIndirectAbsorberModel(ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
+            IndirectAbsorber(ChillNum).CalcIndirectAbsorberModel(MyLoad, RunFlag, EquipFlowCtrl);
             IndirectAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
 
         } else if (LoopNum == IndirectAbsorber(ChillNum).CDLoopNum) {
@@ -1575,12 +1575,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::CalcIndirectAbsorberModel(int const ChillNum,                   // Absorber number
-                                   Real64 const MyLoad,                  // operating load
-                                   bool const RunFlag,                   // TRUE when Absorber operating
-                                   bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep !unused1208
-                                   int const EquipFlowCtrl               // Flow control mode for the equipment
-    )
+    void IndirectAbsorberSpecs::CalcIndirectAbsorberModel(Real64 const MyLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
@@ -1930,13 +1925,13 @@ namespace ChillerIndirectAbsorption {
             FRAC = 1.0;
         }
 
-        IndirectAbsorber(ChillNum).ChillerONOFFCyclingFrac = FRAC;
+        this->ChillerONOFFCyclingFrac = FRAC;
 
         Real64 HeatInputfCondTemp;      // performance curve output
 
-        if (IndirectAbsorber(ChillNum).GeneratorInletNodeNum > 0) {
-            if (IndirectAbsorber(ChillNum).HeatInputFCondTempPtr > 0) {
-                HeatInputfCondTemp = CurveManager::CurveValue(IndirectAbsorber(ChillNum).HeatInputFCondTempPtr, DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp);
+        if (this->GeneratorInletNodeNum > 0) {
+            if (this->HeatInputFCondTempPtr > 0) {
+                HeatInputfCondTemp = CurveManager::CurveValue(this->HeatInputFCondTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
             } else {
                 HeatInputfCondTemp = 1.0;
             }
@@ -1946,8 +1941,8 @@ namespace ChillerIndirectAbsorption {
 
         Real64 HeatInputfEvapTemp;      // performance curve output
 
-        if (IndirectAbsorber(ChillNum).HeatInputFEvapTempPtr > 0) {
-            HeatInputfEvapTemp = CurveManager::CurveValue(IndirectAbsorber(ChillNum).HeatInputFEvapTempPtr, DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).Temp);
+        if (this->HeatInputFEvapTempPtr > 0) {
+            HeatInputfEvapTemp = CurveManager::CurveValue(this->HeatInputFEvapTempPtr, DataLoopNode::Node(this->EvapOutletNodeNum).Temp);
         } else {
             HeatInputfEvapTemp = 1.0;
         }
@@ -1955,8 +1950,8 @@ namespace ChillerIndirectAbsorption {
         Real64 HeatInputRat;             // generator heat input ratio
 
         // Calculate steam input ratio. Include impact of generator and evaporator temperatures
-        if (IndirectAbsorber(ChillNum).GeneratorInputCurvePtr > 0) {
-            HeatInputRat = CurveManager::CurveValue(IndirectAbsorber(ChillNum).GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
+        if (this->GeneratorInputCurvePtr > 0) {
+            HeatInputRat = CurveManager::CurveValue(this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
         } else {
             HeatInputRat = HeatInputfCondTemp * HeatInputfEvapTemp;
         }
@@ -1964,152 +1959,152 @@ namespace ChillerIndirectAbsorption {
         Real64 ElectricInputRat;         // energy input ratio
 
         // Calculate electric input ratio
-        if (IndirectAbsorber(ChillNum).PumpPowerCurvePtr > 0) {
-            ElectricInputRat = CurveManager::CurveValue(IndirectAbsorber(ChillNum).PumpPowerCurvePtr, PartLoadRat);
+        if (this->PumpPowerCurvePtr > 0) {
+            ElectricInputRat = CurveManager::CurveValue(this->PumpPowerCurvePtr, PartLoadRat);
         } else {
             ElectricInputRat = 1.0;
         }
 
-        IndirectAbsorber(ChillNum).QGenerator = HeatInputRat * AbsorberNomCap * FRAC;
-        IndirectAbsorber(ChillNum).PumpingPower = ElectricInputRat * this->NomPumpPower * FRAC;
+        this->QGenerator = HeatInputRat * AbsorberNomCap * FRAC;
+        this->PumpingPower = ElectricInputRat * this->NomPumpPower * FRAC;
 
-        if (IndirectAbsorber(ChillNum).EvapMassFlowRate == 0.0) {
-            IndirectAbsorber(ChillNum).QGenerator = 0.0;
-            IndirectAbsorber(ChillNum).EvapOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
-            IndirectAbsorber(ChillNum).PumpingPower = 0.0;
+        if (this->EvapMassFlowRate == 0.0) {
+            this->QGenerator = 0.0;
+            this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->PumpingPower = 0.0;
         }
 
-        IndirectAbsorber(ChillNum).QCondenser = IndirectAbsorber(ChillNum).QEvaporator + IndirectAbsorber(ChillNum).QGenerator + IndirectAbsorber(ChillNum).PumpingPower;
+        this->QCondenser = this->QEvaporator + this->QGenerator + this->PumpingPower;
 
-        CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CDLoopNum).FluidName,
+        CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                         CondInletTemp,
-                                        DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CDLoopNum).FluidIndex,
+                                        DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                         RoutineName);
 
-        if (IndirectAbsorber(ChillNum).CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            IndirectAbsorber(ChillNum).CondOutletTemp = IndirectAbsorber(ChillNum).QCondenser / IndirectAbsorber(ChillNum).CondMassFlowRate / CpFluid + CondInletTemp;
+        if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpFluid + CondInletTemp;
         } else {
-            IndirectAbsorber(ChillNum).CondOutletTemp = CondInletTemp;
-            IndirectAbsorber(ChillNum).CondMassFlowRate = 0.0;
-            IndirectAbsorber(ChillNum).QCondenser = 0.0;
+            this->CondOutletTemp = CondInletTemp;
+            this->CondMassFlowRate = 0.0;
+            this->QCondenser = 0.0;
             return;
             // V7 plant upgrade, no longer fatal here anymore... set some things and return
         }
 
-        if (IndirectAbsorber(ChillNum).GeneratorInletNodeNum > 0) {
+        if (this->GeneratorInletNodeNum > 0) {
             //   Hot water plant is used for the generator
-            if (IndirectAbsorber(ChillNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
 
-                CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidName,
-                                                DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
-                                                DataPlant::PlantLoop(IndirectAbsorber(ChillNum).GenLoopNum).FluidIndex,
+                CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GenLoopNum).FluidName,
+                                                DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                DataPlant::PlantLoop(this->GenLoopNum).FluidIndex,
                                                 RoutineName);
-                if ((IndirectAbsorber(ChillNum).FlowMode == ConstantFlow) || (IndirectAbsorber(ChillNum).FlowMode == NotModulated)) {
-                    IndirectAbsorber(ChillNum).GenMassFlowRate = IndirectAbsorber(ChillNum).GenMassFlowRateMax;
+                if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
+                    this->GenMassFlowRate = this->GenMassFlowRateMax;
                 } else {
-                    IndirectAbsorber(ChillNum).GenMassFlowRate = IndirectAbsorber(ChillNum).QGenerator / CpFluid / IndirectAbsorber(ChillNum).GeneratorDeltaTemp;
+                    this->GenMassFlowRate = this->QGenerator / CpFluid / this->GeneratorDeltaTemp;
                 }
 
-                PlantUtilities::SetComponentFlowRate(IndirectAbsorber(ChillNum).GenMassFlowRate,
-                                     IndirectAbsorber(ChillNum).GeneratorInletNodeNum,
-                                     IndirectAbsorber(ChillNum).GeneratorOutletNodeNum,
-                                     IndirectAbsorber(ChillNum).GenLoopNum,
-                                     IndirectAbsorber(ChillNum).GenLoopSideNum,
-                                     IndirectAbsorber(ChillNum).GenBranchNum,
-                                     IndirectAbsorber(ChillNum).GenCompNum);
+                PlantUtilities::SetComponentFlowRate(this->GenMassFlowRate,
+                                     this->GeneratorInletNodeNum,
+                                     this->GeneratorOutletNodeNum,
+                                     this->GenLoopNum,
+                                     this->GenLoopSideNum,
+                                     this->GenBranchNum,
+                                     this->GenCompNum);
 
-                if (IndirectAbsorber(ChillNum).GenMassFlowRate <= 0.0) {
-                    IndirectAbsorber(ChillNum).GenOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp;
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Enthalpy;
+                if (this->GenMassFlowRate <= 0.0) {
+                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;
+                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy;
                 } else {
-                    IndirectAbsorber(ChillNum).GenOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp - IndirectAbsorber(ChillNum).QGenerator / (CpFluid * IndirectAbsorber(ChillNum).GenMassFlowRate);
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Enthalpy - IndirectAbsorber(ChillNum).QGenerator / IndirectAbsorber(ChillNum).GenMassFlowRate;
+                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - this->QGenerator / (CpFluid * this->GenMassFlowRate);
+                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy - this->QGenerator / this->GenMassFlowRate;
                 }
 
             } else { // using a steam plant for the generator
 
                 // enthalpy of dry steam at generator inlet
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                       DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
+                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                        1.0,
-                                                       IndirectAbsorber(ChillNum).SteamFluidIndex,
-                                                       calcChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
+                                                       this->SteamFluidIndex,
+                                                       calcChillerAbsorptionIndirect + this->Name);
 
                 // enthalpy of wet steam at generator inlet
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                       DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
+                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                        0.0,
-                                                       IndirectAbsorber(ChillNum).SteamFluidIndex,
-                                                       calcChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
+                                                       this->SteamFluidIndex,
+                                                       calcChillerAbsorptionIndirect + this->Name);
 
                 // temperature difference of fluid through generator
-                Real64 SteamDeltaT = IndirectAbsorber(ChillNum).GeneratorSubcool;
+                Real64 SteamDeltaT = this->GeneratorSubcool;
 
                 // generator outlet temperature
-                Real64 SteamOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp - SteamDeltaT;
+                Real64 SteamOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
 
                  // heat of vaporization of steam
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                        fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
-                IndirectAbsorber(ChillNum).GenMassFlowRate = IndirectAbsorber(ChillNum).QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
-                PlantUtilities::SetComponentFlowRate(IndirectAbsorber(ChillNum).GenMassFlowRate,
-                                     IndirectAbsorber(ChillNum).GeneratorInletNodeNum,
-                                     IndirectAbsorber(ChillNum).GeneratorOutletNodeNum,
-                                     IndirectAbsorber(ChillNum).GenLoopNum,
-                                     IndirectAbsorber(ChillNum).GenLoopSideNum,
-                                     IndirectAbsorber(ChillNum).GenBranchNum,
-                                     IndirectAbsorber(ChillNum).GenCompNum);
+                        fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorptionIndirect + this->Name);
+                this->GenMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
+                PlantUtilities::SetComponentFlowRate(this->GenMassFlowRate,
+                                     this->GeneratorInletNodeNum,
+                                     this->GeneratorOutletNodeNum,
+                                     this->GenLoopNum,
+                                     this->GenLoopSideNum,
+                                     this->GenBranchNum,
+                                     this->GenCompNum);
 
-                if (IndirectAbsorber(ChillNum).GenMassFlowRate <= 0.0) {
-                    IndirectAbsorber(ChillNum).GenOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp;
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Enthalpy;
+                if (this->GenMassFlowRate <= 0.0) {
+                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp;
+                    this->SteamOutletEnthalpy = DataLoopNode::Node(this->GeneratorInletNodeNum).Enthalpy;
                 } else {
-                    IndirectAbsorber(ChillNum).GenOutletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp - SteamDeltaT;
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
-                                                               DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
+                    this->GenOutletTemp = DataLoopNode::Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
+                    this->SteamOutletEnthalpy = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
+                                                               DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                                0.0,
-                                                               IndirectAbsorber(ChillNum).SteamFluidIndex,
-                                                               LoopLossesChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
+                                                               this->SteamFluidIndex,
+                                                               LoopLossesChillerAbsorptionIndirect + this->Name);
                     CpFluid = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
-                                                    DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
+                                                    DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
                                                     const_cast<int &>(waterIndex),
-                                                    calcChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
+                                                    calcChillerAbsorptionIndirect + this->Name);
 
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy -= CpFluid * SteamDeltaT;
+                    this->SteamOutletEnthalpy -= CpFluid * SteamDeltaT;
 
                     //************************* Loop Losses *****************************
 
                     // temperature of condensed steam leaving generator (after condensate trap)
                     Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(fluidNameSteam,
                                                                 DataEnvironment::OutBaroPress,
-                                                                IndirectAbsorber(ChillNum).SteamFluidIndex,
-                                                                LoopLossesChillerAbsorptionIndirect + IndirectAbsorber(ChillNum).Name);
+                                                                this->SteamFluidIndex,
+                                                                LoopLossesChillerAbsorptionIndirect + this->Name);
 
                     // enthalpy  of condensed steam leaving generator (after condensate trap)
                     Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam,
                                                           TempWaterAtmPress,
                                                           0.0,
-                                                          IndirectAbsorber(ChillNum).SteamFluidIndex,
-                                                          LoopLossesChillerAbsorptionIndirectSpace + IndirectAbsorber(ChillNum).Name);
+                                                          this->SteamFluidIndex,
+                                                          LoopLossesChillerAbsorptionIndirectSpace + this->Name);
 
                     // Point 4 at atm - loop delta subcool during return journery back to pump
 
                     // temperature of condensed steam entering pump (includes loop losses)
-                    Real64 TempLoopOutToPump = TempWaterAtmPress - IndirectAbsorber(ChillNum).LoopSubcool;
+                    Real64 TempLoopOutToPump = TempWaterAtmPress - this->LoopSubcool;
 
                     // Reported value of coil outlet enthalpy at the node to match the node outlet temperature
 
                     // enthalpy of condensed steam entering pump (includes loop losses)
-                    Real64 EnthPumpInlet = EnthAtAtmPress - CpFluid * IndirectAbsorber(ChillNum).LoopSubcool;
+                    Real64 EnthPumpInlet = EnthAtAtmPress - CpFluid * this->LoopSubcool;
 
                     // Point 3-Point 5,
-                    EnergyLossToEnvironment = IndirectAbsorber(ChillNum).GenMassFlowRate * (IndirectAbsorber(ChillNum).SteamOutletEnthalpy - EnthPumpInlet);
+                    EnergyLossToEnvironment = this->GenMassFlowRate * (this->SteamOutletEnthalpy - EnthPumpInlet);
 
                     //************************* Loop Losses *****************************
 
-                    IndirectAbsorber(ChillNum).GenOutletTemp = TempLoopOutToPump;
-                    IndirectAbsorber(ChillNum).SteamOutletEnthalpy = EnthPumpInlet;
+                    this->GenOutletTemp = TempLoopOutToPump;
+                    this->SteamOutletEnthalpy = EnthPumpInlet;
 
                 } // IF(GenMassFlowRate .LE. 0.0d0)THEN
 
@@ -2118,10 +2113,10 @@ namespace ChillerIndirectAbsorption {
         } // IF(GeneratorInletNode .GT. 0)THEN
 
         // convert power to energy
-        IndirectAbsorber(ChillNum).GeneratorEnergy = IndirectAbsorber(ChillNum).QGenerator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        IndirectAbsorber(ChillNum).EvaporatorEnergy = IndirectAbsorber(ChillNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        IndirectAbsorber(ChillNum).CondenserEnergy = IndirectAbsorber(ChillNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        IndirectAbsorber(ChillNum).PumpingEnergy = IndirectAbsorber(ChillNum).PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->GeneratorEnergy = this->QGenerator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->PumpingEnergy = this->PumpingPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         //                              ------
         //                            /        \.
