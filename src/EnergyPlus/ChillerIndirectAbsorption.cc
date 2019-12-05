@@ -122,14 +122,12 @@ namespace ChillerIndirectAbsorption {
     bool GetInput(true); // when TRUE, calls subroutine to read input file.
 
     Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-    Array1D<ReportVars> IndirectAbsorberReport;
 
     void clear_state()
     {
         NumIndirectAbsorbers = 0;
         EnergyLossToEnvironment = 0.0;
         IndirectAbsorber.deallocate();
-        IndirectAbsorberReport.deallocate();
     }
 
     void SimIndirectAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
@@ -226,10 +224,10 @@ namespace ChillerIndirectAbsorption {
                                                 DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                 IndirectAbsorber(ChillNum).CondInletNodeNum,
                                                 IndirectAbsorber(ChillNum).CondOutletNodeNum,
-                                                IndirectAbsorberReport(ChillNum).QCond,
-                                                IndirectAbsorberReport(ChillNum).CondInletTemp,
-                                                IndirectAbsorberReport(ChillNum).CondOutletTemp,
-                                                IndirectAbsorberReport(ChillNum).Condmdot,
+                                                IndirectAbsorber(ChillNum).Report.QCond,
+                                                IndirectAbsorber(ChillNum).Report.CondInletTemp,
+                                                IndirectAbsorber(ChillNum).Report.CondOutletTemp,
+                                                IndirectAbsorber(ChillNum).Report.Condmdot,
                                                 FirstIteration);
 
         } else if (LoopNum == IndirectAbsorber(ChillNum).GenLoopNum) {
@@ -240,8 +238,8 @@ namespace ChillerIndirectAbsorption {
                                                         IndirectAbsorber(ChillNum).GeneratorInletNodeNum,
                                                         IndirectAbsorber(ChillNum).GeneratorOutletNodeNum,
                                                         IndirectAbsorber(ChillNum).GenHeatSourceType,
-                                                        IndirectAbsorberReport(ChillNum).QGenerator,
-                                                        IndirectAbsorberReport(ChillNum).SteamMdot,
+                                                        IndirectAbsorber(ChillNum).Report.QGenerator,
+                                                        IndirectAbsorber(ChillNum).Report.SteamMdot,
                                                         FirstIteration);
 
         } else {
@@ -285,7 +283,6 @@ namespace ChillerIndirectAbsorption {
         if (allocated(IndirectAbsorber)) return;
 
         IndirectAbsorber.allocate(NumIndirectAbsorbers);
-        IndirectAbsorberReport.allocate(NumIndirectAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum) {
@@ -566,13 +563,13 @@ namespace ChillerIndirectAbsorption {
         for (AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum) {
             SetupOutputVariable("Chiller Electric Power",
                                 OutputProcessor::Unit::W,
-                                IndirectAbsorberReport(AbsorberNum).PumpingPower,
+                                IndirectAbsorber(AbsorberNum).Report.PumpingPower,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                IndirectAbsorberReport(AbsorberNum).PumpingEnergy,
+                                IndirectAbsorber(AbsorberNum).Report.PumpingEnergy,
                                 "System",
                                 "Sum",
                                 IndirectAbsorber(AbsorberNum).Name,
@@ -583,13 +580,13 @@ namespace ChillerIndirectAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                IndirectAbsorberReport(AbsorberNum).QEvap,
+                                IndirectAbsorber(AbsorberNum).Report.QEvap,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                IndirectAbsorberReport(AbsorberNum).EvapEnergy,
+                                IndirectAbsorber(AbsorberNum).Report.EvapEnergy,
                                 "System",
                                 "Sum",
                                 IndirectAbsorber(AbsorberNum).Name,
@@ -600,32 +597,32 @@ namespace ChillerIndirectAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IndirectAbsorberReport(AbsorberNum).EvapInletTemp,
+                                IndirectAbsorber(AbsorberNum).Report.EvapInletTemp,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IndirectAbsorberReport(AbsorberNum).EvapOutletTemp,
+                                IndirectAbsorber(AbsorberNum).Report.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                IndirectAbsorberReport(AbsorberNum).Evapmdot,
+                                IndirectAbsorber(AbsorberNum).Report.Evapmdot,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                IndirectAbsorberReport(AbsorberNum).QCond,
+                                IndirectAbsorber(AbsorberNum).Report.QCond,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                IndirectAbsorberReport(AbsorberNum).CondEnergy,
+                                IndirectAbsorber(AbsorberNum).Report.CondEnergy,
                                 "System",
                                 "Sum",
                                 IndirectAbsorber(AbsorberNum).Name,
@@ -636,19 +633,19 @@ namespace ChillerIndirectAbsorption {
                                 "Plant");
             SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IndirectAbsorberReport(AbsorberNum).CondInletTemp,
+                                IndirectAbsorber(AbsorberNum).Report.CondInletTemp,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IndirectAbsorberReport(AbsorberNum).CondOutletTemp,
+                                IndirectAbsorber(AbsorberNum).Report.CondOutletTemp,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                IndirectAbsorberReport(AbsorberNum).Condmdot,
+                                IndirectAbsorber(AbsorberNum).Report.Condmdot,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
@@ -656,13 +653,13 @@ namespace ChillerIndirectAbsorption {
             if (IndirectAbsorber(AbsorberNum).GenHeatSourceType == DataLoopNode::NodeType_Water) {
                 SetupOutputVariable("Chiller Hot Water Consumption Rate",
                                     OutputProcessor::Unit::W,
-                                    IndirectAbsorberReport(AbsorberNum).QGenerator,
+                                    IndirectAbsorber(AbsorberNum).Report.QGenerator,
                                     "System",
                                     "Average",
                                     IndirectAbsorber(AbsorberNum).Name);
                 SetupOutputVariable("Chiller Source Hot Water Energy",
                                     OutputProcessor::Unit::J,
-                                    IndirectAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                    IndirectAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                     "System",
                                     "Sum",
                                     IndirectAbsorber(AbsorberNum).Name,
@@ -675,13 +672,13 @@ namespace ChillerIndirectAbsorption {
                 if (IndirectAbsorber(AbsorberNum).GenInputOutputNodesUsed) {
                     SetupOutputVariable("Chiller Source Steam Rate",
                                         OutputProcessor::Unit::W,
-                                        IndirectAbsorberReport(AbsorberNum).QGenerator,
+                                        IndirectAbsorber(AbsorberNum).Report.QGenerator,
                                         "System",
                                         "Average",
                                         IndirectAbsorber(AbsorberNum).Name);
                     SetupOutputVariable("Chiller Source Steam Energy",
                                         OutputProcessor::Unit::J,
-                                        IndirectAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                        IndirectAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                         "System",
                                         "Sum",
                                         IndirectAbsorber(AbsorberNum).Name,
@@ -693,13 +690,13 @@ namespace ChillerIndirectAbsorption {
                 } else {
                     SetupOutputVariable("Chiller Source Steam Rate",
                                         OutputProcessor::Unit::W,
-                                        IndirectAbsorberReport(AbsorberNum).QGenerator,
+                                        IndirectAbsorber(AbsorberNum).Report.QGenerator,
                                         "System",
                                         "Average",
                                         IndirectAbsorber(AbsorberNum).Name);
                     SetupOutputVariable("Chiller Source Steam Energy",
                                         OutputProcessor::Unit::J,
-                                        IndirectAbsorberReport(AbsorberNum).GeneratorEnergy,
+                                        IndirectAbsorber(AbsorberNum).Report.GeneratorEnergy,
                                         "System",
                                         "Sum",
                                         IndirectAbsorber(AbsorberNum).Name,
@@ -713,26 +710,26 @@ namespace ChillerIndirectAbsorption {
 
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                IndirectAbsorberReport(AbsorberNum).ActualCOP,
+                                IndirectAbsorber(AbsorberNum).Report.ActualCOP,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                IndirectAbsorberReport(AbsorberNum).ChillerPartLoadRatio,
+                                IndirectAbsorber(AbsorberNum).Report.ChillerPartLoadRatio,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
             SetupOutputVariable("Chiller Cycling Ratio",
                                 OutputProcessor::Unit::None,
-                                IndirectAbsorberReport(AbsorberNum).ChillerCyclingFrac,
+                                IndirectAbsorber(AbsorberNum).Report.ChillerCyclingFrac,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
 
             SetupOutputVariable("Chiller Steam Heat Loss Rate",
                                 OutputProcessor::Unit::W,
-                                IndirectAbsorberReport(AbsorberNum).LoopLoss,
+                                IndirectAbsorber(AbsorberNum).Report.LoopLoss,
                                 "System",
                                 "Average",
                                 IndirectAbsorber(AbsorberNum).Name);
@@ -1927,7 +1924,7 @@ namespace ChillerIndirectAbsorption {
 
         // part load ratio for efficiency calc
         Real64 PartLoadRat = max(IndirectAbsorber(ChillNum).MinPartLoadRat, OperPartLoadRat);
-        IndirectAbsorberReport(ChillNum).ChillerPartLoadRatio = OperPartLoadRat;
+        IndirectAbsorber(ChillNum).Report.ChillerPartLoadRatio = OperPartLoadRat;
 
         Real64 FRAC;                    // fraction of time step chiller cycles
         if (OperPartLoadRat < PartLoadRat) {
@@ -2168,25 +2165,25 @@ namespace ChillerIndirectAbsorption {
             PlantUtilities::SafeCopyPlantNode(this->EvapInletNodeNum, this->EvapOutletNodeNum);
             PlantUtilities::SafeCopyPlantNode(this->CondInletNodeNum, CondOutletNode);
 
-            IndirectAbsorberReport(Num).PumpingPower = 0.0;
-            IndirectAbsorberReport(Num).QEvap = 0.0;
-            IndirectAbsorberReport(Num).QCond = 0.0;
-            IndirectAbsorberReport(Num).QGenerator = 0.0;
-            IndirectAbsorberReport(Num).PumpingEnergy = 0.0;
-            IndirectAbsorberReport(Num).EvapEnergy = 0.0;
-            IndirectAbsorberReport(Num).CondEnergy = 0.0;
-            IndirectAbsorberReport(Num).GeneratorEnergy = 0.0;
-            IndirectAbsorberReport(Num).EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            IndirectAbsorberReport(Num).CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            IndirectAbsorberReport(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorberReport(Num).EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            IndirectAbsorberReport(Num).Evapmdot = 0.0;
-            IndirectAbsorberReport(Num).Condmdot = 0.0;
-            IndirectAbsorberReport(Num).Genmdot = 0.0;
-            IndirectAbsorberReport(Num).ActualCOP = 0.0;
-            IndirectAbsorberReport(Num).ChillerPartLoadRatio = 0.0;
-            IndirectAbsorberReport(Num).LoopLoss = 0.0;
-            IndirectAbsorberReport(Num).ChillerCyclingFrac = 0.0;
+            IndirectAbsorber(Num).Report.PumpingPower = 0.0;
+            IndirectAbsorber(Num).Report.QEvap = 0.0;
+            IndirectAbsorber(Num).Report.QCond = 0.0;
+            IndirectAbsorber(Num).Report.QGenerator = 0.0;
+            IndirectAbsorber(Num).Report.PumpingEnergy = 0.0;
+            IndirectAbsorber(Num).Report.EvapEnergy = 0.0;
+            IndirectAbsorber(Num).Report.CondEnergy = 0.0;
+            IndirectAbsorber(Num).Report.GeneratorEnergy = 0.0;
+            IndirectAbsorber(Num).Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            IndirectAbsorber(Num).Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.Evapmdot = 0.0;
+            IndirectAbsorber(Num).Report.Condmdot = 0.0;
+            IndirectAbsorber(Num).Report.Genmdot = 0.0;
+            IndirectAbsorber(Num).Report.ActualCOP = 0.0;
+            IndirectAbsorber(Num).Report.ChillerPartLoadRatio = 0.0;
+            IndirectAbsorber(Num).Report.LoopLoss = 0.0;
+            IndirectAbsorber(Num).Report.ChillerCyclingFrac = 0.0;
 
             if (this->GeneratorInletNodeNum > 0) {
                 PlantUtilities::SafeCopyPlantNode(this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
@@ -2199,28 +2196,28 @@ namespace ChillerIndirectAbsorption {
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             DataLoopNode::Node(CondOutletNode).Temp = this->CondOutletTemp;
 
-            IndirectAbsorberReport(Num).PumpingPower = this->PumpingPower;
-            IndirectAbsorberReport(Num).QEvap = this->QEvaporator;
-            IndirectAbsorberReport(Num).QCond = this->QCondenser;
-            IndirectAbsorberReport(Num).QGenerator = this->QGenerator;
-            IndirectAbsorberReport(Num).PumpingEnergy = this->PumpingEnergy;
-            IndirectAbsorberReport(Num).EvapEnergy = this->EvaporatorEnergy;
-            IndirectAbsorberReport(Num).CondEnergy = this->CondenserEnergy;
-            IndirectAbsorberReport(Num).GeneratorEnergy = this->GeneratorEnergy;
-            IndirectAbsorberReport(Num).EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            IndirectAbsorberReport(Num).CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            IndirectAbsorberReport(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorberReport(Num).EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            IndirectAbsorberReport(Num).Evapmdot = this->EvapMassFlowRate;
-            IndirectAbsorberReport(Num).Condmdot = this->CondMassFlowRate;
-            IndirectAbsorberReport(Num).Genmdot = this->GenMassFlowRate;
-            IndirectAbsorberReport(Num).LoopLoss = EnergyLossToEnvironment;
-            IndirectAbsorberReport(Num).ChillerCyclingFrac = this->ChillerONOFFCyclingFrac;
+            IndirectAbsorber(Num).Report.PumpingPower = this->PumpingPower;
+            IndirectAbsorber(Num).Report.QEvap = this->QEvaporator;
+            IndirectAbsorber(Num).Report.QCond = this->QCondenser;
+            IndirectAbsorber(Num).Report.QGenerator = this->QGenerator;
+            IndirectAbsorber(Num).Report.PumpingEnergy = this->PumpingEnergy;
+            IndirectAbsorber(Num).Report.EvapEnergy = this->EvaporatorEnergy;
+            IndirectAbsorber(Num).Report.CondEnergy = this->CondenserEnergy;
+            IndirectAbsorber(Num).Report.GeneratorEnergy = this->GeneratorEnergy;
+            IndirectAbsorber(Num).Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            IndirectAbsorber(Num).Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            IndirectAbsorber(Num).Report.Evapmdot = this->EvapMassFlowRate;
+            IndirectAbsorber(Num).Report.Condmdot = this->CondMassFlowRate;
+            IndirectAbsorber(Num).Report.Genmdot = this->GenMassFlowRate;
+            IndirectAbsorber(Num).Report.LoopLoss = EnergyLossToEnvironment;
+            IndirectAbsorber(Num).Report.ChillerCyclingFrac = this->ChillerONOFFCyclingFrac;
 
             if (this->QGenerator != 0.0) {
-                IndirectAbsorberReport(Num).ActualCOP = this->QEvaporator / this->QGenerator;
+                IndirectAbsorber(Num).Report.ActualCOP = this->QEvaporator / this->QGenerator;
             } else {
-                IndirectAbsorberReport(Num).ActualCOP = 0.0;
+                IndirectAbsorber(Num).Report.ActualCOP = 0.0;
             }
 
             if (this->GeneratorInletNodeNum > 0) {

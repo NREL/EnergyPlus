@@ -71,6 +71,39 @@ namespace ChillerIndirectAbsorption {
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
 
+    struct ReportVars
+    {
+        // Members
+        Real64 PumpingPower;         // reporting: W - electric pumping power
+        Real64 QGenerator;           // reporting: W - steam heat transfer rate
+        Real64 QEvap;                // reporting: W - evaporator heat transfer rate
+        Real64 QCond;                // reporting: W - condenser heat transfer rate
+        Real64 PumpingEnergy;        // reporting: J - electric pumping power
+        Real64 GeneratorEnergy;      // reporting: J - steam heat transfer rate
+        Real64 EvapEnergy;           // reporting: J - evaporator heat transfer rate
+        Real64 CondEnergy;           // reporting: J - condenser heat transfer rate
+        Real64 CondInletTemp;        // reporting: C - condenser inlet temperature
+        Real64 EvapInletTemp;        // reporting: C - evaporator inlet temperature
+        Real64 CondOutletTemp;       // reporting: C - condenser outlet temperature
+        Real64 EvapOutletTemp;       // reporting: C - evaporator outlet temperature
+        Real64 Evapmdot;             // reporting: kg/ - evaporator mass flow rate
+        Real64 Condmdot;             // reporting: kg/ - condenser mass flow rate
+        Real64 Genmdot;              // reporting: generators mass flow rate when connected to plant
+        Real64 SteamMdot;            // reporting: kg/s - steam mass flow rate
+        Real64 ActualCOP;            // reporting: coefficient of performance = QEvap/QGenerator
+        Real64 ChillerPartLoadRatio; // reporting: part-load ratio
+        Real64 ChillerCyclingFrac;   // reporting: chiller on/off cycling fraction
+        Real64 LoopLoss;             // reporting: W - loop loss from absorber outlet to condensate pump inlet
+
+        // Default Constructor
+        ReportVars()
+                : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
+                  CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
+                  SteamMdot(0.0), ActualCOP(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingFrac(0.0), LoopLoss(0.0)
+        {
+        }
+    };
+
     struct IndirectAbsorberSpecs
     {
         // Members
@@ -84,7 +117,7 @@ namespace ChillerIndirectAbsorption {
         Real64 CondVolFlowRate;           // m3/s - design nominal water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized; // true if condenser flow rate was autosize on input
         Real64 EvapMassFlowRateMax;       // kg/s - Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-        Real64 CondMassFlowRateMax;       // Max Design Condenesor Mass Flow Rate [kg/s]
+        Real64 CondMassFlowRateMax;       // Max Design Condenser Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax;        // kg/s - Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 MinPartLoadRat;            // (BLAST MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat;            // (BLAST MAX) max allowed operating frac full load
@@ -161,6 +194,7 @@ namespace ChillerIndirectAbsorption {
         bool GenInputOutputNodesUsed;
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
+        ReportVars Report;
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -190,42 +224,8 @@ namespace ChillerIndirectAbsorption {
         void updateRecords(Real64 MyLoad, bool RunFlag, int Num);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PumpingPower;         // reporting: W - electric pumping power
-        Real64 QGenerator;           // reporting: W - steam heat transfer rate
-        Real64 QEvap;                // reporting: W - evaporator heat transfer rate
-        Real64 QCond;                // reporting: W - condenser heat transfer rate
-        Real64 PumpingEnergy;        // reporting: J - electric pumping power
-        Real64 GeneratorEnergy;      // reporting: J - steam heat transfer rate
-        Real64 EvapEnergy;           // reporting: J - evaporator heat transfer rate
-        Real64 CondEnergy;           // reporting: J - condenser heat transfer rate
-        Real64 CondInletTemp;        // reporting: C - condenser inlet temperature
-        Real64 EvapInletTemp;        // reporting: C - evaporator inlet temperature
-        Real64 CondOutletTemp;       // reporting: C - condenser outlet temperature
-        Real64 EvapOutletTemp;       // reporting: C - evaporator outlet temperature
-        Real64 Evapmdot;             // reporting: kg/ - evaporator mass flow rate
-        Real64 Condmdot;             // reporting: kg/ - condenser mass flow rate
-        Real64 Genmdot;              // reporting: generators mass flow rate when connected to plant
-        Real64 SteamMdot;            // reporting: kg/s - steam mass flow rate
-        Real64 ActualCOP;            // reporting: coefficient of performance = QEvap/QGenerator
-        Real64 ChillerPartLoadRatio; // reporting: part-load ratio
-        Real64 ChillerCyclingFrac;   // reporting: chiller on/off cycling fraction
-        Real64 LoopLoss;             // reporting: W - loop loss from absorber outlet to condensate pump inlet
-
-        // Default Constructor
-        ReportVars()
-            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
-              SteamMdot(0.0), ActualCOP(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingFrac(0.0), LoopLoss(0.0)
-        {
-        }
-    };
-
     // Object Data
     extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> IndirectAbsorberReport;
 
     void SimIndirectAbsorber(std::string const &AbsorberType, // type of Absorber
                              std::string const &AbsorberName, // user specified name of Absorber
