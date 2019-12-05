@@ -101,6 +101,7 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -748,8 +749,19 @@ namespace MixedAir {
                     bool CoolingActive = false;
                     Real64 OAUCoilOutTemp = 0.0;
                     bool ZoneEquipFlag = false;
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
-                        CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(CompName,
+                                                                             FirstHVACIteration,
+                                                                             AirLoopNum,
+                                                                             CompIndex,
+                                                                             HeatingActive,
+                                                                             CoolingActive,
+                                                                             CompIndex,
+                                                                             OAUCoilOutTemp,
+                                                                             ZoneEquipFlag,
+                                                                             sensOut,
+                                                                             latOut);
                 }
                 if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {

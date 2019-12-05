@@ -658,13 +658,17 @@ namespace AirLoopHVACDOAS {
 
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirInNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirInNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;
                             errorsFound = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirOutNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirOutNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) == 0) {
                             OutletNodeErrFlag = true;
                             errorsFound = true;

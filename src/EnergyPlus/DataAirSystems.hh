@@ -53,9 +53,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -64,7 +64,6 @@ namespace DataAirSystems {
     // Using/Aliasing
     using DataPlant::MeterData;
     using DataPlant::SubcomponentData;
-    using UnitarySystems::UnitarySys;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -91,7 +90,7 @@ namespace DataAirSystems {
         std::string Name;        // Component name
         int CompType_Num;        // Numeric designator for CompType (TypeOf)
         int CompIndex;           // Component Index in whatever is using this component
-        UnitarySys *compPointer; // pointer to UnitarySystem
+        HVACSystemData *compPointer; // pointer to HVAC system
         int FlowCtrl;            // Component flow control (ACTIVE/PASSIVE)
         bool ON;                 // When true, the designated component or operation scheme is available
         bool Parent;             // When true, the designated component is made up of sub-components

@@ -204,4 +204,4 @@ namespace AirLoopHVACDOAS {
     extern bool GetInputOnceFlag;
 } // namespace AirLoopHVACDOAS
 } // namespace EnergyPlus
-#endif // ENERGYPLUS_UNITARYSYSTEM_HH
+#endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

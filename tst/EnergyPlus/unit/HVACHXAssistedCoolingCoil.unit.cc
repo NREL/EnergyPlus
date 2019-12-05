@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -395,7 +396,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     UnitarySystems::UnitarySys thisSys;
-    UnitarySystems::UnitarySys *mySys;
+    HVACSystemData *mySys;
     int AirLoopNum = 0;
     int CompIndex = 0;
     bool HeatingActive = false;
@@ -404,18 +405,21 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     Real64 OAUCoilOutTemp = 0.0;
     std::string compName = "GASHEAT DXAC FURNACE 1";
     bool zoneEquipment = true;
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
     mySys = thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
-    mySys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    thisSys.getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    thisSys = UnitarySystems::unitarySys[0];
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
     DataGlobals::SysSizingCalc =
         false; // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
 
-    InletNode = mySys->AirInNode;
-    OutletNode = mySys->AirOutNode;
-    ControlZoneNum = mySys->NodeNumOfControlledZone;
+    InletNode = thisSys.AirInNode;
+    OutletNode = thisSys.AirOutNode;
+    ControlZoneNum = thisSys.NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
     DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
@@ -458,10 +462,11 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = mySys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
+    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys.m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
-    mySys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment);
+    mySys->simulate(
+        compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
@@ -475,6 +480,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         MinHumRatio = DataLoopNode::Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = DataLoopNode::Node(InletNode).MassFlowRate *
                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) - Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+    EXPECT_NEAR(DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
@@ -493,7 +499,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
-    mySys->simulate(compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment);
+    mySys->simulate(
+        compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
     CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp);
@@ -511,8 +518,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     // TODO: FIXME: Need to fix this in future, it is failing now, probably due to object ordering. Unit test failure message below
     // The difference between DataZoneEnergyDemands::ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired and Qsens_sys is 1000, which
     // exceeds 1.0, where DataZoneEnergyDemands::ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired evaluates to -1000, Qsens_sys evaluates
-    // to 0, and 1.0 evaluates to 1. test model performance EXPECT_NEAR( DataZoneEnergyDemands::ZoneSysEnergyDemand( ControlZoneNum
-    // ).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
+    // to 0, and 1.0 evaluates to 1. test model performance 
+    EXPECT_NEAR( DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
 }

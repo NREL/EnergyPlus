@@ -729,6 +729,12 @@ namespace HVACVariableRefrigerantFlow {
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
         int fanOutletNode;               // fan outlet node index
         bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
+        int airLoopNum;                  // index to air loop
+        bool isInAirLoop;                // true if TU is configured in an air loop
+        bool isInZone;                   // true if TU is configured as zone equipment
+        Real64 controlZoneMassFlowFrac;  // ratio of control zone air mass flow rate to total zone air mass flow rate
+        int zoneSequenceCoolingNum;      // zone equipment cooling sequence
+        int zoneSequenceHeatingNum;      // zone equipment heating sequence
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
@@ -749,7 +755,8 @@ namespace HVACVariableRefrigerantFlow {
               ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
               ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), firstPass(true),
               SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
-              fanOutletNode(0), MySuppCoilPlantScanFlag(true)
+              fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInAirLoop(false), isInZone(false), controlZoneMassFlowFrac(1.0),
+              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0)
         {
         }
 
@@ -843,11 +850,16 @@ namespace HVACVariableRefrigerantFlow {
     // Functions
 
     void SimulateVRF(std::string const &CompName,
-                     int const ZoneNum,
                      bool const FirstHVACIteration,
+                     int const ZoneNum,
+                     int &CompIndex,
+                     bool &HeatingActive,
+                     bool &CoolingActive,
+                     int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                     Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                     bool const ZoneEquipment,    // TRUE if called as zone equipment
                      Real64 &SysOutputProvided,
-                     Real64 &LatOutputProvided,
-                     int &CompIndex);
+                     Real64 &LatOutputProvided);
 
     void SimVRFCondenserPlant(std::string const &VRFType,    // Type of VRF
                               int const VRFTypeNum,          // Type of VRF in Plant equipment
@@ -862,8 +874,7 @@ namespace HVACVariableRefrigerantFlow {
                               int const LoopNum              // The calling loop number
     );
 
-    void CalcVRFCondenser(int const VRFCond,            // index to VRF condenser
-                          bool const FirstHVACIteration // flag for first time through HVAC system simulation
+    void CalcVRFCondenser(int const VRFCond  // index to VRF condenser
     );
 
     // Get Input Section of the Module

@@ -2417,10 +2417,21 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
                     OutAirUnit(OAUnitNum)
                         .OAEquip(SimCompNum)
-                        .compPointer->simulate(
-                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
+                        .compPointer->simulate(EquipName,
+                                               FirstHVACIteration,
+                                               -1,
+                                               DXSystemIndex,
+                                               HeatActive,
+                                               CoolActive,
+                                               UnitNum,
+                                               Dxsystemouttemp,
+                                               false,
+                                               sensOut,
+                                               latOut);
                 }
 
             } else {

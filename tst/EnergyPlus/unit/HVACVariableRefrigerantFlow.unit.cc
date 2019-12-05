@@ -3226,8 +3226,23 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
 
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(ZoneInletAirNode,
@@ -3250,8 +3265,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
         VRF(VRFCond).HeatingCapacity + 1000.0; // simulates a dual Tstat with load to cooling SP > load to heating SP
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = VRF(VRFCond).HeatingCapacity;
 
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
 
     ASSERT_TRUE(VRF(VRFCond).DefrostPower > 0.0); // defrost power should be greater than 0
     DefrostWatts = VRF(VRFCond).VRFCondRTF * (VRF(VRFCond).HeatingCapacity / 1.01667) * VRF(VRFCond).DefrostFraction;
@@ -3327,8 +3351,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Node(VRFTU(VRFCond).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
     Node(VRFTU(VRFCond).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
     Node(VRFTU(VRFCond).VRFTUInletNodeNum).Enthalpy = 36485.3142;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
 
     outWB = Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;                // no defrost adjustment to OA WB
     InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
@@ -3402,8 +3435,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     VRF(VRFCond).MasterZoneTUIndex = 0;
     VRF(VRFCond).ThermostatPriority = ThermostatOffsetPriority;
 
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_NEAR(SysOutputProvided,
                 ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired,
                 5.0); // system output should be less than 0 and approx = to VRF capacity * SHR
@@ -3460,8 +3502,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 400.0;
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_EQ(SysOutputProvided,
               0.0); // for this system with 0 no load flow rate output should be = 0 when fan heat at very low TU PLR (1E-20) is greater than load
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
@@ -3474,15 +3525,33 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 900.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 800.0;
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired, 5.0); // system should meet the heating load
     EXPECT_GT(VRF(VRFCond).VRFCondPLR, 0.0);                                                      // system should be on
 
     Node(VRF(VRFCond).CondenserNodeNum).Temp = 21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
     Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
               0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
@@ -3490,8 +3559,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
               0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
 
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0);                               // system should also be off
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
@@ -4994,8 +5072,24 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     PlantManager::SizePlantLoop(1, true);
     PlantManager::InitLoopEquip = true;
     // call air-side VRF
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
+
     // call plant-side VRF
     SimVRFCondenserPlant(SimPlantEquipTypes(VRF(VRFCond).VRFPlantTypeOfNum),
                          VRF(VRFCond).VRFPlantTypeOfNum,
@@ -5021,8 +5115,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataEnvironment::OutHumRat = 0.017767; // 50% RH
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 26.045;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_TRUE(VRF(VRFCond).VRFCondPLR > 0.0);
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
@@ -5053,8 +5156,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataEnvironment::OutHumRat = 0.00269; // 50% RH
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 1.34678;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
 
     EXPECT_TRUE(VRF(VRFCond).VRFCondPLR > 0.0);
     EXPECT_NEAR(SysOutputProvided, ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP, 1.0);
@@ -5065,8 +5177,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     Node(VRF(VRFCond).CondenserNodeNum).Temp = 21.0; // outside the heating temperature range (-20 to 20) of VRF outdoor unit
     Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0);                               // system should be off
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
@@ -5075,8 +5196,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
     EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
               0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
@@ -5915,7 +6045,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
 
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
 
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecHeatingPower, 0.0);
@@ -5949,7 +6079,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
     TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 5000.0);
@@ -5980,7 +6110,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6023,7 +6153,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     // set heat recovery time constant to non-zero value (means mode change will degrade performance)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6052,7 +6182,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
                                                            // 1 time step to get same answer
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6075,7 +6205,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     LastModeCooling(VRFCond) = false;
     LastModeHeating(VRFCond) = true;
 
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
 
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
 
@@ -6085,7 +6215,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6093,7 +6223,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6101,7 +6231,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -10528,7 +10658,24 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     auto &thisDXCoolingCoil(DXCoil(1));
     auto &thisDXHeatingCoil(DXCoil(2));
     // run the model
-    SimulateVRF(VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
+
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);
@@ -12239,7 +12386,24 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     auto &thisDXCoolingCoil(DXCoil(1));
     auto &thisDXHeatingCoil(DXCoil(2));
     // run the model
-    SimulateVRF(VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+
+    SimulateVRF(VRFTU(VRFTUNum).Name,
+        FirstHVACIteration,
+        CurZoneNum,
+        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+        HeatingActive,
+        CoolingActive,
+        OAUnitNum,
+        OAUCoilOutTemp,
+        ZoneEquipment,
+        SysOutputProvided,
+        LatOutputProvided);
+
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);

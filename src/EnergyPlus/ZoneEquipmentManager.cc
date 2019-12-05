@@ -3647,12 +3647,22 @@ namespace ZoneEquipmentManager {
                                      LatOutputProvided,
                                      ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                        bool HeatingActive = false;
+                        bool CoolingActive = false;
+                        int const OAUnitNum = 0;
+                        Real64 const OAUCoilOutTemp = 0.0;
+                        bool const ZoneEquipment = true;
                         SimulateVRF(PrioritySimOrder(EquipTypeNum).EquipName,
-                                    ControlledZoneNum,
                                     FirstHVACIteration,
+                                    ControlledZoneNum,
+                                    ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                                    HeatingActive,
+                                    CoolingActive,
+                                    OAUnitNum,
+                                    OAUCoilOutTemp,
+                                    ZoneEquipment,
                                     SysOutputProvided,
-                                    LatOutputProvided,
-                                    ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+                                    LatOutputProvided);
 
                     } else if (SELECT_CASE_var == WindowAC_Num) { // 'ZoneHVAC:WindowAirConditioner'
                         SimWindowAC(PrioritySimOrder(EquipTypeNum).EquipName,
