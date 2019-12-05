@@ -214,7 +214,7 @@ namespace ChillerIndirectAbsorption {
         if (LoopNum == IndirectAbsorber(ChillNum).CWLoopNum) {
 
             IndirectAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-            CalcIndirectAbsorberModel(ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
+            IndirectAbsorber(ChillNum).CalcIndirectAbsorberModel(ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
             IndirectAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
 
         } else if (LoopNum == IndirectAbsorber(ChillNum).CDLoopNum) {
@@ -1575,7 +1575,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void CalcIndirectAbsorberModel(int const ChillNum,                   // Absorber number
+    void IndirectAbsorberSpecs::CalcIndirectAbsorberModel(int const ChillNum,                   // Absorber number
                                    Real64 const MyLoad,                  // operating load
                                    bool const RunFlag,                   // TRUE when Absorber operating
                                    bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep !unused1208
@@ -1606,60 +1606,60 @@ namespace ChillerIndirectAbsorption {
         Real64 EvapDeltaTemp(0.0);       // C - evaporator temperature difference, water side
 
         // set module level inlet and outlet nodes
-        IndirectAbsorber(ChillNum).EvapMassFlowRate = 0.0;
-        IndirectAbsorber(ChillNum).CondMassFlowRate = 0.0;
-        IndirectAbsorber(ChillNum).GenMassFlowRate = 0.0;
-        IndirectAbsorber(ChillNum).QCondenser = 0.0;
-        IndirectAbsorber(ChillNum).QEvaporator = 0.0;
-        IndirectAbsorber(ChillNum).QGenerator = 0.0;
-        IndirectAbsorber(ChillNum).PumpingEnergy = 0.0;
-        IndirectAbsorber(ChillNum).CondenserEnergy = 0.0;
-        IndirectAbsorber(ChillNum).EvaporatorEnergy = 0.0;
-        IndirectAbsorber(ChillNum).GeneratorEnergy = 0.0;
-        IndirectAbsorber(ChillNum).PumpingPower = 0.0;
-        IndirectAbsorber(ChillNum).ChillerONOFFCyclingFrac = 0.0;
+        this->EvapMassFlowRate = 0.0;
+        this->CondMassFlowRate = 0.0;
+        this->GenMassFlowRate = 0.0;
+        this->QCondenser = 0.0;
+        this->QEvaporator = 0.0;
+        this->QGenerator = 0.0;
+        this->PumpingEnergy = 0.0;
+        this->CondenserEnergy = 0.0;
+        this->EvaporatorEnergy = 0.0;
+        this->GeneratorEnergy = 0.0;
+        this->PumpingPower = 0.0;
+        this->ChillerONOFFCyclingFrac = 0.0;
 
         //  If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) IndirectAbsorber(ChillNum).EvapMassFlowRate = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).MassFlowRate;
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             return;
         }
 
         // Warn if entering condenser water temperature is below minimum
-        if (DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp < IndirectAbsorber(ChillNum).MinCondInletTemp) {
+        if (DataLoopNode::Node(this->CondInletNodeNum).Temp < this->MinCondInletTemp) {
             if (!DataGlobals::WarmupFlag) {
-                if (IndirectAbsorber(ChillNum).MinCondInletTempCtr < 1) {
-                    ++IndirectAbsorber(ChillNum).MinCondInletTempCtr;
-                    ShowWarningError("Chiller:Absorption:Indirect \"" + IndirectAbsorber(ChillNum).Name + "\"");
+                if (this->MinCondInletTempCtr < 1) {
+                    ++this->MinCondInletTempCtr;
+                    ShowWarningError("Chiller:Absorption:Indirect \"" + this->Name + "\"");
                     ShowContinueError("...Entering condenser water temperature below specified minimum (" +
-                                      General::RoundSigDigits(IndirectAbsorber(ChillNum).MinCondInletTemp, 3) + " C).");
-                    ShowContinueError("...Entering condenser water temperature = " + General::RoundSigDigits(DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp, 3) + " C.");
+                                      General::RoundSigDigits(this->MinCondInletTemp, 3) + " C).");
+                    ShowContinueError("...Entering condenser water temperature = " + General::RoundSigDigits(DataLoopNode::Node(this->CondInletNodeNum).Temp, 3) + " C.");
                     ShowContinueErrorTimeStamp("...simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Entering condenser water temperature below specified minimum error continues.",
-                                                   IndirectAbsorber(ChillNum).MinCondInletTempIndex,
-                                                   DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp,
-                                                   DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp);
+                                                   this->MinCondInletTempIndex,
+                                                   DataLoopNode::Node(this->CondInletNodeNum).Temp,
+                                                   DataLoopNode::Node(this->CondInletNodeNum).Temp);
                 }
             }
         }
 
         // Warn if entering generator fluid temperature is below minimum
-        if (IndirectAbsorber(ChillNum).GeneratorInletNodeNum > 0) {
-            if (DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp < IndirectAbsorber(ChillNum).MinGeneratorInletTemp) {
+        if (this->GeneratorInletNodeNum > 0) {
+            if (DataLoopNode::Node(this->GeneratorInletNodeNum).Temp < this->MinGeneratorInletTemp) {
                 if (!DataGlobals::WarmupFlag) {
-                    if (IndirectAbsorber(ChillNum).MinGenInletTempCtr < 1) {
-                        ++IndirectAbsorber(ChillNum).MinGenInletTempCtr;
-                        ShowWarningError("Chiller:Absorption:Indirect \"" + IndirectAbsorber(ChillNum).Name + "\"");
+                    if (this->MinGenInletTempCtr < 1) {
+                        ++this->MinGenInletTempCtr;
+                        ShowWarningError("Chiller:Absorption:Indirect \"" + this->Name + "\"");
                         ShowContinueError("...Entering generator fluid temperature below specified minimum (" +
-                                          General::RoundSigDigits(IndirectAbsorber(ChillNum).MinGeneratorInletTemp, 3) + " C).");
-                        ShowContinueError("...Entering generator fluid temperature = " + General::RoundSigDigits(DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp, 3) + " C.");
+                                          General::RoundSigDigits(this->MinGeneratorInletTemp, 3) + " C).");
+                        ShowContinueError("...Entering generator fluid temperature = " + General::RoundSigDigits(DataLoopNode::Node(this->GeneratorInletNodeNum).Temp, 3) + " C.");
                         ShowContinueErrorTimeStamp("...simulation continues.");
                     } else {
                         ShowRecurringWarningErrorAtEnd("Entering generator fluid temperature below specified minimum error continues.",
-                                                       IndirectAbsorber(ChillNum).MinGenInletTempIndex,
-                                                       DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp,
-                                                       DataLoopNode::Node(IndirectAbsorber(ChillNum).GeneratorInletNodeNum).Temp);
+                                                       this->MinGenInletTempIndex,
+                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp,
+                                                       DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
                     }
                 }
             }
@@ -1667,51 +1667,48 @@ namespace ChillerIndirectAbsorption {
 
         // Set module level Absorber inlet and temperature variables
         // C - evaporator inlet temperature, water side
-        Real64 EvapInletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp;
+        Real64 EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
 
         // C - condenser inlet temperature, water side
-        Real64 CondInletTemp = DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp;
+        Real64 CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
 
         // Set the condenser mass flow rates
-        IndirectAbsorber(ChillNum).CondMassFlowRate = DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).MassFlowRate;
+        this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
 
         // Absorber nominal capacity
-        Real64 AbsorberNomCap = IndirectAbsorber(ChillNum).NomCap;
-
-        // Absorber nominal pumping power
-        Real64 NomPumpPower = IndirectAbsorber(ChillNum).NomPumpPower;
+        Real64 AbsorberNomCap = this->NomCap;
 
         // C - (BLAST ADJTC(1)The design secondary loop fluid
-        Real64 TempCondIn = DataLoopNode::Node(IndirectAbsorber(ChillNum).CondInletNodeNum).Temp;
+        Real64 TempCondIn = DataLoopNode::Node(this->CondInletNodeNum).Temp;
 
         // C - evaporator outlet temperature, water side
-        Real64 TempEvapOut = DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapOutletNodeNum).Temp;
+        Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
         // C - Evaporator low temp. limit cut off
-        Real64 TempLowLimitEout = IndirectAbsorber(ChillNum).TempLowLimitEvapOut;
+        Real64 TempLowLimitEout = this->TempLowLimitEvapOut;
 
-        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).FluidName,
+        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                         EvapInletTemp,
-                                        DataPlant::PlantLoop(IndirectAbsorber(ChillNum).CWLoopNum).FluidIndex,
+                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                         RoutineName);
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (IndirectAbsorber(ChillNum).FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = IndirectAbsorber(ChillNum).FaultyChillerSWTIndex;
+        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            IndirectAbsorber(ChillNum).FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
             // update the TempEvapOut
-            TempEvapOut = max(IndirectAbsorber(ChillNum).TempLowLimitEvapOut,
-                              min(DataLoopNode::Node(IndirectAbsorber(ChillNum).EvapInletNodeNum).Temp, EvapOutletTemp_ff - IndirectAbsorber(ChillNum).FaultyChillerSWTOffset));
-            IndirectAbsorber(ChillNum).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+            TempEvapOut = max(this->TempLowLimitEvapOut,
+                              min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
+            this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
         }
 
         Real64 CapacityfAbsorberTemp;   // performance curve output
 
-        if (IndirectAbsorber(ChillNum).CapFCondenserTempPtr > 0) {
-            CapacityfAbsorberTemp = CurveManager::CurveValue(IndirectAbsorber(ChillNum).CapFCondenserTempPtr, TempCondIn);
+        if (this->CapFCondenserTempPtr > 0) {
+            CapacityfAbsorberTemp = CurveManager::CurveValue(this->CapFCondenserTempPtr, TempCondIn);
         } else {
             CapacityfAbsorberTemp = 1.0;
         }
@@ -1974,7 +1971,7 @@ namespace ChillerIndirectAbsorption {
         }
 
         IndirectAbsorber(ChillNum).QGenerator = HeatInputRat * AbsorberNomCap * FRAC;
-        IndirectAbsorber(ChillNum).PumpingPower = ElectricInputRat * NomPumpPower * FRAC;
+        IndirectAbsorber(ChillNum).PumpingPower = ElectricInputRat * this->NomPumpPower * FRAC;
 
         if (IndirectAbsorber(ChillNum).EvapMassFlowRate == 0.0) {
             IndirectAbsorber(ChillNum).QGenerator = 0.0;

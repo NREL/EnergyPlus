@@ -222,6 +222,13 @@ namespace ChillerIndirectAbsorption {
         void sizeChiller();
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
+
+        void CalcIndirectAbsorberModel(int ChillNum,        // Absorber number
+                                       Real64 MyLoad,       // operating load
+                                       bool RunFlag,        // TRUE when Absorber operating
+                                       bool FirstIteration, // TRUE when first iteration of timestep !unused1208
+                                       int EquipFlowCtrl    // Flow control mode for the equipment
+        );
     };
 
     // Object Data
@@ -245,13 +252,6 @@ namespace ChillerIndirectAbsorption {
                              Real64 &TempCondInDesign);
 
     void GetIndirectAbsorberInput();
-
-    void CalcIndirectAbsorberModel(int ChillNum,        // Absorber number
-                                   Real64 MyLoad,       // operating load
-                                   bool RunFlag,        // TRUE when Absorber operating
-                                   bool FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                   int EquipFlowCtrl    // Flow control mode for the equipment
-    );
 
     void clear_state();
 
