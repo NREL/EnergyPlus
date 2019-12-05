@@ -2242,7 +2242,6 @@ namespace SurfaceGeometry {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const AbCorners(4, {"ULC", "LLC", "LRC", "URC"});
         static Array1D_string const FlCorners(4, {"UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2289,21 +2288,14 @@ namespace SurfaceGeometry {
                 CCW = true;
 
                 OK = false;
-                Found = UtilityRoutines::FindItem(GAlphas(1), AbCorners, 4);
+                Found = UtilityRoutines::FindItem(GAlphas(1), FlCorners, 4);
                 if (Found == 0) {
-                    Found = UtilityRoutines::FindItem(GAlphas(1), FlCorners, 4);
-                    if (Found == 0) {
-                        ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + GAlphas(1));
-                        ErrorsFound = true;
-                    } else {
-                        Corner = Found;
-                        OK = true;
-                        OutMsg += FlCorners(Corner) + ',';
-                    }
+                    ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + GAlphas(1));
+                    ErrorsFound = true;
                 } else {
                     Corner = Found;
-                    OutMsg += FlCorners(Corner) + ',';
                     OK = true;
+                    OutMsg += FlCorners(Corner) + ',';
                 }
 
                 OK = false;
@@ -2323,13 +2315,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(3), "WCS") || UtilityRoutines::SameString(GAlphas(3), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(3), "World") || UtilityRoutines::SameString(GAlphas(3), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(3), "World") || UtilityRoutines::SameString(GAlphas(3), "Absolute")) {
                     WorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(3), "Rel") || has_prefixi(GAlphas(3), "Relative") || UtilityRoutines::SameString(GAlphas(3), "Local")) {
+                if (UtilityRoutines::SameString(GAlphas(3), "Relative")) {
                     WorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
@@ -2342,14 +2333,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(4), "WCS") || UtilityRoutines::SameString(GAlphas(4), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(4), "World") || UtilityRoutines::SameString(GAlphas(4), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(4), "World") || UtilityRoutines::SameString(GAlphas(4), "Absolute")) {
                     DaylRefWorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(4), "Rel") || has_prefixi(GAlphas(4), "Relative") || UtilityRoutines::SameString(GAlphas(4), "Local") ||
-                    GAlphas(4).empty()) {
+                if (UtilityRoutines::SameString(GAlphas(4), "Relative") || GAlphas(4).empty()) {
                     DaylRefWorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
@@ -2362,14 +2351,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(5), "WCS") || UtilityRoutines::SameString(GAlphas(5), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(5), "World") || UtilityRoutines::SameString(GAlphas(5), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(5), "World") || UtilityRoutines::SameString(GAlphas(5), "Absolute")) {
                     RectSurfRefWorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(5), "Rel") || has_prefixi(GAlphas(5), "Relative") || UtilityRoutines::SameString(GAlphas(5), "Local") ||
-                    GAlphas(5).empty()) {
+                if (UtilityRoutines::SameString(GAlphas(5), "Relative") || GAlphas(5).empty()) {
                     RectSurfRefWorldCoordSystem = false;
                     OutMsg += "RelativeToZoneOrigin";
                     OK = true;

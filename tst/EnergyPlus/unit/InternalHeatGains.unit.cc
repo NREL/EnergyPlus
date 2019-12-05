@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
         "OtherEquipment,",
         "  OtherEq2,",
-        "  PropaneGas,",
+        "  Propane,",
         "  Zone1,",
         "  Schedule1,",
         "  EquipmentLevel,",
@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, 0);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::LPGUse);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::PropaneUse);
         }
     }
 }
@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
         "OtherEquipment,",
         "  OtherEq1,",
-        "  FuelOil#1,",
+        "  FuelOilNo1,",
         "  Zone1,",
         "  Schedule1,",
         "  EquipmentLevel,",
@@ -203,8 +203,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_FALSE(has_err_output());
+    ASSERT_FALSE(process_idf(idf_objects, false)); // add false to supress error assertions
+    EXPECT_TRUE(has_err_output(false));
+
+    std::string error_string = delimited_string(
+        { "   ** Severe  ** <root>[OtherEquipment][OtherEq1][fuel_type] - \"Water\" - Failed to match against any enum values." });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     bool ErrorsFound(false);
 
@@ -217,11 +221,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error);
 
-    std::string const error_string = delimited_string(
+    error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
          "   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1",
          "   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
-         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=1",
+         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=2",
          "   ..... Last severe error=GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
