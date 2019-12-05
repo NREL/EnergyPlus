@@ -238,7 +238,7 @@
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
     0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
-    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {W}
     HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
@@ -381,7 +381,7 @@
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
     0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
-    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {W}
     HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
@@ -524,7 +524,7 @@
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
     0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
-    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {W}
     HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
@@ -667,7 +667,7 @@
     0.80,                    !- Rated Sensible Heat Ratio at Speed 1
     0.020140,                !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     0.000018,                !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
-    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {dimensionless}
+    10.0,                    !- Speed 1 Reference Unit Water Pump Input Power At Rated Conditions {W}
     HPWHHeatingCapFTemp,     !- Speed 1 Total WH Capacity Function of Temperature Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Air Flow Fraction Curve Name
     ConstantCubic,           !- Speed 1 Total WH Capacity Function of Water Flow Fraction Curve Name
@@ -2551,8 +2551,8 @@
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2561,8 +2561,8 @@
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2571,8 +2571,8 @@
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone1DirectAir,          !- Name

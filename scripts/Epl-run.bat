@@ -316,7 +316,7 @@ IF EXIST SLABSurfaceTemps.TXT COPY "%epout%.expidf"+SLABSurfaceTemps.TXT "%epout
 IF EXIST SLABSurfaceTemps.TXT DEL SLABSurfaceTemps.TXT
 
 :  4. Execute EnergyPlus
-"%program_path%EnergyPlus" -c
+"%program_path%EnergyPlus"
 if %pausing%==Y pause
 
 :  5. Copy Post Processing Program command file(s) to working directory

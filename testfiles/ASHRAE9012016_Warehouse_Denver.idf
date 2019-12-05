@@ -4429,7 +4429,7 @@
   InternalMass,
     Bulk Storage Products Surface,  !- Name
     Bulk Storage Products,   !- Construction Name
-    Zone3 Bulk Storage,      !- Zone Name
+    Zone3 Bulk Storage,      !- Zone or ZoneList Name
     6028.44715712782;        !- Surface Area {m2}
 
  !-   ===========  ALL OBJECTS IN CLASS: SURFACE:SHADING:ATTACHED ===========
@@ -7059,8 +7059,8 @@
     Zone1 Office Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2 Fine Storage Equipment,  !- Name
@@ -7069,8 +7069,8 @@
     Zone2 Fine Storage Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -7079,14 +7079,14 @@
     Zone3UnitHeater,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:HighTemperatureRadiant,  !- Zone Equipment 2 Object Type
     Zone3HiRadiant,          !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
  !-   ===========  ALL OBJECTS IN CLASS: UNIT HEATER ===========
                         !- Availability Schedule Name
@@ -7445,11 +7445,9 @@
   Output:Table:SummaryReports,
     EnvelopeSummary,         !- Report 1 Name
     InputVerificationandResultsSummary,  !- Report 2 Name
-    BEPS,                    !- Report 3 Name
+    AnnualBuildingUtilityPerformanceSummary, !- Report 3 Name
     EquipmentSummary,        !- Report 4 Name
-    ABUPS,                   !- Report 5 Name
-    IVRS,                    !- Report 6 Name
-    AllMonthly;              !- Report 7 Name
+    AllMonthly;              !- Report 5 Name
 
  !-   ===========  ALL OBJECTS IN CLASS: REPORT:TABLE:MONTHLY ===========
 
