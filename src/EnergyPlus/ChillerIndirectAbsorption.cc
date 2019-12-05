@@ -73,6 +73,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -147,151 +148,74 @@ namespace ChillerIndirectAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void IndirectAbsorberSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    void IndirectAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
 
-    }
+            this->initialize(RunFlag, CurLoad);
+            this->calculate(CurLoad, RunFlag);
+            this->updateRecords(CurLoad, RunFlag);
 
-    void IndirectAbsorberSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                             Real64 &EP_UNUSED(MaxLoad),
-                             Real64 &EP_UNUSED(MinLoad),
-                             Real64 &EP_UNUSED(OptLoad))
-    {
-
-    }
-
-    void IndirectAbsorberSpecs::getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
-    {
-
-    }
-
-    void IndirectAbsorberSpecs::getSizingFactor(Real64 &EP_UNUSED(SizFac))
-    {
-
-    }
-
-    void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
-    {
-
-    }
-
-    void SimIndirectAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
-                             std::string const &AbsorberName,            // user specified name of Absorber
-                             int const EquipFlowCtrl,                    // Flow control mode for the equipment
-                             int const LoopNum,                          // Plant loop index for where called from
-                             int const LoopSide,                         // Plant loop side index for where called from
-                             int &CompIndex,                             // Chiller number pointer
-                             bool const RunFlag,                         // simulate Absorber when TRUE
-                             bool const FirstIteration,                  // initialize variables when TRUE
-                             bool &InitLoopEquip,                        // If not zero, calculate the max load for operating conditions
-                             Real64 &MyLoad,                             // loop demand component will meet
-                             Real64 &MaxCap,                             // W - maximum operating capacity of Absorber
-                             Real64 &MinCap,                             // W - minimum operating capacity of Absorber
-                             Real64 &OptCap,                             // W - optimal operating capacity of Absorber
-                             bool const GetSizingFactor,                 // TRUE when just the sizing factor is requested
-                             Real64 &SizingFactor,                       // sizing factor
-                             Real64 &TempCondInDesign)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         R. Raustad (FSEC)
-        //       DATE WRITTEN   May 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE: This is the Indirect Absorption Chiller model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        int ChillNum; // Chiller number pointer
-
-        if (CompIndex != 0) {
-            TempCondInDesign = IndirectAbsorber(CompIndex).TempDesCondIn;
-        }
-
-        // Get Absorber data from input file
-        if (GetInput) {
-            GetIndirectAbsorberInput();
-            GetInput = false;
-        }
-
-        // Find the correct Chiller
-        if (CompIndex == 0) {
-            ChillNum = UtilityRoutines::FindItemInList(AbsorberName, IndirectAbsorber);
-            if (ChillNum == 0) {
-                ShowFatalError("SimIndirectAbsorber: Specified chiller not one of Valid Absorption Chillers=" + AbsorberName);
-            }
-            CompIndex = ChillNum;
-        } else {
-            ChillNum = CompIndex;
-            if (ChillNum > NumIndirectAbsorbers || ChillNum < 1) {
-                ShowFatalError("SimIndirectAbsorber:  Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumIndirectAbsorbers) + ", Entered Unit name=" + AbsorberName);
-            }
-            if (AbsorberName != IndirectAbsorber(ChillNum).Name) {
-                ShowFatalError("SimIndirectAbsorber: Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) + ", Unit name=" + AbsorberName +
-                               ", stored Unit Name for that index=" + IndirectAbsorber(ChillNum).Name);
-            }
-        }
-
-        // Initialize Loop Equipment
-        if (InitLoopEquip) {
-            IndirectAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-
-            if (LoopNum == IndirectAbsorber(ChillNum).CWLoopNum) {
-                IndirectAbsorber(ChillNum).sizeChiller(); // only size when called from chilled water loop
-                MinCap = IndirectAbsorber(ChillNum).NomCap * IndirectAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = IndirectAbsorber(ChillNum).NomCap * IndirectAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = IndirectAbsorber(ChillNum).NomCap * IndirectAbsorber(ChillNum).OptPartLoadRat;
-            } else {
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            }
-            if (GetSizingFactor) {
-                ChillNum = UtilityRoutines::FindItemInList(AbsorberName, IndirectAbsorber);
-                if (ChillNum != 0) {
-                    SizingFactor = IndirectAbsorber(ChillNum).SizFac;
-                }
-            }
-            return;
-        }
-
-        if (LoopNum == IndirectAbsorber(ChillNum).CWLoopNum) {
-
-            IndirectAbsorber(ChillNum).initialize(RunFlag, MyLoad);
-            IndirectAbsorber(ChillNum).calculate(MyLoad, RunFlag, EquipFlowCtrl);
-            IndirectAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
-
-        } else if (LoopNum == IndirectAbsorber(ChillNum).CDLoopNum) {
+        } else if (calledFromLocation.loopNum == this->CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
-            PlantUtilities::UpdateChillerComponentCondenserSide(LoopNum,
-                                                LoopSide,
-                                                DataPlant::TypeOf_Chiller_Indirect_Absorption,
-                                                IndirectAbsorber(ChillNum).CondInletNodeNum,
-                                                IndirectAbsorber(ChillNum).CondOutletNodeNum,
-                                                IndirectAbsorber(ChillNum).Report.QCond,
-                                                IndirectAbsorber(ChillNum).Report.CondInletTemp,
-                                                IndirectAbsorber(ChillNum).Report.CondOutletTemp,
-                                                IndirectAbsorber(ChillNum).Report.Condmdot,
-                                                FirstIteration);
+            PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
+                                                                calledFromLocation.loopSideNum,
+                                                                DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                                this->CondInletNodeNum,
+                                                                this->CondOutletNodeNum,
+                                                                this->Report.QCond,
+                                                                this->Report.CondInletTemp,
+                                                                this->Report.CondOutletTemp,
+                                                                this->Report.Condmdot,
+                                                                FirstHVACIteration);
 
-        } else if (LoopNum == IndirectAbsorber(ChillNum).GenLoopNum) {
+        } else if (calledFromLocation.loopNum == this->GenLoopNum) {
             // Called from non-dominant generator hot water or steam connection loop side
-            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(LoopNum,
-                                                        LoopSide,
-                                                        DataPlant::TypeOf_Chiller_Indirect_Absorption,
-                                                        IndirectAbsorber(ChillNum).GeneratorInletNodeNum,
-                                                        IndirectAbsorber(ChillNum).GeneratorOutletNodeNum,
-                                                        IndirectAbsorber(ChillNum).GenHeatSourceType,
-                                                        IndirectAbsorber(ChillNum).Report.QGenerator,
-                                                        IndirectAbsorber(ChillNum).Report.SteamMdot,
-                                                        FirstIteration);
+            PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(calledFromLocation.loopNum,
+                                                                        calledFromLocation.loopSideNum,
+                                                                        DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                                        this->GeneratorInletNodeNum,
+                                                                        this->GeneratorOutletNodeNum,
+                                                                        this->GenHeatSourceType,
+                                                                        this->Report.QGenerator,
+                                                                        this->Report.SteamMdot,
+                                                                        FirstHVACIteration);
 
         } else {
-            ShowFatalError("SimIndirectAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(LoopNum) + ", Unit name=" + AbsorberName +
-                           ", stored chilled water loop=" + General::TrimSigDigits(IndirectAbsorber(ChillNum).CWLoopNum) +
-                           ", stored condenser water loop=" + General::TrimSigDigits(IndirectAbsorber(ChillNum).CDLoopNum) +
-                           ", stored generator loop=" + General::TrimSigDigits(IndirectAbsorber(ChillNum).GenLoopNum));
+            ShowFatalError("SimIndirectAbsorber: Invalid LoopNum passed=" + General::TrimSigDigits(calledFromLocation.loopNum) + ", Unit name=" + this->Name +
+                           ", stored chilled water loop=" + General::TrimSigDigits(this->CWLoopNum) +
+                           ", stored condenser water loop=" + General::TrimSigDigits(this->CDLoopNum) +
+                           ", stored generator loop=" + General::TrimSigDigits(this->GenLoopNum));
+        }
+    }
+
+    void IndirectAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation,  Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            MinLoad = this->NomCap * this->MinPartLoadRat;
+            MaxLoad = this->NomCap * this->MaxPartLoadRat;
+            OptLoad = this->NomCap * this->OptPartLoadRat;
+        } else {
+            MinLoad = 0.0;
+            MaxLoad = 0.0;
+            OptLoad = 0.0;
+        }
+    }
+
+    void IndirectAbsorberSpecs::getSizingFactor(Real64 &sizFac)
+    {
+        sizFac = this->SizFac;
+    }
+
+    void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {
+        bool runFlag = true;
+        Real64 myLoad = 0.0;
+
+        this->initialize(runFlag, myLoad);
+
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            this->sizeChiller(); // only size when called from chilled water loop
         }
     }
 
@@ -1639,7 +1563,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::calculate(Real64 const MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void IndirectAbsorberSpecs::calculate(Real64 const MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
@@ -1681,7 +1605,7 @@ namespace ChillerIndirectAbsorption {
 
         //  If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
+            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             return;
         }
 

@@ -194,6 +194,7 @@ namespace ChillerIndirectAbsorption {
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         ReportVars Report;
+        int EquipFlowCtrl;
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -213,7 +214,7 @@ namespace ChillerIndirectAbsorption {
               GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
               PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
               CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false),
-              MyOneTimeFlag(true), MyEnvrnFlag(true)
+              MyOneTimeFlag(true), MyEnvrnFlag(true), EquipFlowCtrl(0)
         {
         }
 
@@ -226,9 +227,7 @@ namespace ChillerIndirectAbsorption {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
-
-        void getSizingFactor(Real64 &SizFac) override;
+        void getSizingFactor(Real64 &sizFac) override;
 
         void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
@@ -240,28 +239,11 @@ namespace ChillerIndirectAbsorption {
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
 
-        void calculate(Real64 MyLoad, bool RunFlag, int EquipFlowCtrl);
+        void calculate(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
     extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-
-    void SimIndirectAbsorber(std::string const &AbsorberType, // type of Absorber
-                             std::string const &AbsorberName, // user specified name of Absorber
-                             int EquipFlowCtrl,         // Flow control mode for the equipment
-                             int LoopNum,               // Plant loop index for where called from
-                             int LoopSide,              // Plant loop side index for where called from
-                             int &CompIndex,                  // Chiller number pointer
-                             bool RunFlag,              // simulate Absorber when TRUE
-                             bool FirstIteration,       // initialize variables when TRUE
-                             bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
-                             Real64 &MyLoad,                  // loop demand component will meet
-                             Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
-                             Real64 &MinCap,                  // W - minimum operating capacity of Absorber
-                             Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                             bool GetSizingFactor,      // TRUE when just the sizing factor is requested
-                             Real64 &SizingFactor,            // sizing factor
-                             Real64 &TempCondInDesign);
 
     void GetIndirectAbsorberInput();
 

@@ -58,6 +58,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -1111,6 +1112,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -3943,10 +3945,8 @@ namespace EnergyPlus {
                                         this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                         this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
                                     }
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Indirect_Absorption) { //       =  4  ! revised absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption) { // = 4 ! revised absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
-
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                         this_component.HowLoadServed = HowMet_NoneDemand;
