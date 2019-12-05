@@ -128,6 +128,53 @@ namespace ChillerIndirectAbsorption {
         IndirectAbsorber.deallocate();
     }
 
+    PlantComponent *IndirectAbsorberSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (GetInput) {
+            GetIndirectAbsorberInput();
+            GetInput = false;
+        }
+        // Now look for this particular object
+        for (auto &thisAbs : IndirectAbsorber) {
+            if (thisAbs.Name == objectName) {
+                return &thisAbs;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void IndirectAbsorberSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
+    void IndirectAbsorberSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                             Real64 &EP_UNUSED(MaxLoad),
+                             Real64 &EP_UNUSED(MinLoad),
+                             Real64 &EP_UNUSED(OptLoad))
+    {
+
+    }
+
+    void IndirectAbsorberSpecs::getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    {
+
+    }
+
+    void IndirectAbsorberSpecs::getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    {
+
+    }
+
+    void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+
+    }
+
     void SimIndirectAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                              std::string const &AbsorberName,            // user specified name of Absorber
                              int const EquipFlowCtrl,                    // Flow control mode for the equipment
@@ -567,6 +614,7 @@ namespace ChillerIndirectAbsorption {
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Electric Energy",
                             OutputProcessor::Unit::J,
                             this->Report.PumpingEnergy,
@@ -578,12 +626,14 @@ namespace ChillerIndirectAbsorption {
                             "Cooling",
                             _,
                             "Plant");
+
         SetupOutputVariable("Chiller Evaporator Cooling Rate",
                             OutputProcessor::Unit::W,
                             this->Report.QEvap,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
                             this->Report.EvapEnergy,
@@ -595,18 +645,21 @@ namespace ChillerIndirectAbsorption {
                             "CHILLERS",
                             _,
                             "Plant");
+
         SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.EvapInletTemp,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.EvapOutletTemp,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->Report.Evapmdot,
@@ -620,6 +673,7 @@ namespace ChillerIndirectAbsorption {
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->Report.CondEnergy,
@@ -631,18 +685,21 @@ namespace ChillerIndirectAbsorption {
                             "HEATREJECTION",
                             _,
                             "Plant");
+
         SetupOutputVariable("Chiller Condenser Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.CondInletTemp,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Condenser Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.CondOutletTemp,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->Report.Condmdot,
@@ -657,6 +714,7 @@ namespace ChillerIndirectAbsorption {
                                 "System",
                                 "Average",
                                 this->Name);
+
             SetupOutputVariable("Chiller Source Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
@@ -676,6 +734,7 @@ namespace ChillerIndirectAbsorption {
                                     "System",
                                     "Average",
                                     this->Name);
+
                 SetupOutputVariable("Chiller Source Steam Energy",
                                     OutputProcessor::Unit::J,
                                     this->Report.GeneratorEnergy,
@@ -694,6 +753,7 @@ namespace ChillerIndirectAbsorption {
                                     "System",
                                     "Average",
                                     this->Name);
+
                 SetupOutputVariable("Chiller Source Steam Energy",
                                     OutputProcessor::Unit::J,
                                     this->Report.GeneratorEnergy,
@@ -714,12 +774,14 @@ namespace ChillerIndirectAbsorption {
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Part Load Ratio",
                             OutputProcessor::Unit::None,
                             this->Report.ChillerPartLoadRatio,
                             "System",
                             "Average",
                             this->Name);
+
         SetupOutputVariable("Chiller Cycling Ratio",
                             OutputProcessor::Unit::None,
                             this->Report.ChillerCyclingFrac,

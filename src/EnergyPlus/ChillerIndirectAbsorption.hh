@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -101,7 +102,7 @@ namespace ChillerIndirectAbsorption {
         }
     };
 
-    struct IndirectAbsorberSpecs
+    struct IndirectAbsorberSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // user identifier
@@ -215,6 +216,21 @@ namespace ChillerIndirectAbsorption {
               MyOneTimeFlag(true), MyEnvrnFlag(true)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
+
+        void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
