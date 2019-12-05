@@ -66,9 +66,6 @@ namespace ChillerIndirectAbsorption {
 
     extern int NumIndirectAbsorbers;       // number of Absorption Chillers specified in input
 
-    // moving this to a member variable caused math diffs...
-    extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
-
     extern bool GetInput; // When TRUE, calls subroutine to read input file
 
     struct ReportVars
@@ -191,6 +188,7 @@ namespace ChillerIndirectAbsorption {
         Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
         Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
         Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
+        Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
         bool GenInputOutputNodesUsed;
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
@@ -213,7 +211,8 @@ namespace ChillerIndirectAbsorption {
               FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0),
               GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
               PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true), MyEnvrnFlag(true)
+              CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false),
+              MyOneTimeFlag(true), MyEnvrnFlag(true)
         {
         }
 

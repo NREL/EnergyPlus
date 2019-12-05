@@ -117,7 +117,6 @@ namespace ChillerIndirectAbsorption {
     int const waterIndex(1);
 
     int NumIndirectAbsorbers(0);         // number of Absorption Chillers specified in input
-    Real64 EnergyLossToEnvironment(0.0); // J - piping energy loss from generator outlet to pump inlet
 
     bool GetInput(true); // when TRUE, calls subroutine to read input file.
 
@@ -126,7 +125,6 @@ namespace ChillerIndirectAbsorption {
     void clear_state()
     {
         NumIndirectAbsorbers = 0;
-        EnergyLossToEnvironment = 0.0;
         IndirectAbsorber.deallocate();
     }
 
@@ -1613,6 +1611,7 @@ namespace ChillerIndirectAbsorption {
         this->GeneratorEnergy = 0.0;
         this->PumpingPower = 0.0;
         this->ChillerONOFFCyclingFrac = 0.0;
+        this->EnergyLossToEnvironment = 0.0;
 
         //  If no loop demand or Absorber OFF, return
         if (MyLoad >= 0.0 || !RunFlag) {
@@ -2099,7 +2098,7 @@ namespace ChillerIndirectAbsorption {
                     Real64 EnthPumpInlet = EnthAtAtmPress - CpFluid * this->LoopSubcool;
 
                     // Point 3-Point 5,
-                    EnergyLossToEnvironment = this->GenMassFlowRate * (this->SteamOutletEnthalpy - EnthPumpInlet);
+                    this->EnergyLossToEnvironment = this->GenMassFlowRate * (this->SteamOutletEnthalpy - EnthPumpInlet);
 
                     //************************* Loop Losses *****************************
 
@@ -2203,7 +2202,7 @@ namespace ChillerIndirectAbsorption {
             this->Report.Evapmdot = this->EvapMassFlowRate;
             this->Report.Condmdot = this->CondMassFlowRate;
             this->Report.Genmdot = this->GenMassFlowRate;
-            this->Report.LoopLoss = EnergyLossToEnvironment;
+            this->Report.LoopLoss = this->EnergyLossToEnvironment;
             this->Report.ChillerCyclingFrac = this->ChillerONOFFCyclingFrac;
 
             if (this->QGenerator != 0.0) {
