@@ -215,7 +215,7 @@ namespace ChillerIndirectAbsorption {
 
             IndirectAbsorber(ChillNum).initialize(RunFlag, MyLoad);
             CalcIndirectAbsorberModel(ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
-            IndirectAbsorber(ChillNum).updateRecords(MyLoad, RunFlag, ChillNum);
+            IndirectAbsorber(ChillNum).updateRecords(MyLoad, RunFlag);
 
         } else if (LoopNum == IndirectAbsorber(ChillNum).CDLoopNum) {
             // Called from non-dominant condenser water connection loop side
@@ -2149,7 +2149,7 @@ namespace ChillerIndirectAbsorption {
         //         Enthalpy (H)
     }
 
-    void IndirectAbsorberSpecs::updateRecords(Real64 MyLoad, bool RunFlag, int Num)
+    void IndirectAbsorberSpecs::updateRecords(Real64 MyLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R. Raustad (FSEC)
@@ -2165,25 +2165,25 @@ namespace ChillerIndirectAbsorption {
             PlantUtilities::SafeCopyPlantNode(this->EvapInletNodeNum, this->EvapOutletNodeNum);
             PlantUtilities::SafeCopyPlantNode(this->CondInletNodeNum, CondOutletNode);
 
-            IndirectAbsorber(Num).Report.PumpingPower = 0.0;
-            IndirectAbsorber(Num).Report.QEvap = 0.0;
-            IndirectAbsorber(Num).Report.QCond = 0.0;
-            IndirectAbsorber(Num).Report.QGenerator = 0.0;
-            IndirectAbsorber(Num).Report.PumpingEnergy = 0.0;
-            IndirectAbsorber(Num).Report.EvapEnergy = 0.0;
-            IndirectAbsorber(Num).Report.CondEnergy = 0.0;
-            IndirectAbsorber(Num).Report.GeneratorEnergy = 0.0;
-            IndirectAbsorber(Num).Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorber(Num).Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.Evapmdot = 0.0;
-            IndirectAbsorber(Num).Report.Condmdot = 0.0;
-            IndirectAbsorber(Num).Report.Genmdot = 0.0;
-            IndirectAbsorber(Num).Report.ActualCOP = 0.0;
-            IndirectAbsorber(Num).Report.ChillerPartLoadRatio = 0.0;
-            IndirectAbsorber(Num).Report.LoopLoss = 0.0;
-            IndirectAbsorber(Num).Report.ChillerCyclingFrac = 0.0;
+            this->Report.PumpingPower = 0.0;
+            this->Report.QEvap = 0.0;
+            this->Report.QCond = 0.0;
+            this->Report.QGenerator = 0.0;
+            this->Report.PumpingEnergy = 0.0;
+            this->Report.EvapEnergy = 0.0;
+            this->Report.CondEnergy = 0.0;
+            this->Report.GeneratorEnergy = 0.0;
+            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.Evapmdot = 0.0;
+            this->Report.Condmdot = 0.0;
+            this->Report.Genmdot = 0.0;
+            this->Report.ActualCOP = 0.0;
+            this->Report.ChillerPartLoadRatio = 0.0;
+            this->Report.LoopLoss = 0.0;
+            this->Report.ChillerCyclingFrac = 0.0;
 
             if (this->GeneratorInletNodeNum > 0) {
                 PlantUtilities::SafeCopyPlantNode(this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
@@ -2196,28 +2196,28 @@ namespace ChillerIndirectAbsorption {
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             DataLoopNode::Node(CondOutletNode).Temp = this->CondOutletTemp;
 
-            IndirectAbsorber(Num).Report.PumpingPower = this->PumpingPower;
-            IndirectAbsorber(Num).Report.QEvap = this->QEvaporator;
-            IndirectAbsorber(Num).Report.QCond = this->QCondenser;
-            IndirectAbsorber(Num).Report.QGenerator = this->QGenerator;
-            IndirectAbsorber(Num).Report.PumpingEnergy = this->PumpingEnergy;
-            IndirectAbsorber(Num).Report.EvapEnergy = this->EvaporatorEnergy;
-            IndirectAbsorber(Num).Report.CondEnergy = this->CondenserEnergy;
-            IndirectAbsorber(Num).Report.GeneratorEnergy = this->GeneratorEnergy;
-            IndirectAbsorber(Num).Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
-            IndirectAbsorber(Num).Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            IndirectAbsorber(Num).Report.Evapmdot = this->EvapMassFlowRate;
-            IndirectAbsorber(Num).Report.Condmdot = this->CondMassFlowRate;
-            IndirectAbsorber(Num).Report.Genmdot = this->GenMassFlowRate;
-            IndirectAbsorber(Num).Report.LoopLoss = EnergyLossToEnvironment;
-            IndirectAbsorber(Num).Report.ChillerCyclingFrac = this->ChillerONOFFCyclingFrac;
+            this->Report.PumpingPower = this->PumpingPower;
+            this->Report.QEvap = this->QEvaporator;
+            this->Report.QCond = this->QCondenser;
+            this->Report.QGenerator = this->QGenerator;
+            this->Report.PumpingEnergy = this->PumpingEnergy;
+            this->Report.EvapEnergy = this->EvaporatorEnergy;
+            this->Report.CondEnergy = this->CondenserEnergy;
+            this->Report.GeneratorEnergy = this->GeneratorEnergy;
+            this->Report.EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->Report.CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->Report.CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
+            this->Report.EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->Report.Evapmdot = this->EvapMassFlowRate;
+            this->Report.Condmdot = this->CondMassFlowRate;
+            this->Report.Genmdot = this->GenMassFlowRate;
+            this->Report.LoopLoss = EnergyLossToEnvironment;
+            this->Report.ChillerCyclingFrac = this->ChillerONOFFCyclingFrac;
 
             if (this->QGenerator != 0.0) {
-                IndirectAbsorber(Num).Report.ActualCOP = this->QEvaporator / this->QGenerator;
+                this->Report.ActualCOP = this->QEvaporator / this->QGenerator;
             } else {
-                IndirectAbsorber(Num).Report.ActualCOP = 0.0;
+                this->Report.ActualCOP = 0.0;
             }
 
             if (this->GeneratorInletNodeNum > 0) {

@@ -221,7 +221,7 @@ namespace ChillerIndirectAbsorption {
 
         void sizeChiller();
 
-        void updateRecords(Real64 MyLoad, bool RunFlag, int Num);
+        void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
