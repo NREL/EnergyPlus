@@ -182,6 +182,12 @@ namespace ChillerIndirectAbsorption {
               CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true), MyEnvrnFlag(true)
         {
         }
+
+        void initialize(bool RunFlag, Real64 MyLoad);
+
+        void sizeChiller();
+
+        void updateRecords(Real64 MyLoad, bool RunFlag, int Num);
     };
 
     struct ReportVars
@@ -240,23 +246,11 @@ namespace ChillerIndirectAbsorption {
 
     void GetIndirectAbsorberInput();
 
-    void InitIndirectAbsorpChiller(int ChillNum, // number of the current electric chiller being simulated
-                                   bool RunFlag, // TRUE when chiller operating
-                                   Real64 MyLoad // requested load
-    );
-
-    void SizeIndirectAbsorpChiller(int ChillNum);
-
     void CalcIndirectAbsorberModel(int ChillNum,        // Absorber number
                                    Real64 MyLoad,       // operating load
                                    bool RunFlag,        // TRUE when Absorber operating
                                    bool FirstIteration, // TRUE when first iteration of timestep !unused1208
                                    int EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
-    void UpdateIndirectAbsorberRecords(Real64 MyLoad, // current load
-                                       bool RunFlag,  // TRUE if Absorber operating
-                                       int Num        // Absorber number
     );
 
     void clear_state();
