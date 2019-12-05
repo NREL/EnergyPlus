@@ -2013,6 +2013,9 @@ namespace HeatBalanceIntRadExchange {
                 errorsFound = true;
                 ShowSevereError("Carroll MRT Zone Radiant Exchange method unable to converge on \"view factor\" calculation.");
             }
+            if (errorsFound) {
+                ShowFatalError("CalcFMRT: Errors found while calculating mean radiant temperature view factors.  Program terminated.");
+            }
         }
         return;
     }

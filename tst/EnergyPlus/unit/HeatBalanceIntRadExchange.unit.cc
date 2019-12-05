@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
 
     CalcFMRT(N, A, FMRT);
 
-    std::string const error_string = "   ** Severe  ** Geometry not compatible with Carroll MRT Zone Radiant Exchange method.\n";
+    std::string const error_string = delimited_string({"   ** Severe  ** Geometry not compatible with Carroll MRT Zone Radiant Exchange method."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     CalcFp(N, EMISS, FMRT, Fp);
