@@ -183,9 +183,6 @@ namespace HeatBalanceIntRadExchange {
         Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        Real64 RecSurfTemp;                // Receiving surface temperature (C)
-        Real64 SendSurfTemp;               // Sending surface temperature (C)
-        Real64 RecSurfEmiss;               // Inside surface emissivity
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
         int ShadeFlag;     // Window shading status current time step
@@ -347,6 +344,7 @@ namespace HeatBalanceIntRadExchange {
                 auto const &surface_window(SurfaceWindow(SendSurfNum));
                 int const ConstrNumSend = Surface(SendSurfNum).Construction;
                 auto const &construct(Construct(ConstrNumSend));
+                Real64 SendSurfTemp;
                 if (construct.WindowTypeEQL || construct.WindowTypeBSDF) {
                     SendSurfTemp = surface_window.EffInsSurfTemp;
                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
@@ -386,37 +384,39 @@ namespace HeatBalanceIntRadExchange {
             for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                 int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
                 int const ConstrNumRec = Surface(RecSurfNum).Construction;
-                auto const &construct(Construct(ConstrNumRec));
-                auto &surface_window(SurfaceWindow(RecSurfNum));
+                auto const &rec_construct(Construct(ConstrNumRec));
+                auto &rec_surface_window(SurfaceWindow(RecSurfNum));
                 auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
 
                 // Set surface emissivities and temperatures
-                if (construct.WindowTypeEQL) {
+                Real64 RecSurfEmiss;
+                Real64 RecSurfTemp;
+                if (rec_construct.WindowTypeEQL) {
                     RecSurfEmiss = EQLWindowInsideEffectiveEmiss(ConstrNumRec);
-                    RecSurfTemp = surface_window.EffInsSurfTemp;
-                } else if (construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn) {
-                    RecSurfTemp = surface_window.EffInsSurfTemp;
-                    RecSurfEmiss = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
-                } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
-                    if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
+                    RecSurfTemp = rec_surface_window.EffInsSurfTemp;
+                } else if (rec_construct.WindowTypeBSDF && rec_surface_window.ShadingFlag == IntShadeOn) {
+                    RecSurfTemp = rec_surface_window.EffInsSurfTemp;
+                    RecSurfEmiss = rec_surface_window.EffShBlindEmiss[0] + rec_surface_window.EffGlassEmiss[0];
+                } else if (rec_construct.TypeIsWindow && rec_surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
+                    if (SurfIterations == 0 && rec_surface_window.ShadingFlag <= 0) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        RecSurfTemp = surface_window.ThetaFace(2 * construct.TotGlassLayers) - KelvinConv;
-                        RecSurfEmiss = construct.InsideAbsorpThermal;
+                        RecSurfTemp = rec_surface_window.ThetaFace(2 * rec_construct.TotGlassLayers) - KelvinConv;
+                        RecSurfEmiss = rec_construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
-                    } else if (surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn) {
-                        RecSurfTemp = surface_window.EffInsSurfTemp;
-                        RecSurfEmiss = InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffShBlindEmiss) +
-                                       InterpSlatAng(surface_window.SlatAngThisTS, surface_window.MovableSlats, surface_window.EffGlassEmiss);
+                    } else if (rec_surface_window.ShadingFlag == IntShadeOn || rec_surface_window.ShadingFlag == IntBlindOn) {
+                        RecSurfTemp = rec_surface_window.EffInsSurfTemp;
+                        RecSurfEmiss = InterpSlatAng(rec_surface_window.SlatAngThisTS, rec_surface_window.MovableSlats, rec_surface_window.EffShBlindEmiss) +
+                                       InterpSlatAng(rec_surface_window.SlatAngThisTS, rec_surface_window.MovableSlats, rec_surface_window.EffGlassEmiss);
                     } else {
                         RecSurfTemp = SurfaceTemp(RecSurfNum);
-                        RecSurfEmiss = construct.InsideAbsorpThermal;
+                        RecSurfEmiss = rec_construct.InsideAbsorpThermal;
                     }
                 } else {
                     RecSurfTemp = SurfaceTemp(RecSurfNum);
-                    RecSurfEmiss = construct.InsideAbsorpThermal;
+                    RecSurfEmiss = rec_construct.InsideAbsorpThermal;
                 }
                 // precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
                 RecSurfTempInKTo4th = pow_4(RecSurfTemp + KelvinConv);
@@ -427,12 +427,31 @@ namespace HeatBalanceIntRadExchange {
                 // Calculate net long-wave radiation for opaque surfaces and incident
                 // long-wave radiation for windows.
                 if (CarrollMethod) {
-                    if (construct.TypeIsWindow) {
+                    if (rec_construct.TypeIsWindow) {
                         Real64 CarrollMRTInKTo4thWin = CarrollMRTInKTo4th;  // arbitrary value, IR will be zero
                         Real64 CarrollMRTNumeratorWin(0.0);
                         Real64 CarrollMRTDenominatorWin(0.0);
                         for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
+                            int const SendSurfNum = zone_SurfacePtr[SendZoneSurfNum];
+                            auto const &send_surface_window(SurfaceWindow(SendSurfNum));
+                            int const ConstrNumSend = Surface(SendSurfNum).Construction;
+                            auto const &send_construct(Construct(ConstrNumSend));
+
+                            Real64 SendSurfTemp;
                             if (SendZoneSurfNum != RecZoneSurfNum) {
+                                if (send_construct.WindowTypeEQL || send_construct.WindowTypeBSDF) {
+                                    SendSurfTemp = send_surface_window.EffInsSurfTemp;
+                                } else if (send_construct.TypeIsWindow && send_surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
+                                    if (SurfIterations == 0 && send_surface_window.ShadingFlag <= 0) {
+                                        SendSurfTemp = send_surface_window.ThetaFace(2 * send_construct.TotGlassLayers) - KelvinConv;
+                                    } else if (send_surface_window.ShadingFlag == IntShadeOn || send_surface_window.ShadingFlag == IntBlindOn) {
+                                        SendSurfTemp = send_surface_window.EffInsSurfTemp;
+                                    } else {
+                                        SendSurfTemp = SurfaceTemp(SendSurfNum);
+                                    }
+                                } else {
+                                    SendSurfTemp = SurfaceTemp(SendSurfNum);
+                                }
                                 CarrollMRTNumeratorWin += SendSurfTemp*zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
                                 CarrollMRTDenominatorWin += zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
                             }
@@ -440,11 +459,11 @@ namespace HeatBalanceIntRadExchange {
                         if (CarrollMRTDenominatorWin > 0.0) {
                             CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin/CarrollMRTDenominatorWin + KelvinConv);
                         }
-                        surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / RecSurfEmiss;
+                        rec_surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / RecSurfEmiss;
                     }
                     netLWRadToRecSurf += zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - RecSurfTempInKTo4th);
                 } else {
-                    if (construct.TypeIsWindow) {          // Window
+                    if (rec_construct.TypeIsWindow) {          // Window
                         Real64 scriptF_acc(0.0);           // Local accumulator
                         Real64 netLWRadToRecSurf_cor(0.0); // Correction
                         Real64 IRfromParentZone_acc(0.0);  // Local accumulator
@@ -476,7 +495,7 @@ namespace HeatBalanceIntRadExchange {
                             //          ENDIF
                         }
                         netLWRadToRecSurf += IRfromParentZone_acc - netLWRadToRecSurf_cor - (scriptF_acc * RecSurfTempInKTo4th);
-                        surface_window.IRfromParentZone += IRfromParentZone_acc / RecSurfEmiss;
+                        rec_surface_window.IRfromParentZone += IRfromParentZone_acc / RecSurfEmiss;
                     } else {
                         Real64 netLWRadToRecSurf_acc(0.0); // Local accumulator
                         for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum, ++lSR) {
