@@ -1465,7 +1465,6 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
                                 this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = SwimmingPool::SwimmingPoolData::factory(CompNames(CompNum));
                             } else {
                                 // discover unsupported equipment on branches.
                                 ShowSevereError("GetPlantInput: Branch=\"" + BranchNames(BranchNum) +

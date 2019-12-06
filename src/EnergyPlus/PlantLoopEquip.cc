@@ -997,7 +997,7 @@ namespace PlantLoopEquip {
             } else if (EquipTypeNum == TypeOf_UnitarySysRecovery) {
 
             } else if (EquipTypeNum == TypeOf_SwimmingPool_Indoor) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
             } else {
 
                 ShowSevereError("SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf);

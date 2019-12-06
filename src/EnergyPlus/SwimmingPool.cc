@@ -79,6 +79,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -127,7 +128,7 @@ namespace SwimmingPool {
         Pool.deallocate();
     }
 
-    PlantComponent *SwimmingPoolData::factory(std::string const &objectName)
+    void SimSwimmingPool(bool FirstHVACIteration)
     {
         // Process the input data if it hasn't been done already
         if (getSwimmingPoolInput) {
@@ -135,35 +136,33 @@ namespace SwimmingPool {
             getSwimmingPoolInput = false;
         }
 
-        // Now look for this particular object
-        for (auto &pool : Pool) {
-            if (pool.Name == objectName) {
-                return &pool;
-            }
-        }
-
-        // If we didn't find it, fatal
-        ShowFatalError("LocalSwimmingPoolFactory: Error getting inputs for swimming pool named: " + objectName); // LCOV_EXCL_LINE
-
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void SwimmingPoolData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
-    {
         // System wide (for all pools) inits
         DataHeatBalFanSys::SumConvPool = 0.0;
         DataHeatBalFanSys::SumLatentPool = 0.0;
 
+        PlantLocation A(0, 0, 0, 0);
+        Real64 CurLoad = 0.0;
+        bool RunFlag = true;                                                                        
+
+        for (auto &thisPool : Pool) {
+            thisPool.simulate(A, FirstHVACIteration, CurLoad, RunFlag);
+        }
+
+        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+
+        ReportSwimmingPool();
+    }
+
+    void SwimmingPoolData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                    bool FirstHVACIteration,
+                                    Real64 &EP_UNUSED(CurLoad),
+                                    bool EP_UNUSED(RunFlag))
+    {
         this->InitSwimmingPool(FirstHVACIteration);
 
         this->CalcSwimmingPool();
 
         this->UpdateSwimmingPool();
-
-        if (NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
-
-        ReportSwimmingPool();
     }
 
     void GetSwimmingPool()

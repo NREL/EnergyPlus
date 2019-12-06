@@ -60,7 +60,7 @@ namespace EnergyPlus {
 
 namespace SwimmingPool {
 
-    extern int NumSwimmingPools;                 // Number of swimming pools
+    extern int NumSwimmingPools; // Number of swimming pools
 
     struct SwimmingPoolData : PlantComponent
     {
@@ -136,14 +136,14 @@ namespace SwimmingPool {
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
         Array1D_int SurfaceToPoolIndex;
-        Array1D<Real64> QPoolSrcAvg;         // Average source over the time step for a particular radiant surface
-        Array1D<Real64> HeatTransCoefsAvg;   // Average denominator term over the time step for a particular pool
+        Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
+        Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
         Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
         // Record keeping variables used to calculate QRadSysSrcAvg locally
-        Array1D<Real64> LastQPoolSrc;         // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastHeatTransCoefs;   // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastSysTimeElapsed;   // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastTimeStepSys;      // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         SwimmingPoolData()
@@ -155,13 +155,11 @@ namespace SwimmingPool {
               PeopleSchedPtr(0), PeopleHeatGainSchedPtr(0), PeopleHeatGain(0.0), GlycolIndex(0), WaterMass(0.0), SatPressPoolWaterTemp(0.0),
               PartPressZoneAirTemp(0.0), PoolWaterTemp(23.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterMassFlowRate(0.0),
               MakeUpWaterMassFlowRate(0.0), MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0), MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0),
-              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0),
-              MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
+              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0), MyOneTimeFlag(true),
+              MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
-        
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
@@ -182,17 +180,18 @@ namespace SwimmingPool {
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio
         );
-                          
+
         void UpdateSwimmingPool();
-        
     };
 
     // Object Data
     extern Array1D<SwimmingPoolData> Pool;
 
     void clear_state();
-    
+
     void GetSwimmingPool();
+
+    void SimSwimmingPool(bool FirstHVACIteration);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
