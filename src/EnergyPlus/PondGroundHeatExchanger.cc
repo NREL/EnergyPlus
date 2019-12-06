@@ -136,7 +136,7 @@ namespace PondGroundHeatExchanger {
         this->ReportPondGroundHeatExchanger();
     }
 
-    PlantComponent *PondGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string const objectName)
+    PlantComponent *PondGroundHeatExchangerData::factory(std::string const &objectName)
     {
         if (GetInputFlag) {
             GetPondGroundHeatExchanger();
@@ -307,34 +307,35 @@ namespace PondGroundHeatExchanger {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
-        // Set up the output variables
-        for (Item = 1; Item <= NumOfPondGHEs; ++Item) {
-            SetupOutputVariable("Pond Heat Exchanger Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                PondGHE(Item).HeatTransferRate,
-                                "Plant",
-                                "Average",
-                                PondGHE(Item).Name);
-            SetupOutputVariable(
-                "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, PondGHE(Item).Energy, "Plant", "Sum", PondGHE(Item).Name);
-            SetupOutputVariable("Pond Heat Exchanger Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                PondGHE(Item).MassFlowRate,
-                                "Plant",
-                                "Average",
-                                PondGHE(Item).Name);
-            SetupOutputVariable(
-                "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).InletTemp, "Plant", "Average", PondGHE(Item).Name);
-            SetupOutputVariable(
-                "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, PondGHE(Item).OutletTemp, "Plant", "Average", PondGHE(Item).Name);
-            SetupOutputVariable(
-                "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, PondGHE(Item).PondTemp, "Plant", "Average", PondGHE(Item).Name);
-        }
-
         if (!DataEnvironment::GroundTemp_DeepObjInput) {
             ShowWarningError("GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
             ShowContinueError("Defaults, constant throughout the year of (" + General::RoundSigDigits(DataEnvironment::GroundTemp_Deep, 1) + ") will be used.");
         }
+    }
+
+    void PondGroundHeatExchangerData::setupOutputVars()
+    {
+        SetupOutputVariable("Pond Heat Exchanger Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeatTransferRate,
+                            "Plant",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable(
+                "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, this->Energy, "Plant", "Sum", this->Name);
+        SetupOutputVariable("Pond Heat Exchanger Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            "Plant",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable(
+                "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "Plant", "Average", this->Name);
+        SetupOutputVariable(
+                "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "Plant", "Average", this->Name);
+        SetupOutputVariable(
+                "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
+
     }
 
     void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -365,6 +366,12 @@ namespace PondGroundHeatExchanger {
 
         // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
         // For each environment start the pond midway between drybulb and ground temp.
+
+        if (setupOutputVarsFlag)
+        {
+            this->setupOutputVars();
+            setupOutputVarsFlag = false;
+        }
 
         if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
@@ -479,7 +486,7 @@ namespace PondGroundHeatExchanger {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Thic calculates the summation of the heat fluxes on the pond for a
+        // This calculates the summation of the heat fluxes on the pond for a
         // given pond temperature. The following heat fluxes are calculated:
         //   convection,
         //   long-wave radiation,
@@ -509,7 +516,7 @@ namespace PondGroundHeatExchanger {
 
         Real64 CalcTotalFLux; // function return variable
 
-        Real64 const PrantlAir(0.71); // Prantl number for air - assumed constant
+        Real64 const PrandtlAir(0.71); // Prandtl number for air - assumed constant
         Real64 const SchmidtAir(0.6); // Schmidt number for air - assumed constant
         Real64 const PondHeight(0.0); // for now
         static std::string const RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
@@ -566,7 +573,7 @@ namespace PondGroundHeatExchanger {
         Real64 LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
 
         // evaporative heat flux
-        Real64 FluxEvap = pow_2(PrantlAir / SchmidtAir) / 3.0 * ConvCoef / SpecHeatAir * (HumRatioFilm - HumRatioAir) * LatentHeatAir;
+        Real64 FluxEvap = pow_2(PrandtlAir / SchmidtAir) / 3.0 * ConvCoef / SpecHeatAir * (HumRatioFilm - HumRatioAir) * LatentHeatAir;
 
         // ground heat transfer flux
         Real64 Perimeter = 4.0 * std::sqrt(this->Area); // pond perimeter -- square assumption

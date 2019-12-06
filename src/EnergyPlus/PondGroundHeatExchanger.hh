@@ -104,6 +104,7 @@ namespace PondGroundHeatExchanger {
 
         bool OneTimeFlag;
         bool MyFlag;
+        bool setupOutputVarsFlag;
 
         int WaterIndex;
 
@@ -113,18 +114,19 @@ namespace PondGroundHeatExchanger {
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
               OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true),
-              MyFlag(true), WaterIndex(0)
+              MyFlag(true), setupOutputVarsFlag(true), WaterIndex(0)
         {
         }
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-        );
+        void InitPondGroundHeatExchanger(bool FirstHVACIteration);
+
+        void setupOutputVars();
 
         void CalcPondGroundHeatExchanger();
 
