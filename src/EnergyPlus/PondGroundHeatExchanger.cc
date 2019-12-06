@@ -360,13 +360,9 @@ namespace PondGroundHeatExchanger {
 
         Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
         Real64 const PondHeight(0.0);     // for now
+
         static std::string const RoutineName("InitPondGroundHeatExchanger");
 
-        Real64 DesignFlow; // Hypothetical design flow rate
-
-        Real64 rho;
-        Real64 Cp;
-        bool errFlag;
         // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
         // For each environment start the pond midway between drybulb and ground temp.
 
@@ -379,14 +375,14 @@ namespace PondGroundHeatExchanger {
         // Init more variables
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
-            errFlag = false;
+            bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(
                 this->Name, DataPlant::TypeOf_GrndHtExchgPond, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
             }
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, DataPrecisionGlobals::constant_zero, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-            Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, DataPrecisionGlobals::constant_zero, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, DataPrecisionGlobals::constant_zero, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, DataPrecisionGlobals::constant_zero, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             this->DesignMassFlowRate = DataGlobals::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
             PlantUtilities::InitComponentNodes(0.0,
@@ -412,7 +408,8 @@ namespace PondGroundHeatExchanger {
         OutletTemp = DataLoopNode::Node(OutletNodeNum).Temp;
         PondTemp = this->BulkTemperature;
 
-        DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+        // Hypothetical design flow rate
+        Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
         PlantUtilities::SetComponentFlowRate(DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
@@ -451,37 +448,25 @@ namespace PondGroundHeatExchanger {
 
         static std::string const RoutineName("CalcPondGroundHeatExchanger");
 
-        Real64 PondTempStar;
-        Real64 PondTempStarStar;
-        Real64 PondTempStarStarStar;
-        Real64 Flux;
-        Real64 FluxStar;
-        Real64 FluxStarStar;
-        Real64 NewPondTemp;
-        Real64 SpecificHeat;
-        Real64 PondMass;
+        Real64 PondMass = this->Depth * this->Area * FluidProperties::GetDensityGlycol(fluidNameWater, max(this->PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
 
-        PondMass = this->Depth * this->Area * FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemp, DataPrecisionGlobals::constant_zero), this->WaterIndex, RoutineName);
-
-        SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
-                                             max(PondTemp, DataPrecisionGlobals::constant_zero),
+        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater,
+                                             max(this->PondTemp, DataPrecisionGlobals::constant_zero),
                                              this->WaterIndex,
                                              RoutineName); // DSU bug fix here, was using working fluid index
 
-        Flux = this->CalcTotalFLux(PondTemp);
-        PondTempStar = this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
+        Real64 Flux = this->CalcTotalFLux(this->PondTemp);
+        Real64 PondTempStar = this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * Flux / (SpecificHeat * PondMass);
 
-        FluxStar = this->CalcTotalFLux(PondTempStar);
-        PondTempStarStar = this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
+        Real64 FluxStar = this->CalcTotalFLux(PondTempStar);
+        Real64 PondTempStarStar = this->PastBulkTemperature + 0.5 * DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStar / (SpecificHeat * PondMass);
 
-        FluxStarStar = this->CalcTotalFLux(PondTempStarStar);
-        PondTempStarStarStar = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
+        Real64 FluxStarStar = this->CalcTotalFLux(PondTempStarStar);
+        Real64 PondTempStarStarStar = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys * FluxStarStar / (SpecificHeat * PondMass);
 
-        NewPondTemp = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys *
+        this->PondTemp = this->PastBulkTemperature + DataGlobals::SecInHour * DataHVACGlobals::TimeStepSys *
                                                       (Flux + 2.0 * FluxStar + 2.0 * FluxStarStar + this->CalcTotalFLux(PondTempStarStarStar)) /
                                                       (6.0 * SpecificHeat * PondMass);
-
-        PondTemp = NewPondTemp;
     }
 
     Real64 PondGroundHeatExchangerData::CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
@@ -529,35 +514,16 @@ namespace PondGroundHeatExchanger {
         Real64 const PondHeight(0.0); // for now
         static std::string const RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
-        Real64 ConvCoef;        // convection coefficient
-        Real64 ExternalTemp;    // external environmental temp - drybulb or wetbulb
-        Real64 FluxSolAbsorbed; // absorbed solar flux
-        Real64 FluxLongwave;    // absorbed longwave flux
-        Real64 FluxConvect;     // convective flux
-        Real64 FluxEvap;        // evaporative heat flux
-        Real64 FluxGround;      // ground heat transfer flux
-        Real64 Qfluid;          // convective flux
-        Real64 SurfTempAbs;     // absolute value of surface temp
-        Real64 SkyTempAbs;      // absolute value of sky temp
-        Real64 ThermalAbs;      // thermal absorptivity
-        Real64 SpecHeat;        // specific heat capacity
-        Real64 HumRatioFilm;    // humidity ratio at pond surface/film temperature
-        Real64 HumRatioAir;     // humidity ratio of air
-        Real64 SpecHeatAir;     // air specific heat
-        Real64 LatentHeatAir;   // latent heat of air
-        Real64 UvalueGround;    // ground heat transfer coefficient
-        Real64 Perimeter;       // pond perimeter
-        Real64 OutDryBulb;      // drybulb at pond height
-        Real64 OutWetBulb;      // wetbulb at pond height
-
         // make a surface heat balance and solve for temperature
-        ThermalAbs = 0.9;
+        Real64 ThermalAbs = 0.9;  // thermal absorptivity
 
         // set appropriate external temp
         // use height dependency --  if there was a height for this unit, it could be inserted.
         // parameter PondHeight=0.0 is used.
-        OutDryBulb = DataEnvironment::OutDryBulbTempAt(PondHeight);
-        OutWetBulb = DataEnvironment::OutWetBulbTempAt(PondHeight);
+        Real64 OutDryBulb = DataEnvironment::OutDryBulbTempAt(PondHeight);
+        Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(PondHeight);
+
+        Real64 ExternalTemp;    // external environmental temp - drybulb or wetbulb
         if (DataEnvironment::IsSnow || DataEnvironment::IsRain) {
             ExternalTemp = OutWetBulb;
         } else { // normal dry conditions
@@ -565,42 +531,51 @@ namespace PondGroundHeatExchanger {
         }
 
         // absolute temperatures
-        SurfTempAbs = PondBulkTemp + DataGlobals::KelvinConv;
-        SkyTempAbs = DataEnvironment::SkyTemp + DataGlobals::KelvinConv;
+        Real64 SurfTempAbs = PondBulkTemp + DataGlobals::KelvinConv;  // absolute value of surface temp
+        Real64 SkyTempAbs = DataEnvironment::SkyTemp + DataGlobals::KelvinConv;  // absolute value of sky temp
 
         // ASHRAE simple convection coefficient model for external surfaces.
-        ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(PondHeight));
+        Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(PondHeight));
+
         // convective flux
-        FluxConvect = ConvCoef * (PondBulkTemp - ExternalTemp);
+        Real64 FluxConvect = ConvCoef * (PondBulkTemp - ExternalTemp);
 
         // long-wave radiation between pond and sky.
-        FluxLongwave = StefBoltzmann * ThermalAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs));
+        Real64 FluxLongwave = StefBoltzmann * ThermalAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs));
 
         // total absorbed solar using function - no ground solar
-        FluxSolAbsorbed = CalcSolarFlux();
+        Real64 FluxSolAbsorbed = CalcSolarFlux();
 
         // specific heat from fluid prop routines
-        SpecHeat =
-            FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        Real64 SpecHeat = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         // heat transfer with fluid - heat exchanger analogy.
-        Qfluid = this->MassFlowRate * SpecHeat * this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate) *
+
+        // convective flux
+        Real64 Qfluid = this->MassFlowRate * SpecHeat * this->CalcEffectiveness(this->InletTemp, PondBulkTemp, this->MassFlowRate) *
                  (this->InletTemp - PondBulkTemp);
 
         this->HeatTransferRate = Qfluid;
 
         // evaporation flux
         // get air properties
-        HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
-        HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
-        SpecHeatAir = Psychrometrics::PsyCpAirFnWTdb(HumRatioAir, OutDryBulb);
-        LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
+        Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
 
-        FluxEvap = pow_2(PrantlAir / SchmidtAir) / 3.0 * ConvCoef / SpecHeatAir * (HumRatioFilm - HumRatioAir) * LatentHeatAir;
+        Real64 // humidity ratio at pond surface/film temperature
+        HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
+        Real64 SpecHeatAir = Psychrometrics::PsyCpAirFnWTdb(HumRatioAir, OutDryBulb);
+        Real64 LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
+
+        // evaporative heat flux
+        Real64 FluxEvap = pow_2(PrantlAir / SchmidtAir) / 3.0 * ConvCoef / SpecHeatAir * (HumRatioFilm - HumRatioAir) * LatentHeatAir;
 
         // ground heat transfer flux
-        Perimeter = 4.0 * std::sqrt(this->Area); // square assumption
-        UvalueGround = 0.999 * (GrndConductivity / this->Depth) + 1.37 * (GrndConductivity * Perimeter / this->Area);
-        FluxGround = UvalueGround * (PondBulkTemp - DataEnvironment::GroundTemp_Deep);
+        Real64 Perimeter = 4.0 * std::sqrt(this->Area); // pond perimeter -- square assumption
+
+        // ground heat transfer coefficient
+        Real64 UvalueGround = 0.999 * (GrndConductivity / this->Depth) + 1.37 * (GrndConductivity * Perimeter / this->Area);
+
+        // ground heat transfer flux
+        Real64 FluxGround = UvalueGround * (PondBulkTemp - DataEnvironment::GroundTemp_Deep);
 
         CalcTotalFLux = Qfluid + this->Area * (FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround);
         if (DataGlobals::BeginTimeStepFlag) {
@@ -641,16 +616,7 @@ namespace PondGroundHeatExchanger {
 
         Real64 const WaterRefIndex(1.33); // refractive index of water
         Real64 const AirRefIndex(1.0003); // refractive index of air
-        Real64 const PondExtCoef(0.3);    // extinction coefficent of water
-
-        Real64 IncidAngle;   // angle of incidence of beam
-        Real64 RefractAngle; // angle of refraction of beam
-        Real64 Transmitance; // transmitted solar
-        Real64 Reflectance;  // reflectance
-        Real64 Absorbtance;  // absorbed solar
-
-        Real64 ParallelRad; // parallel component of irradiation
-        Real64 PerpendRad;  // parallel component of irradiation
+        Real64 const PondExtCoef(0.3);    // extinction coefficient of water
 
         // check for sun up.
         if (!DataEnvironment::SunIsUp) {
@@ -659,21 +625,21 @@ namespace PondGroundHeatExchanger {
         }
 
         // get the incidence and reflection angles
-        IncidAngle = std::acos(DataEnvironment::SOLCOS(3));
-        RefractAngle = std::asin(std::sin(IncidAngle) * AirRefIndex / WaterRefIndex);
+        Real64 IncidAngle = std::acos(DataEnvironment::SOLCOS(3));
+        Real64 RefractAngle = std::asin(std::sin(IncidAngle) * AirRefIndex / WaterRefIndex);
 
         // absorbed component: Tau_a
-        Absorbtance = std::exp(-PondExtCoef * this->Depth / std::cos(RefractAngle));
+        Real64 Absorbtance = std::exp(-PondExtCoef * this->Depth / std::cos(RefractAngle));
 
         // parallel and perpendicular components
-        ParallelRad = pow_2(std::tan(RefractAngle - IncidAngle)) / pow_2(std::tan(RefractAngle + IncidAngle));
-        PerpendRad = pow_2(std::sin(RefractAngle - IncidAngle)) / pow_2(std::sin(RefractAngle + IncidAngle));
+        Real64 ParallelRad = pow_2(std::tan(RefractAngle - IncidAngle)) / pow_2(std::tan(RefractAngle + IncidAngle));
+        Real64 PerpendRad = pow_2(std::sin(RefractAngle - IncidAngle)) / pow_2(std::sin(RefractAngle + IncidAngle));
 
         // transmittance: Tau
-        Transmitance = 0.5 * Absorbtance * ((1.0 - ParallelRad) / (1.0 + ParallelRad) + (1.0 - PerpendRad) / (1.0 + PerpendRad));
+        Real64 Transmitance = 0.5 * Absorbtance * ((1.0 - ParallelRad) / (1.0 + ParallelRad) + (1.0 - PerpendRad) / (1.0 + PerpendRad));
 
         // reflectance: Tau_a - Tau
-        Reflectance = Absorbtance - Transmitance;
+        Real64 Reflectance = Absorbtance - Transmitance;
 
         // apply reflectance to beam and diffuse solar to find flux
         CalcSolarFlux = (1.0 - Reflectance) * (DataEnvironment::SOLCOS(3) * DataEnvironment::BeamSolarRad + DataEnvironment::DifSolarRad);
@@ -720,33 +686,18 @@ namespace PondGroundHeatExchanger {
         Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
         static std::string const CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
 
-        Real64 NusseltNum;       // Nusselt number (dimensionless)
-        Real64 PrantlNum;       // Prandtl number (dimensionless)
-        Real64 ReynoldsNum;     // Reynolds number (dimensionless)
-        Real64 RayleighNum;     // Rayleigh number (dimensionless)
-        Real64 ThermDiff;       // thermal diffusivity
-        Real64 ExpansionCoef;   // Expansion coefficient, in K^-1
-        Real64 Viscosity;       // Viscosity, in Ns/m2
-        Real64 Density;         // fluid density
-        Real64 SpecificHeat;    // Fluid specific heat
-        Real64 Conductivity;    // Fluid thermal conductivity
-        Real64 WaterSpecHeat;   // Specific heat of pond water
-        Real64 NTU;             // Number of transfer units, non-dimensional
-        Real64 ConvCoefOut;     // convection coefficient at outside of pipe
-        Real64 ConvCoefIn;      // convection coefficient at inside of pipe
-        Real64 PipeResistance;  // pipe wall thermal resistance
-        Real64 TotalResistance; // total pipe thermal resistance - conduction and convection
-
         // evaluate properties at pipe fluid temperature for given pipe fluid
 
-        SpecificHeat = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
-        Conductivity = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
-        Viscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+        Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+        Real64 Conductivity = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+        Real64 Viscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * TubeInDiameter * NumCircuits);
+        Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobals::Pi * Viscosity * TubeInDiameter * NumCircuits);
 
-        PrantlNum = Viscosity * SpecificHeat / Conductivity;
+        Real64 PrantlNum = Viscosity * SpecificHeat / Conductivity;
+
+        Real64 NusseltNum;       // Nusselt number (dimensionless)
 
         // Calculate the Nusselt number based on what flow regime one is in. h = (k)(Nu)/D
         if (ReynoldsNum >= MaxLaminarRe) { // Turbulent flow --> use Dittus-Boelter equation
@@ -756,44 +707,46 @@ namespace PondGroundHeatExchanger {
         }
 
         // inside convection resistance, from Nu
-        ConvCoefIn = Conductivity * NusseltNum / TubeInDiameter;
+        Real64 ConvCoefIn = Conductivity * NusseltNum / TubeInDiameter;
 
         // now find properties of pond water - always assume pond fluid is water
-        WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Conductivity = FluidProperties::GetConductivityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Viscosity = FluidProperties::GetViscosityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
-        Density = FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterConductivity = FluidProperties::GetConductivityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterViscosity = FluidProperties::GetViscosityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
+        Real64 WaterDensity = FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 0.0), this->WaterIndex, CalledFrom);
 
         // derived properties for natural convection coefficient
         // expansion coef (Beta) = -1/Rho. dRho/dT
         // The following code includes some slight modifications from Simon's original code.
         // It guarantees that the delta T is 10C and also avoids the problems associated with
         // water hitting a maximum density at around 4C. (RKS)
-        ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, WaterIndex, CalledFrom) -
+        Real64 ExpansionCoef = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) + 5.0, WaterIndex, CalledFrom) -
                           FluidProperties::GetDensityGlycol(fluidNameWater, max(PondTemperature, 10.0) - 5.0, this->WaterIndex, CalledFrom)) /
-                        (10.0 * Density);
+                        (10.0 * WaterDensity);
 
-        ThermDiff = Conductivity / (Density * WaterSpecHeat);
-        PrantlNum = Viscosity * WaterSpecHeat / Conductivity;
+        Real64 ThermDiff = WaterConductivity / (WaterDensity * WaterSpecHeat);
+        PrantlNum = WaterViscosity * WaterSpecHeat / WaterConductivity;
 
-        RayleighNum =
-            Density * GravConst * ExpansionCoef * std::abs(InsideTemperature - PondTemperature) * pow_3(TubeOutDiameter) / (Viscosity * ThermDiff);
+        Real64 RayleighNum = WaterDensity * GravConst * ExpansionCoef * std::abs(InsideTemperature - PondTemperature) * pow_3(TubeOutDiameter) / (WaterViscosity * ThermDiff);
 
         // Calculate the Nusselt number for natural convection at outside of pipe
         NusseltNum = pow_2(0.6 + (0.387 * std::pow(RayleighNum, 1.0 / 6.0) / (std::pow(1.0 + 0.559 / std::pow(PrantlNum, 9.0 / 16.0), 8.0 / 27.0))));
 
         // outside convection resistance, from Nu
-        ConvCoefOut = Conductivity * NusseltNum / TubeOutDiameter;
+        Real64 ConvCoefOut = WaterConductivity * NusseltNum / TubeOutDiameter;
 
         // conduction resistance of pipe
-        PipeResistance = TubeInDiameter / TubeConductivity * std::log(TubeOutDiameter / TubeInDiameter);
+        Real64 PipeResistance = TubeInDiameter / TubeConductivity * std::log(TubeOutDiameter / TubeInDiameter);
 
-        TotalResistance = PipeResistance + 1.0 / ConvCoefIn + TubeInDiameter / (TubeOutDiameter * ConvCoefOut);
+        // total pipe thermal resistance - conduction and convection
+        Real64 TotalResistance = PipeResistance + 1.0 / ConvCoefIn + TubeInDiameter / (TubeOutDiameter * ConvCoefOut);
 
         // Calculate the NTU parameter
         // NTU = UA/[(Mdot*Cp)min] = A/[Rtot*(Mdot*Cp)min]
         // where: Rtot = Ri,convection + Rconduction + Ro,conveciton
         //        A = Pi*D*TubeLength
+
+        Real64 NTU;             // Number of transfer units, non-dimensional
 
         if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
@@ -844,11 +797,9 @@ namespace PondGroundHeatExchanger {
 
         static std::string const RoutineName("PondGroundHeatExchanger:Update");
 
-        Real64 CpFluid; // Specific heat of working fluid
-
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         // check for flow
 
         PlantUtilities::SafeCopyPlantNode(InletNodeNum, OutletNodeNum);
