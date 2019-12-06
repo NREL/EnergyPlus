@@ -126,21 +126,12 @@ namespace DataGlobalConstants {
     std::string const cRT_FuelOil_1("FuelOil#1");
     std::string const cRT_FuelOil_1UC("FUELOIL#1");
     int const iRT_FuelOil_1(1006);
-    std::string const cRT_DistillateOil("DistillateOil");
-    std::string const cRT_DistillateOilUC("DISTILLATEOIL");
-    int const iRT_DistillateOil(1006);
     std::string const cRT_FuelOil_2("FuelOil#2");
     std::string const cRT_FuelOil_2UC("FUELOIL#2");
     int const iRT_FuelOil_2(1007);
-    std::string const cRT_ResidualOil("ResidualOil");
-    std::string const cRT_ResidualOilUC("RESIDUALOIL");
-    int const iRT_ResidualOil(1007);
     std::string const cRT_Propane("Propane");
     std::string const cRT_PropaneUC("PROPANE");
     int const iRT_Propane(1008);
-    std::string const cRT_LPG("LPG");
-    std::string const cRT_LPGUC("LPG");
-    int const iRT_LPG(1008);
     std::string const cRT_Water("Water");
     std::string const cRT_WaterUC("WATER");
     int const iRT_Water(1009);
@@ -351,7 +342,7 @@ namespace DataGlobalConstants {
         {
             auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
 
-            if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC")) {
+            if (SELECT_CASE_var == "ELECTRICITY") {
                 ResourceTypeNum = iRT_Electricity;
 
             } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
@@ -366,13 +357,13 @@ namespace DataGlobalConstants {
             } else if (SELECT_CASE_var == "COAL") {
                 ResourceTypeNum = iRT_Coal;
 
-            } else if ((SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "DISTILLATE OIL")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO1") || (SELECT_CASE_var == "FUELOIL#1")) {
                 ResourceTypeNum = iRT_FuelOil_1;
 
-            } else if ((SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO2") || (SELECT_CASE_var == "FUELOIL#2")) {
                 ResourceTypeNum = iRT_FuelOil_2;
 
-            } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG")) {
+            } else if (SELECT_CASE_var == "PROPANE") {
                 ResourceTypeNum = iRT_Propane;
 
             } else if (SELECT_CASE_var == "OTHERFUEL1") {

@@ -1752,5 +1752,5 @@
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    ABUPS;                   !- Report 1 Name
+    AnnualBuildingUtilityPerformanceSummary;  !- Report 1 Name
 
