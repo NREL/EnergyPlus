@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     HumRat = 0.005;
     Pool(PoolNum).CurActivityFactor = 0.5;
     Pool(PoolNum).CurCoverEvapFac = 0.3;
-    thisPool.CalcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
+    thisPool.calcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
     EXPECT_NEAR(0.000207, EvapRate, 0.000001);
     EXPECT_NEAR(4250.0, Pool(PoolNum).SatPressPoolWaterTemp, 10.0);
     EXPECT_NEAR(810.0, Pool(PoolNum).PartPressZoneAirTemp, 10.0);
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     HumRat = 0.010;
     Pool(PoolNum).CurActivityFactor = 1.0;
     Pool(PoolNum).CurCoverEvapFac = 1.0;
-    thisPool.CalcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
+    thisPool.calcSwimmingPoolEvap(EvapRate, SurfNum, MAT, HumRat);
     EXPECT_NEAR(0.000788, EvapRate, 0.000001);
     EXPECT_NEAR(3570.0, Pool(PoolNum).SatPressPoolWaterTemp, 10.0);
     EXPECT_NEAR(1600.0, Pool(PoolNum).PartPressZoneAirTemp, 10.0);
@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     
 
     // Test 1
-    Pool(1).InitSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
+    Pool(1).initSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
     EXPECT_EQ(Pool(1).HWLoopNum, 1);
     EXPECT_EQ(Pool(1).HWLoopSide, 1);
     EXPECT_EQ(Pool(1).HWBranchNum, 1);
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
 
     // Test 2
     MyPlantScanFlagPool = true;
-    Pool(2).InitSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
+    Pool(2).initSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
     EXPECT_EQ(Pool(2).HWLoopNum, 2);
     EXPECT_EQ(Pool(2).HWLoopSide, 2);
     EXPECT_EQ(Pool(2).HWBranchNum, 1);
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     DataSizing::CompDesWaterFlow.deallocate();
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.0;
-    thisPool.InitSwimmingPoolPlantNodeFlow(MyPlantScanFlagPool);
+    thisPool.initSwimmingPoolPlantNodeFlow(MyPlantScanFlagPool);
     EXPECT_EQ(DataSizing::CompDesWaterFlow(1).SupNode, 1);
     EXPECT_EQ(DataSizing::CompDesWaterFlow(1).DesVolFlowRate, 0.00075);
 
@@ -253,7 +253,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     DataSizing::CompDesWaterFlow.deallocate();
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.0;
-    thisPool.InitSwimmingPoolPlantNodeFlow(MyPlantScanFlagPool);
+    thisPool.initSwimmingPoolPlantNodeFlow(MyPlantScanFlagPool);
     EXPECT_EQ(DataSizing::CompDesWaterFlow(1).SupNode, 1);
     EXPECT_EQ(DataSizing::CompDesWaterFlow(1).DesVolFlowRate, 0.002);
 

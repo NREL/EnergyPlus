@@ -158,11 +158,11 @@ namespace SwimmingPool {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
     {
-        this->InitSwimmingPool(FirstHVACIteration);
+        this->initialize(FirstHVACIteration);
 
-        this->CalcSwimmingPool();
+        this->calculate();
 
-        this->UpdateSwimmingPool();
+        this->update();
     }
 
     void GetSwimmingPool()
@@ -459,7 +459,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::InitSwimmingPool(bool const FirstHVACIteration // true during the first HVAC iteration
+    void SwimmingPoolData::initialize(bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -479,7 +479,7 @@ namespace SwimmingPool {
         Real64 PeopleModifier = ScheduleManager::GetCurrentScheduleValue(this->PeopleSchedPtr);
 
         if (this->MyOneTimeFlag) {
-            this->SetupOutputVars(); // Set up the output variables once here
+            this->setupOutputVars(); // Set up the output variables once here
             this->ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
@@ -497,7 +497,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::InitSwimmingPoolPlantLoopIndex(this->MyPlantScanFlagPool);
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(this->MyPlantScanFlagPool);
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -525,7 +525,7 @@ namespace SwimmingPool {
             Real64 Density = FluidProperties::GetDensityGlycol("WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
             this->WaterMass = DataSurfaces::Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
             this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
-            InitSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
+            initSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
         }
 
         if (DataGlobals::BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
@@ -634,7 +634,7 @@ namespace SwimmingPool {
         this->CurCoverLWRadFac = 1.0 - (this->CurCoverSchedVal * this->CoverLWRadFactor);
     }
 
-    void SwimmingPoolData::SetupOutputVars()
+    void SwimmingPoolData::setupOutputVars()
     {
         SetupOutputVariable(
             "Indoor Pool Makeup Water Rate", OutputProcessor::Unit::m3_s, this->MakeUpWaterVolFlowRate, "System", "Average", this->Name);
@@ -702,7 +702,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::InitSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
         // SUBROUTINE INFORMATION:
@@ -737,7 +737,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::InitSwimmingPoolPlantNodeFlow(bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+    void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
 
@@ -756,7 +756,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::CalcSwimmingPool()
+    void SwimmingPoolData::calculate()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
@@ -812,7 +812,7 @@ namespace SwimmingPool {
         // Convection coefficient calculation
         Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - DataHeatBalFanSys::MAT(ZoneNum)), 1.0 / 3.0) *
                          this->CurCoverConvFac; // convection coefficient for pool
-        CalcSwimmingPoolEvap(EvapRate, SurfNum, DataHeatBalFanSys::MAT(ZoneNum), DataHeatBalFanSys::ZoneAirHumRat(ZoneNum));
+        calcSwimmingPoolEvap(EvapRate, SurfNum, DataHeatBalFanSys::MAT(ZoneNum), DataHeatBalFanSys::ZoneAirHumRat(ZoneNum));
         this->MakeUpWaterMassFlowRate = EvapRate;
         Real64 EvapEnergyLossPerArea = -EvapRate *
                                        Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum)) /
@@ -878,7 +878,7 @@ namespace SwimmingPool {
             EvapRate * Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum));
     }
 
-    void SwimmingPoolData::CalcSwimmingPoolEvap(Real64 &EvapRate,   // evaporation rate of pool
+    void SwimmingPoolData::calcSwimmingPoolEvap(Real64 &EvapRate,   // evaporation rate of pool
                                                 int const SurfNum,  // surface index
                                                 Real64 const MAT,   // mean air temperature
                                                 Real64 const HumRat // zone air humidity ratio
@@ -901,7 +901,7 @@ namespace SwimmingPool {
                    DataConversions::CFMF * this->CurCoverEvapFac;
     }
 
-    void SwimmingPoolData::UpdateSwimmingPool()
+    void SwimmingPoolData::update()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim

@@ -162,26 +162,26 @@ namespace SwimmingPool {
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSwimmingPool(bool FirstHVACIteration // true during the first HVAC iteration
+        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
         );
 
-        void SetupOutputVars();
+        void setupOutputVars();
 
-        void InitSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        void initSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );
 
-        void InitSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );
 
-        void CalcSwimmingPool();
+        void calculate();
 
-        void CalcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio
         );
 
-        void UpdateSwimmingPool();
+        void update();
     };
 
     // Object Data
