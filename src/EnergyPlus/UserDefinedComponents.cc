@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -92,7 +91,6 @@ namespace UserDefinedComponents {
     // PURPOSE OF THIS MODULE:
     // Collect component models for custom program with Erl.
 
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::emsCallFromUserDefinedComponentModel;
     using DataGlobals::NumOfZones;
@@ -149,8 +147,6 @@ namespace UserDefinedComponents {
         int CompNum;
         int ThisLoop;
         int Loop;
-
-        ThisLoop = 0;
 
         if (GetInput) {
             GetUserDefinedComponents();
@@ -318,7 +314,7 @@ namespace UserDefinedComponents {
 
         ReportCoilUserDefined(CompNum);
 
-        if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
+        if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
             if (Node(UserCoil(CompNum).Air(1).InletNodeNum).Temp < Node(UserCoil(CompNum).Air(1).OutletNodeNum).Temp) {
                 HeatingActive = true;

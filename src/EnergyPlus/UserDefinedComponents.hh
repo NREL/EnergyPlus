@@ -272,50 +272,50 @@ namespace UserDefinedComponents {
 
     // Functions
 
-    void SimUserDefinedPlantComponent(int const LoopNum,            // plant loop sim call originated from
-                                      int const LoopSideNum,        // plant loop side sim call originated from
+    void SimUserDefinedPlantComponent(int LoopNum,            // plant loop sim call originated from
+                                      int LoopSideNum,        // plant loop side sim call originated from
                                       std::string const &EquipType, // type of equipment, 'PlantComponent:UserDefined'
                                       std::string const &EquipName, // user name for component
                                       int &CompIndex,
                                       bool &InitLoopEquip,
-                                      Real64 const MyLoad,
+                                      Real64 MyLoad,
                                       Real64 &MaxCap,
                                       Real64 &MinCap,
                                       Real64 &OptCap);
 
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
                             int &CompIndex,
-                            int const AirLoopNum,
+                            int AirLoopNum,
                             bool &HeatingActive,
                             bool &CoolingActive);
 
     void SimZoneAirUserDefined(std::string const &CompName,    // name of the packaged terminal heat pump
-                               int const ZoneNum,              // number of zone being served
+                               int ZoneNum,              // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                int &CompIndex                  // index to zone hvac unit
     );
 
     void
-    SimAirTerminalUserDefined(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+    SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetUserDefinedComponents();
 
-    void InitPlantUserComponent(int const CompNum, int const LoopNum, Real64 const MyLoad);
+    void InitPlantUserComponent(int CompNum, int LoopNum, Real64 MyLoad);
 
-    void InitCoilUserDefined(int const CompNum);
+    void InitCoilUserDefined(int CompNum);
 
-    void InitZoneAirUserDefined(int const CompNum, int const ZoneNum);
+    void InitZoneAirUserDefined(int CompNum, int ZoneNum);
 
-    void InitAirTerminalUserDefined(int const CompNum, int const ZoneNum);
+    void InitAirTerminalUserDefined(int CompNum, int ZoneNum);
 
-    void ReportPlantUserComponent(int const CompNum, int const LoopNum);
+    void ReportPlantUserComponent(int CompNum, int LoopNum);
 
-    void ReportCoilUserDefined(int const CompNum);
+    void ReportCoilUserDefined(int CompNum);
 
-    void ReportZoneAirUserDefined(int const CompNum);
+    void ReportZoneAirUserDefined(int CompNum);
 
-    void ReportAirTerminalUserDefined(int const CompNum);
+    void ReportAirTerminalUserDefined(int CompNum);
 
     void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
