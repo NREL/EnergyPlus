@@ -60,17 +60,8 @@ namespace EnergyPlus {
 
 namespace UserDefinedComponents {
 
-    // Using/Aliasing
     using DataPlant::HowMet_Unknown;
     using DataPlant::LoopFlowStatus_Unknown;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
 
     extern int NumUserPlantComps;
     extern int NumUserCoils;
@@ -82,10 +73,6 @@ namespace UserDefinedComponents {
     extern Array1D_bool CheckUserZoneAirName;
     extern Array1D_bool CheckUserAirTerminal;
     extern bool GetInput;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Types
 
     struct PlantConnectionStruct
     {

@@ -92,16 +92,6 @@ namespace UserDefinedComponents {
     // PURPOSE OF THIS MODULE:
     // Collect component models for custom program with Erl.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::emsCallFromUserDefinedComponentModel;
@@ -110,14 +100,6 @@ namespace UserDefinedComponents {
     using namespace DataLoopNode;
     using namespace DataRuntimeLanguage;
     using DataWater::WaterStorage;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumUserPlantComps(0);
     int NumUserCoils(0);
@@ -130,15 +112,10 @@ namespace UserDefinedComponents {
     Array1D_bool CheckUserAirTerminal;
     bool GetInput(true);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Object Data
     Array1D<UserPlantComponentStruct> UserPlantComp;
     Array1D<UserCoilComponentStruct> UserCoil;
     Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
-
-    // Functions
 
     void SimUserDefinedPlantComponent(int const LoopNum,                       // plant loop sim call originated from
                                       int const LoopSideNum,                   // plant loop side sim call originated from
@@ -164,20 +141,16 @@ namespace UserDefinedComponents {
         // METHODOLOGY EMPLOYED:
         // This routine to be called from PlantLoopEquipment.
 
-        // Using/Aliasing
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int CompNum;
         int ThisLoop;
         int Loop;
 
-        // Autodesk:Uninit Initialize variables used uninitialized
-        ThisLoop = 0; // Autodesk:Uninit Force default initialization
+        ThisLoop = 0;
 
         if (GetInput) {
             GetUserDefinedComponents();
@@ -279,10 +252,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // Using/Aliasing
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using PlantUtilities::InitComponentNodes;
@@ -290,7 +259,6 @@ namespace UserDefinedComponents {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EnthInlet;
         Real64 EnthOutlet;
         int CompNum;
@@ -382,10 +350,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // Using/Aliasing
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using PlantUtilities::InitComponentNodes;
@@ -393,7 +357,6 @@ namespace UserDefinedComponents {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
         int Loop;
         Real64 AirMassFlow;
@@ -488,14 +451,12 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // simulation call for generic air terminal
 
-        // Using/Aliasing
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
         int Loop;
 
@@ -569,10 +530,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataHeatBalance::IntGainTypeOf_AirTerminalUserDefined;
         using DataHeatBalance::IntGainTypeOf_CoilUserDefined;
@@ -586,10 +543,8 @@ namespace UserDefinedComponents {
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
@@ -612,8 +567,6 @@ namespace UserDefinedComponents {
         int aArgCount;
         int StackMngrNum;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
-        //  INTEGER  :: alphaNum
-        //  INTEGER  :: Loop
         int MgrCountTest;
         int CtrlZone; // controlled zone do loop index
         int SupAirIn; // controlled zone supply air inlet index
@@ -2110,16 +2063,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -2127,26 +2070,13 @@ namespace UserDefinedComponents {
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitPlantUserComponent");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag; // environment flag
         static Array1D_bool MyFlag;
         int ConnectionNum;
         bool errFlag;
-        //  REAL(r64) :: rho
-        //  REAL(r64) :: Cp
 
         if (MyOneTimeFlag) {
             MyFlag.allocate(NumUserPlantComps);
@@ -2227,35 +2157,14 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitCoilUserDefined");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
         bool errFlag;
@@ -2336,13 +2245,6 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize data for user-defined zone HVAC forced air component model
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
@@ -2351,19 +2253,8 @@ namespace UserDefinedComponents {
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitZoneAirUserDefined");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
         bool errFlag;
@@ -2459,16 +2350,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
@@ -2477,19 +2358,8 @@ namespace UserDefinedComponents {
         using Psychrometrics::PsyCpAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitAirTerminalUserDefined");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
         bool errFlag;
@@ -2591,27 +2461,9 @@ namespace UserDefinedComponents {
         // METHODOLOGY EMPLOYED:
         // copy actuated values to structures elsewhere in program.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         SafeCopyPlantNode(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum, UserPlantComp(CompNum).Loop(LoopNum).OutletNodeNum);
 
@@ -2675,30 +2527,10 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
         for (Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
@@ -2753,30 +2585,10 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
         Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate = UserZoneAirHVAC(CompNum).ZoneAir.InletMassFlowRate;
@@ -2831,34 +2643,10 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         int Loop;
 
         Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).MassFlowRate = UserAirTerminal(CompNum).AirLoop.InletMassFlowRate;
@@ -2947,7 +2735,6 @@ namespace UserDefinedComponents {
         // This subroutine gets a given user defined Cooling Coil's air inlet node -- issues error message if that
         // coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;
 
         // Obtains and allocates TESCoil related parameters from input file
@@ -2985,7 +2772,6 @@ namespace UserDefinedComponents {
         // This subroutine gets a given user defined Cooling Coil's air outlet node -- issues error message if that
         // coil is not a legal user defined Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;
 
         // Obtains and allocates TESCoil related parameters from input file
