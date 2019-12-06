@@ -2382,10 +2382,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electric";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OffCycParaFuelType = "Gas";
+                    Tank.OnCycParaFuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -2397,13 +2397,13 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOil#1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOil#2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
-                    Tank.OffCycParaFuelType = "Propane";
+                    Tank.OnCycParaFuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
                     Tank.OnCycParaFuelType = "OtherFuel1";
