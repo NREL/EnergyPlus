@@ -60,9 +60,6 @@ namespace EnergyPlus {
 
 namespace UserDefinedComponents {
 
-    using DataPlant::HowMet_Unknown;
-    using DataPlant::LoopFlowStatus_Unknown;
-
     extern int NumUserPlantComps;
     extern int NumUserCoils;
     extern int NumUserZoneAir;
@@ -72,7 +69,6 @@ namespace UserDefinedComponents {
     extern Array1D_bool CheckUserCoilName;
     extern Array1D_bool CheckUserZoneAirName;
     extern Array1D_bool CheckUserAirTerminal;
-    extern bool GetInput;
 
     struct PlantConnectionStruct
     {
@@ -101,12 +97,12 @@ namespace UserDefinedComponents {
         Real64 InletCp;              // fills internal Variable, current specific heat for fluid type and inlet temperature [J/kg-C]
         Real64 InletTemp;            // fills internal variable, current inlet fluid temperature [C]
         Real64 InletMassFlowRate;    // fills internal variable, current inlet mass flow rate [kg/s]
-        Real64 OutletTemp;           // filled by actuator, componenent outlet temperature [C]
+        Real64 OutletTemp;           // filled by actuator, component outlet temperature [C]
 
         // Default Constructor
         PlantConnectionStruct()
             : ErlInitProgramMngr(0), ErlSimProgramMngr(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0), OutletNodeNum(0),
-              FlowPriority(LoopFlowStatus_Unknown), HowLoadServed(HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0),
+              FlowPriority(DataPlant::LoopFlowStatus_Unknown), HowLoadServed(DataPlant::HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0),
               MassFlowRateRequest(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0),
               MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {
@@ -199,7 +195,7 @@ namespace UserDefinedComponents {
         std::string Name;       // user identifier
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
-        int NumAirConnections;  // count of how many air connectiosn there are
+        int NumAirConnections;  // count of how many air connections there are
         bool PlantIsConnected;
         Array1D<AirConnectionStruct> Air;
         PlantConnectionStruct Loop;
@@ -269,8 +265,6 @@ namespace UserDefinedComponents {
     extern Array1D<UserCoilComponentStruct> UserCoil;
     extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
-
-    // Functions
 
     void SimUserDefinedPlantComponent(int LoopNum,            // plant loop sim call originated from
                                       int LoopSideNum,        // plant loop side sim call originated from
