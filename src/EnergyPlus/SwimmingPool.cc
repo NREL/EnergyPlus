@@ -142,7 +142,7 @@ namespace SwimmingPool {
 
         PlantLocation A(0, 0, 0, 0);
         Real64 CurLoad = 0.0;
-        bool RunFlag = true;                                                                        
+        bool RunFlag = true;
 
         for (auto &thisPool : Pool) {
             thisPool.simulate(A, FirstHVACIteration, CurLoad, RunFlag);
