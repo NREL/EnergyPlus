@@ -111,28 +111,29 @@ namespace PondGroundHeatExchanger {
         PondGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
-              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), OneTimeFlag(true),
+              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true),
               MyFlag(true), WaterIndex(0)
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(int const objectType, std::string objectName);
+        static PlantComponent *factory(int objectType, std::string objectName);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+        void InitPondGroundHeatExchanger(bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
         );
 
         void CalcPondGroundHeatExchanger();
 
-        Real64 CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
+        Real64 CalcTotalFLux(Real64 PondBulkTemp // pond temp for this flux calculation
         );
 
-        Real64 CalcEffectiveness(Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
-                                 Real64 const PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
-                                 Real64 const MassFlowRate       // Mass flow rate, in kg/s
+        Real64 CalcEffectiveness(Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
+                                 Real64 PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
+                                 Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
         Real64 CalcSolarFlux();

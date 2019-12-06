@@ -141,7 +141,7 @@ namespace PondGroundHeatExchanger {
         this->ReportPondGroundHeatExchanger();
     }
 
-    PlantComponent *PondGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string objectName)
+    PlantComponent *PondGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string const objectName)
     {
         if (GetInputFlag) {
             GetPondGroundHeatExchanger();
@@ -393,8 +393,7 @@ namespace PondGroundHeatExchanger {
         static std::string const RoutineName("InitPondGroundHeatExchanger");
 
         Real64 DesignFlow; // Hypothetical design flow rate
-        int LoopNum;
-        int LoopSideNum;
+
         Real64 rho;
         Real64 Cp;
         bool errFlag;
@@ -434,9 +433,7 @@ namespace PondGroundHeatExchanger {
         }
 
         // check if we are in very first call for this zone time step
-        LoopNum = this->LoopNum;
-        LoopSideNum = this->LoopSideNum;
-        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 1) { // DSU
+        if (BeginTimeStepFlag && FirstHVACIteration && PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // DSU
             // update past temperature
             this->PastBulkTemperature = this->BulkTemperature;
         }
@@ -614,9 +611,7 @@ namespace PondGroundHeatExchanger {
         // parameter PondHeight=0.0 is used.
         OutDryBulb = OutDryBulbTempAt(PondHeight);
         OutWetBulb = OutWetBulbTempAt(PondHeight);
-        if (IsSnow) {
-            ExternalTemp = OutWetBulb;
-        } else if (IsRain) {
+        if (IsSnow || IsRain) {
             ExternalTemp = OutWetBulb;
         } else { // normal dry conditions
             ExternalTemp = OutDryBulb;
@@ -746,7 +741,7 @@ namespace PondGroundHeatExchanger {
 
     Real64 PondGroundHeatExchangerData::CalcEffectiveness(Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                                           Real64 const PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
-                                                          Real64 const MassFlowRate       // Mass flow rate, in kg/s
+                                                          Real64 const massFlowRate       // Mass flow rate, in kg/s
     )
     {
 
@@ -813,10 +808,9 @@ namespace PondGroundHeatExchanger {
         SpecificHeat = GetSpecificHeatGlycol(PlantLoop(this->LoopNum).FluidName, InsideTemperature, PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Conductivity = GetConductivityGlycol(PlantLoop(this->LoopNum).FluidName, InsideTemperature, PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Viscosity = GetViscosityGlycol(PlantLoop(this->LoopNum).FluidName, InsideTemperature, PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
-        Density = GetDensityGlycol(PlantLoop(this->LoopNum).FluidName, InsideTemperature, PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-        ReynoldsNum = 4.0 * MassFlowRate / (Pi * Viscosity * TubeInDiameter * NumCircuits);
+        ReynoldsNum = 4.0 * massFlowRate / (Pi * Viscosity * TubeInDiameter * NumCircuits);
 
         PrantlNum = Viscosity * SpecificHeat / Conductivity;
 
@@ -867,10 +861,10 @@ namespace PondGroundHeatExchanger {
         // where: Rtot = Ri,convection + Rconduction + Ro,conveciton
         //        A = Pi*D*TubeLength
 
-        if (MassFlowRate == 0.0) {
+        if (massFlowRate == 0.0) {
             CalcEffectiveness = 1.0;
         } else {
-            NTU = Pi * TubeInDiameter * this->CircuitLength * NumCircuits / (TotalResistance * MassFlowRate * SpecificHeat);
+            NTU = Pi * TubeInDiameter * this->CircuitLength * NumCircuits / (TotalResistance * massFlowRate * SpecificHeat);
             // Calculate effectiveness - formula for static fluid
             CalcEffectiveness = (1.0 - std::exp(-NTU));
         }
