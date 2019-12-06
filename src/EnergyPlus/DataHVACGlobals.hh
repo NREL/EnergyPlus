@@ -75,6 +75,7 @@ namespace DataHVACGlobals {
 
     // MODULE PARAMETER DEFINITIONS:
 
+    Real64 const SmallHumRatDiff(1.0E-7);
     extern Real64 const SmallTempDiff;
     extern Real64 const SmallMassFlow;
     extern Real64 const VerySmallMassFlow;
