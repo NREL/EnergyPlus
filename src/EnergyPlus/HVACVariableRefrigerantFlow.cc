@@ -173,7 +173,7 @@ namespace HVACVariableRefrigerantFlow {
     int const NumValidFuelTypes(9);
     Array1D_string const
         cValidFuelTypes(NumValidFuelTypes,
-                        {"Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
+                        {"Electric", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -2276,19 +2276,17 @@ namespace HVACVariableRefrigerantFlow {
                 // A39; \field Fuel type
                 if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRICITY")) {
                     VRF(VRFNum).FuelType = FuelTypeElectric;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRIC")) {
-                    VRF(VRFNum).FuelType = FuelTypeElectric;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "NATURALGAS")) {
                     VRF(VRFNum).FuelType = FuelTypeNaturalGas;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANEGAS")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANE")) {
                     VRF(VRFNum).FuelType = FuelTypePropaneGas;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "DIESEL")) {
                     VRF(VRFNum).FuelType = FuelTypeDiesel;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "GASOLINE")) {
                     VRF(VRFNum).FuelType = FuelTypeGasoline;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#1")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO1")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil1;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#2")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO2")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil2;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "OtherFuel1")) {
                     VRF(VRFNum).FuelType = FuelTypeOtherFuel1;
@@ -2298,7 +2296,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
-                        "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }
