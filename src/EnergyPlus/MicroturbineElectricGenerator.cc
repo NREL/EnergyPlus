@@ -341,11 +341,10 @@ namespace MicroturbineElectricGenerator {
                 if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
                     MTGenerator(GeneratorNum).FuelType = "Gas";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     MTGenerator(GeneratorNum).FuelType = "Gas";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     MTGenerator(GeneratorNum).FuelType = "Propane";
 
                 } else {
