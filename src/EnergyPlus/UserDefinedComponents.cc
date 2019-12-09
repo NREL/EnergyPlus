@@ -2216,7 +2216,7 @@ namespace UserDefinedComponents {
         }
 
         if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-            for (Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+            for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
                 UserZoneAirHVAC(CompNum).Loop(Loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidName,
                                                                                 DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum).Temp,
                                                                                 DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidIndex,
@@ -2311,7 +2311,7 @@ namespace UserDefinedComponents {
         }
 
         if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-            for (Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+            for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
                 UserAirTerminal(CompNum).Loop(Loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidName,
                                                                                 DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum).Temp,
                                                                                 DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidIndex,
@@ -2616,8 +2616,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
