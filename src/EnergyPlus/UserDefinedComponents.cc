@@ -134,7 +134,6 @@ namespace UserDefinedComponents {
 
         int CompNum;
         int ThisLoop;
-        int Loop;
 
         if (GetInput) {
             GetUserDefinedComponents();
@@ -167,7 +166,7 @@ namespace UserDefinedComponents {
             InitPlantUserComponent(CompNum, LoopNum, MyLoad);
             // find loop connection number from LoopNum and LoopSide
             ThisLoop = 0;
-            for (Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
+            for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
                 if (LoopNum != UserPlantComp(CompNum).Loop(Loop).LoopNum) continue;
                 if (LoopSideNum != UserPlantComp(CompNum).Loop(Loop).LoopSideNum) continue;
                 ThisLoop = Loop;
@@ -202,7 +201,7 @@ namespace UserDefinedComponents {
         }
 
         ThisLoop = 0;
-        for (Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
+        for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
             if (LoopNum != UserPlantComp(CompNum).Loop(Loop).LoopNum) continue;
             if (LoopSideNum != UserPlantComp(CompNum).Loop(Loop).LoopSideNum) continue;
             ThisLoop = Loop;
@@ -236,8 +235,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        Real64 EnthInlet;
-        Real64 EnthOutlet;
         int CompNum;
 
         if (GetInput) {
@@ -297,19 +294,12 @@ namespace UserDefinedComponents {
 
         if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
-            if (DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).Temp < DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).Temp) {
-                HeatingActive = true;
-            } else {
-                HeatingActive = false;
-            }
+            HeatingActive = DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).Temp <
+                            DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).Temp;
 
-            EnthInlet = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).Temp, DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).HumRat);
-            EnthOutlet = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).Temp, DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).HumRat);
-            if (EnthInlet > EnthOutlet) {
-                CoolingActive = true;
-            } else {
-                CoolingActive = false;
-            }
+            Real64 EnthInlet = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).Temp, DataLoopNode::Node(UserCoil(CompNum).Air(1).InletNodeNum).HumRat);
+            Real64 EnthOutlet = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).Temp, DataLoopNode::Node(UserCoil(CompNum).Air(1).OutletNodeNum).HumRat);
+            CoolingActive = EnthInlet > EnthOutlet;
         }
     }
 
@@ -328,11 +318,6 @@ namespace UserDefinedComponents {
         //       RE-ENGINEERED  na
 
         int CompNum;
-        int Loop;
-        Real64 AirMassFlow;
-        Real64 MinHumRat;
-        Real64 SpecHumOut;
-        Real64 SpecHumIn;
 
         if (GetInput) {
             GetUserDefinedComponents();
@@ -368,7 +353,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
             }
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-                for (Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+                for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
 
                     PlantUtilities::InitComponentNodes(UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
                                        UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMax,
@@ -395,16 +380,15 @@ namespace UserDefinedComponents {
         ReportZoneAirUserDefined(CompNum);
 
         // calculate delivered capacity
-        AirMassFlow =
+        Real64 AirMassFlow =
             min(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate, DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).MassFlowRate);
         // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
-        MinHumRat = min(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat, DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat);
+        Real64 MinHumRat = min(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat, DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat);
         SensibleOutputProvided = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Temp, MinHumRat) -
                                                 Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp, MinHumRat));
 
-        // CR9155 Remove specific humidity calculations
-        SpecHumOut = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat;
-        SpecHumIn = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
+        Real64 SpecHumOut = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat;
+        Real64 SpecHumIn = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
         LatentOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
     }
 
@@ -422,7 +406,6 @@ namespace UserDefinedComponents {
         // simulation call for generic air terminal
 
         int CompNum;
-        int Loop;
 
         if (GetInput) {
             GetUserDefinedComponents();
@@ -458,7 +441,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
             }
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-                for (Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+                for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
 
                     PlantUtilities::InitComponentNodes(UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
                                        UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMax,
@@ -496,43 +479,26 @@ namespace UserDefinedComponents {
 
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
         static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        int CompLoop;
-        int ConnectionLoop;
-        int NumPlantConnections;
-        int NumAirConnections;
         std::string LoopStr;
-        int aArgCount;
-        int StackMngrNum;
         static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
-        int MgrCountTest;
-        int CtrlZone; // controlled zone do loop index
-        int SupAirIn; // controlled zone supply air inlet index
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
-        MaxNumNumbers = NumNums;
-        MaxNumAlphas = NumAlphas;
 
-        cAlphaFieldNames.allocate(MaxNumAlphas);
-        cAlphaArgs.allocate(MaxNumAlphas);
-        lAlphaFieldBlanks.dimension(MaxNumAlphas, false);
-        cNumericFieldNames.allocate(MaxNumNumbers);
-        rNumericArgs.dimension(MaxNumNumbers, 0.0);
-        lNumericFieldBlanks.dimension(MaxNumNumbers, false);
+        cAlphaFieldNames.allocate(NumAlphas);
+        cAlphaArgs.allocate(NumAlphas);
+        lAlphaFieldBlanks.dimension(NumAlphas, false);
+        rNumericArgs.dimension(NumNums, 0.0);
 
         // need to make sure GetEMSInput has run...
 
@@ -541,7 +507,7 @@ namespace UserDefinedComponents {
         if (NumUserPlantComps > 0) {
             UserPlantComp.allocate(NumUserPlantComps);
             CheckUserPlantCompName.dimension(NumUserPlantComps, true);
-            for (CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop) {
+            for (int CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               CompLoop,
                                               cAlphaArgs,
@@ -549,17 +515,17 @@ namespace UserDefinedComponents {
                                               rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
+                                              _,
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              _);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 UserPlantComp(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -570,14 +536,14 @@ namespace UserDefinedComponents {
                     }
                 }
 
-                NumPlantConnections = std::floor(rNumericArgs(1));
+                int NumPlantConnections = std::floor(rNumericArgs(1));
 
                 if ((NumPlantConnections >= 1) && (NumPlantConnections <= 4)) {
                     UserPlantComp(CompLoop).Loop.allocate(NumPlantConnections);
                     UserPlantComp(CompLoop).NumPlantConnections = NumPlantConnections;
-                    for (ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
+                    for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                         LoopStr = General::RoundSigDigits(ConnectionLoop);
-                        aArgCount = (ConnectionLoop - 1) * 6 + 3;
+                        int aArgCount = (ConnectionLoop - 1) * 6 + 3;
                         UserPlantComp(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
                                                                                                       ErrorsFound,
                                                                                                       cCurrentModuleObject,
@@ -639,7 +605,7 @@ namespace UserDefinedComponents {
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 4)) {
-                            StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), DataRuntimeLanguage::EMSProgramCallManager);
+                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), DataRuntimeLanguage::EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
@@ -652,7 +618,7 @@ namespace UserDefinedComponents {
 
                         // find program to call for model simulations for just this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 5)) {
-                            StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), DataRuntimeLanguage::EMSProgramCallManager);
+                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), DataRuntimeLanguage::EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
@@ -890,9 +856,9 @@ namespace UserDefinedComponents {
                 }
 
                 // make sure user has entered at least some erl program managers to actually calculate something
-                MgrCountTest = 0;
+                int MgrCountTest = 0;
                 if (UserPlantComp(CompLoop).ErlSimProgramMngr > 0) MgrCountTest = 1;
-                for (ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
+                for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                     if (UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr > 0) ++MgrCountTest;
                     if (UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr > 0) ++MgrCountTest;
                 }
@@ -913,7 +879,7 @@ namespace UserDefinedComponents {
         if (NumUserCoils > 0) {
             UserCoil.allocate(NumUserCoils);
             CheckUserCoilName.dimension(NumUserCoils, true);
-            for (CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop) {
+            for (int CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               CompLoop,
                                               cAlphaArgs,
@@ -921,10 +887,10 @@ namespace UserDefinedComponents {
                                               rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
+                                              _,
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              _);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -934,7 +900,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -947,7 +913,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -958,12 +924,12 @@ namespace UserDefinedComponents {
                     }
                 }
 
-                NumAirConnections = std::floor(rNumericArgs(1));
+                int NumAirConnections = std::floor(rNumericArgs(1));
                 if ((NumAirConnections >= 1) && (NumAirConnections <= 2)) {
                     UserCoil(CompLoop).Air.allocate(NumAirConnections);
                     UserCoil(CompLoop).NumAirConnections = NumAirConnections;
-                    for (ConnectionLoop = 1; ConnectionLoop <= NumAirConnections; ++ConnectionLoop) {
-                        aArgCount = (ConnectionLoop - 1) * 2 + 4;
+                    for (int ConnectionLoop = 1; ConnectionLoop <= NumAirConnections; ++ConnectionLoop) {
+                        int aArgCount = (ConnectionLoop - 1) * 2 + 4;
                         UserCoil(CompLoop).Air(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
                                                                                                 ErrorsFound,
                                                                                                 cCurrentModuleObject,
@@ -1220,7 +1186,7 @@ namespace UserDefinedComponents {
         if (NumUserZoneAir > 0) {
             UserZoneAirHVAC.allocate(NumUserZoneAir);
             CheckUserZoneAirName.dimension(NumUserZoneAir, true);
-            for (CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop) {
+            for (int CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               CompLoop,
                                               cAlphaArgs,
@@ -1228,16 +1194,16 @@ namespace UserDefinedComponents {
                                               rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
+                                              _,
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              _);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1250,7 +1216,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1405,12 +1371,12 @@ namespace UserDefinedComponents {
                     //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
-                NumPlantConnections = std::floor(rNumericArgs(1));
+                int NumPlantConnections = std::floor(rNumericArgs(1));
                 UserZoneAirHVAC(CompLoop).NumPlantConnections = NumPlantConnections;
                 if ((NumPlantConnections >= 1) && (NumPlantConnections <= 3)) {
                     UserZoneAirHVAC(CompLoop).Loop.allocate(NumPlantConnections);
-                    for (ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
-                        aArgCount = (ConnectionLoop - 1) * 2 + 8;
+                    for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
+                        int aArgCount = (ConnectionLoop - 1) * 2 + 8;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
                                                                                                         ErrorsFound,
                                                                                                         cCurrentModuleObject,
@@ -1594,7 +1560,7 @@ namespace UserDefinedComponents {
         if (NumUserAirTerminals > 0) {
             UserAirTerminal.allocate(NumUserAirTerminals);
             CheckUserAirTerminal.dimension(NumUserAirTerminals, true);
-            for (CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop) {
+            for (int CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               CompLoop,
                                               cAlphaArgs,
@@ -1602,16 +1568,16 @@ namespace UserDefinedComponents {
                                               rNumericArgs,
                                               NumNums,
                                               IOStat,
-                                              lNumericFieldBlanks,
+                                              _,
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
-                                              cNumericFieldNames);
+                                              _);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1624,7 +1590,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1730,9 +1696,9 @@ namespace UserDefinedComponents {
                 }
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= DataGlobals::NumOfZones; ++CtrlZone) {
+                for (int CtrlZone = 1; CtrlZone <= DataGlobals::NumOfZones; ++CtrlZone) {
                     if (!DataZoneEquipment::ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                    for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             if (DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError("Error in connecting a terminal unit to a zone");
@@ -1820,12 +1786,12 @@ namespace UserDefinedComponents {
                     //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
-                NumPlantConnections = std::floor(rNumericArgs(1));
+                int NumPlantConnections = std::floor(rNumericArgs(1));
                 UserAirTerminal(CompLoop).NumPlantConnections = NumPlantConnections;
                 if ((NumPlantConnections >= 1) && (NumPlantConnections <= 2)) {
                     UserAirTerminal(CompLoop).Loop.allocate(NumPlantConnections);
-                    for (ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
-                        aArgCount = (ConnectionLoop - 1) * 2 + 8;
+                    for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
+                        int aArgCount = (ConnectionLoop - 1) * 2 + 8;
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
                                                                                                         ErrorsFound,
                                                                                                         cCurrentModuleObject,
@@ -2019,8 +1985,6 @@ namespace UserDefinedComponents {
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag; // environment flag
         static Array1D_bool MyFlag;
-        int ConnectionNum;
-        bool errFlag;
 
         if (MyOneTimeFlag) {
             MyFlag.allocate(NumUserPlantComps);
@@ -2032,8 +1996,8 @@ namespace UserDefinedComponents {
 
         if (MyFlag(CompNum)) {
             // locate the connections to the plant loops
-            for (ConnectionNum = 1; ConnectionNum <= UserPlantComp(CompNum).NumPlantConnections; ++ConnectionNum) {
-                errFlag = false;
+            for (int ConnectionNum = 1; ConnectionNum <= UserPlantComp(CompNum).NumPlantConnections; ++ConnectionNum) {
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(UserPlantComp(CompNum).Name,
                                                         DataPlant::TypeOf_PlantComponentUserDefined,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).LoopNum,
@@ -2105,8 +2069,6 @@ namespace UserDefinedComponents {
 
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
-        bool errFlag;
-        int Loop;
 
         if (MyOneTimeFlag) {
             MyFlag.dimension(NumUserCoils, true);
@@ -2115,7 +2077,7 @@ namespace UserDefinedComponents {
 
         if (MyFlag(CompNum)) {
             if (UserCoil(CompNum).PlantIsConnected) {
-                errFlag = false;
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(UserCoil(CompNum).Name,
                                                         DataPlant::TypeOf_CoilUserDefined,
                                                         UserCoil(CompNum).Loop.LoopNum,
@@ -2144,7 +2106,7 @@ namespace UserDefinedComponents {
         }
 
         // fill internal variable targets
-        for (Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
+        for (int Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
             UserCoil(CompNum).Air(Loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
                                                                      DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp,
                                                                      DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat,
@@ -2187,8 +2149,6 @@ namespace UserDefinedComponents {
 
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
-        bool errFlag;
-        int Loop;
 
         if (MyOneTimeFlag) {
             MyFlag.dimension(NumUserZoneAir, true);
@@ -2197,8 +2157,8 @@ namespace UserDefinedComponents {
 
         if (MyFlag(CompNum)) {
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-                for (Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
-                    errFlag = false;
+                for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+                    bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(UserZoneAirHVAC(CompNum).Name,
                                                             DataPlant::TypeOf_ZoneHVACAirUserDefined,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
@@ -2284,8 +2244,6 @@ namespace UserDefinedComponents {
 
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyFlag;
-        bool errFlag;
-        int Loop;
 
         if (MyOneTimeFlag) {
             MyFlag.dimension(NumUserAirTerminals, true);
@@ -2294,8 +2252,8 @@ namespace UserDefinedComponents {
 
         if (MyFlag(CompNum)) {
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-                for (Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
-                    errFlag = false;
+                for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+                    bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(UserAirTerminal(CompNum).Name,
                                                             DataPlant::TypeOf_AirTerminalUserDefined,
                                                             UserAirTerminal(CompNum).Loop(Loop).LoopNum,
@@ -2445,9 +2403,7 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        int Loop;
-
-        for (Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
+        for (int Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
             if (UserCoil(CompNum).Air(Loop).OutletNodeNum > 0) {
                 DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).Temp = UserCoil(CompNum).Air(Loop).OutletTemp;
                 DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).HumRat = UserCoil(CompNum).Air(Loop).OutletHumRat;
@@ -2499,8 +2455,6 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        int Loop;
-
         DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate = UserZoneAirHVAC(CompNum).ZoneAir.InletMassFlowRate;
 
         DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Temp = UserZoneAirHVAC(CompNum).ZoneAir.OutletTemp;
@@ -2518,7 +2472,7 @@ namespace UserDefinedComponents {
         }
 
         if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-            for (Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+            for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
                 // make mass flow requests
                 PlantUtilities::SetComponentFlowRate(UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateRequest,
                                      UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
@@ -2553,8 +2507,6 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        int Loop;
-
         DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).MassFlowRate = UserAirTerminal(CompNum).AirLoop.InletMassFlowRate;
 
         DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.OutletNodeNum).Temp = UserAirTerminal(CompNum).AirLoop.OutletTemp;
@@ -2571,7 +2523,7 @@ namespace UserDefinedComponents {
         }
 
         if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-            for (Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+            for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
                 // make mass flow requests
                 PlantUtilities::SetComponentFlowRate(UserAirTerminal(CompNum).Loop(Loop).MassFlowRateRequest,
                                      UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
