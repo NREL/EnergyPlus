@@ -182,9 +182,10 @@ namespace UserDefinedComponents {
         AirConnectionStruct Air;
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;
+        bool myOneTimeFlag;
 
         // Default Constructor
-        UserPlantComponentStruct() : ErlSimProgramMngr(0), NumPlantConnections(0)
+        UserPlantComponentStruct() : ErlSimProgramMngr(0), NumPlantConnections(0), myOneTimeFlag(true)
         {
         }
     };
@@ -201,9 +202,10 @@ namespace UserDefinedComponents {
         PlantConnectionStruct Loop;
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;
+        bool myOneTimeFlag;
 
         // Default Constructor
-        UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumAirConnections(0), PlantIsConnected(false)
+        UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumAirConnections(0), PlantIsConnected(false), myOneTimeFlag(true)
         {
         }
     };
@@ -224,11 +226,12 @@ namespace UserDefinedComponents {
         Real64 RemainingOutputToCoolingSP;    // sensible load remaining for device, negative means cooling [W]
         Real64 RemainingOutputReqToHumidSP;   // latent load remaining for device, to humidification setpoint [kg/s]
         Real64 RemainingOutputReqToDehumidSP; // latent load remaining for device, Negative means dehumidify [kg/s]
+        bool myOneTimeFlag;
 
         // Default Constructor
         UserZoneHVACForcedAirComponentStruct()
             : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0),
-              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0)
+              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
         {
         }
     };
@@ -251,11 +254,12 @@ namespace UserDefinedComponents {
         Real64 RemainingOutputToCoolingSP;    // sensible load remaining for device, negative means cooling [W]
         Real64 RemainingOutputReqToHumidSP;   // latent load remaining for device, to humidification setpoint [kg/s]
         Real64 RemainingOutputReqToDehumidSP; // latent load remaining for device, Negative means dehumidify [kg/s]
+        bool myOneTimeFlag;
 
         // Default Constructor
         UserAirTerminalComponentStruct()
             : ActualCtrlZoneNum(0), ADUNum(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0),
-              RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0)
+              RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
         {
         }
     };

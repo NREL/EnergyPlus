@@ -483,7 +483,7 @@ namespace UserDefinedComponents {
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
-        static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
+        int TotalArgs;              // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
@@ -1982,19 +1982,7 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitPlantUserComponent");
 
-        static bool MyOneTimeFlag(true); // one time flag
-        static Array1D_bool MyEnvrnFlag; // environment flag
-        static Array1D_bool MyFlag;
-
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumUserPlantComps);
-            MyEnvrnFlag.allocate(NumUserPlantComps);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (MyFlag(CompNum)) {
+        if (UserPlantComp(CompNum).myOneTimeFlag) {
             // locate the connections to the plant loops
             for (int ConnectionNum = 1; ConnectionNum <= UserPlantComp(CompNum).NumPlantConnections; ++ConnectionNum) {
                 bool errFlag = false;
@@ -2028,7 +2016,7 @@ namespace UserDefinedComponents {
                     .HowLoadServed = UserPlantComp(CompNum).Loop(ConnectionNum).HowLoadServed;
             }
 
-            MyFlag(CompNum) = false;
+            UserPlantComp(CompNum).myOneTimeFlag = false;
         }
 
         if (LoopNum <= 0 || LoopNum > UserPlantComp(CompNum).NumPlantConnections) return;
@@ -2067,15 +2055,7 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitCoilUserDefined");
 
-        static bool MyOneTimeFlag(true); // one time flag
-        static Array1D_bool MyFlag;
-
-        if (MyOneTimeFlag) {
-            MyFlag.dimension(NumUserCoils, true);
-            MyOneTimeFlag = false;
-        }
-
-        if (MyFlag(CompNum)) {
+        if (UserCoil(CompNum).myOneTimeFlag) {
             if (UserCoil(CompNum).PlantIsConnected) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(UserCoil(CompNum).Name,
@@ -2102,7 +2082,7 @@ namespace UserDefinedComponents {
                     .Comp(UserCoil(CompNum).Loop.CompNum)
                     .HowLoadServed = UserCoil(CompNum).Loop.HowLoadServed;
             }
-            MyFlag(CompNum) = false;
+            UserCoil(CompNum).myOneTimeFlag = false;
         }
 
         // fill internal variable targets
@@ -2147,15 +2127,7 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitZoneAirUserDefined");
 
-        static bool MyOneTimeFlag(true); // one time flag
-        static Array1D_bool MyFlag;
-
-        if (MyOneTimeFlag) {
-            MyFlag.dimension(NumUserZoneAir, true);
-            MyOneTimeFlag = false;
-        }
-
-        if (MyFlag(CompNum)) {
+        if (UserZoneAirHVAC(CompNum).myOneTimeFlag) {
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
                     bool errFlag = false;
@@ -2188,6 +2160,7 @@ namespace UserDefinedComponents {
                         .HowLoadServed = UserZoneAirHVAC(CompNum).Loop(Loop).HowLoadServed;
                 }
             }
+            UserZoneAirHVAC(CompNum).myOneTimeFlag = false;
         }
         // fill internal variable targets
         UserZoneAirHVAC(CompNum).RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
@@ -2242,15 +2215,7 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitAirTerminalUserDefined");
 
-        static bool MyOneTimeFlag(true); // one time flag
-        static Array1D_bool MyFlag;
-
-        if (MyOneTimeFlag) {
-            MyFlag.dimension(NumUserAirTerminals, true);
-            MyOneTimeFlag = false;
-        }
-
-        if (MyFlag(CompNum)) {
+        if (UserAirTerminal(CompNum).myOneTimeFlag) {
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
                     bool errFlag = false;
@@ -2283,6 +2248,7 @@ namespace UserDefinedComponents {
                         .HowLoadServed = UserAirTerminal(CompNum).Loop(Loop).HowLoadServed;
                 }
             }
+            UserAirTerminal(CompNum).myOneTimeFlag = false;
         }
         // fill internal variable targets
         UserAirTerminal(CompNum).RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
