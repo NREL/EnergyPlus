@@ -105,6 +105,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 
 namespace EnergyPlus {
@@ -977,6 +978,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
