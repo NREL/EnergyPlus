@@ -1037,8 +1037,7 @@ namespace EnergyPlus {
                                 this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
-                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(
-                                                TypeOf_GrndHtExchgPond, CompNames(CompNum));
+                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Slinky")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
                                 this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
