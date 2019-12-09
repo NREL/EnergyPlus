@@ -9807,7 +9807,7 @@
             "ambient_temperature_schedule_name": "SWHSys1 Water Heater Ambient Temperature Schedule Name",
             "deadband_temperature_difference": 2.0,
             "heater_control_type": "Cycle",
-            "heater_fuel_type": "NATURALGAS",
+            "heater_fuel_type": "NaturalGas",
             "heater_maximum_capacity": 845000,
             "heater_thermal_efficiency": 0.8,
             "indirect_water_heating_recovery_time": 1.5,
