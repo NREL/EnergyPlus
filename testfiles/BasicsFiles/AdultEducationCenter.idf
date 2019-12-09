@@ -363,7 +363,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    WorldCoordinateSystem;   !- Coordinate System
+    World;                   !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER and SURFACE:HEATTRANSFER:SUB ===========
 !-   Heat transfer objects listed as order in Figure.
@@ -839,13 +839,13 @@
   InternalMass,
     Zn001:IntM001,           !- Name
     Medium Partitions,       !- Construction Name
-    Full Building - 1 Zone,  !- Zone Name
+    Full Building - 1 Zone,  !- Zone or ZoneList Name
     956.9014;                !- Surface Area {m2}
 
   InternalMass,
     Zn001:IntM002,           !- Name
     Medium/Heavy Partitions, !- Construction Name
-    Full Building - 1 Zone,  !- Zone Name
+    Full Building - 1 Zone,  !- Zone or ZoneList Name
     1757.725;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPE ===========
