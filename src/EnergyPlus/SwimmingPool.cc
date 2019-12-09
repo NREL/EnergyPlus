@@ -497,7 +497,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(this->MyPlantScanFlagPool);
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex();
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -702,8 +702,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    )
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -731,9 +730,9 @@ namespace SwimmingPool {
                     ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
                 }
             }
-            MyPlantScanFlagPool = false;
-        } else if (MyPlantScanFlagPool && !DataGlobals::AnyPlantInModel) {
-            MyPlantScanFlagPool = false;
+            this->MyPlantScanFlagPool = false;
+        } else if (this->MyPlantScanFlagPool && !DataGlobals::AnyPlantInModel) {
+            this->MyPlantScanFlagPool = false;
         }
     }
 

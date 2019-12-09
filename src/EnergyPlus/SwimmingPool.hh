@@ -167,8 +167,7 @@ namespace SwimmingPool {
 
         void setupOutputVars();
 
-        void initSwimmingPoolPlantLoopIndex(bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-        );
+        void initSwimmingPoolPlantLoopIndex();
 
         void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
         );

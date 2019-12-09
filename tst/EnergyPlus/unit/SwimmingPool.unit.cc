@@ -171,21 +171,21 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     
 
     // Test 1
-    Pool(1).initSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
+    Pool(1).initSwimmingPoolPlantLoopIndex();
     EXPECT_EQ(Pool(1).HWLoopNum, 1);
     EXPECT_EQ(Pool(1).HWLoopSide, 1);
     EXPECT_EQ(Pool(1).HWBranchNum, 1);
     EXPECT_EQ(Pool(1).HWCompNum, 1);
-    EXPECT_EQ(MyPlantScanFlagPool, false);
+    EXPECT_EQ(MyPlantScanFlagPool, true);
 
     // Test 2
     MyPlantScanFlagPool = true;
-    Pool(2).initSwimmingPoolPlantLoopIndex(MyPlantScanFlagPool);
+    Pool(2).initSwimmingPoolPlantLoopIndex();
     EXPECT_EQ(Pool(2).HWLoopNum, 2);
     EXPECT_EQ(Pool(2).HWLoopSide, 2);
     EXPECT_EQ(Pool(2).HWBranchNum, 1);
     EXPECT_EQ(Pool(2).HWCompNum, 1);
-    EXPECT_EQ(MyPlantScanFlagPool, false);
+    EXPECT_EQ(MyPlantScanFlagPool, true);
 }
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
