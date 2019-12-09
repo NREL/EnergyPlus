@@ -163,7 +163,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (InitLoopEquip || DataGlobals::BeginEnvrnFlag) {
-            InitPlantUserComponent(CompNum, LoopNum, MyLoad);
+            UserPlantComp(CompNum).InitPlantUserComponent(LoopNum, MyLoad);
             // find loop connection number from LoopNum and LoopSide
             ThisLoop = 0;
             for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
@@ -207,7 +207,7 @@ namespace UserDefinedComponents {
             ThisLoop = Loop;
         }
 
-        InitPlantUserComponent(CompNum, ThisLoop, MyLoad);
+        UserPlantComp(CompNum).InitPlantUserComponent(ThisLoop, MyLoad);
 
         if (ThisLoop > 0) {
             if (UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr > 0) {
@@ -219,7 +219,7 @@ namespace UserDefinedComponents {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).ErlSimProgramMngr);
         }
 
-        ReportPlantUserComponent(CompNum, ThisLoop);
+        UserPlantComp(CompNum).ReportPlantUserComponent(ThisLoop);
     }
 
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
@@ -284,13 +284,13 @@ namespace UserDefinedComponents {
             }
         }
 
-        InitCoilUserDefined(CompNum);
+        UserCoil(CompNum).InitCoilUserDefined();
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
         }
 
-        ReportCoilUserDefined(CompNum);
+        UserCoil(CompNum).ReportCoilUserDefined();
 
         if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
@@ -347,7 +347,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            InitZoneAirUserDefined(CompNum, ZoneNum);
+            UserZoneAirHVAC(CompNum).InitZoneAirUserDefined(ZoneNum);
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
@@ -371,13 +371,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        InitZoneAirUserDefined(CompNum, ZoneNum);
+        UserZoneAirHVAC(CompNum).InitZoneAirUserDefined(ZoneNum);
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         }
 
-        ReportZoneAirUserDefined(CompNum);
+        UserZoneAirHVAC(CompNum).ReportZoneAirUserDefined();
 
         // calculate delivered capacity
         Real64 AirMassFlow =
@@ -435,7 +435,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            InitAirTerminalUserDefined(CompNum, ZoneNum);
+            UserAirTerminal(CompNum).InitAirTerminalUserDefined(ZoneNum);
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
@@ -459,13 +459,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        InitAirTerminalUserDefined(CompNum, ZoneNum);
+        UserAirTerminal(CompNum).InitAirTerminalUserDefined(ZoneNum);
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
         }
 
-        ReportAirTerminalUserDefined(CompNum);
+        UserAirTerminal(CompNum).ReportAirTerminalUserDefined();
     }
 
     void GetUserDefinedComponents()
@@ -1972,7 +1972,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void InitPlantUserComponent(int const CompNum, int const LoopNum, Real64 const MyLoad)
+    void UserPlantComponentStruct::InitPlantUserComponent(int const LoopNum, Real64 const MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -1982,69 +1982,69 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitPlantUserComponent");
 
-        if (UserPlantComp(CompNum).myOneTimeFlag) {
+        if (this->myOneTimeFlag) {
             // locate the connections to the plant loops
-            for (int ConnectionNum = 1; ConnectionNum <= UserPlantComp(CompNum).NumPlantConnections; ++ConnectionNum) {
+            for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(UserPlantComp(CompNum).Name,
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                         DataPlant::TypeOf_PlantComponentUserDefined,
-                                                        UserPlantComp(CompNum).Loop(ConnectionNum).LoopNum,
-                                                        UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum,
-                                                        UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum,
-                                                        UserPlantComp(CompNum).Loop(ConnectionNum).CompNum,
+                                                        this->Loop(ConnectionNum).LoopNum,
+                                                        this->Loop(ConnectionNum).LoopSideNum,
+                                                        this->Loop(ConnectionNum).BranchNum,
+                                                        this->Loop(ConnectionNum).CompNum,
                                                         errFlag,
                                                         _,
                                                         _,
                                                         _,
-                                                        UserPlantComp(CompNum).Loop(ConnectionNum).InletNodeNum);
+                                                        this->Loop(ConnectionNum).InletNodeNum);
                 if (errFlag) {
                     ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
 
                 // set user input for flow priority
-                DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(ConnectionNum).LoopNum)
-                    .LoopSide(UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum)
-                    .Branch(UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum)
-                    .Comp(UserPlantComp(CompNum).Loop(ConnectionNum).CompNum)
-                    .FlowPriority = UserPlantComp(CompNum).Loop(ConnectionNum).FlowPriority;
+                DataPlant::PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                    .Branch(this->Loop(ConnectionNum).BranchNum)
+                    .Comp(this->Loop(ConnectionNum).CompNum)
+                    .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
 
                 // set user input for how loads served
-                DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(ConnectionNum).LoopNum)
-                    .LoopSide(UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum)
-                    .Branch(UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum)
-                    .Comp(UserPlantComp(CompNum).Loop(ConnectionNum).CompNum)
-                    .HowLoadServed = UserPlantComp(CompNum).Loop(ConnectionNum).HowLoadServed;
+                DataPlant::PlantLoop(this->Loop(ConnectionNum).LoopNum)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
+                    .Branch(this->Loop(ConnectionNum).BranchNum)
+                    .Comp(this->Loop(ConnectionNum).CompNum)
+                    .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
             }
 
-            UserPlantComp(CompNum).myOneTimeFlag = false;
+            this->myOneTimeFlag = false;
         }
 
-        if (LoopNum <= 0 || LoopNum > UserPlantComp(CompNum).NumPlantConnections) return;
+        if (LoopNum <= 0 || LoopNum > this->NumPlantConnections) return;
 
         // fill internal variable targets
-        UserPlantComp(CompNum).Loop(LoopNum).MyLoad = MyLoad;
-        UserPlantComp(CompNum).Loop(LoopNum).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum).FluidName,
-                                                                         DataLoopNode::Node(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum).Temp,
-                                                                         DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum).FluidIndex,
+        this->Loop(LoopNum).MyLoad = MyLoad;
+        this->Loop(LoopNum).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum).FluidName,
+                                                                         DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp,
+                                                                         DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum).FluidIndex,
                                                                          RoutineName);
-        UserPlantComp(CompNum).Loop(LoopNum).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum).FluidName,
-                                                                             DataLoopNode::Node(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum).Temp,
-                                                                             DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum).FluidIndex,
+        this->Loop(LoopNum).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum).FluidName,
+                                                                             DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp,
+                                                                             DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum).FluidIndex,
                                                                              RoutineName);
-        UserPlantComp(CompNum).Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum).MassFlowRate;
-        UserPlantComp(CompNum).Loop(LoopNum).InletTemp = DataLoopNode::Node(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum).Temp;
-        if (UserPlantComp(CompNum).Air.InletNodeNum > 0) {
-            UserPlantComp(CompNum).Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(
-                DataEnvironment::OutBaroPress, DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp, DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat, RoutineName);
-            UserPlantComp(CompNum).Air.InletCp =
-                Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat, DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp);
-            UserPlantComp(CompNum).Air.InletTemp = DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).Temp;
-            UserPlantComp(CompNum).Air.InletMassFlowRate = DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).MassFlowRate;
-            UserPlantComp(CompNum).Air.InletHumRat = DataLoopNode::Node(UserPlantComp(CompNum).Air.InletNodeNum).HumRat;
+        this->Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
+        this->Loop(LoopNum).InletTemp = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp;
+        if (this->Air.InletNodeNum > 0) {
+            this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(
+                DataEnvironment::OutBaroPress, DataLoopNode::Node(this->Air.InletNodeNum).Temp, DataLoopNode::Node(this->Air.InletNodeNum).HumRat, RoutineName);
+            this->Air.InletCp =
+                Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->Air.InletNodeNum).HumRat, DataLoopNode::Node(this->Air.InletNodeNum).Temp);
+            this->Air.InletTemp = DataLoopNode::Node(this->Air.InletNodeNum).Temp;
+            this->Air.InletMassFlowRate = DataLoopNode::Node(this->Air.InletNodeNum).MassFlowRate;
+            this->Air.InletHumRat = DataLoopNode::Node(this->Air.InletNodeNum).HumRat;
         }
     }
 
-    void InitCoilUserDefined(int const CompNum)
+    void UserCoilComponentStruct::InitCoilUserDefined()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2055,65 +2055,65 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitCoilUserDefined");
 
-        if (UserCoil(CompNum).myOneTimeFlag) {
-            if (UserCoil(CompNum).PlantIsConnected) {
+        if (this->myOneTimeFlag) {
+            if (this->PlantIsConnected) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(UserCoil(CompNum).Name,
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                         DataPlant::TypeOf_CoilUserDefined,
-                                                        UserCoil(CompNum).Loop.LoopNum,
-                                                        UserCoil(CompNum).Loop.LoopSideNum,
-                                                        UserCoil(CompNum).Loop.BranchNum,
-                                                        UserCoil(CompNum).Loop.CompNum,
+                                                        this->Loop.LoopNum,
+                                                        this->Loop.LoopSideNum,
+                                                        this->Loop.BranchNum,
+                                                        this->Loop.CompNum,
                                                         errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
                 // set user input for flow priority
-                DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum)
-                    .LoopSide(UserCoil(CompNum).Loop.LoopSideNum)
-                    .Branch(UserCoil(CompNum).Loop.BranchNum)
-                    .Comp(UserCoil(CompNum).Loop.CompNum)
-                    .FlowPriority = UserCoil(CompNum).Loop.FlowPriority;
+                DataPlant::PlantLoop(this->Loop.LoopNum)
+                    .LoopSide(this->Loop.LoopSideNum)
+                    .Branch(this->Loop.BranchNum)
+                    .Comp(this->Loop.CompNum)
+                    .FlowPriority = this->Loop.FlowPriority;
 
                 // set user input for how loads served
-                DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum)
-                    .LoopSide(UserCoil(CompNum).Loop.LoopSideNum)
-                    .Branch(UserCoil(CompNum).Loop.BranchNum)
-                    .Comp(UserCoil(CompNum).Loop.CompNum)
-                    .HowLoadServed = UserCoil(CompNum).Loop.HowLoadServed;
+                DataPlant::PlantLoop(this->Loop.LoopNum)
+                    .LoopSide(this->Loop.LoopSideNum)
+                    .Branch(this->Loop.BranchNum)
+                    .Comp(this->Loop.CompNum)
+                    .HowLoadServed = this->Loop.HowLoadServed;
             }
-            UserCoil(CompNum).myOneTimeFlag = false;
+            this->myOneTimeFlag = false;
         }
 
         // fill internal variable targets
-        for (int Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
-            UserCoil(CompNum).Air(Loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
-                                                                     DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp,
-                                                                     DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat,
-                                                                     RoutineName);
+        for (int loop = 1; loop <= this->NumAirConnections; ++loop) {
+            this->Air(loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+                                                                         DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp,
+                                                                         DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat,
+                                                                         RoutineName);
 
-            UserCoil(CompNum).Air(Loop).InletCp =
-                Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat, DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp);
-            UserCoil(CompNum).Air(Loop).InletTemp = DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).Temp;
-            UserCoil(CompNum).Air(Loop).InletMassFlowRate = DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).MassFlowRate;
-            UserCoil(CompNum).Air(Loop).InletHumRat = DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).HumRat;
+            this->Air(loop).InletCp =
+                Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat, DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp);
+            this->Air(loop).InletTemp = DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp;
+            this->Air(loop).InletMassFlowRate = DataLoopNode::Node(this->Air(loop).InletNodeNum).MassFlowRate;
+            this->Air(loop).InletHumRat = DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat;
         }
 
-        if (UserCoil(CompNum).PlantIsConnected) {
-            UserCoil(CompNum).Loop.InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum).FluidName,
-                                                               DataLoopNode::Node(UserCoil(CompNum).Loop.InletNodeNum).Temp,
-                                                               DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum).FluidIndex,
+        if (this->PlantIsConnected) {
+            this->Loop.InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->Loop.LoopNum).FluidName,
+                                                               DataLoopNode::Node(this->Loop.InletNodeNum).Temp,
+                                                               DataPlant::PlantLoop(this->Loop.LoopNum).FluidIndex,
                                                                RoutineName);
-            UserCoil(CompNum).Loop.InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum).FluidName,
-                                                                   DataLoopNode::Node(UserCoil(CompNum).Loop.InletNodeNum).Temp,
-                                                                   DataPlant::PlantLoop(UserCoil(CompNum).Loop.LoopNum).FluidIndex,
+            this->Loop.InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Loop.LoopNum).FluidName,
+                                                                   DataLoopNode::Node(this->Loop.InletNodeNum).Temp,
+                                                                   DataPlant::PlantLoop(this->Loop.LoopNum).FluidIndex,
                                                                    RoutineName);
-            UserCoil(CompNum).Loop.InletTemp = DataLoopNode::Node(UserCoil(CompNum).Loop.InletNodeNum).Temp;
-            UserCoil(CompNum).Loop.InletMassFlowRate = DataLoopNode::Node(UserCoil(CompNum).Loop.InletNodeNum).MassFlowRate;
+            this->Loop.InletTemp = DataLoopNode::Node(this->Loop.InletNodeNum).Temp;
+            this->Loop.InletMassFlowRate = DataLoopNode::Node(this->Loop.InletNodeNum).MassFlowRate;
         }
     }
 
-    void InitZoneAirUserDefined(int const CompNum, int const ZoneNum)
+    void UserZoneHVACForcedAirComponentStruct::InitZoneAirUserDefined(int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2127,84 +2127,84 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitZoneAirUserDefined");
 
-        if (UserZoneAirHVAC(CompNum).myOneTimeFlag) {
-            if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-                for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+        if (this->myOneTimeFlag) {
+            if (this->NumPlantConnections > 0) {
+                for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(UserZoneAirHVAC(CompNum).Name,
+                    PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                             DataPlant::TypeOf_ZoneHVACAirUserDefined,
-                                                            UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
-                                                            UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
-                                                            UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
-                                                            UserZoneAirHVAC(CompNum).Loop(Loop).CompNum,
+                                                            this->Loop(loop).LoopNum,
+                                                            this->Loop(loop).LoopSideNum,
+                                                            this->Loop(loop).BranchNum,
+                                                            this->Loop(loop).CompNum,
                                                             errFlag,
                                                             _,
                                                             _,
                                                             _,
-                                                            UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum);
+                                                            this->Loop(loop).InletNodeNum);
                     if (errFlag) {
                         ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum)
-                        .LoopSide(UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum)
-                        .Branch(UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum)
-                        .Comp(UserZoneAirHVAC(CompNum).Loop(Loop).CompNum)
-                        .FlowPriority = UserZoneAirHVAC(CompNum).Loop(Loop).FlowPriority;
+                    DataPlant::PlantLoop(this->Loop(loop).LoopNum)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
+                        .Branch(this->Loop(loop).BranchNum)
+                        .Comp(this->Loop(loop).CompNum)
+                        .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum)
-                        .LoopSide(UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum)
-                        .Branch(UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum)
-                        .Comp(UserZoneAirHVAC(CompNum).Loop(Loop).CompNum)
-                        .HowLoadServed = UserZoneAirHVAC(CompNum).Loop(Loop).HowLoadServed;
+                    DataPlant::PlantLoop(this->Loop(loop).LoopNum)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
+                        .Branch(this->Loop(loop).BranchNum)
+                        .Comp(this->Loop(loop).CompNum)
+                        .HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
-            UserZoneAirHVAC(CompNum).myOneTimeFlag = false;
+            this->myOneTimeFlag = false;
         }
         // fill internal variable targets
-        UserZoneAirHVAC(CompNum).RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        UserZoneAirHVAC(CompNum).RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        UserZoneAirHVAC(CompNum).RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
-        UserZoneAirHVAC(CompNum).RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
+        this->RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        this->RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
+        this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        UserZoneAirHVAC(CompNum).ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
-                                                                      DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp,
-                                                                      DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat,
+        this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+                                                                      DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp,
+                                                                      DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat,
                                                                       RoutineName);
-        UserZoneAirHVAC(CompNum).ZoneAir.InletCp =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat, DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp);
-        UserZoneAirHVAC(CompNum).ZoneAir.InletTemp = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).Temp;
-        UserZoneAirHVAC(CompNum).ZoneAir.InletHumRat = DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).HumRat;
+        this->ZoneAir.InletCp =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat, DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp);
+        this->ZoneAir.InletTemp = DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp;
+        this->ZoneAir.InletHumRat = DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat;
 
-        if (UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum > 0) {
-            UserZoneAirHVAC(CompNum).SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
-                                                                            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp,
-                                                                            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat,
+        if (this->SourceAir.InletNodeNum > 0) {
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+                                                                            DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
+                                                                            DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                             RoutineName);
-            UserZoneAirHVAC(CompNum).SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat,
-                                                                        DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp);
-            UserZoneAirHVAC(CompNum).SourceAir.InletTemp = DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).Temp;
-            UserZoneAirHVAC(CompNum).SourceAir.InletHumRat = DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.InletNodeNum).HumRat;
+            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
+                                                                        DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp);
+            this->SourceAir.InletTemp = DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp;
+            this->SourceAir.InletHumRat = DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat;
         }
 
-        if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-            for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
-                UserZoneAirHVAC(CompNum).Loop(Loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidName,
-                                                                                DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum).Temp,
-                                                                                DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidIndex,
-                                                                                RoutineName);
-                UserZoneAirHVAC(CompNum).Loop(Loop).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidName,
-                                                                                    DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum).Temp,
-                                                                                    DataPlant::PlantLoop(UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum).FluidIndex,
-                                                                                    RoutineName);
-                UserZoneAirHVAC(CompNum).Loop(Loop).InletTemp = DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum).Temp;
-                UserZoneAirHVAC(CompNum).Loop(Loop).InletMassFlowRate = DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum).MassFlowRate;
+        if (this->NumPlantConnections > 0) {
+            for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+                this->Loop(loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidName,
+                                                                              DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp,
+                                                                              DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidIndex,
+                                                                              RoutineName);
+                this->Loop(loop).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidName,
+                                                                                  DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp,
+                                                                                  DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidIndex,
+                                                                                  RoutineName);
+                this->Loop(loop).InletTemp = DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp;
+                this->Loop(loop).InletMassFlowRate = DataLoopNode::Node(this->Loop(loop).InletNodeNum).MassFlowRate;
             }
         }
     }
 
-    void InitAirTerminalUserDefined(int const CompNum, int const ZoneNum)
+    void UserAirTerminalComponentStruct::InitAirTerminalUserDefined(int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2215,84 +2215,84 @@ namespace UserDefinedComponents {
 
         static std::string const RoutineName("InitAirTerminalUserDefined");
 
-        if (UserAirTerminal(CompNum).myOneTimeFlag) {
-            if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-                for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+        if (this->myOneTimeFlag) {
+            if (this->NumPlantConnections > 0) {
+                for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(UserAirTerminal(CompNum).Name,
+                    PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                                             DataPlant::TypeOf_AirTerminalUserDefined,
-                                                            UserAirTerminal(CompNum).Loop(Loop).LoopNum,
-                                                            UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
-                                                            UserAirTerminal(CompNum).Loop(Loop).BranchNum,
-                                                            UserAirTerminal(CompNum).Loop(Loop).CompNum,
+                                                            this->Loop(loop).LoopNum,
+                                                            this->Loop(loop).LoopSideNum,
+                                                            this->Loop(loop).BranchNum,
+                                                            this->Loop(loop).CompNum,
                                                             errFlag,
                                                             _,
                                                             _,
                                                             _,
-                                                            UserAirTerminal(CompNum).Loop(Loop).InletNodeNum);
+                                                            this->Loop(loop).InletNodeNum);
                     if (errFlag) {
                         ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum)
-                        .LoopSide(UserAirTerminal(CompNum).Loop(Loop).LoopSideNum)
-                        .Branch(UserAirTerminal(CompNum).Loop(Loop).BranchNum)
-                        .Comp(UserAirTerminal(CompNum).Loop(Loop).CompNum)
-                        .FlowPriority = UserAirTerminal(CompNum).Loop(Loop).FlowPriority;
+                    DataPlant::PlantLoop(this->Loop(loop).LoopNum)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
+                        .Branch(this->Loop(loop).BranchNum)
+                        .Comp(this->Loop(loop).CompNum)
+                        .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum)
-                        .LoopSide(UserAirTerminal(CompNum).Loop(Loop).LoopSideNum)
-                        .Branch(UserAirTerminal(CompNum).Loop(Loop).BranchNum)
-                        .Comp(UserAirTerminal(CompNum).Loop(Loop).CompNum)
-                        .HowLoadServed = UserAirTerminal(CompNum).Loop(Loop).HowLoadServed;
+                    DataPlant::PlantLoop(this->Loop(loop).LoopNum)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
+                        .Branch(this->Loop(loop).BranchNum)
+                        .Comp(this->Loop(loop).CompNum)
+                        .HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
-            UserAirTerminal(CompNum).myOneTimeFlag = false;
+            this->myOneTimeFlag = false;
         }
         // fill internal variable targets
-        UserAirTerminal(CompNum).RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        UserAirTerminal(CompNum).RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        UserAirTerminal(CompNum).RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
-        UserAirTerminal(CompNum).RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
+        this->RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        this->RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
+        this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        UserAirTerminal(CompNum).AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
-                                                                      DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp,
-                                                                      DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat,
+        this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+                                                                      DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp,
+                                                                      DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat,
                                                                       RoutineName);
-        UserAirTerminal(CompNum).AirLoop.InletCp =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat, DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp);
-        UserAirTerminal(CompNum).AirLoop.InletTemp = DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).Temp;
-        UserAirTerminal(CompNum).AirLoop.InletHumRat = DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).HumRat;
+        this->AirLoop.InletCp =
+            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat, DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp);
+        this->AirLoop.InletTemp = DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp;
+        this->AirLoop.InletHumRat = DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat;
 
-        if (UserAirTerminal(CompNum).SourceAir.InletNodeNum > 0) {
-            UserAirTerminal(CompNum).SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
-                                                                            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp,
-                                                                            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat,
+        if (this->SourceAir.InletNodeNum > 0) {
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
+                                                                            DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
+                                                                            DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                             RoutineName);
-            UserAirTerminal(CompNum).SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat,
-                                                                        DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp);
-            UserAirTerminal(CompNum).SourceAir.InletTemp = DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).Temp;
-            UserAirTerminal(CompNum).SourceAir.InletHumRat = DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.InletNodeNum).HumRat;
+            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
+                                                                        DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp);
+            this->SourceAir.InletTemp = DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp;
+            this->SourceAir.InletHumRat = DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat;
         }
 
-        if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-            for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
-                UserAirTerminal(CompNum).Loop(Loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidName,
-                                                                                DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum).Temp,
-                                                                                DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidIndex,
-                                                                                RoutineName);
-                UserAirTerminal(CompNum).Loop(Loop).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidName,
-                                                                                    DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum).Temp,
-                                                                                    DataPlant::PlantLoop(UserAirTerminal(CompNum).Loop(Loop).LoopNum).FluidIndex,
-                                                                                    RoutineName);
-                UserAirTerminal(CompNum).Loop(Loop).InletTemp = DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum).Temp;
-                UserAirTerminal(CompNum).Loop(Loop).InletMassFlowRate = DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum).MassFlowRate;
+        if (this->NumPlantConnections > 0) {
+            for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+                this->Loop(loop).InletRho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidName,
+                                                                              DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp,
+                                                                              DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidIndex,
+                                                                              RoutineName);
+                this->Loop(loop).InletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidName,
+                                                                                  DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp,
+                                                                                  DataPlant::PlantLoop(this->Loop(loop).LoopNum).FluidIndex,
+                                                                                  RoutineName);
+                this->Loop(loop).InletTemp = DataLoopNode::Node(this->Loop(loop).InletNodeNum).Temp;
+                this->Loop(loop).InletMassFlowRate = DataLoopNode::Node(this->Loop(loop).InletNodeNum).MassFlowRate;
             }
         }
     }
 
-    void ReportPlantUserComponent(int const CompNum, int const LoopNum)
+    void UserPlantComponentStruct::ReportPlantUserComponent(int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2307,57 +2307,57 @@ namespace UserDefinedComponents {
         // METHODOLOGY EMPLOYED:
         // copy actuated values to structures elsewhere in program.
 
-        PlantUtilities::SafeCopyPlantNode(UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum, UserPlantComp(CompNum).Loop(LoopNum).OutletNodeNum);
+        PlantUtilities::SafeCopyPlantNode(this->Loop(LoopNum).InletNodeNum, this->Loop(LoopNum).OutletNodeNum);
 
         // unload Actuators to node data structure
 
-        DataLoopNode::Node(UserPlantComp(CompNum).Loop(LoopNum).OutletNodeNum).Temp = UserPlantComp(CompNum).Loop(LoopNum).OutletTemp;
+        DataLoopNode::Node(this->Loop(LoopNum).OutletNodeNum).Temp = this->Loop(LoopNum).OutletTemp;
 
         // make mass flow requests, just this loop
-        PlantUtilities::SetComponentFlowRate(UserPlantComp(CompNum).Loop(LoopNum).MassFlowRateRequest,
-                             UserPlantComp(CompNum).Loop(LoopNum).InletNodeNum,
-                             UserPlantComp(CompNum).Loop(LoopNum).OutletNodeNum,
-                             UserPlantComp(CompNum).Loop(LoopNum).LoopNum,
-                             UserPlantComp(CompNum).Loop(LoopNum).LoopSideNum,
-                             UserPlantComp(CompNum).Loop(LoopNum).BranchNum,
-                             UserPlantComp(CompNum).Loop(LoopNum).CompNum);
+        PlantUtilities::SetComponentFlowRate(this->Loop(LoopNum).MassFlowRateRequest,
+                             this->Loop(LoopNum).InletNodeNum,
+                             this->Loop(LoopNum).OutletNodeNum,
+                             this->Loop(LoopNum).LoopNum,
+                             this->Loop(LoopNum).LoopSideNum,
+                             this->Loop(LoopNum).BranchNum,
+                             this->Loop(LoopNum).CompNum);
 
-        if (UserPlantComp(CompNum).Air.OutletNodeNum > 0) {
-            DataLoopNode::Node(UserPlantComp(CompNum).Air.OutletNodeNum).Temp = UserPlantComp(CompNum).Air.OutletTemp;
-            DataLoopNode::Node(UserPlantComp(CompNum).Air.OutletNodeNum).HumRat = UserPlantComp(CompNum).Air.OutletHumRat;
-            DataLoopNode::Node(UserPlantComp(CompNum).Air.OutletNodeNum).MassFlowRate = UserPlantComp(CompNum).Air.OutletMassFlowRate;
-            DataLoopNode::Node(UserPlantComp(CompNum).Air.OutletNodeNum).Enthalpy =
-                Psychrometrics::PsyHFnTdbW(UserPlantComp(CompNum).Air.OutletTemp, UserPlantComp(CompNum).Air.OutletHumRat);
+        if (this->Air.OutletNodeNum > 0) {
+            DataLoopNode::Node(this->Air.OutletNodeNum).Temp = this->Air.OutletTemp;
+            DataLoopNode::Node(this->Air.OutletNodeNum).HumRat = this->Air.OutletHumRat;
+            DataLoopNode::Node(this->Air.OutletNodeNum).MassFlowRate = this->Air.OutletMassFlowRate;
+            DataLoopNode::Node(this->Air.OutletNodeNum).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(this->Air.OutletTemp, this->Air.OutletHumRat);
         }
 
-        if (UserPlantComp(CompNum).Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(UserPlantComp(CompNum).Water.SupplyTankID).VdotRequestDemand(UserPlantComp(CompNum).Water.SupplyTankDemandARRID) =
-                UserPlantComp(CompNum).Water.SupplyVdotRequest;
+        if (this->Water.SuppliedByWaterSystem) {
+            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) =
+                this->Water.SupplyVdotRequest;
         }
 
-        if (UserPlantComp(CompNum).Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(UserPlantComp(CompNum).Water.CollectionTankID).VdotAvailSupply(UserPlantComp(CompNum).Water.CollectionTankSupplyARRID) =
-                UserPlantComp(CompNum).Water.CollectedVdot;
+        if (this->Water.CollectsToWaterSystem) {
+            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) =
+                this->Water.CollectedVdot;
         }
 
-        if (UserPlantComp(CompNum).Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapLowOutLimit) {
-            DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum)
-                .LoopSide(UserPlantComp(CompNum).Loop(LoopNum).LoopSideNum)
-                .Branch(UserPlantComp(CompNum).Loop(LoopNum).BranchNum)
-                .Comp(UserPlantComp(CompNum).Loop(LoopNum).CompNum)
-                .MinOutletTemp = UserPlantComp(CompNum).Loop(LoopNum).LowOutTempLimit;
+        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapLowOutLimit) {
+            DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum)
+                .LoopSide(this->Loop(LoopNum).LoopSideNum)
+                .Branch(this->Loop(LoopNum).BranchNum)
+                .Comp(this->Loop(LoopNum).CompNum)
+                .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
         }
 
-        if (UserPlantComp(CompNum).Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapHiOutLimit) {
-            DataPlant::PlantLoop(UserPlantComp(CompNum).Loop(LoopNum).LoopNum)
-                .LoopSide(UserPlantComp(CompNum).Loop(LoopNum).LoopSideNum)
-                .Branch(UserPlantComp(CompNum).Loop(LoopNum).BranchNum)
-                .Comp(UserPlantComp(CompNum).Loop(LoopNum).CompNum)
-                .MaxOutletTemp = UserPlantComp(CompNum).Loop(LoopNum).HiOutTempLimit;
+        if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet_ByNominalCapHiOutLimit) {
+            DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum)
+                .LoopSide(this->Loop(LoopNum).LoopSideNum)
+                .Branch(this->Loop(LoopNum).BranchNum)
+                .Comp(this->Loop(LoopNum).CompNum)
+                .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
         }
     }
 
-    void ReportCoilUserDefined(int const CompNum)
+    void UserCoilComponentStruct::ReportCoilUserDefined()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2369,47 +2369,47 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        for (int Loop = 1; Loop <= UserCoil(CompNum).NumAirConnections; ++Loop) {
-            if (UserCoil(CompNum).Air(Loop).OutletNodeNum > 0) {
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).Temp = UserCoil(CompNum).Air(Loop).OutletTemp;
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).HumRat = UserCoil(CompNum).Air(Loop).OutletHumRat;
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).MassFlowRate = UserCoil(CompNum).Air(Loop).OutletMassFlowRate;
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).Enthalpy =
-                    Psychrometrics::PsyHFnTdbW(UserCoil(CompNum).Air(Loop).OutletTemp, UserCoil(CompNum).Air(Loop).OutletHumRat);
+        for (int loop = 1; loop <= this->NumAirConnections; ++loop) {
+            if (this->Air(loop).OutletNodeNum > 0) {
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).Temp = this->Air(loop).OutletTemp;
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).HumRat = this->Air(loop).OutletHumRat;
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).MassFlowRate = this->Air(loop).OutletMassFlowRate;
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).Enthalpy =
+                    Psychrometrics::PsyHFnTdbW(this->Air(loop).OutletTemp, this->Air(loop).OutletHumRat);
 
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).MassFlowRateMinAvail =
-                    DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).MassFlowRateMinAvail;
-                DataLoopNode::Node(UserCoil(CompNum).Air(Loop).OutletNodeNum).MassFlowRateMaxAvail =
-                    DataLoopNode::Node(UserCoil(CompNum).Air(Loop).InletNodeNum).MassFlowRateMaxAvail;
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).MassFlowRateMinAvail =
+                    DataLoopNode::Node(this->Air(loop).InletNodeNum).MassFlowRateMinAvail;
+                DataLoopNode::Node(this->Air(loop).OutletNodeNum).MassFlowRateMaxAvail =
+                    DataLoopNode::Node(this->Air(loop).InletNodeNum).MassFlowRateMaxAvail;
             }
         }
 
-        if (UserCoil(CompNum).PlantIsConnected) {
+        if (this->PlantIsConnected) {
             // make mass flow requests
-            PlantUtilities::SetComponentFlowRate(UserCoil(CompNum).Loop.MassFlowRateRequest,
-                                 UserCoil(CompNum).Loop.InletNodeNum,
-                                 UserCoil(CompNum).Loop.OutletNodeNum,
-                                 UserCoil(CompNum).Loop.LoopNum,
-                                 UserCoil(CompNum).Loop.LoopSideNum,
-                                 UserCoil(CompNum).Loop.BranchNum,
-                                 UserCoil(CompNum).Loop.CompNum);
-            PlantUtilities::SafeCopyPlantNode(UserCoil(CompNum).Loop.InletNodeNum, UserCoil(CompNum).Loop.OutletNodeNum);
+            PlantUtilities::SetComponentFlowRate(this->Loop.MassFlowRateRequest,
+                                 this->Loop.InletNodeNum,
+                                 this->Loop.OutletNodeNum,
+                                 this->Loop.LoopNum,
+                                 this->Loop.LoopSideNum,
+                                 this->Loop.BranchNum,
+                                 this->Loop.CompNum);
+            PlantUtilities::SafeCopyPlantNode(this->Loop.InletNodeNum, this->Loop.OutletNodeNum);
             // unload Actuators to node data structure
-            DataLoopNode::Node(UserCoil(CompNum).Loop.OutletNodeNum).Temp = UserCoil(CompNum).Loop.OutletTemp;
+            DataLoopNode::Node(this->Loop.OutletNodeNum).Temp = this->Loop.OutletTemp;
         }
 
-        if (UserCoil(CompNum).Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(UserCoil(CompNum).Water.SupplyTankID).VdotRequestDemand(UserCoil(CompNum).Water.SupplyTankDemandARRID) =
-                UserCoil(CompNum).Water.SupplyVdotRequest;
+        if (this->Water.SuppliedByWaterSystem) {
+            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) =
+                this->Water.SupplyVdotRequest;
         }
 
-        if (UserCoil(CompNum).Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(UserCoil(CompNum).Water.CollectionTankID).VdotAvailSupply(UserCoil(CompNum).Water.CollectionTankSupplyARRID) =
-                UserCoil(CompNum).Water.CollectedVdot;
+        if (this->Water.CollectsToWaterSystem) {
+            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) =
+                this->Water.CollectedVdot;
         }
     }
 
-    void ReportZoneAirUserDefined(int const CompNum)
+    void UserZoneHVACForcedAirComponentStruct::ReportZoneAirUserDefined()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2421,50 +2421,50 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // report model outputs
 
-        DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.InletNodeNum).MassFlowRate = UserZoneAirHVAC(CompNum).ZoneAir.InletMassFlowRate;
+        DataLoopNode::Node(this->ZoneAir.InletNodeNum).MassFlowRate = this->ZoneAir.InletMassFlowRate;
 
-        DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Temp = UserZoneAirHVAC(CompNum).ZoneAir.OutletTemp;
-        DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).HumRat = UserZoneAirHVAC(CompNum).ZoneAir.OutletHumRat;
-        DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).MassFlowRate = UserZoneAirHVAC(CompNum).ZoneAir.OutletMassFlowRate;
-        DataLoopNode::Node(UserZoneAirHVAC(CompNum).ZoneAir.OutletNodeNum).Enthalpy =
-            Psychrometrics::PsyHFnTdbW(UserZoneAirHVAC(CompNum).ZoneAir.OutletTemp, UserZoneAirHVAC(CompNum).ZoneAir.OutletHumRat);
+        DataLoopNode::Node(this->ZoneAir.OutletNodeNum).Temp = this->ZoneAir.OutletTemp;
+        DataLoopNode::Node(this->ZoneAir.OutletNodeNum).HumRat = this->ZoneAir.OutletHumRat;
+        DataLoopNode::Node(this->ZoneAir.OutletNodeNum).MassFlowRate = this->ZoneAir.OutletMassFlowRate;
+        DataLoopNode::Node(this->ZoneAir.OutletNodeNum).Enthalpy =
+            Psychrometrics::PsyHFnTdbW(this->ZoneAir.OutletTemp, this->ZoneAir.OutletHumRat);
 
-        if (UserZoneAirHVAC(CompNum).SourceAir.OutletNodeNum > 0) {
-            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.OutletNodeNum).Temp = UserZoneAirHVAC(CompNum).SourceAir.OutletTemp;
-            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.OutletNodeNum).HumRat = UserZoneAirHVAC(CompNum).SourceAir.OutletHumRat;
-            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.OutletNodeNum).MassFlowRate = UserZoneAirHVAC(CompNum).SourceAir.OutletMassFlowRate;
-            DataLoopNode::Node(UserZoneAirHVAC(CompNum).SourceAir.OutletNodeNum).Enthalpy =
-                Psychrometrics::PsyHFnTdbW(UserZoneAirHVAC(CompNum).SourceAir.OutletTemp, UserZoneAirHVAC(CompNum).SourceAir.OutletHumRat);
+        if (this->SourceAir.OutletNodeNum > 0) {
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).Temp = this->SourceAir.OutletTemp;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).HumRat = this->SourceAir.OutletHumRat;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).MassFlowRate = this->SourceAir.OutletMassFlowRate;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(this->SourceAir.OutletTemp, this->SourceAir.OutletHumRat);
         }
 
-        if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
-            for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
+        if (this->NumPlantConnections > 0) {
+            for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                 // make mass flow requests
-                PlantUtilities::SetComponentFlowRate(UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateRequest,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
-                                     UserZoneAirHVAC(CompNum).Loop(Loop).CompNum);
-                PlantUtilities::SafeCopyPlantNode(UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum, UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum);
+                PlantUtilities::SetComponentFlowRate(this->Loop(loop).MassFlowRateRequest,
+                                     this->Loop(loop).InletNodeNum,
+                                     this->Loop(loop).OutletNodeNum,
+                                     this->Loop(loop).LoopNum,
+                                     this->Loop(loop).LoopSideNum,
+                                     this->Loop(loop).BranchNum,
+                                     this->Loop(loop).CompNum);
+                PlantUtilities::SafeCopyPlantNode(this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);
                 // unload Actuators to node data structure
-                DataLoopNode::Node(UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum).Temp = UserZoneAirHVAC(CompNum).Loop(Loop).OutletTemp;
+                DataLoopNode::Node(this->Loop(loop).OutletNodeNum).Temp = this->Loop(loop).OutletTemp;
             }
         }
 
-        if (UserZoneAirHVAC(CompNum).Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(UserZoneAirHVAC(CompNum).Water.SupplyTankID).VdotRequestDemand(UserZoneAirHVAC(CompNum).Water.SupplyTankDemandARRID) =
-                UserZoneAirHVAC(CompNum).Water.SupplyVdotRequest;
+        if (this->Water.SuppliedByWaterSystem) {
+            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) =
+                this->Water.SupplyVdotRequest;
         }
 
-        if (UserZoneAirHVAC(CompNum).Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(UserZoneAirHVAC(CompNum).Water.CollectionTankID).VdotAvailSupply(UserZoneAirHVAC(CompNum).Water.CollectionTankSupplyARRID) =
-                UserZoneAirHVAC(CompNum).Water.CollectedVdot;
+        if (this->Water.CollectsToWaterSystem) {
+            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) =
+                this->Water.CollectedVdot;
         }
     }
 
-    void ReportAirTerminalUserDefined(int const CompNum)
+    void UserAirTerminalComponentStruct::ReportAirTerminalUserDefined()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2473,45 +2473,45 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.InletNodeNum).MassFlowRate = UserAirTerminal(CompNum).AirLoop.InletMassFlowRate;
+        DataLoopNode::Node(this->AirLoop.InletNodeNum).MassFlowRate = this->AirLoop.InletMassFlowRate;
 
-        DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.OutletNodeNum).Temp = UserAirTerminal(CompNum).AirLoop.OutletTemp;
-        DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.OutletNodeNum).HumRat = UserAirTerminal(CompNum).AirLoop.OutletHumRat;
-        DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.OutletNodeNum).MassFlowRate = UserAirTerminal(CompNum).AirLoop.OutletMassFlowRate;
-        DataLoopNode::Node(UserAirTerminal(CompNum).AirLoop.OutletNodeNum).Enthalpy =
-            Psychrometrics::PsyHFnTdbW(UserAirTerminal(CompNum).AirLoop.OutletTemp, UserAirTerminal(CompNum).AirLoop.OutletHumRat);
-        if (UserAirTerminal(CompNum).SourceAir.OutletNodeNum > 0) {
-            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.OutletNodeNum).Temp = UserAirTerminal(CompNum).SourceAir.OutletTemp;
-            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.OutletNodeNum).HumRat = UserAirTerminal(CompNum).SourceAir.OutletHumRat;
-            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.OutletNodeNum).MassFlowRate = UserAirTerminal(CompNum).SourceAir.OutletMassFlowRate;
-            DataLoopNode::Node(UserAirTerminal(CompNum).SourceAir.OutletNodeNum).Enthalpy =
-                Psychrometrics::PsyHFnTdbW(UserAirTerminal(CompNum).SourceAir.OutletTemp, UserAirTerminal(CompNum).SourceAir.OutletHumRat);
+        DataLoopNode::Node(this->AirLoop.OutletNodeNum).Temp = this->AirLoop.OutletTemp;
+        DataLoopNode::Node(this->AirLoop.OutletNodeNum).HumRat = this->AirLoop.OutletHumRat;
+        DataLoopNode::Node(this->AirLoop.OutletNodeNum).MassFlowRate = this->AirLoop.OutletMassFlowRate;
+        DataLoopNode::Node(this->AirLoop.OutletNodeNum).Enthalpy =
+            Psychrometrics::PsyHFnTdbW(this->AirLoop.OutletTemp, this->AirLoop.OutletHumRat);
+        if (this->SourceAir.OutletNodeNum > 0) {
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).Temp = this->SourceAir.OutletTemp;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).HumRat = this->SourceAir.OutletHumRat;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).MassFlowRate = this->SourceAir.OutletMassFlowRate;
+            DataLoopNode::Node(this->SourceAir.OutletNodeNum).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(this->SourceAir.OutletTemp, this->SourceAir.OutletHumRat);
         }
 
-        if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
-            for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
+        if (this->NumPlantConnections > 0) {
+            for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                 // make mass flow requests
-                PlantUtilities::SetComponentFlowRate(UserAirTerminal(CompNum).Loop(Loop).MassFlowRateRequest,
-                                     UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
-                                     UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,
-                                     UserAirTerminal(CompNum).Loop(Loop).LoopNum,
-                                     UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
-                                     UserAirTerminal(CompNum).Loop(Loop).BranchNum,
-                                     UserAirTerminal(CompNum).Loop(Loop).CompNum);
-                PlantUtilities::SafeCopyPlantNode(UserAirTerminal(CompNum).Loop(Loop).InletNodeNum, UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum);
+                PlantUtilities::SetComponentFlowRate(this->Loop(loop).MassFlowRateRequest,
+                                     this->Loop(loop).InletNodeNum,
+                                     this->Loop(loop).OutletNodeNum,
+                                     this->Loop(loop).LoopNum,
+                                     this->Loop(loop).LoopSideNum,
+                                     this->Loop(loop).BranchNum,
+                                     this->Loop(loop).CompNum);
+                PlantUtilities::SafeCopyPlantNode(this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);
                 // unload Actuators to node data structure
-                DataLoopNode::Node(UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum).Temp = UserAirTerminal(CompNum).Loop(Loop).OutletTemp;
+                DataLoopNode::Node(this->Loop(loop).OutletNodeNum).Temp = this->Loop(loop).OutletTemp;
             }
         }
 
-        if (UserAirTerminal(CompNum).Water.SuppliedByWaterSystem) {
-            DataWater::WaterStorage(UserAirTerminal(CompNum).Water.SupplyTankID).VdotRequestDemand(UserAirTerminal(CompNum).Water.SupplyTankDemandARRID) =
-                UserAirTerminal(CompNum).Water.SupplyVdotRequest;
+        if (this->Water.SuppliedByWaterSystem) {
+            DataWater::WaterStorage(this->Water.SupplyTankID).VdotRequestDemand(this->Water.SupplyTankDemandARRID) =
+                this->Water.SupplyVdotRequest;
         }
 
-        if (UserAirTerminal(CompNum).Water.CollectsToWaterSystem) {
-            DataWater::WaterStorage(UserAirTerminal(CompNum).Water.CollectionTankID).VdotAvailSupply(UserAirTerminal(CompNum).Water.CollectionTankSupplyARRID) =
-                UserAirTerminal(CompNum).Water.CollectedVdot;
+        if (this->Water.CollectsToWaterSystem) {
+            DataWater::WaterStorage(this->Water.CollectionTankID).VdotAvailSupply(this->Water.CollectionTankSupplyARRID) =
+                this->Water.CollectedVdot;
         }
     }
 

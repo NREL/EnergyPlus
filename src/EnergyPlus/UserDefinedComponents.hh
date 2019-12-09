@@ -188,6 +188,11 @@ namespace UserDefinedComponents {
         UserPlantComponentStruct() : ErlSimProgramMngr(0), NumPlantConnections(0), myOneTimeFlag(true)
         {
         }
+
+        void InitPlantUserComponent(int LoopNum, Real64 MyLoad);
+
+        void ReportPlantUserComponent(int LoopNum);
+
     };
 
     struct UserCoilComponentStruct
@@ -208,6 +213,11 @@ namespace UserDefinedComponents {
         UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumAirConnections(0), PlantIsConnected(false), myOneTimeFlag(true)
         {
         }
+
+        void InitCoilUserDefined();
+
+        void ReportCoilUserDefined();
+
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -234,6 +244,11 @@ namespace UserDefinedComponents {
               RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
         {
         }
+
+        void InitZoneAirUserDefined(int ZoneNum);
+
+        void ReportZoneAirUserDefined();
+
     };
 
     struct UserAirTerminalComponentStruct
@@ -262,6 +277,11 @@ namespace UserDefinedComponents {
               RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
         {
         }
+
+        void InitAirTerminalUserDefined(int ZoneNum);
+
+        void ReportAirTerminalUserDefined();
+
     };
 
     // Object Data
@@ -294,34 +314,15 @@ namespace UserDefinedComponents {
                                int &CompIndex                  // index to zone hvac unit
     );
 
-    void
-    SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
     void GetUserDefinedComponents();
 
-    void InitPlantUserComponent(int CompNum, int LoopNum, Real64 MyLoad);
-
-    void InitCoilUserDefined(int CompNum);
-
-    void InitZoneAirUserDefined(int CompNum, int ZoneNum);
-
-    void InitAirTerminalUserDefined(int CompNum, int ZoneNum);
-
-    void ReportPlantUserComponent(int CompNum, int LoopNum);
-
-    void ReportCoilUserDefined(int CompNum);
-
-    void ReportZoneAirUserDefined(int CompNum);
-
-    void ReportAirTerminalUserDefined(int CompNum);
-
     void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void
-    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 
