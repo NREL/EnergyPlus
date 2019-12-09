@@ -345,7 +345,6 @@ namespace PlantLoopEquip {
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
 
-                dynamic_cast<ChillerAbsorption::BLASTAbsorberSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {

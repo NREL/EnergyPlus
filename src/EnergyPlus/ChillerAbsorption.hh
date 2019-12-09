@@ -67,8 +67,6 @@ namespace ChillerAbsorption {
 
     extern int numBlastAbsorbers; // number of Absorption Chillers specified in input
 
-    extern Array1D_bool CheckEquipName;
-
     extern bool getInput; // When TRUE, calls subroutine to read input file
 
     struct ReportVars

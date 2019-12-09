@@ -119,14 +119,13 @@ namespace ChillerAbsorption {
 
     int numBlastAbsorbers(0); // number of Absorption Chillers specified in input
     bool getInput(true);      // when TRUE, calls subroutine to read input file.
-    Array1D_bool CheckEquipName;
+
     Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
 
     void clear_state()
     {
         numBlastAbsorbers = 0;
         getInput = true;
-        CheckEquipName.deallocate();
         BLASTAbsorber.deallocate();
     }
 
@@ -151,6 +150,9 @@ namespace ChillerAbsorption {
 
     void BLASTAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+
+        this->EquipFlowCtrl = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
+
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             // called from dominant chilled water connection loop side
 
@@ -261,9 +263,8 @@ namespace ChillerAbsorption {
         }
 
         if (allocated(BLASTAbsorber)) return;
-        // ALLOCATE ARRAYS
+
         BLASTAbsorber.allocate(numBlastAbsorbers);
-        CheckEquipName.dimension(numBlastAbsorbers, true);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
         for (AbsorberNum = 1; AbsorberNum <= numBlastAbsorbers; ++AbsorberNum) {
