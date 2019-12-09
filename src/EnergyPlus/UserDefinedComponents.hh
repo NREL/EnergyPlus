@@ -189,9 +189,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void InitPlantUserComponent(int LoopNum, Real64 MyLoad);
+        void initialize(int LoopNum, Real64 MyLoad);
 
-        void ReportPlantUserComponent(int LoopNum);
+        void report(int LoopNum);
 
     };
 
@@ -214,9 +214,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void InitCoilUserDefined();
+        void initialize();
 
-        void ReportCoilUserDefined();
+        void report();
 
     };
 
@@ -245,9 +245,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void InitZoneAirUserDefined(int ZoneNum);
+        void initialize(int ZoneNum);
 
-        void ReportZoneAirUserDefined();
+        void report();
 
     };
 
@@ -278,9 +278,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void InitAirTerminalUserDefined(int ZoneNum);
+        void initialize(int ZoneNum);
 
-        void ReportAirTerminalUserDefined();
+        void report();
 
     };
 

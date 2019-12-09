@@ -163,7 +163,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (InitLoopEquip || DataGlobals::BeginEnvrnFlag) {
-            UserPlantComp(CompNum).InitPlantUserComponent(LoopNum, MyLoad);
+            UserPlantComp(CompNum).initialize(LoopNum, MyLoad);
             // find loop connection number from LoopNum and LoopSide
             ThisLoop = 0;
             for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
@@ -207,7 +207,7 @@ namespace UserDefinedComponents {
             ThisLoop = Loop;
         }
 
-        UserPlantComp(CompNum).InitPlantUserComponent(ThisLoop, MyLoad);
+        UserPlantComp(CompNum).initialize(ThisLoop, MyLoad);
 
         if (ThisLoop > 0) {
             if (UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr > 0) {
@@ -219,7 +219,7 @@ namespace UserDefinedComponents {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).ErlSimProgramMngr);
         }
 
-        UserPlantComp(CompNum).ReportPlantUserComponent(ThisLoop);
+        UserPlantComp(CompNum).report(ThisLoop);
     }
 
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
@@ -284,13 +284,13 @@ namespace UserDefinedComponents {
             }
         }
 
-        UserCoil(CompNum).InitCoilUserDefined();
+        UserCoil(CompNum).initialize();
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
         }
 
-        UserCoil(CompNum).ReportCoilUserDefined();
+        UserCoil(CompNum).report();
 
         if (AirLoopNum != -1) { // IF the system is not an equipment of outdoor air unit
             // determine if heating or cooling on primary air stream
@@ -347,7 +347,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserZoneAirHVAC(CompNum).InitZoneAirUserDefined(ZoneNum);
+            UserZoneAirHVAC(CompNum).initialize(ZoneNum);
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
@@ -371,13 +371,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserZoneAirHVAC(CompNum).InitZoneAirUserDefined(ZoneNum);
+        UserZoneAirHVAC(CompNum).initialize(ZoneNum);
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         }
 
-        UserZoneAirHVAC(CompNum).ReportZoneAirUserDefined();
+        UserZoneAirHVAC(CompNum).report();
 
         // calculate delivered capacity
         Real64 AirMassFlow =
@@ -435,7 +435,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserAirTerminal(CompNum).InitAirTerminalUserDefined(ZoneNum);
+            UserAirTerminal(CompNum).initialize(ZoneNum);
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
@@ -459,13 +459,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserAirTerminal(CompNum).InitAirTerminalUserDefined(ZoneNum);
+        UserAirTerminal(CompNum).initialize(ZoneNum);
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
         }
 
-        UserAirTerminal(CompNum).ReportAirTerminalUserDefined();
+        UserAirTerminal(CompNum).report();
     }
 
     void GetUserDefinedComponents()
@@ -1972,7 +1972,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::InitPlantUserComponent(int const LoopNum, Real64 const MyLoad)
+    void UserPlantComponentStruct::initialize(int LoopNum, Real64 MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -2044,7 +2044,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::InitCoilUserDefined()
+    void UserCoilComponentStruct::initialize()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2113,7 +2113,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::InitZoneAirUserDefined(int const ZoneNum)
+    void UserZoneHVACForcedAirComponentStruct::initialize(int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2204,7 +2204,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserAirTerminalComponentStruct::InitAirTerminalUserDefined(int const ZoneNum)
+    void UserAirTerminalComponentStruct::initialize(int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2292,7 +2292,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::ReportPlantUserComponent(int const LoopNum)
+    void UserPlantComponentStruct::report(int const LoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2357,7 +2357,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::ReportCoilUserDefined()
+    void UserCoilComponentStruct::report()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2409,7 +2409,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::ReportZoneAirUserDefined()
+    void UserZoneHVACForcedAirComponentStruct::report()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2464,7 +2464,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserAirTerminalComponentStruct::ReportAirTerminalUserDefined()
+    void UserAirTerminalComponentStruct::report()
     {
 
         // SUBROUTINE INFORMATION:
