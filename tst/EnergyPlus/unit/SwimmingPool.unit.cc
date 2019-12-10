@@ -66,7 +66,6 @@ using namespace EnergyPlus::DataPlant;
 
 TEST_F(EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow)
 {
-
     // Tests for MakeUpWaterVolFlowFunct
     EXPECT_EQ(0.05, MakeUpWaterVolFlowFunct(5, 100));
     EXPECT_NEAR(0.00392, MakeUpWaterVolFlowFunct(0.1, 25.5), .0001);
@@ -127,7 +126,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
 {
-
     bool MyPlantScanFlagPool;
 
     // Tests for InitSwimmingPoolPlantLoopIndex
@@ -190,7 +188,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
 {
-
     bool MyPlantScanFlagPool;
     int PoolNum;
 
