@@ -346,7 +346,6 @@ The new input field will be appended to the end of the existing air terminal VAV
 ### Initial Changes
 The following functions of SingleDuct module may be moved as member function as an incremental contribution to re-factor.
 
-    void GetSysInput();
     void InitSys(int const SysNum, bool const FirstHVACIteration);
     void SizeSys(int const SysNum);
     void SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
@@ -363,10 +362,8 @@ The following functions of SingleDuct module may be moved as member function as 
     void UpdateSys(int const SysNum);
     void ReportSys(int const SysNum);
 
-
 The following functions of DualDuct module may be moved as member function as an incremental contribution to re-factor.   
 
-    void GetDualDuctInput();
     void InitDualDuct(int const DamperNum, bool const FirstHVACIteration);
     void SizeDualDuct(int const DamperNum);
     void SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
@@ -376,8 +373,6 @@ The following functions of DualDuct module may be moved as member function as an
     void CalcOAOnlyMassFlow(int const DamperNum, Real64 &OAMassFlow, Optional<Real64> MaxOAVolFlow = _);
     void UpdateDualDuct(int const DamperNum);
     void ReportDualDuct(int const DamperNum); // unused1208
-    void ReportDualDuctConnections();
-    void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 
 
 ### SingleDuct
