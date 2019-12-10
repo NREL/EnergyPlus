@@ -67,9 +67,12 @@ namespace DataGlobals {
     extern bool DDOnlySimulation;
     extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
+    extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
     extern bool isCBOR;
     extern bool isMsgPack;
+    extern bool isUBJSON;
+    extern bool isBSON;
     extern bool preserveIDFOrder;
 
     // MODULE PARAMETER DEFINITIONS:

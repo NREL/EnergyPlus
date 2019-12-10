@@ -7121,9 +7121,9 @@ namespace WeatherManager {
                 }
             }
             //   A7,  \field Rain Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes") || UtilityRoutines::SameString(cAlphaArgs(7), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No") || UtilityRoutines::SameString(cAlphaArgs(7), "0") || lAlphaFieldBlanks(7)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No") || lAlphaFieldBlanks(7)) {
                 DesDayInput(EnvrnNum).RainInd = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid field: " + cAlphaFieldNames(7) + "=\"" +
@@ -7133,9 +7133,9 @@ namespace WeatherManager {
             }
 
             //   A8,  \field Snow Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Yes") || UtilityRoutines::SameString(cAlphaArgs(8), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "Yes")) {
                 DesDayInput(EnvrnNum).SnowInd = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "No") || UtilityRoutines::SameString(cAlphaArgs(8), "0") || lAlphaFieldBlanks(8)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "No") || lAlphaFieldBlanks(8)) {
                 DesDayInput(EnvrnNum).SnowInd = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid field: " + cAlphaFieldNames(8) + "=\"" +
@@ -7721,9 +7721,9 @@ namespace WeatherManager {
             }
 
             //   A9,  \field Daylight Saving Time Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "Yes") || UtilityRoutines::SameString(cAlphaArgs(9), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "Yes")) {
                 DesDayInput(EnvrnNum).DSTIndicator = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "No") || UtilityRoutines::SameString(cAlphaArgs(9), "0") || lAlphaFieldBlanks(9)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "No") || lAlphaFieldBlanks(9)) {
                 DesDayInput(EnvrnNum).DSTIndicator = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");

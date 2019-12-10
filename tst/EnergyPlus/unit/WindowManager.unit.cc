@@ -588,7 +588,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",

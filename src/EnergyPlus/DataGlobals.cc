@@ -89,9 +89,12 @@ namespace DataGlobals {
     bool DDOnlySimulation(false);
     bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
+    bool outputEpJSONConversionOnly(false);
     bool isEpJSON(false);
     bool isCBOR(false);
     bool isMsgPack(false);
+    bool isUBJSON(false);
+    bool isBSON(false);
     bool preserveIDFOrder(true);
 
     // MODULE PARAMETER DEFINITIONS:
@@ -272,6 +275,7 @@ namespace DataGlobals {
         DDOnlySimulation = false;
         AnnualSimulation = false;
         outputEpJSONConversion = false;
+        outputEpJSONConversionOnly = false;
         isEpJSON = false;
         isCBOR = false;
         isMsgPack = false;
