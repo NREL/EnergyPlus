@@ -583,7 +583,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
 
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",
