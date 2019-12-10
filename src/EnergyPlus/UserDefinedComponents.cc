@@ -75,6 +75,7 @@
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -102,24 +103,86 @@ namespace UserDefinedComponents {
     Array1D_bool CheckUserAirTerminal;
 
     bool GetInput(true);
+    bool GetPlantCompInput(true);
 
     Array1D<UserPlantComponentStruct> UserPlantComp;
     Array1D<UserCoilComponentStruct> UserCoil;
     Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
 
-    void SimUserDefinedPlantComponent(int const LoopNum,                       // plant loop sim call originated from
-                                      int const LoopSideNum,                   // plant loop side sim call originated from
-                                      std::string const &EP_UNUSED(EquipType), // type of equipment, 'PlantComponent:UserDefined'
-                                      std::string const &EquipName,            // user name for component
-                                      int &CompIndex,
-                                      bool &InitLoopEquip,
-                                      Real64 const MyLoad,
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap)
+    PlantComponent *UserPlantComponentStruct::factory(std::string const &objectName)
     {
+        // Process the input data
+        if (GetPlantCompInput) {
+            GetUserDefinedPlantComponents();
+            GetPlantCompInput = false;
+        }
+        // Now look for this particular object
+        for (auto &thisComp : UserPlantComp) {
+            if (thisComp.Name == objectName) {
+                return &thisComp;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalUserDefinedPlantComponentFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
 
+    void UserPlantComponentStruct::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {
+        bool anyEMSRan;
+        Real64 myLoad = 0.0;
+        int thisLoop = 0;
+
+        this->initialize(calledFromLocation.loopNum, myLoad);
+
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
+        }
+
+        if (thisLoop > 0) {
+            if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
+                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+            }
+
+            PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
+                                               this->Loop(thisLoop).MassFlowRateMax,
+                                               this->Loop(thisLoop).InletNodeNum,
+                                               this->Loop(thisLoop).OutletNodeNum,
+                                               this->Loop(thisLoop).LoopNum,
+                                               this->Loop(thisLoop).LoopSideNum,
+                                               this->Loop(thisLoop).BranchNum,
+                                               this->Loop(thisLoop).CompNum);
+
+            PlantUtilities::RegisterPlantCompDesignFlow(this->Loop(thisLoop).InletNodeNum,
+                                                        this->Loop(thisLoop).DesignVolumeFlowRate);
+
+        } else {
+            // throw warning
+            ShowFatalError("SimUserDefinedPlantComponent: did not find where called from loop number called from =" + General::TrimSigDigits(calledFromLocation.loopNum) +
+                           " , loop side called from =" + General::TrimSigDigits(calledFromLocation.loopSideNum));
+        }
+    }
+
+    void UserPlantComponentStruct::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        int thisLoop = 0;
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
+        }
+
+        MinLoad = this->Loop(thisLoop).MinLoad;
+        MaxLoad = this->Loop(thisLoop).MaxLoad;
+        OptLoad = this->Loop(thisLoop).OptLoad;
+    }
+
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(const EnergyPlus::PlantLocation &calledFromLocation, bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Jan 2012
@@ -129,97 +192,32 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // User Defined plant generic component
 
-        // METHODOLOGY EMPLOYED:
-        // This routine to be called from PlantLoopEquipment.
-
-        int CompNum;
-        int ThisLoop;
-
-        if (GetInput) {
-            GetUserDefinedComponents();
-            GetInput = false;
+        if (DataGlobals::BeginEnvrnFlag) {
+            this->onInitLoopEquip(calledFromLocation);
         }
 
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(EquipName, UserPlantComp);
-            if (CompNum == 0) {
-                ShowFatalError("SimUserDefinedPlantComponent: User Defined Plant Component not found");
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum < 1 || CompNum > NumUserPlantComps) {
-                ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                               ", Number of units =" + General::TrimSigDigits(NumUserPlantComps) + ", Entered Unit name = " + EquipName);
-            }
-            if (CheckUserPlantCompName(CompNum)) {
-                if (EquipName != UserPlantComp(CompNum).Name) {
-                    ShowFatalError("SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Unit name=" + EquipName +
-                                   ", stored unit name for that index=" + UserPlantComp(CompNum).Name);
-                }
-                CheckUserPlantCompName(CompNum) = false;
-            }
-        }
         bool anyEMSRan;
-        if (InitLoopEquip || DataGlobals::BeginEnvrnFlag) {
-            UserPlantComp(CompNum).initialize(LoopNum, MyLoad);
-            // find loop connection number from LoopNum and LoopSide
-            ThisLoop = 0;
-            for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
-                if (LoopNum != UserPlantComp(CompNum).Loop(Loop).LoopNum) continue;
-                if (LoopSideNum != UserPlantComp(CompNum).Loop(Loop).LoopSideNum) continue;
-                ThisLoop = Loop;
-            }
-            if (ThisLoop > 0) {
-                if (UserPlantComp(CompNum).Loop(ThisLoop).ErlInitProgramMngr > 0) {
-                    EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).Loop(ThisLoop).ErlInitProgramMngr);
-                }
-                // now interface sizing related values with rest of E+
-                MinCap = UserPlantComp(CompNum).Loop(ThisLoop).MinLoad;
-                MaxCap = UserPlantComp(CompNum).Loop(ThisLoop).MaxLoad;
-                OptCap = UserPlantComp(CompNum).Loop(ThisLoop).OptLoad;
+        int thisLoop = 0;
 
-                PlantUtilities::InitComponentNodes(UserPlantComp(CompNum).Loop(ThisLoop).MassFlowRateMin,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).MassFlowRateMax,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).InletNodeNum,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).OutletNodeNum,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).LoopNum,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).LoopSideNum,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).BranchNum,
-                                   UserPlantComp(CompNum).Loop(ThisLoop).CompNum);
-
-                PlantUtilities::RegisterPlantCompDesignFlow(UserPlantComp(CompNum).Loop(ThisLoop).InletNodeNum,
-                                            UserPlantComp(CompNum).Loop(ThisLoop).DesignVolumeFlowRate);
-
-            } else {
-                // throw warning
-                ShowFatalError("SimUserDefinedPlantComponent: did not find where called from loop number called from =" + General::TrimSigDigits(LoopNum) +
-                               " , loop side called from =" + General::TrimSigDigits(LoopSideNum));
-            }
-            return;
+        for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
+            if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
+            thisLoop = loop;
         }
 
-        ThisLoop = 0;
-        for (int Loop = 1; Loop <= UserPlantComp(CompNum).NumPlantConnections; ++Loop) {
-            if (LoopNum != UserPlantComp(CompNum).Loop(Loop).LoopNum) continue;
-            if (LoopSideNum != UserPlantComp(CompNum).Loop(Loop).LoopSideNum) continue;
-            ThisLoop = Loop;
-        }
+        this->initialize(thisLoop, CurLoad);
 
-        UserPlantComp(CompNum).initialize(ThisLoop, MyLoad);
-
-        if (ThisLoop > 0) {
-            if (UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr);
+        if (thisLoop > 0) {
+            if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
+                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
             }
         }
 
-        if (UserPlantComp(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).ErlSimProgramMngr);
+        if (this->ErlSimProgramMngr > 0) {
+            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
         }
 
-        UserPlantComp(CompNum).report(ThisLoop);
+        this->report(thisLoop);
     }
 
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
@@ -237,9 +235,9 @@ namespace UserDefinedComponents {
 
         int CompNum;
 
-        if (GetInput) {
-            GetUserDefinedComponents();
-            GetInput = false;
+        if (GetPlantCompInput) {
+            GetUserDefinedPlantComponents();
+            GetPlantCompInput = false;
         }
 
         // Find the correct Equipment
@@ -468,15 +466,8 @@ namespace UserDefinedComponents {
         UserAirTerminal(CompNum).report();
     }
 
-    void GetUserDefinedComponents()
+    void GetUserDefinedPlantComponents()
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   Jan 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         bool ErrorsFound(false);
@@ -502,7 +493,6 @@ namespace UserDefinedComponents {
 
         // need to make sure GetEMSInput has run...
 
-        cCurrentModuleObject = "PlantComponent:UserDefined";
         NumUserPlantComps = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumUserPlantComps > 0) {
             UserPlantComp.allocate(NumUserPlantComps);
@@ -545,21 +535,21 @@ namespace UserDefinedComponents {
                         LoopStr = General::RoundSigDigits(ConnectionLoop);
                         int aArgCount = (ConnectionLoop - 1) * 6 + 3;
                         UserPlantComp(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
-                                                                                                      ErrorsFound,
-                                                                                                      cCurrentModuleObject,
-                                                                                                      cAlphaArgs(1),
-                                                                                                      DataLoopNode::NodeType_Water,
-                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                      ConnectionLoop,
-                                                                                                      DataLoopNode::ObjectIsNotParent);
+                                                                                                                        ErrorsFound,
+                                                                                                                        cCurrentModuleObject,
+                                                                                                                        cAlphaArgs(1),
+                                                                                                                        DataLoopNode::NodeType_Water,
+                                                                                                                        DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                                        ConnectionLoop,
+                                                                                                                        DataLoopNode::ObjectIsNotParent);
                         UserPlantComp(CompLoop).Loop(ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount + 1),
-                                                                                                       ErrorsFound,
-                                                                                                       cCurrentModuleObject,
-                                                                                                       cAlphaArgs(1),
-                                                                                                       DataLoopNode::NodeType_Water,
-                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                       ConnectionLoop,
-                                                                                                       DataLoopNode::ObjectIsNotParent);
+                                                                                                                         ErrorsFound,
+                                                                                                                         cCurrentModuleObject,
+                                                                                                                         cAlphaArgs(1),
+                                                                                                                         DataLoopNode::NodeType_Water,
+                                                                                                                         DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                                         ConnectionLoop,
+                                                                                                                         DataLoopNode::ObjectIsNotParent);
 
                         BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes " + LoopStr);
 
@@ -707,16 +697,16 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(27)) {
                     UserPlantComp(CompLoop).Air.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(27),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
-                                                                                 UserPlantComp(CompLoop).Name,
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                                   ErrorsFound,
+                                                                                                   cCurrentModuleObject,
+                                                                                                   UserPlantComp(CompLoop).Name,
+                                                                                                   DataLoopNode::NodeType_Air,
+                                                                                                   DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                                   1,
+                                                                                                   DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
                     SetupEMSInternalVariable(
-                        "Inlet Temperature for Air Connection", UserPlantComp(CompLoop).Name, "[C]", UserPlantComp(CompLoop).Air.InletTemp);
+                            "Inlet Temperature for Air Connection", UserPlantComp(CompLoop).Name, "[C]", UserPlantComp(CompLoop).Air.InletTemp);
                     SetupEMSInternalVariable("Inlet Mass Flow Rate for Air Connection",
                                              UserPlantComp(CompLoop).Name,
                                              "[kg/s]",
@@ -726,23 +716,23 @@ namespace UserDefinedComponents {
                                              "[kgWater/kgDryAir]",
                                              UserPlantComp(CompLoop).Air.InletHumRat);
                     SetupEMSInternalVariable(
-                        "Inlet Density for Air Connection", UserPlantComp(CompLoop).Name, "[kg/m3]", UserPlantComp(CompLoop).Air.InletRho);
+                            "Inlet Density for Air Connection", UserPlantComp(CompLoop).Name, "[kg/m3]", UserPlantComp(CompLoop).Air.InletRho);
                     SetupEMSInternalVariable(
-                        "Inlet Specific Heat for Air Connection", UserPlantComp(CompLoop).Name, "[J/kg-C]", UserPlantComp(CompLoop).Air.InletCp);
+                            "Inlet Specific Heat for Air Connection", UserPlantComp(CompLoop).Name, "[J/kg-C]", UserPlantComp(CompLoop).Air.InletCp);
                 }
 
                 if (!lAlphaFieldBlanks(28)) {
                     UserPlantComp(CompLoop).Air.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(28),
-                                                                                  ErrorsFound,
-                                                                                  cCurrentModuleObject,
-                                                                                  UserPlantComp(CompLoop).Name,
-                                                                                  DataLoopNode::NodeType_Air,
-                                                                                  DataLoopNode::NodeConnectionType_ReliefAir,
-                                                                                  1,
-                                                                                  DataLoopNode::ObjectIsNotParent);
+                                                                                                    ErrorsFound,
+                                                                                                    cCurrentModuleObject,
+                                                                                                    UserPlantComp(CompLoop).Name,
+                                                                                                    DataLoopNode::NodeType_Air,
+                                                                                                    DataLoopNode::NodeConnectionType_ReliefAir,
+                                                                                                    1,
+                                                                                                    DataLoopNode::ObjectIsNotParent);
                     // outlet air node results
                     SetupEMSActuator(
-                        "Air Connection", UserPlantComp(CompLoop).Name, "Outlet Temperature", "[C]", lDummy, UserPlantComp(CompLoop).Air.OutletTemp);
+                            "Air Connection", UserPlantComp(CompLoop).Name, "Outlet Temperature", "[C]", lDummy, UserPlantComp(CompLoop).Air.OutletTemp);
                     SetupEMSActuator("Air Connection",
                                      UserPlantComp(CompLoop).Name,
                                      "Outlet Humidity Ratio",
@@ -759,11 +749,11 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(29)) {
                     WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(29),
-                                             ErrorsFound,
-                                             UserPlantComp(CompLoop).Water.SupplyTankID,
-                                             UserPlantComp(CompLoop).Water.SupplyTankDemandARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(29),
+                                                           ErrorsFound,
+                                                           UserPlantComp(CompLoop).Water.SupplyTankID,
+                                                           UserPlantComp(CompLoop).Water.SupplyTankDemandARRID);
 
                     UserPlantComp(CompLoop).Water.SuppliedByWaterSystem = true;
                     SetupEMSActuator("Water System",
@@ -776,11 +766,11 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(30)) {
                     WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(30),
-                                             ErrorsFound,
-                                             UserPlantComp(CompLoop).Water.CollectionTankID,
-                                             UserPlantComp(CompLoop).Water.CollectionTankSupplyARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(30),
+                                                           ErrorsFound,
+                                                           UserPlantComp(CompLoop).Water.CollectionTankID,
+                                                           UserPlantComp(CompLoop).Water.CollectionTankSupplyARRID);
                     UserPlantComp(CompLoop).Water.CollectsToWaterSystem = true;
                     SetupEMSActuator("Water System",
                                      UserPlantComp(CompLoop).Name,
@@ -875,7 +865,15 @@ namespace UserDefinedComponents {
         }
 
         cCurrentModuleObject = "Coil:UserDefined";
+        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+
+        cAlphaFieldNames.allocate(NumAlphas);
+        cAlphaArgs.allocate(NumAlphas);
+        lAlphaFieldBlanks.dimension(NumAlphas, false);
+        rNumericArgs.dimension(NumNums, 0.0);
+
         NumUserCoils = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+
         if (NumUserCoils > 0) {
             UserCoil.allocate(NumUserCoils);
             CheckUserCoilName.dimension(NumUserCoils, true);
@@ -894,13 +892,15 @@ namespace UserDefinedComponents {
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
-                GlobalNames::VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+                GlobalNames::VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound,
+                                                  cCurrentModuleObject + " Name");
 
                 UserCoil(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -913,7 +913,8 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -930,14 +931,15 @@ namespace UserDefinedComponents {
                     UserCoil(CompLoop).NumAirConnections = NumAirConnections;
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumAirConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 4;
-                        UserCoil(CompLoop).Air(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
-                                                                                                ErrorsFound,
-                                                                                                cCurrentModuleObject,
-                                                                                                UserCoil(CompLoop).Name,
-                                                                                                DataLoopNode::NodeType_Air,
-                                                                                                DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                1,
-                                                                                                DataLoopNode::ObjectIsNotParent);
+                        UserCoil(CompLoop).Air(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                UserCoil(CompLoop).Name,
+                                DataLoopNode::NodeType_Air,
+                                DataLoopNode::NodeConnectionType_Inlet,
+                                1,
+                                DataLoopNode::ObjectIsNotParent);
 
                         LoopStr = General::RoundSigDigits(ConnectionLoop);
                         // model input related internal variables
@@ -962,14 +964,15 @@ namespace UserDefinedComponents {
                                                  "[J/kg-C]",
                                                  UserCoil(CompLoop).Air(ConnectionLoop).InletCp);
 
-                        UserCoil(CompLoop).Air(ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount + 1),
-                                                                                                 ErrorsFound,
-                                                                                                 cCurrentModuleObject,
-                                                                                                 UserCoil(CompLoop).Name,
-                                                                                                 DataLoopNode::NodeType_Air,
-                                                                                                 DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                 1,
-                                                                                                 DataLoopNode::ObjectIsNotParent);
+                        UserCoil(CompLoop).Air(ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount + 1),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                UserCoil(CompLoop).Name,
+                                DataLoopNode::NodeType_Air,
+                                DataLoopNode::NodeConnectionType_Outlet,
+                                1,
+                                DataLoopNode::ObjectIsNotParent);
                         SetupEMSActuator("Air Connection " + LoopStr,
                                          UserCoil(CompLoop).Name,
                                          "Outlet Temperature",
@@ -989,7 +992,9 @@ namespace UserDefinedComponents {
                                          lDummy,
                                          UserCoil(CompLoop).Air(ConnectionLoop).OutletMassFlowRate);
 
-                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Air Nodes " + LoopStr);
+                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1),
+                                                           cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1),
+                                                           "Air Nodes " + LoopStr);
                     }
 
                     if (!lAlphaFieldBlanks(8)) {
@@ -1009,23 +1014,24 @@ namespace UserDefinedComponents {
 
                     if (UserCoil(CompLoop).PlantIsConnected) { // get input
                         UserCoil(CompLoop).Loop.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(9),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
-                                                                                 cAlphaArgs(1),
-                                                                                 DataLoopNode::NodeType_Water,
-                                                                                 DataLoopNode::NodeConnectionType_Inlet,
-                                                                                 2,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                                   ErrorsFound,
+                                                                                                   cCurrentModuleObject,
+                                                                                                   cAlphaArgs(1),
+                                                                                                   DataLoopNode::NodeType_Water,
+                                                                                                   DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                   2,
+                                                                                                   DataLoopNode::ObjectIsNotParent);
                         UserCoil(CompLoop).Loop.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(10),
-                                                                                  ErrorsFound,
-                                                                                  cCurrentModuleObject,
-                                                                                  cAlphaArgs(1),
-                                                                                  DataLoopNode::NodeType_Water,
-                                                                                  DataLoopNode::NodeConnectionType_Outlet,
-                                                                                  2,
-                                                                                  DataLoopNode::ObjectIsNotParent);
+                                                                                                    ErrorsFound,
+                                                                                                    cCurrentModuleObject,
+                                                                                                    cAlphaArgs(1),
+                                                                                                    DataLoopNode::NodeType_Water,
+                                                                                                    DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                    2,
+                                                                                                    DataLoopNode::ObjectIsNotParent);
 
-                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
+                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9),
+                                                           cAlphaArgs(10), "Plant Nodes");
 
                         // this model is only for plant connections that are "Demand"
                         UserCoil(CompLoop).Loop.HowLoadServed = DataPlant::HowMet_NoneDemand;
@@ -1035,18 +1041,22 @@ namespace UserDefinedComponents {
                         // Setup Internal Variables
                         // model input related internal variables
                         SetupEMSInternalVariable(
-                            "Inlet Temperature for Plant Connection", UserCoil(CompLoop).Name, "[C]", UserCoil(CompLoop).Loop.InletTemp);
+                                "Inlet Temperature for Plant Connection", UserCoil(CompLoop).Name, "[C]",
+                                UserCoil(CompLoop).Loop.InletTemp);
                         SetupEMSInternalVariable("Inlet Mass Flow Rate for Plant Connection",
                                                  UserCoil(CompLoop).Name,
                                                  "[kg/s]",
                                                  UserCoil(CompLoop).Loop.InletMassFlowRate);
                         SetupEMSInternalVariable(
-                            "Inlet Density for Plant Connection", UserCoil(CompLoop).Name, "[kg/m3]", UserCoil(CompLoop).Loop.InletRho);
+                                "Inlet Density for Plant Connection", UserCoil(CompLoop).Name, "[kg/m3]",
+                                UserCoil(CompLoop).Loop.InletRho);
                         SetupEMSInternalVariable(
-                            "Inlet Specific Heat for Plant Connection", UserCoil(CompLoop).Name, "[J/kg-C]", UserCoil(CompLoop).Loop.InletCp);
+                                "Inlet Specific Heat for Plant Connection", UserCoil(CompLoop).Name, "[J/kg-C]",
+                                UserCoil(CompLoop).Loop.InletCp);
                         // model results related actuators
                         SetupEMSActuator(
-                            "Plant Connection", UserCoil(CompLoop).Name, "Outlet Temperature", "[C]", lDummy, UserCoil(CompLoop).Loop.OutletTemp);
+                                "Plant Connection", UserCoil(CompLoop).Name, "Outlet Temperature", "[C]", lDummy,
+                                UserCoil(CompLoop).Loop.OutletTemp);
                         SetupEMSActuator("Plant Connection",
                                          UserCoil(CompLoop).Name,
                                          "Mass Flow Rate",
@@ -1077,11 +1087,11 @@ namespace UserDefinedComponents {
 
                     if (!lAlphaFieldBlanks(11)) {
                         WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 cAlphaArgs(11),
-                                                 ErrorsFound,
-                                                 UserCoil(CompLoop).Water.SupplyTankID,
-                                                 UserCoil(CompLoop).Water.SupplyTankDemandARRID);
+                                                               cCurrentModuleObject,
+                                                               cAlphaArgs(11),
+                                                               ErrorsFound,
+                                                               UserCoil(CompLoop).Water.SupplyTankID,
+                                                               UserCoil(CompLoop).Water.SupplyTankDemandARRID);
 
                         UserCoil(CompLoop).Water.SuppliedByWaterSystem = true;
                         SetupEMSActuator("Water System",
@@ -1094,11 +1104,11 @@ namespace UserDefinedComponents {
 
                     if (!lAlphaFieldBlanks(12)) {
                         WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 cAlphaArgs(12),
-                                                 ErrorsFound,
-                                                 UserCoil(CompLoop).Water.CollectionTankID,
-                                                 UserCoil(CompLoop).Water.CollectionTankSupplyARRID);
+                                                               cCurrentModuleObject,
+                                                               cAlphaArgs(12),
+                                                               ErrorsFound,
+                                                               UserCoil(CompLoop).Water.CollectionTankID,
+                                                               UserCoil(CompLoop).Water.CollectionTankSupplyARRID);
                         UserCoil(CompLoop).Water.CollectsToWaterSystem = true;
                         SetupEMSActuator("Water System",
                                          UserCoil(CompLoop).Name,
@@ -1110,9 +1120,11 @@ namespace UserDefinedComponents {
 
                     if (!lAlphaFieldBlanks(13)) {
 
-                        UserCoil(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), DataHeatBalance::Zone);
+                        UserCoil(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13),
+                                                                                          DataHeatBalance::Zone);
                         if (UserCoil(CompLoop).Zone.ZoneNum == 0) {
-                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(13));
+                            ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                            ":  Ambient Zone Name not found = " + cAlphaArgs(13));
                             ErrorsFound = true;
                         } else {
                             UserCoil(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -1178,10 +1190,48 @@ namespace UserDefinedComponents {
         } // NumUserCoils > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(
+                    "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+        }
+    }
+
+    void GetUserDefinedComponents()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         B. Griffith
+        //       DATE WRITTEN   Jan 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        static ObjexxFCL::gio::Fmt fmtLD("*");
+
+        bool ErrorsFound(false);
+        int NumAlphas;               // Number of elements in the alpha array
+        int NumNums;                 // Number of elements in the numeric array
+        int IOStat;                  // IO Status when calling get input subroutine
+        int TotalArgs;              // argument for call to GetObjectDefMaxArgs
+        Array1D_string cAlphaFieldNames;
+        Array1D_bool lAlphaFieldBlanks;
+        Array1D_string cAlphaArgs;
+        Array1D<Real64> rNumericArgs;
+        std::string cCurrentModuleObject;
+        std::string LoopStr;
+        static bool lDummy; // Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
+
+        if (GetPlantCompInput) {
+            GetUserDefinedPlantComponents();
+            GetPlantCompInput = false;
         }
 
         cCurrentModuleObject = "ZoneHVAC:ForcedAir:UserDefined";
+        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+
+        cAlphaFieldNames.allocate(NumAlphas);
+        cAlphaArgs.allocate(NumAlphas);
+        lAlphaFieldBlanks.dimension(NumAlphas, false);
+        rNumericArgs.dimension(NumNums, 0.0);
+
         NumUserZoneAir = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumUserZoneAir > 0) {
             UserZoneAirHVAC.allocate(NumUserZoneAir);
@@ -1203,7 +1253,8 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1216,7 +1267,8 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1228,13 +1280,14 @@ namespace UserDefinedComponents {
                 }
 
                 UserZoneAirHVAC(CompLoop).ZoneAir.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(4),
-                                                                                   ErrorsFound,
-                                                                                   cCurrentModuleObject,
-                                                                                   UserZoneAirHVAC(CompLoop).Name,
-                                                                                   DataLoopNode::NodeType_Air,
-                                                                                   DataLoopNode::NodeConnectionType_Inlet,
-                                                                                   1,
-                                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                                                     ErrorsFound,
+                                                                                                     cCurrentModuleObject,
+                                                                                                     UserZoneAirHVAC(
+                                                                                                             CompLoop).Name,
+                                                                                                     DataLoopNode::NodeType_Air,
+                                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                     1,
+                                                                                                     DataLoopNode::ObjectIsNotParent);
                 // model input related internal variables
                 SetupEMSInternalVariable("Inlet Temperature for Primary Air Connection",
                                          UserZoneAirHVAC(CompLoop).Name,
@@ -1277,13 +1330,14 @@ namespace UserDefinedComponents {
                                  lDummy,
                                  UserZoneAirHVAC(CompLoop).ZoneAir.InletMassFlowRate);
                 UserZoneAirHVAC(CompLoop).ZoneAir.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(5),
-                                                                                    ErrorsFound,
-                                                                                    cCurrentModuleObject,
-                                                                                    UserZoneAirHVAC(CompLoop).Name,
-                                                                                    DataLoopNode::NodeType_Air,
-                                                                                    DataLoopNode::NodeConnectionType_Outlet,
-                                                                                    1,
-                                                                                    DataLoopNode::ObjectIsNotParent);
+                                                                                                      ErrorsFound,
+                                                                                                      cCurrentModuleObject,
+                                                                                                      UserZoneAirHVAC(
+                                                                                                              CompLoop).Name,
+                                                                                                      DataLoopNode::NodeType_Air,
+                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                      1,
+                                                                                                      DataLoopNode::ObjectIsNotParent);
                 SetupEMSActuator("Primary Air Connection",
                                  UserZoneAirHVAC(CompLoop).Name,
                                  "Outlet Temperature",
@@ -1304,14 +1358,15 @@ namespace UserDefinedComponents {
                                  UserZoneAirHVAC(CompLoop).ZoneAir.OutletMassFlowRate);
 
                 if (!lAlphaFieldBlanks(6)) {
-                    UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(6),
-                                                                                         ErrorsFound,
-                                                                                         cCurrentModuleObject,
-                                                                                         UserZoneAirHVAC(CompLoop).Name,
-                                                                                         DataLoopNode::NodeType_Air,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
-                                                                                         2,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                    UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                            cAlphaArgs(6),
+                            ErrorsFound,
+                            cCurrentModuleObject,
+                            UserZoneAirHVAC(CompLoop).Name,
+                            DataLoopNode::NodeType_Air,
+                            DataLoopNode::NodeConnectionType_Inlet,
+                            2,
+                            DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
                     SetupEMSInternalVariable("Inlet Temperature for Secondary Air Connection",
                                              UserZoneAirHVAC(CompLoop).Name,
@@ -1339,14 +1394,15 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(7)) {
-                    UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(7),
-                                                                                          ErrorsFound,
-                                                                                          cCurrentModuleObject,
-                                                                                          UserZoneAirHVAC(CompLoop).Name,
-                                                                                          DataLoopNode::NodeType_Air,
-                                                                                          DataLoopNode::NodeConnectionType_Outlet,
-                                                                                          2,
-                                                                                          DataLoopNode::ObjectIsNotParent);
+                    UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                            cAlphaArgs(7),
+                            ErrorsFound,
+                            cCurrentModuleObject,
+                            UserZoneAirHVAC(CompLoop).Name,
+                            DataLoopNode::NodeType_Air,
+                            DataLoopNode::NodeConnectionType_Outlet,
+                            2,
+                            DataLoopNode::ObjectIsNotParent);
                     SetupEMSActuator("Secondary Air Connection",
                                      UserZoneAirHVAC(CompLoop).Name,
                                      "Outlet Temperature",
@@ -1367,7 +1423,8 @@ namespace UserDefinedComponents {
                                      UserZoneAirHVAC(CompLoop).SourceAir.OutletMassFlowRate);
                 }
 
-                if ((UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum > 0) && (UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum > 0)) {
+                if ((UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum > 0) &&
+                    (UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum > 0)) {
                     //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
@@ -1377,25 +1434,32 @@ namespace UserDefinedComponents {
                     UserZoneAirHVAC(CompLoop).Loop.allocate(NumPlantConnections);
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 8;
-                        UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeType_Water,
-                                                                                                        DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                        (ConnectionLoop + 2),
-                                                                                                        DataLoopNode::ObjectIsNotParent);
-                        UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount + 1),
-                                                                                                         ErrorsFound,
-                                                                                                         cCurrentModuleObject,
-                                                                                                         cAlphaArgs(1),
-                                                                                                         DataLoopNode::NodeType_Water,
-                                                                                                         DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                         (ConnectionLoop + 2),
-                                                                                                         DataLoopNode::ObjectIsNotParent);
-                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
+                        UserZoneAirHVAC(CompLoop).Loop(
+                                ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                cAlphaArgs(1),
+                                DataLoopNode::NodeType_Water,
+                                DataLoopNode::NodeConnectionType_Inlet,
+                                (ConnectionLoop + 2),
+                                DataLoopNode::ObjectIsNotParent);
+                        UserZoneAirHVAC(CompLoop).Loop(
+                                ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount + 1),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                cAlphaArgs(1),
+                                DataLoopNode::NodeType_Water,
+                                DataLoopNode::NodeConnectionType_Outlet,
+                                (ConnectionLoop + 2),
+                                DataLoopNode::ObjectIsNotParent);
+                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1),
+                                                           cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1),
+                                                           "Plant Nodes");
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
-                        UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                        UserZoneAirHVAC(CompLoop).Loop(
+                                ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
                         strip(LoopStr);
@@ -1453,11 +1517,11 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(14)) {
                     WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(14),
-                                             ErrorsFound,
-                                             UserZoneAirHVAC(CompLoop).Water.SupplyTankID,
-                                             UserZoneAirHVAC(CompLoop).Water.SupplyTankDemandARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(14),
+                                                           ErrorsFound,
+                                                           UserZoneAirHVAC(CompLoop).Water.SupplyTankID,
+                                                           UserZoneAirHVAC(CompLoop).Water.SupplyTankDemandARRID);
 
                     UserZoneAirHVAC(CompLoop).Water.SuppliedByWaterSystem = true;
                     SetupEMSActuator("Water System",
@@ -1470,11 +1534,12 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(15)) {
                     WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(15),
-                                             ErrorsFound,
-                                             UserZoneAirHVAC(CompLoop).Water.CollectionTankID,
-                                             UserZoneAirHVAC(CompLoop).Water.CollectionTankSupplyARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(15),
+                                                           ErrorsFound,
+                                                           UserZoneAirHVAC(CompLoop).Water.CollectionTankID,
+                                                           UserZoneAirHVAC(
+                                                                   CompLoop).Water.CollectionTankSupplyARRID);
                     UserZoneAirHVAC(CompLoop).Water.CollectsToWaterSystem = true;
                     SetupEMSActuator("Water System",
                                      UserZoneAirHVAC(CompLoop).Name,
@@ -1486,9 +1551,12 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(16)) {
 
-                    UserZoneAirHVAC(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(16), DataHeatBalance::Zone);
+                    UserZoneAirHVAC(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(16),
+                                                                                             DataHeatBalance::Zone);
                     if (UserZoneAirHVAC(CompLoop).Zone.ZoneNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(16));
+                        ShowSevereError(
+                                cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " +
+                                cAlphaArgs(16));
                         ErrorsFound = true;
                     } else {
                         UserZoneAirHVAC(CompLoop).Zone.DeviceHasInternalGains = true;
@@ -1552,10 +1620,19 @@ namespace UserDefinedComponents {
         } // NumUserZoneAir > 0
 
         if (ErrorsFound) {
-            ShowFatalError("GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
+            ShowFatalError(
+                    "GetUserDefinedComponents: Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
         cCurrentModuleObject = "AirTerminal:SingleDuct:UserDefined";
+
+        inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+
+        cAlphaFieldNames.allocate(NumAlphas);
+        cAlphaArgs.allocate(NumAlphas);
+        lAlphaFieldBlanks.dimension(NumAlphas, false);
+        rNumericArgs.dimension(NumNums, 0.0);
+
         NumUserAirTerminals = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (NumUserAirTerminals > 0) {
             UserAirTerminal.allocate(NumUserAirTerminals);
@@ -1577,7 +1654,8 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1590,7 +1668,8 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3),
+                                                                       DataRuntimeLanguage::EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1602,14 +1681,16 @@ namespace UserDefinedComponents {
                 }
 
                 UserAirTerminal(CompLoop).AirLoop.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(4),
-                                                                                   ErrorsFound,
-                                                                                   cCurrentModuleObject,
-                                                                                   UserAirTerminal(CompLoop).Name,
-                                                                                   DataLoopNode::NodeType_Air,
-                                                                                   DataLoopNode::NodeConnectionType_Inlet,
-                                                                                   1,
-                                                                                   DataLoopNode::ObjectIsNotParent,
-                                                                                   cAlphaFieldNames(4));
+                                                                                                     ErrorsFound,
+                                                                                                     cCurrentModuleObject,
+                                                                                                     UserAirTerminal(
+                                                                                                             CompLoop).Name,
+                                                                                                     DataLoopNode::NodeType_Air,
+                                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                     1,
+                                                                                                     DataLoopNode::ObjectIsNotParent,
+                                                                                                     cAlphaFieldNames(
+                                                                                                             4));
                 // model input related internal variables
                 SetupEMSInternalVariable("Inlet Temperature for Primary Air Connection",
                                          UserAirTerminal(CompLoop).Name,
@@ -1652,14 +1733,16 @@ namespace UserDefinedComponents {
                                  lDummy,
                                  UserAirTerminal(CompLoop).AirLoop.InletMassFlowRate);
                 UserAirTerminal(CompLoop).AirLoop.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(5),
-                                                                                    ErrorsFound,
-                                                                                    cCurrentModuleObject,
-                                                                                    UserAirTerminal(CompLoop).Name,
-                                                                                    DataLoopNode::NodeType_Air,
-                                                                                    DataLoopNode::NodeConnectionType_Outlet,
-                                                                                    1,
-                                                                                    DataLoopNode::ObjectIsNotParent,
-                                                                                    cAlphaFieldNames(5));
+                                                                                                      ErrorsFound,
+                                                                                                      cCurrentModuleObject,
+                                                                                                      UserAirTerminal(
+                                                                                                              CompLoop).Name,
+                                                                                                      DataLoopNode::NodeType_Air,
+                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                      1,
+                                                                                                      DataLoopNode::ObjectIsNotParent,
+                                                                                                      cAlphaFieldNames(
+                                                                                                              5));
                 SetupEMSActuator("Primary Air Connection",
                                  UserAirTerminal(CompLoop).Name,
                                  "Outlet Temperature",
@@ -1678,37 +1761,49 @@ namespace UserDefinedComponents {
                                  "[kg/s]",
                                  lDummy,
                                  UserAirTerminal(CompLoop).AirLoop.OutletMassFlowRate);
-                BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
+                BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4),
+                                                   cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
                 for (ADUNum = 1; ADUNum <= DataDefineEquip::NumAirDistUnits; ++ADUNum) {
-                    if (UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == DataDefineEquip::AirDistUnit(ADUNum).OutletNodeNum) {
+                    if (UserAirTerminal(CompLoop).AirLoop.OutletNodeNum ==
+                        DataDefineEquip::AirDistUnit(ADUNum).OutletNodeNum) {
                         //        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum
                         UserAirTerminal(CompLoop).ADUNum = ADUNum;
                     }
                 }
                 // one assumes if there isn't one assigned, it's an error?
                 if (UserAirTerminal(CompLoop).ADUNum == 0) {
-                    ShowSevereError("GetUserDefinedComponents: No matching Air Distribution Unit for " + cCurrentModuleObject + " = " +
+                    ShowSevereError("GetUserDefinedComponents: No matching Air Distribution Unit for " +
+                                    cCurrentModuleObject + " = " +
                                     UserAirTerminal(CompLoop).Name);
-                    ShowContinueError("...should have outlet node=" + DataLoopNode::NodeID(UserAirTerminal(CompLoop).AirLoop.OutletNodeNum));
+                    ShowContinueError("...should have outlet node=" +
+                                      DataLoopNode::NodeID(UserAirTerminal(CompLoop).AirLoop.OutletNodeNum));
                     //          ErrorsFound=.TRUE.
                 }
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (int CtrlZone = 1; CtrlZone <= DataGlobals::NumOfZones; ++CtrlZone) {
                     if (!DataZoneEquipment::ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    for (int SupAirIn = 1;
+                         SupAirIn <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (UserAirTerminal(CompLoop).AirLoop.OutletNodeNum ==
+                            DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode >
+                                0) {
                                 ShowSevereError("Error in connecting a terminal unit to a zone");
-                                ShowContinueError(DataLoopNode::NodeID(UserAirTerminal(CompLoop).AirLoop.OutletNodeNum) + " already connects to another zone");
-                                ShowContinueError("Occurs for terminal unit " + cCurrentModuleObject + " = " + UserAirTerminal(CompLoop).Name);
+                                ShowContinueError(
+                                        DataLoopNode::NodeID(UserAirTerminal(CompLoop).AirLoop.OutletNodeNum) +
+                                        " already connects to another zone");
+                                ShowContinueError("Occurs for terminal unit " + cCurrentModuleObject + " = " +
+                                                  UserAirTerminal(CompLoop).Name);
                                 ShowContinueError("Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = UserAirTerminal(CompLoop).AirLoop.InletNodeNum;
-                                DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = UserAirTerminal(CompLoop).AirLoop.OutletNodeNum;
+                                DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(
+                                        SupAirIn).InNode = UserAirTerminal(CompLoop).AirLoop.InletNodeNum;
+                                DataZoneEquipment::ZoneEquipConfig(CtrlZone).AirDistUnitCool(
+                                        SupAirIn).OutNode = UserAirTerminal(CompLoop).AirLoop.OutletNodeNum;
                             }
 
                             UserAirTerminal(CompLoop).ActualCtrlZoneNum = CtrlZone;
@@ -1717,15 +1812,16 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(6)) {
-                    UserAirTerminal(CompLoop).SourceAir.InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(6),
-                                                                                         ErrorsFound,
-                                                                                         cCurrentModuleObject,
-                                                                                         UserAirTerminal(CompLoop).Name,
-                                                                                         DataLoopNode::NodeType_Air,
-                                                                                         DataLoopNode::NodeConnectionType_Inlet,
-                                                                                         2,
-                                                                                         DataLoopNode::ObjectIsNotParent,
-                                                                                         cAlphaFieldNames(6));
+                    UserAirTerminal(CompLoop).SourceAir.InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                            cAlphaArgs(6),
+                            ErrorsFound,
+                            cCurrentModuleObject,
+                            UserAirTerminal(CompLoop).Name,
+                            DataLoopNode::NodeType_Air,
+                            DataLoopNode::NodeConnectionType_Inlet,
+                            2,
+                            DataLoopNode::ObjectIsNotParent,
+                            cAlphaFieldNames(6));
                     // model input related internal variables
                     SetupEMSInternalVariable("Inlet Temperature for Secondary Air Connection",
                                              UserAirTerminal(CompLoop).Name,
@@ -1753,15 +1849,16 @@ namespace UserDefinedComponents {
                 }
 
                 if (!lAlphaFieldBlanks(7)) {
-                    UserAirTerminal(CompLoop).SourceAir.OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(7),
-                                                                                          ErrorsFound,
-                                                                                          cCurrentModuleObject,
-                                                                                          UserAirTerminal(CompLoop).Name,
-                                                                                          DataLoopNode::NodeType_Air,
-                                                                                          DataLoopNode::NodeConnectionType_Outlet,
-                                                                                          2,
-                                                                                          DataLoopNode::ObjectIsNotParent,
-                                                                                          cAlphaFieldNames(7));
+                    UserAirTerminal(CompLoop).SourceAir.OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                            cAlphaArgs(7),
+                            ErrorsFound,
+                            cCurrentModuleObject,
+                            UserAirTerminal(CompLoop).Name,
+                            DataLoopNode::NodeType_Air,
+                            DataLoopNode::NodeConnectionType_Outlet,
+                            2,
+                            DataLoopNode::ObjectIsNotParent,
+                            cAlphaFieldNames(7));
                     SetupEMSActuator("Secondary Air Connection",
                                      UserAirTerminal(CompLoop).Name,
                                      "Outlet Temperature",
@@ -1782,7 +1879,8 @@ namespace UserDefinedComponents {
                                      UserAirTerminal(CompLoop).SourceAir.OutletMassFlowRate);
                 }
 
-                if ((UserAirTerminal(CompLoop).SourceAir.InletNodeNum > 0) && (UserAirTerminal(CompLoop).SourceAir.OutletNodeNum > 0)) {
+                if ((UserAirTerminal(CompLoop).SourceAir.InletNodeNum > 0) &&
+                    (UserAirTerminal(CompLoop).SourceAir.OutletNodeNum > 0)) {
                     //  CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(6),cAlphaArgs(7),'Air Nodes')
                 }
 
@@ -1792,27 +1890,34 @@ namespace UserDefinedComponents {
                     UserAirTerminal(CompLoop).Loop.allocate(NumPlantConnections);
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 8;
-                        UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount),
-                                                                                                        ErrorsFound,
-                                                                                                        cCurrentModuleObject,
-                                                                                                        cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeType_Water,
-                                                                                                        DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                        (ConnectionLoop + 2),
-                                                                                                        DataLoopNode::ObjectIsNotParent,
-                                                                                                        cAlphaFieldNames(aArgCount));
-                        UserAirTerminal(CompLoop).Loop(ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(aArgCount + 1),
-                                                                                                         ErrorsFound,
-                                                                                                         cCurrentModuleObject,
-                                                                                                         cAlphaArgs(1),
-                                                                                                         DataLoopNode::NodeType_Water,
-                                                                                                         DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                         (ConnectionLoop + 2),
-                                                                                                         DataLoopNode::ObjectIsNotParent,
-                                                                                                         cAlphaFieldNames(aArgCount + 1));
-                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
+                        UserAirTerminal(CompLoop).Loop(
+                                ConnectionLoop).InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                cAlphaArgs(1),
+                                DataLoopNode::NodeType_Water,
+                                DataLoopNode::NodeConnectionType_Inlet,
+                                (ConnectionLoop + 2),
+                                DataLoopNode::ObjectIsNotParent,
+                                cAlphaFieldNames(aArgCount));
+                        UserAirTerminal(CompLoop).Loop(
+                                ConnectionLoop).OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                                cAlphaArgs(aArgCount + 1),
+                                ErrorsFound,
+                                cCurrentModuleObject,
+                                cAlphaArgs(1),
+                                DataLoopNode::NodeType_Water,
+                                DataLoopNode::NodeConnectionType_Outlet,
+                                (ConnectionLoop + 2),
+                                DataLoopNode::ObjectIsNotParent,
+                                cAlphaFieldNames(aArgCount + 1));
+                        BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1),
+                                                           cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1),
+                                                           "Plant Nodes");
                         UserAirTerminal(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_NoneDemand;
-                        UserAirTerminal(CompLoop).Loop(ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                        UserAirTerminal(CompLoop).Loop(
+                                ConnectionLoop).FlowPriority = DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
                         LoopStr = General::RoundSigDigits(ConnectionLoop);
                         // model input related internal variables
@@ -1869,11 +1974,11 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(12)) {
                     WaterManager::SetupTankDemandComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(12),
-                                             ErrorsFound,
-                                             UserAirTerminal(CompLoop).Water.SupplyTankID,
-                                             UserAirTerminal(CompLoop).Water.SupplyTankDemandARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(12),
+                                                           ErrorsFound,
+                                                           UserAirTerminal(CompLoop).Water.SupplyTankID,
+                                                           UserAirTerminal(CompLoop).Water.SupplyTankDemandARRID);
 
                     UserAirTerminal(CompLoop).Water.SuppliedByWaterSystem = true;
                     SetupEMSActuator("Water System",
@@ -1886,11 +1991,12 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(13)) {
                     WaterManager::SetupTankSupplyComponent(cAlphaArgs(1),
-                                             cCurrentModuleObject,
-                                             cAlphaArgs(13),
-                                             ErrorsFound,
-                                             UserAirTerminal(CompLoop).Water.CollectionTankID,
-                                             UserAirTerminal(CompLoop).Water.CollectionTankSupplyARRID);
+                                                           cCurrentModuleObject,
+                                                           cAlphaArgs(13),
+                                                           ErrorsFound,
+                                                           UserAirTerminal(CompLoop).Water.CollectionTankID,
+                                                           UserAirTerminal(
+                                                                   CompLoop).Water.CollectionTankSupplyARRID);
                     UserAirTerminal(CompLoop).Water.CollectsToWaterSystem = true;
                     SetupEMSActuator("Water System",
                                      UserAirTerminal(CompLoop).Name,
@@ -1902,9 +2008,12 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(14)) {
 
-                    UserAirTerminal(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(14), DataHeatBalance::Zone);
+                    UserAirTerminal(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(14),
+                                                                                             DataHeatBalance::Zone);
                     if (UserAirTerminal(CompLoop).Zone.ZoneNum == 0) {
-                        ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(14));
+                        ShowSevereError(
+                                cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " +
+                                cAlphaArgs(14));
                         ErrorsFound = true;
                     } else {
                         UserAirTerminal(CompLoop).Zone.DeviceHasInternalGains = true;

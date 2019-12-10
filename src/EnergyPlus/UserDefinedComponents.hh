@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -172,7 +173,7 @@ namespace UserDefinedComponents {
         }
     };
 
-    struct UserPlantComponentStruct
+    struct UserPlantComponentStruct : PlantComponent
     {
         // Members
         std::string Name;                    // user identifier
@@ -188,6 +189,14 @@ namespace UserDefinedComponents {
         UserPlantComponentStruct() : ErlSimProgramMngr(0), NumPlantConnections(0), myOneTimeFlag(true)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(int LoopNum, Real64 MyLoad);
 
@@ -290,17 +299,6 @@ namespace UserDefinedComponents {
     extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
 
-    void SimUserDefinedPlantComponent(int LoopNum,            // plant loop sim call originated from
-                                      int LoopSideNum,        // plant loop side sim call originated from
-                                      std::string const &EquipType, // type of equipment, 'PlantComponent:UserDefined'
-                                      std::string const &EquipName, // user name for component
-                                      int &CompIndex,
-                                      bool &InitLoopEquip,
-                                      Real64 MyLoad,
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap);
-
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int AirLoopNum,
@@ -315,6 +313,8 @@ namespace UserDefinedComponents {
     );
 
     void SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+
+    void GetUserDefinedPlantComponents();
 
     void GetUserDefinedComponents();
 
