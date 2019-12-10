@@ -542,7 +542,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue > oldScanValue) {
+                                        if (scanValue < oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -550,7 +550,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue < oldScanValue) {
+                                        if (scanValue > oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -1412,6 +1412,11 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_timeBelowBottomBinTotal);
         ret.push_back(outStr);
+        // cell value
+        if (fldSt.m_cell.size() > 0) {
+            outStr = std::to_string(fldSt.m_cell[0].result);
+            ret.push_back(outStr);
+        }
         return ret;
     }
 
