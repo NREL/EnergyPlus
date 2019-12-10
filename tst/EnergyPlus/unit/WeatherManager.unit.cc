@@ -788,8 +788,9 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     EnergyPlus::sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings({
-        {"Hum Ind Value at Max Temp", "90500.00 {J/kg}"},
-        {"Hum Ind Type", "Enthalpy"}
+        {"Hum Ind Value at Max Temp", "90500.00"},
+        {"Hum Ind Type", "Enthalpy"},
+        {"Hum Ind Units", "{J/kgDryAir}"}
     });
 
     std::string columnName;
@@ -809,6 +810,5 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         // Add informative message if failed
         EXPECT_EQ(value, expectedValue) << "Failed for ColumnName=" << columnName;
     }
-
 
 }

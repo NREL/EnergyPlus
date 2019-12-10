@@ -4135,7 +4135,7 @@ namespace WeatherManager {
         Real64 const ZHGlobalSolarConstant(1355.0);
         static ObjexxFCL::gio::Fmt EnvDDHdFormat(
             "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   "
-            "'Hum Ind Type, Hum Ind Value at Max Temp, Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
+            "'Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
             "Speed {m/s}, Clearness, Rain, Snow')");
         static ObjexxFCL::gio::Fmt EnvDDayFormat("('Environment:Design Day Data,')");
         static ObjexxFCL::gio::Fmt DDayMiscHdFormat(
@@ -4325,23 +4325,23 @@ namespace WeatherManager {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
             }
 
-            // Hum Ind Type, Hum Ind Value at Max Temp
+            // Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units
             if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
-                StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
-                StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
-                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {J/kg},";
+                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{J/kgDryAir},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
-                StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
+                StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + ",{kgWater/kgDryAir},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
-                StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
+                StringOut = "Schedule,<schedule values from 0.0 to 100.0>,{percent},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
-                StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits(DesDayInput(Envrn).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits(DesDayInput(Envrn).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
-                StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
-                StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             }
             {
                 IOFlags flags;
