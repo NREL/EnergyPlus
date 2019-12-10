@@ -60,10 +60,6 @@ namespace EnergyPlus {
 
 namespace PhotovoltaicThermalCollectors {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     extern int const SimplePVTmodel;
     extern int const LayerByLayerPVTmodel;
 
@@ -78,22 +74,9 @@ namespace PhotovoltaicThermalCollectors {
 
     extern Real64 const SimplePVTWaterSizeFactor; // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern Array1D_bool CheckEquipName;
     extern int NumPVT;              // count of all types of PVT in input file
     extern int NumSimplePVTPerform; // count of simple PVT performance objects in input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-    // Driver/Manager Routines
-
-    // Utility routines for module
-    // these would be public such as:
-    // PUBLIC  GetPVTIncidentSolarForInternalPVLayer
-    // PUBLIC  GetPVTCellTemp
-
-    // Types
 
     struct SimplePVTModelStruct
     {
@@ -182,10 +165,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     };
 
-    // Object Data
     extern Array1D<PVTCollectorStruct> PVT;
-
-    // Functions
 
     void SimPVTcollectors(int &PVTnum, // index to PVT array.
                           bool const FirstHVACIteration,
@@ -215,9 +195,6 @@ namespace PhotovoltaicThermalCollectors {
     int GetAirOutletNodeNum(std::string const &PVTName,
         bool &ErrorsFound
     );
-
-    //=====================  Utility/Other routines for module.
-    // Insert as appropriate
 
 } // namespace PhotovoltaicThermalCollectors
 

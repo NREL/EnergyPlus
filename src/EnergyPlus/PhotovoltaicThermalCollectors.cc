@@ -105,12 +105,6 @@ namespace PhotovoltaicThermalCollectors {
     //  the first model is a "simple" or "ideal" model useful for sizing, early design, or policy analyses
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
-    // REFERENCES:
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using DataSurfaces::Surface;
@@ -122,8 +116,6 @@ namespace PhotovoltaicThermalCollectors {
     using DataSurfaces::TotSurfaces;
     using namespace DataPhotovoltaics;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     int const SimplePVTmodel(1001);
     int const LayerByLayerPVTmodel(1002);
 
@@ -141,25 +133,11 @@ namespace PhotovoltaicThermalCollectors {
     static std::string const BlankString;
     static bool GetInputFlag(true); // First time, input is "gotten"
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     Array1D_bool CheckEquipName;
     int NumPVT(0);              // count of all types of PVT in input file
     int NumSimplePVTPerform(0); // count of simple PVT performance objects in input file
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-    // Driver/Manager Routines
-
-    // Utility routines for module
-    // these would be public such as:
-    // PUBLIC  GetPVTIncidentSolarForInternalPVLayer
-    // PUBLIC  GetPVTCellTemp
-
-    // Object Data
     Array1D<PVTCollectorStruct> PVT;
-
-    // Functions
 
     void SimPVTcollectors(int &PVTnum, // index to PVT array.
                           bool const FirstHVACIteration,
@@ -174,13 +152,7 @@ namespace PhotovoltaicThermalCollectors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // Using/Aliasing
         using General::TrimSigDigits;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (GetInputFlag) {
             GetPVTcollectorsInput();
@@ -246,10 +218,6 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for PVT objects
 
-        // METHODOLOGY EMPLOYED:
-        // usual E+ methods
-
-        // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataHeatBalance;
         using namespace DataLoopNode;
@@ -263,7 +231,6 @@ namespace PhotovoltaicThermalCollectors {
         using ScheduleManager::GetScheduleIndex;
         using namespace DataPlant; // DSU
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
@@ -538,7 +505,6 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::SysSizingCalc;
         using DataHeatBalance::QRadSWOutIncident;
@@ -556,10 +522,8 @@ namespace PhotovoltaicThermalCollectors {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitPVTcollectors");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
         int PVTindex;
@@ -752,10 +716,6 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Obtains hot water flow rate from the plant sizing array.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::Cooling;
         using DataHVACGlobals::Heating;
@@ -775,22 +735,9 @@ namespace PhotovoltaicThermalCollectors {
         using DataPlant::PlantFirstSizesOkayToReport;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;    // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound; // If errors detected in input
-        // unused1208  CHARACTER(len=MaxNameLength) :: equipName     ! Name of boiler object
         Real64 DesVolFlow;
         Real64 DesMassFlow;
         bool HardSizeNoDesRun;        // Indicator to hardsize and no sizing run
@@ -977,29 +924,10 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHeatBalance::QRadSWOutIncident;
         using DataLoopNode::Node;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int SurfNum(0);
-        //  INTEGER   :: PlantLoopNum = 0
-        //  REAL(r64) :: mdot  = 0.0D0
 
         SurfNum = PVT(PVTnum).SurfNum;
 
@@ -1033,36 +961,15 @@ namespace PhotovoltaicThermalCollectors {
             }
 
         } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
-            // PlantLoopNum = PVT(PVTNum)%PlantLoopNum
-            //    mdot   = Node(PVT(PVTNum)%PlantInletNodeNum)%MassFlowRate
-            // If (.NOT. Allocated(PlantReport)) RETURN ! this can happen early before plant is setup
             if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
                 if (QRadSWOutIncident(SurfNum) > MinIrradiance) {
                     // is heating wanted?
-
-                    //  IF (mdot > 0.0D0) THEN
-                    //  If (PlantReport(PlantLoopNum)%HeatingDemand > 0.0) THEN
                     PVT(PVTnum).HeatingUseful = true;
-                    //          PVT(PVTnum)%CoolingUseful   = .FALSE.
                     PVT(PVTnum).BypassDamperOff = true;
-                    //        ELSE
-                    //          PVT(PVTnum)%HeatingUseful   = .FALSE.
-                    //          PVT(PVTnum)%CoolingUseful   = .TRUE.
-                    //          PVT(PVTnum)%BypassDamperOff = .FALSE.
-                    //        ENDIF
-
                 } else {
                     // is cooling wanted?
-                    //        IF (mdot > 0.0D0) THEN
-                    //  If (PlantReport(PlantLoopNum)%CoolingDemand > 0.0) THEN
-                    //          PVT(PVTnum)%CoolingUseful   = .TRUE.
-                    //          PVT(PVTnum)%HeatingUseful   = .FALSE.
-                    //          PVT(PVTnum)%BypassDamperOff = .TRUE.
-                    //        ELSE
                     PVT(PVTnum).CoolingUseful = false;
-                    //          PVT(PVTnum)%HeatingUseful   = .TRUE.
                     PVT(PVTnum).BypassDamperOff = false;
-                    //        ENDIF
                 }
             }
         }
@@ -1083,10 +990,6 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
@@ -1102,19 +1005,7 @@ namespace PhotovoltaicThermalCollectors {
         using Psychrometrics::PsyTwbFnTdbWPb;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcPVTcollectors");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         static int InletNode(0);
         static int OutletNode(0);
@@ -1136,7 +1027,6 @@ namespace PhotovoltaicThermalCollectors {
         static Real64 WetBulbInlet(0.0);
         static Real64 DewPointInlet(0.0);
 
-        // flow
         SurfNum = PVT(PVTnum).SurfNum;
         RoughSurf = VerySmooth;
 
@@ -1296,33 +1186,10 @@ namespace PhotovoltaicThermalCollectors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
         using Psychrometrics::PsyHFnTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
 
@@ -1367,30 +1234,6 @@ namespace PhotovoltaicThermalCollectors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int PVTnum(0);
         static int loop(0);
 
@@ -1425,10 +1268,8 @@ namespace PhotovoltaicThermalCollectors {
         // This function looks up the given PVT and returns the air inlet node number.
         // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
 
-        // Return value
         int NodeNum; // node number returned
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichPVT;
 
         if (GetInputFlag) {
@@ -1461,10 +1302,8 @@ namespace PhotovoltaicThermalCollectors {
         // This function looks up the given PVT and returns the air outlet node number.
         // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
 
-        // Return value
         int NodeNum; // node number returned
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichPVT;
 
         if (GetInputFlag) {
@@ -1483,9 +1322,6 @@ namespace PhotovoltaicThermalCollectors {
 
         return NodeNum;
     }
-
-    //=====================  Utility/Other routines for module.
-    // Insert as appropriate
 
 } // namespace PhotovoltaicThermalCollectors
 
