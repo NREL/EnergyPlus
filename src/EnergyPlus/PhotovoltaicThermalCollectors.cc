@@ -192,8 +192,6 @@ namespace PhotovoltaicThermalCollectors {
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
         bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
-        int SurfNum;                    // local use only
-        int ThisParamObj;
 
         // Object Data
         Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
@@ -261,7 +259,7 @@ namespace PhotovoltaicThermalCollectors {
             if (UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound)) continue;
 
             PVT(Item).Name = DataIPShortCuts::cAlphaArgs(1);
-            PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate; // DSU, assigned in DataPlant
+            PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
 
             PVT(Item).SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), DataSurfaces::Surface);
             // check surface
@@ -277,8 +275,6 @@ namespace PhotovoltaicThermalCollectors {
                 }
                 ErrorsFound = true;
             } else {
-                //     ! Found one -- make sure has right parameters for PVT
-                SurfNum = PVT(Item).SurfNum;
 
                 if (!DataSurfaces::Surface(PVT(Item).SurfNum).ExtSolar) {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
@@ -287,11 +283,11 @@ namespace PhotovoltaicThermalCollectors {
                     ErrorsFound = true;
                 }
                 // check surface orientation, warn if upside down
-                if ((DataSurfaces::Surface(SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(SurfNum).Tilt > 95.0)) {
+                if ((DataSurfaces::Surface(PVT(Item).SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(PVT(Item).SurfNum).Tilt > 95.0)) {
                     ShowWarningError("Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError("Surface used for solar collector faces down");
-                    ShowContinueError("Surface tilt angle (degrees from ground outward normal) = " + General::RoundSigDigits(DataSurfaces::Surface(SurfNum).Tilt, 2));
+                    ShowContinueError("Surface tilt angle (degrees from ground outward normal) = " + General::RoundSigDigits(DataSurfaces::Surface(PVT(Item).SurfNum).Tilt, 2));
                 }
 
             } // check surface
@@ -303,7 +299,7 @@ namespace PhotovoltaicThermalCollectors {
                 ErrorsFound = true;
             } else {
                 PVT(Item).PVTModelName = DataIPShortCuts::cAlphaArgs(3);
-                ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpSimplePVTperf);
+                int ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpSimplePVTperf);
                 if (ThisParamObj > 0) {
                     PVT(Item).Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
                     // do one-time setups on input data
@@ -463,13 +459,6 @@ namespace PhotovoltaicThermalCollectors {
 
         static std::string const RoutineName("InitPVTcollectors");
 
-        int InletNode = 0;
-        int OutletNode = 0;
-        int PVTindex;
-        int SurfNum;
-        bool errFlag;
-        Real64 rho; // local fluid density kg/s
-
         // Do the one time initializations
         if (PVT(PVTnum).MyOneTimeFlag) {
             PVT(PVTnum).MyOneTimeFlag = false;
@@ -477,7 +466,7 @@ namespace PhotovoltaicThermalCollectors {
 
         if (PVT(PVTnum).SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (PVT(PVTnum).PlantInletNodeNum > 0)) {
-                errFlag = false;
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(PVT(PVTnum).Name,
                                         PVT(PVTnum).TypeNum,
                                         PVT(PVTnum).WLoopNum,
@@ -516,7 +505,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         if (!DataGlobals::SysSizingCalc && PVT(PVTnum).MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
-            for (PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
+            for (int PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
                 if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
                     if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!DataGlobals::AnyEnergyManagementSystemInModel) {
@@ -541,6 +530,9 @@ namespace PhotovoltaicThermalCollectors {
         if (!DataGlobals::SysSizingCalc && PVT(PVTnum).SizingInit && (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR)) {
             SizePVT(PVTnum);
         }
+
+        int InletNode = 0;
+        int OutletNode = 0;
 
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
@@ -578,7 +570,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
 
-                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PVT(PVTnum).WLoopNum).FluidName,
+                    Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PVT(PVTnum).WLoopNum).FluidName,
                                            DataGlobals::HWInitConvTemp,
                                            DataPlant::PlantLoop(PVT(PVTnum).WLoopNum).FluidIndex,
                                            RoutineName);
@@ -609,25 +601,20 @@ namespace PhotovoltaicThermalCollectors {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
-                // heating only right now, so control flow requests based on incident solar
-                SurfNum = PVT(PVTnum).SurfNum;
-                if (DataHeatBalance::QRadSWOutIncident(SurfNum) > DataPhotovoltaics::MinIrradiance) {
-                    // IF (FirstHVACIteration) THEN
-                    PVT(PVTnum).MassFlowRate = PVT(PVTnum).MaxMassFlowRate; // DSU
-                    // ENDIF
+                // heating only right now, so control flow requests based on incident solar;
+                if (DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                    PVT(PVTnum).MassFlowRate = PVT(PVTnum).MaxMassFlowRate;
                 } else {
-                    // IF (FirstHVACIteration) THEN
-                    PVT(PVTnum).MassFlowRate = 0.0; // DSU
-                    // ENDIF
+                    PVT(PVTnum).MassFlowRate = 0.0;
                 }
-                // Should we declare a mass flow rate variable in the data structure instead of using node(outlet)%MassFlowRate ?  DSU
+
                 PlantUtilities::SetComponentFlowRate(PVT(PVTnum).MassFlowRate,
                                      InletNode,
                                      OutletNode,
                                      PVT(PVTnum).WLoopNum,
                                      PVT(PVTnum).WLoopSideNum,
                                      PVT(PVTnum).WLoopBranchNum,
-                                     PVT(PVTnum).WLoopCompNum); // DSU | DSU
+                                     PVT(PVTnum).WLoopCompNum);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 PVT(PVTnum).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
             }
@@ -650,17 +637,10 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Obtains hot water flow rate from the plant sizing array.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizNum;    // Plant Sizing index corresponding to CurLoopNum
-        bool ErrorsFound; // If errors detected in input
-        Real64 DesVolFlow;
-        Real64 DesMassFlow;
-        bool HardSizeNoDesRun;        // Indicator to hardsize and no sizing run
         bool SizingDesRunThisAirSys;  // true if a particular air system had a Sizing:System object and system sizing done
-        Real64 DesignVolFlowRateDes;  // Autosize design volume flow for reporting
-        Real64 DesignVolFlowRateUser; // Hardsize design volume flow for reporting
 
-        HardSizeNoDesRun = !(DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone);
+        // Indicator to hardsize and no sizing run
+        bool HardSizeNoDesRun = !(DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone);
 
         if (DataSizing::CurSysNum > 0) {
             CheckThisAirSystemForSizing(DataSizing::CurSysNum, SizingDesRunThisAirSys);
@@ -668,9 +648,9 @@ namespace PhotovoltaicThermalCollectors {
             SizingDesRunThisAirSys = false;
         }
 
-        DesignVolFlowRateDes = 0.0;
-        PltSizNum = 0;
-        ErrorsFound = false;
+        Real64 DesignVolFlowRateDes = 0.0;  // Autosize design volume flow for reporting
+        int PltSizNum = 0; // Plant Sizing index corresponding to CurLoopNum
+        bool ErrorsFound = false;
 
         if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
@@ -683,11 +663,10 @@ namespace PhotovoltaicThermalCollectors {
             if (PVT(PVTnum).WLoopSideNum == DataPlant::SupplySide) {
                 if (PltSizNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        DesVolFlow = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+                        DesignVolFlowRateDes = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
                     } else {
-                        DesVolFlow = 0.0;
+                        DesignVolFlowRateDes = 0.0;
                     }
-                    DesignVolFlowRateDes = DesVolFlow;
                 } else {
                     if (PVT(PVTnum).DesignVolFlowRateWasAutoSized) {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -725,7 +704,7 @@ namespace PhotovoltaicThermalCollectors {
 
             } else { // Hardsized with sizing data
                 if (PVT(PVTnum).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
-                    DesignVolFlowRateUser = PVT(PVTnum).DesignVolFlowRate;
+                    Real64 DesignVolFlowRateUser = PVT(PVTnum).DesignVolFlowRate;
                     ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
                                        PVT(PVTnum).Name,
                                        "Design Size Design Flow Rate [m3/s]",
@@ -759,23 +738,22 @@ namespace PhotovoltaicThermalCollectors {
                 } else {
                     CheckSysSizing("SolarCollector:FlatPlate:PhotovoltaicThermal", PVT(PVTnum).Name);
                     if (DataSizing::CurOASysNum > 0) {
-                        DesVolFlow = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow;
+                        DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow;
                     } else {
                         {
                             auto const SELECT_CASE_var(DataSizing::CurDuctType);
                             if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                DesVolFlow = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                DesVolFlow = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow;
+                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                DesVolFlow = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesHeatVolFlow;
+                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesHeatVolFlow;
                             } else {
-                                DesVolFlow = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
                             }
                         }
                     }
-                    DesMassFlow = DataEnvironment::StdRhoAir * DesVolFlow;
-                    DesignVolFlowRateDes = DesVolFlow;
+                    Real64 DesMassFlow = DataEnvironment::StdRhoAir * DesignVolFlowRateDes;
                     PVT(PVTnum).MaxMassFlowRate = DesMassFlow;
                 }
                 if (!HardSizeNoDesRun) {
@@ -788,7 +766,7 @@ namespace PhotovoltaicThermalCollectors {
                         PVT(PVTnum).SizingInit = false;
                     } else {
                         if (PVT(PVTnum).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {
-                            DesignVolFlowRateUser = PVT(PVTnum).DesignVolFlowRate;
+                            Real64 DesignVolFlowRateUser = PVT(PVTnum).DesignVolFlowRate;
                             ReportSizingManager::ReportSizingOutput("SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                PVT(PVTnum).Name,
                                                "Design Size Design Flow Rate [m3/s]",
@@ -895,26 +873,6 @@ namespace PhotovoltaicThermalCollectors {
         static std::string const RoutineName("CalcPVTcollectors");
 
         int InletNode(0);
-        Real64 Eff(0.0);
-        int SurfNum(0);
-        int RoughSurf(0);
-        Real64 HcExt(0.0);
-        Real64 HrSky(0.0);
-        Real64 HrGround(0.0);
-        Real64 HrAir(0.0);
-        Real64 Tcollector(0.0);
-        Real64 mdot(0.0);
-        Real64 Tinlet(0.0);
-        Real64 Winlet(0.0);
-        Real64 CpInlet(0.0);
-        Real64 PotentialOutletTemp(0.0);
-        Real64 BypassFraction(0.0);
-        Real64 PotentialHeatGain(0.0);
-        Real64 WetBulbInlet(0.0);
-        Real64 DewPointInlet(0.0);
-
-        SurfNum = PVT(PVTnum).SurfNum;
-        RoughSurf = DataHeatBalance::VerySmooth;
 
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
@@ -925,12 +883,17 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        mdot = PVT(PVTnum).MassFlowRate;
-        Tinlet = DataLoopNode::Node(InletNode).Temp;
+        Real64 mdot = PVT(PVTnum).MassFlowRate;
+        Real64 Tinlet = DataLoopNode::Node(InletNode).Temp;
 
         if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
 
+            Real64 BypassFraction(0.0);
+            Real64 PotentialOutletTemp(0.0);
+
             if (PVT(PVTnum).HeatingUseful && PVT(PVTnum).BypassDamperOff && (mdot > 0.0)) {
+
+                Real64 Eff(0.0);
 
                 {
                     auto const SELECT_CASE_var(PVT(PVTnum).Simple.ThermEfficMode);
@@ -943,11 +906,11 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 }
 
-                PotentialHeatGain = DataHeatBalance::QRadSWOutIncident(SurfNum) * Eff * PVT(PVTnum).AreaCol;
+                Real64 PotentialHeatGain = DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) * Eff * PVT(PVTnum).AreaCol;
 
                 if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Winlet = DataLoopNode::Node(InletNode).HumRat;
-                    CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                     } else {
@@ -969,7 +932,7 @@ namespace PhotovoltaicThermalCollectors {
                         BypassFraction = 0.0;
                     }
                 } else if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
-                    CpInlet = Psychrometrics::CPHW(Tinlet);
+                    Real64 CpInlet = Psychrometrics::CPHW(Tinlet);
                     if (mdot * CpInlet != 0.0) { // protect divide by zero
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                     } else {
@@ -991,11 +954,20 @@ namespace PhotovoltaicThermalCollectors {
             } else if (PVT(PVTnum).CoolingUseful && PVT(PVTnum).BypassDamperOff && (mdot > 0.0)) {
                 // calculate cooling using energy balance
 
+                Real64 HrGround(0.0);
+                Real64 HrAir(0.0);
+                Real64 HcExt(0.0);
+                Real64 HrSky(0.0);
+
                 ConvectionCoefficients::InitExteriorConvectionCoeff(
-                    SurfNum, 0.0, RoughSurf, PVT(PVTnum).Simple.SurfEmissivity, PVT(PVTnum).Simple.LastCollectorTemp, HcExt, HrSky, HrGround, HrAir);
+                        PVT(PVTnum).SurfNum, 0.0, DataHeatBalance::VerySmooth, PVT(PVTnum).Simple.SurfEmissivity, PVT(PVTnum).Simple.LastCollectorTemp, HcExt, HrSky, HrGround, HrAir);
+
+                Real64 WetBulbInlet(0.0);
+                Real64 DewPointInlet(0.0);
+                Real64 CpInlet(0.0);
 
                 if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    Winlet = DataLoopNode::Node(InletNode).HumRat;
+                    Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
                     WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
                     DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
@@ -1003,9 +975,9 @@ namespace PhotovoltaicThermalCollectors {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                 }
 
-                Tcollector = (2.0 * mdot * CpInlet * Tinlet +
-                              PVT(PVTnum).AreaCol * (HrGround * DataEnvironment::OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp + HrAir * DataSurfaces::Surface(SurfNum).OutDryBulbTemp +
-                                                     HcExt * DataSurfaces::Surface(SurfNum).OutDryBulbTemp)) /
+                Real64 Tcollector = (2.0 * mdot * CpInlet * Tinlet +
+                              PVT(PVTnum).AreaCol * (HrGround * DataEnvironment::OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp + HrAir * DataSurfaces::Surface(PVT(PVTnum).SurfNum).OutDryBulbTemp +
+                                                     HcExt * DataSurfaces::Surface(PVT(PVTnum).SurfNum).OutDryBulbTemp)) /
                              (2.0 * mdot * CpInlet + PVT(PVTnum).AreaCol * (HrGround + HrSky + HrAir + HcExt));
 
                 PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
@@ -1136,7 +1108,6 @@ namespace PhotovoltaicThermalCollectors {
         // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
 
         int NodeNum; // node number returned
-
         int WhichPVT;
 
         if (GetInputFlag) {
@@ -1170,7 +1141,6 @@ namespace PhotovoltaicThermalCollectors {
         // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
 
         int NodeNum; // node number returned
-
         int WhichPVT;
 
         if (GetInputFlag) {
