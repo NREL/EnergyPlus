@@ -192,7 +192,6 @@ namespace PlantLoopEquip {
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
-        using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
         using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using UserDefinedComponents::SimUserDefinedPlantComponent;
@@ -207,7 +206,7 @@ namespace PlantLoopEquip {
         Real64 MaxLoad;
         Real64 MinLoad;
         Real64 OptLoad;
-        Real64 SizingFac;        // the component sizing fraction
+        Real64 SizingFac = 0.0;        // the component sizing fraction
         int GeneralEquipType;    // Basic Equipment type from EquipType Used to help organize this routine
         Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
         Real64 TempEvapOutDesign;
@@ -991,25 +990,7 @@ namespace PlantLoopEquip {
 
             if (EquipTypeNum == TypeOf_CentralGroundSourceHeatPump) {
 
-                SimCentralGroundSourceHeatPump(sim_component.Name,
-                                               EquipFlowCtrl,
-                                               EquipNum,
-                                               LoopNum,
-                                               RunFlag,
-                                               FirstHVACIteration,
-                                               InitLoopEquip,
-                                               CurLoad,
-                                               MaxLoad,
-                                               MinLoad,
-                                               OptLoad,
-                                               GetCompSizFac,
-                                               SizingFac);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 if (GetCompSizFac) {
                     sim_component.SizFac = SizingFac;
