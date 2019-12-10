@@ -160,6 +160,8 @@ namespace PhotovoltaicThermalCollectors {
         {
         }
 
+        void setupReportVars();
+
         void initialize(bool FirstHVACIteration);
 
         void size();

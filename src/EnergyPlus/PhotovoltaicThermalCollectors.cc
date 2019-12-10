@@ -380,69 +380,71 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        for (Item = 1; Item <= NumPVT; ++Item) {
-            // electrical production reporting under generator:photovoltaic....
-            //    only thermal side reported here,
-
-            SetupOutputVariable(
-                "Generator Produced Thermal Rate", OutputProcessor::Unit::W, PVT(Item).Report.ThermPower, "System", "Average", PVT(Item).Name);
-            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
-                SetupOutputVariable("Generator Produced Thermal Energy",
-                                    OutputProcessor::Unit::J,
-                                    PVT(Item).Report.ThermEnergy,
-                                    "System",
-                                    "Sum",
-                                    PVT(Item).Name,
-                                    _,
-                                    "SolarWater",
-                                    "HeatProduced",
-                                    _,
-                                    "Plant");
-            } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                SetupOutputVariable("Generator Produced Thermal Energy",
-                                    OutputProcessor::Unit::J,
-                                    PVT(Item).Report.ThermEnergy,
-                                    "System",
-                                    "Sum",
-                                    PVT(Item).Name,
-                                    _,
-                                    "SolarAir",
-                                    "HeatProduced",
-                                    _,
-                                    "System");
-                SetupOutputVariable("Generator PVT Fluid Bypass Status",
-                                    OutputProcessor::Unit::None,
-                                    PVT(Item).Report.BypassStatus,
-                                    "System",
-                                    "Average",
-                                    PVT(Item).Name);
-            }
-
-            SetupOutputVariable("Generator PVT Fluid Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                PVT(Item).Report.TinletWorkFluid,
-                                "System",
-                                "Average",
-                                PVT(Item).Name);
-            SetupOutputVariable("Generator PVT Fluid Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                PVT(Item).Report.ToutletWorkFluid,
-                                "System",
-                                "Average",
-                                PVT(Item).Name);
-            SetupOutputVariable("Generator PVT Fluid Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                PVT(Item).Report.MdotWorkFluid,
-                                "System",
-                                "Average",
-                                PVT(Item).Name);
-        }
-
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for photovoltaic thermal collectors");
         }
 
         if (allocated(tmpSimplePVTperf)) tmpSimplePVTperf.deallocate();
+    }
+
+    void PVTCollectorStruct::setupReportVars()
+    {
+        SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, "System", "Average", this->Name);
+
+        if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
+            SetupOutputVariable("Generator Produced Thermal Energy",
+                                OutputProcessor::Unit::J,
+                                this->Report.ThermEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarWater",
+                                "HeatProduced",
+                                _,
+                                "Plant");
+
+        } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
+            SetupOutputVariable("Generator Produced Thermal Energy",
+                                OutputProcessor::Unit::J,
+                                this->Report.ThermEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "SolarAir",
+                                "HeatProduced",
+                                _,
+                                "System");
+
+            SetupOutputVariable("Generator PVT Fluid Bypass Status",
+                                OutputProcessor::Unit::None,
+                                this->Report.BypassStatus,
+                                "System",
+                                "Average",
+                                this->Name);
+        }
+
+        SetupOutputVariable("Generator PVT Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.TinletWorkFluid,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator PVT Fluid Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.ToutletWorkFluid,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Generator PVT Fluid Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.MdotWorkFluid,
+                            "System",
+                            "Average",
+                            this->Name);
     }
 
     void PVTCollectorStruct::initialize(bool const FirstHVACIteration)
@@ -461,6 +463,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // Do the one time initializations
         if (this->MyOneTimeFlag) {
+            this->setupReportVars();
             this->MyOneTimeFlag = false;
         }
 
