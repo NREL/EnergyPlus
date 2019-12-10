@@ -58,6 +58,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -1121,6 +1122,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
@@ -3935,8 +3937,7 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                     this_component.HowLoadServed = HowMet_ByNominalCap;
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Absorption) { //                =  3  ! older BLAST absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Absorption) {  // = 3 ! older BLAST absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
