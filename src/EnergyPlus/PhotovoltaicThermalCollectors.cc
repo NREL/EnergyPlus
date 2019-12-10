@@ -1045,7 +1045,7 @@ namespace PhotovoltaicThermalCollectors {
                 PVT(PVTnum).Report.ThermEnergy = PVT(PVTnum).Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 PVT(PVTnum).Report.ThermEfficiency = 0.0;
                 PVT(PVTnum).Simple.LastCollectorTemp = Tcollector;
-                PVT(PVTnum).Report.BypassStatus = 0.0;
+                PVT(PVTnum).Report.BypassStatus = BypassFraction;
 
             } else {
                 PVT(PVTnum).Report.TinletWorkFluid = Tinlet;
