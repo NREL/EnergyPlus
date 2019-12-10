@@ -114,7 +114,6 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    static std::string const BlankString;
     static bool GetInputFlag(true); // First time, input is "gotten"
 
     Array1D_bool CheckEquipName;
@@ -204,7 +203,7 @@ namespace PhotovoltaicThermalCollectors {
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
         int SurfNum;                    // local use only
         int ThisParamObj;
 
@@ -480,19 +479,15 @@ namespace PhotovoltaicThermalCollectors {
         int OutletNode = 0;
         int PVTindex;
         int SurfNum;
-        static bool MySetPointCheckFlag(true);
-        static bool MyOneTimeFlag(true);      // one time flag
-        static Array1D_bool SetLoopIndexFlag; // get loop number flag
         bool errFlag;
         Real64 rho; // local fluid density kg/s
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
-            SetLoopIndexFlag.dimension(NumPVT, true);
-            MyOneTimeFlag = false;
+        if (PVT(PVTnum).MyOneTimeFlag) {
+            PVT(PVTnum).MyOneTimeFlag = false;
         }
 
-        if (SetLoopIndexFlag(PVTnum)) {
+        if (PVT(PVTnum).SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (PVT(PVTnum).PlantInletNodeNum > 0)) {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(PVT(PVTnum).Name,
@@ -510,7 +505,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");
                 }
-                SetLoopIndexFlag(PVTnum) = false;
+                PVT(PVTnum).SetLoopIndexFlag = false;
             }
         }
 
@@ -532,7 +527,7 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        if (!DataGlobals::SysSizingCalc && MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
+        if (!DataGlobals::SysSizingCalc && PVT(PVTnum).MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
             for (PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
                 if (PVT(PVTindex).WorkingFluidType == AirWorkingFluid) {
                     if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
@@ -552,7 +547,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 }
             }
-            MySetPointCheckFlag = false;
+            PVT(PVTnum).MySetPointCheckFlag = false;
         }
 
         if (!DataGlobals::SysSizingCalc && PVT(PVTnum).SizingInit && (PVT(PVTnum).WorkingFluidType == AirWorkingFluid)) {
@@ -850,14 +845,10 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
-        static int SurfNum(0);
-
-        SurfNum = PVT(PVTnum).SurfNum;
-
         if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
 
             if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::QRadSWOutIncident(SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
                     if (DataLoopNode::Node(PVT(PVTnum).HVACOutletNodeNum).TempSetPoint > DataLoopNode::Node(PVT(PVTnum).HVACInletNodeNum).Temp) {
@@ -885,7 +876,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
             if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
-                if (DataHeatBalance::QRadSWOutIncident(SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                if (DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     PVT(PVTnum).HeatingUseful = true;
                     PVT(PVTnum).BypassDamperOff = true;
@@ -915,24 +906,24 @@ namespace PhotovoltaicThermalCollectors {
 
         static std::string const RoutineName("CalcPVTcollectors");
 
-        static int InletNode(0);
-        static Real64 Eff(0.0);
-        static int SurfNum(0);
-        static int RoughSurf(0);
-        static Real64 HcExt(0.0);
-        static Real64 HrSky(0.0);
-        static Real64 HrGround(0.0);
-        static Real64 HrAir(0.0);
-        static Real64 Tcollector(0.0);
-        static Real64 mdot(0.0);
-        static Real64 Tinlet(0.0);
-        static Real64 Winlet(0.0);
-        static Real64 CpInlet(0.0);
-        static Real64 PotentialOutletTemp(0.0);
-        static Real64 BypassFraction(0.0);
-        static Real64 PotentialHeatGain(0.0);
-        static Real64 WetBulbInlet(0.0);
-        static Real64 DewPointInlet(0.0);
+        int InletNode(0);
+        Real64 Eff(0.0);
+        int SurfNum(0);
+        int RoughSurf(0);
+        Real64 HcExt(0.0);
+        Real64 HrSky(0.0);
+        Real64 HrGround(0.0);
+        Real64 HrAir(0.0);
+        Real64 Tcollector(0.0);
+        Real64 mdot(0.0);
+        Real64 Tinlet(0.0);
+        Real64 Winlet(0.0);
+        Real64 CpInlet(0.0);
+        Real64 PotentialOutletTemp(0.0);
+        Real64 BypassFraction(0.0);
+        Real64 PotentialHeatGain(0.0);
+        Real64 WetBulbInlet(0.0);
+        Real64 DewPointInlet(0.0);
 
         SurfNum = PVT(PVTnum).SurfNum;
         RoughSurf = DataHeatBalance::VerySmooth;
@@ -1123,11 +1114,10 @@ namespace PhotovoltaicThermalCollectors {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static int PVTnum(0);
-        static int loop(0);
+        int PVTnum(0);
 
         // first find PVT index that is associated with this PV generator
-        for (loop = 1; loop <= NumPVT; ++loop) {
+        for (int loop = 1; loop <= NumPVT; ++loop) {
             if (!PVT(loop).PVfound) continue;
             if (PVT(loop).PVnum == PVindex) { // we found it
                 PVTnum = loop;
