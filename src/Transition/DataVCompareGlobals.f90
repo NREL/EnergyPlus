@@ -131,7 +131,7 @@ INTEGER :: NumRenamedObjects=0
 
 ! Following for V8 only.
 INTEGER :: NumChillers=0
-INTEGER :: NumChillerHeaters=0
+INTEGER :: numChillerHeaters=0
 LOGICAL :: CondFDVariables=.false.
 
 end module DataVCompareGlobals

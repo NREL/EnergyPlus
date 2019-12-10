@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     VRF TU with DOAS RH Control,  !- Name
@@ -2806,7 +2806,7 @@
     0,                       !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    Electric,                !- Fuel Type
+    Electricity,             !- Fuel Type
     ;                        !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
 
   ZoneTerminalUnitList,

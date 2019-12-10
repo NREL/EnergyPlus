@@ -1522,6 +1522,177 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  OutdoorAir:Node,",
+        "    Outside Air Inlet Node 1; !- Name",
+
+        "  Schedule:Constant,",
+        "    Min OA Sched,             !- Name",
+        "     Any Number,              !- Schedule Type Limits Name",
+        "     0.5;                     !- Value",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller 1,          !- Name",
+        "    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+        "    VAV Sys 1 Inlet Node,     !- Return Air Node Name",
+        "    Mixed Air Node 1,         !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 1, !- Actuator Node Name",
+        "    0.0,                      !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    2.5,                      !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,      !- Economizer Control Type",
+        "    ModulateFlow,             !- Economizer Control Action Type",
+        "    ,                         !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                         !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                         !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                         !- Electronic Enthalpy Limit Curve Name",
+        "    ,                         !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,                !- Lockout Type",
+        "    ProportionalMinimum,      !- Minimum Limit Type",
+        "    Min OA Sched,             !- Minimum Outdoor Air Schedule Name",
+        "    ,                         !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    ,                         !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    ,                         !- Mechanical Ventilation Controller Name",
+        "    ,                         !- Time of Day Economizer Control Schedule Name",
+        "    Yes,                      !- High Humidity Control",
+        "    Zone1,                    !- Humidistat Control Zone Name",
+        "    0.8,                      !- High Humidity Outdoor Air Flow Ratio",
+        "    Yes;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    compare_err_stream(""); // just for debugging
+
+    bool ErrorsFound(false); // If errors detected in input
+    int ControllerNum(0);    // Controller number
+    int NumArg(0);
+    int NumNums(0);
+    int NumAlphas(0);
+    int IOStat(0);
+    std::string const CurrentModuleObject = CurrentModuleObjects(CMO_OAController);
+
+    inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+
+    Array1D<Real64> NumArray(NumNums, 0.0);
+    Array1D_string AlphArray(NumAlphas);
+    Array1D_string cAlphaFields(NumAlphas);
+    Array1D_string cNumericFields(NumNums);
+    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    Array1D_bool lNumericBlanks(NumNums, true);
+
+    NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    OAController.allocate(NumOAControllers);
+
+    ControllerNum = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE1";
+    NumOfZones = 1;
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ActualZoneNum = 1;
+    ZoneEquipConfig(1).ZoneNode = 2;
+    ZoneEquipConfig(1).NumInletNodes = 1;
+    ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    PrimaryAirSystem.allocate(1);
+    AirLoopControlInfo.allocate(1);
+    PrimaryAirSystem(1).NumBranches = 1;
+    PrimaryAirSystem(1).Branch.allocate(1);
+    PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    PrimaryAirSystem(1).Branch(1).Comp(1).Name = "OASysName";
+    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+    OutsideAirSys.allocate(1);
+    OutsideAirSys(1).Name = "OASysName";
+    OutsideAirSys(1).NumControllers = 1;
+    OutsideAirSys(1).ControllerType.allocate(1);
+    OutsideAirSys(1).ControllerType(1) = "Controller:OutdoorAir";
+    OutsideAirSys(1).ControllerName.allocate(1);
+    OutsideAirSys(1).ControllerName(1) = "OA Controller 1";
+    DataAirLoop::NumOASystems = 1;
+    HumidityControlZone.allocate(1);
+    HumidityControlZone(1).ActualZoneNum = 1;
+    NumHumidityControlZones = 1;
+
+    inputProcessor->getObjectItem(CurrentModuleObject,
+        ControllerNum,
+        AlphArray,
+        NumAlphas,
+        NumArray,
+        NumNums,
+        IOStat,
+        lNumericBlanks,
+        lAlphaBlanks,
+        cAlphaFields,
+        cNumericFields);
+
+    ProcessOAControllerInputs(CurrentModuleObject,
+        ControllerNum,
+        AlphArray,
+        NumAlphas,
+        NumArray,
+        NumNums,
+        lNumericBlanks,
+        lAlphaBlanks,
+        cAlphaFields,
+        cNumericFields,
+        ErrorsFound);
+    // compare_err_stream( "" ); // just for debugging
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_FALSE(OAController(ControllerNum)
+        .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
+    EXPECT_FALSE(has_err_output(true));
+    EXPECT_EQ(OAController(ControllerNum).HumidistatZoneNum, 1);
+
+    // Set up conditions
+    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).TotalOutputRequired = -1.0; // dehumidification requested by humidistat
+    EXPECT_EQ(OAController(ControllerNum).NodeNumofHumidistatZone, ZoneEquipConfig(1).ZoneNode);
+    int airLoopNum = 1;
+    int outAirMinFrac = 0.0;
+    Real64 OASignal = 0.0;
+    bool HighHumidityOperationFlag = false;
+    bool firstHVACIteration = false;
+    OAController(ControllerNum).MixSetTemp = 15.0;
+    OAController(ControllerNum).RetTemp = 20.0;
+    OAController(ControllerNum).InletTemp = 25.0;
+    OAController(ControllerNum).MixMassFlow = 2.5;
+    OAController(ControllerNum).MaxOAMassFlowRate = 2.5;
+
+    // Case 1 - OA humrat = zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006;
+    OAController(ControllerNum).CalcOAEconomizer(airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
+
+    // Case 2 - OA humrat < zone humrat - high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff;
+    OAController(ControllerNum).CalcOAEconomizer(airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_TRUE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.8, 0.00001);
+
+    // Case 3 - OA humrat within tolerance of zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff / 2.0;
+    OAController(ControllerNum).CalcOAEconomizer(airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
+
+    // Case 4 - OA humrat slightly above zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 + DataHVACGlobals::SmallHumRatDiff / 2.0;
+    OAController(ControllerNum).CalcOAEconomizer(airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
+}
+
 TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
 {
 
