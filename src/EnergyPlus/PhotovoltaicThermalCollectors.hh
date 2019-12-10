@@ -118,11 +118,11 @@ namespace PhotovoltaicThermalCollectors {
     {
         // Members
         std::string Name;         // Name of PVT collector
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
-        int WLoopNum;             // Water plant loop index number                      !DSU
-        int WLoopSideNum;         // Water plant loop side index                        !DSU
-        int WLoopBranchNum;       // Water plant loop branch index                      !DSU
-        int WLoopCompNum;         // Water plant loop component index                   !DSU
+        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  
+        int WLoopNum;             // Water plant loop index number                      
+        int WLoopSideNum;         // Water plant loop side index                        
+        int WLoopBranchNum;       // Water plant loop branch index                      
+        int WLoopCompNum;         // Water plant loop component index                   
         bool EnvrnInit;           // manage begin environmen inits
         bool SizingInit;          // manage when sizing is complete
         std::string PVTModelName; // Name of PVT performance object
@@ -140,7 +140,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 DesignVolFlowRate;
         bool DesignVolFlowRateWasAutoSized; // true if design volume flow rate was autosize on input
         Real64 MaxMassFlowRate;
-        Real64 MassFlowRate; // DSU
+        Real64 MassFlowRate;
         Real64 AreaCol;
         bool BypassDamperOff;
         bool CoolingUseful;
@@ -159,6 +159,17 @@ namespace PhotovoltaicThermalCollectors {
               SetLoopIndexFlag(true)
         {
         }
+
+        void initialize(bool FirstHVACIteration);
+
+        void size();
+
+        void control();
+
+        void calculate();
+
+        void update();
+
     };
 
     extern Array1D<PVTCollectorStruct> PVT;
@@ -170,16 +181,6 @@ namespace PhotovoltaicThermalCollectors {
                           Optional_bool_const InitLoopEquip = _);
 
     void GetPVTcollectorsInput();
-
-    void InitPVTcollectors(int PVTnum, bool FirstHVACIteration);
-
-    void SizePVT(int PVTnum);
-
-    void ControlPVTcollector(int PVTnum);
-
-    void CalcPVTcollectors(int PVTnum);
-
-    void UpdatePVTcollectors(int PVTnum);
 
     void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
