@@ -67,11 +67,11 @@ If we realign to the header, we see that two values related to Humidity Indicati
 Environment:Design Day Data,33.00,6.60,DefaultMultipliers,<MISSING>,<MISSING>,100511,220,3.2,0.00,No,No
 ```
 
-*v9.3.0:* The `Hum Ind Type` and `Hum Ind Value at Max Temp` are swapped and actually output to the EIO:
+*v9.3.0:* The `Hum Ind Type` and `Hum Ind Value at Max Temp` are swapped and actually output to the EIO, and the `Hum Ind Units` is added:
 
 ```
-! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow
-Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00 {J/kg},100511,220,3.2,0.00,No,No
+! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow
+Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No
 ```
 
 See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
