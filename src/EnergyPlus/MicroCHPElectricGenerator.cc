@@ -1265,8 +1265,7 @@ namespace MicroCHPElectricGenerator {
         if (NumMicroCHPs == 0) return;
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
-            for (auto &e : DataGenerators::FuelSupply)
-                e.QskinLoss = 0.0;
+            for (auto &e : DataGenerators::FuelSupply) e.QskinLoss = 0.0;
             for (auto &e : MicroCHP) {
                 e.A42Model.QdotSkin = 0.0;
                 e.A42Model.SkinLossConvect = 0.0;
