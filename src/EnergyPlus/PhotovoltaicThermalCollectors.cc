@@ -103,12 +103,6 @@ namespace PhotovoltaicThermalCollectors {
 
     int const SimplePVTmodel(1001);
 
-    int const ScheduledThermEffic(15); // mode for thermal efficiency is to use schedule
-    int const FixedThermEffic(16);     // mode for thermal efficiency is to use fixed value
-
-    int const LiquidWorkingFluid(1);
-    int const AirWorkingFluid(2);
-
     int const CalledFromPlantLoopEquipMgr(101);
     int const CalledFromOutsideAirSystem(102);
 
@@ -128,12 +122,6 @@ namespace PhotovoltaicThermalCollectors {
                           Optional_string_const PVTName,
                           Optional_bool_const InitLoopEquip)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         if (GetInputFlag) {
             GetPVTcollectorsInput();
@@ -175,8 +163,8 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         // check where called from and what type of collector this is, return if not right for calling order for speed
-        if ((PVT(PVTnum).WorkingFluidType == AirWorkingFluid) && (CalledFrom == CalledFromPlantLoopEquipMgr)) return;
-        if ((PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) && (CalledFrom == CalledFromOutsideAirSystem)) return;
+        if ((PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) && (CalledFrom == CalledFromPlantLoopEquipMgr)) return;
+        if ((PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) && (CalledFrom == CalledFromOutsideAirSystem)) return;
 
         InitPVTcollectors(PVTnum, FirstHVACIteration);
 
@@ -231,9 +219,9 @@ namespace PhotovoltaicThermalCollectors {
 
                 tmpSimplePVTperf(Item).Name = DataIPShortCuts::cAlphaArgs(1);
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Fixed")) {
-                    tmpSimplePVTperf(Item).ThermEfficMode = FixedThermEffic;
+                    tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::FIXED;
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "Scheduled")) {
-                    tmpSimplePVTperf(Item).ThermEfficMode = ScheduledThermEffic;
+                    tmpSimplePVTperf(Item).ThermEfficMode = ThermEfficEnum::SCHEDULED;
                 } else {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -243,7 +231,7 @@ namespace PhotovoltaicThermalCollectors {
                 tmpSimplePVTperf(Item).ThermEffic = DataIPShortCuts::rNumericArgs(2);
 
                 tmpSimplePVTperf(Item).ThermEffSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(3));
-                if ((tmpSimplePVTperf(Item).ThermEffSchedNum == 0) && (tmpSimplePVTperf(Item).ThermEfficMode == ScheduledThermEffic)) {
+                if ((tmpSimplePVTperf(Item).ThermEffSchedNum == 0) && (tmpSimplePVTperf(Item).ThermEfficMode == ThermEfficEnum::SCHEDULED)) {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
                     ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ErrorsFound = true;
@@ -345,9 +333,9 @@ namespace PhotovoltaicThermalCollectors {
             }
 
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Water")) {
-                PVT(Item).WorkingFluidType = LiquidWorkingFluid;
+                PVT(Item).WorkingFluidType = WorkingFluidEnum::LIQUID;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(5), "Air")) {
-                PVT(Item).WorkingFluidType = AirWorkingFluid;
+                PVT(Item).WorkingFluidType = WorkingFluidEnum::AIR;
             } else {
                 if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
@@ -360,7 +348,7 @@ namespace PhotovoltaicThermalCollectors {
                 ErrorsFound = true;
             }
 
-            if (PVT(Item).WorkingFluidType == LiquidWorkingFluid) {
+            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                 PVT(Item).PlantInletNodeNum = NodeInputManager::GetOnlySingleNode(
                     DataIPShortCuts::cAlphaArgs(6), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
                 PVT(Item).PlantOutletNodeNum = NodeInputManager::GetOnlySingleNode(
@@ -371,7 +359,7 @@ namespace PhotovoltaicThermalCollectors {
                 PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
             }
 
-            if (PVT(Item).WorkingFluidType == AirWorkingFluid) {
+            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
                 PVT(Item).HVACInletNodeNum = NodeInputManager::GetOnlySingleNode(
                     DataIPShortCuts::cAlphaArgs(8), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
                 PVT(Item).HVACOutletNodeNum = NodeInputManager::GetOnlySingleNode(
@@ -387,9 +375,9 @@ namespace PhotovoltaicThermalCollectors {
             }
             if (PVT(Item).DesignVolFlowRate != DataSizing::AutoSize) {
 
-                if (PVT(Item).WorkingFluidType == LiquidWorkingFluid) {
+                if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     PlantUtilities::RegisterPlantCompDesignFlow(PVT(Item).PlantInletNodeNum, PVT(Item).DesignVolFlowRate);
-                } else if (PVT(Item).WorkingFluidType == AirWorkingFluid) {
+                } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
                     PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * DataEnvironment::StdRhoAir;
                 }
                 PVT(Item).SizingInit = false;
@@ -402,7 +390,7 @@ namespace PhotovoltaicThermalCollectors {
 
             SetupOutputVariable(
                 "Generator Produced Thermal Rate", OutputProcessor::Unit::W, PVT(Item).Report.ThermPower, "System", "Average", PVT(Item).Name);
-            if (PVT(Item).WorkingFluidType == LiquidWorkingFluid) {
+            if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
                                     PVT(Item).Report.ThermEnergy,
@@ -414,7 +402,7 @@ namespace PhotovoltaicThermalCollectors {
                                     "HeatProduced",
                                     _,
                                     "Plant");
-            } else if (PVT(Item).WorkingFluidType == AirWorkingFluid) {
+            } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
                                     PVT(Item).Report.ThermEnergy,
@@ -529,7 +517,7 @@ namespace PhotovoltaicThermalCollectors {
 
         if (!DataGlobals::SysSizingCalc && PVT(PVTnum).MySetPointCheckFlag && DataHVACGlobals::DoSetPointTest) {
             for (PVTindex = 1; PVTindex <= NumPVT; ++PVTindex) {
-                if (PVT(PVTindex).WorkingFluidType == AirWorkingFluid) {
+                if (PVT(PVTindex).WorkingFluidType == WorkingFluidEnum::AIR) {
                     if (DataLoopNode::Node(PVT(PVTindex).HVACOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                             ShowSevereError("Missing temperature setpoint for PVT outlet node  ");
@@ -550,16 +538,16 @@ namespace PhotovoltaicThermalCollectors {
             PVT(PVTnum).MySetPointCheckFlag = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && PVT(PVTnum).SizingInit && (PVT(PVTnum).WorkingFluidType == AirWorkingFluid)) {
+        if (!DataGlobals::SysSizingCalc && PVT(PVTnum).SizingInit && (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR)) {
             SizePVT(PVTnum);
         }
 
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
-            if (SELECT_CASE_var == LiquidWorkingFluid) {
+            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 InletNode = PVT(PVTnum).PlantInletNodeNum;
                 OutletNode = PVT(PVTnum).PlantOutletNodeNum;
-            } else if (SELECT_CASE_var == AirWorkingFluid) {
+            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 InletNode = PVT(PVTnum).HVACInletNodeNum;
                 OutletNode = PVT(PVTnum).HVACOutletNodeNum;
             } else {
@@ -588,7 +576,7 @@ namespace PhotovoltaicThermalCollectors {
             {
                 auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
 
-                if (SELECT_CASE_var == LiquidWorkingFluid) {
+                if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
 
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PVT(PVTnum).WLoopNum).FluidName,
                                            DataGlobals::HWInitConvTemp,
@@ -608,7 +596,7 @@ namespace PhotovoltaicThermalCollectors {
 
                     PVT(PVTnum).Simple.LastCollectorTemp = 23.0;
 
-                } else if (SELECT_CASE_var == AirWorkingFluid) {
+                } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                     PVT(PVTnum).Simple.LastCollectorTemp = 23.0;
                 }
             }
@@ -620,7 +608,7 @@ namespace PhotovoltaicThermalCollectors {
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
 
-            if (SELECT_CASE_var == LiquidWorkingFluid) {
+            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar
                 SurfNum = PVT(PVTnum).SurfNum;
                 if (DataHeatBalance::QRadSWOutIncident(SurfNum) > DataPhotovoltaics::MinIrradiance) {
@@ -640,7 +628,7 @@ namespace PhotovoltaicThermalCollectors {
                                      PVT(PVTnum).WLoopSideNum,
                                      PVT(PVTnum).WLoopBranchNum,
                                      PVT(PVTnum).WLoopCompNum); // DSU | DSU
-            } else if (SELECT_CASE_var == AirWorkingFluid) {
+            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 PVT(PVTnum).MassFlowRate = DataLoopNode::Node(InletNode).MassFlowRate;
             }
         }
@@ -684,7 +672,7 @@ namespace PhotovoltaicThermalCollectors {
         PltSizNum = 0;
         ErrorsFound = false;
 
-        if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
+        if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
             if (!allocated(DataSizing::PlantSizData)) return;
             if (!allocated(DataPlant::PlantLoop)) return;
@@ -757,7 +745,7 @@ namespace PhotovoltaicThermalCollectors {
             }
         } // plant component
 
-        if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
+        if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (DataSizing::CurSysNum > 0) {
                 if (!PVT(PVTnum).DesignVolFlowRateWasAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
@@ -845,7 +833,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
-        if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
+        if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
                 if (DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) > DataPhotovoltaics::MinIrradiance) {
@@ -874,7 +862,7 @@ namespace PhotovoltaicThermalCollectors {
                 }
             }
 
-        } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
+        } else if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (PVT(PVTnum).PVTModelType == SimplePVTmodel) {
                 if (DataHeatBalance::QRadSWOutIncident(PVT(PVTnum).SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
@@ -930,9 +918,9 @@ namespace PhotovoltaicThermalCollectors {
 
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
-            if (SELECT_CASE_var == LiquidWorkingFluid) {
+            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 InletNode = PVT(PVTnum).PlantInletNodeNum;
-            } else if (SELECT_CASE_var == AirWorkingFluid) {
+            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 InletNode = PVT(PVTnum).HVACInletNodeNum;
             }
         }
@@ -947,9 +935,9 @@ namespace PhotovoltaicThermalCollectors {
                 {
                     auto const SELECT_CASE_var(PVT(PVTnum).Simple.ThermEfficMode);
 
-                    if (SELECT_CASE_var == FixedThermEffic) {
+                    if (SELECT_CASE_var == ThermEfficEnum::FIXED) {
                         Eff = PVT(PVTnum).Simple.ThermEffic;
-                    } else if (SELECT_CASE_var == ScheduledThermEffic) {
+                    } else if (SELECT_CASE_var == ThermEfficEnum::SCHEDULED) {
                         Eff = ScheduleManager::GetCurrentScheduleValue(PVT(PVTnum).Simple.ThermEffSchedNum);
                         PVT(PVTnum).Simple.ThermEffic = Eff;
                     }
@@ -957,7 +945,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 PotentialHeatGain = DataHeatBalance::QRadSWOutIncident(SurfNum) * Eff * PVT(PVTnum).AreaCol;
 
-                if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
+                if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
                     Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
                     if (mdot * CpInlet > 0.0) {
@@ -980,7 +968,7 @@ namespace PhotovoltaicThermalCollectors {
                     } else {
                         BypassFraction = 0.0;
                     }
-                } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
+                } else if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                     if (mdot * CpInlet != 0.0) { // protect divide by zero
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
@@ -1006,12 +994,12 @@ namespace PhotovoltaicThermalCollectors {
                 ConvectionCoefficients::InitExteriorConvectionCoeff(
                     SurfNum, 0.0, RoughSurf, PVT(PVTnum).Simple.SurfEmissivity, PVT(PVTnum).Simple.LastCollectorTemp, HcExt, HrSky, HrGround, HrAir);
 
-                if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
+                if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
                     Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
                     WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
                     DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
-                } else if (PVT(PVTnum).WorkingFluidType == LiquidWorkingFluid) {
+                } else if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                 }
 
@@ -1023,7 +1011,7 @@ namespace PhotovoltaicThermalCollectors {
                 PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
                 PVT(PVTnum).Report.ToutletWorkFluid = PotentialOutletTemp;
                 // trap for air not being cooled below its wetbulb.
-                if (PVT(PVTnum).WorkingFluidType == AirWorkingFluid) {
+                if (PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) {
                     if (PotentialOutletTemp < DewPointInlet) {
                         //  water removal would be needed.. not going to allow that for now.  limit cooling to dew point and model bypass
                         if (Tinlet != PotentialOutletTemp) {
@@ -1075,14 +1063,14 @@ namespace PhotovoltaicThermalCollectors {
 
         {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
-            if (SELECT_CASE_var == LiquidWorkingFluid) {
+            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 InletNode = PVT(PVTnum).PlantInletNodeNum;
                 OutletNode = PVT(PVTnum).PlantOutletNodeNum;
 
                 PlantUtilities::SafeCopyPlantNode(InletNode, OutletNode);
                 DataLoopNode::Node(OutletNode).Temp = PVT(PVTnum).Report.ToutletWorkFluid;
 
-            } else if (SELECT_CASE_var == AirWorkingFluid) {
+            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 InletNode = PVT(PVTnum).HVACInletNodeNum;
                 OutletNode = PVT(PVTnum).HVACOutletNodeNum;
 

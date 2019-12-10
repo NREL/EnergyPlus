@@ -55,20 +55,21 @@ namespace EnergyPlus {
 
 namespace PhotovoltaicThermalCollectors {
 
-    extern int const SimplePVTmodel;
+    enum struct WorkingFluidEnum
+    {
+        LIQUID,
+        AIR
+    };
 
-    extern int const ScheduledThermEffic; // mode for thermal efficiency is to use schedule
-    extern int const FixedThermEffic;     // mode for thermal efficiency is to use fixed value
-
-    extern int const LiquidWorkingFluid;
-    extern int const AirWorkingFluid;
+    enum struct ThermEfficEnum
+    {
+        SCHEDULED,
+        FIXED
+    };
 
     extern int const CalledFromPlantLoopEquipMgr;
     extern int const CalledFromOutsideAirSystem;
 
-    extern Real64 const SimplePVTWaterSizeFactor; // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
-
-    extern Array1D_bool CheckEquipName;
     extern int NumPVT;              // count of all types of PVT in input file
     extern int NumSimplePVTPerform; // count of simple PVT performance objects in input file
 
@@ -77,7 +78,7 @@ namespace PhotovoltaicThermalCollectors {
         // Members
         std::string Name;
         Real64 ThermalActiveFract; // fraction of surface area with active thermal collection
-        int ThermEfficMode;        // setting for how therm effic is determined
+        ThermEfficEnum ThermEfficMode;        // setting for how therm effic is determined
         Real64 ThermEffic;         // fixed or current Therm efficiency
         int ThermEffSchedNum;      // pointer to schedule for therm effic (if any)
         Real64 SurfEmissivity;     // surface emittance in long wave IR
@@ -86,7 +87,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         SimplePVTModelStruct()
-            : ThermalActiveFract(0.0), ThermEfficMode(0), ThermEffic(0.0), ThermEffSchedNum(0), SurfEmissivity(0.0), LastCollectorTemp(0.0),
+            : ThermalActiveFract(0.0), ThermEfficMode(ThermEfficEnum::FIXED), ThermEffic(0.0), ThermEffSchedNum(0), SurfEmissivity(0.0), LastCollectorTemp(0.0),
               CollectorTemp(0.0)
         {
         }
@@ -131,7 +132,7 @@ namespace PhotovoltaicThermalCollectors {
         int PVnum;                // PV index
         bool PVfound;             // init, need to delay get input until PV gotten
         SimplePVTModelStruct Simple; // performance data structure.
-        int WorkingFluidType;
+        WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
         int HVACInletNodeNum;
@@ -152,7 +153,7 @@ namespace PhotovoltaicThermalCollectors {
         // Default Constructor
         PVTCollectorStruct()
             : TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0),
-              PVnum(0), PVfound(false), WorkingFluidType(0), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
+              PVnum(0), PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
               DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0),
               BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
               SetLoopIndexFlag(true)
