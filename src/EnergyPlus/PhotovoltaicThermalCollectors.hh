@@ -56,7 +56,6 @@ namespace EnergyPlus {
 namespace PhotovoltaicThermalCollectors {
 
     extern int const SimplePVTmodel;
-    extern int const LayerByLayerPVTmodel;
 
     extern int const ScheduledThermEffic; // mode for thermal efficiency is to use schedule
     extern int const FixedThermEffic;     // mode for thermal efficiency is to use fixed value
@@ -117,7 +116,6 @@ namespace PhotovoltaicThermalCollectors {
     struct PVTCollectorStruct
     {
         // Members
-        // input
         std::string Name;         // Name of PVT collector
         int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  !DSU
         int WLoopNum;             // Water plant loop index number                      !DSU
@@ -132,8 +130,6 @@ namespace PhotovoltaicThermalCollectors {
         std::string PVname;       // named Generator:Photovoltaic object
         int PVnum;                // PV index
         bool PVfound;             // init, need to delay get input until PV gotten
-        // INTEGER                      :: PlantLoopNum       = 0  ! needed for sizing and control
-        // INTEGER                      :: PlantLoopSide      = 0  ! needed for sizing, demand vs. supply sided
         SimplePVTModelStruct Simple; // performance data structure.
         int WorkingFluidType;
         int PlantInletNodeNum;
@@ -152,7 +148,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         PVTCollectorStruct()
-            : WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0),
+            : TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0),
               PVnum(0), PVfound(false), WorkingFluidType(0), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
               DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0),
               BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false)
@@ -163,33 +159,28 @@ namespace PhotovoltaicThermalCollectors {
     extern Array1D<PVTCollectorStruct> PVT;
 
     void SimPVTcollectors(int &PVTnum, // index to PVT array.
-                          bool const FirstHVACIteration,
-                          int const CalledFrom,
+                          bool FirstHVACIteration,
+                          int CalledFrom,
                           Optional_string_const PVTName = _,
                           Optional_bool_const InitLoopEquip = _);
 
     void GetPVTcollectorsInput();
 
-    void InitPVTcollectors(int const PVTnum, bool const FirstHVACIteration);
+    void InitPVTcollectors(int PVTnum, bool FirstHVACIteration);
 
-    void SizePVT(int const PVTnum);
+    void SizePVT(int PVTnum);
 
-    void ControlPVTcollector(int const PVTnum);
+    void ControlPVTcollector(int PVTnum);
 
-    void CalcPVTcollectors(int const PVTnum);
+    void CalcPVTcollectors(int PVTnum);
 
-    void UpdatePVTcollectors(int const PVTnum);
+    void UpdatePVTcollectors(int PVTnum);
 
-    void GetPVTThermalPowerProduction(int const PVindex, // index of PV generator (not PVT collector)
-                                      Real64 &ThermalPower,
-                                      Real64 &ThermalEnergy);
-    int GetAirInletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    );
+    void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-    int GetAirOutletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound);
+
+    int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
 

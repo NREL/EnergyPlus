@@ -102,7 +102,6 @@ namespace PhotovoltaicThermalCollectors {
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
     int const SimplePVTmodel(1001);
-    int const LayerByLayerPVTmodel(1002);
 
     int const ScheduledThermEffic(15); // mode for thermal efficiency is to use schedule
     int const FixedThermEffic(16);     // mode for thermal efficiency is to use fixed value
@@ -477,11 +476,10 @@ namespace PhotovoltaicThermalCollectors {
 
         static std::string const RoutineName("InitPVTcollectors");
 
-        int InletNode;
-        int OutletNode;
+        int InletNode = 0;
+        int OutletNode = 0;
         int PVTindex;
         int SurfNum;
-        static bool ErrorsFound(false);
         static bool MySetPointCheckFlag(true);
         static bool MyOneTimeFlag(true);      // one time flag
         static Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -516,14 +514,13 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
 
-        // finish set up of PV, becaues PV get-input follows PVT's get input.
+        // finish set up of PV, because PV get-input follows PVT's get input.
         if (!PVT(PVTnum).PVfound) {
             if (allocated(DataPhotovoltaics::PVarray)) {
                 PVT(PVTnum).PVnum = UtilityRoutines::FindItemInList(PVT(PVTnum).PVname, DataPhotovoltaics::PVarray);
                 if (PVT(PVTnum).PVnum == 0) {
                     ShowSevereError("Invalid name for photovoltaic generator = " + PVT(PVTnum).PVname);
                     ShowContinueError("Entered in flat plate photovoltaic-thermal collector = " + PVT(PVTnum).Name);
-                    ErrorsFound = true;
                 } else {
                     PVT(PVTnum).PVfound = true;
                 }
@@ -531,7 +528,6 @@ namespace PhotovoltaicThermalCollectors {
                 if ((!DataGlobals::BeginEnvrnFlag) && (!FirstHVACIteration)) {
                     ShowSevereError("Photovoltaic generators are missing for Photovoltaic Thermal modeling");
                     ShowContinueError("Needed for flat plate photovoltaic-thermal collector = " + PVT(PVTnum).Name);
-                    ErrorsFound = true;
                 }
             }
         }
@@ -571,6 +567,8 @@ namespace PhotovoltaicThermalCollectors {
             } else if (SELECT_CASE_var == AirWorkingFluid) {
                 InletNode = PVT(PVTnum).HVACInletNodeNum;
                 OutletNode = PVT(PVTnum).HVACOutletNodeNum;
+            } else {
+                assert(false);
             }
         }
 
@@ -679,11 +677,8 @@ namespace PhotovoltaicThermalCollectors {
         Real64 DesignVolFlowRateDes;  // Autosize design volume flow for reporting
         Real64 DesignVolFlowRateUser; // Hardsize design volume flow for reporting
 
-        if (DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone) {
-            HardSizeNoDesRun = false;
-        } else {
-            HardSizeNoDesRun = true;
-        }
+        HardSizeNoDesRun = !(DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone);
+
         if (DataSizing::CurSysNum > 0) {
             CheckThisAirSystemForSizing(DataSizing::CurSysNum, SizingDesRunThisAirSys);
         } else {
@@ -691,7 +686,6 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         DesignVolFlowRateDes = 0.0;
-        DesignVolFlowRateUser = 0.0;
         PltSizNum = 0;
         ErrorsFound = false;
 
@@ -922,7 +916,6 @@ namespace PhotovoltaicThermalCollectors {
         static std::string const RoutineName("CalcPVTcollectors");
 
         static int InletNode(0);
-        static int OutletNode(0);
         static Real64 Eff(0.0);
         static int SurfNum(0);
         static int RoughSurf(0);
@@ -948,10 +941,8 @@ namespace PhotovoltaicThermalCollectors {
             auto const SELECT_CASE_var(PVT(PVTnum).WorkingFluidType);
             if (SELECT_CASE_var == LiquidWorkingFluid) {
                 InletNode = PVT(PVTnum).PlantInletNodeNum;
-                OutletNode = PVT(PVTnum).PlantOutletNodeNum;
             } else if (SELECT_CASE_var == AirWorkingFluid) {
                 InletNode = PVT(PVTnum).HVACInletNodeNum;
-                OutletNode = PVT(PVTnum).HVACOutletNodeNum;
             }
         }
 
@@ -1064,18 +1055,6 @@ namespace PhotovoltaicThermalCollectors {
                 PVT(PVTnum).Report.ThermEfficiency = 0.0;
                 PVT(PVTnum).Simple.LastCollectorTemp = Tcollector;
                 PVT(PVTnum).Report.BypassStatus = 0.0;
-
-            } else if (!PVT(PVTnum).BypassDamperOff) { // bypassed, zero things out
-
-                PVT(PVTnum).Report.TinletWorkFluid = Tinlet;
-                PVT(PVTnum).Report.ToutletWorkFluid = Tinlet;
-                PVT(PVTnum).Report.ThermHeatLoss = 0.0;
-                PVT(PVTnum).Report.ThermHeatGain = 0.0;
-                PVT(PVTnum).Report.ThermPower = 0.0;
-                PVT(PVTnum).Report.ThermEfficiency = 0.0;
-                PVT(PVTnum).Report.ThermEnergy = 0.0;
-                PVT(PVTnum).Report.BypassStatus = 1.0;
-                PVT(PVTnum).Report.MdotWorkFluid = mdot;
 
             } else {
                 PVT(PVTnum).Report.TinletWorkFluid = Tinlet;
