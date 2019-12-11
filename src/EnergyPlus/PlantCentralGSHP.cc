@@ -2037,9 +2037,20 @@ namespace PlantCentralGSHP {
                 ChillerEIRFT =
                     max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                 ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
-                CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+
+                if (ReferenceCOP <= 0.0) {
+                    CHPower = 0.0;
+                } else {
+                    CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+                }
+
                 QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
-                ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                if (CHPower == 0.0) {
+                    ActualCOP = 0.0;
+                } else {
+                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                }
 
                 if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
@@ -2487,7 +2498,13 @@ namespace PlantCentralGSHP {
                         max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                     ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
                     CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
-                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                    if (CHPower <= 0.0) {
+                        ActualCOP = 0.0;
+                    } else {
+                        ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                    }
+
                     QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
 
                     // Determine heating load for this heater and pass the remaining load to the next chiller heater
