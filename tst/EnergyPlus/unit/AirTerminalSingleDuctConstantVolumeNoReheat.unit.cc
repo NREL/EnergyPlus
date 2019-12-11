@@ -246,7 +246,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     int const ZonePtr = Sys(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     // run SimConstVolNoReheat() function
-    Sys(SysNum).SimConstVolNoReheat(SysNum, FirstHVACIteration, ZonePtr, ZoneAirNodeNum);
+    Sys(SysNum).SimConstVolNoReheat(SysNum, ZoneAirNodeNum);
     // check the TA outlet air mass flow rate
     EXPECT_EQ(MassFlowRateMaxAvail, SysOutlet(SysNum).AirMassFlowRate);
 }
