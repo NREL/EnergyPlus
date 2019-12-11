@@ -201,7 +201,6 @@ namespace UserDefinedComponents {
         void initialize(int LoopNum, Real64 MyLoad);
 
         void report(int LoopNum);
-
     };
 
     struct UserCoilComponentStruct
@@ -226,7 +225,6 @@ namespace UserDefinedComponents {
         void initialize();
 
         void report();
-
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -257,7 +255,6 @@ namespace UserDefinedComponents {
         void initialize(int ZoneNum);
 
         void report();
-
     };
 
     struct UserAirTerminalComponentStruct
@@ -290,7 +287,6 @@ namespace UserDefinedComponents {
         void initialize(int ZoneNum);
 
         void report();
-
     };
 
     // Object Data
@@ -308,7 +304,7 @@ namespace UserDefinedComponents {
                             bool &CoolingActive);
 
     void SimZoneAirUserDefined(std::string const &CompName,    // name of the packaged terminal heat pump
-                               int ZoneNum,              // number of zone being served
+                               int ZoneNum,                    // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                int &CompIndex                  // index to zone hvac unit
@@ -322,9 +318,11 @@ namespace UserDefinedComponents {
 
     void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void
+    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void
+    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 
