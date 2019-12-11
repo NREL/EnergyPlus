@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +69,7 @@ namespace ExteriorEnergyUse {
     extern int const CoalUse;         // Coal
     extern int const FuelOil1Use;     // FuelOil#1
     extern int const FuelOil2Use;     // FuelOil#2
-    extern int const LPGUse;          // PropaneGas
+    extern int const PropaneUse;      // Propane
     extern int const GasolineUse;     // Gasoline
     extern int const DieselUse;       // Diesel
     extern int const SteamUse;        // Steam

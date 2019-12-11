@@ -51,7 +51,7 @@
 #include <string>
 #include <vector>
 
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

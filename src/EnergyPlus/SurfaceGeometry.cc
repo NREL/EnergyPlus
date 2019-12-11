@@ -60,33 +60,33 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DataZoneEquipment.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <ScheduleManager.hh>
-#include <SurfaceGeometry.hh>
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -2210,7 +2210,6 @@ namespace SurfaceGeometry {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const AbCorners(4, {"ULC", "LLC", "LRC", "URC"});
         static Array1D_string const FlCorners(4, {"UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2257,21 +2256,14 @@ namespace SurfaceGeometry {
                 CCW = true;
 
                 OK = false;
-                Found = UtilityRoutines::FindItem(GAlphas(1), AbCorners, 4);
+                Found = UtilityRoutines::FindItem(GAlphas(1), FlCorners, 4);
                 if (Found == 0) {
-                    Found = UtilityRoutines::FindItem(GAlphas(1), FlCorners, 4);
-                    if (Found == 0) {
-                        ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + GAlphas(1));
-                        ErrorsFound = true;
-                    } else {
-                        Corner = Found;
-                        OK = true;
-                        OutMsg += FlCorners(Corner) + ',';
-                    }
+                    ShowSevereError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + GAlphas(1));
+                    ErrorsFound = true;
                 } else {
                     Corner = Found;
-                    OutMsg += FlCorners(Corner) + ',';
                     OK = true;
+                    OutMsg += FlCorners(Corner) + ',';
                 }
 
                 OK = false;
@@ -2291,13 +2283,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(3), "WCS") || UtilityRoutines::SameString(GAlphas(3), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(3), "World") || UtilityRoutines::SameString(GAlphas(3), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(3), "World") || UtilityRoutines::SameString(GAlphas(3), "Absolute")) {
                     WorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(3), "Rel") || has_prefixi(GAlphas(3), "Relative") || UtilityRoutines::SameString(GAlphas(3), "Local")) {
+                if (UtilityRoutines::SameString(GAlphas(3), "Relative")) {
                     WorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
@@ -2310,14 +2301,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(4), "WCS") || UtilityRoutines::SameString(GAlphas(4), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(4), "World") || UtilityRoutines::SameString(GAlphas(4), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(4), "World") || UtilityRoutines::SameString(GAlphas(4), "Absolute")) {
                     DaylRefWorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(4), "Rel") || has_prefixi(GAlphas(4), "Relative") || UtilityRoutines::SameString(GAlphas(4), "Local") ||
-                    GAlphas(4).empty()) {
+                if (UtilityRoutines::SameString(GAlphas(4), "Relative") || GAlphas(4).empty()) {
                     DaylRefWorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
@@ -2330,14 +2319,12 @@ namespace SurfaceGeometry {
                 }
 
                 OK = false;
-                if (UtilityRoutines::SameString(GAlphas(5), "WCS") || UtilityRoutines::SameString(GAlphas(5), "WorldCoordinateSystem") ||
-                    UtilityRoutines::SameString(GAlphas(5), "World") || UtilityRoutines::SameString(GAlphas(5), "Absolute")) {
+                if (UtilityRoutines::SameString(GAlphas(5), "World") || UtilityRoutines::SameString(GAlphas(5), "Absolute")) {
                     RectSurfRefWorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem";
                     OK = true;
                 }
-                if (has_prefixi(GAlphas(5), "Rel") || has_prefixi(GAlphas(5), "Relative") || UtilityRoutines::SameString(GAlphas(5), "Local") ||
-                    GAlphas(5).empty()) {
+                if (UtilityRoutines::SameString(GAlphas(5), "Relative") || GAlphas(5).empty()) {
                     RectSurfRefWorldCoordSystem = false;
                     OutMsg += "RelativeToZoneOrigin";
                     OK = true;

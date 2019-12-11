@@ -52,53 +52,54 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace ChillerAbsorption {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
     extern int const FlowModeNotSet;
     extern int const ConstantFlow;
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // DERIVED TYPE DEFINITIONS:
+    extern int numBlastAbsorbers; // number of Absorption Chillers specified in input
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumBLASTAbsorbers; // number of Absorption Chillers specified in input
+    extern bool getInput; // When TRUE, calls subroutine to read input file
 
-    extern Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
-    extern Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
-    extern Real64 SteamMassFlowRate;   // Kg/s - steam mass flow rate, water side
-    extern Real64 CondOutletTemp;      // C - condenser outlet temperature, water side
-    extern Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
-    extern Real64 GenOutletTemp;       // C - generator fluid outlet temperature
-    extern Real64 SteamOutletEnthalpy; // J/kg - generator fluid outlet enthalpy
-    extern Real64 PumpingPower;        // W - rate of Absorber energy use
-    extern Real64 PumpingEnergy;       // J - Absorber energy use
-    extern Real64 QGenerator;          // W - rate of Absorber steam use
-    extern Real64 GeneratorEnergy;     // J - Absorber steam use
-    extern Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
-    extern Real64 EvaporatorEnergy;    // J - heat transfer to the evaporator coil
-    extern Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
-    extern Real64 CondenserEnergy;     // J - heat transfer to the condenser coil
+    struct ReportVars
+    {
+        // Members
+        Real64 PumpingPower;    // reporting: electric pumping power
+        Real64 QGenerator;      // reporting: steam heat transfer rate
+        Real64 QEvap;           // reporting: evaporator heat transfer rate
+        Real64 QCond;           // reporting: condenser heat transfer rate
+        Real64 PumpingEnergy;   // reporting: electric pumping power
+        Real64 GeneratorEnergy; // reporting: steam heat transfer rate
+        Real64 EvapEnergy;      // reporting: evaporator heat transfer rate
+        Real64 CondEnergy;      // reporting: condenser heat transfer rate
+        Real64 CondInletTemp;   // reporting: condenser inlet temperature
+        Real64 EvapInletTemp;   // reporting: evaporator inlet temperature
+        Real64 CondOutletTemp;  // reporting: condenser outlet temperature
+        Real64 EvapOutletTemp;  // reporting: evaporator outlet temperature
+        Real64 Evapmdot;        // reporting: evaporator mass flow rate
+        Real64 Condmdot;        // reporting: condenser mass flow rate
+        Real64 Genmdot;         // reporting: generator mass flow rate when connected to plant
+        Real64 SteamMdot;       // reporting: steam mass flow rate
+        Real64 ActualCOP;       // reporting: coefficient of performance = QEvap/QGenerator
 
-    extern Array1D_bool CheckEquipName;
+        // Default Constructor
+        ReportVars()
+            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
+              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
+              SteamMdot(0.0), ActualCOP(0.0)
+        {
+        }
+    };
 
-    extern bool GetInput; // When TRUE, calls subroutine to read input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Types
-
-    struct BLASTAbsorberSpecs
+    struct BLASTAbsorberSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // user identifier
@@ -157,6 +158,26 @@ namespace ChillerAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
+        Real64 CondMassFlowRate;               // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;               // Kg/s - evaporator mass flow rate, water side
+        Real64 SteamMassFlowRate;              // Kg/s - steam mass flow rate, water side
+        Real64 CondOutletTemp;                 // C - condenser outlet temperature, water side
+        Real64 EvapOutletTemp;                 // C - evaporator outlet temperature, water side
+        Real64 GenOutletTemp;                  // C - generator fluid outlet temperature
+        Real64 SteamOutletEnthalpy;            // J/kg - generator fluid outlet enthalpy
+        Real64 PumpingPower;                   // W - rate of Absorber energy use
+        Real64 PumpingEnergy;                  // J - Absorber energy use
+        Real64 QGenerator;                     // W - rate of Absorber steam use
+        Real64 GeneratorEnergy;                // J - Absorber steam use
+        Real64 QEvaporator;                    // W - rate of heat transfer to the evaporator coil
+        Real64 EvaporatorEnergy;               // J - heat transfer to the evaporator coil
+        Real64 QCondenser;                     // W - rate of heat transfer to the condenser coil
+        Real64 CondenserEnergy;                // J - heat transfer to the condenser coil
+        bool MyOneTimeFlag;
+        bool MyEnvrnFlag;
+        bool GenInputOutputNodesUsed;
+        ReportVars Report;
+        int EquipFlowCtrl;
 
         // Default Constructor
         BLASTAbsorberSpecs()
@@ -169,104 +190,42 @@ namespace ChillerAbsorption {
               GenHeatSourceType(0), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false), GeneratorSubcool(0.0), SteamFluidIndex(0),
               GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false)
+              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
+              EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
+              PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
+              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
         {
         }
-    };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PumpingPower;    // reporting: electric pumping power
-        Real64 QGenerator;      // reporting: steam heat transfer rate
-        Real64 QEvap;           // reporting: evaporator heat transfer rate
-        Real64 QCond;           // reporting: condensor heat transfer rate
-        Real64 PumpingEnergy;   // reporting: electric pumping power
-        Real64 GeneratorEnergy; // reporting: steam heat transfer rate
-        Real64 EvapEnergy;      // reporting: evaporator heat transfer rate
-        Real64 CondEnergy;      // reporting: condensor heat transfer rate
-        Real64 CondInletTemp;   // reporting: condenser inlet temperature
-        Real64 EvapInletTemp;   // reporting: evaporator inlet temperature
-        Real64 CondOutletTemp;  // reporting: condenser outlet temperature
-        Real64 EvapOutletTemp;  // reporting: evaporator outlet temperature
-        Real64 Evapmdot;        // reporting: evaporator mass flow rate
-        Real64 Condmdot;        // reporting: condenser mass flow rate
-        Real64 Genmdot;         // reporting: generatore mass flow rate when connected to plant
-        Real64 SteamMdot;       // reporting: steam mass flow rate
-        Real64 ActualCOP;       // reporting: coefficient of performance = QEvap/QGenerator
+        static PlantComponent *factory(std::string const &objectName);
 
-        // Default Constructor
-        ReportVars()
-            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
-              SteamMdot(0.0), ActualCOP(0.0)
-        {
-        }
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void getSizingFactor(Real64 &sizFac) override;
+
+        void initialize(bool RunFlag, Real64 MyLoad);
+
+        void setupOutputVars();
+
+        void sizeChiller();
+
+        void calculate(Real64 &MyLoad, bool RunFlag);
+
+        void updateRecords(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
     extern Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> BLASTAbsorberReport;
 
-    // Functions
-
-    void SimBLASTAbsorber(std::string const &AbsorberType, // type of Absorber
-                          std::string const &AbsorberName, // user specified name of Absorber
-                          int const EquipFlowCtrl,         // Flow control mode for the equipment
-                          int const LoopNum,               // Plant loop index for where called from
-                          int const LoopSide,              // Plant loop side index for where called from
-                          int &CompIndex,                  // Chiller number pointer
-                          bool const RunFlag,              // simulate Absorber when TRUE
-                          bool const FirstIteration,       // initialize variables when TRUE
-                          bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
-                          Real64 &MyLoad,                  // loop demand component will meet
-                          Real64 &MaxCap,                  // Maximum operating capacity of chiller [W]
-                          Real64 &MinCap,                  // Minimum operating capacity of chiller [W]
-                          Real64 &OptCap,                  // Optimal operating capacity of chiller [W]
-                          bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
-                          Real64 &SizingFactor,            // sizing factor
-                          Real64 &TempCondInDesign);
-
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
+    void clear_state();
 
     void GetBLASTAbsorberInput();
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
-    void InitBLASTAbsorberModel(int const ChillNum, // number of the current electric chiller being simulated
-                                bool const RunFlag, // TRUE when chiller operating
-                                Real64 const MyLoad);
-
-    void SizeAbsorpChiller(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
-    void CalcBLASTAbsorberModel(int &ChillNum,             // Absorber number
-                                Real64 &MyLoad,            // operating load
-                                bool const RunFlag,        // TRUE when Absorber operating
-                                bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                int const EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    void UpdateBLASTAbsorberRecords(Real64 const MyLoad, // current load
-                                    bool const RunFlag,  // TRUE if Absorber operating
-                                    int const Num        // Absorber number
-    );
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
 } // namespace ChillerAbsorption
 

@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -218,7 +218,8 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             next_token(idf, index);
             continue;
         } else if (token == Token::COMMA) {
-            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Extraneous comma found.");
+            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
+                                 " - Extraneous comma found.");
             success = false;
             return root;
         } else if (token == Token::EXCLAMATION) {
@@ -480,7 +481,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const double_val = stod(num_str, nullptr);
             val = double_val;
-        } catch (std::exception & e) {
+        } catch (std::exception &e) {
             auto const double_val = stold(num_str, nullptr);
             val = double_val;
         }
@@ -488,7 +489,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const int_val = stoi(num_str, nullptr);
             val = int_val;
-        } catch (std::exception & e) {
+        } catch (std::exception &e) {
             auto const int_val = stoll(num_str, nullptr);
             val = int_val;
         }
@@ -512,47 +513,47 @@ json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success
     }
 
     switch (token) {
-        case Token::STRING: {
-            auto const parsed_string = parse_string(idf, index, success);
-            auto const &enum_it = field_loc.find("enum");
-            if (enum_it != field_loc.end()) {
-                for (auto const &s : enum_it.value()) {
-                    auto const &str = s.get<std::string>();
-                    if (icompare(str, parsed_string)) {
-                        return str;
-                    }
-                }
-            } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
-                auto const &default_it = field_loc.find("default");
-                // The following is hacky because it abuses knowing the consistent generated structure
-                // in the future this might not hold true for the array indexes.
-                if (default_it != field_loc.end()) {
-                    return field_loc["anyOf"][1]["enum"][1];
-                } else {
-                    return field_loc["anyOf"][1]["enum"][0];
+    case Token::STRING: {
+        auto const parsed_string = parse_string(idf, index, success);
+        auto const &enum_it = field_loc.find("enum");
+        if (enum_it != field_loc.end()) {
+            for (auto const &s : enum_it.value()) {
+                auto const &str = s.get<std::string>();
+                if (icompare(str, parsed_string)) {
+                    return str;
                 }
             }
-            return parsed_string;
-        }
-        case Token::NUMBER: {
-            size_t save_line_index = index_into_cur_line;
-            size_t save_line_num = cur_line_num;
-            json value = parse_number(idf, index, success);
-            if (!success) {
-                cur_line_num = save_line_num;
-                index_into_cur_line = save_line_index;
-                success = true;
-                return parse_string(idf, index, success);
+        } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
+            auto const &default_it = field_loc.find("default");
+            // The following is hacky because it abuses knowing the consistent generated structure
+            // in the future this might not hold true for the array indexes.
+            if (default_it != field_loc.end()) {
+                return field_loc["anyOf"][1]["enum"][1];
+            } else {
+                return field_loc["anyOf"][1]["enum"][0];
             }
-            return value;
         }
-        case Token::NONE:
-        case Token::END:
-        case Token::EXCLAMATION:
-        case Token::COMMA:
-        case Token::SEMICOLON:
-        default:
-            break;
+        return parsed_string;
+    }
+    case Token::NUMBER: {
+        size_t save_line_index = index_into_cur_line;
+        size_t save_line_num = cur_line_num;
+        json value = parse_number(idf, index, success);
+        if (!success) {
+            cur_line_num = save_line_num;
+            index_into_cur_line = save_line_index;
+            success = true;
+            return parse_string(idf, index, success);
+        }
+        return value;
+    }
+    case Token::NONE:
+    case Token::END:
+    case Token::EXCLAMATION:
+    case Token::COMMA:
+    case Token::SEMICOLON:
+    default:
+        break;
     }
     success = false;
     return nullptr;

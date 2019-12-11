@@ -48,15 +48,15 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <PollutionModule.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -747,7 +747,7 @@ namespace PollutionModule {
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
-                if ((SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS") || (SELECT_CASE_var == "GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     if (Pollution.NatGasCoef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -841,8 +841,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "RESIDUALOIL") || (SELECT_CASE_var == "RESIDUAL OIL") || (SELECT_CASE_var == "FUEL OIL #2") ||
-                           (SELECT_CASE_var == "FUELOIL#2")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -936,8 +935,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "DISTILLATEOIL") || (SELECT_CASE_var == "DISTILLATE OIL") || (SELECT_CASE_var == "FUEL OIL #1") ||
-                           (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -1303,8 +1301,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Gasoline", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.GasolineCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     if (Pollution.PropaneCoef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -1775,14 +1772,14 @@ namespace PollutionModule {
                 ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
                 ErrorsFound = true;
             }
-            // Check for Residual Oil
+            // Check for FuelOil#2 (Residual Oil)
             if (!Pollution.FuelOil2Coef.FuelFactorUsed && (FuelType.FuelOil2FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for RESIDUAL/FUEL OIL #2");
+                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
                 ErrorsFound = true;
             }
-            // Check for Distillate Oil
+            // Check for FuelOil#1 (Distillate Oil)
             if (!Pollution.FuelOil1Coef.FuelFactorUsed && (FuelType.FuelOil1FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DISTILLATE/FUEL OIL #1");
+                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
                 ErrorsFound = true;
             }
             // Check for Coal
@@ -1851,7 +1848,7 @@ namespace PollutionModule {
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
-                if ((SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS") || (SELECT_CASE_var == "GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     // Pollutants from Natural Gas
                     SetupOutputVariable("Environmental Impact Natural Gas Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2041,8 +2038,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "RESIDUALOIL") || (SELECT_CASE_var == "RESIDUAL OIL") || (SELECT_CASE_var == "FUEL OIL #2") ||
-                           (SELECT_CASE_var == "FUELOIL#2")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     // Pollutants from FuelOil#2
                     SetupOutputVariable("Environmental Impact Fuel Oil #2 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2232,8 +2228,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "DISTILLATEOIL") || (SELECT_CASE_var == "DISTILLATE OIL") || (SELECT_CASE_var == "FUEL OIL #1") ||
-                           (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     // Pollutants from FuelOil#1
                     SetupOutputVariable("Environmental Impact Fuel Oil #1 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2613,7 +2608,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     // Pollutants from Electricity
                     SetupOutputVariable("Environmental Impact Electricity Source Energy",
                                         OutputProcessor::Unit::J,
@@ -3014,8 +3009,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     // Pollutants from Propane
                     SetupOutputVariable("Environmental Impact Propane Source Energy",
                                         OutputProcessor::Unit::J,
@@ -5779,7 +5773,7 @@ namespace PollutionModule {
         // The Distillate Oil or Fuel Oil #1
         FuelType.FuelOil1 = FuelType.FuelOil1Facility;
 
-        // The Residual Oil fuel type will be summed with the Fuel Oils
+        // The Residual Oil or Fuel Oil #2
         FuelType.FuelOil2 = FuelType.FuelOil2Facility;
 
         // The Gasoline fuel type will be summed
@@ -5892,7 +5886,7 @@ namespace PollutionModule {
                     fuelSourceFactor = 3.167;
                 }
 
-            } else if ((SELECT_CASE_var == "ResidualOil") || (SELECT_CASE_var == "FuelOil#2")) {
+            } else if (SELECT_CASE_var == "FuelOil#2") {
                 if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                     fuelFactorUsed = true;
                     fuelSourceFactor = Pollution.FuelOil2Coef.Source;
@@ -5906,7 +5900,7 @@ namespace PollutionModule {
                     fuelSourceFactor = 1.05;
                 }
 
-            } else if ((SELECT_CASE_var == "DistillateOil") || (SELECT_CASE_var == "FuelOil#1")) {
+            } else if (SELECT_CASE_var == "FuelOil#1") {
                 if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                     fuelFactorUsed = true;
                     fuelSourceFactor = Pollution.FuelOil1Coef.Source;

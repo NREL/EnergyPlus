@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -106,9 +106,9 @@ namespace EconomicLifeCycleCost {
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
-    //   Distillate oil
-    //   Liquified petroleum gas
-    //   Residual oil
+    //   Distillate oil - FuelOil#1
+    //   Liquified petroleum gas - Propane
+    //   Residual oil - FuelOil#2
     //   Coal
 
     extern int const startServicePeriod;

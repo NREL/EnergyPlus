@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <Plant/LoopSide.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/LoopSide.hh>
 
 namespace EnergyPlus {
 

@@ -57,44 +57,44 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <EMSManager.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixedAir.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SteamCoils.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
-#include <WaterManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
 
@@ -173,7 +173,7 @@ namespace HVACVariableRefrigerantFlow {
     int const NumValidFuelTypes(9);
     Array1D_string const
         cValidFuelTypes(NumValidFuelTypes,
-                        {"Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
+                        {"Electric", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -2276,19 +2276,17 @@ namespace HVACVariableRefrigerantFlow {
                 // A39; \field Fuel type
                 if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRICITY")) {
                     VRF(VRFNum).FuelType = FuelTypeElectric;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRIC")) {
-                    VRF(VRFNum).FuelType = FuelTypeElectric;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "NATURALGAS")) {
                     VRF(VRFNum).FuelType = FuelTypeNaturalGas;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANEGAS")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANE")) {
                     VRF(VRFNum).FuelType = FuelTypePropaneGas;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "DIESEL")) {
                     VRF(VRFNum).FuelType = FuelTypeDiesel;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "GASOLINE")) {
                     VRF(VRFNum).FuelType = FuelTypeGasoline;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#1")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO1")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil1;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#2")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO2")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil2;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "OtherFuel1")) {
                     VRF(VRFNum).FuelType = FuelTypeOtherFuel1;
@@ -2298,7 +2296,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
-                        "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }

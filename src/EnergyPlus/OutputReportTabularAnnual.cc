@@ -61,19 +61,19 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportData.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -542,7 +542,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue > oldScanValue) {
+                                        if (scanValue < oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -550,7 +550,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue < oldScanValue) {
+                                        if (scanValue > oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -1412,6 +1412,11 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_timeBelowBottomBinTotal);
         ret.push_back(outStr);
+        // cell value
+        if (fldSt.m_cell.size() > 0) {
+            outStr = std::to_string(fldSt.m_cell[0].result);
+            ret.push_back(outStr);
+        }
         return ret;
     }
 

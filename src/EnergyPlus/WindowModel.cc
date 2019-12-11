@@ -45,10 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "DataIPShortCuts.hh"
-#include <InputProcessing/InputProcessor.hh>
-
-#include "WindowModel.hh"
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 

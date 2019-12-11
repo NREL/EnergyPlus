@@ -64,25 +64,25 @@
 
 // EnergyPlus Headers
 #include "re2/re2.h"
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataOutputs.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <ResultsSchema.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <SortAndStringUtilities.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -1917,7 +1917,7 @@ namespace OutputProcessor {
             if (meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC") {
                 OutResourceType = "Electricity";
 
-            } else if (meterType == "GAS" || meterType == "NATURALGAS" || meterType == "NATURAL GAS") {
+            } else if (meterType == "GAS" || meterType == "NATURALGAS") {
                 OutResourceType = "Gas";
 
             } else if (meterType == "GASOLINE") {
@@ -1929,13 +1929,13 @@ namespace OutputProcessor {
             } else if (meterType == "COAL") {
                 OutResourceType = "Coal";
 
-            } else if (meterType == "FUEL OIL #1" || meterType == "FUELOIL#1" || meterType == "FUEL OIL" || meterType == "DISTILLATE OIL") {
+            } else if (meterType ==  "FUELOIL#1") {
                 OutResourceType = "FuelOil#1";
 
-            } else if (meterType == "FUEL OIL #2" || meterType == "FUELOIL#2" || meterType == "RESIDUAL OIL") {
+            } else if (meterType == "FUELOIL#2") {
                 OutResourceType = "FuelOil#2";
 
-            } else if (meterType == "PROPANE" || meterType == "LPG" || meterType == "PROPANEGAS" || meterType == "PROPANE GAS") {
+            } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
                 OutResourceType = "Propane";
 
             } else if (meterType == "WATER" || meterType == "H2O") {
