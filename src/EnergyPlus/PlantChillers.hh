@@ -196,10 +196,9 @@ namespace PlantChillers {
         }
     };
 
-    struct ElectricChillerSpecs
+    struct ElectricChillerSpecs : BaseChillerSpecs
     {
         // Members
-        BaseChillerSpecs Base;
         Real64 MinPartLoadRat; // (Electric MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat; // (Electric MAX) max allowed operating frac full load
         Real64 OptPartLoadRat; // (Electric BEST) optimal operating frac full load
@@ -247,10 +246,9 @@ namespace PlantChillers {
         }
     };
 
-    struct EngineDrivenChillerSpecs
+    struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
         // Members
-        BaseChillerSpecs Base;
         std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 MinPartLoadRat; // (EngineDriven MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat; // (EngineDriven MAX) max allowed operating frac full load
@@ -353,10 +351,9 @@ namespace PlantChillers {
         }
     };
 
-    struct GTChillerSpecs
+    struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        BaseChillerSpecs Base;
         std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 MinPartLoadRat; // (GT MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat; // (GT MAX) max allowed operating frac full load
@@ -430,10 +427,9 @@ namespace PlantChillers {
         }
     };
 
-    struct ConstCOPChillerSpecs
+    struct ConstCOPChillerSpecs : BaseChillerSpecs
     {
         // Members
-        BaseChillerSpecs Base;
         Real64 ActualCOP;
 
         // Default Constructor
