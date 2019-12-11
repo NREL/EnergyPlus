@@ -103,76 +103,54 @@ namespace PhotovoltaicThermalCollectors {
 
     int const SimplePVTmodel(1001);
 
-    int const CalledFromPlantLoopEquipMgr(101);
-    int const CalledFromOutsideAirSystem(102);
-
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
     static bool GetInputFlag(true); // First time, input is "gotten"
 
-    Array1D_bool CheckEquipName;
     int NumPVT(0);              // count of all types of PVT in input file
-    int NumSimplePVTPerform(0); // count of simple PVT performance objects in input file
 
     Array1D<PVTCollectorStruct> PVT;
 
-    void SimPVTcollectors(int &PVTnum, // index to PVT array.
-                          bool const FirstHVACIteration,
-                          int const CalledFrom,
-                          Optional_string_const PVTName,
-                          Optional_bool_const InitLoopEquip)
+    void clear_state()
     {
+        GetInputFlag = true;
+        NumPVT = 0;
+        PVT.deallocate();
+    }
 
+    PlantComponent *PVTCollectorStruct::factory(std::string const &objectName)
+    {
         if (GetInputFlag) {
             GetPVTcollectorsInput();
             GetInputFlag = false;
         }
-
-        if (present(PVTName)) {
-            if (PVTnum == 0) {
-                PVTnum = UtilityRoutines::FindItemInList(PVTName, PVT);
-                if (PVTnum == 0) {
-                    ShowFatalError("SimPVTcollectors: Unit not found=" + PVTName());
-                }
-            } else {
-                if (PVTnum > NumPVT || PVTnum < 1) {
-                    ShowFatalError("SimPVTcollectors: Invalid PVT index passed = " + General::TrimSigDigits(PVTnum) +
-                                   ", Number of PVT units=" + General::TrimSigDigits(NumPVT) + ", Entered Unit name=" + PVTName());
-                }
-                if (CheckEquipName(PVTnum)) {
-                    if (PVTName != PVT(PVTnum).Name) {
-                        ShowFatalError("SimPVTcollectors: Invalid PVT index passed = " + General::TrimSigDigits(PVTnum) + ", Unit name=" + PVTName() +
-                                       ", stored name for that index=" + PVT(PVTnum).Name);
-                    }
-                    CheckEquipName(PVTnum) = false;
-                }
-            }
-        } else {
-            if (PVTnum > NumPVT || PVTnum < 1) {
-                ShowFatalError("SimPVTcollectors: Invalid PVT index passed = " + General::TrimSigDigits(PVTnum) +
-                               ", Number of PVT units=" + General::TrimSigDigits(NumPVT) + ", Entered Unit name=" + PVTName());
-            }
-        } // compName present
-
-        if (present(InitLoopEquip)) {
-            if (InitLoopEquip) {
-                PVT(PVTnum).initialize(FirstHVACIteration);
-                PVT(PVTnum).size();
-                return;
+        for (auto &thisComp : PVT) {
+            if (thisComp.Name == objectName) {
+                return &thisComp;
             }
         }
+        // If we didn't find it, fatal
+        ShowFatalError("Solar Thermal Collector Factory: Error getting inputs for object named: " + objectName);
+        // Shut up the compiler
+        return nullptr;
+    }
 
-        // check where called from and what type of collector this is, return if not right for calling order for speed
-        if ((PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::AIR) && (CalledFrom == CalledFromPlantLoopEquipMgr)) return;
-        if ((PVT(PVTnum).WorkingFluidType == WorkingFluidEnum::LIQUID) && (CalledFrom == CalledFromOutsideAirSystem)) return;
+    void PVTCollectorStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->initialize(true);
+        this->size();
+    }
 
-        PVT(PVTnum).initialize(FirstHVACIteration);
+    void PVTCollectorStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                               bool const FirstHVACIteration,
+                                               Real64 &EP_UNUSED(CurLoad),
+                                               bool const EP_UNUSED(RunFlag))
+    {
 
-        PVT(PVTnum).control();
-
-        PVT(PVTnum).calculate();
-
-        PVT(PVTnum).update();
+        this->initialize(FirstHVACIteration);
+        this->control();
+        this->calculate();
+        this->update();
     }
 
     void GetPVTcollectorsInput()
@@ -198,7 +176,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // first load the performance object info into temporary structure
         DataIPShortCuts::cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-        NumSimplePVTPerform = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        int NumSimplePVTPerform = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
         if (NumSimplePVTPerform > 0) {
             tmpSimplePVTperf.allocate(NumSimplePVTPerform);
             for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
@@ -242,7 +220,6 @@ namespace PhotovoltaicThermalCollectors {
         DataIPShortCuts::cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
         NumPVT = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
         PVT.allocate(NumPVT);
-        CheckEquipName.dimension(NumPVT, true);
 
         for (Item = 1; Item <= NumPVT; ++Item) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,

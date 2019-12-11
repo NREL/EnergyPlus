@@ -93,6 +93,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -599,8 +600,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
@@ -831,7 +830,11 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    SimPVTcollectors(CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName);
+                    auto thisPVT = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompName);
+                    PlantLocation dummyCalledFrom(0, 0, 0, 0);
+                    Real64 dummyCurLoad(0.0);
+                    bool dummyRunFlag(true);
+                    thisPVT->simulate(dummyCalledFrom, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
                 }
 
                 // Evaporative Cooler Types

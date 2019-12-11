@@ -51,6 +51,9 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
+// EnergyPlus Headers
+#include <EnergyPlus/PlantComponent.hh>
+
 namespace EnergyPlus {
 
 namespace PhotovoltaicThermalCollectors {
@@ -66,12 +69,6 @@ namespace PhotovoltaicThermalCollectors {
         SCHEDULED,
         FIXED
     };
-
-    extern int const CalledFromPlantLoopEquipMgr;
-    extern int const CalledFromOutsideAirSystem;
-
-    extern int NumPVT;              // count of all types of PVT in input file
-    extern int NumSimplePVTPerform; // count of simple PVT performance objects in input file
 
     struct SimplePVTModelStruct
     {
@@ -114,16 +111,16 @@ namespace PhotovoltaicThermalCollectors {
         }
     };
 
-    struct PVTCollectorStruct
+    struct PVTCollectorStruct : PlantComponent
     {
         // Members
         std::string Name;         // Name of PVT collector
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant  
-        int WLoopNum;             // Water plant loop index number                      
-        int WLoopSideNum;         // Water plant loop side index                        
-        int WLoopBranchNum;       // Water plant loop branch index                      
-        int WLoopCompNum;         // Water plant loop component index                   
-        bool EnvrnInit;           // manage begin environmen inits
+        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant
+        int WLoopNum;             // Water plant loop index number
+        int WLoopSideNum;         // Water plant loop side index
+        int WLoopBranchNum;       // Water plant loop branch index
+        int WLoopCompNum;         // Water plant loop component index
+        bool EnvrnInit;           // manage begin environment inits
         bool SizingInit;          // manage when sizing is complete
         std::string PVTModelName; // Name of PVT performance object
         int PVTModelType;         // model type indicator, only simple avail now
@@ -160,6 +157,12 @@ namespace PhotovoltaicThermalCollectors {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
         void setupReportVars();
 
         void initialize(bool FirstHVACIteration);
@@ -176,11 +179,7 @@ namespace PhotovoltaicThermalCollectors {
 
     extern Array1D<PVTCollectorStruct> PVT;
 
-    void SimPVTcollectors(int &PVTnum, // index to PVT array.
-                          bool FirstHVACIteration,
-                          int CalledFrom,
-                          Optional_string_const PVTName = _,
-                          Optional_bool_const InitLoopEquip = _);
+    void clear_state();
 
     void GetPVTcollectorsInput();
 
