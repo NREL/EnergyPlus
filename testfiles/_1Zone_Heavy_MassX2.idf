@@ -272,7 +272,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    Absolute;                !- Coordinate System
+    World;                   !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 

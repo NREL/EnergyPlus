@@ -150,6 +150,8 @@ namespace CommandLineInterface {
 
         opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
+        opt.add("", 0, 0, 0, "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation", "--convert-only");
+
         opt.add("L",
                 0,
                 1,
@@ -198,6 +200,8 @@ namespace CommandLineInterface {
         AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
+
+        outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
         // Process standard arguments
         if (opt.isSet("-h")) {
@@ -262,9 +266,19 @@ namespace CommandLineInterface {
         } else if (inputFileExt == "CBOR") {
             isEpJSON = true;
             isCBOR = true;
+            DisplayString("CBOR input format is experimental and unsupported.");
         } else if (inputFileExt == "MSGPACK") {
             isEpJSON = true;
             isMsgPack = true;
+            DisplayString("MsgPack input format is experimental and unsupported.");
+        } else if (inputFileExt == "UBJSON") {
+            isEpJSON = true;
+            isUBJSON = true;
+            DisplayString("UBJSON input format is experimental and unsupported.");
+        } else if (inputFileExt == "BSON") {
+            isEpJSON = true;
+            isBSON = true;
+            DisplayString("BSON input format is experimental and unsupported.");
         } else {
             DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
             exit(EXIT_FAILURE);

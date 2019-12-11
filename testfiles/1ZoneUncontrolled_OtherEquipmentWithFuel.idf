@@ -427,7 +427,7 @@
 
   OtherEquipment,
     Test 352a,               !- Name
-    FuelOil#2,               !- Fuel Type
+    FuelOilNo2,                !- Fuel Type
     ZONE ONE,                !- Zone or ZoneList Name
     OthEqSch,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method

@@ -229,6 +229,8 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+ADD_SUBDIRECTORY(src/ConvertInputFormat)
+
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
