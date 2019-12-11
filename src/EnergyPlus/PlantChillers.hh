@@ -140,7 +140,6 @@ namespace PlantChillers {
         Real64 modEvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
         Real64 modCondOutletTemp;      // C - condenser outlet temperature, air or water side
         Real64 modEvapOutletTemp;      // C - evaporator outlet temperature, water side
-        Real64 modPower;               // W - rate of chiller energy use
         Real64 modQEvaporator;         // W - rate of heat transfer to the evaporator coil
         Real64 modQCondenser;          // W - rate of heat transfer to the condenser coil
         Real64 modEnergy;              // J - chiller energy use
@@ -179,7 +178,6 @@ namespace PlantChillers {
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
               TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), modCondMassFlowRate(0.0), modEvapMassFlowRate(0.0), modCondOutletTemp(0.0),
         modEvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
-         modPower(0.0)      ,         // W - rate of chiller energy use
          modQEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
          modQCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
          modEnergy(0.0)       ,      // J - chiller energy use

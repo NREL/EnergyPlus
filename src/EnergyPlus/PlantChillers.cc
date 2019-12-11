@@ -5345,7 +5345,7 @@ namespace PlantChillers {
         // set module level inlet and outlet nodes
         ElectricChiller(ChillNum).modEvapMassFlowRate = 0.0;
         ElectricChiller(ChillNum).modCondMassFlowRate = 0.0;
-        ElectricChiller(ChillNum).modPower = 0.0;
+        ElectricChiller(ChillNum).Power = 0.0;
         ElectricChiller(ChillNum).modEnergy = 0.0;
         ElectricChiller(ChillNum).modQCondenser = 0.0;
         ElectricChiller(ChillNum).modQEvaporator = 0.0;
@@ -5621,7 +5621,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            ElectricChiller(ChillNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / RatedCOP * FRAC;
+            ElectricChiller(ChillNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / RatedCOP * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((ElectricChiller(ChillNum).FlowMode == ConstantFlow) || (ElectricChiller(ChillNum).FlowMode == NotModulated)) {
@@ -5848,12 +5848,12 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            ElectricChiller(ChillNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / RatedCOP * FRAC;
+            ElectricChiller(ChillNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / RatedCOP * FRAC;
 
             if (ElectricChiller(ChillNum).modEvapMassFlowRate == 0.0) {
                 ElectricChiller(ChillNum).modQEvaporator = 0.0;
                 ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
-                ElectricChiller(ChillNum).modPower = 0.0;
+                ElectricChiller(ChillNum).Power = 0.0;
                 ElectricChiller(ChillNum).PrintMessage = false;
             }
             if (ElectricChiller(ChillNum).modQEvaporator == 0.0 && ElectricChiller(ChillNum).CondenserType == EvapCooled) {
@@ -5866,7 +5866,7 @@ namespace PlantChillers {
 
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        ElectricChiller(ChillNum).modQCondenser = ElectricChiller(ChillNum).modPower + ElectricChiller(ChillNum).modQEvaporator;
+        ElectricChiller(ChillNum).modQCondenser = ElectricChiller(ChillNum).Power + ElectricChiller(ChillNum).modQEvaporator;
 
         if (ElectricChiller(ChillNum).CondenserType == WaterCooled) {
             if (ElectricChiller(ChillNum).modCondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -5903,7 +5903,7 @@ namespace PlantChillers {
 
         // Calculate Energy
         ElectricChiller(ChillNum).modCondenserEnergy = ElectricChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ElectricChiller(ChillNum).modEnergy = ElectricChiller(ChillNum).modPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).modEnergy = ElectricChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         ElectricChiller(ChillNum).modEvaporatorEnergy = ElectricChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
@@ -5934,7 +5934,7 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            ElectricChiller(ChillNum).modPower = 0.0;
+            ElectricChiller(ChillNum).Power = 0.0;
             ElectricChiller(ChillNum).modEnergy = 0.0;
         }
     }
@@ -6025,7 +6025,7 @@ namespace PlantChillers {
         // set module level inlet and outlet nodes
         EngineDrivenChiller(ChillerNum).modEvapMassFlowRate = 0.0;
         EngineDrivenChiller(ChillerNum).modCondMassFlowRate = 0.0;
-        EngineDrivenChiller(ChillerNum).modPower = 0.0;
+        EngineDrivenChiller(ChillerNum).Power = 0.0;
         EngineDrivenChiller(ChillerNum).modQCondenser = 0.0;
         EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
         EngineDrivenChiller(ChillerNum).modEnergy = 0.0;
@@ -6286,7 +6286,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            EngineDrivenChiller(ChillerNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            EngineDrivenChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((EngineDrivenChiller(ChillerNum).FlowMode == ConstantFlow) || (EngineDrivenChiller(ChillerNum).FlowMode == NotModulated)) {
@@ -6516,12 +6516,12 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            EngineDrivenChiller(ChillerNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            EngineDrivenChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             if (EngineDrivenChiller(ChillerNum).modEvapMassFlowRate == 0.0) {
                 EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
                 EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
-                EngineDrivenChiller(ChillerNum).modPower = 0.0;
+                EngineDrivenChiller(ChillerNum).Power = 0.0;
                 EngineDrivenChiller(ChillerNum).PrintMessage = false;
             }
             if (EngineDrivenChiller(ChillerNum).modQEvaporator == 0.0 && EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
@@ -6535,7 +6535,7 @@ namespace PlantChillers {
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        EngineDrivenChiller(ChillerNum).modQCondenser = EngineDrivenChiller(ChillerNum).modPower + EngineDrivenChiller(ChillerNum).modQEvaporator;
+        EngineDrivenChiller(ChillerNum).modQCondenser = EngineDrivenChiller(ChillerNum).Power + EngineDrivenChiller(ChillerNum).modQEvaporator;
 
         if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
 
@@ -6619,7 +6619,7 @@ namespace PlantChillers {
 
         // Calculate Energy
         EngineDrivenChiller(ChillerNum).modCondenserEnergy = EngineDrivenChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).modEnergy = EngineDrivenChiller(ChillerNum).modPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).modEnergy = EngineDrivenChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modEvaporatorEnergy = EngineDrivenChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = EngineDrivenFuelEnergy;
         EngineDrivenChiller(ChillerNum).modFuelEnergy = EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -6660,7 +6660,7 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            EngineDrivenChiller(ChillerNum).modPower = 0.0;
+            EngineDrivenChiller(ChillerNum).Power = 0.0;
             EngineDrivenChiller(ChillerNum).modEnergy = 0.0;
         }
     }
@@ -6760,7 +6760,7 @@ namespace PlantChillers {
         // set module level inlet and outlet nodes
         GTChiller(ChillerNum).modEvapMassFlowRate = 0.0;
         GTChiller(ChillerNum).modCondMassFlowRate = 0.0;
-        GTChiller(ChillerNum).modPower = 0.0;
+        GTChiller(ChillerNum).Power = 0.0;
         GTChiller(ChillerNum).modQCondenser = 0.0;
         GTChiller(ChillerNum).modQEvaporator = 0.0;
         GTChiller(ChillerNum).modEnergy = 0.0;
@@ -7001,7 +7001,7 @@ namespace PlantChillers {
             } else {
                 FRAC = 1.0;
             }
-            GTChiller(ChillerNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            GTChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((GTChiller(ChillerNum).FlowMode == ConstantFlow) || (GTChiller(ChillerNum).FlowMode == NotModulated)) {
@@ -7224,12 +7224,12 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            GTChiller(ChillerNum).modPower = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            GTChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             if (GTChiller(ChillerNum).modEvapMassFlowRate == 0.0) {
                 GTChiller(ChillerNum).modQEvaporator = 0.0;
                 GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
-                GTChiller(ChillerNum).modPower = 0.0;
+                GTChiller(ChillerNum).Power = 0.0;
                 GTChiller(ChillerNum).PrintMessage = false;
             }
             if (GTChiller(ChillerNum).modQEvaporator == 0.0 && GTChiller(ChillerNum).CondenserType == EvapCooled) {
@@ -7244,7 +7244,7 @@ namespace PlantChillers {
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        GTChiller(ChillerNum).modQCondenser = GTChiller(ChillerNum).modPower + GTChiller(ChillerNum).modQEvaporator;
+        GTChiller(ChillerNum).modQCondenser = GTChiller(ChillerNum).Power + GTChiller(ChillerNum).modQEvaporator;
 
         if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
 
@@ -7279,12 +7279,12 @@ namespace PlantChillers {
         //               IF (RFLAGS(81)) WRITE (OUTPUT,703) PREQD,ETOWER(TypeIndex),RPLOAD
         //               IF (PREQD .GT. 0.0d0) THEN
         if (AvailChillerCap > 0) {
-            RPLoad = GTChiller(ChillerNum).modPower / AvailChillerCap;
+            RPLoad = GTChiller(ChillerNum).Power / AvailChillerCap;
         } else {
             RPLoad = 0.0;
         }
 
-        if (GTChiller(ChillerNum).modPower > 0) {
+        if (GTChiller(ChillerNum).Power > 0) {
             // D$                               FOR EACH CHILLER OPERATING
             //                  MAXSZ = NUMCHSIZ(TypeIndex,IPLCTR)
             //                  DO IS = 1,MAXSZ
@@ -7441,7 +7441,7 @@ namespace PlantChillers {
 
         // Calculate Energy
         GTChiller(ChillerNum).modCondenserEnergy = GTChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).modEnergy = GTChiller(ChillerNum).modPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).modEnergy = GTChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         GTChiller(ChillerNum).modEvaporatorEnergy = GTChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
@@ -7472,7 +7472,7 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            GTChiller(ChillerNum).modPower = 0.0;
+            GTChiller(ChillerNum).Power = 0.0;
             GTChiller(ChillerNum).modEnergy = 0.0;
         }
     }
@@ -7620,7 +7620,7 @@ namespace PlantChillers {
             ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
             ConstCOPChiller(ChillNum).modCondOutletTemp = Node(CondInletNode).Temp;
 
-            ConstCOPChiller(ChillNum).modPower = 0.0;
+            ConstCOPChiller(ChillNum).Power = 0.0;
             ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
             ConstCOPChiller(ChillNum).modQCondenser = 0.0;
             ConstCOPChiller(ChillNum).modEnergy = 0.0;
@@ -7737,7 +7737,7 @@ namespace PlantChillers {
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             ConstCOPChiller(ChillNum).PossibleSubcooling = false;
             ConstCOPChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
-            ConstCOPChiller(ChillNum).modPower = std::abs(MyLoad) / COP;
+            ConstCOPChiller(ChillNum).Power = std::abs(MyLoad) / COP;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((ConstCOPChiller(ChillNum).FlowMode == ConstantFlow) || (ConstCOPChiller(ChillNum).FlowMode == NotModulated)) {
@@ -7926,11 +7926,11 @@ namespace PlantChillers {
                 }
             }
             // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-            ConstCOPChiller(ChillNum).modPower = ConstCOPChiller(ChillNum).modQEvaporator / COP;
+            ConstCOPChiller(ChillNum).Power = ConstCOPChiller(ChillNum).modQEvaporator / COP;
             if (ConstCOPChiller(ChillNum).modEvapMassFlowRate == 0.0) {
                 ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
                 ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
-                ConstCOPChiller(ChillNum).modPower = 0.0;
+                ConstCOPChiller(ChillNum).Power = 0.0;
                 ConstCOPChiller(ChillNum).PrintMessage = false;
             }
             if (ConstCOPChiller(ChillNum).modQEvaporator == 0.0 && ConstCOPChiller(ChillNum).CondenserType == EvapCooled) {
@@ -7944,7 +7944,7 @@ namespace PlantChillers {
 
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        ConstCOPChiller(ChillNum).modQCondenser = ConstCOPChiller(ChillNum).modPower + ConstCOPChiller(ChillNum).modQEvaporator;
+        ConstCOPChiller(ChillNum).modQCondenser = ConstCOPChiller(ChillNum).Power + ConstCOPChiller(ChillNum).modQEvaporator;
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
         Real64 const CondInletTemp = Node(CondInletNode).Temp;
@@ -7968,7 +7968,7 @@ namespace PlantChillers {
 
         // Calculate Energy
         ConstCOPChiller(ChillNum).modCondenserEnergy = ConstCOPChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ConstCOPChiller(ChillNum).modEnergy = ConstCOPChiller(ChillNum).modPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).modEnergy = ConstCOPChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         ConstCOPChiller(ChillNum).modEvaporatorEnergy = ConstCOPChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
@@ -7989,7 +7989,7 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            ConstCOPChiller(ChillNum).modPower = 0.0;
+            ConstCOPChiller(ChillNum).Power = 0.0;
             ConstCOPChiller(ChillNum).modEnergy = 0.0;
         }
     }
@@ -8252,7 +8252,6 @@ namespace PlantChillers {
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
-            ElectricChiller(Num).Power = ElectricChiller(Num).modPower;
             ElectricChiller(Num).QEvap = ElectricChiller(Num).modQEvaporator;
             ElectricChiller(Num).QCond = ElectricChiller(Num).modQCondenser;
             ElectricChiller(Num).Energy = ElectricChiller(Num).modEnergy;
@@ -8268,8 +8267,8 @@ namespace PlantChillers {
                 ElectricChiller(Num).BasinHeaterPower = ElectricChiller(Num).modBasinHeaterPower;
                 ElectricChiller(Num).BasinHeaterConsumption = ElectricChiller(Num).modBasinHeaterPower * ReportingConstant;
             }
-            if (ElectricChiller(Num).modPower != 0.0) {
-                ElectricChiller(Num).ActualCOP = ElectricChiller(Num).modQEvaporator / ElectricChiller(Num).modPower;
+            if (ElectricChiller(Num).Power != 0.0) {
+                ElectricChiller(Num).ActualCOP = ElectricChiller(Num).modQEvaporator / ElectricChiller(Num).Power;
             } else {
                 ElectricChiller(Num).ActualCOP = 0.0;
             }
@@ -8343,7 +8342,6 @@ namespace PlantChillers {
             Node(EvapOutletNode).Temp = EngineDrivenChiller(Num).modEvapOutletTemp;
             Node(CondOutletNode).Temp = EngineDrivenChiller(Num).modCondOutletTemp;
 
-            EngineDrivenChiller(Num).Power = EngineDrivenChiller(Num).modPower;
             EngineDrivenChiller(Num).QEvap = EngineDrivenChiller(Num).modQEvaporator;
             EngineDrivenChiller(Num).QCond = EngineDrivenChiller(Num).modQCondenser;
             EngineDrivenChiller(Num).Energy = EngineDrivenChiller(Num).modEnergy;
@@ -8468,7 +8466,6 @@ namespace PlantChillers {
                 Node(HeatRecOutletNode).Temp = GTChiller(Num).HeatRecOutletTemp;
             }
 
-            GTChiller(Num).Power = GTChiller(Num).modPower;
             GTChiller(Num).QEvap = GTChiller(Num).modQEvaporator;
             GTChiller(Num).QCond = GTChiller(Num).modQCondenser;
             GTChiller(Num).Energy = GTChiller(Num).modEnergy;
@@ -8549,7 +8546,6 @@ namespace PlantChillers {
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
         } else {
-            ConstCOPChiller(Num).Power = ConstCOPChiller(Num).modPower;
             ConstCOPChiller(Num).QEvap = ConstCOPChiller(Num).modQEvaporator;
             ConstCOPChiller(Num).QCond = ConstCOPChiller(Num).modQCondenser;
             ConstCOPChiller(Num).Energy = ConstCOPChiller(Num).modEnergy;
@@ -8561,8 +8557,8 @@ namespace PlantChillers {
             ConstCOPChiller(Num).EvapOutletTemp = ConstCOPChiller(Num).modEvapOutletTemp;
             ConstCOPChiller(Num).Evapmdot = ConstCOPChiller(Num).modEvapMassFlowRate;
             ConstCOPChiller(Num).Condmdot = ConstCOPChiller(Num).modCondMassFlowRate;
-            if (ConstCOPChiller(Num).modPower != 0.0) {
-                ConstCOPChiller(Num).ActualCOP = ConstCOPChiller(Num).modQEvaporator / ConstCOPChiller(Num).modPower;
+            if (ConstCOPChiller(Num).Power != 0.0) {
+                ConstCOPChiller(Num).ActualCOP = ConstCOPChiller(Num).modQEvaporator / ConstCOPChiller(Num).Power;
             } else {
                 ConstCOPChiller(Num).ActualCOP = 0.0;
             }
