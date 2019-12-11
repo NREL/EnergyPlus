@@ -82,6 +82,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -177,11 +178,9 @@ namespace PlantLoopEquip {
         // na
 
         // Using/Aliasing
-        using ChillerAbsorption::SimBLASTAbsorber;
         using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
-        using ChillerIndirectAbsorption::SimIndirectAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
         using PlantChillers::SimChiller;
         using Pumps::SimPumps;
@@ -193,7 +192,6 @@ namespace PlantLoopEquip {
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
-        using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
         using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
@@ -207,7 +205,7 @@ namespace PlantLoopEquip {
         Real64 MaxLoad;
         Real64 MinLoad;
         Real64 OptLoad;
-        Real64 SizingFac;        // the component sizing fraction
+        Real64 SizingFac = 0.0;        // the component sizing fraction
         int GeneralEquipType;    // Basic Equipment type from EquipType Used to help organize this routine
         Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
         Real64 TempEvapOutDesign;
@@ -342,60 +340,12 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
-                SimBLASTAbsorber(sim_component.TypeOf,
-                                 sim_component.Name,
-                                 EquipFlowCtrl,
-                                 LoopNum,
-                                 LoopSideNum,
-                                 EquipNum,
-                                 RunFlag,
-                                 FirstHVACIteration,
-                                 InitLoopEquip,
-                                 CurLoad,
-                                 MaxLoad,
-                                 MinLoad,
-                                 OptLoad,
-                                 GetCompSizFac,
-                                 SizingFac,
-                                 TempCondInDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {
-                SimIndirectAbsorber(sim_component.TypeOf,
-                                    sim_component.Name,
-                                    EquipFlowCtrl,
-                                    LoopNum,
-                                    LoopSideNum,
-                                    EquipNum,
-                                    RunFlag,
-                                    FirstHVACIteration,
-                                    InitLoopEquip,
-                                    CurLoad,
-                                    MaxLoad,
-                                    MinLoad,
-                                    OptLoad,
-                                    GetCompSizFac,
-                                    SizingFac,
-                                    TempCondInDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                dynamic_cast<ChillerIndirectAbsorption::IndirectAbsorberSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricEIR) {
                 SimElectricEIRChiller(sim_component.TypeOf,
@@ -1007,25 +957,7 @@ namespace PlantLoopEquip {
 
             if (EquipTypeNum == TypeOf_CentralGroundSourceHeatPump) {
 
-                SimCentralGroundSourceHeatPump(sim_component.Name,
-                                               EquipFlowCtrl,
-                                               EquipNum,
-                                               LoopNum,
-                                               RunFlag,
-                                               FirstHVACIteration,
-                                               InitLoopEquip,
-                                               CurLoad,
-                                               MaxLoad,
-                                               MinLoad,
-                                               OptLoad,
-                                               GetCompSizFac,
-                                               SizingFac);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 if (GetCompSizFac) {
                     sim_component.SizFac = SizingFac;
