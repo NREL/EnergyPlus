@@ -110,6 +110,24 @@ namespace UserDefinedComponents {
     Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
 
+    void clear_state()
+    {
+        NumUserPlantComps = 0;
+        NumUserCoils = 0;
+        NumUserZoneAir = 0;
+        NumUserAirTerminals = 0;
+
+        CheckUserPlantCompName.deallocate();
+        CheckUserCoilName.deallocate();
+        CheckUserZoneAirName.deallocate();
+        CheckUserAirTerminal.deallocate();
+
+        UserPlantComp.deallocate();
+        UserCoil.deallocate();
+        UserZoneAirHVAC.deallocate();
+        UserAirTerminal.deallocate();
+    }
+
     PlantComponent *UserPlantComponentStruct::factory(std::string const &objectName)
     {
         // Process the input data

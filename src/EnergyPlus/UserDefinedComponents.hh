@@ -299,6 +299,8 @@ namespace UserDefinedComponents {
     extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
     extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
 
+    void clear_state();
+
     void SimCoilUserDefined(std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int AirLoopNum,
