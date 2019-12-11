@@ -4827,13 +4827,9 @@ namespace OutputReportTabular {
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
         using PlantChillers::ConstCOPChiller;
-        using PlantChillers::ConstCOPChillerReport;
         using PlantChillers::ElectricChiller;
-        using PlantChillers::ElectricChillerReport;
         using PlantChillers::EngineDrivenChiller;
-        using PlantChillers::EngineDrivenChillerReport;
         using PlantChillers::GTChiller;
-        using PlantChillers::GTChillerReport;
         using PlantChillers::NumConstCOPChillers;
         using PlantChillers::NumElectricChillers;
         using PlantChillers::NumEngineDrivenChillers;
@@ -4894,22 +4890,22 @@ namespace OutputReportTabular {
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
             if (ElectricChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChillerReport(iChiller).Base.CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).Base.CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
             if (EngineDrivenChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChillerReport(iChiller).Base.CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).Base.CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
             if (GTChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChillerReport(iChiller).Base.CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).Base.CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
             if (ConstCOPChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChillerReport(iChiller).Base.CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).Base.CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {

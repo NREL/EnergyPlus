@@ -151,6 +151,22 @@ namespace PlantChillers {
         Real64 modAvgCondSinkTemp;     // condenser temperature value for use in curves [C]
         Real64 modBasinHeaterPower;    // Basin heater power (W)
 
+        // Members
+        Real64 Power;
+        Real64 QEvap;
+        Real64 QCond;
+        Real64 Energy;
+        Real64 EvapEnergy;
+        Real64 CondEnergy;
+        Real64 CondInletTemp;
+        Real64 EvapInletTemp;
+        Real64 CondOutletTemp;
+        Real64 EvapOutletTemp;
+        Real64 Evapmdot;
+        Real64 Condmdot;
+        Real64 BasinHeaterPower;       // Basin heater power (W)
+        Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+
         // Default Constructor
         BaseChillerSpecs()
             : CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
@@ -172,7 +188,9 @@ namespace PlantChillers {
          modQHeatRecovered(0.0)  ,    // W - rate of heat transfer to the Heat Recovery coil
          modHeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
          modAvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
-         modBasinHeaterPower(0.0)    // Basin heater power (W)
+         modBasinHeaterPower(0.0),    // Basin heater power (W)
+              Power(0.0), QEvap(0.0), QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
+              CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
 
         {
         }
@@ -210,6 +228,13 @@ namespace PlantChillers {
         int HRCompNum;                             // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
         Real64 modCondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
+        Real64 ActualCOP;
+        Real64 QHeatRecovery;
+        Real64 EnergyHeatRecovery;
+        Real64 HeatRecInletTemp;
+        Real64 HeatRecOutletTemp;
+        Real64 HeatRecMassFlow;
+        Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
 
         // Default Constructor
         ElectricChillerSpecs()
@@ -263,7 +288,6 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
 
-
         // engine driven:
         Real64 modHeatRecInletTemp;   // Inlet Temperature of the heat recovery fluid
         Real64 modHeatRecMdotActual;  // reporting: Heat Recovery Loop Mass flow rate
@@ -279,7 +303,24 @@ namespace PlantChillers {
         Real64 modFuelEnergy;          // Fuel Energy used (J)
         Real64 modFuelMdot;            // Fuel Amount used (Kg/s)
         Real64 modExhaustStackTemp;    // Exhaust Stack Temperature (C)
-        
+
+        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
+        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
+        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
+        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
+        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
+        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
+        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
+        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
+        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
+        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
+        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
+        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
+        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
+        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
+        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
+        Real64 FuelCOP;             // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
+
         // Default Constructor
         EngineDrivenChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
@@ -304,7 +345,10 @@ namespace PlantChillers {
          modExhaustEnergyRec(0.0),    // exhaust gas heat recovered (J)
          modFuelEnergy(0.0),          // Fuel Energy used (J)
          modFuelMdot(0.0),            // Fuel Amount used (Kg/s)
-         modExhaustStackTemp(0.0)    // Exhaust Stack Temperature (C)
+         modExhaustStackTemp(0.0),    // Exhaust Stack Temperature (C)
+              QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), TotalHeatEnergyRec(0.0),
+              JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0), FuelMdot(0.0),
+              ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
         {
         }
     };
@@ -364,6 +408,12 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
 
+        Real64 FuelEnergyUsed;     // reporting: Fuel Energy used
+        Real64 FuelEnergyUsedRate; // reporting: Fuel energy used rate (fuel consumption rate)
+        Real64 FuelMassUsed;       // reporting: Fuel Amount used
+        Real64 FuelMassUsedRate;   // reporting: Fuel amount used (fuel Mass consumption rate)
+        Real64 FuelCOP;            // reporting: Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
+
         // Default Constructor
         GTChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
@@ -375,7 +425,7 @@ namespace PlantChillers {
               HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), FuelHeatingValue(0.0),
               HeatRecCapacityFraction(0.0), engineCapacityScalar(0.35), HeatRecMaxTemp(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
-              HRCompNum(0)
+              HRCompNum(0), FuelEnergyUsed(0.0), FuelEnergyUsedRate(0.0), FuelMassUsed(0.0), FuelMassUsedRate(0.0), FuelCOP(0.0)
         {
         }
     };
@@ -384,132 +434,17 @@ namespace PlantChillers {
     {
         // Members
         BaseChillerSpecs Base;
-
-        // Default Constructor
-        ConstCOPChillerSpecs() = default;
-    };
-
-    struct BaseReportVars
-    {
-        // Members
-        Real64 Power;
-        Real64 QEvap;
-        Real64 QCond;
-        Real64 Energy;
-        Real64 EvapEnergy;
-        Real64 CondEnergy;
-        Real64 CondInletTemp;
-        Real64 EvapInletTemp;
-        Real64 CondOutletTemp;
-        Real64 EvapOutletTemp;
-        Real64 Evapmdot;
-        Real64 Condmdot;
-        Real64 BasinHeaterPower;       // Basin heater power (W)
-        Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
-
-        // Default Constructor
-        BaseReportVars()
-            : Power(0.0), QEvap(0.0), QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
-        {
-        }
-    };
-
-    struct ElectricReportVars
-    {
-        // Members
-        BaseReportVars Base;
-        Real64 ActualCOP;
-        Real64 QHeatRecovery;
-        Real64 EnergyHeatRecovery;
-        Real64 HeatRecInletTemp;
-        Real64 HeatRecOutletTemp;
-        Real64 HeatRecMassFlow;
-        Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
-
-        // Default Constructor
-        ElectricReportVars()
-            : ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0),
-              ChillerCondAvgTemp(0.0)
-        {
-        }
-    };
-
-    struct EngineDrivenReportVars
-    {
-        // Members
-        BaseReportVars Base;
-        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
-        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
-        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
-        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
-        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
-        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 FuelCOP;             // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
-
-        // Default Constructor
-        EngineDrivenReportVars()
-            : QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), TotalHeatEnergyRec(0.0),
-              JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0), FuelMdot(0.0),
-              ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
-        {
-        }
-    };
-
-    struct GasTurbineReportVars
-    {
-        // Members
-        BaseReportVars Base;
-        Real64 HeatRecLubeEnergy;  // reporting: Heat Recovered from Lubricant(J)
-        Real64 HeatRecLubeRate;    // reporting: Recoverable Lube Oil Rate of Rwecovery (W)
-        Real64 FuelEnergyUsed;     // reporting: Fuel Energy used
-        Real64 FuelEnergyUsedRate; // reporting: Fuel energy used rate (fuel consumption rate)
-        Real64 FuelMassUsed;       // reporting: Fuel Amount used
-        Real64 FuelMassUsedRate;   // reporting: Fuel amount used (fuel Mass consumption rate)
-        Real64 ExhaustStackTemp;   // reporting: Exhaust Stack Temperature
-        Real64 HeatRecInletTemp;   // reporting: Heat Recovery Loop Inlet Temperature
-        Real64 HeatRecOutletTemp;  // reporting: Heat Recovery Loop Outlet Temperature
-        Real64 HeatRecMdot;        // reporting: Heat Recovery Loop Mass flow rate
-        Real64 FuelCOP;            // reporting: Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
-
-        // Default Constructor
-        GasTurbineReportVars()
-            : HeatRecLubeEnergy(0.0), HeatRecLubeRate(0.0), FuelEnergyUsed(0.0), FuelEnergyUsedRate(0.0), FuelMassUsed(0.0), FuelMassUsedRate(0.0),
-              ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
-        {
-        }
-    };
-
-    struct ConstCOPReportVars
-    {
-        // Members
-        BaseReportVars Base;
         Real64 ActualCOP;
 
         // Default Constructor
-        ConstCOPReportVars() : ActualCOP(0.0)
-        {
-        }
+        ConstCOPChillerSpecs() : ActualCOP(0.0) {}
     };
 
     // Object Data
     extern Array1D<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
-    extern Array1D<ElectricReportVars> ElectricChillerReport;
     extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    extern Array1D<EngineDrivenReportVars> EngineDrivenChillerReport;
     extern Array1D<GTChillerSpecs> GTChiller; // dimension to number of machines
-    extern Array1D<GasTurbineReportVars> GTChillerReport;
     extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
-    extern Array1D<ConstCOPReportVars> ConstCOPChillerReport;
 
     // Functions
 

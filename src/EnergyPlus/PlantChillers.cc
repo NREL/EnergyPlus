@@ -149,14 +149,10 @@ namespace PlantChillers {
 
     // Object Data
     Array1D<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
-    Array1D<ElectricReportVars> ElectricChillerReport;
     Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    Array1D<EngineDrivenReportVars> EngineDrivenChillerReport;
     Array1D<GTChillerSpecs> GTChiller; // dimension to number of machines
-    Array1D<GasTurbineReportVars> GTChillerReport;
     Array1D<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
-    Array1D<ConstCOPReportVars> ConstCOPChillerReport;
-
+    
     void clear_state()
     {
         NumElectricChillers = 0;
@@ -168,13 +164,9 @@ namespace PlantChillers {
         GetGasTurbineInput = true;
         GetConstCOPInput = true;
         ElectricChiller.deallocate();
-        ElectricChillerReport.deallocate();
         EngineDrivenChiller.deallocate();
-        EngineDrivenChillerReport.deallocate();
         GTChiller.deallocate();
-        GTChillerReport.deallocate();
         ConstCOPChiller.deallocate();
-        ConstCOPChillerReport.deallocate();
     }
 
     void SimChiller(int const LoopNum,              // Flow control mode for the equipment
@@ -277,10 +269,10 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_Electric,
                                                         ElectricChiller(ChillNum).Base.CondInletNodeNum,
                                                         ElectricChiller(ChillNum).Base.CondOutletNodeNum,
-                                                        ElectricChillerReport(ChillNum).Base.QCond,
-                                                        ElectricChillerReport(ChillNum).Base.CondInletTemp,
-                                                        ElectricChillerReport(ChillNum).Base.CondOutletTemp,
-                                                        ElectricChillerReport(ChillNum).Base.Condmdot,
+                                                        ElectricChiller(ChillNum).Base.QCond,
+                                                        ElectricChiller(ChillNum).Base.CondInletTemp,
+                                                        ElectricChiller(ChillNum).Base.CondOutletTemp,
+                                                        ElectricChiller(ChillNum).Base.Condmdot,
                                                         FirstHVACIteration);
                 } else if (LoopNum == ElectricChiller(ChillNum).HRLoopNum) { // heat recovery loop
                     PlantUtilities::UpdateComponentHeatRecoverySide(ElectricChiller(ChillNum).HRLoopNum,
@@ -288,10 +280,10 @@ namespace PlantChillers {
                                                     TypeOf_Chiller_Electric,
                                                     ElectricChiller(ChillNum).HeatRecInletNodeNum,
                                                     ElectricChiller(ChillNum).HeatRecOutletNodeNum,
-                                                    ElectricChillerReport(ChillNum).QHeatRecovery,
-                                                    ElectricChillerReport(ChillNum).HeatRecInletTemp,
-                                                    ElectricChillerReport(ChillNum).HeatRecOutletTemp,
-                                                    ElectricChillerReport(ChillNum).HeatRecMassFlow,
+                                                    ElectricChiller(ChillNum).QHeatRecovery,
+                                                                    ElectricChiller(ChillNum).HeatRecInletTemp,
+                                                                    ElectricChiller(ChillNum).HeatRecOutletTemp,
+                                                                    ElectricChiller(ChillNum).HeatRecMassFlow,
                                                     FirstHVACIteration);
                 }
 
@@ -357,10 +349,10 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_EngineDriven,
                                                         EngineDrivenChiller(ChillNum).Base.CondInletNodeNum,
                                                         EngineDrivenChiller(ChillNum).Base.CondOutletNodeNum,
-                                                        EngineDrivenChillerReport(ChillNum).Base.QCond,
-                                                        EngineDrivenChillerReport(ChillNum).Base.CondInletTemp,
-                                                        EngineDrivenChillerReport(ChillNum).Base.CondOutletTemp,
-                                                        EngineDrivenChillerReport(ChillNum).Base.Condmdot,
+                                                                        EngineDrivenChiller(ChillNum).Base.QCond,
+                                                                        EngineDrivenChiller(ChillNum).Base.CondInletTemp,
+                                                                        EngineDrivenChiller(ChillNum).Base.CondOutletTemp,
+                                                                        EngineDrivenChiller(ChillNum).Base.Condmdot,
                                                         FirstHVACIteration);
                 } else if (LoopNum == EngineDrivenChiller(ChillNum).HRLoopNum) { // heat recovery loop
                     PlantUtilities::UpdateComponentHeatRecoverySide(EngineDrivenChiller(ChillNum).HRLoopNum,
@@ -368,10 +360,10 @@ namespace PlantChillers {
                                                     TypeOf_Chiller_EngineDriven,
                                                     EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
                                                     EngineDrivenChiller(ChillNum).HeatRecOutletNodeNum,
-                                                    EngineDrivenChillerReport(ChillNum).QTotalHeatRecovered,
-                                                    EngineDrivenChillerReport(ChillNum).HeatRecInletTemp,
-                                                    EngineDrivenChillerReport(ChillNum).HeatRecOutletTemp,
-                                                    EngineDrivenChillerReport(ChillNum).HeatRecMdot,
+                                                                    EngineDrivenChiller(ChillNum).QTotalHeatRecovered,
+                                                                    EngineDrivenChiller(ChillNum).HeatRecInletTemp,
+                                                                    EngineDrivenChiller(ChillNum).HeatRecOutletTemp,
+                                                                    EngineDrivenChiller(ChillNum).HeatRecMdot,
                                                     FirstHVACIteration);
                 }
 
@@ -438,10 +430,10 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_CombTurbine,
                                                         GTChiller(ChillNum).Base.CondInletNodeNum,
                                                         GTChiller(ChillNum).Base.CondOutletNodeNum,
-                                                        GTChillerReport(ChillNum).Base.QCond,
-                                                        GTChillerReport(ChillNum).Base.CondInletTemp,
-                                                        GTChillerReport(ChillNum).Base.CondOutletTemp,
-                                                        GTChillerReport(ChillNum).Base.Condmdot,
+                                                                        GTChiller(ChillNum).Base.QCond,
+                                                                        GTChiller(ChillNum).Base.CondInletTemp,
+                                                                        GTChiller(ChillNum).Base.CondOutletTemp,
+                                                                        GTChiller(ChillNum).Base.Condmdot,
                                                         FirstHVACIteration);
                 } else if (LoopNum == GTChiller(ChillNum).HRLoopNum) { // heat recovery loop
                     PlantUtilities::UpdateComponentHeatRecoverySide(GTChiller(ChillNum).HRLoopNum,
@@ -449,10 +441,10 @@ namespace PlantChillers {
                                                     TypeOf_Chiller_CombTurbine,
                                                     GTChiller(ChillNum).HeatRecInletNodeNum,
                                                     GTChiller(ChillNum).HeatRecOutletNodeNum,
-                                                    GTChillerReport(ChillNum).HeatRecLubeRate,
-                                                    GTChillerReport(ChillNum).HeatRecInletTemp,
-                                                    GTChillerReport(ChillNum).HeatRecOutletTemp,
-                                                    GTChillerReport(ChillNum).HeatRecMdot,
+                                                                    GTChiller(ChillNum).HeatRecLubeRate,
+                                                                    GTChiller(ChillNum).HeatRecInletTemp,
+                                                                    GTChiller(ChillNum).HeatRecOutletTemp,
+                                                                    GTChiller(ChillNum).HeatRecMdot,
                                                     FirstHVACIteration);
                 }
 
@@ -520,10 +512,10 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_ConstCOP,
                                                         ConstCOPChiller(ChillNum).Base.CondInletNodeNum,
                                                         ConstCOPChiller(ChillNum).Base.CondOutletNodeNum,
-                                                        ConstCOPChillerReport(ChillNum).Base.QCond,
-                                                        ConstCOPChillerReport(ChillNum).Base.CondInletTemp,
-                                                        ConstCOPChillerReport(ChillNum).Base.CondOutletTemp,
-                                                        ConstCOPChillerReport(ChillNum).Base.Condmdot,
+                                                                        ConstCOPChiller(ChillNum).Base.QCond,
+                                                                        ConstCOPChiller(ChillNum).Base.CondInletTemp,
+                                                                        ConstCOPChiller(ChillNum).Base.CondOutletTemp,
+                                                                        ConstCOPChiller(ChillNum).Base.Condmdot,
                                                         FirstHVACIteration);
                 }
             }
@@ -580,8 +572,7 @@ namespace PlantChillers {
 
         // ALLOCATE ARRAYS
         ElectricChiller.allocate(NumElectricChillers);
-        ElectricChillerReport.allocate(NumElectricChillers);
-
+        
         // LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
         for (ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -901,13 +892,13 @@ namespace PlantChillers {
         for (ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum) {
             SetupOutputVariable("Chiller Electric Power",
                                 OutputProcessor::Unit::W,
-                                ElectricChillerReport(ChillerNum).Base.Power,
+                                ElectricChiller(ChillerNum).Base.Power,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricChillerReport(ChillerNum).Base.Energy,
+                                ElectricChiller(ChillerNum).Base.Energy,
                                 "System",
                                 "Sum",
                                 ElectricChiller(ChillerNum).Base.Name,
@@ -919,13 +910,13 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ElectricChillerReport(ChillerNum).Base.QEvap,
+                                ElectricChiller(ChillerNum).Base.QEvap,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricChillerReport(ChillerNum).Base.EvapEnergy,
+                                ElectricChiller(ChillerNum).Base.EvapEnergy,
                                 "System",
                                 "Sum",
                                 ElectricChiller(ChillerNum).Base.Name,
@@ -936,32 +927,32 @@ namespace PlantChillers {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElectricChillerReport(ChillerNum).Base.EvapInletTemp,
+                                ElectricChiller(ChillerNum).Base.EvapInletTemp,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElectricChillerReport(ChillerNum).Base.EvapOutletTemp,
+                                ElectricChiller(ChillerNum).Base.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ElectricChillerReport(ChillerNum).Base.Evapmdot,
+                                ElectricChiller(ChillerNum).Base.Evapmdot,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ElectricChillerReport(ChillerNum).Base.QCond,
+                                ElectricChiller(ChillerNum).Base.QCond,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricChillerReport(ChillerNum).Base.CondEnergy,
+                                ElectricChiller(ChillerNum).Base.CondEnergy,
                                 "System",
                                 "Sum",
                                 ElectricChiller(ChillerNum).Base.Name,
@@ -972,7 +963,7 @@ namespace PlantChillers {
                                 "Plant");
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                ElectricChillerReport(ChillerNum).ActualCOP,
+                                ElectricChiller(ChillerNum).ActualCOP,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Base.Name);
@@ -981,46 +972,46 @@ namespace PlantChillers {
             if (ElectricChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ElectricChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).Base.CondOutletTemp,
+                                    ElectricChiller(ChillerNum).Base.CondOutletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ElectricChillerReport(ChillerNum).Base.Condmdot,
+                                    ElectricChiller(ChillerNum).Base.Condmdot,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
             } else if (ElectricChiller(ChillerNum).Base.CondenserType == AirCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ElectricChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
             } else if (ElectricChiller(ChillerNum).Base.CondenserType == EvapCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ElectricChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
                 if (ElectricChiller(ChillerNum).Base.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable("Chiller Basin Heater Electric Power",
                                         OutputProcessor::Unit::W,
-                                        ElectricChillerReport(ChillerNum).Base.BasinHeaterPower,
+                                        ElectricChiller(ChillerNum).Base.BasinHeaterPower,
                                         "System",
                                         "Average",
                                         ElectricChiller(ChillerNum).Base.Name);
                     SetupOutputVariable("Chiller Basin Heater Electric Energy",
                                         OutputProcessor::Unit::J,
-                                        ElectricChillerReport(ChillerNum).Base.BasinHeaterConsumption,
+                                        ElectricChiller(ChillerNum).Base.BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         ElectricChiller(ChillerNum).Base.Name,
@@ -1036,13 +1027,13 @@ namespace PlantChillers {
             if (ElectricChiller(ChillerNum).HeatRecActive) {
                 SetupOutputVariable("Chiller Total Recovered Heat Rate",
                                     OutputProcessor::Unit::W,
-                                    ElectricChillerReport(ChillerNum).QHeatRecovery,
+                                    ElectricChiller(ChillerNum).QHeatRecovery,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Total Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    ElectricChillerReport(ChillerNum).EnergyHeatRecovery,
+                                    ElectricChiller(ChillerNum).EnergyHeatRecovery,
                                     "System",
                                     "Sum",
                                     ElectricChiller(ChillerNum).Base.Name,
@@ -1053,28 +1044,28 @@ namespace PlantChillers {
                                     "Plant");
                 SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).HeatRecInletTemp,
+                                    ElectricChiller(ChillerNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
 
                 SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).HeatRecOutletTemp,
+                                    ElectricChiller(ChillerNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
 
                 SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ElectricChillerReport(ChillerNum).HeatRecMassFlow,
+                                    ElectricChiller(ChillerNum).HeatRecMassFlow,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
 
                 SetupOutputVariable("Chiller Effective Heat Rejection Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricChillerReport(ChillerNum).ChillerCondAvgTemp,
+                                    ElectricChiller(ChillerNum).ChillerCondAvgTemp,
                                     "System",
                                     "Average",
                                     ElectricChiller(ChillerNum).Base.Name);
@@ -1132,8 +1123,7 @@ namespace PlantChillers {
 
         // ALLOCATE ARRAYS
         EngineDrivenChiller.allocate(NumEngineDrivenChillers);
-        EngineDrivenChillerReport.allocate(NumEngineDrivenChillers);
-
+        
         // LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
         for (ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -1512,26 +1502,26 @@ namespace PlantChillers {
         for (ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum) {
             SetupOutputVariable("Chiller Drive Shaft Power",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChillerReport(ChillerNum).Base.Power,
+                                EngineDrivenChiller(ChillerNum).Base.Power,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Drive Shaft Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChillerReport(ChillerNum).Base.Energy,
+                                EngineDrivenChiller(ChillerNum).Base.Energy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChillerReport(ChillerNum).Base.QEvap,
+                                EngineDrivenChiller(ChillerNum).Base.QEvap,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChillerReport(ChillerNum).Base.EvapEnergy,
+                                EngineDrivenChiller(ChillerNum).Base.EvapEnergy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1542,31 +1532,31 @@ namespace PlantChillers {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                EngineDrivenChillerReport(ChillerNum).Base.EvapInletTemp,
+                                EngineDrivenChiller(ChillerNum).Base.EvapInletTemp,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                EngineDrivenChillerReport(ChillerNum).Base.EvapOutletTemp,
+                                EngineDrivenChiller(ChillerNum).Base.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                EngineDrivenChillerReport(ChillerNum).Base.Evapmdot,
+                                EngineDrivenChiller(ChillerNum).Base.Evapmdot,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChillerReport(ChillerNum).Base.QCond,
+                                EngineDrivenChiller(ChillerNum).Base.QCond,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChillerReport(ChillerNum).Base.CondEnergy,
+                                EngineDrivenChiller(ChillerNum).Base.CondEnergy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1580,46 +1570,46 @@ namespace PlantChillers {
             if (EngineDrivenChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).Base.CondInletTemp,
+                                    EngineDrivenChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).Base.CondOutletTemp,
+                                    EngineDrivenChiller(ChillerNum).Base.CondOutletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    EngineDrivenChillerReport(ChillerNum).Base.Condmdot,
+                                    EngineDrivenChiller(ChillerNum).Base.Condmdot,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
             } else if (EngineDrivenChiller(ChillerNum).Base.CondenserType == AirCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).Base.CondInletTemp,
+                                    EngineDrivenChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
             } else if (EngineDrivenChiller(ChillerNum).Base.CondenserType == EvapCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).Base.CondInletTemp,
+                                    EngineDrivenChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 if (EngineDrivenChiller(ChillerNum).Base.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable("Chiller Basin Heater Electric Power",
                                         OutputProcessor::Unit::W,
-                                        EngineDrivenChillerReport(ChillerNum).Base.BasinHeaterPower,
+                                        EngineDrivenChiller(ChillerNum).Base.BasinHeaterPower,
                                         "System",
                                         "Average",
                                         EngineDrivenChiller(ChillerNum).Base.Name);
                     SetupOutputVariable("Chiller Basin Heater Electric Energy",
                                         OutputProcessor::Unit::J,
-                                        EngineDrivenChillerReport(ChillerNum).Base.BasinHeaterConsumption,
+                                        EngineDrivenChiller(ChillerNum).Base.BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1633,13 +1623,13 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller " + EngineDrivenChiller(ChillerNum).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChillerReport(ChillerNum).FuelEnergyUseRate,
+                                EngineDrivenChiller(ChillerNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller " + EngineDrivenChiller(ChillerNum).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChillerReport(ChillerNum).FuelEnergy,
+                                EngineDrivenChiller(ChillerNum).FuelEnergy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1651,28 +1641,28 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                EngineDrivenChillerReport(ChillerNum).FuelCOP,
+                                EngineDrivenChiller(ChillerNum).FuelCOP,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller " + EngineDrivenChiller(ChillerNum).FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                EngineDrivenChillerReport(ChillerNum).FuelMdot,
+                                EngineDrivenChiller(ChillerNum).FuelMdot,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Exhaust Temperature",
                                 OutputProcessor::Unit::C,
-                                EngineDrivenChillerReport(ChillerNum).ExhaustStackTemp,
+                                EngineDrivenChiller(ChillerNum).ExhaustStackTemp,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                EngineDrivenChillerReport(ChillerNum).HeatRecMdot,
+                                EngineDrivenChiller(ChillerNum).HeatRecMdot,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Base.Name);
@@ -1681,13 +1671,13 @@ namespace PlantChillers {
                 // need to only report if heat recovery active
                 SetupOutputVariable("Chiller Jacket Recovered Heat Rate",
                                     OutputProcessor::Unit::W,
-                                    EngineDrivenChillerReport(ChillerNum).QJacketRecovered,
+                                    EngineDrivenChiller(ChillerNum).QJacketRecovered,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Jacket Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    EngineDrivenChillerReport(ChillerNum).JacketEnergyRec,
+                                    EngineDrivenChiller(ChillerNum).JacketEnergyRec,
                                     "System",
                                     "Sum",
                                     EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1699,13 +1689,13 @@ namespace PlantChillers {
 
                 SetupOutputVariable("Chiller Lube Recovered Heat Rate",
                                     OutputProcessor::Unit::W,
-                                    EngineDrivenChillerReport(ChillerNum).QLubeOilRecovered,
+                                    EngineDrivenChiller(ChillerNum).QLubeOilRecovered,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Lube Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    EngineDrivenChillerReport(ChillerNum).LubeOilEnergyRec,
+                                    EngineDrivenChiller(ChillerNum).LubeOilEnergyRec,
                                     "System",
                                     "Sum",
                                     EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1717,13 +1707,13 @@ namespace PlantChillers {
 
                 SetupOutputVariable("Chiller Exhaust Recovered Heat Rate",
                                     OutputProcessor::Unit::W,
-                                    EngineDrivenChillerReport(ChillerNum).QExhaustRecovered,
+                                    EngineDrivenChiller(ChillerNum).QExhaustRecovered,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Exhaust Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    EngineDrivenChillerReport(ChillerNum).ExhaustEnergyRec,
+                                    EngineDrivenChiller(ChillerNum).ExhaustEnergyRec,
                                     "System",
                                     "Sum",
                                     EngineDrivenChiller(ChillerNum).Base.Name,
@@ -1735,27 +1725,27 @@ namespace PlantChillers {
 
                 SetupOutputVariable("Chiller Total Recovered Heat Rate",
                                     OutputProcessor::Unit::W,
-                                    EngineDrivenChillerReport(ChillerNum).QTotalHeatRecovered,
+                                    EngineDrivenChiller(ChillerNum).QTotalHeatRecovered,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Total Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    EngineDrivenChillerReport(ChillerNum).TotalHeatEnergyRec,
+                                    EngineDrivenChiller(ChillerNum).TotalHeatEnergyRec,
                                     "System",
                                     "Sum",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
 
                 SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).HeatRecInletTemp,
+                                    EngineDrivenChiller(ChillerNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
 
                 SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    EngineDrivenChillerReport(ChillerNum).HeatRecOutletTemp,
+                                    EngineDrivenChiller(ChillerNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     EngineDrivenChiller(ChillerNum).Base.Name);
@@ -1816,8 +1806,7 @@ namespace PlantChillers {
 
         // ALLOCATE ARRAYS
         GTChiller.allocate(NumGTChillers);
-        GTChillerReport.allocate(NumGTChillers);
-
+        
         for (ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           ChillerNum,
@@ -2169,26 +2158,26 @@ namespace PlantChillers {
         for (ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum) {
             SetupOutputVariable("Chiller Drive Shaft Power",
                                 OutputProcessor::Unit::W,
-                                GTChillerReport(ChillerNum).Base.Power,
+                                GTChiller(ChillerNum).Base.Power,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Drive Shaft Energy",
                                 OutputProcessor::Unit::J,
-                                GTChillerReport(ChillerNum).Base.Energy,
+                                GTChiller(ChillerNum).Base.Energy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                GTChillerReport(ChillerNum).Base.QEvap,
+                                GTChiller(ChillerNum).Base.QEvap,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                GTChillerReport(ChillerNum).Base.EvapEnergy,
+                                GTChiller(ChillerNum).Base.EvapEnergy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name,
@@ -2199,32 +2188,32 @@ namespace PlantChillers {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                GTChillerReport(ChillerNum).Base.EvapInletTemp,
+                                GTChiller(ChillerNum).Base.EvapInletTemp,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                GTChillerReport(ChillerNum).Base.EvapOutletTemp,
+                                GTChiller(ChillerNum).Base.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                GTChillerReport(ChillerNum).Base.Evapmdot,
+                                GTChiller(ChillerNum).Base.Evapmdot,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                GTChillerReport(ChillerNum).Base.QCond,
+                                GTChiller(ChillerNum).Base.QCond,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                GTChillerReport(ChillerNum).Base.CondEnergy,
+                                GTChiller(ChillerNum).Base.CondEnergy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name,
@@ -2238,46 +2227,46 @@ namespace PlantChillers {
             if (GTChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    GTChillerReport(ChillerNum).Base.CondInletTemp,
+                                    GTChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     GTChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    GTChillerReport(ChillerNum).Base.CondOutletTemp,
+                                    GTChiller(ChillerNum).Base.CondOutletTemp,
                                     "System",
                                     "Average",
                                     GTChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    GTChillerReport(ChillerNum).Base.Condmdot,
+                                    GTChiller(ChillerNum).Base.Condmdot,
                                     "System",
                                     "Average",
                                     GTChiller(ChillerNum).Base.Name);
             } else if (GTChiller(ChillerNum).Base.CondenserType == AirCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    GTChillerReport(ChillerNum).Base.CondInletTemp,
+                                    GTChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     GTChiller(ChillerNum).Base.Name);
             } else if (GTChiller(ChillerNum).Base.CondenserType == EvapCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    GTChillerReport(ChillerNum).Base.CondInletTemp,
+                                    GTChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     GTChiller(ChillerNum).Base.Name);
                 if (GTChiller(ChillerNum).Base.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable("Chiller Basin Heater Electric Power",
                                         OutputProcessor::Unit::W,
-                                        GTChillerReport(ChillerNum).Base.BasinHeaterPower,
+                                        GTChiller(ChillerNum).Base.BasinHeaterPower,
                                         "System",
                                         "Average",
                                         GTChiller(ChillerNum).Base.Name);
                     SetupOutputVariable("Chiller Basin Heater Electric Energy",
                                         OutputProcessor::Unit::J,
-                                        GTChillerReport(ChillerNum).Base.BasinHeaterConsumption,
+                                        GTChiller(ChillerNum).Base.BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         GTChiller(ChillerNum).Base.Name,
@@ -2291,13 +2280,13 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Lube Recovered Heat Rate",
                                 OutputProcessor::Unit::W,
-                                GTChillerReport(ChillerNum).HeatRecLubeRate,
+                                GTChiller(ChillerNum).HeatRecLubeRate,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Lube Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
-                                GTChillerReport(ChillerNum).HeatRecLubeEnergy,
+                                GTChiller(ChillerNum).HeatRecLubeEnergy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name,
@@ -2309,14 +2298,14 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller " + GTChiller(ChillerNum).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
-                                GTChillerReport(ChillerNum).FuelEnergyUsedRate,
+                                GTChiller(ChillerNum).FuelEnergyUsedRate,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller " + GTChiller(ChillerNum).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                GTChillerReport(ChillerNum).FuelEnergyUsed,
+                                GTChiller(ChillerNum).FuelEnergyUsed,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name,
@@ -2328,48 +2317,48 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller " + GTChiller(ChillerNum).FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                GTChillerReport(ChillerNum).FuelMassUsedRate,
+                                GTChiller(ChillerNum).FuelMassUsedRate,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller " + GTChiller(ChillerNum).FuelType + " Mass",
                                 OutputProcessor::Unit::kg,
-                                GTChillerReport(ChillerNum).FuelMassUsed,
+                                GTChiller(ChillerNum).FuelMassUsed,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Exhaust Temperature",
                                 OutputProcessor::Unit::C,
-                                GTChillerReport(ChillerNum).ExhaustStackTemp,
+                                GTChiller(ChillerNum).ExhaustStackTemp,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                GTChillerReport(ChillerNum).HeatRecInletTemp,
+                                GTChiller(ChillerNum).HeatRecInletTemp,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                GTChillerReport(ChillerNum).HeatRecOutletTemp,
+                                GTChiller(ChillerNum).HeatRecOutletTemp,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                GTChillerReport(ChillerNum).HeatRecMdot,
+                                GTChiller(ChillerNum).HeatRecMdot,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable(
-                "Chiller COP", OutputProcessor::Unit::W_W, GTChillerReport(ChillerNum).FuelCOP, "System", "Average", GTChiller(ChillerNum).Base.Name);
+                "Chiller COP", OutputProcessor::Unit::W_W, GTChiller(ChillerNum).FuelCOP, "System", "Average", GTChiller(ChillerNum).Base.Name);
 
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable("Chiller Nominal Capacity", GTChiller(ChillerNum).Base.Name, "[W]", GTChiller(ChillerNum).Base.NomCap);
@@ -2428,8 +2417,7 @@ namespace PlantChillers {
         if (allocated(ConstCOPChiller)) return;
 
         ConstCOPChiller.allocate(NumConstCOPChillers);
-        ConstCOPChillerReport.allocate(NumConstCOPChillers);
-
+        
         // LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
         for (ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -2634,13 +2622,13 @@ namespace PlantChillers {
         for (ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum) {
             SetupOutputVariable("Chiller Electric Power",
                                 OutputProcessor::Unit::W,
-                                ConstCOPChillerReport(ChillerNum).Base.Power,
+                                ConstCOPChiller(ChillerNum).Base.Power,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ConstCOPChillerReport(ChillerNum).Base.Energy,
+                                ConstCOPChiller(ChillerNum).Base.Energy,
                                 "System",
                                 "Sum",
                                 ConstCOPChiller(ChillerNum).Base.Name,
@@ -2652,13 +2640,13 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ConstCOPChillerReport(ChillerNum).Base.QEvap,
+                                ConstCOPChiller(ChillerNum).Base.QEvap,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ConstCOPChillerReport(ChillerNum).Base.EvapEnergy,
+                                ConstCOPChiller(ChillerNum).Base.EvapEnergy,
                                 "System",
                                 "Sum",
                                 ConstCOPChiller(ChillerNum).Base.Name,
@@ -2669,38 +2657,38 @@ namespace PlantChillers {
                                 "Plant");
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ConstCOPChillerReport(ChillerNum).Base.EvapInletTemp,
+                                ConstCOPChiller(ChillerNum).Base.EvapInletTemp,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ConstCOPChillerReport(ChillerNum).Base.EvapOutletTemp,
+                                ConstCOPChiller(ChillerNum).Base.EvapOutletTemp,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ConstCOPChillerReport(ChillerNum).Base.Evapmdot,
+                                ConstCOPChiller(ChillerNum).Base.Evapmdot,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                ConstCOPChillerReport(ChillerNum).ActualCOP,
+                                ConstCOPChiller(ChillerNum).ActualCOP,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ConstCOPChillerReport(ChillerNum).Base.QCond,
+                                ConstCOPChiller(ChillerNum).Base.QCond,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Base.Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ConstCOPChillerReport(ChillerNum).Base.CondEnergy,
+                                ConstCOPChiller(ChillerNum).Base.CondEnergy,
                                 "System",
                                 "Sum",
                                 ConstCOPChiller(ChillerNum).Base.Name,
@@ -2714,46 +2702,46 @@ namespace PlantChillers {
             if (ConstCOPChiller(ChillerNum).Base.CondenserType == WaterCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ConstCOPChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ConstCOPChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ConstCOPChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ConstCOPChillerReport(ChillerNum).Base.CondOutletTemp,
+                                    ConstCOPChiller(ChillerNum).Base.CondOutletTemp,
                                     "System",
                                     "Average",
                                     ConstCOPChiller(ChillerNum).Base.Name);
                 SetupOutputVariable("Chiller Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ConstCOPChillerReport(ChillerNum).Base.Condmdot,
+                                    ConstCOPChiller(ChillerNum).Base.Condmdot,
                                     "System",
                                     "Average",
                                     ConstCOPChiller(ChillerNum).Base.Name);
             } else if (ConstCOPChiller(ChillerNum).Base.CondenserType == AirCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ConstCOPChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ConstCOPChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ConstCOPChiller(ChillerNum).Base.Name);
             } else if (ConstCOPChiller(ChillerNum).Base.CondenserType == EvapCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ConstCOPChillerReport(ChillerNum).Base.CondInletTemp,
+                                    ConstCOPChiller(ChillerNum).Base.CondInletTemp,
                                     "System",
                                     "Average",
                                     ConstCOPChiller(ChillerNum).Base.Name);
                 if (ConstCOPChiller(ChillerNum).Base.BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable("Chiller Basin Heater Electric Power",
                                         OutputProcessor::Unit::W,
-                                        ConstCOPChillerReport(ChillerNum).Base.BasinHeaterPower,
+                                        ConstCOPChiller(ChillerNum).Base.BasinHeaterPower,
                                         "System",
                                         "Average",
                                         ConstCOPChiller(ChillerNum).Base.Name);
                     SetupOutputVariable("Chiller Basin Heater Electric Energy",
                                         OutputProcessor::Unit::J,
-                                        ConstCOPChillerReport(ChillerNum).Base.BasinHeaterConsumption,
+                                        ConstCOPChiller(ChillerNum).Base.BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         ConstCOPChiller(ChillerNum).Base.Name,
@@ -5522,10 +5510,10 @@ namespace PlantChillers {
 
         // correct inlet temperature if using heat recovery
         if (ElectricChiller(ChillNum).HeatRecActive) {
-            if ((ElectricChillerReport(ChillNum).QHeatRecovery + ElectricChillerReport(ChillNum).Base.QCond) > 0.0) {
-                ElectricChiller(ChillNum).Base.modAvgCondSinkTemp = (ElectricChillerReport(ChillNum).QHeatRecovery * ElectricChillerReport(ChillNum).HeatRecInletTemp +
-                                   ElectricChillerReport(ChillNum).Base.QCond * ElectricChillerReport(ChillNum).Base.CondInletTemp) /
-                                  (ElectricChillerReport(ChillNum).QHeatRecovery + ElectricChillerReport(ChillNum).Base.QCond);
+            if ((ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).Base.QCond) > 0.0) {
+                ElectricChiller(ChillNum).Base.modAvgCondSinkTemp = (ElectricChiller(ChillNum).QHeatRecovery * ElectricChiller(ChillNum).HeatRecInletTemp +
+                        ElectricChiller(ChillNum).Base.QCond * ElectricChiller(ChillNum).Base.CondInletTemp) /
+                                  (ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).Base.QCond);
             } else {
                 ElectricChiller(ChillNum).Base.modAvgCondSinkTemp = _CondInletTemp;
             }
@@ -7419,7 +7407,7 @@ namespace PlantChillers {
 
         FuelHeatingValue = GTChiller(ChillerNum).FuelHeatingValue;
 
-        GTChillerReport(ChillerNum).FuelMassUsedRate = std::abs(FuelEnergyIn) / (FuelHeatingValue * KJtoJ);
+        GTChiller(ChillerNum).FuelMassUsedRate = std::abs(FuelEnergyIn) / (FuelHeatingValue * KJtoJ);
 
         GTChiller(ChillerNum).ExhaustStackTemp = _ExhaustStackTemp;
 
@@ -8195,35 +8183,35 @@ namespace PlantChillers {
                 Node(CondOutletNode).Enthalpy = Node(CondInletNode).Enthalpy;
             }
 
-            ElectricChillerReport(Num).Base.Power = 0.0;
-            ElectricChillerReport(Num).Base.QEvap = 0.0;
-            ElectricChillerReport(Num).Base.QCond = 0.0;
-            ElectricChillerReport(Num).Base.Energy = 0.0;
-            ElectricChillerReport(Num).Base.EvapEnergy = 0.0;
-            ElectricChillerReport(Num).Base.CondEnergy = 0.0;
-            ElectricChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            ElectricChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            ElectricChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            ElectricChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            ElectricChillerReport(Num).Base.Evapmdot = ElectricChiller(Num).Base.modEvapMassFlowRate;
-            ElectricChillerReport(Num).Base.Condmdot = ElectricChiller(Num).Base.modCondMassFlowRate;
-            ElectricChillerReport(Num).ActualCOP = 0.0;
+            ElectricChiller(Num).Base.Power = 0.0;
+            ElectricChiller(Num).Base.QEvap = 0.0;
+            ElectricChiller(Num).Base.QCond = 0.0;
+            ElectricChiller(Num).Base.Energy = 0.0;
+            ElectricChiller(Num).Base.EvapEnergy = 0.0;
+            ElectricChiller(Num).Base.CondEnergy = 0.0;
+            ElectricChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            ElectricChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            ElectricChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            ElectricChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            ElectricChiller(Num).Base.Evapmdot = ElectricChiller(Num).Base.modEvapMassFlowRate;
+            ElectricChiller(Num).Base.Condmdot = ElectricChiller(Num).Base.modCondMassFlowRate;
+            ElectricChiller(Num).ActualCOP = 0.0;
             if (ElectricChiller(Num).Base.CondenserType == EvapCooled) {
-                ElectricChillerReport(Num).Base.BasinHeaterPower = ElectricChiller(Num).Base.modBasinHeaterPower;
-                ElectricChillerReport(Num).Base.BasinHeaterConsumption = ElectricChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                ElectricChiller(Num).Base.BasinHeaterPower = ElectricChiller(Num).Base.modBasinHeaterPower;
+                ElectricChiller(Num).Base.BasinHeaterConsumption = ElectricChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
 
             if (ElectricChiller(Num).HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
 
-                ElectricChillerReport(Num).QHeatRecovery = 0.0;
-                ElectricChillerReport(Num).EnergyHeatRecovery = 0.0;
-                ElectricChillerReport(Num).HeatRecInletTemp = Node(HeatRecInNode).Temp;
-                ElectricChillerReport(Num).HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
-                ElectricChillerReport(Num).HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
+                ElectricChiller(Num).QHeatRecovery = 0.0;
+                ElectricChiller(Num).EnergyHeatRecovery = 0.0;
+                ElectricChiller(Num).HeatRecInletTemp = Node(HeatRecInNode).Temp;
+                ElectricChiller(Num).HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
+                ElectricChiller(Num).HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
 
-                ElectricChillerReport(Num).ChillerCondAvgTemp = ElectricChiller(Num).Base.modAvgCondSinkTemp;
+                ElectricChiller(Num).ChillerCondAvgTemp = ElectricChiller(Num).Base.modAvgCondSinkTemp;
             }
 
         } else { // Chiller is running, so pass calculated values
@@ -8236,38 +8224,38 @@ namespace PlantChillers {
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
-            ElectricChillerReport(Num).Base.Power = ElectricChiller(Num).Base.modPower;
-            ElectricChillerReport(Num).Base.QEvap = ElectricChiller(Num).Base.modQEvaporator;
-            ElectricChillerReport(Num).Base.QCond = ElectricChiller(Num).Base.modQCondenser;
-            ElectricChillerReport(Num).Base.Energy = ElectricChiller(Num).Base.modEnergy;
-            ElectricChillerReport(Num).Base.EvapEnergy = ElectricChiller(Num).Base.modEvaporatorEnergy;
-            ElectricChillerReport(Num).Base.CondEnergy = ElectricChiller(Num).Base.modCondenserEnergy;
-            ElectricChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            ElectricChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            ElectricChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            ElectricChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            ElectricChillerReport(Num).Base.Evapmdot = ElectricChiller(Num).Base.modEvapMassFlowRate;
-            ElectricChillerReport(Num).Base.Condmdot = ElectricChiller(Num).Base.modCondMassFlowRate;
+            ElectricChiller(Num).Base.Power = ElectricChiller(Num).Base.modPower;
+            ElectricChiller(Num).Base.QEvap = ElectricChiller(Num).Base.modQEvaporator;
+            ElectricChiller(Num).Base.QCond = ElectricChiller(Num).Base.modQCondenser;
+            ElectricChiller(Num).Base.Energy = ElectricChiller(Num).Base.modEnergy;
+            ElectricChiller(Num).Base.EvapEnergy = ElectricChiller(Num).Base.modEvaporatorEnergy;
+            ElectricChiller(Num).Base.CondEnergy = ElectricChiller(Num).Base.modCondenserEnergy;
+            ElectricChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            ElectricChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            ElectricChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            ElectricChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            ElectricChiller(Num).Base.Evapmdot = ElectricChiller(Num).Base.modEvapMassFlowRate;
+            ElectricChiller(Num).Base.Condmdot = ElectricChiller(Num).Base.modCondMassFlowRate;
             if (ElectricChiller(Num).Base.CondenserType == EvapCooled) {
-                ElectricChillerReport(Num).Base.BasinHeaterPower = ElectricChiller(Num).Base.modBasinHeaterPower;
-                ElectricChillerReport(Num).Base.BasinHeaterConsumption = ElectricChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                ElectricChiller(Num).Base.BasinHeaterPower = ElectricChiller(Num).Base.modBasinHeaterPower;
+                ElectricChiller(Num).Base.BasinHeaterConsumption = ElectricChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
             if (ElectricChiller(Num).Base.modPower != 0.0) {
-                ElectricChillerReport(Num).ActualCOP = ElectricChiller(Num).Base.modQEvaporator / ElectricChiller(Num).Base.modPower;
+                ElectricChiller(Num).ActualCOP = ElectricChiller(Num).Base.modQEvaporator / ElectricChiller(Num).Base.modPower;
             } else {
-                ElectricChillerReport(Num).ActualCOP = 0.0;
+                ElectricChiller(Num).ActualCOP = 0.0;
             }
 
             if (ElectricChiller(Num).HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
-                ElectricChillerReport(Num).QHeatRecovery = ElectricChiller(Num).Base.modQHeatRecovered;
-                ElectricChillerReport(Num).EnergyHeatRecovery = ElectricChiller(Num).Base.modQHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                ElectricChiller(Num).QHeatRecovery = ElectricChiller(Num).Base.modQHeatRecovered;
+                ElectricChiller(Num).EnergyHeatRecovery = ElectricChiller(Num).Base.modQHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 Node(HeatRecOutNode).Temp = ElectricChiller(Num).Base.modHeatRecOutletTemp;
-                ElectricChillerReport(Num).HeatRecInletTemp = Node(HeatRecInNode).Temp;
-                ElectricChillerReport(Num).HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
-                ElectricChillerReport(Num).HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
-                ElectricChillerReport(Num).ChillerCondAvgTemp = ElectricChiller(Num).Base.modAvgCondSinkTemp;
+                ElectricChiller(Num).HeatRecInletTemp = Node(HeatRecInNode).Temp;
+                ElectricChiller(Num).HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
+                ElectricChiller(Num).HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
+                ElectricChiller(Num).ChillerCondAvgTemp = ElectricChiller(Num).Base.modAvgCondSinkTemp;
             }
         }
     }
@@ -8305,67 +8293,67 @@ namespace PlantChillers {
             Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
-            EngineDrivenChillerReport(Num).Base.Power = 0.0;
-            EngineDrivenChillerReport(Num).Base.QEvap = 0.0;
-            EngineDrivenChillerReport(Num).Base.QCond = 0.0;
-            EngineDrivenChillerReport(Num).Base.Energy = 0.0;
-            EngineDrivenChillerReport(Num).Base.EvapEnergy = 0.0;
-            EngineDrivenChillerReport(Num).Base.CondEnergy = 0.0;
-            EngineDrivenChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.Evapmdot = EngineDrivenChiller(Num).Base.modEvapMassFlowRate;
-            EngineDrivenChillerReport(Num).Base.Condmdot = EngineDrivenChiller(Num).Base.modCondMassFlowRate;
-            EngineDrivenChillerReport(Num).FuelCOP = 0.0;
+            EngineDrivenChiller(Num).Base.Power = 0.0;
+            EngineDrivenChiller(Num).Base.QEvap = 0.0;
+            EngineDrivenChiller(Num).Base.QCond = 0.0;
+            EngineDrivenChiller(Num).Base.Energy = 0.0;
+            EngineDrivenChiller(Num).Base.EvapEnergy = 0.0;
+            EngineDrivenChiller(Num).Base.CondEnergy = 0.0;
+            EngineDrivenChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            EngineDrivenChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            EngineDrivenChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            EngineDrivenChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            EngineDrivenChiller(Num).Base.Evapmdot = EngineDrivenChiller(Num).Base.modEvapMassFlowRate;
+            EngineDrivenChiller(Num).Base.Condmdot = EngineDrivenChiller(Num).Base.modCondMassFlowRate;
+            EngineDrivenChiller(Num).FuelCOP = 0.0;
             if (EngineDrivenChiller(Num).Base.CondenserType == EvapCooled) {
-                EngineDrivenChillerReport(Num).Base.BasinHeaterPower = EngineDrivenChiller(Num).Base.modBasinHeaterPower;
-                EngineDrivenChillerReport(Num).Base.BasinHeaterConsumption = EngineDrivenChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                EngineDrivenChiller(Num).Base.BasinHeaterPower = EngineDrivenChiller(Num).Base.modBasinHeaterPower;
+                EngineDrivenChiller(Num).Base.BasinHeaterConsumption = EngineDrivenChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
         } else { // Chiller is running
             // set node temperatures
             Node(EvapOutletNode).Temp = EngineDrivenChiller(Num).Base.modEvapOutletTemp;
             Node(CondOutletNode).Temp = EngineDrivenChiller(Num).Base.modCondOutletTemp;
 
-            EngineDrivenChillerReport(Num).Base.Power = EngineDrivenChiller(Num).Base.modPower;
-            EngineDrivenChillerReport(Num).Base.QEvap = EngineDrivenChiller(Num).Base.modQEvaporator;
-            EngineDrivenChillerReport(Num).Base.QCond = EngineDrivenChiller(Num).Base.modQCondenser;
-            EngineDrivenChillerReport(Num).Base.Energy = EngineDrivenChiller(Num).Base.modEnergy;
-            EngineDrivenChillerReport(Num).Base.EvapEnergy = EngineDrivenChiller(Num).Base.modEvaporatorEnergy;
-            EngineDrivenChillerReport(Num).Base.CondEnergy = EngineDrivenChiller(Num).Base.modCondenserEnergy;
-            EngineDrivenChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            EngineDrivenChillerReport(Num).Base.Evapmdot = EngineDrivenChiller(Num).Base.modEvapMassFlowRate;
-            EngineDrivenChillerReport(Num).Base.Condmdot = EngineDrivenChiller(Num).Base.modCondMassFlowRate;
+            EngineDrivenChiller(Num).Base.Power = EngineDrivenChiller(Num).Base.modPower;
+            EngineDrivenChiller(Num).Base.QEvap = EngineDrivenChiller(Num).Base.modQEvaporator;
+            EngineDrivenChiller(Num).Base.QCond = EngineDrivenChiller(Num).Base.modQCondenser;
+            EngineDrivenChiller(Num).Base.Energy = EngineDrivenChiller(Num).Base.modEnergy;
+            EngineDrivenChiller(Num).Base.EvapEnergy = EngineDrivenChiller(Num).Base.modEvaporatorEnergy;
+            EngineDrivenChiller(Num).Base.CondEnergy = EngineDrivenChiller(Num).Base.modCondenserEnergy;
+            EngineDrivenChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            EngineDrivenChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            EngineDrivenChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            EngineDrivenChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            EngineDrivenChiller(Num).Base.Evapmdot = EngineDrivenChiller(Num).Base.modEvapMassFlowRate;
+            EngineDrivenChiller(Num).Base.Condmdot = EngineDrivenChiller(Num).Base.modCondMassFlowRate;
             if (EngineDrivenChiller(Num).modFuelEnergyUseRate != 0.0) {
-                EngineDrivenChillerReport(Num).FuelCOP = EngineDrivenChiller(Num).Base.modQEvaporator / EngineDrivenChiller(Num).modFuelEnergyUseRate;
+                EngineDrivenChiller(Num).FuelCOP = EngineDrivenChiller(Num).Base.modQEvaporator / EngineDrivenChiller(Num).modFuelEnergyUseRate;
             } else {
-                EngineDrivenChillerReport(Num).FuelCOP = 0.0;
+                EngineDrivenChiller(Num).FuelCOP = 0.0;
             }
             if (EngineDrivenChiller(Num).Base.CondenserType == EvapCooled) {
-                EngineDrivenChillerReport(Num).Base.BasinHeaterPower = EngineDrivenChiller(Num).Base.modBasinHeaterPower;
-                EngineDrivenChillerReport(Num).Base.BasinHeaterConsumption = EngineDrivenChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                EngineDrivenChiller(Num).Base.BasinHeaterPower = EngineDrivenChiller(Num).Base.modBasinHeaterPower;
+                EngineDrivenChiller(Num).Base.BasinHeaterConsumption = EngineDrivenChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
         }
 
         // Update Heat Recovery Stuff whether running or not, variables should be set correctly
-        EngineDrivenChillerReport(Num).QJacketRecovered = EngineDrivenChiller(Num).modQJacketRecovered;
-        EngineDrivenChillerReport(Num).QLubeOilRecovered = EngineDrivenChiller(Num).modQLubeOilRecovered;
-        EngineDrivenChillerReport(Num).QExhaustRecovered = EngineDrivenChiller(Num).modQExhaustRecovered;
-        EngineDrivenChillerReport(Num).QTotalHeatRecovered = EngineDrivenChiller(Num).modQTotalHeatRecovered;
-        EngineDrivenChillerReport(Num).FuelEnergyUseRate = EngineDrivenChiller(Num).modFuelEnergyUseRate;
-        EngineDrivenChillerReport(Num).JacketEnergyRec = EngineDrivenChiller(Num).modJacketEnergyRec;
-        EngineDrivenChillerReport(Num).LubeOilEnergyRec = EngineDrivenChiller(Num).modLubeOilEnergyRec;
-        EngineDrivenChillerReport(Num).ExhaustEnergyRec = EngineDrivenChiller(Num).modExhaustEnergyRec;
-        EngineDrivenChillerReport(Num).TotalHeatEnergyRec = EngineDrivenChiller(Num).modTotalHeatEnergyRec;
-        EngineDrivenChillerReport(Num).FuelEnergy = EngineDrivenChiller(Num).modFuelEnergy;
-        EngineDrivenChillerReport(Num).FuelMdot = EngineDrivenChiller(Num).modFuelMdot;
-        EngineDrivenChillerReport(Num).ExhaustStackTemp = EngineDrivenChiller(Num).modExhaustStackTemp;
-        EngineDrivenChillerReport(Num).HeatRecInletTemp = EngineDrivenChiller(Num).modHeatRecInletTemp;
-        EngineDrivenChillerReport(Num).HeatRecOutletTemp = EngineDrivenChiller(Num).Base.modHeatRecOutletTemp;
-        EngineDrivenChillerReport(Num).HeatRecMdot = EngineDrivenChiller(Num).modHeatRecMdotActual;
+        EngineDrivenChiller(Num).QJacketRecovered = EngineDrivenChiller(Num).modQJacketRecovered;
+        EngineDrivenChiller(Num).QLubeOilRecovered = EngineDrivenChiller(Num).modQLubeOilRecovered;
+        EngineDrivenChiller(Num).QExhaustRecovered = EngineDrivenChiller(Num).modQExhaustRecovered;
+        EngineDrivenChiller(Num).QTotalHeatRecovered = EngineDrivenChiller(Num).modQTotalHeatRecovered;
+        EngineDrivenChiller(Num).FuelEnergyUseRate = EngineDrivenChiller(Num).modFuelEnergyUseRate;
+        EngineDrivenChiller(Num).JacketEnergyRec = EngineDrivenChiller(Num).modJacketEnergyRec;
+        EngineDrivenChiller(Num).LubeOilEnergyRec = EngineDrivenChiller(Num).modLubeOilEnergyRec;
+        EngineDrivenChiller(Num).ExhaustEnergyRec = EngineDrivenChiller(Num).modExhaustEnergyRec;
+        EngineDrivenChiller(Num).TotalHeatEnergyRec = EngineDrivenChiller(Num).modTotalHeatEnergyRec;
+        EngineDrivenChiller(Num).FuelEnergy = EngineDrivenChiller(Num).modFuelEnergy;
+        EngineDrivenChiller(Num).FuelMdot = EngineDrivenChiller(Num).modFuelMdot;
+        EngineDrivenChiller(Num).ExhaustStackTemp = EngineDrivenChiller(Num).modExhaustStackTemp;
+        EngineDrivenChiller(Num).HeatRecInletTemp = EngineDrivenChiller(Num).modHeatRecInletTemp;
+        EngineDrivenChiller(Num).HeatRecOutletTemp = EngineDrivenChiller(Num).Base.modHeatRecOutletTemp;
+        EngineDrivenChiller(Num).HeatRecMdot = EngineDrivenChiller(Num).modHeatRecMdotActual;
 
         // Update the Heat Recovery outlet
         if (EngineDrivenChiller(Num).HeatRecActive) {
@@ -8411,35 +8399,35 @@ namespace PlantChillers {
 
             if (GTChiller(Num).HeatRecActive) {
                 PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
-                GTChillerReport(Num).HeatRecInletTemp = Node(HeatRecInletNode).Temp;
-                GTChillerReport(Num).HeatRecOutletTemp = Node(HeatRecOutletNode).Temp;
+                GTChiller(Num).HeatRecInletTemp = Node(HeatRecInletNode).Temp;
+                GTChiller(Num).HeatRecOutletTemp = Node(HeatRecOutletNode).Temp;
             }
 
-            GTChillerReport(Num).Base.Power = 0.0;
-            GTChillerReport(Num).Base.QEvap = 0.0;
-            GTChillerReport(Num).Base.QCond = 0.0;
-            GTChillerReport(Num).Base.Energy = 0.0;
-            GTChillerReport(Num).Base.EvapEnergy = 0.0;
-            GTChillerReport(Num).Base.CondEnergy = 0.0;
-            GTChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            GTChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            GTChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            GTChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            GTChillerReport(Num).Base.Evapmdot = GTChiller(Num).Base.modEvapMassFlowRate;
-            GTChillerReport(Num).Base.Condmdot = GTChiller(Num).Base.modCondMassFlowRate;
-            GTChillerReport(Num).FuelEnergyUsedRate = 0.0;
-            GTChillerReport(Num).FuelMassUsedRate = 0.0;
-            GTChillerReport(Num).FuelEnergyUsed = 0.0;
-            GTChillerReport(Num).FuelMassUsed = 0.0;
+            GTChiller(Num).Base.Power = 0.0;
+            GTChiller(Num).Base.QEvap = 0.0;
+            GTChiller(Num).Base.QCond = 0.0;
+            GTChiller(Num).Base.Energy = 0.0;
+            GTChiller(Num).Base.EvapEnergy = 0.0;
+            GTChiller(Num).Base.CondEnergy = 0.0;
+            GTChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            GTChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            GTChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            GTChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            GTChiller(Num).Base.Evapmdot = GTChiller(Num).Base.modEvapMassFlowRate;
+            GTChiller(Num).Base.Condmdot = GTChiller(Num).Base.modCondMassFlowRate;
+            GTChiller(Num).FuelEnergyUsedRate = 0.0;
+            GTChiller(Num).FuelMassUsedRate = 0.0;
+            GTChiller(Num).FuelEnergyUsed = 0.0;
+            GTChiller(Num).FuelMassUsed = 0.0;
 
-            GTChillerReport(Num).HeatRecLubeEnergy = 0.0;
-            GTChillerReport(Num).HeatRecLubeRate = 0.0;
-            GTChillerReport(Num).ExhaustStackTemp = 0.0;
-            GTChillerReport(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
-            GTChillerReport(Num).FuelCOP = 0.0;
+            GTChiller(Num).HeatRecLubeEnergy = 0.0;
+            GTChiller(Num).HeatRecLubeRate = 0.0;
+            GTChiller(Num).ExhaustStackTemp = 0.0;
+            GTChiller(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
+            GTChiller(Num).FuelCOP = 0.0;
             if (GTChiller(Num).Base.CondenserType == EvapCooled) {
-                GTChillerReport(Num).Base.BasinHeaterPower = GTChiller(Num).Base.modBasinHeaterPower;
-                GTChillerReport(Num).Base.BasinHeaterConsumption = GTChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                GTChiller(Num).Base.BasinHeaterPower = GTChiller(Num).Base.modBasinHeaterPower;
+                GTChiller(Num).Base.BasinHeaterConsumption = GTChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
 
         } else { // Chiller is running so report calculated values
@@ -8452,37 +8440,37 @@ namespace PlantChillers {
                 Node(HeatRecOutletNode).Temp = GTChiller(Num).HeatRecOutletTemp;
             }
 
-            GTChillerReport(Num).Base.Power = GTChiller(Num).Base.modPower;
-            GTChillerReport(Num).Base.QEvap = GTChiller(Num).Base.modQEvaporator;
-            GTChillerReport(Num).Base.QCond = GTChiller(Num).Base.modQCondenser;
-            GTChillerReport(Num).Base.Energy = GTChiller(Num).Base.modEnergy;
-            GTChillerReport(Num).Base.EvapEnergy = GTChiller(Num).Base.modEvaporatorEnergy;
-            GTChillerReport(Num).Base.CondEnergy = GTChiller(Num).Base.modCondenserEnergy;
-            GTChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            GTChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            GTChillerReport(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
-            GTChillerReport(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
-            GTChillerReport(Num).Base.Evapmdot = GTChiller(Num).Base.modEvapMassFlowRate;
-            GTChillerReport(Num).Base.Condmdot = GTChiller(Num).Base.modCondMassFlowRate;
+            GTChiller(Num).Base.Power = GTChiller(Num).Base.modPower;
+            GTChiller(Num).Base.QEvap = GTChiller(Num).Base.modQEvaporator;
+            GTChiller(Num).Base.QCond = GTChiller(Num).Base.modQCondenser;
+            GTChiller(Num).Base.Energy = GTChiller(Num).Base.modEnergy;
+            GTChiller(Num).Base.EvapEnergy = GTChiller(Num).Base.modEvaporatorEnergy;
+            GTChiller(Num).Base.CondEnergy = GTChiller(Num).Base.modCondenserEnergy;
+            GTChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            GTChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            GTChiller(Num).Base.CondOutletTemp = Node(CondOutletNode).Temp;
+            GTChiller(Num).Base.EvapOutletTemp = Node(EvapOutletNode).Temp;
+            GTChiller(Num).Base.Evapmdot = GTChiller(Num).Base.modEvapMassFlowRate;
+            GTChiller(Num).Base.Condmdot = GTChiller(Num).Base.modCondMassFlowRate;
 
-            GTChillerReport(Num).HeatRecLubeEnergy = GTChiller(Num).HeatRecLubeEnergy;
-            GTChillerReport(Num).HeatRecLubeRate = GTChiller(Num).HeatRecLubeRate;
-            GTChillerReport(Num).FuelEnergyUsedRate = GTChiller(Num).FuelEnergyIn;
-            GTChillerReport(Num).FuelMassUsedRate = GTChillerReport(Num).FuelMassUsedRate;
-            GTChillerReport(Num).FuelEnergyUsed = GTChillerReport(Num).FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            GTChillerReport(Num).FuelMassUsed = GTChillerReport(Num).FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            GTChillerReport(Num).ExhaustStackTemp = GTChiller(Num).ExhaustStackTemp;
-            GTChillerReport(Num).HeatRecInletTemp = GTChiller(Num).HeatRecInletTemp;
-            GTChillerReport(Num).HeatRecOutletTemp = GTChiller(Num).HeatRecOutletTemp;
-            GTChillerReport(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
-            if (GTChillerReport(Num).FuelEnergyUsedRate != 0.0) {
-                GTChillerReport(Num).FuelCOP = GTChillerReport(Num).Base.QEvap / GTChillerReport(Num).FuelEnergyUsedRate;
+            GTChiller(Num).HeatRecLubeEnergy = GTChiller(Num).HeatRecLubeEnergy;
+            GTChiller(Num).HeatRecLubeRate = GTChiller(Num).HeatRecLubeRate;
+            GTChiller(Num).FuelEnergyUsedRate = GTChiller(Num).FuelEnergyIn;
+            GTChiller(Num).FuelMassUsedRate = GTChiller(Num).FuelMassUsedRate;
+            GTChiller(Num).FuelEnergyUsed = GTChiller(Num).FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            GTChiller(Num).FuelMassUsed = GTChiller(Num).FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            GTChiller(Num).ExhaustStackTemp = GTChiller(Num).ExhaustStackTemp;
+            GTChiller(Num).HeatRecInletTemp = GTChiller(Num).HeatRecInletTemp;
+            GTChiller(Num).HeatRecOutletTemp = GTChiller(Num).HeatRecOutletTemp;
+            GTChiller(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
+            if (GTChiller(Num).FuelEnergyUsedRate != 0.0) {
+                GTChiller(Num).FuelCOP = GTChiller(Num).Base.QEvap / GTChiller(Num).FuelEnergyUsedRate;
             } else {
-                GTChillerReport(Num).FuelCOP = 0.0;
+                GTChiller(Num).FuelCOP = 0.0;
             }
             if (GTChiller(Num).Base.CondenserType == EvapCooled) {
-                GTChillerReport(Num).Base.BasinHeaterPower = GTChiller(Num).Base.modBasinHeaterPower;
-                GTChillerReport(Num).Base.BasinHeaterConsumption = GTChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                GTChiller(Num).Base.BasinHeaterPower = GTChiller(Num).Base.modBasinHeaterPower;
+                GTChiller(Num).Base.BasinHeaterConsumption = GTChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
         }
     }
@@ -8510,22 +8498,22 @@ namespace PlantChillers {
         CondOutletNode = ConstCOPChiller(Num).Base.CondOutletNodeNum;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
-            ConstCOPChillerReport(Num).Base.Power = 0.0;
-            ConstCOPChillerReport(Num).Base.QEvap = 0.0;
-            ConstCOPChillerReport(Num).Base.QCond = 0.0;
-            ConstCOPChillerReport(Num).Base.Energy = 0.0;
-            ConstCOPChillerReport(Num).Base.EvapEnergy = 0.0;
-            ConstCOPChillerReport(Num).Base.CondEnergy = 0.0;
-            ConstCOPChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.CondOutletTemp = Node(CondInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.EvapOutletTemp = Node(EvapInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.Evapmdot = ConstCOPChiller(Num).Base.modEvapMassFlowRate;
-            ConstCOPChillerReport(Num).Base.Condmdot = ConstCOPChiller(Num).Base.modCondMassFlowRate;
-            ConstCOPChillerReport(Num).ActualCOP = 0.0;
+            ConstCOPChiller(Num).Base.Power = 0.0;
+            ConstCOPChiller(Num).Base.QEvap = 0.0;
+            ConstCOPChiller(Num).Base.QCond = 0.0;
+            ConstCOPChiller(Num).Base.Energy = 0.0;
+            ConstCOPChiller(Num).Base.EvapEnergy = 0.0;
+            ConstCOPChiller(Num).Base.CondEnergy = 0.0;
+            ConstCOPChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            ConstCOPChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            ConstCOPChiller(Num).Base.CondOutletTemp = Node(CondInletNode).Temp;
+            ConstCOPChiller(Num).Base.EvapOutletTemp = Node(EvapInletNode).Temp;
+            ConstCOPChiller(Num).Base.Evapmdot = ConstCOPChiller(Num).Base.modEvapMassFlowRate;
+            ConstCOPChiller(Num).Base.Condmdot = ConstCOPChiller(Num).Base.modCondMassFlowRate;
+            ConstCOPChiller(Num).ActualCOP = 0.0;
             if (ConstCOPChiller(Num).Base.CondenserType == EvapCooled) {
-                ConstCOPChillerReport(Num).Base.BasinHeaterPower = ConstCOPChiller(Num).Base.modBasinHeaterPower;
-                ConstCOPChillerReport(Num).Base.BasinHeaterConsumption = ConstCOPChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                ConstCOPChiller(Num).Base.BasinHeaterPower = ConstCOPChiller(Num).Base.modBasinHeaterPower;
+                ConstCOPChiller(Num).Base.BasinHeaterConsumption = ConstCOPChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
 
             // set outlet node temperatures
@@ -8533,26 +8521,26 @@ namespace PlantChillers {
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
         } else {
-            ConstCOPChillerReport(Num).Base.Power = ConstCOPChiller(Num).Base.modPower;
-            ConstCOPChillerReport(Num).Base.QEvap = ConstCOPChiller(Num).Base.modQEvaporator;
-            ConstCOPChillerReport(Num).Base.QCond = ConstCOPChiller(Num).Base.modQCondenser;
-            ConstCOPChillerReport(Num).Base.Energy = ConstCOPChiller(Num).Base.modEnergy;
-            ConstCOPChillerReport(Num).Base.EvapEnergy = ConstCOPChiller(Num).Base.modEvaporatorEnergy;
-            ConstCOPChillerReport(Num).Base.CondEnergy = ConstCOPChiller(Num).Base.modCondenserEnergy;
-            ConstCOPChillerReport(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
-            ConstCOPChillerReport(Num).Base.CondOutletTemp = ConstCOPChiller(Num).Base.modCondOutletTemp;
-            ConstCOPChillerReport(Num).Base.EvapOutletTemp = ConstCOPChiller(Num).Base.modEvapOutletTemp;
-            ConstCOPChillerReport(Num).Base.Evapmdot = ConstCOPChiller(Num).Base.modEvapMassFlowRate;
-            ConstCOPChillerReport(Num).Base.Condmdot = ConstCOPChiller(Num).Base.modCondMassFlowRate;
+            ConstCOPChiller(Num).Base.Power = ConstCOPChiller(Num).Base.modPower;
+            ConstCOPChiller(Num).Base.QEvap = ConstCOPChiller(Num).Base.modQEvaporator;
+            ConstCOPChiller(Num).Base.QCond = ConstCOPChiller(Num).Base.modQCondenser;
+            ConstCOPChiller(Num).Base.Energy = ConstCOPChiller(Num).Base.modEnergy;
+            ConstCOPChiller(Num).Base.EvapEnergy = ConstCOPChiller(Num).Base.modEvaporatorEnergy;
+            ConstCOPChiller(Num).Base.CondEnergy = ConstCOPChiller(Num).Base.modCondenserEnergy;
+            ConstCOPChiller(Num).Base.CondInletTemp = Node(CondInletNode).Temp;
+            ConstCOPChiller(Num).Base.EvapInletTemp = Node(EvapInletNode).Temp;
+            ConstCOPChiller(Num).Base.CondOutletTemp = ConstCOPChiller(Num).Base.modCondOutletTemp;
+            ConstCOPChiller(Num).Base.EvapOutletTemp = ConstCOPChiller(Num).Base.modEvapOutletTemp;
+            ConstCOPChiller(Num).Base.Evapmdot = ConstCOPChiller(Num).Base.modEvapMassFlowRate;
+            ConstCOPChiller(Num).Base.Condmdot = ConstCOPChiller(Num).Base.modCondMassFlowRate;
             if (ConstCOPChiller(Num).Base.modPower != 0.0) {
-                ConstCOPChillerReport(Num).ActualCOP = ConstCOPChiller(Num).Base.modQEvaporator / ConstCOPChiller(Num).Base.modPower;
+                ConstCOPChiller(Num).ActualCOP = ConstCOPChiller(Num).Base.modQEvaporator / ConstCOPChiller(Num).Base.modPower;
             } else {
-                ConstCOPChillerReport(Num).ActualCOP = 0.0;
+                ConstCOPChiller(Num).ActualCOP = 0.0;
             }
             if (ConstCOPChiller(Num).Base.CondenserType == EvapCooled) {
-                ConstCOPChillerReport(Num).Base.BasinHeaterPower = ConstCOPChiller(Num).Base.modBasinHeaterPower;
-                ConstCOPChillerReport(Num).Base.BasinHeaterConsumption = ConstCOPChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
+                ConstCOPChiller(Num).Base.BasinHeaterPower = ConstCOPChiller(Num).Base.modBasinHeaterPower;
+                ConstCOPChiller(Num).Base.BasinHeaterConsumption = ConstCOPChiller(Num).Base.modBasinHeaterPower * ReportingConstant;
             }
 
             // set outlet node temperatures
