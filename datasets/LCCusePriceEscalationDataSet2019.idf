@@ -55,7 +55,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Residential-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0251,                              !- Year 1 Escalation
@@ -203,7 +203,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Commercial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9953,                              !- Year 1 Escalation
@@ -240,7 +240,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Commercial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0198,                              !- Year 1 Escalation
@@ -388,7 +388,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Industrial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9969,                              !- Year 1 Escalation
@@ -425,7 +425,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Industrial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0271,                              !- Year 1 Escalation
@@ -573,7 +573,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Residential-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9694,                              !- Year 1 Escalation
@@ -721,7 +721,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Commercial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9688,                              !- Year 1 Escalation
@@ -758,7 +758,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Commercial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0660,                              !- Year 1 Escalation
@@ -906,7 +906,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Industrial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9651,                              !- Year 1 Escalation
@@ -943,7 +943,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Industrial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0829,                              !- Year 1 Escalation
@@ -1091,7 +1091,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Residential-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0305,                              !- Year 1 Escalation
@@ -1239,7 +1239,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Commercial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9946,                              !- Year 1 Escalation
@@ -1276,7 +1276,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Commercial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0692,                              !- Year 1 Escalation
@@ -1424,7 +1424,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Industrial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0004,                              !- Year 1 Escalation
@@ -1461,7 +1461,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Industrial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0896,                              !- Year 1 Escalation
@@ -1609,7 +1609,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Residential-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0289,                              !- Year 1 Escalation
@@ -1757,7 +1757,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Commercial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9966,                              !- Year 1 Escalation
@@ -1794,7 +1794,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Commercial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.1341,                              !- Year 1 Escalation
@@ -1942,7 +1942,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Industrial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0004,                              !- Year 1 Escalation
@@ -1979,7 +1979,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Industrial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9565,                              !- Year 1 Escalation
@@ -2127,7 +2127,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Residential-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0222,                              !- Year 1 Escalation
@@ -2275,7 +2275,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Commercial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9903,                              !- Year 1 Escalation
@@ -2312,7 +2312,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Commercial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0251,                              !- Year 1 Escalation
@@ -2460,7 +2460,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Industrial-Distillate Oil,  !- Name
-    FuelOil#1,                         !- Resource
+    FuelOilNo1,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9898,                              !- Year 1 Escalation
@@ -2497,7 +2497,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Industrial-Residual Oil,  !- Name
-    FuelOil#2,                         !- Resource
+    FuelOilNo2,                          !- Resource
   2020,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     1.0691,                              !- Year 1 Escalation

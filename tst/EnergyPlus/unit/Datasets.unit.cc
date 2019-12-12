@@ -148,6 +148,18 @@ TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2016)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2016.idf"))));
 }
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2017)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2017.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2018)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2018.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2019)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2019.idf"))));
+}
 TEST_F(DataSetFixture, MoistureMaterials)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/MoistureMaterials.idf"))));

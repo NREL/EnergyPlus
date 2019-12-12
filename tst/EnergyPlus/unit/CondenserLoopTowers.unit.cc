@@ -2675,7 +2675,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     std::string const idf_objects = delimited_string({
 
         // General Stuff
-        "Version, 9.2;",
+        "Version,9.3;",
 
         "Timestep, 4;",
 
@@ -3076,7 +3076,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     std::string const idf_objects = delimited_string({
 
         // General Stuff
-        "Version, 9.2;",
+        "Version,9.3;",
 
         "Timestep, 4;",
 
