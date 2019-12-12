@@ -133,6 +133,7 @@ The new feature will be compared against exiting model. Unit test will be perfor
 
 The new input field will be appended to the end of the existing air terminal VAV objects. Modified *AirTerminal:SingleDuct:VAV:Reheat* object is shown below as a sample.
 
+The input field *Minimum Air Flow Turndown Schedule Name* fraction values (0.0 to 1.0) will be used to adjust the design minimum air flow turndowns (for example during unoccupied hours) by multiplying the design minimum air flow. These fractions also adjust the design minim air flow used for sizing purpose but users may choose not to so by specifying a fraction value of 1.0 for Summer and Winter Design Days. This field can be used with any of the three *zone minimum air flow input methods*. 
 
   AirTerminal:SingleDuct:VAV:Reheat,
 
@@ -373,7 +374,7 @@ The new input field will be appended to the end of the existing air terminal VAV
        \object-list ScheduleNames
        \note This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction
        \note values. This field can be used with any of the three "Zone Minimum Air Flow Input Method"   
-       \note Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum turndown airflow
+       \note Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown
        \note below the design minimum air flow and is intended for use with ASHRAE Standard 170.
        \note If this field is left blank, then the operating minimum air flow fraction value is set to 1.0
 
