@@ -8464,8 +8464,7 @@ namespace OutputReportTabular {
             columnHead.allocate(7);
             columnWidth.allocate(7);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(7, numRows);
-
+            tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
 
@@ -8542,18 +8541,30 @@ namespace OutputReportTabular {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
 
+                Array1D_string rowHeadTemp(rowHead);
                 // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
                 // for better sql queries
-                FillRowHead(rowHead);
+                FillRowHead(rowHeadTemp);
+
+                for (int i = 1; i <= numRows; ++i) {
+                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                }
+
+                // Erase the SubCategory (first column), using slicing
+                Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _ }));
 
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
                 }
+                rowHeadTemp.deallocate();
+                tableBodyTemp.deallocate();
+                columnHeadTemp.deallocate();
             }
 
             // EAp2-4/5. Performance Rating Method Compliance
@@ -9875,16 +9886,30 @@ namespace OutputReportTabular {
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
 
-            // Forward-Fill the blanks in the rowHead for better sql queries
-            FillRowHead(rowHead);
+            Array1D_string rowHeadTemp(rowHead);
+            // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+            // for better sql queries
+            FillRowHead(rowHeadTemp);
+
+            for (int i = 1; i <= numRows; ++i) {
+                rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+            }
+
+            // Erase the SubCategory (first column), using slicing
+            Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+            Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
+            rowHeadTemp.deallocate();
+            tableBodyTemp.deallocate();
+            columnHeadTemp.deallocate();
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 6; ++iResource) {
@@ -15148,6 +15173,7 @@ namespace OutputReportTabular {
             }
         }
     }
+
 
     //======================================================================================================================
     //======================================================================================================================
