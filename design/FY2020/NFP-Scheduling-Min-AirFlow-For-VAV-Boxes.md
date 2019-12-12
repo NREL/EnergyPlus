@@ -7,7 +7,7 @@
 
  - Original Date: December 5, 2019
  - Design Document: December 10, 2019
-
+ - Updated NFP based on review comments: December 12, 2019
 
 ## Justification for Feature Update ##
 Many inpatient and outpatient healthcare facilities in the US and around the world are governed by ASHRAE Standard 170 or similar standards that require minimum supply air flow rates during occupied mode operation by space type. In order to maintain thermal comfort, this minimum air flow rate may be exceeded and in perimeter spaces the design air flow can be twice as high the design minimum air flow. But during unoccupied mode operation, the minimum air flow based on space type can be either zero, the box minimum, or the minimum required to maintain air flow direction between spaces.
@@ -22,7 +22,36 @@ N/A
 
 ###Other Conference Call Topics (not in scope of current proposal):
 
-N/A
+####Github review comments and responses:
+
+@mjwitte, Comment:
+"Operating" is a bit confusing here. Even though the other inputs are the "design" minimum, they also are used for operation, and the existing "Minimum Air Flow Fraction Schedule Name" is primarily operational. It's only used for sizing if the other min flow fields are blank. How about "Minimum Air Flow Turndown Schedule Name" or "Minimum Air Flow Adjustment Schedule Name" or ???
+
+Is this adjustment limited to zero to 1.0? Or would an adjustment >1.0 ever be applicable?
+
+@Nigusse, Response:
+I will use "Minimum Air Flow Turndown Schedule Name" as the new field name but will use "Adjustment" in the description. I am thinking to limit to 0.0 to 1.0. I think users should use the design minimum fraction or the design minimum flow if they desire scale it up.
+
+
+@mjwitte, Comment:
+Feel free to rename this confusing struct SysDesignParams and its associated name Sys.
+
+@Nigusse, Response:
+I will take the liberty to rename the struct when I get there. Thanks.
+
+@mjwitte, Comment:
+Same here, I've always found DamperDesignParams and Damper to be confusing.
+
+@Nigusse, Response:
+will do.
+
+@mjwitte, Comment:
+My initial thought is to apply it. The user can always set this to 1.0 for the Winter and Summer design day types. But this needs to be explained clearly that it will get used. But I'd be ok with not applying it. I guess it depends on the details of how this should be used relative to the referenced Standards.
+
+@Nigusse, Response:
+Nigusse 3 minutes ago Author Member
+I agree, applying it gives users the flexibility. If they choose not to do, they have the option to specify different schedule values for Winter and Summer design days. I will add note in the I/O Ref documentation and even in the idd if necessary.
+
 
 ## Overview ##
 
@@ -62,38 +91,38 @@ Currently the design minimum air flow is determined from user specified minimum 
 
 ***DesignMinimumFlowRate = Sys.AirMassFlowRateMax * Sys.ZoneMinAirFrac***
 
-This enhancement will allow adjusting the design minimum air flow to determine operating minimum air flow using the fraction values specified in the new input field as follows:
+This enhancement will allow adjusting the design minimum air flow to determine minimum air flow turndown using the fraction values specified in the new input field (Minimum Air Flow Turndown Schedule Name) as follows:
  
-***OperatingMinimumFlowRate = DesignMinimumFlowRate * OperatingMinimumFraction***
+***MinimumTurnDownFlowRate = DesignMinimumFlowRate * TurnDownMinimumFraction***
 
 or
 
-***OperatingMinimumFlowRate = Sys.AirMassFlowRateMax * Sys.ZoneMinAirFrac * OperatingMinimumFraction***
+***OperatingMinimumFlowRate = Sys.AirMassFlowRateMax * Sys.ZoneMinAirFrac * TurnDownMinimumFraction***
 
-***OperatingMinimumFraction*** is defined as the ratio of *Actual Minimum AirFlow* to the *Design Minimum AirFlow*. The *Operating Minimum Air Flow Fraction*, which is obtained from the new input field and multiplies the design minimum air flow to calculate operating minimum air flow.
+***TurnDownMinimumFraction*** is defined as the ratio of *Minimum TurnDown AirFlow* to the *Design Minimum AirFlow*. The *Minimum Air Flow Turndown Fraction*, which is obtained from the new input field and multiplies the design minimum air flow to calculate minimum turndown air flow.
 
-If there is outdoor air flow required for ventilation, then the actual minimum will be the maximum of the operating minimum air flow calculated above and the current outdoor air flow requirement as shown below:
+If there is outdoor air flow required for ventilation, then the actual minimum will be the maximum of the minimum turndown air flow calculated above and the current outdoor air flow requirement as shown below:
 
-***OperatingMinimumFlowRate = max(OperatingMinimumFlowRate, CurrentOAMassFlowRate)***
+***MinimumTurnDownFlowRate = max(MinimumTurnDownFlowRate, CurrentOAMassFlowRate)***
 
 
 And this operating minimum air flow is checked against the minimum and maximum air flow of the air terminal boxes set during initialization at every iteration as shown below:
 
-***OperatingMinimumFlowRate = max(OperatingMinimumFlowRate, SysInlet.AirMassFlowRateMinAvail)***
+***MinimumTurnDownFlowRate = max(MinimumTurnDownFlowRate, SysInlet.AirMassFlowRateMinAvail)***
 
-***OperatingMinimumFlowRate = min(OperatingMinimumFlowRate, SysInlet.AirMassFlowRateMaxAvail)***
+***MinimumTurnDownFlowRate = min(MinimumTurnDownFlowRate, SysInlet.AirMassFlowRateMaxAvail)***
 
 
 The system inlet minimum available air flow rate will be the operating minimum and is calculated as follows:
 
-***SysInlet.AirMassFlowRateMinAvail = Sys.AirMassFlowRateMax * Sys.ZoneMinAirFrac * OperatingMinimumFraction***
+***SysInlet.AirMassFlowRateMinAvail = Sys.AirMassFlowRateMax * Sys.ZoneMinAirFrac * TurnDownMinimumFraction***
 
 
 The maximum air flow during reheat will not be adjusted by the new field, will remain the design minimum and is given by:
 
 ***MaxAirVolFlowRateDuringReheat = Sys.MaxAirVolFlowRate * Sys.ZoneMinAirFrac***
 
-If the new input field is blank, then the **OperatingMinimumFraction** variable will be set to 1.0.
+If the new input field is blank, then the **TurnDownMinimumFraction** variable will be set to 1.0.
 
 
 ##Testing/Validation/Data Source(s):
@@ -127,19 +156,21 @@ The new input field will be appended to the end of the existing air terminal VAV
     AutoCalculate,           !- Maximum Flow Fraction During Reheat
     ,                        !- Maximum Reheat Air Temperature
     ,                        !- Design Specification Outdoor Air Object Name
-    OperatingMinAirFlowSch;  !- Operating Minimum Air Flow Fraction Schedule Name
+    TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
   
   Schedule:Compact,
 
-    OperatingMinAirFlowSch,  !- Name
+    TurndownMinAirFlowSch,   !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    For: Weekdays,           !- Field 2
     Until: 7:00,0.00,        !- Field 3
     Until: 17:00,0.50,       !- Field 4
     Until: 24:00,0.00,       !- Field 5
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 6
-    Until: 24:00,0.00;       !- Field 7
+    For: SummerDesignDay WinterDesignDay, !- Field 6
+    Until: 24:00,1.00,       !- Field 7
+    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+    Until: 24:00,0.00;       !- Field 9
 
   
 ###AirTerminal:SingleDuct:VAV:Reheat,
@@ -205,7 +236,9 @@ The new input field will be appended to the end of the existing air terminal VAV
        \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
        \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
-
+       \note This constant minimum air flow fraction will be multiplied with the fractional values from input 
+       \note field "Minimum Air Flow Turndown Schedule Name".
+   
   N3 , \field Fixed Minimum Air Flow Rate
 
        \type real
@@ -220,7 +253,9 @@ The new input field will be appended to the end of the existing air terminal VAV
        \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
        \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
-
+       \note This fixed minimum air flow  will be multiplied with the fractional values from input 
+       \note field "Minimum Air Flow Turndown Schedule Name".
+   
   A6 , \field Minimum Air Flow Fraction Schedule Name
 
        \type object-list
@@ -229,7 +264,9 @@ The new input field will be appended to the end of the existing air terminal VAV
        \note Schedule values are fractions, 0.0 to 1.0.
        \note If the field Constant Minimum Air Flow Fraction is blank, then the average of the
        \note minimum and maximum schedule values is used for sizing normal-action reheat coils.
-
+       \note This fraction will be multiplied with the fractional values from input field 
+       \note "Minimum Air Flow Turndown Schedule Name".
+   
   A7 , \field Reheat Coil Object Type
 
        \required-field
@@ -330,14 +367,14 @@ The new input field will be appended to the end of the existing air terminal VAV
        \note At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate.
        \note If this field is blank, then the terminal unit will not be controlled for outdoor air flow.
 
-  A12; \field Operating Minimum Air Flow Fraction Schedule Name
+  A12; \field Minimum Air Flow Turndown Schedule Name
 
        \type object-list
        \object-list ScheduleNames
        \note This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction
        \note values. This field can be used with any of the three "Zone Minimum Air Flow Input Method"   
-       \note Schedule values are fractions, 0.0 to 1.0. This field is intended for use with 
-       \note ASHRAE Standard 170.
+       \note Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum turndown airflow
+       \note below the design minimum air flow and is intended for use with ASHRAE Standard 170.
        \note If this field is left blank, then the operating minimum air flow fraction value is set to 1.0
 
 
@@ -485,4 +522,4 @@ Existing function SimDualDuctVarVol() will be modified to calculate and set the 
 
 One obvious technical issue that needs to be discussed is that do we want to change the minimum air flow used for sizing the child objects in the air terminal objects. For example, should we size the reheat coil using the design minim air flow, or should we use the adjusted minimum air flow?
 
-
+Based on github comments from @mjwitte, the fraction values from the new input field "Minimum Air Flow Turndown Schedule Name" will multiply the design minimum air flow used for sizing purposes and users will have the option to not to do so by appropriately scheduling a value of 1.0 for Winter and Summer Design Days. 
