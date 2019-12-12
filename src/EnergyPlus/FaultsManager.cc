@@ -1401,9 +1401,9 @@ namespace FaultsManager {
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
-                    if (ChillerAbsorption::GetInput) {
+                    if (ChillerAbsorption::getInput) {
                         ChillerAbsorption::GetBLASTAbsorberInput();
-                        ChillerAbsorption::GetInput = false;
+                        ChillerAbsorption::getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum =

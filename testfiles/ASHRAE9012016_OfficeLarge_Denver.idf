@@ -134,7 +134,7 @@
 !    CHW_deltaT = 8.33
 !    HOTW_PumpCurve_flag = pump_ride_on_curve
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -3101,8 +3101,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: SURFACEGEOMETRY ===========
 
   GlobalGeometryRules,
-    ULC,                     !- Starting Vertex Position
-    CCW,                     !- Vertex Entry Direction
+    UpperLeftCorner,         !- Starting Vertex Position
+    Counterclockwise,        !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========
