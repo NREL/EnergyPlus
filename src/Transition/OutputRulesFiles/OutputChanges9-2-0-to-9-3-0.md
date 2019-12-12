@@ -102,7 +102,7 @@ SELECT Value FROM TabularDataWithStrings
 SELECT ColumnName as FuelType, Value FROM TabularDataWithStrings
   WHERE TableName = 'End Uses By Subcategory'
   AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
-  AND RowName = 'Interior Lighting:AnotherEndUseSubCat'
+  AND RowName = 'Interior Lighting:GeneralLights'
 ```
 
 | FuelType         | Value |
