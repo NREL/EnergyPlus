@@ -5,10 +5,15 @@ Condenser hot gas reheat model for DX Cooling Coil System
 
 **Florida Solar Energy Center**
 
-
+ - Eightth edition
+ - Revised design document based on the conference call and discussion with Rich on 12/11/19 
+ - Revision Date: 12/11/19
+ - Seventh edition
+ - Revised design document based on the conference call on 12/4/19 
+ - Revision Date: 12/5/19
  - Sixth edition
  - Revised design document based on new coil model 
- - Revision Date: 11/27/19
+ - Revision Date: 12/2/19
  - Fifth edition
  - Add idd change and design document based on new coil model 
  - Revision Date: 11/27/19
@@ -34,6 +39,52 @@ In applications where active humidity control is used to control either discharg
 Currently EnergyPlus does not provide modeling capabilities for hot gas reheat. Addition of this feature to EnergyPlus would allow engineers to evaluate the energy-efficient humidity control options. An EnergyPlus model for this feature would need to model not just the use of hot gas for free reheat, but also controls for these  dehumidification modes. 
 
 ## E-mail and  Conference Call Conclusions ##
+
+### Conference call on 12/11/19
+
+Tianzhen rasied an issue to report waste heat receovery when the Reheat mode is used.
+
+Answer:
+
+I will add two new report variables to catch waster heat recovery in the struct CoilCoolingDX as 
+
+    Real64 recoeredHeatEnergy = 0.0;
+    Real64 recoeredHeatEnergyRate = 0.0;
+
+The receovered waste heat energy is estimated in the equation below after discussion with Carrier:
+ 
+recoeredHeatEnergy = (SensibleEnergy_NormalOperation - SensibleEnergy_ReheatMode) * ModeRatio
+
+In addition, I will add two more output variables to catch operation mode and mode raio:
+
+    Real64 ModeRatio = 0.0; // Mode ratio
+    int ModeStage = 1; // 1 Normal; 2 Subcool; 3 Reheat
+
+### Discussion with Rich on 12/11/19
+
+We had discussion this morning regarding autosize of SHR.
+
+Although different SHRs in different operation modes are expected, the same sizing code will be used to autosize the same SHR will be used, until we find a better algorithm to autosie SHR in different operation modes.
+
+In addition, an optional aurgument will be added as LoadSHR  
+
+    CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = 1.0);
+
+The loadSHR is provided from the parent object, such as unitary system, because the coil model does not know the required loadSHR, whihc is used to determine the coil operation mode.
+
+	LoadSHR = ZoneLoad / (ZoneLoad + MoistureLoad * hg) 
+
+When LoadSHR is passed to CoilCoolingDX, the coil model can perform ModeStage determination and ModeRatio calculcation internally, so that external call will be perfromaed as a single function call. In addition, a global variable will not be used instead.
+
+###Conference Call on 12/4/19
+
+People attended:
+
+Lawrence Scheier; Michael Witte; Ricahrd Raustad; Edwind Lee; Nagappan Chidambaram; Jason DeGraw; Brent Griffith
+
+Mike suggested to remove an additional argument as ModeRatio. The Moderatio may be calculated inside the module, similar process as SpeedRatio.
+
+ModeRatio will be used inside the new coil module and will not be used as an argument.
 
 ###Conference Call on 10/23/19
 
@@ -871,11 +922,11 @@ Current:
 
 Proposed:
 
-Two additional option argument are added to allow SubcoolReatCoil cooling
+Two additional option argument are added to allow SubcoolReheatCoil cooling
 
     void simulate(
 <span style="color:red">int useAlternateMode</span>, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, 
-<span style="color:red">Real64 ModeRatio</span>);
+<span style="color:red">Real64 LoadSHR</span>);
 
 ModeRatio: A mode ratio with the same SHR between subcooling or reheat and normal operation. The SHR is determined by the system sensible and latent loads. 
 
@@ -943,15 +994,28 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 DataLoopNode::NodeData &condInletNode,
                                                 DataLoopNode::NodeData &condOutletNode,
 <span style="color:red">
-                                                int CoilOpMode,
-                                                Real64 ModeRatio)
+                                                Real64 LoadSHR)
 </span>
 {
 
 <span style="color:red">
 
 	if (useAlternateMode == 2) {
-        	this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, ModeRatio); 
+            if (Normal Mode) {
+        		this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+			else if (Subcool Mode) {
+        		this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        		this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+				Combine bot modes together to get mode ratio with the same SHR as LoadSHR
+				Combine node outputs with mode ratio
+			} else // Reheat mode
+        		this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        		this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+				Combine bot modes together to get mode ratio with the same SHR as LoadSHR
+				Combine node outputs with mode ratio
+			}
+
+        	this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode); 
 </span>
 	} else  if (useAlternateMode == 1) {
         	this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
@@ -961,39 +1025,42 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
 }
 
-#### calculate ####
+#### New output variables
 
-An additional option arguments are added. These two arguments are available from CoilCoolingDX::simulate()
+##### New water heat recovery outputs
 
-Current:
+    Real64 recoeredHeatEnergy = 0.0;
+    Real64 recoeredHeatEnergyRate = 0.0;
 
-    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
-                   const DataLoopNode::NodeData &inletNode,
-                   DataLoopNode::NodeData &outletNode,
-                   Real64 &PLR,
-                   int &speedNum,
-                   Real64 &speedRatio,
-                   int &fanOpMode,
-                   DataLoopNode::NodeData &condInletNode,
-                   DataLoopNode::NodeData &condOutletNode);
+The receovered waste heat energy is estimated in the equation below after discussion with Carrier:
+ 
+recoeredHeatEnergy = (SensibleEnergy_NormalOperation - SensibleEnergy_ReheatMode) * ModeRatio
 
-Proposed:
+##### Report SubcoolReheat coil performance
 
-    void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
-                   const DataLoopNode::NodeData &inletNode,
-                   DataLoopNode::NodeData &outletNode,
-                   Real64 &PLR,
-                   int &speedNum,
-                   Real64 &speedRatio,
-                   int &fanOpMode,
-                   DataLoopNode::NodeData &condInletNode,
-                   DataLoopNode::NodeData &condOutletNode,
-                   Real64 &ModeRatio);
+    Real64 ModeRatio = 0.0; // Mode ratio
+
+ModeRatio is a ratio between either subcool and normal operation or reheat mode and normal operation to keep combined output with the same SHR as load SHR
+
+    int ModeStage = 1; // 1 Normal; 2 Subcool and Normal; 3 Reheat and Normal
+
+ModeStage is a stage to show which mode is operated at the current time
+
+        SetupOutputVariable("SubcooReheat Cooling Coil Operation Mode",
+                            OutputProcessor::Unit::None,
+                            this->performance.ModeStage,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("SubcooReheat Cooling Coil Operation Mode Ratio", 
+                            OutputProcessor::Unit::None, 
+                            this->performance.ModeRatio, 
+                            "System", 
+                            "Average", 
+                            this->name);
 
 
-Add sections to deal with Subcool and Reheat modes in the function.
-
-#### UnitarySystem ####
+### UnitarySystem ####
 
 There are multiple HACKATHON example files available. The example files are based on UnitarySystem. Therefore, the present feature are limited to the UnitarySystem object as parent.
 
@@ -1004,3 +1071,11 @@ In order to make UnitarySystem recognize that the cooling coil type is SubcoolRe
 If 3 fields are not empty(), the coil type is SubcoolReheatCoil as
 
 NotEmpty(base_operating_mode_name && alternate_operating_mode_name && alternate_operating_mode2_name)  
+
+#####Calculate LoadSHR 
+
+The loadSHR is provided from the parent object, such as unitary system, because the coil model does not know the required loadSHR, whihc is used to determine the coil operation mode.
+
+	LoadSHR = ZoneLoad / (ZoneLoad + MoistureLoad * hg) 
+ 
+
