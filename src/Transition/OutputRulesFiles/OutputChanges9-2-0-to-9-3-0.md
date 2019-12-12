@@ -81,26 +81,52 @@ See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
 ### End Use By Subcategory in SQL
 
 In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
-the tables `TableName = "End Uses by Subcategory"` no longer have blank `RowName` corresponding to the End Use (eg: Heating, Interior Lighting, etc) for additional End Use Subcategories.
-This will allow querying a specific End Use Subcategory in the SQL file.
+the tables `TableName = "End Uses by Subcategory"` have been refactored. `RowName` is now in the format `<End Use Category>:<End Use Subcategory>`.
+This will allow querying a specific End Use Subcategory in the SQL file more easily.
 
-Example SQL Query to return all rows (one row per fuel type) for End Use "Interior Lighting", Subcategory "GeneralLights":
+Example SQL Queries:
 
+* Get the Value corresponding to a specific Fuel Type "Electricity", End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName = 'Interior Lighting:GeneralLights'
 ```
-SELECT * FROM TabularDataWithStrings
-  WHERE TableName = "End Uses By Subcategory"
-  AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
-  AND RowName = "Interior Lighting"
-  AND (TabularDataIndex - (SELECT TabularDataIndex FROM TabularDataWithStrings
-                              WHERE TableName = "End Uses By Subcategory"
-                              AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
-                              AND ColumnName = "Subcategory"
-                              AND RowName = "Interior Lighting"
-                              AND Value = "GeneralLights"))
-      % (SELECT COUNT(Value) FROM TabularDataWithStrings
-                              WHERE TableName = "End Uses By Subcategory"
-                              AND ReportName = "AnnualBuildingUtilityPerformanceSummary"
-                              AND ColumnName = "Subcategory")
+
+* Return all rows (one row per fuel type) for End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT ColumnName as FuelType, Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND RowName = 'Interior Lighting:AnotherEndUseSubCat'
 ```
+
+| FuelType         | Value |
+|------------------|-------|
+| Electricity      | 83.33 |
+| Natural Gas      | 0.00  |
+| Additional Fuel  | 0.00  |
+| District Cooling | 0.00  |
+| District Heating | 0.00  |
+| Water            | 0.00  |
+
+* Get all rows related to Electricity usage by Interior Lighting:
+
+```sql
+SELECT RowName as "End Use&Subcategory", Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName LIKE 'Interior Lighting:%'
+```
+
+| End Use&Subcategory                   | Value  |
+|---------------------------------------|--------|
+| Interior Lighting:GeneralLights       | 166.67 |
+| Interior Lighting:AnotherEndUseSubCat | 83.33  |
 
 See [PR#7584](https://github.com/NREL/EnergyPlus/pull/7584).
