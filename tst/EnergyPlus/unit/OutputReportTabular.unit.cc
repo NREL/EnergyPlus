@@ -7761,99 +7761,61 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General", "AnotherEndUseSubCat"};
 
     std::string endUseName = "Exterior Lighting";
     std::string endUseSubCategoryName = "AnotherEndUseSubCat";
+    std::string rowName = endUseName + ":" + endUseSubCategoryName;
+    std::string columnName = "Electricity";
 
-    for (auto& reportName: testReportNames) {
+    for (auto& endUseSubCategoryName: endUseSubCategoryNames) {
+        for (auto& reportName: testReportNames) {
 
-        std::string query("SELECT RowName From TabularDataWithStrings"
-                          "  WHERE TableName = 'End Uses By Subcategory'"
-                          "  AND ColumnName = 'Subcategory'"
-                          "  AND ReportName = '" + reportName + "'"
-                          "  AND Value = '" + endUseSubCategoryName + "'");
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE TableName = 'End Uses By Subcategory'"
+                              "  AND ColumnName = 'Electricity'"
+                              "  AND ReportName = '" + reportName + "'"
+                              "  AND RowName = '" + endUseName + ":" + endUseSubCategoryName + "'"); // Now Like 'Exterior Lighting:General'
 
-        auto result = queryResult(query, "TabularDataWithStrings");
+            auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
-
-        // Add informative message if failed
-        EXPECT_EQ(endUseName, result[0][0]) << "Failed for reportName=" << reportName;
+            ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+        }
     }
 
-    // Here's a demonstration of how the new format of the table could help in querying for a specific end use only, which was impossible before
-    // Here I'm returning ALL entries that belong to a specific end use (one row for each resource (fuel) type)
 
+    // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
+    // and make sure it's the right number that's returned
+    std::string query("SELECT Value From TabularDataWithStrings"
+                  "  WHERE TableName = 'End Uses By Subcategory'"
+                  "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                  "  AND ColumnName = 'Electricity'"
+                  "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+    Real64 return_val = execAndReturnFirstDouble(query);
+
+    EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+
+
+    // Get all Interior Lighting End Uses (all subcats) for Electricity
     {
-        auto result = queryResult(
-                "SELECT * FROM TabularDataWithStrings"
+        std::string query("SELECT Value From TabularDataWithStrings"
                 "  WHERE TableName = 'End Uses By Subcategory'"
                 "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                "  AND RowName = '" + endUseName + "'"
-                "  AND (TabularDataIndex - (SELECT TabularDataIndex FROM TabularDataWithStrings"
-                "                              WHERE TableName = 'End Uses By Subcategory'"
-                "                              AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                "                              AND ColumnName = 'Subcategory'"
-                "                              AND RowName = '" + endUseName + "'"
-                "                              AND Value = '" + endUseSubCategoryName + "'))"
-                "       % (SELECT COUNT(Value) FROM TabularDataWithStrings"
-                "            WHERE TableName = 'End Uses By Subcategory'"
-                "            AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                "            AND ColumnName = 'Subcategory') = 0",
-                "TabularDataWithStrings");
-        ASSERT_EQ(7u, result.size());
-    }
-
-    {
-        // Since the above is a bit dense, let's break it down
-        // We get the First TabularDataIndex for our end use subcategory
-        // We also get the number of subcategories
-        // We seek (TabularDataIndex - startIndex) % nCats == 0
-        std::string startIndexQuery(
-            "SELECT TabularDataIndex FROM TabularDataWithStrings"
-            "  WHERE TableName = 'End Uses By Subcategory'"
-            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-            "  AND ColumnName = 'Subcategory'"
-            "  AND RowName = '" + endUseName + "'"
-            "  AND Value = '" + endUseSubCategoryName + "'"
-        );
-
-        Real64 return_val = execAndReturnFirstDouble(startIndexQuery);
-        int startIndex = static_cast<int>(return_val);
-
-        std::string nEndUseSubCatsQuery(
-            "SELECT COUNT(Value) FROM TabularDataWithStrings"
-            "  WHERE TableName = 'End Uses By Subcategory'"
-            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-            "  AND ColumnName = 'Subcategory'"
-        );
-        return_val = execAndReturnFirstDouble(nEndUseSubCatsQuery);
-        int nEndUseSubCats = static_cast<int>(return_val);
-
-        std::string query(
-            "SELECT * FROM TabularDataWithStrings"
-            "  WHERE TableName = 'End Uses By Subcategory'"
-            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-            "  AND RowName = '" + endUseName + "'" // Purely optional here...
-            "  AND (TabularDataIndex - " + std::to_string(startIndex) + ") % " + std::to_string(nEndUseSubCats) + " = 0"
-        );
+                "  AND ColumnName = 'Electricity'"
+                "  AND RowName LIKE 'Exterior Lighting:%'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(7u, result.size()) << "Failed for query: " << query;
-
-        // Now specifically get the electricity one, and make sure it's the right number that's returned
-        query = (
-            "SELECT Value FROM TabularDataWithStrings"
-            "  WHERE TableName = 'End Uses By Subcategory'"
-            "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-            "  AND RowName = '" + endUseName + "'"
-            "  AND ColumnName = 'Electricity'"
-            "  AND (TabularDataIndex - " + std::to_string(startIndex) + ") % " + std::to_string(nEndUseSubCats) + " = 0"
-        );
-        return_val = execAndReturnFirstDouble(query);
-        EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
-
-
+        ASSERT_EQ(2u, result.size()) << "Failed for query: " << query;
     }
 
+    // Get all subcat usage for all fuels (6)
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                "  WHERE TableName = 'End Uses By Subcategory'"
+                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(6u, result.size()) << "Failed for query: " << query;
+    }
 }
