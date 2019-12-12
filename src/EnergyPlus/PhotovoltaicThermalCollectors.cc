@@ -73,6 +73,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -124,11 +125,13 @@ namespace PhotovoltaicThermalCollectors {
             GetPVTcollectorsInput();
             GetInputFlag = false;
         }
+
         for (auto &thisComp : PVT) {
             if (thisComp.Name == objectName) {
                 return &thisComp;
             }
         }
+
         // If we didn't find it, fatal
         ShowFatalError("Solar Thermal Collector Factory: Error getting inputs for object named: " + objectName);
         // Shut up the compiler
@@ -1043,9 +1046,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void GetPVTThermalPowerProduction(int const PVindex, // index of PV generator (not PVT collector)
-                                      Real64 &ThermalPower,
-                                      Real64 &ThermalEnergy)
+    void GetPVTThermalPowerProduction(int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1073,9 +1074,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    int GetAirInletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    )
+    int GetAirInletNodeNum(std::string const &PVTName,  bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1106,9 +1105,7 @@ namespace PhotovoltaicThermalCollectors {
 
         return NodeNum;
     }
-    int GetAirOutletNodeNum(std::string const &PVTName,
-        bool &ErrorsFound
-    )
+    int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -1138,6 +1135,34 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         return NodeNum;
+    }
+
+    int getPVTindexFromName(std::string const &objectName)
+    {
+        if (GetInputFlag) {
+            GetPVTcollectorsInput();
+            GetInputFlag = false;
+        }
+
+        for (auto it = PVT.begin(); it != PVT.end(); ++it) {
+            if (it->Name == objectName) {
+                return static_cast<int> (std::distance(PVT.begin(), it) + 1);
+            }
+        }
+
+        // If we didn't find it, fatal
+        ShowFatalError("Solar Thermal Collector GetIndexFromName: Error getting inputs for object named: " + objectName);
+        assert(false);
+        return 0;  // Shutup compiler
+    }
+
+    void simPVTfromOASys(int const index, bool const FirstHVACIteration)
+    {
+        PlantLocation dummyLoc(0, 0, 0, 0);
+        Real64 dummyCurLoad(0.0);
+        bool dummyRunFlag(true);
+
+        PVT(index).simulate(dummyLoc, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
     }
 
 } // namespace PhotovoltaicThermalCollectors

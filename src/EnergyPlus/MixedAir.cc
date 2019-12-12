@@ -459,7 +459,7 @@ namespace MixedAir {
                                OACoolCoil,
                                OAHX);
             }
-            // now simulate again propogate current temps back through OA system
+            // now simulate again propigate current temps back through OA system
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
@@ -830,11 +830,10 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    auto thisPVT = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompName);
-                    PlantLocation dummyCalledFrom(0, 0, 0, 0);
-                    Real64 dummyCurLoad(0.0);
-                    bool dummyRunFlag(true);
-                    thisPVT->simulate(dummyCalledFrom, FirstHVACIteration, dummyCurLoad, dummyRunFlag);
+                    if (CompIndex == 0) {
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                    }
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
