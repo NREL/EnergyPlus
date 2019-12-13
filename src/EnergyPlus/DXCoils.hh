@@ -753,7 +753,7 @@ namespace DXCoils {
 
     void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum);
+    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum, std::ostream &OutputFile);
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
