@@ -169,7 +169,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 {
 
     bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
@@ -238,7 +237,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     GetZoneAirLoopEquipment();
     GetSysInput();
     DataEnvironment::StdRhoAir = 1.0;
-    // FirstHVACIteration = false;
     int const SysNum(1);
     Real64 MassFlowRateMaxAvail = Sys(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
     SysInlet(SysNum).AirMassFlowRate = MassFlowRateMaxAvail;
