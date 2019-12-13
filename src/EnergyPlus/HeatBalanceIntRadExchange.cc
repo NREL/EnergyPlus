@@ -342,13 +342,12 @@ namespace HeatBalanceIntRadExchange {
                 auto const &surface_window(SurfaceWindow(SurfNum));
                 int const ConstrNum = Surface(SurfNum).Construction;
                 auto const &construct(Construct(ConstrNum));
-                if (construct.WindowTypeEQL || construct.WindowTypeBSDF) {
+                if (construct.WindowTypeEQL) {
                     SurfaceTempRad[ZoneSurfNum] = surface_window.EffInsSurfTemp;
-                    if (construct.WindowTypeEQL) {
-                        SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(ConstrNum);
-                    } else if (construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn) {
-                        SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
-                    }
+                    SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(ConstrNum);
+                } else if (construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn) {
+                    SurfaceTempRad[ZoneSurfNum] = surface_window.EffInsSurfTemp;
+                    SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser) {
                     if (SurfIterations == 0 && surface_window.ShadingFlag <= 0) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
