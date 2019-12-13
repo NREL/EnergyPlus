@@ -286,15 +286,15 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set( RULES_XLS Rules9-1-0-to-9-2-0.md )
+set( RULES_XLS Rules9-2-0-to-9-3-0.md )
 install(FILES "${CMAKE_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${CMAKE_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-2-0-Energy+.idd" )
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-3-0-Energy+.idd" )
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
