@@ -284,41 +284,43 @@ namespace SingleDuct {
             }
         }
 
+        auto &thisATU(Sys(SysNum));
+
         TermUnitSingDuct = true;
-        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(Sys(SysNum).ADUNum).TermUnitSizingNum;
+        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisATU.ADUNum).TermUnitSizingNum;
 
         // With the correct SysNum Initialize the system
-        InitSys(SysNum, FirstHVACIteration); // Initialize all Sys related parameters
+        thisATU.InitSys(SysNum, FirstHVACIteration); // Initialize all Sys related parameters
 
         // Calculate the Correct Sys Model with the current SysNum
         {
-            auto const SELECT_CASE_var(Sys(SysNum).SysType_Num);
+            auto const SELECT_CASE_var(thisATU.SysType_Num);
 
             if (SELECT_CASE_var == SingleDuctConstVolReheat) { // AirTerminal:SingleDuct:ConstantVolume:Reheat
-                SimConstVol(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimConstVol(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) { // AirTerminal:SingleDuct:ConstantVolume:NoReheat
                 Sys(SysNum).SimConstVolNoReheat(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctVAVReheat) { // SINGLE DUCT:VAV:REHEAT
-                SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctVAVNoReheat) { // SINGLE DUCT:VAV:NOREHEAT
-                SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctVAVReheatVSFan) { // SINGLE DUCT:VAV:REHEAT:VS FAN
-                SimVAVVS(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimVAVVS(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctCBVAVReheat) { // SINGLE DUCT:VAVHEATANDCOOL:REHEAT
-                SimCBVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimCBVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctCBVAVNoReheat) { // SINGLE DUCT:VAVHEATANDCOOL:NOREHEAT
-                SimCBVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimCBVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
             }
         }
 
         // Report the current Sys
-        ReportSys(SysNum);
+        thisATU.ReportSys(SysNum);
 
         TermUnitSingDuct = false;
     }
@@ -1956,7 +1958,7 @@ namespace SingleDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSys(int const SysNum, bool const FirstHVACIteration)
+    void SysDesignParams::InitSys(int const SysNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2070,7 +2072,7 @@ namespace SingleDuct {
 
         if (!SysSizingCalc && MySizeFlag(SysNum)) {
 
-            SizeSys(SysNum);
+            Sys(SysNum).SizeSys(SysNum);
 
             MySizeFlag(SysNum) = false;
         }
@@ -2308,7 +2310,7 @@ namespace SingleDuct {
         Sys(SysNum).CoolEnergy = 0.0;
     }
 
-    void SizeSys(int const SysNum)
+    void SysDesignParams::SizeSys(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3131,7 +3133,7 @@ namespace SingleDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SysDesignParams::SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3355,7 +3357,7 @@ namespace SingleDuct {
         }
 
         // Need to make sure that the damper outlets are passed to the coil inlet
-        UpdateSys(SysNum);
+        Sys(SysNum).UpdateSys(SysNum);
 
         // At the current air mass flow rate, calculate heating coil load
         QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
@@ -3421,7 +3423,7 @@ namespace SingleDuct {
 
             SysOutlet(SysNum).AirMassFlowRate = MassFlow;
 
-            UpdateSys(SysNum);
+            Sys(SysNum).UpdateSys(SysNum);
 
             // Now do the heating coil calculation for each heating coil type
             {
@@ -3514,7 +3516,7 @@ namespace SingleDuct {
                                 (std::abs(MassFlow - MassFlow1(SysNum)) >= MassFlowDiff(SysNum))) {
                                 if (MassFlow > 0.0) MassFlow = MassFlow1(SysNum);
                                 SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-                                UpdateSys(SysNum);
+                                Sys(SysNum).UpdateSys(SysNum);
 
                                 // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                                 // and is working as-is, temperature setpoints are maintained as expected.
@@ -3542,7 +3544,7 @@ namespace SingleDuct {
 
                             SysOutlet(SysNum).AirMassFlowRate = MassFlow;
                             // reset OA report variable
-                            UpdateSys(SysNum);
+                            Sys(SysNum).UpdateSys(SysNum);
                         } // IF (Node(Sys(SysNum)%ReheatControlNode)%MassFlowRate .EQ. MaxFlowWater) THEN
                     }     // IF (Sys(SysNum)%DamperHeatingAction .EQ. ReverseAction) THEN
 
@@ -3633,7 +3635,7 @@ namespace SingleDuct {
         MassFlow1(SysNum) = MassFlow;
     }
 
-    void CalcOAMassFlow(int const SysNum,     // index to terminal unit
+    void SysDesignParams::CalcOAMassFlow(int const SysNum,     // index to terminal unit
                         Real64 &SAMassFlow,   // outside air based on optional user input
                         Real64 &AirLoopOAFrac // outside air based on optional user input
     )
@@ -3702,7 +3704,7 @@ namespace SingleDuct {
         }
     }
 
-    void SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SysDesignParams::SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3834,7 +3836,7 @@ namespace SingleDuct {
         }
 
         // Need to make sure that the damper outlets are passed to the coil inlet
-        UpdateSys(SysNum);
+        Sys(SysNum).UpdateSys(SysNum);
 
         QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (SysInlet(SysNum).AirTemp - ZoneTemp);
 
@@ -3890,7 +3892,7 @@ namespace SingleDuct {
 
             SysOutlet(SysNum).AirMassFlowRate = MassFlow;
 
-            UpdateSys(SysNum);
+            Sys(SysNum).UpdateSys(SysNum);
 
             {
                 auto const SELECT_CASE_var(Sys(SysNum).ReheatComp_Num);
@@ -3964,7 +3966,7 @@ namespace SingleDuct {
                             // reset terminal unit inlet air mass flow to new value.
                             MassFlow = Node(SysOutletNode).MassFlowRate;
                             SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-                            UpdateSys(SysNum);
+                            Sys(SysNum).UpdateSys(SysNum);
                         }
                         // look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
                         // equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
@@ -3973,7 +3975,7 @@ namespace SingleDuct {
                             (std::abs(MassFlow - MassFlow1(SysNum)) >= MassFlowDiff(SysNum))) {
                             MassFlow = MassFlow1(SysNum);
                             SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-                            UpdateSys(SysNum);
+                            Sys(SysNum).UpdateSys(SysNum);
                             ControlCompOutput(Sys(SysNum).ReheatName,
                                               Sys(SysNum).ReheatComp,
                                               Sys(SysNum).ReheatComp_Index,
@@ -4076,7 +4078,7 @@ namespace SingleDuct {
         MassFlow1(SysNum) = MassFlow;
     }
 
-    void SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SysDesignParams::SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4257,7 +4259,7 @@ namespace SingleDuct {
                 Par(6) = double(FanType);
                 Par(7) = double(FanOp);
                 Par(8) = QTotLoad;
-                SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, VAVVSCoolingResidual, MinMassFlow, MaxCoolMassFlow, Par);
+                SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, this->VAVVSCoolingResidual, MinMassFlow, MaxCoolMassFlow, Par);
                 if (SolFlag == -1) {
                     if (Sys(SysNum).IterationLimit == 0) {
                         ShowWarningError("Supply air flow control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
@@ -4318,7 +4320,7 @@ namespace SingleDuct {
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
                     ErrTolerance = Sys(SysNum).ControllerOffset;
-                    SolveRoot(ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par);
+                    SolveRoot(ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par);
                     if (SolFlag == -1) {
                         ShowRecurringWarningErrorAtEnd("Hot Water flow control failed in VS VAV terminal unit " + Sys(SysNum).SysName,
                                                        Sys(SysNum).ErrCount1);
@@ -4349,7 +4351,7 @@ namespace SingleDuct {
                     Par(6) = double(FanType);
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
-                    SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par);
+                    SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, this->VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par);
                     if (SolFlag == -1) {
                         if (Sys(SysNum).IterationLimit == 0) {
                             ShowWarningError("Supply air flow control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
@@ -4392,7 +4394,7 @@ namespace SingleDuct {
                     Par(10) = MaxFlowSteam;
                     Par(11) = MaxSteamCap;
                     ErrTolerance = Sys(SysNum).ControllerOffset;
-                    SolveRoot(ErrTolerance, 500, SolFlag, HWFlow, VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par);
+                    SolveRoot(ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par);
                     if (SolFlag == -1) {
                         ShowRecurringWarningErrorAtEnd("Steam flow control failed in VS VAV terminal unit " + Sys(SysNum).SysName,
                                                        Sys(SysNum).ErrCount1);
@@ -4421,7 +4423,7 @@ namespace SingleDuct {
                     Par(6) = double(FanType);
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
-                    SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par);
+                    SolveRoot(UnitFlowToler, 50, SolFlag, MassFlow, this->VAVVSHWFanOnResidual, MinMassFlow, MaxHeatMassFlow, Par);
                     if (SolFlag == -1) {
                         if (Sys(SysNum).IterationLimit == 0) {
                             ShowWarningError("Steam heating coil control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
@@ -4462,7 +4464,7 @@ namespace SingleDuct {
                     Par(6) = double(FanType);
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
-                    SolveRoot(UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par);
+                    SolveRoot(UnitFlowToler, 50, SolFlag, FracDelivered, this->VAVVSHCFanOnResidual, 0.0, 1.0, Par);
                     if (SolFlag == -1) {
                         if (Sys(SysNum).IterationLimit == 0) {
                             ShowWarningError("Heating coil control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
@@ -4495,7 +4497,7 @@ namespace SingleDuct {
         }
     }
 
-    void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SysDesignParams::SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4575,7 +4577,7 @@ namespace SingleDuct {
         SysOutlet(SysNum).AirMassFlowRate = MassFlow;
         SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
         SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
-        UpdateSys(SysNum);
+        Sys(SysNum).UpdateSys(SysNum);
 
         QActualHeating = QToHeatSetPt - MassFlow * CpAir * (SysInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
         // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
@@ -4763,10 +4765,10 @@ namespace SingleDuct {
         this->CoolEnergy = Sys(SysNum).CoolRate * TimeStepSys * SecInHour;
 
         // update the air terminal outlet node data
-        UpdateSys(SysNum);
+        Sys(SysNum).UpdateSys(SysNum);
     }
 
-    void CalcVAVVS(int const SysNum,               // Unit index
+    void SysDesignParams::CalcVAVVS(int const SysNum,               // Unit index
                    bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
                    int const ZoneNode,             // zone node number
                    int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
@@ -4887,7 +4889,7 @@ namespace SingleDuct {
         LoadMet = AirMassFlow * CpAirZn * (Node(HCOutNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SysDesignParams::VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -4952,14 +4954,14 @@ namespace SingleDuct {
         MinHWFlow = Par(5);
         FanType = int(Par(6));
         FanOp = int(Par(7));
-        CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+        Sys(UnitIndex).CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
         return Residuum;
     }
 
-    Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
+    Real64 SysDesignParams::VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5043,14 +5045,14 @@ namespace SingleDuct {
                 QSteamLoad = MaxSteamCoilCapacity * HWMassFlow / (MaxSteamFlow - MinSteamFlow);
             }
         }
-        CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
+        Sys(UnitIndex).CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
         return Residuum;
     }
 
-    Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SysDesignParams::VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -5115,14 +5117,14 @@ namespace SingleDuct {
         HWMassFlow = Par(5);
         FanType = int(Par(6));
         FanOp = int(Par(7));
-        CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par(8), FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+        Sys(UnitIndex).CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par(8), FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
         return Residuum;
     }
 
-    Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
+    Real64 SysDesignParams::VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5193,7 +5195,7 @@ namespace SingleDuct {
         AirMassFlowRate =
             max(HeatingFrac * Sys(UnitIndex).HeatAirMassFlowRateMax, SysInlet(UnitIndex).AirMassFlowRateMaxAvail * Sys(UnitIndex).ZoneMinAirFrac);
 
-        CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
+        Sys(UnitIndex).CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
 
         Residuum = (Par(8) - UnitOutput) / Par(8);
 
@@ -5206,7 +5208,7 @@ namespace SingleDuct {
     // Beginning of Update subroutines for the Sys Module
     // *****************************************************************************
 
-    void UpdateSys(int const SysNum)
+    void SysDesignParams::UpdateSys(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5280,7 +5282,7 @@ namespace SingleDuct {
     // Beginning of Reporting subroutines for the Sys Module
     // *****************************************************************************
 
-    void ReportSys(int const EP_UNUSED(SysNum)) // unused1208
+    void SysDesignParams::ReportSys(int const EP_UNUSED(SysNum)) // unused1208
     {
 
         // SUBROUTINE INFORMATION:

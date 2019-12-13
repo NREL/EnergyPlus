@@ -202,34 +202,36 @@ namespace DualDuct {
             }
         }
 
+        auto &thisDualDuct(Damper(DamperNum));
+
         if (CompIndex > 0) {
-            DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(Damper(DamperNum).ADUNum).TermUnitSizingNum;
+            DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DamperNum Initialize
-            InitDualDuct(DamperNum, FirstHVACIteration); // Initialize all Damper related parameters
+            thisDualDuct.InitDualDuct(DamperNum, FirstHVACIteration); // Initialize all Damper related parameters
 
             // Calculate the Correct Damper Model with the current DamperNum
             {
-                auto const SELECT_CASE_var(Damper(DamperNum).DamperType);
+                auto const SELECT_CASE_var(thisDualDuct.DamperType);
 
                 if (SELECT_CASE_var == DualDuct_ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
 
-                    SimDualDuctConstVol(DamperNum, ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctConstVol(DamperNum, ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_VariableVolume) { // 'AirTerminal:DualDuct:VAV'
 
-                    SimDualDuctVarVol(DamperNum, ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctVarVol(DamperNum, ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_OutdoorAir) {
 
-                    SimDualDuctVAVOutdoorAir(DamperNum, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
+                    thisDualDuct.SimDualDuctVAVOutdoorAir(DamperNum, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
                 }
             }
 
             // Update the current Damper to the outlet nodes
-            UpdateDualDuct(DamperNum);
+            thisDualDuct.UpdateDualDuct(DamperNum);
 
             // Report the current Damper
-            ReportDualDuct(DamperNum);
+            thisDualDuct.ReportDualDuct(DamperNum);
         } else {
             ShowFatalError("SimulateDualDuct: Damper not found=" + CompName);
         }
@@ -737,7 +739,7 @@ namespace DualDuct {
                     Damper(DamperNum).NoOAFlowInputFromUser = false;
 
                     // now fill design OA rate
-                    CalcOAOnlyMassFlow(DamperNum, DummyOAFlow, Damper(DamperNum).DesignOAFlowRate);
+                    Damper(DamperNum).CalcOAOnlyMassFlow(DamperNum, DummyOAFlow, Damper(DamperNum).DesignOAFlowRate);
 
                     if (Damper(DamperNum).MaxAirVolFlowRate != AutoSize) {
                         ReportSizingOutput(CurrentModuleObject,
@@ -815,7 +817,7 @@ namespace DualDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitDualDuct(int const DamperNum, bool const FirstHVACIteration)
+    void DamperDesignParams::InitDualDuct(int const DamperNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1100,7 +1102,7 @@ namespace DualDuct {
         }
     }
 
-    void SizeDualDuct(int const DamperNum)
+    void DamperDesignParams::SizeDualDuct(int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1176,7 +1178,7 @@ namespace DualDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DamperDesignParams::SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1310,7 +1312,7 @@ namespace DualDuct {
         }
     }
 
-    void SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DamperDesignParams::SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1530,7 +1532,7 @@ namespace DualDuct {
         }
     }
 
-    void SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DamperDesignParams::SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1799,7 +1801,7 @@ namespace DualDuct {
         DamperRecircAirInlet(DamperNum).AirMassFlowRateHist1 = DamperRecircAirInlet(DamperNum).AirMassFlowRate;
     }
 
-    void CalcOAMassFlow(int const DamperNum,  // index to terminal unit
+    void DamperDesignParams::CalcOAMassFlow(int const DamperNum,  // index to terminal unit
                         Real64 &SAMassFlow,   // outside air based on optional user input
                         Real64 &AirLoopOAFrac // outside air based on optional user input
     )
@@ -1853,7 +1855,7 @@ namespace DualDuct {
         }
     }
 
-    void CalcOAOnlyMassFlow(int const DamperNum,          // index to terminal unit
+    void DamperDesignParams::CalcOAOnlyMassFlow(int const DamperNum,          // index to terminal unit
                             Real64 &OAMassFlow,           // outside air flow from user input kg/s
                             Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
@@ -1936,7 +1938,7 @@ namespace DualDuct {
     // Beginning of Update subroutines for the Damper Module
     // *****************************************************************************
 
-    void UpdateDualDuct(int const DamperNum)
+    void DamperDesignParams::UpdateDualDuct(int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2073,7 +2075,7 @@ namespace DualDuct {
     // Beginning of Reporting subroutines for the Damper Module
     // *****************************************************************************
 
-    void ReportDualDuct(int const EP_UNUSED(DamperNum)) // unused1208
+    void DamperDesignParams::ReportDualDuct(int const EP_UNUSED(DamperNum)) // unused1208
     {
 
         // SUBROUTINE INFORMATION:

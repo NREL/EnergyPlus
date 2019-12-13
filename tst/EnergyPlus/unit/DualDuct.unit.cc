@@ -117,11 +117,11 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataEnvironment::StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
-    DualDuct::CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
+    DualDuct::Damper(1).CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
     EXPECT_NEAR(0.5, AirLoopOAFrac, 0.00001);
 
-    DualDuct::CalcOAOnlyMassFlow(2, OAMassFlow);
+    DualDuct::Damper(2).CalcOAOnlyMassFlow(2, OAMassFlow);
     EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
     // Cleanup

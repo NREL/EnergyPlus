@@ -227,7 +227,36 @@ namespace SingleDuct {
         {
         }
 
+        void InitSys(int const SysNum, bool const FirstHVACIteration);
+
+        void SizeSys(int const SysNum);
+
+        void SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+
+        void CalcOAMassFlow(int const SysNum, Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
+
+        void SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+
+        void SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+
+        void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
+
+        void CalcVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNode, int const HCoilType, Real64 const HWFlow, Real64 const HCoilReq, int const FanType, Real64 const AirFlow, int const FanOn, Real64 &LoadMet);
+
+        static Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, Array1<Real64> const &Par);
+
+        static Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow, Array1<Real64> const &Par);
+
+        static Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, Array1<Real64> const &Par);
+
+        static Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, Array1<Real64> const &Par);
+
         void SimConstVolNoReheat(int const SysNum, bool const EP_UNUSED(FirstHVACIteration), int const EP_UNUSED(ZoneNum), int const ZoneNodeNum);
+
+        void UpdateSys(int const SysNum);
+
+        void ReportSys(int const SysNum);
+
     };
 
     struct AirTerminalMixerData
@@ -322,76 +351,6 @@ namespace SingleDuct {
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitSys(int const SysNum, bool const FirstHVACIteration);
-
-    void SizeSys(int const SysNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
-
-    void CalcOAMassFlow(int const SysNum,     // index to terminal unit
-                        Real64 &SAMassFlow,   // outside air based on optional user input
-                        Real64 &AirLoopOAFrac // outside air based on optional user input
-    );
-
-    void SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
-
-    void SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
-
-    void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
-
-    void CalcVAVVS(int const SysNum,              // Unit index
-                   bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                   int const ZoneNode,            // zone node number
-                   int const HCoilType,           // type of hot water coil !unused1208
-                   Real64 const HWFlow,           // hot water flow (kg/s)
-                   Real64 const HCoilReq,         // gas or elec coil demand requested
-                   int const FanType,             // type of fan
-                   Real64 const AirFlow,          // air flow rate (kg/s)
-                   int const FanOn,               // 1 means fan is on
-                   Real64 &LoadMet                // load met by unit (watts)
-    );
-
-    Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
-    );
-
-    Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
-    );
-
-    Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
-    );
-
-    Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
-    );
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Sys Module
-    // *****************************************************************************
-
-    void UpdateSys(int const SysNum);
-
-    //        End of Update subroutines for the Sys Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Sys Module
-    // *****************************************************************************
-
-    void ReportSys(int const SysNum); // unused1208
 
     void GetHVACSingleDuctSysIndex(std::string const &SDSName,
                                    int &SDSIndex,
