@@ -99,19 +99,11 @@ namespace ZoneAirLoopEquipmentManager {
     bool MyOneTimeFlag(true);
 
     namespace {
-
-        Array1D_bool EachOnceFlag;
-    }
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool GetAirDistUnitsFlag(true);  // If TRUE, Air Distribution Data has not been read in yet
-        bool InitAirDistUnitsFlag(true); // If TRUE, Air Distribution unit actualzonenums have not been initialized yet
-    }
+        bool InitAirDistUnitsFlag(true); // If TRUE, not all Air Distribution Units have been initialized
+        Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
+        int numADUInitialized(0);        // Count of ADUs that have been initialized
+    } 
 
     // Functions
     void clear_state()
@@ -121,6 +113,7 @@ namespace ZoneAirLoopEquipmentManager {
         EachOnceFlag.deallocate();
         MyOneTimeFlag = true;
         InitAirDistUnitsFlag = true;
+        numADUInitialized = 0;
     }
 
     void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
@@ -177,7 +170,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
         // matched to zone euqip config nodes
-        //InitZoneAirLoopEquipment(AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
     void GetZoneAirLoopEquipment()
@@ -560,9 +553,9 @@ namespace ZoneAirLoopEquipmentManager {
                 }
             }
             EachOnceFlag(AirDistUnitNum) = false;
-            for (int num = 1; num <= NumAirDistUnits; ++num) {
-                // If all EachOnceFlags are false, set InitAirDistUnitsFlag to false
-                if (EachOnceFlag(num)) break;
+            ++numADUInitialized;
+            if (numADUInitialized == NumAirDistUnits) {
+                // If all ADUs are initialized, set InitAirDistUnitsFlag to false
                 InitAirDistUnitsFlag = false;
             }
         }
