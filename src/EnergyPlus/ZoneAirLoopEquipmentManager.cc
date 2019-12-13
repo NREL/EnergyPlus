@@ -85,21 +85,7 @@ namespace ZoneAirLoopEquipmentManager {
     // MODULE INFORMATION:
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   May 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // Needs description
-
-    // METHODOLOGY EMPLOYED: none
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
@@ -110,20 +96,12 @@ namespace ZoneAirLoopEquipmentManager {
     using DataHVACGlobals::FirstTimeStepSysFlag;
     using namespace DataDefineEquip;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     bool MyOneTimeFlag(true);
 
     namespace {
 
         Array1D_bool EachOnceFlag;
     }
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -132,19 +110,16 @@ namespace ZoneAirLoopEquipmentManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool GetAirDistUnitsFlag(true);  // If TRUE, Air Distribution Data has not been read in yet
-        bool InitAirDistUnitsFlag(true); // If TRUE, Air Distribution unit actualtzonenums have not been initialized yet
-    }                                    // namespace
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
+        bool InitAirDistUnitsFlag(true); // If TRUE, Air Distribution unit actualzonenums have not been initialized yet
+    }
 
     // Functions
     void clear_state()
     {
 
         GetAirDistUnitsFlag = true;
-        EachOnceFlag = true;
+        EachOnceFlag.deallocate();
         MyOneTimeFlag = true;
-
         InitAirDistUnitsFlag = true;
     }
 
@@ -161,36 +136,14 @@ namespace ZoneAirLoopEquipmentManager {
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
         //       MODIFIED       Don Shirey, Aug 2009 (LatOutputProvided)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calls the zone thermal control simulations and the interfaces
         // (water-air, refrigerant-air, steam-air, electric-electric,
         // water-water, etc)
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool SimZone;
         int AirDistUnitNum;
 
         // Beginning of Code
@@ -224,13 +177,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
         // matched to zone euqip config nodes
-        InitZoneAirLoopEquipment(AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
-
-        //  CALL RecordZoneAirLoopEquipment
-
-        // ReportZoneAirLoopEquipment( AirDistUnitNum );
-
-        SimZone = false;
+        //InitZoneAirLoopEquipment(AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
     void GetZoneAirLoopEquipment()
@@ -297,6 +244,8 @@ namespace ZoneAirLoopEquipmentManager {
         NumAirDistUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
         AirDistUnit.allocate(NumAirDistUnits);
+        EachOnceFlag.allocate(NumAirDistUnits);
+        EachOnceFlag = true;
 
         if (NumAirDistUnits > 0) {
 
@@ -567,10 +516,8 @@ namespace ZoneAirLoopEquipmentManager {
         // This subroutine is left for Module format consistency -- not needed in this module.
 
         // Do the Begin Simulation initializations
-        if (InitAirDistUnitsFlag) {
-            EachOnceFlag.allocate(NumAirDistUnits);
-            EachOnceFlag = true;
-            InitAirDistUnitsFlag = false;
+        if (!InitAirDistUnitsFlag) {
+            return;
         }
         if (EachOnceFlag(AirDistUnitNum) && (AirDistUnit(AirDistUnitNum).TermUnitSizingNum > 0)) {
 
@@ -613,6 +560,11 @@ namespace ZoneAirLoopEquipmentManager {
                 }
             }
             EachOnceFlag(AirDistUnitNum) = false;
+            for (int num = 0; num <= NumAirDistUnits; ++num) {
+                // If all EachOnceFlags are false, set InitAirDistUnitsFlag to false
+                if (EachOnceFlag(num)) break;
+                InitAirDistUnitsFlag = false;
+            }
         }
     }
 
@@ -642,19 +594,11 @@ namespace ZoneAirLoopEquipmentManager {
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   May 1997
         //       MODIFIED       Don Shirey, Aug 2009 (LatOutputProvided)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates primary system air supplied to a zone and calculates
         // airflow requirements
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataAirLoop::AirLoopFlow;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -667,19 +611,8 @@ namespace ZoneAirLoopEquipmentManager {
         using SingleDuct::SimulateSingleDuct;
         using UserDefinedComponents::SimAirTerminalUserDefined;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         bool ProvideSysOutput;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirDistCompNum;
         int InNodeNum;                      // air distribution unit inlet node
         int OutNodeNum;                     // air distribution unit outlet node
@@ -700,8 +633,8 @@ namespace ZoneAirLoopEquipmentManager {
             MassFlowRateMinAvail = 0.0;
             // check for no plenum
             // set the max and min avail flow rates taking into acount the upstream leak
-            if (InNodeNum > 0) {
-                if (AirDistUnit(AirDistUnitNum).UpStreamLeak) {
+            if (AirDistUnit(AirDistUnitNum).UpStreamLeak) {
+                if (InNodeNum > 0) {
                     MassFlowRateMaxAvail = Node(InNodeNum).MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = Node(InNodeNum).MassFlowRateMinAvail;
                     AirLoopNum = AirDistUnit(AirDistUnitNum).AirLoopNum;
@@ -903,8 +836,6 @@ namespace ZoneAirLoopEquipmentManager {
                 SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
                     (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
             }
-            // AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
-            // AirDistUnit( AirDistUnitNum ).CoolRate = std::abs( min( 0.0, SysOutputProvided ));
 
             // Sign convention: LatOutputProvided <0 Zone is dehumidified
             //                  LatOutputProvided >0 Zone is humidified
@@ -916,64 +847,6 @@ namespace ZoneAirLoopEquipmentManager {
             LatOutputProvided = 0.0;
         }
     }
-
-    void UpdateZoneAirLoopEquipment()
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Russ Taylor
-        //       DATE WRITTEN   Nov 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is left for Module format consistency -- not needed in this module.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-    }
-
-    // void
-    // ReportZoneAirLoopEquipment(
-    // int const AirDistUnitNum
-    // )
-    // {
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR:          Russ Taylor
-    //       DATE WRITTEN:    Nov 1997
-
-    // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    // using DataHVACGlobals::TimeStepSys;
-
-    // report the Direct Air Output
-    // AirDistUnit( AirDistUnitNum ).HeatGain = AirDistUnit( AirDistUnitNum ).HeatRate * TimeStepSys * SecInHour;
-    // AirDistUnit( AirDistUnitNum ).CoolGain = AirDistUnit( AirDistUnitNum ).CoolRate * TimeStepSys * SecInHour;
-    // }
 
 } // namespace ZoneAirLoopEquipmentManager
 
