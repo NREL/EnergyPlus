@@ -499,7 +499,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Formats
         static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
-        static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{.3F},{.3F},{.3F},{.3F}\n");
+        static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:.3F},{:.3F},{:.3F},{:.3F}\n");
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(iZC_TStat);
