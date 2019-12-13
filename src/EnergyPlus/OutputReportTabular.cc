@@ -2005,15 +2005,7 @@ namespace OutputReportTabular {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
                     ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "BEPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2025,23 +2017,11 @@ namespace OutputReportTabular {
                     displayTabularVeriSum = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "IVRS")) {
-                    displayTabularVeriSum = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
                     displayComponentSizing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CSS")) {
-                    displayComponentSizing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
-                    displaySurfaceShadowing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "SHAD")) {
                     displaySurfaceShadowing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2091,10 +2071,6 @@ namespace OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "EIO")) {
-                    WriteTabularFiles = true;
-                    displayEioSummary = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
                     WriteTabularFiles = true;
@@ -3348,7 +3324,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("ResidualOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3361,7 +3337,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("DistillateOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;
