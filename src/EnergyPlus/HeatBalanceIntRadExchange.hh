@@ -71,7 +71,7 @@ namespace HeatBalanceIntRadExchange {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SendSurfaceTempInKto4thPrecalc
+    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SurfaceTempInKto4th
 
     extern bool CarrollMethod;  // Use Carroll MRT method
 
