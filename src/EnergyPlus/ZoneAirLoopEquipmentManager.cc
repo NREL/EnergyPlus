@@ -560,7 +560,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
             }
             EachOnceFlag(AirDistUnitNum) = false;
-            for (int num = 0; num <= NumAirDistUnits; ++num) {
+            for (int num = 1; num <= NumAirDistUnits; ++num) {
                 // If all EachOnceFlags are false, set InitAirDistUnitsFlag to false
                 if (EachOnceFlag(num)) break;
                 InitAirDistUnitsFlag = false;
