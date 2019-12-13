@@ -51,6 +51,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <gtest/gtest.h>
 
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
+
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1267,7 +1272,10 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Get Air Loop HVAC Data
     SimAirServingZones::GetAirPathData();
     SimAirServingZones::InitAirLoops(FirstHVACIteration);
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+
+    auto *ostream = ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits);
+    assert(ostream);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*ostream);
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

@@ -50,6 +50,10 @@
 #include <cmath>
 #include <string>
 
+// lib {fmt}
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
@@ -92,9 +96,6 @@
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
-
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 
 namespace EnergyPlus {
 

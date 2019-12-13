@@ -652,7 +652,9 @@ namespace HeatBalanceKivaManager {
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+            auto *ostream = ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits);
+            assert(ostream);
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(*ostream);
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 

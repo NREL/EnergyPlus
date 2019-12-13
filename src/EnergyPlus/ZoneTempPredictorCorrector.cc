@@ -49,6 +49,11 @@
 #include <cmath>
 #include <string>
 
+// lib {fmt}
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -351,7 +356,9 @@ namespace ZoneTempPredictorCorrector {
         // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints();
+            auto *ostream = ObjexxFCL::gio::out_stream(OutputFileInits);
+            assert(ostream);
+            GetZoneAirSetPoints(*ostream);
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -381,7 +388,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints()
+    void GetZoneAirSetPoints(std::ostream &OutputFile)
     {
 
         // SUBROUTINE INFORMATION:
@@ -491,9 +498,8 @@ namespace ZoneTempPredictorCorrector {
         Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
-                                   "','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')");
-        static ObjexxFCL::gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
+        static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
+        static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{.3F},{.3F},{.3F},{.3F}\n");
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(iZC_TStat);
@@ -1884,8 +1890,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_700);
-        ObjexxFCL::gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
+        OutputFile << Header;
+        fmt::print(OutputFile, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -6862,7 +6868,9 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints();
+            auto *ostream = ObjexxFCL::gio::out_stream(OutputFileInits);
+            assert(ostream);
+            GetZoneAirSetPoints(*ostream);
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {

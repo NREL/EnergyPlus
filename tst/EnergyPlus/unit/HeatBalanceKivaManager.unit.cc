@@ -50,6 +50,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
@@ -189,7 +192,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput();    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+    auto *ostream = ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits);
+    assert(ostream);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*ostream);
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand; 
 
