@@ -140,8 +140,8 @@ namespace PlantChillers {
         Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
         Real64 modCondOutletTemp;      // C - condenser outlet temperature, air or water side
         Real64 modEvapOutletTemp;      // C - evaporator outlet temperature, water side
-        Real64 modQEvaporator;         // W - rate of heat transfer to the evaporator coil
-        Real64 modQCondenser;          // W - rate of heat transfer to the condenser coil
+        Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
+        Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
         Real64 Energy;              // J - chiller energy use
         Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
         Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
@@ -152,8 +152,6 @@ namespace PlantChillers {
 
         // Members
         Real64 Power;
-        Real64 QEvap;
-        Real64 QCond;
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
         Real64 CondOutletTemp;
@@ -174,8 +172,8 @@ namespace PlantChillers {
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
               TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), modCondMassFlowRate(0.0), EvapMassFlowRate(0.0), modCondOutletTemp(0.0),
         modEvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
-         modQEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
-         modQCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
+              QEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
+              QCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
          Energy(0.0)       ,      // J - chiller energy use
               EvaporatorEnergy(0.0) ,   // J - rate of heat transfer to the evaporator coil
               CondenserEnergy(0.0) ,    // J - rate of heat transfer to the condenser coil
@@ -183,7 +181,7 @@ namespace PlantChillers {
          modHeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
          modAvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
          modBasinHeaterPower(0.0),    // Basin heater power (W)
-              Power(0.0), QEvap(0.0), QCond(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
+              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
               CondOutletTemp(0.0), EvapOutletTemp(0.0), Condmdot(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
 
         {

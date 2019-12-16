@@ -276,7 +276,7 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_Electric,
                                                         ElectricChiller(ChillNum).CondInletNodeNum,
                                                         ElectricChiller(ChillNum).CondOutletNodeNum,
-                                                        ElectricChiller(ChillNum).QCond,
+                                                        ElectricChiller(ChillNum).QCondenser,
                                                         ElectricChiller(ChillNum).CondInletTemp,
                                                         ElectricChiller(ChillNum).CondOutletTemp,
                                                         ElectricChiller(ChillNum).Condmdot,
@@ -363,7 +363,7 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_EngineDriven,
                                                         EngineDrivenChiller(ChillNum).CondInletNodeNum,
                                                         EngineDrivenChiller(ChillNum).CondOutletNodeNum,
-                                                                        EngineDrivenChiller(ChillNum).QCond,
+                                                                        EngineDrivenChiller(ChillNum).QCondenser,
                                                                         EngineDrivenChiller(ChillNum).CondInletTemp,
                                                                         EngineDrivenChiller(ChillNum).CondOutletTemp,
                                                                         EngineDrivenChiller(ChillNum).Condmdot,
@@ -451,7 +451,7 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_CombTurbine,
                                                         GTChiller(ChillNum).CondInletNodeNum,
                                                         GTChiller(ChillNum).CondOutletNodeNum,
-                                                                        GTChiller(ChillNum).QCond,
+                                                                        GTChiller(ChillNum).QCondenser,
                                                                         GTChiller(ChillNum).CondInletTemp,
                                                                         GTChiller(ChillNum).CondOutletTemp,
                                                                         GTChiller(ChillNum).Condmdot,
@@ -540,7 +540,7 @@ namespace PlantChillers {
                                                         TypeOf_Chiller_ConstCOP,
                                                         ConstCOPChiller(ChillNum).CondInletNodeNum,
                                                         ConstCOPChiller(ChillNum).CondOutletNodeNum,
-                                                                        ConstCOPChiller(ChillNum).QCond,
+                                                                        ConstCOPChiller(ChillNum).QCondenser,
                                                                         ConstCOPChiller(ChillNum).CondInletTemp,
                                                                         ConstCOPChiller(ChillNum).CondOutletTemp,
                                                                         ConstCOPChiller(ChillNum).Condmdot,
@@ -938,7 +938,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ElectricChiller(ChillerNum).QEvap,
+                                ElectricChiller(ChillerNum).QEvaporator,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Name);
@@ -974,7 +974,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ElectricChiller(ChillerNum).QCond,
+                                ElectricChiller(ChillerNum).QCondenser,
                                 "System",
                                 "Average",
                                 ElectricChiller(ChillerNum).Name);
@@ -1543,7 +1543,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChiller(ChillerNum).QEvap,
+                                EngineDrivenChiller(ChillerNum).QEvaporator,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Name);
@@ -1578,7 +1578,7 @@ namespace PlantChillers {
                                 EngineDrivenChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                EngineDrivenChiller(ChillerNum).QCond,
+                                EngineDrivenChiller(ChillerNum).QCondenser,
                                 "System",
                                 "Average",
                                 EngineDrivenChiller(ChillerNum).Name);
@@ -2199,7 +2199,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                GTChiller(ChillerNum).QEvap,
+                                GTChiller(ChillerNum).QEvaporator,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Name);
@@ -2235,7 +2235,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                GTChiller(ChillerNum).QCond,
+                                GTChiller(ChillerNum).QCondenser,
                                 "System",
                                 "Average",
                                 GTChiller(ChillerNum).Name);
@@ -2668,7 +2668,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ConstCOPChiller(ChillerNum).QEvap,
+                                ConstCOPChiller(ChillerNum).QEvaporator,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Name);
@@ -2710,7 +2710,7 @@ namespace PlantChillers {
 
             SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ConstCOPChiller(ChillerNum).QCond,
+                                ConstCOPChiller(ChillerNum).QCondenser,
                                 "System",
                                 "Average",
                                 ConstCOPChiller(ChillerNum).Name);
@@ -5347,8 +5347,8 @@ namespace PlantChillers {
         ElectricChiller(ChillNum).modCondMassFlowRate = 0.0;
         ElectricChiller(ChillNum).Power = 0.0;
         ElectricChiller(ChillNum).Energy = 0.0;
-        ElectricChiller(ChillNum).modQCondenser = 0.0;
-        ElectricChiller(ChillNum).modQEvaporator = 0.0;
+        ElectricChiller(ChillNum).QCondenser = 0.0;
+        ElectricChiller(ChillNum).QEvaporator = 0.0;
         ElectricChiller(ChillNum).CondenserEnergy = 0.0;
         ElectricChiller(ChillNum).EvaporatorEnergy = 0.0;
         ElectricChiller(ChillNum).modQHeatRecovered = 0.0;
@@ -5538,10 +5538,10 @@ namespace PlantChillers {
 
         // correct inlet temperature if using heat recovery
         if (ElectricChiller(ChillNum).HeatRecActive) {
-            if ((ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).QCond) > 0.0) {
+            if ((ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).QCondenser) > 0.0) {
                 ElectricChiller(ChillNum).modAvgCondSinkTemp = (ElectricChiller(ChillNum).QHeatRecovery * ElectricChiller(ChillNum).HeatRecInletTemp +
-                        ElectricChiller(ChillNum).QCond * ElectricChiller(ChillNum).CondInletTemp) /
-                                  (ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).QCond);
+                        ElectricChiller(ChillNum).QCondenser * ElectricChiller(ChillNum).CondInletTemp) /
+                                  (ElectricChiller(ChillNum).QHeatRecovery + ElectricChiller(ChillNum).QCondenser);
             } else {
                 ElectricChiller(ChillNum).modAvgCondSinkTemp = _CondInletTemp;
             }
@@ -5615,7 +5615,7 @@ namespace PlantChillers {
             ElectricChiller(ChillNum).PossibleSubcooling =
                 !(DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
                   DataPlant::CompSetPtBasedSchemeType);
-            ElectricChiller(ChillNum).modQEvaporator = AvailChillerCap * OperPartLoadRat;
+            ElectricChiller(ChillNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
             if (OperPartLoadRat < MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
             } else {
@@ -5638,7 +5638,7 @@ namespace PlantChillers {
                                      ElectricChiller(ChillNum).CWCompNum);
                 // Evaluate delta temp based on actual flow rate
                 if (ElectricChiller(ChillNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = ElectricChiller(ChillNum).modQEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
+                    EvapDeltaTemp = ElectricChiller(ChillNum).QEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
@@ -5660,7 +5660,7 @@ namespace PlantChillers {
                 if (EvapDeltaTemp != 0.0) {
 
                     // Calculate desired flow to request based on load
-                    ElectricChiller(ChillNum).EvapMassFlowRate = std::abs(ElectricChiller(ChillNum).modQEvaporator / Cp / EvapDeltaTemp);
+                    ElectricChiller(ChillNum).EvapMassFlowRate = std::abs(ElectricChiller(ChillNum).QEvaporator / Cp / EvapDeltaTemp);
                     // Check to see if the Maximum is exceeded, if so set to maximum
                     if ((ElectricChiller(ChillNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) ElectricChiller(ChillNum).PossibleSubcooling = true;
                     ElectricChiller(ChillNum).EvapMassFlowRate = min(EvapMassFlowRateMax, ElectricChiller(ChillNum).EvapMassFlowRate);
@@ -5712,9 +5712,9 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         ElectricChiller(ChillNum).modEvapOutletTemp,
                                         ElectricChiller(ChillNum).EvapMassFlowRate,
-                                        ElectricChiller(ChillNum).modQEvaporator);
+                                        ElectricChiller(ChillNum).QEvaporator);
                 // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (ElectricChiller(ChillNum).modQEvaporator / AvailChillerCap) : 0.0;
+                PartLoadRat = (AvailChillerCap > 0.0) ? (ElectricChiller(ChillNum).QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
                 // ChillerPartLoadRatio = PartLoadRat;
                 EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
@@ -5746,8 +5746,8 @@ namespace PlantChillers {
             // Flow resolver might have given less flow or control scheme have provided more load, which may
             // result in subcooling.
             if (ElectricChiller(ChillNum).PossibleSubcooling) {
-                ElectricChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = ElectricChiller(ChillNum).modQEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
+                ElectricChiller(ChillNum).QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = ElectricChiller(ChillNum).QEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
                 ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
 
@@ -5772,7 +5772,7 @@ namespace PlantChillers {
                     }
                 }
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
-                ElectricChiller(ChillNum).modQEvaporator = std::abs(ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+                ElectricChiller(ChillNum).QEvaporator = std::abs(ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
                 ElectricChiller(ChillNum).modEvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
@@ -5780,33 +5780,33 @@ namespace PlantChillers {
                 if ((Node(EvapInletNode).Temp - TempLowLimitEout) > DeltaTempTol) {
                     ElectricChiller(ChillNum).modEvapOutletTemp = TempLowLimitEout;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
-                    ElectricChiller(ChillNum).modQEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ElectricChiller(ChillNum).QEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
-                    ElectricChiller(ChillNum).modQEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ElectricChiller(ChillNum).QEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             if (ElectricChiller(ChillNum).modEvapOutletTemp < Node(EvapOutletNode).TempMin) {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
-                    ElectricChiller(ChillNum).modQEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ElectricChiller(ChillNum).QEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
-                    ElectricChiller(ChillNum).modQEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ElectricChiller(ChillNum).QEvaporator = ElectricChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
 
             // If load exceeds the distributed load set to the distributed load
-            if (ElectricChiller(ChillNum).modQEvaporator > std::abs(MyLoad)) {
+            if (ElectricChiller(ChillNum).QEvaporator > std::abs(MyLoad)) {
                 if (ElectricChiller(ChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    ElectricChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = ElectricChiller(ChillNum).modQEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
+                    ElectricChiller(ChillNum).QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = ElectricChiller(ChillNum).QEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    ElectricChiller(ChillNum).modQEvaporator = 0.0;
+                    ElectricChiller(ChillNum).QEvaporator = 0.0;
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -5824,19 +5824,19 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         ElectricChiller(ChillNum).modEvapOutletTemp,
                                         ElectricChiller(ChillNum).EvapMassFlowRate,
-                                        ElectricChiller(ChillNum).modQEvaporator);
+                                        ElectricChiller(ChillNum).QEvaporator);
                 // update corresponding variables at faulty case
                 EvapDeltaTemp = Node(EvapInletNode).Temp - ElectricChiller(ChillNum).modEvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (ElectricChiller(ChillNum).modQEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
+            if (ElectricChiller(ChillNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
                 if (ElectricChiller(ChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    ElectricChiller(ChillNum).modQEvaporator = AvailChillerCap * OperPartLoadRat;
-                    EvapDeltaTemp = ElectricChiller(ChillNum).modQEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
+                    ElectricChiller(ChillNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
+                    EvapDeltaTemp = ElectricChiller(ChillNum).QEvaporator / ElectricChiller(ChillNum).EvapMassFlowRate / Cp;
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    ElectricChiller(ChillNum).modQEvaporator = 0.0;
+                    ElectricChiller(ChillNum).QEvaporator = 0.0;
                     ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -5851,12 +5851,12 @@ namespace PlantChillers {
             ElectricChiller(ChillNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / RatedCOP * FRAC;
 
             if (ElectricChiller(ChillNum).EvapMassFlowRate == 0.0) {
-                ElectricChiller(ChillNum).modQEvaporator = 0.0;
+                ElectricChiller(ChillNum).QEvaporator = 0.0;
                 ElectricChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 ElectricChiller(ChillNum).Power = 0.0;
                 ElectricChiller(ChillNum).PrintMessage = false;
             }
-            if (ElectricChiller(ChillNum).modQEvaporator == 0.0 && ElectricChiller(ChillNum).CondenserType == EvapCooled) {
+            if (ElectricChiller(ChillNum).QEvaporator == 0.0 && ElectricChiller(ChillNum).CondenserType == EvapCooled) {
                 CalcBasinHeaterPower(ElectricChiller(ChillNum).BasinHeaterPowerFTempDiff,
                                      ElectricChiller(ChillNum).BasinHeaterSchedulePtr,
                                      ElectricChiller(ChillNum).BasinHeaterSetPointTemp,
@@ -5866,25 +5866,25 @@ namespace PlantChillers {
 
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        ElectricChiller(ChillNum).modQCondenser = ElectricChiller(ChillNum).Power + ElectricChiller(ChillNum).modQEvaporator;
+        ElectricChiller(ChillNum).QCondenser = ElectricChiller(ChillNum).Power + ElectricChiller(ChillNum).QEvaporator;
 
         if (ElectricChiller(ChillNum).CondenserType == WaterCooled) {
             if (ElectricChiller(ChillNum).modCondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
                 if (ElectricChiller(ChillNum).HeatRecActive)
-                    CalcElectricChillerHeatRecovery(ChillNum, ElectricChiller(ChillNum).modQCondenser, ElectricChiller(ChillNum).modCondMassFlowRate, _CondInletTemp, ElectricChiller(ChillNum).modQHeatRecovered);
+                    CalcElectricChillerHeatRecovery(ChillNum, ElectricChiller(ChillNum).QCondenser, ElectricChiller(ChillNum).modCondMassFlowRate, _CondInletTemp, ElectricChiller(ChillNum).modQHeatRecovered);
                 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricChiller(ChillNum).CDLoopNum).FluidName,
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(ElectricChiller(ChillNum).CDLoopNum).FluidIndex,
                                                RoutineName);
-                ElectricChiller(ChillNum).modCondOutletTemp = ElectricChiller(ChillNum).modQCondenser / ElectricChiller(ChillNum).modCondMassFlowRate / CpCond + _CondInletTemp;
+                ElectricChiller(ChillNum).modCondOutletTemp = ElectricChiller(ChillNum).QCondenser / ElectricChiller(ChillNum).modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + ElectricChiller(ChillNum).Name);
                 ShowContinueErrorTimeStamp("");
             }
         } else { // Air Cooled or Evap Cooled
 
-            if (ElectricChiller(ChillNum).modQCondenser > 0.0) {
+            if (ElectricChiller(ChillNum).QCondenser > 0.0) {
                 ElectricChiller(ChillNum).modCondMassFlowRate = ElectricChiller(ChillNum).CondMassFlowRateMax * OperPartLoadRat;
             } else {
                 ElectricChiller(ChillNum).modCondMassFlowRate = 0.0;
@@ -5892,19 +5892,19 @@ namespace PlantChillers {
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (ElectricChiller(ChillNum).HeatRecActive)
-                CalcElectricChillerHeatRecovery(ChillNum, ElectricChiller(ChillNum).modQCondenser, ElectricChiller(ChillNum).modCondMassFlowRate, _CondInletTemp, ElectricChiller(ChillNum).modQHeatRecovered);
+                CalcElectricChillerHeatRecovery(ChillNum, ElectricChiller(ChillNum).QCondenser, ElectricChiller(ChillNum).modCondMassFlowRate, _CondInletTemp, ElectricChiller(ChillNum).modQHeatRecovered);
             if (ElectricChiller(ChillNum).modCondMassFlowRate > 0.0) {
                 CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
-                ElectricChiller(ChillNum).modCondOutletTemp = _CondInletTemp + ElectricChiller(ChillNum).modQCondenser / ElectricChiller(ChillNum).modCondMassFlowRate / CpCond;
+                ElectricChiller(ChillNum).modCondOutletTemp = _CondInletTemp + ElectricChiller(ChillNum).QCondenser / ElectricChiller(ChillNum).modCondMassFlowRate / CpCond;
             } else {
                 ElectricChiller(ChillNum).modCondOutletTemp = _CondInletTemp;
             }
         }
 
         // Calculate Energy
-        ElectricChiller(ChillNum).CondenserEnergy = ElectricChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).CondenserEnergy = ElectricChiller(ChillNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         ElectricChiller(ChillNum).Energy = ElectricChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ElectricChiller(ChillNum).EvaporatorEnergy = ElectricChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).EvaporatorEnergy = ElectricChiller(ChillNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (ElectricChiller(ChillNum).Energy < 0.0) { // there is a serious problem
@@ -6026,8 +6026,8 @@ namespace PlantChillers {
         EngineDrivenChiller(ChillerNum).EvapMassFlowRate = 0.0;
         EngineDrivenChiller(ChillerNum).modCondMassFlowRate = 0.0;
         EngineDrivenChiller(ChillerNum).Power = 0.0;
-        EngineDrivenChiller(ChillerNum).modQCondenser = 0.0;
-        EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
+        EngineDrivenChiller(ChillerNum).QCondenser = 0.0;
+        EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
         EngineDrivenChiller(ChillerNum).Energy = 0.0;
         EngineDrivenChiller(ChillerNum).CondenserEnergy = 0.0;
         EngineDrivenChiller(ChillerNum).EvaporatorEnergy = 0.0;
@@ -6280,7 +6280,7 @@ namespace PlantChillers {
         // condenser side outlet temperature.
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             EngineDrivenChiller(ChillerNum).PossibleSubcooling = false;
-            EngineDrivenChiller(ChillerNum).modQEvaporator = AvailChillerCap * OperPartLoadRat;
+            EngineDrivenChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
             if (OperPartLoadRat < MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
             } else {
@@ -6302,7 +6302,7 @@ namespace PlantChillers {
                                      EngineDrivenChiller(ChillerNum).CWCompNum);
                 // Evaluate delta temp based on actual flow rate
                 if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).modQEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
@@ -6322,7 +6322,7 @@ namespace PlantChillers {
                 }
 
                 if (EvapDeltaTemp != 0.0) {
-                    EngineDrivenChiller(ChillerNum).EvapMassFlowRate = std::abs(EngineDrivenChiller(ChillerNum).modQEvaporator / Cp / EvapDeltaTemp);
+                    EngineDrivenChiller(ChillerNum).EvapMassFlowRate = std::abs(EngineDrivenChiller(ChillerNum).QEvaporator / Cp / EvapDeltaTemp);
                     if ((EngineDrivenChiller(ChillerNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) EngineDrivenChiller(ChillerNum).PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
                     EngineDrivenChiller(ChillerNum).EvapMassFlowRate = min(EvapMassFlowRateMax, EngineDrivenChiller(ChillerNum).EvapMassFlowRate);
@@ -6371,9 +6371,9 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         EngineDrivenChiller(ChillerNum).modEvapOutletTemp,
                                         EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
-                                        EngineDrivenChiller(ChillerNum).modQEvaporator);
+                                        EngineDrivenChiller(ChillerNum).QEvaporator);
                 // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (EngineDrivenChiller(ChillerNum).modQEvaporator / AvailChillerCap) : 0.0;
+                PartLoadRat = (AvailChillerCap > 0.0) ? (EngineDrivenChiller(ChillerNum).QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
                 EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
             }
@@ -6402,13 +6402,13 @@ namespace PlantChillers {
             }
 
             if (EngineDrivenChiller(ChillerNum).PossibleSubcooling) {
-                EngineDrivenChiller(ChillerNum).modQEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = EngineDrivenChiller(ChillerNum).modQEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
+                EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
                 EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 if (EngineDrivenChiller(ChillerNum).modEvapOutletTemp < Node(EvapOutletNode).TempMin) {
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+                    EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
                 }
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
 
@@ -6441,7 +6441,7 @@ namespace PlantChillers {
                     }
                 }
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
-                EngineDrivenChiller(ChillerNum).modQEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+                EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
                 EngineDrivenChiller(ChillerNum).modEvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
@@ -6449,32 +6449,32 @@ namespace PlantChillers {
                 if ((Node(EvapInletNode).Temp - TempLowLimitEout) > DeltaTempTol) {
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = TempLowLimitEout;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             if (EngineDrivenChiller(ChillerNum).modEvapOutletTemp < Node(EvapOutletNode).TempMin) {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             // If load exceeds the distributed load set to the distributed load
-            if (EngineDrivenChiller(ChillerNum).modQEvaporator > std::abs(MyLoad)) {
+            if (EngineDrivenChiller(ChillerNum).QEvaporator > std::abs(MyLoad)) {
                 if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).modQEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -6492,19 +6492,19 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         EngineDrivenChiller(ChillerNum).modEvapOutletTemp,
                                         EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
-                                        EngineDrivenChiller(ChillerNum).modQEvaporator);
+                                        EngineDrivenChiller(ChillerNum).QEvaporator);
                 // update corresponding variables at faulty case
                 EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).modEvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (EngineDrivenChiller(ChillerNum).modQEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
+            if (EngineDrivenChiller(ChillerNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
                 if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = AvailChillerCap * OperPartLoadRat;
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).modQEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
+                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
+                    EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
                     EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -6519,12 +6519,12 @@ namespace PlantChillers {
             EngineDrivenChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate == 0.0) {
-                EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
+                EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
                 EngineDrivenChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 EngineDrivenChiller(ChillerNum).Power = 0.0;
                 EngineDrivenChiller(ChillerNum).PrintMessage = false;
             }
-            if (EngineDrivenChiller(ChillerNum).modQEvaporator == 0.0 && EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
+            if (EngineDrivenChiller(ChillerNum).QEvaporator == 0.0 && EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
                 CalcBasinHeaterPower(EngineDrivenChiller(ChillerNum).BasinHeaterPowerFTempDiff,
                                      EngineDrivenChiller(ChillerNum).BasinHeaterSchedulePtr,
                                      EngineDrivenChiller(ChillerNum).BasinHeaterSetPointTemp,
@@ -6535,7 +6535,7 @@ namespace PlantChillers {
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        EngineDrivenChiller(ChillerNum).modQCondenser = EngineDrivenChiller(ChillerNum).Power + EngineDrivenChiller(ChillerNum).modQEvaporator;
+        EngineDrivenChiller(ChillerNum).QCondenser = EngineDrivenChiller(ChillerNum).Power + EngineDrivenChiller(ChillerNum).QEvaporator;
 
         if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
 
@@ -6544,7 +6544,7 @@ namespace PlantChillers {
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CDLoopNum).FluidIndex,
                                                RoutineName);
-                EngineDrivenChiller(ChillerNum).modCondOutletTemp = EngineDrivenChiller(ChillerNum).modQCondenser / EngineDrivenChiller(ChillerNum).modCondMassFlowRate / CpCond + _CondInletTemp;
+                EngineDrivenChiller(ChillerNum).modCondOutletTemp = EngineDrivenChiller(ChillerNum).QCondenser / EngineDrivenChiller(ChillerNum).modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" +
                                 EngineDrivenChiller(ChillerNum).Name);
@@ -6568,7 +6568,7 @@ namespace PlantChillers {
         } else {
             PartLoadRat = max(MinPartLoadRat, PartLoadRat);
             ClngLoadFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).ClngLoadtoFuelCurve, PartLoadRat);
-            EngineDrivenFuelEnergy = EngineDrivenChiller(ChillerNum).modQEvaporator / ClngLoadFuelRat;
+            EngineDrivenFuelEnergy = EngineDrivenChiller(ChillerNum).QEvaporator / ClngLoadFuelRat;
         }
         // Use Curve fit to determine energy recovered in the water jacket.  This curve calculates the water jacket energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the water jacket at that
@@ -6618,9 +6618,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        EngineDrivenChiller(ChillerNum).CondenserEnergy = EngineDrivenChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).CondenserEnergy = EngineDrivenChiller(ChillerNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).Energy = EngineDrivenChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = EngineDrivenChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = EngineDrivenChiller(ChillerNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = EngineDrivenFuelEnergy;
         EngineDrivenChiller(ChillerNum).modFuelEnergy = EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modJacketEnergyRec = EngineDrivenChiller(ChillerNum).modQJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -6761,8 +6761,8 @@ namespace PlantChillers {
         GTChiller(ChillerNum).EvapMassFlowRate = 0.0;
         GTChiller(ChillerNum).modCondMassFlowRate = 0.0;
         GTChiller(ChillerNum).Power = 0.0;
-        GTChiller(ChillerNum).modQCondenser = 0.0;
-        GTChiller(ChillerNum).modQEvaporator = 0.0;
+        GTChiller(ChillerNum).QCondenser = 0.0;
+        GTChiller(ChillerNum).QEvaporator = 0.0;
         GTChiller(ChillerNum).Energy = 0.0;
         GTChiller(ChillerNum).CondenserEnergy = 0.0;
         GTChiller(ChillerNum).EvaporatorEnergy = 0.0;
@@ -6995,7 +6995,7 @@ namespace PlantChillers {
         // condenser side outlet temperature.
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             GTChiller(ChillerNum).PossibleSubcooling = false;
-            GTChiller(ChillerNum).modQEvaporator = AvailChillerCap * OperPartLoadRat;
+            GTChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
             if (OperPartLoadRat < MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
             } else {
@@ -7017,7 +7017,7 @@ namespace PlantChillers {
                                      GTChiller(ChillerNum).CWCompNum);
                 // Evaluate delta temp based on actual flow rate
                 if (GTChiller(ChillerNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = GTChiller(ChillerNum).modQEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
@@ -7035,7 +7035,7 @@ namespace PlantChillers {
                 }
                 if (EvapDeltaTemp != 0.0) {
                     // Calculate desired flow to request based on load
-                    GTChiller(ChillerNum).EvapMassFlowRate = std::abs(GTChiller(ChillerNum).modQEvaporator / Cp / EvapDeltaTemp);
+                    GTChiller(ChillerNum).EvapMassFlowRate = std::abs(GTChiller(ChillerNum).QEvaporator / Cp / EvapDeltaTemp);
                     if ((GTChiller(ChillerNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) GTChiller(ChillerNum).PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
                     GTChiller(ChillerNum).EvapMassFlowRate = min(EvapMassFlowRateMax, GTChiller(ChillerNum).EvapMassFlowRate);
@@ -7084,9 +7084,9 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         GTChiller(ChillerNum).modEvapOutletTemp,
                                         GTChiller(ChillerNum).EvapMassFlowRate,
-                                        GTChiller(ChillerNum).modQEvaporator);
+                                        GTChiller(ChillerNum).QEvaporator);
                 // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (GTChiller(ChillerNum).modQEvaporator / AvailChillerCap) : 0.0;
+                PartLoadRat = (AvailChillerCap > 0.0) ? (GTChiller(ChillerNum).QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
                 // ChillerPartLoadRatio = PartLoadRat;
                 EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
@@ -7116,8 +7116,8 @@ namespace PlantChillers {
             }
 
             if (GTChiller(ChillerNum).PossibleSubcooling) {
-                GTChiller(ChillerNum).modQEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = GTChiller(ChillerNum).modQEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
+                GTChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
                 GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
                 {
@@ -7149,7 +7149,7 @@ namespace PlantChillers {
                     }
                 }
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
-                GTChiller(ChillerNum).modQEvaporator = std::abs(GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+                GTChiller(ChillerNum).QEvaporator = std::abs(GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
                 GTChiller(ChillerNum).modEvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
@@ -7157,32 +7157,32 @@ namespace PlantChillers {
                 if ((Node(EvapInletNode).Temp - TempLowLimitEout) > DeltaTempTol) {
                     GTChiller(ChillerNum).modEvapOutletTemp = TempLowLimitEout;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
-                    GTChiller(ChillerNum).modQEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
-                    GTChiller(ChillerNum).modQEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             if (GTChiller(ChillerNum).modEvapOutletTemp < Node(EvapOutletNode).TempMin) {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
-                    GTChiller(ChillerNum).modQEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
-                    GTChiller(ChillerNum).modQEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             // If load exceeds the distributed load set to the distributed load
-            if (GTChiller(ChillerNum).modQEvaporator > std::abs(MyLoad)) {
+            if (GTChiller(ChillerNum).QEvaporator > std::abs(MyLoad)) {
                 if (GTChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    GTChiller(ChillerNum).modQEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = GTChiller(ChillerNum).modQEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    GTChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).modQEvaporator = 0.0;
+                    GTChiller(ChillerNum).QEvaporator = 0.0;
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -7200,19 +7200,19 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         GTChiller(ChillerNum).modEvapOutletTemp,
                                         GTChiller(ChillerNum).EvapMassFlowRate,
-                                        GTChiller(ChillerNum).modQEvaporator);
+                                        GTChiller(ChillerNum).QEvaporator);
                 // update corresponding variables at faulty case
                 EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).modEvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (GTChiller(ChillerNum).modQEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
+            if (GTChiller(ChillerNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
                 if (GTChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    GTChiller(ChillerNum).modQEvaporator = AvailChillerCap * PartLoadRat;
-                    EvapDeltaTemp = GTChiller(ChillerNum).modQEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
+                    GTChiller(ChillerNum).QEvaporator = AvailChillerCap * PartLoadRat;
+                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).modQEvaporator = 0.0;
+                    GTChiller(ChillerNum).QEvaporator = 0.0;
                     GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -7227,12 +7227,12 @@ namespace PlantChillers {
             GTChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             if (GTChiller(ChillerNum).EvapMassFlowRate == 0.0) {
-                GTChiller(ChillerNum).modQEvaporator = 0.0;
+                GTChiller(ChillerNum).QEvaporator = 0.0;
                 GTChiller(ChillerNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 GTChiller(ChillerNum).Power = 0.0;
                 GTChiller(ChillerNum).PrintMessage = false;
             }
-            if (GTChiller(ChillerNum).modQEvaporator == 0.0 && GTChiller(ChillerNum).CondenserType == EvapCooled) {
+            if (GTChiller(ChillerNum).QEvaporator == 0.0 && GTChiller(ChillerNum).CondenserType == EvapCooled) {
                 CalcBasinHeaterPower(GTChiller(ChillerNum).BasinHeaterPowerFTempDiff,
                                      GTChiller(ChillerNum).BasinHeaterSchedulePtr,
                                      GTChiller(ChillerNum).BasinHeaterSetPointTemp,
@@ -7244,7 +7244,7 @@ namespace PlantChillers {
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        GTChiller(ChillerNum).modQCondenser = GTChiller(ChillerNum).Power + GTChiller(ChillerNum).modQEvaporator;
+        GTChiller(ChillerNum).QCondenser = GTChiller(ChillerNum).Power + GTChiller(ChillerNum).QEvaporator;
 
         if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
 
@@ -7253,7 +7253,7 @@ namespace PlantChillers {
                                                                 _CondInletTemp,
                                                DataPlant::PlantLoop(GTChiller(ChillerNum).CDLoopNum).FluidIndex,
                                                RoutineName);
-                GTChiller(ChillerNum).modCondOutletTemp = GTChiller(ChillerNum).modQCondenser / GTChiller(ChillerNum).modCondMassFlowRate / CpCond + _CondInletTemp;
+                GTChiller(ChillerNum).modCondOutletTemp = GTChiller(ChillerNum).QCondenser / GTChiller(ChillerNum).modCondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + GTChiller(ChillerNum).Name);
                 ShowContinueErrorTimeStamp("");
@@ -7440,9 +7440,9 @@ namespace PlantChillers {
         GTChiller(ChillerNum).ExhaustStackTemp = _ExhaustStackTemp;
 
         // Calculate Energy
-        GTChiller(ChillerNum).CondenserEnergy = GTChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).CondenserEnergy = GTChiller(ChillerNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         GTChiller(ChillerNum).Energy = GTChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).EvaporatorEnergy = GTChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).EvaporatorEnergy = GTChiller(ChillerNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (GTChiller(ChillerNum).Energy < 0.0) { // there is a serious problem
@@ -7621,8 +7621,8 @@ namespace PlantChillers {
             ConstCOPChiller(ChillNum).modCondOutletTemp = Node(CondInletNode).Temp;
 
             ConstCOPChiller(ChillNum).Power = 0.0;
-            ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
-            ConstCOPChiller(ChillNum).modQCondenser = 0.0;
+            ConstCOPChiller(ChillNum).QEvaporator = 0.0;
+            ConstCOPChiller(ChillNum).QCondenser = 0.0;
             ConstCOPChiller(ChillNum).Energy = 0.0;
             ConstCOPChiller(ChillNum).EvaporatorEnergy = 0.0;
             ConstCOPChiller(ChillNum).CondenserEnergy = 0.0;
@@ -7736,7 +7736,7 @@ namespace PlantChillers {
 
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             ConstCOPChiller(ChillNum).PossibleSubcooling = false;
-            ConstCOPChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
+            ConstCOPChiller(ChillNum).QEvaporator = std::abs(MyLoad);
             ConstCOPChiller(ChillNum).Power = std::abs(MyLoad) / COP;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
@@ -7754,7 +7754,7 @@ namespace PlantChillers {
                                      ConstCOPChiller(ChillNum).CWCompNum);
                 // Evaluate delta temp based on actual flow rate
                 if (ConstCOPChiller(ChillNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = ConstCOPChiller(ChillNum).modQEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
+                    EvapDeltaTemp = ConstCOPChiller(ChillNum).QEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
@@ -7774,7 +7774,7 @@ namespace PlantChillers {
                 }
 
                 if (EvapDeltaTemp > DeltaTempTol) {
-                    ConstCOPChiller(ChillNum).EvapMassFlowRate = std::abs(ConstCOPChiller(ChillNum).modQEvaporator / Cp / EvapDeltaTemp);
+                    ConstCOPChiller(ChillNum).EvapMassFlowRate = std::abs(ConstCOPChiller(ChillNum).QEvaporator / Cp / EvapDeltaTemp);
                     if ((ConstCOPChiller(ChillNum).EvapMassFlowRate - ConstCOPChiller(ChillNum).EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance)
                         ConstCOPChiller(ChillNum).PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
@@ -7824,7 +7824,7 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         ConstCOPChiller(ChillNum).modEvapOutletTemp,
                                         ConstCOPChiller(ChillNum).EvapMassFlowRate,
-                                        ConstCOPChiller(ChillNum).modQEvaporator);
+                                        ConstCOPChiller(ChillNum).QEvaporator);
                 // update corresponding variables at faulty case
                 // PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
                 // PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
@@ -7857,19 +7857,19 @@ namespace PlantChillers {
 
             // Recalculate the Delts Temp
             if (ConstCOPChiller(ChillNum).PossibleSubcooling) {
-                ConstCOPChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = ConstCOPChiller(ChillNum).modQEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
+                ConstCOPChiller(ChillNum).QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = ConstCOPChiller(ChillNum).QEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
                 ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 if (ConstCOPChiller(ChillNum).modEvapOutletTemp < Node(EvapOutletNode).TempMin) {
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ConstCOPChiller(ChillNum).modEvapOutletTemp;
-                    ConstCOPChiller(ChillNum).modQEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ConstCOPChiller(ChillNum).QEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             } else {
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
                 // Calculate the evaporator heat transfer at the specified flow which could have changed
                 //  in the Flow Resolution step.
-                ConstCOPChiller(ChillNum).modQEvaporator = std::abs(ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+                ConstCOPChiller(ChillNum).QEvaporator = std::abs(ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
                 ConstCOPChiller(ChillNum).modEvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
@@ -7877,21 +7877,21 @@ namespace PlantChillers {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapOutletNode).TempMin;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ConstCOPChiller(ChillNum).modEvapOutletTemp;
-                    ConstCOPChiller(ChillNum).modQEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ConstCOPChiller(ChillNum).QEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                     EvapDeltaTemp = Node(EvapInletNode).Temp - ConstCOPChiller(ChillNum).modEvapOutletTemp;
-                    ConstCOPChiller(ChillNum).modQEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    ConstCOPChiller(ChillNum).QEvaporator = ConstCOPChiller(ChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             // If load exceeds the distributed load set to the distributed load
-            if (ConstCOPChiller(ChillNum).modQEvaporator > std::abs(MyLoad)) {
+            if (ConstCOPChiller(ChillNum).QEvaporator > std::abs(MyLoad)) {
                 if (ConstCOPChiller(ChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    ConstCOPChiller(ChillNum).modQEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = ConstCOPChiller(ChillNum).modQEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
+                    ConstCOPChiller(ChillNum).QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = ConstCOPChiller(ChillNum).QEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
+                    ConstCOPChiller(ChillNum).QEvaporator = 0.0;
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
@@ -7909,31 +7909,31 @@ namespace PlantChillers {
                                         Node(EvapInletNode).Temp,
                                         ConstCOPChiller(ChillNum).modEvapOutletTemp,
                                         ConstCOPChiller(ChillNum).EvapMassFlowRate,
-                                        ConstCOPChiller(ChillNum).modQEvaporator);
+                                        ConstCOPChiller(ChillNum).QEvaporator);
                 // update corresponding variables at faulty case
                 EvapDeltaTemp = Node(EvapInletNode).Temp - ConstCOPChiller(ChillNum).modEvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (ConstCOPChiller(ChillNum).modQEvaporator > ChillerNomCap) {
+            if (ConstCOPChiller(ChillNum).QEvaporator > ChillerNomCap) {
                 if (ConstCOPChiller(ChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    ConstCOPChiller(ChillNum).modQEvaporator = ChillerNomCap;
-                    EvapDeltaTemp = ConstCOPChiller(ChillNum).modQEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
+                    ConstCOPChiller(ChillNum).QEvaporator = ChillerNomCap;
+                    EvapDeltaTemp = ConstCOPChiller(ChillNum).QEvaporator / ConstCOPChiller(ChillNum).EvapMassFlowRate / Cp;
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
+                    ConstCOPChiller(ChillNum).QEvaporator = 0.0;
                     ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
             // Calculate the Power consumption of the Const COP chiller which is a simplified calculation
-            ConstCOPChiller(ChillNum).Power = ConstCOPChiller(ChillNum).modQEvaporator / COP;
+            ConstCOPChiller(ChillNum).Power = ConstCOPChiller(ChillNum).QEvaporator / COP;
             if (ConstCOPChiller(ChillNum).EvapMassFlowRate == 0.0) {
-                ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
+                ConstCOPChiller(ChillNum).QEvaporator = 0.0;
                 ConstCOPChiller(ChillNum).modEvapOutletTemp = Node(EvapInletNode).Temp;
                 ConstCOPChiller(ChillNum).Power = 0.0;
                 ConstCOPChiller(ChillNum).PrintMessage = false;
             }
-            if (ConstCOPChiller(ChillNum).modQEvaporator == 0.0 && ConstCOPChiller(ChillNum).CondenserType == EvapCooled) {
+            if (ConstCOPChiller(ChillNum).QEvaporator == 0.0 && ConstCOPChiller(ChillNum).CondenserType == EvapCooled) {
                 CalcBasinHeaterPower(ConstCOPChiller(ChillNum).BasinHeaterPowerFTempDiff,
                                      ConstCOPChiller(ChillNum).BasinHeaterSchedulePtr,
                                      ConstCOPChiller(ChillNum).BasinHeaterSetPointTemp,
@@ -7944,7 +7944,7 @@ namespace PlantChillers {
 
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        ConstCOPChiller(ChillNum).modQCondenser = ConstCOPChiller(ChillNum).Power + ConstCOPChiller(ChillNum).modQEvaporator;
+        ConstCOPChiller(ChillNum).QCondenser = ConstCOPChiller(ChillNum).Power + ConstCOPChiller(ChillNum).QEvaporator;
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
         Real64 const CondInletTemp = Node(CondInletNode).Temp;
@@ -7955,7 +7955,7 @@ namespace PlantChillers {
                                            DataPlant::PlantLoop(ConstCOPChiller(ChillNum).CDLoopNum).FluidIndex,
                                            RoutineName);
             if (ConstCOPChiller(ChillNum).modCondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                ConstCOPChiller(ChillNum).modCondOutletTemp = ConstCOPChiller(ChillNum).modQCondenser / ConstCOPChiller(ChillNum).modCondMassFlowRate / CpCond + CondInletTemp;
+                ConstCOPChiller(ChillNum).modCondOutletTemp = ConstCOPChiller(ChillNum).QCondenser / ConstCOPChiller(ChillNum).modCondMassFlowRate / CpCond + CondInletTemp;
             } else {
                 ShowSevereError("CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller=" + ConstCOPChiller(ChillNum).Name);
                 ShowContinueErrorTimeStamp("");
@@ -7967,9 +7967,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        ConstCOPChiller(ChillNum).CondenserEnergy = ConstCOPChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).CondenserEnergy = ConstCOPChiller(ChillNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         ConstCOPChiller(ChillNum).Energy = ConstCOPChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ConstCOPChiller(ChillNum).EvaporatorEnergy = ConstCOPChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).EvaporatorEnergy = ConstCOPChiller(ChillNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (ConstCOPChiller(ChillNum).Energy < 0.0) { // there is a serious problem
@@ -8212,8 +8212,8 @@ namespace PlantChillers {
             }
 
             ElectricChiller(Num).Power = 0.0;
-            ElectricChiller(Num).QEvap = 0.0;
-            ElectricChiller(Num).QCond = 0.0;
+            ElectricChiller(Num).QEvaporator = 0.0;
+            ElectricChiller(Num).QCondenser = 0.0;
             ElectricChiller(Num).Energy = 0.0;
             ElectricChiller(Num).EvaporatorEnergy = 0.0;
             ElectricChiller(Num).CondenserEnergy = 0.0;
@@ -8251,8 +8251,6 @@ namespace PlantChillers {
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
-            ElectricChiller(Num).QEvap = ElectricChiller(Num).modQEvaporator;
-            ElectricChiller(Num).QCond = ElectricChiller(Num).modQCondenser;
             ElectricChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ElectricChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ElectricChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8263,7 +8261,7 @@ namespace PlantChillers {
                 ElectricChiller(Num).BasinHeaterConsumption = ElectricChiller(Num).modBasinHeaterPower * ReportingConstant;
             }
             if (ElectricChiller(Num).Power != 0.0) {
-                ElectricChiller(Num).ActualCOP = ElectricChiller(Num).modQEvaporator / ElectricChiller(Num).Power;
+                ElectricChiller(Num).ActualCOP = ElectricChiller(Num).QEvaporator / ElectricChiller(Num).Power;
             } else {
                 ElectricChiller(Num).ActualCOP = 0.0;
             }
@@ -8316,8 +8314,8 @@ namespace PlantChillers {
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
             EngineDrivenChiller(Num).Power = 0.0;
-            EngineDrivenChiller(Num).QEvap = 0.0;
-            EngineDrivenChiller(Num).QCond = 0.0;
+            EngineDrivenChiller(Num).QEvaporator = 0.0;
+            EngineDrivenChiller(Num).QCondenser = 0.0;
             EngineDrivenChiller(Num).Energy = 0.0;
             EngineDrivenChiller(Num).EvaporatorEnergy = 0.0;
             EngineDrivenChiller(Num).CondenserEnergy = 0.0;
@@ -8336,15 +8334,13 @@ namespace PlantChillers {
             Node(EvapOutletNode).Temp = EngineDrivenChiller(Num).modEvapOutletTemp;
             Node(CondOutletNode).Temp = EngineDrivenChiller(Num).modCondOutletTemp;
 
-            EngineDrivenChiller(Num).QEvap = EngineDrivenChiller(Num).modQEvaporator;
-            EngineDrivenChiller(Num).QCond = EngineDrivenChiller(Num).modQCondenser;
             EngineDrivenChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             EngineDrivenChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             EngineDrivenChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
             EngineDrivenChiller(Num).EvapOutletTemp = Node(EvapOutletNode).Temp;
             EngineDrivenChiller(Num).Condmdot = EngineDrivenChiller(Num).modCondMassFlowRate;
             if (EngineDrivenChiller(Num).modFuelEnergyUseRate != 0.0) {
-                EngineDrivenChiller(Num).FuelCOP = EngineDrivenChiller(Num).modQEvaporator / EngineDrivenChiller(Num).modFuelEnergyUseRate;
+                EngineDrivenChiller(Num).FuelCOP = EngineDrivenChiller(Num).QEvaporator / EngineDrivenChiller(Num).modFuelEnergyUseRate;
             } else {
                 EngineDrivenChiller(Num).FuelCOP = 0.0;
             }
@@ -8420,8 +8416,8 @@ namespace PlantChillers {
             }
 
             GTChiller(Num).Power = 0.0;
-            GTChiller(Num).QEvap = 0.0;
-            GTChiller(Num).QCond = 0.0;
+            GTChiller(Num).QEvaporator = 0.0;
+            GTChiller(Num).QCondenser = 0.0;
             GTChiller(Num).Energy = 0.0;
             GTChiller(Num).EvaporatorEnergy = 0.0;
             GTChiller(Num).CondenserEnergy = 0.0;
@@ -8455,8 +8451,6 @@ namespace PlantChillers {
                 Node(HeatRecOutletNode).Temp = GTChiller(Num).HeatRecOutletTemp;
             }
 
-            GTChiller(Num).QEvap = GTChiller(Num).modQEvaporator;
-            GTChiller(Num).QCond = GTChiller(Num).modQCondenser;
             GTChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             GTChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             GTChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8474,7 +8468,7 @@ namespace PlantChillers {
             GTChiller(Num).HeatRecOutletTemp = GTChiller(Num).HeatRecOutletTemp;
             GTChiller(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
             if (GTChiller(Num).FuelEnergyUsedRate != 0.0) {
-                GTChiller(Num).FuelCOP = GTChiller(Num).QEvap / GTChiller(Num).FuelEnergyUsedRate;
+                GTChiller(Num).FuelCOP = GTChiller(Num).QEvaporator / GTChiller(Num).FuelEnergyUsedRate;
             } else {
                 GTChiller(Num).FuelCOP = 0.0;
             }
@@ -8509,8 +8503,8 @@ namespace PlantChillers {
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             ConstCOPChiller(Num).Power = 0.0;
-            ConstCOPChiller(Num).QEvap = 0.0;
-            ConstCOPChiller(Num).QCond = 0.0;
+            ConstCOPChiller(Num).QEvaporator = 0.0;
+            ConstCOPChiller(Num).QCondenser = 0.0;
             ConstCOPChiller(Num).Energy = 0.0;
             ConstCOPChiller(Num).EvaporatorEnergy = 0.0;
             ConstCOPChiller(Num).CondenserEnergy = 0.0;
@@ -8530,15 +8524,13 @@ namespace PlantChillers {
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
         } else {
-            ConstCOPChiller(Num).QEvap = ConstCOPChiller(Num).modQEvaporator;
-            ConstCOPChiller(Num).QCond = ConstCOPChiller(Num).modQCondenser;
             ConstCOPChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ConstCOPChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ConstCOPChiller(Num).CondOutletTemp = ConstCOPChiller(Num).modCondOutletTemp;
             ConstCOPChiller(Num).EvapOutletTemp = ConstCOPChiller(Num).modEvapOutletTemp;
             ConstCOPChiller(Num).Condmdot = ConstCOPChiller(Num).modCondMassFlowRate;
             if (ConstCOPChiller(Num).Power != 0.0) {
-                ConstCOPChiller(Num).ActualCOP = ConstCOPChiller(Num).modQEvaporator / ConstCOPChiller(Num).Power;
+                ConstCOPChiller(Num).ActualCOP = ConstCOPChiller(Num).QEvaporator / ConstCOPChiller(Num).Power;
             } else {
                 ConstCOPChiller(Num).ActualCOP = 0.0;
             }
