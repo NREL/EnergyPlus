@@ -2091,9 +2091,6 @@ namespace CurveManager {
                     }
                 }
 
-                // Perform Divisor Normalization for methods: NM_DIVISOR_ONLY || NM_AUTO_WITH_DIVISOR
-                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;
-
                 if ((normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMaxPresent) || (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMaxPresent)){
                     PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
                 }

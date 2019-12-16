@@ -166,14 +166,14 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     GetOAControllerInputs();
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
-    // Setup performnace tables
+    // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
     ProcessScheduleInput(); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-    // All to get OA requiremetns
+    // All to get OA requirements
     GetOARequirements();
 
     EXPECT_FALSE(ErrorsFound);
