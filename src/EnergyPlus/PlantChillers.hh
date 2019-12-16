@@ -142,9 +142,9 @@ namespace PlantChillers {
         Real64 modEvapOutletTemp;      // C - evaporator outlet temperature, water side
         Real64 modQEvaporator;         // W - rate of heat transfer to the evaporator coil
         Real64 modQCondenser;          // W - rate of heat transfer to the condenser coil
-        Real64 modEnergy;              // J - chiller energy use
-        Real64 modEvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
-        Real64 modCondenserEnergy;     // J - rate of heat transfer to the condenser coil
+        Real64 Energy;              // J - chiller energy use
+        Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
+        Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
         Real64 modQHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
         Real64 modHeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
         Real64 modAvgCondSinkTemp;     // condenser temperature value for use in curves [C]
@@ -154,9 +154,6 @@ namespace PlantChillers {
         Real64 Power;
         Real64 QEvap;
         Real64 QCond;
-        Real64 Energy;
-        Real64 EvapEnergy;
-        Real64 CondEnergy;
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
         Real64 CondOutletTemp;
@@ -179,14 +176,14 @@ namespace PlantChillers {
         modEvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
          modQEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
          modQCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
-         modEnergy(0.0)       ,      // J - chiller energy use
-         modEvaporatorEnergy(0.0) ,   // J - rate of heat transfer to the evaporator coil
-         modCondenserEnergy(0.0) ,    // J - rate of heat transfer to the condenser coil
+         Energy(0.0)       ,      // J - chiller energy use
+              EvaporatorEnergy(0.0) ,   // J - rate of heat transfer to the evaporator coil
+              CondenserEnergy(0.0) ,    // J - rate of heat transfer to the condenser coil
          modQHeatRecovered(0.0)  ,    // W - rate of heat transfer to the Heat Recovery coil
          modHeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
          modAvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
          modBasinHeaterPower(0.0),    // Basin heater power (W)
-              Power(0.0), QEvap(0.0), QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
+              Power(0.0), QEvap(0.0), QCond(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
               CondOutletTemp(0.0), EvapOutletTemp(0.0), Condmdot(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
 
         {

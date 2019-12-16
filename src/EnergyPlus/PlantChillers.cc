@@ -944,7 +944,7 @@ namespace PlantChillers {
                                 ElectricChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricChiller(ChillerNum).EvapEnergy,
+                                ElectricChiller(ChillerNum).EvaporatorEnergy,
                                 "System",
                                 "Sum",
                                 ElectricChiller(ChillerNum).Name,
@@ -980,7 +980,7 @@ namespace PlantChillers {
                                 ElectricChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricChiller(ChillerNum).CondEnergy,
+                                ElectricChiller(ChillerNum).CondenserEnergy,
                                 "System",
                                 "Sum",
                                 ElectricChiller(ChillerNum).Name,
@@ -1549,7 +1549,7 @@ namespace PlantChillers {
                                 EngineDrivenChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChiller(ChillerNum).EvapEnergy,
+                                EngineDrivenChiller(ChillerNum).EvaporatorEnergy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Name,
@@ -1584,7 +1584,7 @@ namespace PlantChillers {
                                 EngineDrivenChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                EngineDrivenChiller(ChillerNum).CondEnergy,
+                                EngineDrivenChiller(ChillerNum).CondenserEnergy,
                                 "System",
                                 "Sum",
                                 EngineDrivenChiller(ChillerNum).Name,
@@ -2205,7 +2205,7 @@ namespace PlantChillers {
                                 GTChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                GTChiller(ChillerNum).EvapEnergy,
+                                GTChiller(ChillerNum).EvaporatorEnergy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Name,
@@ -2241,7 +2241,7 @@ namespace PlantChillers {
                                 GTChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                GTChiller(ChillerNum).CondEnergy,
+                                GTChiller(ChillerNum).CondenserEnergy,
                                 "System",
                                 "Sum",
                                 GTChiller(ChillerNum).Name,
@@ -2674,7 +2674,7 @@ namespace PlantChillers {
                                 ConstCOPChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ConstCOPChiller(ChillerNum).EvapEnergy,
+                                ConstCOPChiller(ChillerNum).EvaporatorEnergy,
                                 "System",
                                 "Sum",
                                 ConstCOPChiller(ChillerNum).Name,
@@ -2716,7 +2716,7 @@ namespace PlantChillers {
                                 ConstCOPChiller(ChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ConstCOPChiller(ChillerNum).CondEnergy,
+                                ConstCOPChiller(ChillerNum).CondenserEnergy,
                                 "System",
                                 "Sum",
                                 ConstCOPChiller(ChillerNum).Name,
@@ -5346,11 +5346,11 @@ namespace PlantChillers {
         ElectricChiller(ChillNum).EvapMassFlowRate = 0.0;
         ElectricChiller(ChillNum).modCondMassFlowRate = 0.0;
         ElectricChiller(ChillNum).Power = 0.0;
-        ElectricChiller(ChillNum).modEnergy = 0.0;
+        ElectricChiller(ChillNum).Energy = 0.0;
         ElectricChiller(ChillNum).modQCondenser = 0.0;
         ElectricChiller(ChillNum).modQEvaporator = 0.0;
-        ElectricChiller(ChillNum).modCondenserEnergy = 0.0;
-        ElectricChiller(ChillNum).modEvaporatorEnergy = 0.0;
+        ElectricChiller(ChillNum).CondenserEnergy = 0.0;
+        ElectricChiller(ChillNum).EvaporatorEnergy = 0.0;
         ElectricChiller(ChillNum).modQHeatRecovered = 0.0;
         EvapInletNode = ElectricChiller(ChillNum).EvapInletNodeNum;
         EvapOutletNode = ElectricChiller(ChillNum).EvapOutletNodeNum;
@@ -5902,12 +5902,12 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        ElectricChiller(ChillNum).modCondenserEnergy = ElectricChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ElectricChiller(ChillNum).modEnergy = ElectricChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ElectricChiller(ChillNum).modEvaporatorEnergy = ElectricChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).CondenserEnergy = ElectricChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).Energy = ElectricChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ElectricChiller(ChillNum).EvaporatorEnergy = ElectricChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (ElectricChiller(ChillNum).modEnergy < 0.0) { // there is a serious problem
+        if (ElectricChiller(ChillNum).Energy < 0.0) { // there is a serious problem
 
             if (ElectricChiller(ChillNum).CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
@@ -5935,7 +5935,7 @@ namespace PlantChillers {
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
             ElectricChiller(ChillNum).Power = 0.0;
-            ElectricChiller(ChillNum).modEnergy = 0.0;
+            ElectricChiller(ChillNum).Energy = 0.0;
         }
     }
 
@@ -6028,9 +6028,9 @@ namespace PlantChillers {
         EngineDrivenChiller(ChillerNum).Power = 0.0;
         EngineDrivenChiller(ChillerNum).modQCondenser = 0.0;
         EngineDrivenChiller(ChillerNum).modQEvaporator = 0.0;
-        EngineDrivenChiller(ChillerNum).modEnergy = 0.0;
-        EngineDrivenChiller(ChillerNum).modCondenserEnergy = 0.0;
-        EngineDrivenChiller(ChillerNum).modEvaporatorEnergy = 0.0;
+        EngineDrivenChiller(ChillerNum).Energy = 0.0;
+        EngineDrivenChiller(ChillerNum).CondenserEnergy = 0.0;
+        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = 0.0;
         HeatRecCp = 0.0;
         EngineDrivenChiller(ChillerNum).modHeatRecMdotActual = 0.0;
         EngineDrivenChiller(ChillerNum).modQTotalHeatRecovered = 0.0;
@@ -6618,9 +6618,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        EngineDrivenChiller(ChillerNum).modCondenserEnergy = EngineDrivenChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).modEnergy = EngineDrivenChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).modEvaporatorEnergy = EngineDrivenChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).CondenserEnergy = EngineDrivenChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).Energy = EngineDrivenChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = EngineDrivenChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate = EngineDrivenFuelEnergy;
         EngineDrivenChiller(ChillerNum).modFuelEnergy = EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         EngineDrivenChiller(ChillerNum).modJacketEnergyRec = EngineDrivenChiller(ChillerNum).modQJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -6633,7 +6633,7 @@ namespace PlantChillers {
         EngineDrivenChiller(ChillerNum).modFuelMdot = std::abs(EngineDrivenChiller(ChillerNum).modFuelEnergyUseRate) / (EngineDrivenChiller(ChillerNum).FuelHeatingValue * KJtoJ);
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (EngineDrivenChiller(ChillerNum).modEnergy < 0.0) { // there is a serious problem
+        if (EngineDrivenChiller(ChillerNum).Energy < 0.0) { // there is a serious problem
             if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (_CondInletTemp > 70.0) {
@@ -6661,7 +6661,7 @@ namespace PlantChillers {
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
             EngineDrivenChiller(ChillerNum).Power = 0.0;
-            EngineDrivenChiller(ChillerNum).modEnergy = 0.0;
+            EngineDrivenChiller(ChillerNum).Energy = 0.0;
         }
     }
 
@@ -6763,9 +6763,9 @@ namespace PlantChillers {
         GTChiller(ChillerNum).Power = 0.0;
         GTChiller(ChillerNum).modQCondenser = 0.0;
         GTChiller(ChillerNum).modQEvaporator = 0.0;
-        GTChiller(ChillerNum).modEnergy = 0.0;
-        GTChiller(ChillerNum).modCondenserEnergy = 0.0;
-        GTChiller(ChillerNum).modEvaporatorEnergy = 0.0;
+        GTChiller(ChillerNum).Energy = 0.0;
+        GTChiller(ChillerNum).CondenserEnergy = 0.0;
+        GTChiller(ChillerNum).EvaporatorEnergy = 0.0;
         EvapInletNode = GTChiller(ChillerNum).EvapInletNodeNum;
         EvapOutletNode = GTChiller(ChillerNum).EvapOutletNodeNum;
         CondInletNode = GTChiller(ChillerNum).CondInletNodeNum;
@@ -7440,12 +7440,12 @@ namespace PlantChillers {
         GTChiller(ChillerNum).ExhaustStackTemp = _ExhaustStackTemp;
 
         // Calculate Energy
-        GTChiller(ChillerNum).modCondenserEnergy = GTChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).modEnergy = GTChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).modEvaporatorEnergy = GTChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).CondenserEnergy = GTChiller(ChillerNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).Energy = GTChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GTChiller(ChillerNum).EvaporatorEnergy = GTChiller(ChillerNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (GTChiller(ChillerNum).modEnergy < 0.0) { // there is a serious problem
+        if (GTChiller(ChillerNum).Energy < 0.0) { // there is a serious problem
 
             if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
@@ -7473,7 +7473,7 @@ namespace PlantChillers {
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
             GTChiller(ChillerNum).Power = 0.0;
-            GTChiller(ChillerNum).modEnergy = 0.0;
+            GTChiller(ChillerNum).Energy = 0.0;
         }
     }
 
@@ -7623,9 +7623,9 @@ namespace PlantChillers {
             ConstCOPChiller(ChillNum).Power = 0.0;
             ConstCOPChiller(ChillNum).modQEvaporator = 0.0;
             ConstCOPChiller(ChillNum).modQCondenser = 0.0;
-            ConstCOPChiller(ChillNum).modEnergy = 0.0;
-            ConstCOPChiller(ChillNum).modEvaporatorEnergy = 0.0;
-            ConstCOPChiller(ChillNum).modCondenserEnergy = 0.0;
+            ConstCOPChiller(ChillNum).Energy = 0.0;
+            ConstCOPChiller(ChillNum).EvaporatorEnergy = 0.0;
+            ConstCOPChiller(ChillNum).CondenserEnergy = 0.0;
 
             if (ConstCOPChiller(ChillNum).CondenserType == EvapCooled) {
                 CalcBasinHeaterPower(ConstCOPChiller(ChillNum).BasinHeaterPowerFTempDiff,
@@ -7967,12 +7967,12 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        ConstCOPChiller(ChillNum).modCondenserEnergy = ConstCOPChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ConstCOPChiller(ChillNum).modEnergy = ConstCOPChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ConstCOPChiller(ChillNum).modEvaporatorEnergy = ConstCOPChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).CondenserEnergy = ConstCOPChiller(ChillNum).modQCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).Energy = ConstCOPChiller(ChillNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        ConstCOPChiller(ChillNum).EvaporatorEnergy = ConstCOPChiller(ChillNum).modQEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (ConstCOPChiller(ChillNum).modEnergy < 0.0) { // there is a serious problem
+        if (ConstCOPChiller(ChillNum).Energy < 0.0) { // there is a serious problem
 
             if (ConstCOPChiller(ChillNum).CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
@@ -7990,7 +7990,7 @@ namespace PlantChillers {
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
             ConstCOPChiller(ChillNum).Power = 0.0;
-            ConstCOPChiller(ChillNum).modEnergy = 0.0;
+            ConstCOPChiller(ChillNum).Energy = 0.0;
         }
     }
 
@@ -8215,8 +8215,8 @@ namespace PlantChillers {
             ElectricChiller(Num).QEvap = 0.0;
             ElectricChiller(Num).QCond = 0.0;
             ElectricChiller(Num).Energy = 0.0;
-            ElectricChiller(Num).EvapEnergy = 0.0;
-            ElectricChiller(Num).CondEnergy = 0.0;
+            ElectricChiller(Num).EvaporatorEnergy = 0.0;
+            ElectricChiller(Num).CondenserEnergy = 0.0;
             ElectricChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ElectricChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ElectricChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8253,9 +8253,6 @@ namespace PlantChillers {
             // assume that the sufficient evaporator flow rate available
             ElectricChiller(Num).QEvap = ElectricChiller(Num).modQEvaporator;
             ElectricChiller(Num).QCond = ElectricChiller(Num).modQCondenser;
-            ElectricChiller(Num).Energy = ElectricChiller(Num).modEnergy;
-            ElectricChiller(Num).EvapEnergy = ElectricChiller(Num).modEvaporatorEnergy;
-            ElectricChiller(Num).CondEnergy = ElectricChiller(Num).modCondenserEnergy;
             ElectricChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ElectricChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ElectricChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8322,8 +8319,8 @@ namespace PlantChillers {
             EngineDrivenChiller(Num).QEvap = 0.0;
             EngineDrivenChiller(Num).QCond = 0.0;
             EngineDrivenChiller(Num).Energy = 0.0;
-            EngineDrivenChiller(Num).EvapEnergy = 0.0;
-            EngineDrivenChiller(Num).CondEnergy = 0.0;
+            EngineDrivenChiller(Num).EvaporatorEnergy = 0.0;
+            EngineDrivenChiller(Num).CondenserEnergy = 0.0;
             EngineDrivenChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             EngineDrivenChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             EngineDrivenChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8341,9 +8338,6 @@ namespace PlantChillers {
 
             EngineDrivenChiller(Num).QEvap = EngineDrivenChiller(Num).modQEvaporator;
             EngineDrivenChiller(Num).QCond = EngineDrivenChiller(Num).modQCondenser;
-            EngineDrivenChiller(Num).Energy = EngineDrivenChiller(Num).modEnergy;
-            EngineDrivenChiller(Num).EvapEnergy = EngineDrivenChiller(Num).modEvaporatorEnergy;
-            EngineDrivenChiller(Num).CondEnergy = EngineDrivenChiller(Num).modCondenserEnergy;
             EngineDrivenChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             EngineDrivenChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             EngineDrivenChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8429,8 +8423,8 @@ namespace PlantChillers {
             GTChiller(Num).QEvap = 0.0;
             GTChiller(Num).QCond = 0.0;
             GTChiller(Num).Energy = 0.0;
-            GTChiller(Num).EvapEnergy = 0.0;
-            GTChiller(Num).CondEnergy = 0.0;
+            GTChiller(Num).EvaporatorEnergy = 0.0;
+            GTChiller(Num).CondenserEnergy = 0.0;
             GTChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             GTChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             GTChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8463,9 +8457,6 @@ namespace PlantChillers {
 
             GTChiller(Num).QEvap = GTChiller(Num).modQEvaporator;
             GTChiller(Num).QCond = GTChiller(Num).modQCondenser;
-            GTChiller(Num).Energy = GTChiller(Num).modEnergy;
-            GTChiller(Num).EvapEnergy = GTChiller(Num).modEvaporatorEnergy;
-            GTChiller(Num).CondEnergy = GTChiller(Num).modCondenserEnergy;
             GTChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             GTChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             GTChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
@@ -8521,8 +8512,8 @@ namespace PlantChillers {
             ConstCOPChiller(Num).QEvap = 0.0;
             ConstCOPChiller(Num).QCond = 0.0;
             ConstCOPChiller(Num).Energy = 0.0;
-            ConstCOPChiller(Num).EvapEnergy = 0.0;
-            ConstCOPChiller(Num).CondEnergy = 0.0;
+            ConstCOPChiller(Num).EvaporatorEnergy = 0.0;
+            ConstCOPChiller(Num).CondenserEnergy = 0.0;
             ConstCOPChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ConstCOPChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ConstCOPChiller(Num).CondOutletTemp = Node(CondInletNode).Temp;
@@ -8541,9 +8532,6 @@ namespace PlantChillers {
         } else {
             ConstCOPChiller(Num).QEvap = ConstCOPChiller(Num).modQEvaporator;
             ConstCOPChiller(Num).QCond = ConstCOPChiller(Num).modQCondenser;
-            ConstCOPChiller(Num).Energy = ConstCOPChiller(Num).modEnergy;
-            ConstCOPChiller(Num).EvapEnergy = ConstCOPChiller(Num).modEvaporatorEnergy;
-            ConstCOPChiller(Num).CondEnergy = ConstCOPChiller(Num).modCondenserEnergy;
             ConstCOPChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
             ConstCOPChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
             ConstCOPChiller(Num).CondOutletTemp = ConstCOPChiller(Num).modCondOutletTemp;
