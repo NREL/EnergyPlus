@@ -145,10 +145,10 @@ namespace PlantChillers {
         Real64 Energy;              // J - chiller energy use
         Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
         Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
-        Real64 modQHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
-        Real64 modHeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
-        Real64 modAvgCondSinkTemp;     // condenser temperature value for use in curves [C]
-        Real64 modBasinHeaterPower;    // Basin heater power (W)
+        Real64 QHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
+        Real64 HeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
+        Real64 AvgCondSinkTemp;     // condenser temperature value for use in curves [C]
+        Real64 BasinHeaterPower;    // Basin heater power (W)
 
         // Members
         Real64 Power;
@@ -157,7 +157,6 @@ namespace PlantChillers {
         Real64 CondOutletTemp;
         Real64 EvapOutletTemp;
         Real64 Condmdot;
-        Real64 BasinHeaterPower;       // Basin heater power (W)
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
 
         // Default Constructor
@@ -177,12 +176,12 @@ namespace PlantChillers {
          Energy(0.0)       ,      // J - chiller energy use
               EvaporatorEnergy(0.0) ,   // J - rate of heat transfer to the evaporator coil
               CondenserEnergy(0.0) ,    // J - rate of heat transfer to the condenser coil
-         modQHeatRecovered(0.0)  ,    // W - rate of heat transfer to the Heat Recovery coil
-         modHeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
-         modAvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
-         modBasinHeaterPower(0.0),    // Basin heater power (W)
+         QHeatRecovered(0.0)  ,    // W - rate of heat transfer to the Heat Recovery coil
+              HeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
+         AvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
+              BasinHeaterPower(0.0),    // Basin heater power (W)
               Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              CondOutletTemp(0.0), EvapOutletTemp(0.0), Condmdot(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
+              CondOutletTemp(0.0), EvapOutletTemp(0.0), Condmdot(0.0), BasinHeaterConsumption(0.0)
 
         {
         }
