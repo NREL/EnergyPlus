@@ -123,8 +123,7 @@ namespace HybridEvapCoolingModel {
 
     CMode::CMode()
         : ModeID(0.0), Max_Msa(0.0), Min_Msa(0.0), Min_OAF(0.0), Max_OAF(0.0), Minimum_Outdoor_Air_Temperature(0.0),
-          Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0),
-          NormalizationReference(0.0), Correction(0.0)
+          Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0), Correction(0.0)
     {
         MODE_BLOCK_OFFSET_Alpha = 9;
         BLOCK_HEADER_OFFSET_Alpha = 19;
@@ -246,7 +245,7 @@ namespace HybridEvapCoolingModel {
         switch (curveType) {
         case TEMP_CURVE:
             if (ValidPointer(Tsa_curve_pointer)) {
-                Y_val = NormalizationReference * CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
             } else {
                 Y_val = X_3; // return air temp
             }
@@ -254,7 +253,7 @@ namespace HybridEvapCoolingModel {
         case W_CURVE:
 
             if (ValidPointer(HRsa_curve_pointer)) {
-                Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
                 Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = X_4; // return HR
@@ -282,7 +281,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(ESPsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = NormalizationReference * CurveValue(ESPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(ESPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -470,42 +469,6 @@ namespace HybridEvapCoolingModel {
         ModeCounter++;
         return error;
     }
-    bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
-    {
-
-        // Note: This is abusing the table normalization value
-        Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
-        if (NormalizationReference == -1) {
-            // should never happen, because to get to this function we need a valid curve but check anyway.
-            ShowSevereError("Check specification of normalization references in UnitaryHybridUnits, all values should be identical in specified "
-                            "performance curves, in " +
-                            cCurrentModuleObject);
-            return true;
-        }
-        if (CheckNormalizationReference == 0) {
-            ShowWarningError(
-                "Check specification of normalization references in UnitaryHybridUnits, all specified values should be non zero and identicals, in " +
-                cCurrentModuleObject);
-            // warn normalization reference isn't set up right in idf
-        }
-
-        if (NormalizationReference == 0) // then not set yet
-        {
-            // set value from curve to Mode level NormalizationReference
-            NormalizationReference = CheckNormalizationReference;
-        } else // must have been set, so make sure the NormalizationReferences in this mode are all the same, or else give a warning.
-               // by definition all curves for the unit should have the same normalizaiton reference as specified in the I/O reference
-        {
-            if (NormalizationReference != CheckNormalizationReference) {
-                // error there should not be different Normalization References defined for the model
-                ShowSevereError("Check specification of normalization references in UnitaryHybridUnits, all values should be identical in specified "
-                                "performance curves, in " +
-                                cCurrentModuleObject);
-                return true;
-            }
-        }
-        return false;
-    }
 
     bool CMode::ParseMode(int ModeCounter,
                           std::vector<CMode> *OperatingModes,
@@ -574,9 +537,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(TEMP_CURVE, -1);
             } else {
                 InitializeCurve(TEMP_CURVE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
 
@@ -595,9 +555,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(W_CURVE, -1);
             } else {
                 InitializeCurve(W_CURVE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         inter_Alpha = inter_Alpha + 1;
@@ -614,10 +571,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(POWER_CURVE, -1);
             } else {
                 InitializeCurve(POWER_CURVE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) // Edwin it bums out here.
-                {
-                    ErrorsFound = true;
-                }
             }
         }
         // A22, \field Mode0 Supply Fan Electric Power Lookup Table Name
@@ -634,9 +587,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(SUPPLY_FAN_POWER, -1);
             } else {
                 InitializeCurve(SUPPLY_FAN_POWER, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         // A23, \field Mode0 External Static Pressure Lookup Table Name
@@ -653,9 +603,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(EXTERNAL_STATIC_PRESSURE, -1);
             } else {
                 InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         //
@@ -673,9 +620,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(SECOND_FUEL_USE, -1);
             } else {
                 InitializeCurve(SECOND_FUEL_USE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         // A25, \field Mode0 System Third Fuel Consumption Lookup Table Name
@@ -692,9 +636,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(THIRD_FUEL_USE, -1);
             } else {
                 InitializeCurve(THIRD_FUEL_USE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         // A26, \field Mode0 System Water Use Lookup Table Name
@@ -711,9 +652,6 @@ namespace HybridEvapCoolingModel {
                 InitializeCurve(WATER_USE, -1);
             } else {
                 InitializeCurve(WATER_USE, curveID);
-                if (CheckNormalizationReference(curveID, cCurrentModuleObject)) {
-                    ErrorsFound = true;
-                }
             }
         }
         if (ModeID == 0) {
@@ -1086,13 +1024,7 @@ namespace HybridEvapCoolingModel {
         // assess the sixe of the solution space to make sure it holds at least 1 combination
         int solution_map_sizeX = solutionspace.PointX.size();
         // Check the normalization reference is set if not set a default
-        Real64 StandbyNormalizationReference = Mode0.NormalizationReference;
-        if (StandbyNormalizationReference == -1) {
-            ModelNormalizationReference = 1;
-            // if for some reason its not set in standby give warning
-        } else {
-            ModelNormalizationReference = StandbyNormalizationReference;
-        }
+        Real64 StandbyNormalizationReference = StandbyNormalizationReference;
 
         // if the map of the solution space looks valid then populate the class member oStandBy (CSetting) with the settings data (what OSAF it runs
         // at, and how much power it uses etc.

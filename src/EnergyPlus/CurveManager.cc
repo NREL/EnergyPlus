@@ -2694,22 +2694,6 @@ namespace CurveManager {
         }
         return GetCurveName;
     }
-    double GetNormalPoint(int const CurveIndex)
-    {
-
-        std::string s = std::to_string(CurveIndex);
-        if (CurveIndex > 0 && CurveIndex <= NumCurves) {
-            if (PerfCurve(CurveIndex).InterpolationType == BtwxtMethod) {
-                return PerfCurve(CurveIndex).NormalizationValue;
-            } else {
-                ShowWarningError("GetNormalPoint: CurveIndex is not a table, CurveIndex requested  " + s);
-                return -1;
-            }
-        }
-
-        ShowWarningError("GetNormalPoint: CurveIndex not in range of curves, CurveIndex requested  " + s);
-        return -1;
-    }
 
     int GetCurveIndex(std::string const &CurveName) // name of the curve
     {

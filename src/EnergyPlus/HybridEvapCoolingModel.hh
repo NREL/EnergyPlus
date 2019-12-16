@@ -130,7 +130,6 @@ namespace HybridEvapCoolingModel {
         Real64 Maximum_Return_Air_Humidity_Ratio;
         Real64 Minimum_Return_Air_Relative_Humidity;
         Real64 Maximum_Return_Air_Relative_Humidity;
-        Real64 NormalizationReference;
         Real64 Correction;
         int MODE_BLOCK_OFFSET_Alpha;
         int BLOCK_HEADER_OFFSET_Alpha;
@@ -164,7 +163,6 @@ namespace HybridEvapCoolingModel {
         bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max);
         bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
         bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
-        bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject);
 
     private:
     };
