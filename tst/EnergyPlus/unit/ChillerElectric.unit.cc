@@ -158,11 +158,12 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    InitElectricChiller(1, RunFlag, MyLoad);
-    SizeElectricChiller(1);
+    auto &thisChiller = ElectricChiller(1);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    InitElectricChiller(1, RunFlag, MyLoad);
+    thisChiller.initialize(RunFlag, MyLoad);
     // check hardsized chiller nominal capacity
     EXPECT_DOUBLE_EQ(ElectricChiller(1).NomCap, 100000.00);
     // check hardsized chiller evap water vol flow rate
@@ -180,8 +181,8 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     ElectricChiller(1).CondVolFlowRateWasAutoSized = true;
 
     // do autosizing calc
-    InitElectricChiller(1, RunFlag, MyLoad);
-    SizeElectricChiller(1);
+    thisChiller.initialize(RunFlag, MyLoad);
+    thisChiller.size();
     // check autocalculate chiller nominal capacity
     EXPECT_DOUBLE_EQ(ElectricChiller(1).NomCap, 20987.509055700004);
     // check autocalculate chiller evap water vol flow rate
