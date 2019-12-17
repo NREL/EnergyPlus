@@ -139,7 +139,7 @@ namespace PlantChillers {
         Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
         Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
         Real64 CondOutletTemp;      // C - condenser outlet temperature, air or water side
-        Real64 modEvapOutletTemp;      // C - evaporator outlet temperature, water side
+        Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
         Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
         Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
         Real64 Energy;              // J - chiller energy use
@@ -149,12 +149,9 @@ namespace PlantChillers {
         Real64 HeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
         Real64 AvgCondSinkTemp;     // condenser temperature value for use in curves [C]
         Real64 BasinHeaterPower;    // Basin heater power (W)
-
-        // Members
         Real64 Power;
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
-        Real64 EvapOutletTemp;
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
 
         // Default Constructor
@@ -168,7 +165,7 @@ namespace PlantChillers {
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
               TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), CondOutletTemp(0.0),
-        modEvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
+        EvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
               QEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
               QCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
          Energy(0.0)       ,      // J - chiller energy use
@@ -179,7 +176,7 @@ namespace PlantChillers {
          AvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
               BasinHeaterPower(0.0),    // Basin heater power (W)
               Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              EvapOutletTemp(0.0), BasinHeaterConsumption(0.0)
+              BasinHeaterConsumption(0.0)
 
         {
         }
@@ -215,7 +212,7 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
-        Real64 modCondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
+        Real64 CondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
         Real64 ActualCOP;
         Real64 QHeatRecovery;
         Real64 EnergyHeatRecovery;
@@ -230,7 +227,9 @@ namespace PlantChillers {
               CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
-              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), modCondOutletHumRat(0.0)
+              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0),
+              ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0),
+              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0)
         {
         }
     };
