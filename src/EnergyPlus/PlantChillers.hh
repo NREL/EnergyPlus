@@ -275,34 +275,21 @@ namespace PlantChillers {
         int HRCompNum;                             // heat recovery water plant loop component index
 
         // engine driven:
-        Real64 modHeatRecInletTemp;   // Inlet Temperature of the heat recovery fluid
-        Real64 modHeatRecMdotActual;  // reporting: Heat Recovery Loop Mass flow rate
-        Real64 modQTotalHeatRecovered; // total heat recovered (W)
-        Real64 modQJacketRecovered;    // heat recovered from jacket (W)
-        Real64 modQLubeOilRecovered;   // heat recovered from lube (W)
-        Real64 modQExhaustRecovered;   // exhaust gas heat recovered (W)
-        Real64 modFuelEnergyUseRate;   // Fuel Energy used (W)
-        Real64 modTotalHeatEnergyRec;  // total heat recovered (J)
-        Real64 modJacketEnergyRec;     // heat recovered from jacket (J)
-        Real64 modLubeOilEnergyRec;    // heat recovered from lube (J)
-        Real64 modExhaustEnergyRec;    // exhaust gas heat recovered (J)
-        Real64 modFuelEnergy;          // Fuel Energy used (J)
-        Real64 modFuelMdot;            // Fuel Amount used (Kg/s)
-        Real64 modExhaustStackTemp;    // Exhaust Stack Temperature (C)
+        Real64 HeatRecInletTemp;   // Inlet Temperature of the heat recovery fluid
+        Real64 HeatRecMdotActual;  // reporting: Heat Recovery Loop Mass flow rate
+        Real64 QTotalHeatRecovered; // total heat recovered (W)
+        Real64 QJacketRecovered;    // heat recovered from jacket (W)
+        Real64 QLubeOilRecovered;   // heat recovered from lube (W)
+        Real64 QExhaustRecovered;   // exhaust gas heat recovered (W)
+        Real64 FuelEnergyUseRate;   // Fuel Energy used (W)
+        Real64 TotalHeatEnergyRec;  // total heat recovered (J)
+        Real64 JacketEnergyRec;     // heat recovered from jacket (J)
+        Real64 LubeOilEnergyRec;    // heat recovered from lube (J)
+        Real64 ExhaustEnergyRec;    // exhaust gas heat recovered (J)
+        Real64 FuelEnergy;          // Fuel Energy used (J)
+        Real64 FuelMdot;            // Fuel Amount used (Kg/s)
+        Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
 
-        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
-        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
-        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
-        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
-        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
-        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
         Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
         Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
         Real64 FuelCOP;             // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
@@ -315,26 +302,12 @@ namespace PlantChillers {
               UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0), DesignMinExitGasTemp(0.0), FuelHeatingValue(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0),
+              HeatRecInletTemp(0.0),HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0),
 
-
-            // engine driven:
-               modHeatRecInletTemp(0.0),   // Inlet Temperature of the heat recovery fluid
-         modHeatRecMdotActual(0.0),  // reporting: Heat Recovery Loop Mass flow rate
-         modQTotalHeatRecovered(0.0), // total heat recovered (W)
-         modQJacketRecovered(0.0),    // heat recovered from jacket (W)
-         modQLubeOilRecovered(0.0),   // heat recovered from lube (W)
-         modQExhaustRecovered(0.0),   // exhaust gas heat recovered (W)
-         modFuelEnergyUseRate(0.0),   // Fuel Energy used (W)
-         modTotalHeatEnergyRec(0.0),  // total heat recovered (J)
-         modJacketEnergyRec(0.0),     // heat recovered from jacket (J)
-         modLubeOilEnergyRec(0.0),    // heat recovered from lube (J)
-         modExhaustEnergyRec(0.0),    // exhaust gas heat recovered (J)
-         modFuelEnergy(0.0),          // Fuel Energy used (J)
-         modFuelMdot(0.0),            // Fuel Amount used (Kg/s)
-         modExhaustStackTemp(0.0),    // Exhaust Stack Temperature (C)
-              QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), TotalHeatEnergyRec(0.0),
-              JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0), FuelMdot(0.0),
-              ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
+                // engine driven:
+              QLubeOilRecovered(0.0), QExhaustRecovered(0.0),  FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0),
+              JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelMdot(0.0),
+              ExhaustStackTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
         {
         }
     };
