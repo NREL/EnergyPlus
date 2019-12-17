@@ -332,14 +332,16 @@ namespace PlantChillers {
                     }
                 }
 
+                auto & thisChiller(EngineDrivenChiller(ChillNum));
                 if (InitLoopEquip) {
                     TempEvapOutDesign = EngineDrivenChiller(ChillNum).TempDesEvapOut;
                     TempCondInDesign = EngineDrivenChiller(ChillNum).TempDesCondIn;
 
-                    InitEngineDrivenChiller(ChillNum, RunFlag, MyLoad);
+
+                    thisChiller.initialize(RunFlag, MyLoad);
 
                     if (LoopNum == EngineDrivenChiller(ChillNum).CWLoopNum) {
-                        SizeEngineDrivenChiller(ChillNum);
+                        thisChiller.size();
                         MinCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).MinPartLoadRat;
                         MaxCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).MaxPartLoadRat;
                         OptCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).OptPartLoadRat;
@@ -356,9 +358,9 @@ namespace PlantChillers {
 
                 // calculate model depending on where called from
                 if (LoopNum == EngineDrivenChiller(ChillNum).CWLoopNum) { // chilled water loop
-                    InitEngineDrivenChiller(ChillNum, RunFlag, MyLoad);
-                    CalcEngineDrivenChillerModel(ChillNum, MyLoad, RunFlag, EquipFlowCtrl);
-                    UpdateEngineDrivenChiller(MyLoad, RunFlag, ChillNum);
+                    thisChiller.initialize(RunFlag, MyLoad);
+                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+                    thisChiller.update(MyLoad, RunFlag);
                 } else if (LoopNum == EngineDrivenChiller(ChillNum).CDLoopNum) { // condenser loop
                     PlantUtilities::UpdateChillerComponentCondenserSide(EngineDrivenChiller(ChillNum).CDLoopNum,
                                                         EngineDrivenChiller(ChillNum).CDLoopSideNum,
@@ -418,14 +420,16 @@ namespace PlantChillers {
                     }
                 }
 
+                auto &thisChiller(GTChiller(ChillNum));
+                
                 if (InitLoopEquip) {
                     TempEvapOutDesign = GTChiller(ChillNum).TempDesEvapOut;
                     TempCondInDesign = GTChiller(ChillNum).TempDesCondIn;
 
-                    InitGTChiller(ChillNum, RunFlag, MyLoad);
+                    thisChiller.initialize(RunFlag, MyLoad);
 
                     if (LoopNum == GTChiller(ChillNum).CWLoopNum) {
-                        SizeGTChiller(ChillNum);
+                        thisChiller.size();
                         MinCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).MinPartLoadRat;
                         MaxCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).MaxPartLoadRat;
                         OptCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).OptPartLoadRat;
@@ -443,9 +447,9 @@ namespace PlantChillers {
                 // calculate model depending on where called from
                 if (LoopNum == GTChiller(ChillNum).CWLoopNum) { // chilled water loop
 
-                    InitGTChiller(ChillNum, RunFlag, MyLoad);
-                    CalcGTChillerModel(ChillNum, MyLoad, RunFlag, EquipFlowCtrl);
-                    UpdateGTChillerRecords(MyLoad, RunFlag, ChillNum);
+                    thisChiller.initialize(RunFlag, MyLoad);
+                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+                    thisChiller.update(MyLoad, RunFlag);
 
                 } else if (LoopNum == GTChiller(ChillNum).CDLoopNum) { // condenser loop
                     PlantUtilities::UpdateChillerComponentCondenserSide(GTChiller(ChillNum).CDLoopNum,
@@ -3151,7 +3155,7 @@ namespace PlantChillers {
         }
     }
 
-    void InitEngineDrivenChiller(int const ChillNum, // number of the current engine driven chiller being simulated
+    void EngineDrivenChillerSpecs::initialize(
                                  bool const RunFlag, // TRUE when chiller operating
                                  Real64 const MyLoad)
     {
@@ -3189,74 +3193,74 @@ namespace PlantChillers {
         bool FatalError;
 
         // Load inputs to local structure
-        CondInletNode = EngineDrivenChiller(ChillNum).CondInletNodeNum;
-        CondOutletNode = EngineDrivenChiller(ChillNum).CondOutletNodeNum;
-        EvapInletNode = EngineDrivenChiller(ChillNum).EvapInletNodeNum;
-        EvapOutletNode = EngineDrivenChiller(ChillNum).EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
 
         // Init more variables
-        if (EngineDrivenChiller(ChillNum).MyFlag) {
+        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Name,
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                     TypeOf_Chiller_EngineDriven,
-                                    EngineDrivenChiller(ChillNum).CWLoopNum,
-                                    EngineDrivenChiller(ChillNum).CWLoopSideNum,
-                                    EngineDrivenChiller(ChillNum).CWBranchNum,
-                                    EngineDrivenChiller(ChillNum).CWCompNum,
+                                    this->CWLoopNum,
+                                    this->CWLoopSideNum,
+                                    this->CWBranchNum,
+                                    this->CWCompNum,
                                     errFlag,
-                                    EngineDrivenChiller(ChillNum).TempLowLimitEvapOut,
+                                    this->TempLowLimitEvapOut,
                                     _,
                                     _,
-                                    EngineDrivenChiller(ChillNum).EvapInletNodeNum,
+                                    this->EvapInletNodeNum,
                                     _);
-            if (EngineDrivenChiller(ChillNum).CondenserType != AirCooled && EngineDrivenChiller(ChillNum).CondenserType != EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Name,
+            if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                         TypeOf_Chiller_EngineDriven,
-                                        EngineDrivenChiller(ChillNum).CDLoopNum,
-                                        EngineDrivenChiller(ChillNum).CDLoopSideNum,
-                                        EngineDrivenChiller(ChillNum).CDBranchNum,
-                                        EngineDrivenChiller(ChillNum).CDCompNum,
+                                        this->CDLoopNum,
+                                        this->CDLoopSideNum,
+                                        this->CDBranchNum,
+                                        this->CDCompNum,
                                         errFlag,
                                         _,
                                         _,
                                         _,
-                                        EngineDrivenChiller(ChillNum).CondInletNodeNum,
+                                        this->CondInletNodeNum,
                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).CWLoopNum,
-                                              EngineDrivenChiller(ChillNum).CWLoopSideNum,
-                                              EngineDrivenChiller(ChillNum).CDLoopNum,
-                                              EngineDrivenChiller(ChillNum).CDLoopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
+                                              this->CWLoopSideNum,
+                                              this->CDLoopNum,
+                                              this->CDLoopSideNum,
                                               TypeOf_Chiller_EngineDriven,
                                               true);
             }
-            if (EngineDrivenChiller(ChillNum).HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Name,
+            if (this->HeatRecActive) {
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                         TypeOf_Chiller_EngineDriven,
-                                        EngineDrivenChiller(ChillNum).HRLoopNum,
-                                        EngineDrivenChiller(ChillNum).HRLoopSideNum,
-                                        EngineDrivenChiller(ChillNum).HRBranchNum,
-                                        EngineDrivenChiller(ChillNum).HRCompNum,
+                                        this->HRLoopNum,
+                                        this->HRLoopSideNum,
+                                        this->HRBranchNum,
+                                        this->HRCompNum,
                                         errFlag,
                                         _,
                                         _,
                                         _,
-                                        EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
+                                        this->HeatRecInletNodeNum,
                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).CWLoopNum,
-                                              EngineDrivenChiller(ChillNum).CWLoopSideNum,
-                                              EngineDrivenChiller(ChillNum).HRLoopNum,
-                                              EngineDrivenChiller(ChillNum).HRLoopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
+                                              this->CWLoopSideNum,
+                                              this->HRLoopNum,
+                                              this->HRLoopSideNum,
                                               TypeOf_Chiller_EngineDriven,
                                               true);
             }
 
-            if (EngineDrivenChiller(ChillNum).CondenserType != AirCooled && EngineDrivenChiller(ChillNum).CondenserType != EvapCooled &&
-                EngineDrivenChiller(ChillNum).HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).CDLoopNum,
-                                              EngineDrivenChiller(ChillNum).CDLoopSideNum,
-                                              EngineDrivenChiller(ChillNum).HRLoopNum,
-                                              EngineDrivenChiller(ChillNum).HRLoopSideNum,
+            if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled &&
+                this->HeatRecActive) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CDLoopNum,
+                                              this->CDLoopSideNum,
+                                              this->HRLoopNum,
+                                              this->HRLoopSideNum,
                                               TypeOf_Chiller_EngineDriven,
                                               false);
             }
@@ -3264,106 +3268,106 @@ namespace PlantChillers {
                 ShowFatalError("InitEngineDrivenChiller: Program terminated due to previous condition(s).");
             }
 
-            if (EngineDrivenChiller(ChillNum).FlowMode == ConstantFlow) {
+            if (this->FlowMode == ConstantFlow) {
                 // reset flow priority
-                DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum)
-                    .LoopSide(EngineDrivenChiller(ChillNum).CWLoopSideNum)
-                    .Branch(EngineDrivenChiller(ChillNum).CWBranchNum)
-                    .Comp(EngineDrivenChiller(ChillNum).CWCompNum)
+                DataPlant::PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            if (EngineDrivenChiller(ChillNum).FlowMode == LeavingSetPointModulated) {
+            if (this->FlowMode == LeavingSetPointModulated) {
                 // reset flow priority
-                DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum)
-                    .LoopSide(EngineDrivenChiller(ChillNum).CWLoopSideNum)
-                    .Branch(EngineDrivenChiller(ChillNum).CWBranchNum)
-                    .Comp(EngineDrivenChiller(ChillNum).CWCompNum)
+                DataPlant::PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
                 // check if setpoint on outlet node
-                if ((Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
-                    (Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
+                if ((Node(this->EvapOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
+                    (Node(this->EvapOutletNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
-                        if (!EngineDrivenChiller(ChillNum).ModulatedFlowErrDone) {
+                        if (!this->ModulatedFlowErrDone) {
                             ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                             EngineDrivenChiller(ChillNum).Name);
+                                             this->Name);
                             ShowContinueError(
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            EngineDrivenChiller(ChillNum).ModulatedFlowErrDone = true;
+                            this->ModulatedFlowErrDone = true;
                         }
                     } else {
                         // need call to EMS to check node
                         FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(EngineDrivenChiller(ChillNum).EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         if (FatalError) {
-                            if (!EngineDrivenChiller(ChillNum).ModulatedFlowErrDone) {
+                            if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                                 EngineDrivenChiller(ChillNum).Name);
+                                                 this->Name);
                                 ShowContinueError(
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError("  or use an EMS actuator to establish a setpoint at the outlet node ");
                                 ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                EngineDrivenChiller(ChillNum).ModulatedFlowErrDone = true;
+                                this->ModulatedFlowErrDone = true;
                             }
                         }
                     }
-                    EngineDrivenChiller(ChillNum).ModulatedFlowSetToLoop = true;
-                    Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPoint =
-                        Node(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                    Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi =
-                        Node(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                    this->ModulatedFlowSetToLoop = true;
+                    Node(this->EvapOutletNodeNum).TempSetPoint =
+                        Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
 
-            EngineDrivenChiller(ChillNum).MyFlag = false;
+            this->MyFlag = false;
         }
 
         // Initialize critical Demand Side Variables
         //  IF((MyEnvrnFlag(ChillNum) .and. BeginEnvrnFlag) &
         //     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
-        if (EngineDrivenChiller(ChillNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
-                                   DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                    RoutineName);
 
-            EngineDrivenChiller(ChillNum).EvapMassFlowRateMax = rho * EngineDrivenChiller(ChillNum).EvapVolFlowRate;
+            this->EvapMassFlowRateMax = rho * this->EvapVolFlowRate;
             PlantUtilities::InitComponentNodes(0.0,
-                               EngineDrivenChiller(ChillNum).EvapMassFlowRateMax,
+                               this->EvapMassFlowRateMax,
                                EvapInletNode,
                                EvapOutletNode,
-                               EngineDrivenChiller(ChillNum).CWLoopNum,
-                               EngineDrivenChiller(ChillNum).CWLoopSideNum,
-                               EngineDrivenChiller(ChillNum).CWBranchNum,
-                               EngineDrivenChiller(ChillNum).CWCompNum);
+                               this->CWLoopNum,
+                               this->CWLoopSideNum,
+                               this->CWBranchNum,
+                               this->CWCompNum);
 
             // init maximum available condenser flow rate
 
-            if (EngineDrivenChiller(ChillNum).CondenserType == WaterCooled) {
+            if (this->CondenserType == WaterCooled) {
 
-                Node(CondInletNode).Temp = EngineDrivenChiller(ChillNum).TempDesCondIn;
+                Node(CondInletNode).Temp = this->TempDesCondIn;
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                        RoutineName);
 
-                EngineDrivenChiller(ChillNum).CondMassFlowRateMax = rho * EngineDrivenChiller(ChillNum).CondVolFlowRate;
+                this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 PlantUtilities::InitComponentNodes(0.0,
-                                   EngineDrivenChiller(ChillNum).CondMassFlowRateMax,
+                                   this->CondMassFlowRateMax,
                                    CondInletNode,
                                    CondOutletNode,
-                                   EngineDrivenChiller(ChillNum).CDLoopNum,
-                                   EngineDrivenChiller(ChillNum).CDLoopSideNum,
-                                   EngineDrivenChiller(ChillNum).CDBranchNum,
-                                   EngineDrivenChiller(ChillNum).CDCompNum);
+                                   this->CDLoopNum,
+                                   this->CDLoopSideNum,
+                                   this->CDBranchNum,
+                                   this->CDCompNum);
             } else { // air or evap-air
-                Node(CondInletNode).MassFlowRate = EngineDrivenChiller(ChillNum).CondVolFlowRate *
-                    Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, EngineDrivenChiller(ChillNum).TempDesCondIn, 0.0, RoutineName);
+                Node(CondInletNode).MassFlowRate = this->CondVolFlowRate *
+                    Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 Node(CondOutletNode).MassFlowRate = Node(CondInletNode).MassFlowRate;
                 Node(CondInletNode).MassFlowRateMaxAvail = Node(CondInletNode).MassFlowRate;
@@ -3375,43 +3379,43 @@ namespace PlantChillers {
                 Node(CondOutletNode).MassFlowRateMin = 0.0;
             }
 
-            if (EngineDrivenChiller(ChillNum).HeatRecActive) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).HRLoopNum).FluidName,
+            if (this->HeatRecActive) {
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                        DataGlobals::HWInitConvTemp,
-                                       DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).HRLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                        RoutineName);
-                EngineDrivenChiller(ChillNum).DesignHeatRecMassFlowRate = rho * EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate;
+                this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
                 PlantUtilities::InitComponentNodes(0.0,
-                                   EngineDrivenChiller(ChillNum).DesignHeatRecMassFlowRate,
-                                   EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
-                                   EngineDrivenChiller(ChillNum).HeatRecOutletNodeNum,
-                                   EngineDrivenChiller(ChillNum).HRLoopNum,
-                                   EngineDrivenChiller(ChillNum).HRLoopSideNum,
-                                   EngineDrivenChiller(ChillNum).HRBranchNum,
-                                   EngineDrivenChiller(ChillNum).HRCompNum);
+                                   this->DesignHeatRecMassFlowRate,
+                                   this->HeatRecInletNodeNum,
+                                   this->HeatRecOutletNodeNum,
+                                   this->HRLoopNum,
+                                   this->HRLoopSideNum,
+                                   this->HRBranchNum,
+                                   this->HRCompNum);
             }
 
-            EngineDrivenChiller(ChillNum).MyEnvrnFlag = false;
+            this->MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            EngineDrivenChiller(ChillNum).MyEnvrnFlag = true;
+            this->MyEnvrnFlag = true;
         }
 
-        if ((EngineDrivenChiller(ChillNum).FlowMode == LeavingSetPointModulated) &&
-            (EngineDrivenChiller(ChillNum).ModulatedFlowSetToLoop)) {
+        if ((this->FlowMode == LeavingSetPointModulated) &&
+            (this->ModulatedFlowSetToLoop)) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPoint =
-                Node(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-            Node(EngineDrivenChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi =
-                Node(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+            Node(this->EvapOutletNodeNum).TempSetPoint =
+                Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            Node(this->EvapOutletNodeNum).TempSetPointHi =
+                Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
 
         if ((std::abs(MyLoad) > 0.0) && RunFlag) {
-            mdot = EngineDrivenChiller(ChillNum).EvapMassFlowRateMax;
-            mdotCond = EngineDrivenChiller(ChillNum).CondMassFlowRateMax;
+            mdot = this->EvapMassFlowRateMax;
+            mdotCond = this->CondMassFlowRateMax;
         } else {
             mdot = 0.0;
             mdotCond = 0.0;
@@ -3420,43 +3424,43 @@ namespace PlantChillers {
         PlantUtilities::SetComponentFlowRate(mdot,
                              EvapInletNode,
                              EvapOutletNode,
-                             EngineDrivenChiller(ChillNum).CWLoopNum,
-                             EngineDrivenChiller(ChillNum).CWLoopSideNum,
-                             EngineDrivenChiller(ChillNum).CWBranchNum,
-                             EngineDrivenChiller(ChillNum).CWCompNum);
-        if (EngineDrivenChiller(ChillNum).CondenserType == WaterCooled) {
+                             this->CWLoopNum,
+                             this->CWLoopSideNum,
+                             this->CWBranchNum,
+                             this->CWCompNum);
+        if (this->CondenserType == WaterCooled) {
             PlantUtilities::SetComponentFlowRate(mdotCond,
                                  CondInletNode,
                                  CondOutletNode,
-                                 EngineDrivenChiller(ChillNum).CDLoopNum,
-                                 EngineDrivenChiller(ChillNum).CDLoopSideNum,
-                                 EngineDrivenChiller(ChillNum).CDBranchNum,
-                                 EngineDrivenChiller(ChillNum).CDCompNum);
+                                 this->CDLoopNum,
+                                 this->CDLoopSideNum,
+                                 this->CDBranchNum,
+                                 this->CDCompNum);
         }
 
         // Initialize heat recovery flow rates at node
-        if (EngineDrivenChiller(ChillNum).HeatRecActive) {
-            InletNode = EngineDrivenChiller(ChillNum).HeatRecInletNodeNum;
-            OutletNode = EngineDrivenChiller(ChillNum).HeatRecOutletNodeNum;
-            LoopNum = EngineDrivenChiller(ChillNum).HRLoopNum;
-            LoopSideNum = EngineDrivenChiller(ChillNum).HRLoopSideNum;
-            BranchIndex = EngineDrivenChiller(ChillNum).HRBranchNum;
-            CompIndex = EngineDrivenChiller(ChillNum).HRCompNum;
+        if (this->HeatRecActive) {
+            InletNode = this->HeatRecInletNodeNum;
+            OutletNode = this->HeatRecOutletNodeNum;
+            LoopNum = this->HRLoopNum;
+            LoopSideNum = this->HRLoopSideNum;
+            BranchIndex = this->HRBranchNum;
+            CompIndex = this->HRCompNum;
 
             if (RunFlag) {
-                mdot = EngineDrivenChiller(ChillNum).DesignHeatRecMassFlowRate;
+                mdot = this->DesignHeatRecMassFlowRate;
             } else {
                 mdot = 0.0;
             }
 
             PlantUtilities::SetComponentFlowRate(mdot, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex);
         }
-        if (EngineDrivenChiller(ChillNum).CondenserType == EvapCooled) {
-            EngineDrivenChiller(ChillNum).BasinHeaterPower = 0.0;
+        if (this->CondenserType == EvapCooled) {
+            this->BasinHeaterPower = 0.0;
         }
     }
 
-    void InitGTChiller(int const ChillNum, // number of the current engine driven chiller being simulated
+    void GTChillerSpecs::initialize(
                        bool const RunFlag, // TRUE when chiller operating
                        Real64 const MyLoad)
     {
@@ -3494,74 +3498,74 @@ namespace PlantChillers {
         bool errFlag;
         // FLOW:
 
-        CondInletNode = GTChiller(ChillNum).CondInletNodeNum;
-        CondOutletNode = GTChiller(ChillNum).CondOutletNodeNum;
-        EvapInletNode = GTChiller(ChillNum).EvapInletNodeNum;
-        EvapOutletNode = GTChiller(ChillNum).EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
 
         // Init more variables
-        if (GTChiller(ChillNum).MyFlag) {
+        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(GTChiller(ChillNum).Name,
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                     TypeOf_Chiller_CombTurbine,
-                                    GTChiller(ChillNum).CWLoopNum,
-                                    GTChiller(ChillNum).CWLoopSideNum,
-                                    GTChiller(ChillNum).CWBranchNum,
-                                    GTChiller(ChillNum).CWCompNum,
+                                    this->CWLoopNum,
+                                    this->CWLoopSideNum,
+                                    this->CWBranchNum,
+                                    this->CWCompNum,
                                     errFlag,
-                                    GTChiller(ChillNum).TempLowLimitEvapOut,
+                                    this->TempLowLimitEvapOut,
                                     _,
                                     _,
-                                    GTChiller(ChillNum).EvapInletNodeNum,
+                                    this->EvapInletNodeNum,
                                     _);
-            if (GTChiller(ChillNum).CondenserType != AirCooled && GTChiller(ChillNum).CondenserType != EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(GTChiller(ChillNum).Name,
+            if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled) {
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                         TypeOf_Chiller_CombTurbine,
-                                        GTChiller(ChillNum).CDLoopNum,
-                                        GTChiller(ChillNum).CDLoopSideNum,
-                                        GTChiller(ChillNum).CDBranchNum,
-                                        GTChiller(ChillNum).CDCompNum,
+                                        this->CDLoopNum,
+                                        this->CDLoopSideNum,
+                                        this->CDBranchNum,
+                                        this->CDCompNum,
                                         errFlag,
                                         _,
                                         _,
                                         _,
-                                        GTChiller(ChillNum).CondInletNodeNum,
+                                        this->CondInletNodeNum,
                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(GTChiller(ChillNum).CWLoopNum,
-                                              GTChiller(ChillNum).CWLoopSideNum,
-                                              GTChiller(ChillNum).CDLoopNum,
-                                              GTChiller(ChillNum).CDLoopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
+                                              this->CWLoopSideNum,
+                                              this->CDLoopNum,
+                                              this->CDLoopSideNum,
                                               TypeOf_Chiller_CombTurbine,
                                               true);
             }
-            if (GTChiller(ChillNum).HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(GTChiller(ChillNum).Name,
+            if (this->HeatRecActive) {
+                PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                         TypeOf_Chiller_CombTurbine,
-                                        GTChiller(ChillNum).HRLoopNum,
-                                        GTChiller(ChillNum).HRLoopSideNum,
-                                        GTChiller(ChillNum).HRBranchNum,
-                                        GTChiller(ChillNum).HRCompNum,
+                                        this->HRLoopNum,
+                                        this->HRLoopSideNum,
+                                        this->HRBranchNum,
+                                        this->HRCompNum,
                                         errFlag,
                                         _,
                                         _,
                                         _,
-                                        GTChiller(ChillNum).HeatRecInletNodeNum,
+                                        this->HeatRecInletNodeNum,
                                         _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(GTChiller(ChillNum).CWLoopNum,
-                                              GTChiller(ChillNum).CWLoopSideNum,
-                                              GTChiller(ChillNum).HRLoopNum,
-                                              GTChiller(ChillNum).HRLoopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CWLoopNum,
+                                              this->CWLoopSideNum,
+                                              this->HRLoopNum,
+                                              this->HRLoopSideNum,
                                               TypeOf_Chiller_CombTurbine,
                                               true);
             }
 
-            if (GTChiller(ChillNum).CondenserType != AirCooled && GTChiller(ChillNum).CondenserType != EvapCooled &&
-                GTChiller(ChillNum).HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(GTChiller(ChillNum).CDLoopNum,
-                                              GTChiller(ChillNum).CDLoopSideNum,
-                                              GTChiller(ChillNum).HRLoopNum,
-                                              GTChiller(ChillNum).HRLoopSideNum,
+            if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled &&
+                this->HeatRecActive) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->CDLoopNum,
+                                              this->CDLoopSideNum,
+                                              this->HRLoopNum,
+                                              this->HRLoopSideNum,
                                               TypeOf_Chiller_CombTurbine,
                                               false);
             }
@@ -3569,102 +3573,102 @@ namespace PlantChillers {
                 ShowFatalError("InitGTChiller: Program terminated due to previous condition(s).");
             }
 
-            if (GTChiller(ChillNum).FlowMode == ConstantFlow) {
+            if (this->FlowMode == ConstantFlow) {
                 // reset flow priority
-                DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum)
-                    .LoopSide(GTChiller(ChillNum).CWLoopSideNum)
-                    .Branch(GTChiller(ChillNum).CWBranchNum)
-                    .Comp(GTChiller(ChillNum).CWCompNum)
+                DataPlant::PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            if (GTChiller(ChillNum).FlowMode == LeavingSetPointModulated) {
+            if (this->FlowMode == LeavingSetPointModulated) {
                 // reset flow priority
-                DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum)
-                    .LoopSide(GTChiller(ChillNum).CWLoopSideNum)
-                    .Branch(GTChiller(ChillNum).CWBranchNum)
-                    .Comp(GTChiller(ChillNum).CWCompNum)
+                DataPlant::PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
-                if ((Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
-                    (Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
+                if ((Node(this->EvapOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
+                    (Node(this->EvapOutletNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
                     if (!DataGlobals::AnyEnergyManagementSystemInModel) {
-                        if (!GTChiller(ChillNum).ModulatedFlowErrDone) {
+                        if (!this->ModulatedFlowErrDone) {
                             ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                             GTChiller(ChillNum).Name);
+                                             this->Name);
                             ShowContinueError(
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                             ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                            GTChiller(ChillNum).ModulatedFlowErrDone = true;
+                            this->ModulatedFlowErrDone = true;
                         }
                     } else {
                         // need call to EMS to check node
                         FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(GTChiller(ChillNum).EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                         if (FatalError) {
-                            if (!GTChiller(ChillNum).ModulatedFlowErrDone) {
+                            if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " +
-                                                 GTChiller(ChillNum).Name);
+                                                 this->Name);
                                 ShowContinueError(
                                     "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
                                 ShowContinueError("  or use an EMS actuator to establish a setpoint at the outlet node ");
                                 ShowContinueError("  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                                GTChiller(ChillNum).ModulatedFlowErrDone = true;
+                                this->ModulatedFlowErrDone = true;
                             }
                         }
                     }
-                    GTChiller(ChillNum).ModulatedFlowSetToLoop = true;
-                    Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPoint =
-                        Node(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-                    Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi =
-                        Node(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                    this->ModulatedFlowSetToLoop = true;
+                    Node(this->EvapOutletNodeNum).TempSetPoint =
+                        Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    Node(this->EvapOutletNodeNum).TempSetPointHi =
+                        Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            GTChiller(ChillNum).MyFlag = false;
+            this->MyFlag = false;
         }
 
-        if (GTChiller(ChillNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
-                                   DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                    RoutineName);
 
-            GTChiller(ChillNum).EvapMassFlowRateMax = rho * GTChiller(ChillNum).EvapVolFlowRate;
+            this->EvapMassFlowRateMax = rho * this->EvapVolFlowRate;
             PlantUtilities::InitComponentNodes(0.0,
-                               GTChiller(ChillNum).EvapMassFlowRateMax,
+                               this->EvapMassFlowRateMax,
                                EvapInletNode,
                                EvapOutletNode,
-                               GTChiller(ChillNum).CWLoopNum,
-                               GTChiller(ChillNum).CWLoopSideNum,
-                               GTChiller(ChillNum).CWBranchNum,
-                               GTChiller(ChillNum).CWCompNum);
+                               this->CWLoopNum,
+                               this->CWLoopSideNum,
+                               this->CWBranchNum,
+                               this->CWCompNum);
 
             // init maximum available condenser flow rate
-            if (GTChiller(ChillNum).CondenserType == WaterCooled) {
+            if (this->CondenserType == WaterCooled) {
 
-                Node(CondInletNode).Temp = GTChiller(ChillNum).TempDesCondIn;
+                Node(CondInletNode).Temp = this->TempDesCondIn;
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                        RoutineName);
 
-                GTChiller(ChillNum).CondMassFlowRateMax = rho * GTChiller(ChillNum).CondVolFlowRate;
+                this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 PlantUtilities::InitComponentNodes(0.0,
-                                   GTChiller(ChillNum).CondMassFlowRateMax,
+                                   this->CondMassFlowRateMax,
                                    CondInletNode,
                                    CondOutletNode,
-                                   GTChiller(ChillNum).CDLoopNum,
-                                   GTChiller(ChillNum).CDLoopSideNum,
-                                   GTChiller(ChillNum).CDBranchNum,
-                                   GTChiller(ChillNum).CDCompNum);
+                                   this->CDLoopNum,
+                                   this->CDLoopSideNum,
+                                   this->CDBranchNum,
+                                   this->CDCompNum);
             } else { // air or evap-air
                 Node(CondInletNode).MassFlowRate =
-                    GTChiller(ChillNum).CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, GTChiller(ChillNum).TempDesCondIn, 0.0, RoutineName);
+                    this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
 
                 Node(CondOutletNode).MassFlowRate = Node(CondInletNode).MassFlowRate;
                 Node(CondInletNode).MassFlowRateMaxAvail = Node(CondInletNode).MassFlowRate;
@@ -3676,42 +3680,42 @@ namespace PlantChillers {
                 Node(CondOutletNode).MassFlowRateMin = 0.0;
             }
 
-            if (GTChiller(ChillNum).HeatRecActive) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).HRLoopNum).FluidName,
+            if (this->HeatRecActive) {
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                        DataGlobals::HWInitConvTemp,
-                                       DataPlant::PlantLoop(GTChiller(ChillNum).HRLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                        RoutineName);
-                GTChiller(ChillNum).DesignHeatRecMassFlowRate = rho * GTChiller(ChillNum).DesignHeatRecVolFlowRate;
+                this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
                 PlantUtilities::InitComponentNodes(0.0,
-                                   GTChiller(ChillNum).DesignHeatRecMassFlowRate,
-                                   GTChiller(ChillNum).HeatRecInletNodeNum,
-                                   GTChiller(ChillNum).HeatRecOutletNodeNum,
-                                   GTChiller(ChillNum).HRLoopNum,
-                                   GTChiller(ChillNum).HRLoopSideNum,
-                                   GTChiller(ChillNum).HRBranchNum,
-                                   GTChiller(ChillNum).HRCompNum);
+                                   this->DesignHeatRecMassFlowRate,
+                                   this->HeatRecInletNodeNum,
+                                   this->HeatRecOutletNodeNum,
+                                   this->HRLoopNum,
+                                   this->HRLoopSideNum,
+                                   this->HRBranchNum,
+                                   this->HRCompNum);
             }
 
-            GTChiller(ChillNum).MyEnvrnFlag = false;
+            this->MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            GTChiller(ChillNum).MyEnvrnFlag = true;
+            this->MyEnvrnFlag = true;
         }
 
-        if ((GTChiller(ChillNum).FlowMode == LeavingSetPointModulated) && (GTChiller(ChillNum).ModulatedFlowSetToLoop)) {
+        if ((this->FlowMode == LeavingSetPointModulated) && (this->ModulatedFlowSetToLoop)) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
-            Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPoint =
-                Node(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-            Node(GTChiller(ChillNum).EvapOutletNodeNum).TempSetPointHi =
-                Node(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+            Node(this->EvapOutletNodeNum).TempSetPoint =
+                Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            Node(this->EvapOutletNodeNum).TempSetPointHi =
+                Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
 
         if ((std::abs(MyLoad) > 0.0) && RunFlag) {
-            mdot = GTChiller(ChillNum).EvapMassFlowRateMax;
-            mdotCond = GTChiller(ChillNum).CondMassFlowRateMax;
+            mdot = this->EvapMassFlowRateMax;
+            mdotCond = this->CondMassFlowRateMax;
         } else {
             mdot = 0.0;
             mdotCond = 0.0;
@@ -3720,40 +3724,40 @@ namespace PlantChillers {
         PlantUtilities::SetComponentFlowRate(mdot,
                              EvapInletNode,
                              EvapOutletNode,
-                             GTChiller(ChillNum).CWLoopNum,
-                             GTChiller(ChillNum).CWLoopSideNum,
-                             GTChiller(ChillNum).CWBranchNum,
-                             GTChiller(ChillNum).CWCompNum);
-        if (GTChiller(ChillNum).CondenserType == WaterCooled) {
+                             this->CWLoopNum,
+                             this->CWLoopSideNum,
+                             this->CWBranchNum,
+                             this->CWCompNum);
+        if (this->CondenserType == WaterCooled) {
             PlantUtilities::SetComponentFlowRate(mdotCond,
                                  CondInletNode,
                                  CondOutletNode,
-                                 GTChiller(ChillNum).CDLoopNum,
-                                 GTChiller(ChillNum).CDLoopSideNum,
-                                 GTChiller(ChillNum).CDBranchNum,
-                                 GTChiller(ChillNum).CDCompNum);
+                                 this->CDLoopNum,
+                                 this->CDLoopSideNum,
+                                 this->CDBranchNum,
+                                 this->CDCompNum);
         }
 
         // Initialize heat recovery flow rates at node
-        if (GTChiller(ChillNum).HeatRecActive) {
+        if (this->HeatRecActive) {
 
-            InletNode = GTChiller(ChillNum).HeatRecInletNodeNum;
-            OutletNode = GTChiller(ChillNum).HeatRecOutletNodeNum;
-            LoopNum = GTChiller(ChillNum).HRLoopNum;
-            LoopSideNum = GTChiller(ChillNum).HRLoopSideNum;
-            BranchIndex = GTChiller(ChillNum).HRBranchNum;
-            CompIndex = GTChiller(ChillNum).HRCompNum;
+            InletNode = this->HeatRecInletNodeNum;
+            OutletNode = this->HeatRecOutletNodeNum;
+            LoopNum = this->HRLoopNum;
+            LoopSideNum = this->HRLoopSideNum;
+            BranchIndex = this->HRBranchNum;
+            CompIndex = this->HRCompNum;
 
             if (RunFlag) {
-                mdot = GTChiller(ChillNum).DesignHeatRecMassFlowRate;
+                mdot = this->DesignHeatRecMassFlowRate;
             } else {
                 mdot = 0.0;
             }
 
             PlantUtilities::SetComponentFlowRate(mdot, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex);
         }
-        if (GTChiller(ChillNum).CondenserType == EvapCooled) {
-            GTChiller(ChillNum).BasinHeaterPower = 0.0;
+        if (this->CondenserType == EvapCooled) {
+            this->BasinHeaterPower = 0.0;
         }
     }
 
@@ -4305,7 +4309,7 @@ namespace PlantChillers {
         }
     }
 
-    void SizeEngineDrivenChiller(int const ChillNum)
+    void EngineDrivenChillerSpecs::size()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4343,51 +4347,51 @@ namespace PlantChillers {
         PltSizNum = 0;
         PltSizCondNum = 0;
         ErrorsFound = false;
-        tmpNomCap = EngineDrivenChiller(ChillNum).NomCap;
-        tmpEvapVolFlowRate = EngineDrivenChiller(ChillNum).EvapVolFlowRate;
-        tmpCondVolFlowRate = EngineDrivenChiller(ChillNum).CondVolFlowRate;
+        tmpNomCap = this->NomCap;
+        tmpEvapVolFlowRate = this->EvapVolFlowRate;
+        tmpCondVolFlowRate = this->CondVolFlowRate;
         EvapVolFlowRateUser = 0.0;
         NomCapUser = 0.0;
         CondVolFlowRateUser = 0.0;
 
-        if (EngineDrivenChiller(ChillNum).CondenserType == WaterCooled) {
-            PltSizCondNum = DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).PlantSizNum;
+        if (this->CondenserType == WaterCooled) {
+            PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
         }
 
-        PltSizNum = DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).PlantSizNum;
+        PltSizNum = DataPlant::PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                        RoutineName);
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidName,
+                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                            DataGlobals::CWInitConvTemp,
-                                           DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CWLoopNum).FluidIndex,
+                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                            RoutineName);
                 tmpNomCap =
-                    Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * EngineDrivenChiller(ChillNum).SizFac;
+                    Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
-                if (EngineDrivenChiller(ChillNum).NomCapWasAutoSized) tmpNomCap = 0.0;
+                if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (EngineDrivenChiller(ChillNum).NomCapWasAutoSized) {
-                    EngineDrivenChiller(ChillNum).NomCap = tmpNomCap;
+                if (this->NomCapWasAutoSized) {
+                    this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(
-                            "Chiller:EngineDriven", EngineDrivenChiller(ChillNum).Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                            "Chiller:EngineDriven", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(
-                            "Chiller:EngineDriven", EngineDrivenChiller(ChillNum).Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                            "Chiller:EngineDriven", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
-                    if (EngineDrivenChiller(ChillNum).NomCap > 0.0 && tmpNomCap > 0.0) {
-                        NomCapUser = EngineDrivenChiller(ChillNum).NomCap;
+                    if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
+                        NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                               EngineDrivenChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design Size Nominal Capacity [W]",
                                                tmpNomCap,
                                                "User-Specified Nominal Capacity [W]",
@@ -4395,7 +4399,7 @@ namespace PlantChillers {
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerEngineDriven: Potential issue with equipment sizing for " +
-                                                EngineDrivenChiller(ChillNum).Name);
+                                                this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(NomCapUser, 2) + " [W]");
                                     ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNomCap, 2) + " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -4408,47 +4412,47 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (EngineDrivenChiller(ChillNum).NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Engine Driven Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in Engine Driven Chiller object=" + EngineDrivenChiller(ChillNum).Name);
+                ShowContinueError("Occurs in Engine Driven Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!EngineDrivenChiller(ChillNum).NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (EngineDrivenChiller(ChillNum).NomCap > 0.0)) {
+            if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
+                (this->NomCap > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                   EngineDrivenChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Nominal Capacity [W]",
-                                   EngineDrivenChiller(ChillNum).NomCap);
+                                   this->NomCap);
             }
         }
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * EngineDrivenChiller(ChillNum).SizFac;
+                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
-                if (EngineDrivenChiller(ChillNum).EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
+                if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (EngineDrivenChiller(ChillNum).EvapVolFlowRateWasAutoSized) {
-                    EngineDrivenChiller(ChillNum).EvapVolFlowRate = tmpEvapVolFlowRate;
+                if (this->EvapVolFlowRateWasAutoSized) {
+                    this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Chilled Water Flow Rate [m3/s]",
                                            tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design Chilled Water Flow Rate [m3/s]",
                                            tmpEvapVolFlowRate);
                     }
                 } else {
-                    if (EngineDrivenChiller(ChillNum).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
-                        EvapVolFlowRateUser = EngineDrivenChiller(ChillNum).EvapVolFlowRate;
+                    if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
+                        EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                               EngineDrivenChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design Size Design Chilled Water Flow Rate [m3/s]",
                                                tmpEvapVolFlowRate,
                                                "User-Specified Design Chilled Water Flow Rate [m3/s]",
@@ -4456,7 +4460,7 @@ namespace PlantChillers {
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerEngineDriven: Potential issue with equipment sizing for " +
-                                                EngineDrivenChiller(ChillNum).Name);
+                                                this->Name);
                                     ShowContinueError("User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits(EvapVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
@@ -4471,59 +4475,59 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (EngineDrivenChiller(ChillNum).EvapVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Engine Driven Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in Engine Driven Chiller object=" + EngineDrivenChiller(ChillNum).Name);
+                ShowContinueError("Occurs in Engine Driven Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!EngineDrivenChiller(ChillNum).EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (EngineDrivenChiller(ChillNum).EvapVolFlowRate > 0.0)) {
+            if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
+                (this->EvapVolFlowRate > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                   EngineDrivenChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Design Chilled Water Flow Rate [m3/s]",
-                                   EngineDrivenChiller(ChillNum).EvapVolFlowRate);
+                                   this->EvapVolFlowRate);
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(EngineDrivenChiller(ChillNum).EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidName,
-                                       EngineDrivenChiller(ChillNum).TempDesCondIn,
-                                       DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidIndex,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                       this->TempDesCondIn,
+                                       DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                        RoutineName);
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidName,
-                                           EngineDrivenChiller(ChillNum).TempDesCondIn,
-                                           DataPlant::PlantLoop(EngineDrivenChiller(ChillNum).CDLoopNum).FluidIndex,
+                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                           this->TempDesCondIn,
+                                           DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                            RoutineName);
                 tmpCondVolFlowRate =
-                    tmpNomCap * (1.0 + 1.0 / EngineDrivenChiller(ChillNum).COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                    tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
             } else {
-                if (EngineDrivenChiller(ChillNum).CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
+                if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (EngineDrivenChiller(ChillNum).CondVolFlowRateWasAutoSized) {
-                    EngineDrivenChiller(ChillNum).CondVolFlowRate = tmpCondVolFlowRate;
+                if (this->CondVolFlowRateWasAutoSized) {
+                    this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Size Design Condenser Water Flow Rate [m3/s]",
                                            tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                            tmpCondVolFlowRate);
                     }
                 } else {
-                    if (EngineDrivenChiller(ChillNum).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
-                        CondVolFlowRateUser = EngineDrivenChiller(ChillNum).CondVolFlowRate;
+                    if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
+                        CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                               EngineDrivenChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                tmpCondVolFlowRate,
                                                "User-Specified Design Condenser Water Flow Rate [m3/s]",
@@ -4531,7 +4535,7 @@ namespace PlantChillers {
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerEngineDriven: Potential issue with equipment sizing for " +
-                                                EngineDrivenChiller(ChillNum).Name);
+                                                this->Name);
                                     ShowContinueError("User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits(CondVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
@@ -4546,58 +4550,58 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (EngineDrivenChiller(ChillNum).CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of EngineDriven Chiller condenser flow rate requires a condenser");
                 ShowContinueError("loop Sizing:Plant object");
-                ShowContinueError("Occurs in EngineDriven Chiller object=" + EngineDrivenChiller(ChillNum).Name);
+                ShowContinueError("Occurs in EngineDriven Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!EngineDrivenChiller(ChillNum).CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (EngineDrivenChiller(ChillNum).CondVolFlowRate > 0.0)) {
+            if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
+                (this->CondVolFlowRate > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                   EngineDrivenChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Design Condenser Water Flow Rate [m3/s]",
-                                   EngineDrivenChiller(ChillNum).CondVolFlowRate);
+                                   this->CondVolFlowRate);
             }
         }
 
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-        if (EngineDrivenChiller(ChillNum).CondenserType == WaterCooled) {
-            PlantUtilities::RegisterPlantCompDesignFlow(EngineDrivenChiller(ChillNum).CondInletNodeNum, tmpCondVolFlowRate);
+        if (this->CondenserType == WaterCooled) {
+            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
         }
 
         // autosize support for heat recovery flow rate.
-        if (EngineDrivenChiller(ChillNum).HeatRecActive) {
-            Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * EngineDrivenChiller(ChillNum).HeatRecCapacityFraction;
+        if (this->HeatRecActive) {
+            Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRateWasAutoSized) {
-                    EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
+                if (this->DesignHeatRecVolFlowRateWasAutoSized) {
+                    this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                            tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                           EngineDrivenChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                            tmpHeatRecVolFlowRate);
                     }
                 } else {
-                    if (EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
-                        Real64 DesignHeatRecVolFlowRateUser = EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate;
+                    if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
+                        Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
                                 ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                                   EngineDrivenChiller(ChillNum).Name,
+                                                   this->Name,
                                                    "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    tmpHeatRecVolFlowRate,
                                                    "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    DesignHeatRecVolFlowRateUser);
                             } else {
                                 ReportSizingManager::ReportSizingOutput("Chiller:EngineDriven",
-                                                   EngineDrivenChiller(ChillNum).Name,
+                                                   this->Name,
                                                    "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    DesignHeatRecVolFlowRateUser);
                             }
@@ -4605,7 +4609,7 @@ namespace PlantChillers {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeEngineDrivenChiller: Potential issue with equipment sizing for " +
-                                                EngineDrivenChiller(ChillNum).Name);
+                                                this->Name);
                                     ShowContinueError("User-Specified Design Heat Recovery Fluid Flow Rate of " +
                                                       RoundSigDigits(DesignHeatRecVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Heat Recovery Fluid Flow Rate of " +
@@ -4619,18 +4623,18 @@ namespace PlantChillers {
                     }
                 }
             }
-            if (!EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRateWasAutoSized)
-                tmpHeatRecVolFlowRate = EngineDrivenChiller(ChillNum).DesignHeatRecVolFlowRate;
+            if (!this->DesignHeatRecVolFlowRateWasAutoSized)
+                tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
             // save the reference heat recovery fluid volumetric flow rate
-            PlantUtilities::RegisterPlantCompDesignFlow(EngineDrivenChiller(ChillNum).HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
         }
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            equipName = EngineDrivenChiller(ChillNum).Name;
+            equipName = this->Name;
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, "Chiller:EngineDriven");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, EngineDrivenChiller(ChillNum).COP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, EngineDrivenChiller(ChillNum).NomCap);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, this->COP);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, this->NomCap);
         }
 
         if (ErrorsFound) {
@@ -4638,7 +4642,7 @@ namespace PlantChillers {
         }
     }
 
-    void SizeGTChiller(int const ChillNum)
+    void GTChillerSpecs::size()
     {
 
         // SUBROUTINE INFORMATION:
@@ -4678,58 +4682,58 @@ namespace PlantChillers {
         PltSizNum = 0;
         PltSizCondNum = 0;
         ErrorsFound = false;
-        tmpNomCap = GTChiller(ChillNum).NomCap;
-        tmpEvapVolFlowRate = GTChiller(ChillNum).EvapVolFlowRate;
-        tmpCondVolFlowRate = GTChiller(ChillNum).CondVolFlowRate;
+        tmpNomCap = this->NomCap;
+        tmpEvapVolFlowRate = this->EvapVolFlowRate;
+        tmpCondVolFlowRate = this->CondVolFlowRate;
         EvapVolFlowRateUser = 0.0;
         NomCapUser = 0.0;
         CondVolFlowRateUser = 0.0;
         GTEngineCapacityDes = 0.0;
         GTEngineCapacityUser = 0.0;
 
-        if (GTChiller(ChillNum).CondenserType == WaterCooled) {
-            PltSizCondNum = DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).PlantSizNum;
+        if (this->CondenserType == WaterCooled) {
+            PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
         }
 
-        PltSizNum = DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).PlantSizNum;
+        PltSizNum = DataPlant::PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
-                                       DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                        RoutineName);
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidName,
+                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                            DataGlobals::CWInitConvTemp,
-                                           DataPlant::PlantLoop(GTChiller(ChillNum).CWLoopNum).FluidIndex,
+                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                            RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * GTChiller(ChillNum).SizFac;
+                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
-                if (GTChiller(ChillNum).NomCapWasAutoSized) tmpNomCap = 0.0;
+                if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (GTChiller(ChillNum).NomCapWasAutoSized) {
-                    GTChiller(ChillNum).NomCap = tmpNomCap;
+                if (this->NomCapWasAutoSized) {
+                    this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine", GTChiller(ChillNum).Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(
-                            "Chiller:CombustionTurbine", GTChiller(ChillNum).Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                            "Chiller:CombustionTurbine", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
-                    if (GTChiller(ChillNum).NomCap > 0.0 && tmpNomCap > 0.0) {
-                        NomCapUser = GTChiller(ChillNum).NomCap;
+                    if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
+                        NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                               GTChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design Size Nominal Capacity [W]",
                                                tmpNomCap,
                                                "User-Specified Nominal Capacity [W]",
                                                NomCapUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + GTChiller(ChillNum).Name);
+                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(NomCapUser, 2) + " [W]");
                                     ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNomCap, 2) + " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
@@ -4742,53 +4746,53 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (GTChiller(ChillNum).NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Gas Turbine Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in Gas Turbine Chiller object=" + GTChiller(ChillNum).Name);
+                ShowContinueError("Occurs in Gas Turbine Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!GTChiller(ChillNum).NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (GTChiller(ChillNum).NomCap > 0.0)) {
+            if (!this->NomCapWasAutoSized && DataPlant::PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                   GTChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Design Size Nominal Capacity [W]",
-                                   GTChiller(ChillNum).NomCap);
+                                   this->NomCap);
             }
         }
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * GTChiller(ChillNum).SizFac;
+                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
-                if (GTChiller(ChillNum).EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
+                if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (GTChiller(ChillNum).EvapVolFlowRateWasAutoSized) {
-                    GTChiller(ChillNum).EvapVolFlowRate = tmpEvapVolFlowRate;
+                if (this->EvapVolFlowRateWasAutoSized) {
+                    this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design size Design Chilled Water Flow Rate [m3/s]",
                                            tmpEvapVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design size Design Chilled Water Flow Rate [m3/s]",
                                            tmpEvapVolFlowRate);
                     }
                 } else {
-                    if (GTChiller(ChillNum).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
-                        EvapVolFlowRateUser = GTChiller(ChillNum).EvapVolFlowRate;
+                    if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
+                        EvapVolFlowRateUser = this->EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                               GTChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design size Design Chilled Water Flow Rate [m3/s]",
                                                tmpEvapVolFlowRate,
                                                "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                EvapVolFlowRateUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + GTChiller(ChillNum).Name);
+                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits(EvapVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
@@ -4803,64 +4807,64 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (GTChiller(ChillNum).EvapVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Gas Turbine Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in Gas Turbine Chiller object=" + GTChiller(ChillNum).Name);
+                ShowContinueError("Occurs in Gas Turbine Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!GTChiller(ChillNum).EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (GTChiller(ChillNum).EvapVolFlowRate > 0.0)) {
+            if (!this->EvapVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
+                (this->EvapVolFlowRate > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                   GTChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Design Chilled Water Flow Rate [m3/s]",
-                                   GTChiller(ChillNum).EvapVolFlowRate);
+                                   this->EvapVolFlowRate);
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(GTChiller(ChillNum).EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0) {
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidName,
-                                       GTChiller(ChillNum).TempDesCondIn,
-                                       DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidIndex,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                       this->TempDesCondIn,
+                                       DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                        RoutineName);
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidName,
-                                           GTChiller(ChillNum).TempDesCondIn,
-                                           DataPlant::PlantLoop(GTChiller(ChillNum).CDLoopNum).FluidIndex,
+                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                           this->TempDesCondIn,
+                                           DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                            RoutineName);
-                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / GTChiller(ChillNum).COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
             } else {
-                if (GTChiller(ChillNum).CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
+                if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (GTChiller(ChillNum).CondVolFlowRateWasAutoSized) {
-                    GTChiller(ChillNum).CondVolFlowRate = tmpCondVolFlowRate;
+                if (this->CondVolFlowRateWasAutoSized) {
+                    this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Size Design Condenser Water Flow Rate [m3/s]",
                                            tmpCondVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
                                            tmpCondVolFlowRate);
                     }
                 } else {
-                    if (GTChiller(ChillNum).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
-                        CondVolFlowRateUser = GTChiller(ChillNum).CondVolFlowRate;
+                    if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
+                        CondVolFlowRateUser = this->CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                               GTChiller(ChillNum).Name,
+                                               this->Name,
                                                "Design Size Design Condenser Water Flow Rate [m3/s]",
                                                tmpCondVolFlowRate,
                                                "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                CondVolFlowRateUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + GTChiller(ChillNum).Name);
+                                    ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits(CondVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
@@ -4875,46 +4879,46 @@ namespace PlantChillers {
                 }
             }
         } else {
-            if (GTChiller(ChillNum).CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (this->CondVolFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Gas Turbine Chiller condenser flow rate requires a condenser");
                 ShowContinueError("loop Sizing:Plant object");
-                ShowContinueError("Occurs in Gas Turbine Chiller object=" + GTChiller(ChillNum).Name);
+                ShowContinueError("Occurs in Gas Turbine Chiller object=" + this->Name);
                 ErrorsFound = true;
             }
-            if (!GTChiller(ChillNum).CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
-                (GTChiller(ChillNum).CondVolFlowRate > 0.0)) {
+            if (!this->CondVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport &&
+                (this->CondVolFlowRate > 0.0)) {
                 ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                   GTChiller(ChillNum).Name,
+                                   this->Name,
                                    "User-Specified Design Condenser Water Flow Rate [m3/s]",
-                                   GTChiller(ChillNum).CondVolFlowRate);
+                                   this->CondVolFlowRate);
             }
         }
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-        if (GTChiller(ChillNum).CondenserType == WaterCooled)
-            PlantUtilities::RegisterPlantCompDesignFlow(GTChiller(ChillNum).CondInletNodeNum, tmpCondVolFlowRate);
+        if (this->CondenserType == WaterCooled)
+            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
 
-        GTEngineCapacityDes = GTChiller(ChillNum).NomCap / (GTChiller(ChillNum).engineCapacityScalar * GTChiller(ChillNum).COP);
+        GTEngineCapacityDes = this->NomCap / (this->engineCapacityScalar * this->COP);
         if (DataPlant::PlantFirstSizesOkayToFinalize) {
-            if (GTChiller(ChillNum).GTEngineCapacityWasAutoSized) {
-                GTChiller(ChillNum).GTEngineCapacity = GTEngineCapacityDes;
+            if (this->GTEngineCapacityWasAutoSized) {
+                this->GTEngineCapacity = GTEngineCapacityDes;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                       GTChiller(ChillNum).Name,
+                                       this->Name,
                                        "Design Size Gas Turbine Engine Capacity [W]",
                                        GTEngineCapacityDes);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                       GTChiller(ChillNum).Name,
+                                       this->Name,
                                        "Initial Design Size Gas Turbine Engine Capacity [W]",
                                        GTEngineCapacityDes);
                 }
             } else {
-                if (GTChiller(ChillNum).GTEngineCapacity > 0.0 && GTEngineCapacityDes > 0.0) {
-                    GTEngineCapacityUser = GTChiller(ChillNum).GTEngineCapacity;
+                if (this->GTEngineCapacity > 0.0 && GTEngineCapacityDes > 0.0) {
+                    GTEngineCapacityUser = this->GTEngineCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Size Gas Turbine Engine Capacity [W]",
                                            GTEngineCapacityDes,
                                            "User-Specified Gas Turbine Engine Capacity [W]",
@@ -4922,7 +4926,7 @@ namespace PlantChillers {
                     }
                     if (DisplayExtraWarnings) {
                         if ((std::abs(GTEngineCapacityDes - GTEngineCapacityUser) / GTEngineCapacityUser) > DataSizing::AutoVsHardSizingThreshold) {
-                            ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + GTChiller(ChillNum).Name);
+                            ShowMessage("SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError("User-Specified Gas Turbine Engine Capacity of " + RoundSigDigits(GTEngineCapacityUser, 2) + " [W]");
                             ShowContinueError("differs from Design Size Gas Turbine Engine Capacity of " + RoundSigDigits(GTEngineCapacityDes, 2) +
                                               " [W]");
@@ -4935,45 +4939,45 @@ namespace PlantChillers {
         }
 
         // autosize support for heat recovery flow rate.
-        if (GTChiller(ChillNum).HeatRecActive) {
-            Real64 tmpHeatRecVolFlowRate = GTChiller(ChillNum).CondVolFlowRate * GTChiller(ChillNum).HeatRecCapacityFraction;
+        if (this->HeatRecActive) {
+            Real64 tmpHeatRecVolFlowRate = this->CondVolFlowRate * this->HeatRecCapacityFraction;
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                if (GTChiller(ChillNum).DesignHeatRecVolFlowRateWasAutoSized) {
-                    GTChiller(ChillNum).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
+                if (this->DesignHeatRecVolFlowRateWasAutoSized) {
+                    this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                            tmpHeatRecVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                           GTChiller(ChillNum).Name,
+                                           this->Name,
                                            "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                            tmpHeatRecVolFlowRate);
                     }
                 } else {
-                    if (GTChiller(ChillNum).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
-                        Real64 DesignHeatRecVolFlowRateUser = GTChiller(ChillNum).DesignHeatRecVolFlowRate;
+                    if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
+                        Real64 DesignHeatRecVolFlowRateUser = this->DesignHeatRecVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             if (DataGlobals::DoPlantSizing) {
                                 ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                                   GTChiller(ChillNum).Name,
+                                                   this->Name,
                                                    "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    tmpHeatRecVolFlowRate,
                                                    "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    DesignHeatRecVolFlowRateUser);
                             } else {
                                 ReportSizingManager::ReportSizingOutput("Chiller:CombustionTurbine",
-                                                   GTChiller(ChillNum).Name,
+                                                   this->Name,
                                                    "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                    DesignHeatRecVolFlowRateUser);
                             }
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeEngineDrivenChiller: Potential issue with equipment sizing for " +
-                                                EngineDrivenChiller(ChillNum).Name);
+                                    ShowMessage("SizeGasTurbineChiller: Potential issue with equipment sizing for " +
+                                                this->Name);
                                     ShowContinueError("User-Specified Design Heat Recovery Fluid Flow Rate of " +
                                                       RoundSigDigits(DesignHeatRecVolFlowRateUser, 5) + " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Heat Recovery Fluid Flow Rate of " +
@@ -4987,17 +4991,17 @@ namespace PlantChillers {
                     }
                 }
             }
-            if (!GTChiller(ChillNum).DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = GTChiller(ChillNum).DesignHeatRecVolFlowRate;
+            if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
             // save the reference heat recovery fluid volumetric flow rate
-            PlantUtilities::RegisterPlantCompDesignFlow(GTChiller(ChillNum).HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
         }
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            equipName = GTChiller(ChillNum).Name;
+            equipName = this->Name;
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, "Chiller:CombustionTurbine");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, GTChiller(ChillNum).COP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, GTChiller(ChillNum).NomCap);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, this->COP);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, this->NomCap);
         }
 
         if (ErrorsFound) {
@@ -5941,7 +5945,7 @@ namespace PlantChillers {
         }
     }
 
-    void CalcEngineDrivenChillerModel(int &ChillerNum,        // chiller number
+    void EngineDrivenChillerSpecs::calculate(
                                       Real64 &MyLoad,         // operating load
                                       bool const RunFlag,     // TRUE when chiller operating
                                       int const EquipFlowCtrl // Flow control mode for the equipment
@@ -5977,8 +5981,8 @@ namespace PlantChillers {
         static std::string const RoutineName("CalcEngineDrivenChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MinPartLoadRat;           // min allowed operating frac full load
-        Real64 MaxPartLoadRat;           // max allowed operating frac full load
+        Real64 _MinPartLoadRat;           // min allowed operating frac full load
+        Real64 _MaxPartLoadRat;           // max allowed operating frac full load
         Real64 TempCondIn;               // C - (EngineDriven ADJTC(1)The design secondary loop fluid
         Real64 TempCondInDesign;         // C - (EngineDriven ADJTC(1)The design secondary loop fluid
         Real64 TempRiseRat;              // intermediate result:  temperature rise ratio
@@ -6010,57 +6014,57 @@ namespace PlantChillers {
         Real64 CpCond;                         // local for fluid specif heat, for condenser
 
         // Special variables for EngineDriven Chiller
-        Real64 MaxExhaustperPowerOutput; // curve fit parameter
+        Real64 _MaxExhaustperPowerOutput; // curve fit parameter
         Real64 ClngLoadFuelRat;          // (RELDC) Ratio of Shaft Power to Fuel Energy Input
         Real64 RecJacHeattoFuelRat;      // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
         Real64 RecLubeHeattoFuelRat;     // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
         Real64 TotExhausttoFuelRat;      // (REXDC) Total Exhaust Energy Input to Fuel Energy Input
         Real64 TotalExhaustEnergy;
-        Real64 ExhaustTemp;    // (TEX) Exhaust Gas Temp
+        Real64 _ExhaustTemp;    // (TEX) Exhaust Gas Temp
         Real64 ExhaustGasFlow; // exhaust gas mass flow rate
-        Real64 DesignMinExitGasTemp;
-        Real64 UA;        // (UACDC) exhaust gas Heat Exchanger UA
+        Real64 _DesignMinExitGasTemp;
+        Real64 _UA;        // (UACDC) exhaust gas Heat Exchanger UA
         Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
         Real64 EngineDrivenFuelEnergy;
         Real64 HeatRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 
         // set module level inlet and outlet nodes
-        EngineDrivenChiller(ChillerNum).EvapMassFlowRate = 0.0;
-        EngineDrivenChiller(ChillerNum).CondMassFlowRate = 0.0;
-        EngineDrivenChiller(ChillerNum).Power = 0.0;
-        EngineDrivenChiller(ChillerNum).QCondenser = 0.0;
-        EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
-        EngineDrivenChiller(ChillerNum).Energy = 0.0;
-        EngineDrivenChiller(ChillerNum).CondenserEnergy = 0.0;
-        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = 0.0;
+        this->EvapMassFlowRate = 0.0;
+        this->CondMassFlowRate = 0.0;
+        this->Power = 0.0;
+        this->QCondenser = 0.0;
+        this->QEvaporator = 0.0;
+        this->Energy = 0.0;
+        this->CondenserEnergy = 0.0;
+        this->EvaporatorEnergy = 0.0;
         HeatRecCp = 0.0;
-        EngineDrivenChiller(ChillerNum).HeatRecMdotActual = 0.0;
-        EngineDrivenChiller(ChillerNum).QTotalHeatRecovered = 0.0;
-        EngineDrivenChiller(ChillerNum).QJacketRecovered = 0.0;
-        EngineDrivenChiller(ChillerNum).QLubeOilRecovered = 0.0;
-        EngineDrivenChiller(ChillerNum).QExhaustRecovered = 0.0;
+        this->HeatRecMdotActual = 0.0;
+        this->QTotalHeatRecovered = 0.0;
+        this->QJacketRecovered = 0.0;
+        this->QLubeOilRecovered = 0.0;
+        this->QExhaustRecovered = 0.0;
         EngineDrivenFuelEnergy = 0.0;
-        EngineDrivenChiller(ChillerNum).FuelEnergyUseRate = 0.0;
-        EngineDrivenChiller(ChillerNum).TotalHeatEnergyRec = 0.0;
-        EngineDrivenChiller(ChillerNum).JacketEnergyRec = 0.0;
-        EngineDrivenChiller(ChillerNum).LubeOilEnergyRec = 0.0;
-        EngineDrivenChiller(ChillerNum).ExhaustEnergyRec = 0.0;
-        EngineDrivenChiller(ChillerNum).FuelEnergy = 0.0;
-        EngineDrivenChiller(ChillerNum).FuelMdot = 0.0;
-        EngineDrivenChiller(ChillerNum).ExhaustStackTemp = 0.0;
+        this->FuelEnergyUseRate = 0.0;
+        this->TotalHeatEnergyRec = 0.0;
+        this->JacketEnergyRec = 0.0;
+        this->LubeOilEnergyRec = 0.0;
+        this->ExhaustEnergyRec = 0.0;
+        this->FuelEnergy = 0.0;
+        this->FuelMdot = 0.0;
+        this->ExhaustStackTemp = 0.0;
         FRAC = 1.0;
 
-        if (EngineDrivenChiller(ChillerNum).HeatRecActive) {
-            EngineDrivenChiller(ChillerNum).HeatRecInletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
-            EngineDrivenChiller(ChillerNum).HeatRecOutletTemp = Node(EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum).Temp;
+        if (this->HeatRecActive) {
+            this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
+            this->HeatRecOutletTemp = Node(this->HeatRecInletNodeNum).Temp;
         }
 
-        EvapInletNode = EngineDrivenChiller(ChillerNum).EvapInletNodeNum;
-        EvapOutletNode = EngineDrivenChiller(ChillerNum).EvapOutletNodeNum;
-        CondInletNode = EngineDrivenChiller(ChillerNum).CondInletNodeNum;
-        CondOutletNode = EngineDrivenChiller(ChillerNum).CondOutletNodeNum;
-        LoopNum = EngineDrivenChiller(ChillerNum).CWLoopNum;
-        LoopSideNum = EngineDrivenChiller(ChillerNum).CWLoopSideNum;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
+        LoopNum = this->CWLoopNum;
+        LoopSideNum = this->CWLoopSideNum;
         _EvapInletTemp = Node(EvapInletNode).Temp;
 
         //   calculate end time of current time step
@@ -6070,18 +6074,18 @@ namespace PlantChillers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > EngineDrivenChiller(ChillerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= EngineDrivenChiller(ChillerNum).TimeStepSysLast) {
-            if (EngineDrivenChiller(ChillerNum).PrintMessage) {
-                ++EngineDrivenChiller(ChillerNum).MsgErrorCount;
+        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+            if (this->PrintMessage) {
+                ++this->MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
-                if (EngineDrivenChiller(ChillerNum).MsgErrorCount < 2) {
-                    ShowWarningError(EngineDrivenChiller(ChillerNum).MsgBuffer1 + '.');
-                    ShowContinueError(EngineDrivenChiller(ChillerNum).MsgBuffer2);
+                if (this->MsgErrorCount < 2) {
+                    ShowWarningError(this->MsgBuffer1 + '.');
+                    ShowContinueError(this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(EngineDrivenChiller(ChillerNum).MsgBuffer1 + " error continues.",
-                                                   EngineDrivenChiller(ChillerNum).ErrCount1,
-                                                   EngineDrivenChiller(ChillerNum).MsgDataLast,
-                                                   EngineDrivenChiller(ChillerNum).MsgDataLast,
+                    ShowRecurringWarningErrorAtEnd(this->MsgBuffer1 + " error continues.",
+                                                   this->ErrCount1,
+                                                   this->MsgDataLast,
+                                                   this->MsgDataLast,
                                                    _,
                                                    "[C]",
                                                    "[C]");
@@ -6090,85 +6094,85 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        EngineDrivenChiller(ChillerNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        EngineDrivenChiller(ChillerNum).CurrentEndTimeLast = CurrentEndTime;
+        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 1) {
-                EngineDrivenChiller(ChillerNum).EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
+                this->EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
             } else {
-                EngineDrivenChiller(ChillerNum).EvapMassFlowRate = 0.0;
+                this->EvapMassFlowRate = 0.0;
 
-                PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                      EvapInletNode,
                                      EvapOutletNode,
-                                     EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                     EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                     EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                     EngineDrivenChiller(ChillerNum).CWCompNum);
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
             }
 
-            if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
-                if (DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CDLoopNum)
-                        .LoopSide(EngineDrivenChiller(ChillerNum).CDLoopSideNum)
-                        .Branch(EngineDrivenChiller(ChillerNum).CDBranchNum)
-                        .Comp(EngineDrivenChiller(ChillerNum).CDCompNum)
+            if (this->CondenserType == WaterCooled) {
+                if (DataPlant::PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSideNum)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) {
-                    EngineDrivenChiller(ChillerNum).CondMassFlowRate = Node(CondInletNode).MassFlowRate;
+                    this->CondMassFlowRate = Node(CondInletNode).MassFlowRate;
                 } else {
-                    EngineDrivenChiller(ChillerNum).CondMassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).CondMassFlowRate,
+                    this->CondMassFlowRate = 0.0;
+                    PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
                                          CondInletNode,
                                          CondOutletNode,
-                                         EngineDrivenChiller(ChillerNum).CDLoopNum,
-                                         EngineDrivenChiller(ChillerNum).CDLoopSideNum,
-                                         EngineDrivenChiller(ChillerNum).CDBranchNum,
-                                         EngineDrivenChiller(ChillerNum).CDCompNum);
+                                         this->CDLoopNum,
+                                         this->CDLoopSideNum,
+                                         this->CDBranchNum,
+                                         this->CDCompNum);
                 }
             }
 
-            if (EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(EngineDrivenChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterPower);
+            if (this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
-            EngineDrivenChiller(ChillerNum).PrintMessage = false;
+            this->PrintMessage = false;
             return;
         }
 
-        if (EngineDrivenChiller(ChillerNum).CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
+        if (this->CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
-                EngineDrivenChiller(ChillerNum).PrintMessage = true;
+                this->PrintMessage = true;
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
-                EngineDrivenChiller(ChillerNum).MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
-                                                                  EngineDrivenChiller(ChillerNum).Name +
+                this->MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
+                                                                  this->Name +
                                                                   "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                EngineDrivenChiller(ChillerNum).MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
+                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
                                                                   " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
-                EngineDrivenChiller(ChillerNum).MsgDataLast = Node(CondInletNode).Temp;
+                this->MsgDataLast = Node(CondInletNode).Temp;
             } else {
-                EngineDrivenChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
-        } else if (EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
+        } else if (this->CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirWetBulb;
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
-                EngineDrivenChiller(ChillerNum).PrintMessage = true;
+                this->PrintMessage = true;
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
-                EngineDrivenChiller(ChillerNum).MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
-                                                                  EngineDrivenChiller(ChillerNum).Name +
+                this->MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
+                                                                  this->Name +
                                                                   "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                EngineDrivenChiller(ChillerNum).MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
+                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
                                                                   " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
-                EngineDrivenChiller(ChillerNum).MsgDataLast = Node(CondInletNode).Temp;
+                this->MsgDataLast = Node(CondInletNode).Temp;
             } else {
-                EngineDrivenChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
         } // End of the Air Cooled/Evap Cooled Logic block
 
@@ -6176,71 +6180,71 @@ namespace PlantChillers {
         _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
-        if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
-            EngineDrivenChiller(ChillerNum).CondMassFlowRate = EngineDrivenChiller(ChillerNum).CondMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).CondMassFlowRate,
+        if (this->CondenserType == WaterCooled) {
+            this->CondMassFlowRate = this->CondMassFlowRateMax;
+            PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
                                  CondInletNode,
                                  CondOutletNode,
-                                 EngineDrivenChiller(ChillerNum).CDLoopNum,
-                                 EngineDrivenChiller(ChillerNum).CDLoopSideNum,
-                                 EngineDrivenChiller(ChillerNum).CDBranchNum,
-                                 EngineDrivenChiller(ChillerNum).CDCompNum);
-            PlantUtilities::PullCompInterconnectTrigger(EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                        EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                        EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                        EngineDrivenChiller(ChillerNum).CWCompNum,
-                                        EngineDrivenChiller(ChillerNum).CondMassFlowIndex,
-                                        EngineDrivenChiller(ChillerNum).CDLoopNum,
-                                        EngineDrivenChiller(ChillerNum).CDLoopSideNum,
+                                 this->CDLoopNum,
+                                 this->CDLoopSideNum,
+                                 this->CDBranchNum,
+                                 this->CDCompNum);
+            PlantUtilities::PullCompInterconnectTrigger(this->CWLoopNum,
+                                        this->CWLoopSideNum,
+                                        this->CWBranchNum,
+                                        this->CWCompNum,
+                                        this->CondMassFlowIndex,
+                                        this->CDLoopNum,
+                                        this->CDLoopSideNum,
                                         DataPlant::CriteriaType_MassFlowRate,
-                                                        EngineDrivenChiller(ChillerNum).CondMassFlowRate);
-            if (EngineDrivenChiller(ChillerNum).CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
+                                                        this->CondMassFlowRate);
+            if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
         }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        auto const &CapacityRat(EngineDrivenChiller(ChillerNum).CapRatCoef);
-        auto const &PowerRat(EngineDrivenChiller(ChillerNum).PowerRatCoef);
-        auto const &FullLoadFactor(EngineDrivenChiller(ChillerNum).FullLoadCoef);
-        MinPartLoadRat = EngineDrivenChiller(ChillerNum).MinPartLoadRat;
-        MaxPartLoadRat = EngineDrivenChiller(ChillerNum).MaxPartLoadRat;
-        TempCondInDesign = EngineDrivenChiller(ChillerNum).TempDesCondIn;
-        TempRiseRat = EngineDrivenChiller(ChillerNum).TempRiseCoef;
-        TempEvapOutDesign = EngineDrivenChiller(ChillerNum).TempDesEvapOut;
-        ChillerNomCap = EngineDrivenChiller(ChillerNum).NomCap;
-        COP = EngineDrivenChiller(ChillerNum).COP;
-        TempCondIn = Node(EngineDrivenChiller(ChillerNum).CondInletNodeNum).Temp;
-        TempEvapOut = Node(EngineDrivenChiller(ChillerNum).EvapOutletNodeNum).Temp;
-        TempLowLimitEout = EngineDrivenChiller(ChillerNum).TempLowLimitEvapOut;
-        MaxExhaustperPowerOutput = EngineDrivenChiller(ChillerNum).MaxExhaustperPowerOutput;
-        LoopNum = EngineDrivenChiller(ChillerNum).CWLoopNum;
-        LoopSideNum = EngineDrivenChiller(ChillerNum).CWLoopSideNum;
-        EvapMassFlowRateMax = EngineDrivenChiller(ChillerNum).EvapMassFlowRateMax;
+        auto const &CapacityRat(this->CapRatCoef);
+        auto const &PowerRat(this->PowerRatCoef);
+        auto const &FullLoadFactor(this->FullLoadCoef);
+        _MinPartLoadRat = this->MinPartLoadRat;
+        _MaxPartLoadRat = this->MaxPartLoadRat;
+        TempCondInDesign = this->TempDesCondIn;
+        TempRiseRat = this->TempRiseCoef;
+        TempEvapOutDesign = this->TempDesEvapOut;
+        ChillerNomCap = this->NomCap;
+        COP = this->COP;
+        TempCondIn = Node(this->CondInletNodeNum).Temp;
+        TempEvapOut = Node(this->EvapOutletNodeNum).Temp;
+        TempLowLimitEout = this->TempLowLimitEvapOut;
+        _MaxExhaustperPowerOutput = this->MaxExhaustperPowerOutput;
+        LoopNum = this->CWLoopNum;
+        LoopSideNum = this->CWLoopSideNum;
+        EvapMassFlowRateMax = this->EvapMassFlowRateMax;
 
         // If there is a fault of chiller fouling (zrp_Nov2016)
-        if (EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = EngineDrivenChiller(ChillerNum).FaultyChillerFoulingIndex;
+        if (this->FaultyChillerFoulingFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
 
             // update the Chiller nominal capacity and COP at faulty cases
-            ChillerNomCap = NomCap_ff * EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFactor;
-            COP = COP_ff * EngineDrivenChiller(ChillerNum).FaultyChillerFoulingFactor;
+            ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
+            COP = COP_ff * this->FaultyChillerFoulingFactor;
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (EngineDrivenChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex;
+        if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            EngineDrivenChiller(ChillerNum).FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
             // update the TempEvapOut
-            TempEvapOut = max(EngineDrivenChiller(ChillerNum).TempLowLimitEvapOut,
-                              min(Node(EvapInletNode).Temp, EvapOutletTemp_ff - EngineDrivenChiller(ChillerNum).FaultyChillerSWTOffset));
-            EngineDrivenChiller(ChillerNum).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+            TempEvapOut = max(this->TempLowLimitEvapOut,
+                              min(Node(EvapInletNode).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
+            this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
         }
 
         // Calculate chiller performance from this set of performance equations.
@@ -6258,13 +6262,13 @@ namespace PlantChillers {
         //  from BLAST...RCLOAD=AMAX1(MINCHFR(I,IPLCTR),AMIN1(CHLRLOAD(I)/CHLROCAP(I) &
         //         /RCAV,MAXCHFR(I,IPLCTR)))
         if (AvailChillerCap > 0.0) {
-            PartLoadRat = max(MinPartLoadRat, min(std::abs(MyLoad) / AvailChillerCap, MaxPartLoadRat));
+            PartLoadRat = max(_MinPartLoadRat, min(std::abs(MyLoad) / AvailChillerCap, _MaxPartLoadRat));
         }
         // from BLAST...RPOWER=RPWRC(1)+RPWRC(2)*RCLOAD+RPWRC(3)*RCLOAD**2
         FracFullLoadPower = FullLoadFactor(1) + FullLoadFactor(2) * PartLoadRat + FullLoadFactor(3) * pow_2(PartLoadRat);
 
         if (AvailChillerCap > 0.0) {
-            if (std::abs(MyLoad) / AvailChillerCap < MinPartLoadRat) {
+            if (std::abs(MyLoad) / AvailChillerCap < _MinPartLoadRat) {
                 OperPartLoadRat = std::abs(MyLoad) / AvailChillerCap;
             } else {
                 OperPartLoadRat = PartLoadRat;
@@ -6273,49 +6277,49 @@ namespace PlantChillers {
             OperPartLoadRat = 0.0;
         }
 
-        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CWLoopNum).FluidName,
+        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                    Node(EvapInletNode).Temp,
-                                   DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CWLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                    RoutineName);
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
-            EngineDrivenChiller(ChillerNum).PossibleSubcooling = false;
-            EngineDrivenChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
-            if (OperPartLoadRat < MinPartLoadRat) {
-                FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
+            this->PossibleSubcooling = false;
+            this->QEvaporator = AvailChillerCap * OperPartLoadRat;
+            if (OperPartLoadRat < _MinPartLoadRat) {
+                FRAC = min(1.0, (OperPartLoadRat / _MinPartLoadRat));
             } else {
                 FRAC = 1.0;
             }
-            EngineDrivenChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((EngineDrivenChiller(ChillerNum).FlowMode == ConstantFlow) || (EngineDrivenChiller(ChillerNum).FlowMode == NotModulated)) {
+            if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                 // Start by assuming max (design) flow
-                EngineDrivenChiller(ChillerNum).EvapMassFlowRate = EvapMassFlowRateMax;
+                this->EvapMassFlowRate = EvapMassFlowRateMax;
                 // Use SetComponentFlowRate to decide actual flow
-                PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                      EvapInletNode,
                                      EvapOutletNode,
-                                     EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                     EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                     EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                     EngineDrivenChiller(ChillerNum).CWCompNum);
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
                 // Evaluate delta temp based on actual flow rate
-                if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
+                if (this->EvapMassFlowRate != 0.0) {
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
                 // Evaluate outlet temp based on delta
-                EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+                this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
 
-            } else if (EngineDrivenChiller(ChillerNum).FlowMode == LeavingSetPointModulated) {
+            } else if (this->FlowMode == LeavingSetPointModulated) {
 
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                         EvapDeltaTemp = Node(EvapInletNode).Temp - Node(EvapOutletNode).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
@@ -6324,104 +6328,104 @@ namespace PlantChillers {
                 }
 
                 if (EvapDeltaTemp != 0.0) {
-                    EngineDrivenChiller(ChillerNum).EvapMassFlowRate = std::abs(EngineDrivenChiller(ChillerNum).QEvaporator / Cp / EvapDeltaTemp);
-                    if ((EngineDrivenChiller(ChillerNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) EngineDrivenChiller(ChillerNum).PossibleSubcooling = true;
+                    this->EvapMassFlowRate = std::abs(this->QEvaporator / Cp / EvapDeltaTemp);
+                    if ((this->EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) this->PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
-                    EngineDrivenChiller(ChillerNum).EvapMassFlowRate = min(EvapMassFlowRateMax, EngineDrivenChiller(ChillerNum).EvapMassFlowRate);
+                    this->EvapMassFlowRate = min(EvapMassFlowRateMax, this->EvapMassFlowRate);
                     // Use SetComponentFlowRate to decide actual flow
-                    PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                          EvapInletNode,
                                          EvapOutletNode,
-                                         EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                         EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                         EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                         EngineDrivenChiller(ChillerNum).CWCompNum);
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                     {
-                        auto const SELECT_CASE_var(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CWLoopNum).LoopDemandCalcScheme);
+                        auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                            EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempSetPoint;
+                            this->EvapOutletTemp = Node(EvapOutletNode).TempSetPoint;
                         } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                            EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempSetPointHi;
+                            this->EvapOutletTemp = Node(EvapOutletNode).TempSetPointHi;
                         }
                     }
                 } else {
                     // Try to request zero flow
-                    EngineDrivenChiller(ChillerNum).EvapMassFlowRate = 0.0;
+                    this->EvapMassFlowRate = 0.0;
                     // Use SetComponentFlowRate to decide actual flow
-                    PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                          EvapInletNode,
                                          EvapOutletNode,
-                                         EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                         EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                         EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                         EngineDrivenChiller(ChillerNum).CWCompNum);
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                     // No deltaT since component is not running
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (EngineDrivenChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex;
-                bool VarFlowFlag = (EngineDrivenChiller(ChillerNum).FlowMode == LeavingSetPointModulated);
+                int FaultIndex = this->FaultyChillerSWTIndex;
+                bool VarFlowFlag = (this->FlowMode == LeavingSetPointModulated);
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        EngineDrivenChiller(ChillerNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         Cp,
                                         Node(EvapInletNode).Temp,
-                                        EngineDrivenChiller(ChillerNum).EvapOutletTemp,
-                                        EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
-                                        EngineDrivenChiller(ChillerNum).QEvaporator);
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (EngineDrivenChiller(ChillerNum).QEvaporator / AvailChillerCap) : 0.0;
-                PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
-                EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
+                PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
+                PartLoadRat = max(0.0, min(PartLoadRat, _MaxPartLoadRat));
+                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
 
-            EngineDrivenChiller(ChillerNum).EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
-            PlantUtilities::SetComponentFlowRate(EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
+            this->EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
+            PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                  EvapInletNode,
                                  EvapOutletNode,
-                                 EngineDrivenChiller(ChillerNum).CWLoopNum,
-                                 EngineDrivenChiller(ChillerNum).CWLoopSideNum,
-                                 EngineDrivenChiller(ChillerNum).CWBranchNum,
-                                 EngineDrivenChiller(ChillerNum).CWCompNum);
+                                 this->CWLoopNum,
+                                 this->CWLoopSideNum,
+                                 this->CWBranchNum,
+                                 this->CWCompNum);
             // Some other component set the flow to 0. No reason to continue with calculations.
-            if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate == 0.0) {
+            if (this->EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;
-                if (EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
-                    CalcBasinHeaterPower(EngineDrivenChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                         EngineDrivenChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                         EngineDrivenChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                         EngineDrivenChiller(ChillerNum).BasinHeaterPower);
+                if (this->CondenserType == EvapCooled) {
+                    CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                         this->BasinHeaterSchedulePtr,
+                                         this->BasinHeaterSetPointTemp,
+                                         this->BasinHeaterPower);
                 }
-                EngineDrivenChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
                 return;
             }
 
-            if (EngineDrivenChiller(ChillerNum).PossibleSubcooling) {
-                EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
-                EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
-                if (EngineDrivenChiller(ChillerNum).EvapOutletTemp < Node(EvapOutletNode).TempMin) {
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempMin;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
+            if (this->PossibleSubcooling) {
+                this->QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+                if (this->EvapOutletTemp < Node(EvapOutletNode).TempMin) {
+                    this->EvapOutletTemp = Node(EvapOutletNode).TempMin;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = std::abs(this->EvapMassFlowRate * Cp * EvapDeltaTemp);
                 }
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
 
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                        if ((EngineDrivenChiller(ChillerNum).FlowMode == LeavingSetPointModulated) ||
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
                             (DataPlant::PlantLoop(LoopNum)
                                  .LoopSide(LoopSideNum)
-                                 .Branch(EngineDrivenChiller(ChillerNum).CWBranchNum)
-                                 .Comp(EngineDrivenChiller(ChillerNum).CWCompNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
                             (Node(EvapOutletNode).TempSetPoint != SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = Node(EvapOutletNode).TempSetPoint;
@@ -6429,11 +6433,11 @@ namespace PlantChillers {
                             TempEvapOutSetPoint = Node(DataPlant::PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                        if ((EngineDrivenChiller(ChillerNum).FlowMode == LeavingSetPointModulated) ||
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
                             (DataPlant::PlantLoop(LoopNum)
                                  .LoopSide(LoopSideNum)
-                                 .Branch(EngineDrivenChiller(ChillerNum).CWBranchNum)
-                                 .Comp(EngineDrivenChiller(ChillerNum).CWCompNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
                             (Node(EvapOutletNode).TempSetPointHi != SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = Node(EvapOutletNode).TempSetPointHi;
@@ -6443,120 +6447,120 @@ namespace PlantChillers {
                     }
                 }
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
-                EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
-                EngineDrivenChiller(ChillerNum).EvapOutletTemp = TempEvapOutSetPoint;
+                this->QEvaporator = std::abs(this->EvapMassFlowRate * Cp * EvapDeltaTemp);
+                this->EvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
-            if (EngineDrivenChiller(ChillerNum).EvapOutletTemp < TempLowLimitEout) {
+            if (this->EvapOutletTemp < TempLowLimitEout) {
                 if ((Node(EvapInletNode).Temp - TempLowLimitEout) > DeltaTempTol) {
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = TempLowLimitEout;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = TempLowLimitEout;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
-            if (EngineDrivenChiller(ChillerNum).EvapOutletTemp < Node(EvapOutletNode).TempMin) {
+            if (this->EvapOutletTemp < Node(EvapOutletNode).TempMin) {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempMin;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapOutletNode).TempMin;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
-                    EngineDrivenChiller(ChillerNum).QEvaporator = EngineDrivenChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             // If load exceeds the distributed load set to the distributed load
-            if (EngineDrivenChiller(ChillerNum).QEvaporator > std::abs(MyLoad)) {
-                if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    EngineDrivenChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            if (this->QEvaporator > std::abs(MyLoad)) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    this->QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->QEvaporator = 0.0;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (EngineDrivenChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = EngineDrivenChiller(ChillerNum).FaultyChillerSWTIndex;
+                int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        EngineDrivenChiller(ChillerNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         Cp,
                                         Node(EvapInletNode).Temp,
-                                        EngineDrivenChiller(ChillerNum).EvapOutletTemp,
-                                        EngineDrivenChiller(ChillerNum).EvapMassFlowRate,
-                                        EngineDrivenChiller(ChillerNum).QEvaporator);
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - EngineDrivenChiller(ChillerNum).EvapOutletTemp;
+                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (EngineDrivenChiller(ChillerNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
-                if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    EngineDrivenChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
-                    EvapDeltaTemp = EngineDrivenChiller(ChillerNum).QEvaporator / EngineDrivenChiller(ChillerNum).EvapMassFlowRate / Cp;
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            if (this->QEvaporator > (AvailChillerCap * _MaxPartLoadRat)) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    this->QEvaporator = AvailChillerCap * OperPartLoadRat;
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
-                    EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->QEvaporator = 0.0;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
 
-            if (OperPartLoadRat < MinPartLoadRat) {
-                FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
+            if (OperPartLoadRat < _MinPartLoadRat) {
+                FRAC = min(1.0, (OperPartLoadRat / _MinPartLoadRat));
             } else {
                 FRAC = 1.0;
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            EngineDrivenChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
-            if (EngineDrivenChiller(ChillerNum).EvapMassFlowRate == 0.0) {
-                EngineDrivenChiller(ChillerNum).QEvaporator = 0.0;
-                EngineDrivenChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                EngineDrivenChiller(ChillerNum).Power = 0.0;
-                EngineDrivenChiller(ChillerNum).PrintMessage = false;
+            if (this->EvapMassFlowRate == 0.0) {
+                this->QEvaporator = 0.0;
+                this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                this->Power = 0.0;
+                this->PrintMessage = false;
             }
-            if (EngineDrivenChiller(ChillerNum).QEvaporator == 0.0 && EngineDrivenChiller(ChillerNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(EngineDrivenChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                     EngineDrivenChiller(ChillerNum).BasinHeaterPower);
+            if (this->QEvaporator == 0.0 && this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
         } // This is the end of the FlowLock Block
 
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        EngineDrivenChiller(ChillerNum).QCondenser = EngineDrivenChiller(ChillerNum).Power + EngineDrivenChiller(ChillerNum).QEvaporator;
+        this->QCondenser = this->Power + this->QEvaporator;
 
-        if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
+        if (this->CondenserType == WaterCooled) {
 
-            if (EngineDrivenChiller(ChillerNum).CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CDLoopNum).FluidName,
+            if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                 _CondInletTemp,
-                                               DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).CDLoopNum).FluidIndex,
+                                               DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                RoutineName);
-                EngineDrivenChiller(ChillerNum).CondOutletTemp = EngineDrivenChiller(ChillerNum).QCondenser / EngineDrivenChiller(ChillerNum).CondMassFlowRate / CpCond + _CondInletTemp;
+                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + _CondInletTemp;
             } else {
                 ShowSevereError("CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" +
-                                EngineDrivenChiller(ChillerNum).Name);
+                                this->Name);
                 ShowContinueErrorTimeStamp("");
             }
 
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled
-            EngineDrivenChiller(ChillerNum).CondOutletTemp = _CondInletTemp;
+            this->CondOutletTemp = _CondInletTemp;
         }
 
         // EngineDriven Portion of the Engine Driven Chiller:
@@ -6568,79 +6572,80 @@ namespace PlantChillers {
         if (PartLoadRat == 0) {
             EngineDrivenFuelEnergy = 0.0;
         } else {
-            PartLoadRat = max(MinPartLoadRat, PartLoadRat);
-            ClngLoadFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).ClngLoadtoFuelCurve, PartLoadRat);
-            EngineDrivenFuelEnergy = EngineDrivenChiller(ChillerNum).QEvaporator / ClngLoadFuelRat;
+            PartLoadRat = max(_MinPartLoadRat, PartLoadRat);
+            ClngLoadFuelRat = CurveManager::CurveValue(this->ClngLoadtoFuelCurve, PartLoadRat);
+            EngineDrivenFuelEnergy = this->QEvaporator / ClngLoadFuelRat;
         }
         // Use Curve fit to determine energy recovered in the water jacket.  This curve calculates the water jacket energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the water jacket at that
         // particular part load.
 
-        RecJacHeattoFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).RecJacHeattoFuelCurve, PartLoadRat);
-        EngineDrivenChiller(ChillerNum).QJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
+        RecJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PartLoadRat);
+        this->QJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant Energy.  This curve calculates the lube energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
-        RecLubeHeattoFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).RecLubeHeattoFuelCurve, PartLoadRat);
-        EngineDrivenChiller(ChillerNum).QLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
+        RecLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PartLoadRat);
+        this->QLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
-        TotExhausttoFuelRat = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).TotExhausttoFuelCurve, PartLoadRat);
+        TotExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PartLoadRat);
         TotalExhaustEnergy = EngineDrivenFuelEnergy * TotExhausttoFuelRat;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PartLoadRat != 0) {
-            ExhaustTemp = CurveManager::CurveValue(EngineDrivenChiller(ChillerNum).ExhaustTempCurve, PartLoadRat);
-            ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (ExhaustTemp - ReferenceTemp));
+            _ExhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PartLoadRat);
+            ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (_ExhaustTemp - ReferenceTemp));
 
             // Use Curve fit to determine stack temp after heat recovery
-            UA = EngineDrivenChiller(ChillerNum).UACoef(1) * std::pow(ChillerNomCap, EngineDrivenChiller(ChillerNum).UACoef(2));
+            _UA = this->UACoef(1) * std::pow(ChillerNomCap, this->UACoef(2));
 
-            DesignMinExitGasTemp = EngineDrivenChiller(ChillerNum).DesignMinExitGasTemp;
-            EngineDrivenChiller(ChillerNum).ExhaustStackTemp = DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
-                                                          std::exp(UA / (max(ExhaustGasFlow, MaxExhaustperPowerOutput * ChillerNomCap) * ExhaustCP));
+            _DesignMinExitGasTemp = this->DesignMinExitGasTemp;
+            this->ExhaustStackTemp =
+                _DesignMinExitGasTemp + (_ExhaustTemp - _DesignMinExitGasTemp) /
+                                                          std::exp(_UA / (max(ExhaustGasFlow, _MaxExhaustperPowerOutput * ChillerNomCap) * ExhaustCP));
 
-            EngineDrivenChiller(ChillerNum).QExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (ExhaustTemp - EngineDrivenChiller(ChillerNum).ExhaustStackTemp), 0.0);
+            this->QExhaustRecovered = max(ExhaustGasFlow * ExhaustCP * (_ExhaustTemp - this->ExhaustStackTemp), 0.0);
         } else {
-            EngineDrivenChiller(ChillerNum).QExhaustRecovered = 0.0;
+            this->QExhaustRecovered = 0.0;
         }
 
-        EngineDrivenChiller(ChillerNum).QTotalHeatRecovered = EngineDrivenChiller(ChillerNum).QExhaustRecovered + EngineDrivenChiller(ChillerNum).QLubeOilRecovered + EngineDrivenChiller(ChillerNum).QJacketRecovered;
+        this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
 
         // Update Heat Recovery temperatures
-        if (EngineDrivenChiller(ChillerNum).HeatRecActive) {
-            CalcEngineChillerHeatRec(ChillerNum, EngineDrivenChiller(ChillerNum).QTotalHeatRecovered, HeatRecRatio);
-            EngineDrivenChiller(ChillerNum).QExhaustRecovered *= HeatRecRatio;
-            EngineDrivenChiller(ChillerNum).QLubeOilRecovered *= HeatRecRatio;
-            EngineDrivenChiller(ChillerNum).QJacketRecovered *= HeatRecRatio;
+        if (this->HeatRecActive) {
+            this->calcHeatRecovery(this->QTotalHeatRecovered, HeatRecRatio);
+            this->QExhaustRecovered *= HeatRecRatio;
+            this->QLubeOilRecovered *= HeatRecRatio;
+            this->QJacketRecovered *= HeatRecRatio;
         }
 
         // Calculate Energy
-        EngineDrivenChiller(ChillerNum).CondenserEnergy = EngineDrivenChiller(ChillerNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).Energy = EngineDrivenChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).EvaporatorEnergy = EngineDrivenChiller(ChillerNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).FuelEnergyUseRate = EngineDrivenFuelEnergy;
-        EngineDrivenChiller(ChillerNum).FuelEnergy = EngineDrivenChiller(ChillerNum).FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).JacketEnergyRec = EngineDrivenChiller(ChillerNum).QJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).LubeOilEnergyRec = EngineDrivenChiller(ChillerNum).QLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).ExhaustEnergyRec = EngineDrivenChiller(ChillerNum).QExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        EngineDrivenChiller(ChillerNum).QTotalHeatRecovered = EngineDrivenChiller(ChillerNum).QExhaustRecovered + EngineDrivenChiller(ChillerNum).QLubeOilRecovered + EngineDrivenChiller(ChillerNum).QJacketRecovered;
-        EngineDrivenChiller(ChillerNum).TotalHeatEnergyRec = EngineDrivenChiller(ChillerNum).ExhaustEnergyRec + EngineDrivenChiller(ChillerNum).LubeOilEnergyRec + EngineDrivenChiller(ChillerNum).JacketEnergyRec;
-        EngineDrivenChiller(ChillerNum).FuelEnergyUseRate = std::abs(EngineDrivenChiller(ChillerNum).FuelEnergyUseRate);
-        EngineDrivenChiller(ChillerNum).FuelEnergy = std::abs(EngineDrivenChiller(ChillerNum).FuelEnergy);
-        EngineDrivenChiller(ChillerNum).FuelMdot = std::abs(EngineDrivenChiller(ChillerNum).FuelEnergyUseRate) / (EngineDrivenChiller(ChillerNum).FuelHeatingValue * KJtoJ);
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->FuelEnergyUseRate = EngineDrivenFuelEnergy;
+        this->FuelEnergy = this->FuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->JacketEnergyRec = this->QJacketRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->LubeOilEnergyRec = this->QLubeOilRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ExhaustEnergyRec = this->QExhaustRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
+        this->TotalHeatEnergyRec = this->ExhaustEnergyRec + this->LubeOilEnergyRec + this->JacketEnergyRec;
+        this->FuelEnergyUseRate = std::abs(this->FuelEnergyUseRate);
+        this->FuelEnergy = std::abs(this->FuelEnergy);
+        this->FuelMdot = std::abs(this->FuelEnergyUseRate) / (this->FuelHeatingValue * KJtoJ);
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (EngineDrivenChiller(ChillerNum).Energy < 0.0) { // there is a serious problem
-            if (EngineDrivenChiller(ChillerNum).CondenserType == WaterCooled) {
+        if (this->Energy < 0.0) { // there is a serious problem
+            if (this->CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (_CondInletTemp > 70.0) {
                     ShowSevereError("CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller=" +
-                                    EngineDrivenChiller(ChillerNum).Name);
+                                    this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
@@ -6652,7 +6657,7 @@ namespace PlantChillers {
             if (!WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
                     ShowSevereError("CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller=" +
-                                    EngineDrivenChiller(ChillerNum).Name);
+                                    this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
                     ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(_CondInletTemp, 2));
@@ -6662,12 +6667,12 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            EngineDrivenChiller(ChillerNum).Power = 0.0;
-            EngineDrivenChiller(ChillerNum).Energy = 0.0;
+            this->Power = 0.0;
+            this->Energy = 0.0;
         }
     }
 
-    void CalcGTChillerModel(int &ChillerNum,        // chiller number
+    void GTChillerSpecs::calculate(
                             Real64 &MyLoad,         // operating load
                             bool const RunFlag,     // TRUE when chiller operating
                             int const EquipFlowCtrl // Flow control mode for the equipment
@@ -6760,23 +6765,23 @@ namespace PlantChillers {
         Real64 CpCond; // local for fluid specif heat, for condenser
 
         // set module level inlet and outlet nodes
-        GTChiller(ChillerNum).EvapMassFlowRate = 0.0;
-        GTChiller(ChillerNum).CondMassFlowRate = 0.0;
-        GTChiller(ChillerNum).Power = 0.0;
-        GTChiller(ChillerNum).QCondenser = 0.0;
-        GTChiller(ChillerNum).QEvaporator = 0.0;
-        GTChiller(ChillerNum).Energy = 0.0;
-        GTChiller(ChillerNum).CondenserEnergy = 0.0;
-        GTChiller(ChillerNum).EvaporatorEnergy = 0.0;
-        EvapInletNode = GTChiller(ChillerNum).EvapInletNodeNum;
-        EvapOutletNode = GTChiller(ChillerNum).EvapOutletNodeNum;
-        CondInletNode = GTChiller(ChillerNum).CondInletNodeNum;
-        CondOutletNode = GTChiller(ChillerNum).CondOutletNodeNum;
-        HeatRecInNode = GTChiller(ChillerNum).HeatRecInletNodeNum;
+        this->EvapMassFlowRate = 0.0;
+        this->CondMassFlowRate = 0.0;
+        this->Power = 0.0;
+        this->QCondenser = 0.0;
+        this->QEvaporator = 0.0;
+        this->Energy = 0.0;
+        this->CondenserEnergy = 0.0;
+        this->EvaporatorEnergy = 0.0;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
+        HeatRecInNode = this->HeatRecInletNodeNum;
         QHeatRecLube = 0.0;
         FRAC = 1.0;
-        LoopNum = GTChiller(ChillerNum).CWLoopNum;
-        LoopSideNum = GTChiller(ChillerNum).CWLoopSideNum;
+        LoopNum = this->CWLoopNum;
+        LoopSideNum = this->CWLoopSideNum;
         _EvapInletTemp = Node(EvapInletNode).Temp;
 
         // calculate end time of current time step
@@ -6786,18 +6791,18 @@ namespace PlantChillers {
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > GTChiller(ChillerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= GTChiller(ChillerNum).TimeStepSysLast) {
-            if (GTChiller(ChillerNum).PrintMessage) {
-                ++GTChiller(ChillerNum).MsgErrorCount;
+        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+            if (this->PrintMessage) {
+                ++this->MsgErrorCount;
                 // Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
-                if (GTChiller(ChillerNum).MsgErrorCount < 2) {
-                    ShowWarningError(GTChiller(ChillerNum).MsgBuffer1 + '.');
-                    ShowContinueError(GTChiller(ChillerNum).MsgBuffer2);
+                if (this->MsgErrorCount < 2) {
+                    ShowWarningError(this->MsgBuffer1 + '.');
+                    ShowContinueError(this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(GTChiller(ChillerNum).MsgBuffer1 + " error continues.",
-                                                   GTChiller(ChillerNum).ErrCount1,
-                                                   GTChiller(ChillerNum).MsgDataLast,
-                                                   GTChiller(ChillerNum).MsgDataLast,
+                    ShowRecurringWarningErrorAtEnd(this->MsgBuffer1 + " error continues.",
+                                                   this->ErrCount1,
+                                                   this->MsgDataLast,
+                                                   this->MsgDataLast,
                                                    _,
                                                    "[C]",
                                                    "[C]");
@@ -6806,84 +6811,84 @@ namespace PlantChillers {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        GTChiller(ChillerNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        GTChiller(ChillerNum).CurrentEndTimeLast = CurrentEndTime;
+        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->CurrentEndTimeLast = CurrentEndTime;
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.Before leaving
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 1) {
-                GTChiller(ChillerNum).EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
+                this->EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
             } else {
-                GTChiller(ChillerNum).EvapMassFlowRate = 0.0;
+                this->EvapMassFlowRate = 0.0;
 
-                PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).EvapMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                      EvapInletNode,
                                      EvapOutletNode,
-                                     GTChiller(ChillerNum).CWLoopNum,
-                                     GTChiller(ChillerNum).CWLoopSideNum,
-                                     GTChiller(ChillerNum).CWBranchNum,
-                                     GTChiller(ChillerNum).CWCompNum);
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
             }
-            if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
-                if (DataPlant::PlantLoop(GTChiller(ChillerNum).CDLoopNum)
-                        .LoopSide(GTChiller(ChillerNum).CDLoopSideNum)
-                        .Branch(GTChiller(ChillerNum).CDBranchNum)
-                        .Comp(GTChiller(ChillerNum).CDCompNum)
+            if (this->CondenserType == WaterCooled) {
+                if (DataPlant::PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSideNum)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) {
-                    GTChiller(ChillerNum).CondMassFlowRate = Node(CondInletNode).MassFlowRate;
+                    this->CondMassFlowRate = Node(CondInletNode).MassFlowRate;
                 } else {
-                    GTChiller(ChillerNum).CondMassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).CondMassFlowRate,
+                    this->CondMassFlowRate = 0.0;
+                    PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
                                          CondInletNode,
                                          CondOutletNode,
-                                         GTChiller(ChillerNum).CDLoopNum,
-                                         GTChiller(ChillerNum).CDLoopSideNum,
-                                         GTChiller(ChillerNum).CDBranchNum,
-                                         GTChiller(ChillerNum).CDCompNum);
+                                         this->CDLoopNum,
+                                         this->CDLoopSideNum,
+                                         this->CDBranchNum,
+                                         this->CDCompNum);
                 }
             }
 
-            if (GTChiller(ChillerNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(GTChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                     GTChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                     GTChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                     GTChiller(ChillerNum).BasinHeaterPower);
+            if (this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
-            GTChiller(ChillerNum).PrintMessage = false;
+            this->PrintMessage = false;
             return;
         }
 
-        if (GTChiller(ChillerNum).CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
+        if (this->CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirDryBulb;
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
-                GTChiller(ChillerNum).PrintMessage = true;
+                this->PrintMessage = true;
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
-                GTChiller(ChillerNum).MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
-                                                        GTChiller(ChillerNum).Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                GTChiller(ChillerNum).MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
+                this->MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
+                                                        this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
+                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
                                                         " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
-                GTChiller(ChillerNum).MsgDataLast = Node(CondInletNode).Temp;
+                this->MsgDataLast = Node(CondInletNode).Temp;
             } else {
-                GTChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
-        } else if (GTChiller(ChillerNum).CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
+        } else if (this->CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
             Node(CondInletNode).Temp = Node(CondInletNode).OutAirWetBulb;
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
-                GTChiller(ChillerNum).PrintMessage = true;
+                this->PrintMessage = true;
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
-                GTChiller(ChillerNum).MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
-                                                        GTChiller(ChillerNum).Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
-                GTChiller(ChillerNum).MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
+                this->MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
+                                                        this->Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
+                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
                                                         " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
-                GTChiller(ChillerNum).MsgDataLast = Node(CondInletNode).Temp;
+                this->MsgDataLast = Node(CondInletNode).Temp;
             } else {
-                GTChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
         } // End of the Air Cooled/Evap Cooled Logic block
 
@@ -6891,71 +6896,71 @@ namespace PlantChillers {
         _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
-        if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
-            GTChiller(ChillerNum).CondMassFlowRate = GTChiller(ChillerNum).CondMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).CondMassFlowRate,
+        if (this->CondenserType == WaterCooled) {
+            this->CondMassFlowRate = this->CondMassFlowRateMax;
+            PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
                                  CondInletNode,
                                  CondOutletNode,
-                                 GTChiller(ChillerNum).CDLoopNum,
-                                 GTChiller(ChillerNum).CDLoopSideNum,
-                                 GTChiller(ChillerNum).CDBranchNum,
-                                 GTChiller(ChillerNum).CDCompNum);
-            PlantUtilities::PullCompInterconnectTrigger(GTChiller(ChillerNum).CWLoopNum,
-                                        GTChiller(ChillerNum).CWLoopSideNum,
-                                        GTChiller(ChillerNum).CWBranchNum,
-                                        GTChiller(ChillerNum).CWCompNum,
-                                        GTChiller(ChillerNum).CondMassFlowIndex,
-                                        GTChiller(ChillerNum).CDLoopNum,
-                                        GTChiller(ChillerNum).CDLoopSideNum,
+                                 this->CDLoopNum,
+                                 this->CDLoopSideNum,
+                                 this->CDBranchNum,
+                                 this->CDCompNum);
+            PlantUtilities::PullCompInterconnectTrigger(this->CWLoopNum,
+                                        this->CWLoopSideNum,
+                                        this->CWBranchNum,
+                                        this->CWCompNum,
+                                        this->CondMassFlowIndex,
+                                        this->CDLoopNum,
+                                        this->CDLoopSideNum,
                                         DataPlant::CriteriaType_MassFlowRate,
-                                                        GTChiller(ChillerNum).CondMassFlowRate);
+                                                        this->CondMassFlowRate);
 
-            if (GTChiller(ChillerNum).CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
+            if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
         }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        auto const &CapacityRat(GTChiller(ChillerNum).CapRatCoef);
-        auto const &PowerRat(GTChiller(ChillerNum).PowerRatCoef);
-        auto const &FullLoadFactor(GTChiller(ChillerNum).FullLoadCoef);
-        MinPartLoadRat = GTChiller(ChillerNum).MinPartLoadRat;
-        MaxPartLoadRat = GTChiller(ChillerNum).MaxPartLoadRat;
-        TempCondInDesign = GTChiller(ChillerNum).TempDesCondIn;
-        TempRiseRat = GTChiller(ChillerNum).TempRiseCoef;
-        TempEvapOutDesign = GTChiller(ChillerNum).TempDesEvapOut;
-        ChillerNomCap = GTChiller(ChillerNum).NomCap;
-        COP = GTChiller(ChillerNum).COP;
-        TempCondIn = Node(GTChiller(ChillerNum).CondInletNodeNum).Temp;
-        TempEvapOut = Node(GTChiller(ChillerNum).EvapOutletNodeNum).Temp;
-        TempLowLimitEout = GTChiller(ChillerNum).TempLowLimitEvapOut;
-        EvapMassFlowRateMax = GTChiller(ChillerNum).EvapMassFlowRateMax;
-        LoopNum = GTChiller(ChillerNum).CWLoopNum;
-        LoopSideNum = GTChiller(ChillerNum).CWLoopSideNum;
+        auto const &CapacityRat(this->CapRatCoef);
+        auto const &PowerRat(this->PowerRatCoef);
+        auto const &FullLoadFactor(this->FullLoadCoef);
+        MinPartLoadRat = this->MinPartLoadRat;
+        MaxPartLoadRat = this->MaxPartLoadRat;
+        TempCondInDesign = this->TempDesCondIn;
+        TempRiseRat = this->TempRiseCoef;
+        TempEvapOutDesign = this->TempDesEvapOut;
+        ChillerNomCap = this->NomCap;
+        COP = this->COP;
+        TempCondIn = Node(this->CondInletNodeNum).Temp;
+        TempEvapOut = Node(this->EvapOutletNodeNum).Temp;
+        TempLowLimitEout = this->TempLowLimitEvapOut;
+        EvapMassFlowRateMax = this->EvapMassFlowRateMax;
+        LoopNum = this->CWLoopNum;
+        LoopSideNum = this->CWLoopSideNum;
 
         // If there is a fault of chiller fouling (zrp_Nov2016)
-        if (GTChiller(ChillerNum).FaultyChillerFoulingFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = GTChiller(ChillerNum).FaultyChillerFoulingIndex;
+        if (this->FaultyChillerFoulingFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            GTChiller(ChillerNum).FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
 
             // update the Chiller nominal capacity and COP at faulty cases
-            ChillerNomCap = NomCap_ff * GTChiller(ChillerNum).FaultyChillerFoulingFactor;
-            COP = COP_ff * GTChiller(ChillerNum).FaultyChillerFoulingFactor;
+            ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
+            COP = COP_ff * this->FaultyChillerFoulingFactor;
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (GTChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = GTChiller(ChillerNum).FaultyChillerSWTIndex;
+        if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            GTChiller(ChillerNum).FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
             // update the TempEvapOut
-            TempEvapOut = max(GTChiller(ChillerNum).TempLowLimitEvapOut,
-                              min(Node(EvapInletNode).Temp, EvapOutletTemp_ff - GTChiller(ChillerNum).FaultyChillerSWTOffset));
-            GTChiller(ChillerNum).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
+            TempEvapOut = max(this->TempLowLimitEvapOut,
+                              min(Node(EvapInletNode).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
+            this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
         }
 
         // Calculate chiller performance from this set of performance equations.
@@ -6989,46 +6994,46 @@ namespace PlantChillers {
             OperPartLoadRat = 0.0;
         }
 
-        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillerNum).CWLoopNum).FluidName,
+        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                    Node(EvapInletNode).Temp,
-                                   DataPlant::PlantLoop(GTChiller(ChillerNum).CWLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                    RoutineName);
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
-            GTChiller(ChillerNum).PossibleSubcooling = false;
-            GTChiller(ChillerNum).QEvaporator = AvailChillerCap * OperPartLoadRat;
+            this->PossibleSubcooling = false;
+            this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             if (OperPartLoadRat < MinPartLoadRat) {
                 FRAC = min(1.0, (OperPartLoadRat / MinPartLoadRat));
             } else {
                 FRAC = 1.0;
             }
-            GTChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((GTChiller(ChillerNum).FlowMode == ConstantFlow) || (GTChiller(ChillerNum).FlowMode == NotModulated)) {
+            if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                 // Start by assuming max (design) flow
-                GTChiller(ChillerNum).EvapMassFlowRate = EvapMassFlowRateMax;
+                this->EvapMassFlowRate = EvapMassFlowRateMax;
                 // Use SetComponentFlowRate to decide actual flow
-                PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).EvapMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                      EvapInletNode,
                                      EvapOutletNode,
-                                     GTChiller(ChillerNum).CWLoopNum,
-                                     GTChiller(ChillerNum).CWLoopSideNum,
-                                     GTChiller(ChillerNum).CWBranchNum,
-                                     GTChiller(ChillerNum).CWCompNum);
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
                 // Evaluate delta temp based on actual flow rate
-                if (GTChiller(ChillerNum).EvapMassFlowRate != 0.0) {
-                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
+                if (this->EvapMassFlowRate != 0.0) {
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
                 } else {
                     EvapDeltaTemp = 0.0;
                 }
                 // Evaluate outlet temp based on delta
-                GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
-            } else if (GTChiller(ChillerNum).FlowMode == LeavingSetPointModulated) {
+                this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            } else if (this->FlowMode == LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(GTChiller(ChillerNum).CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                         EvapDeltaTemp = Node(EvapInletNode).Temp - Node(EvapOutletNode).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
@@ -7037,99 +7042,99 @@ namespace PlantChillers {
                 }
                 if (EvapDeltaTemp != 0.0) {
                     // Calculate desired flow to request based on load
-                    GTChiller(ChillerNum).EvapMassFlowRate = std::abs(GTChiller(ChillerNum).QEvaporator / Cp / EvapDeltaTemp);
-                    if ((GTChiller(ChillerNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) GTChiller(ChillerNum).PossibleSubcooling = true;
+                    this->EvapMassFlowRate = std::abs(this->QEvaporator / Cp / EvapDeltaTemp);
+                    if ((this->EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) this->PossibleSubcooling = true;
                     // Check to see if the Maximum is exceeded, if so set to maximum
-                    GTChiller(ChillerNum).EvapMassFlowRate = min(EvapMassFlowRateMax, GTChiller(ChillerNum).EvapMassFlowRate);
+                    this->EvapMassFlowRate = min(EvapMassFlowRateMax, this->EvapMassFlowRate);
                     // Use SetComponentFlowRate to decide actual flow
-                    PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).EvapMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                          EvapInletNode,
                                          EvapOutletNode,
-                                         GTChiller(ChillerNum).CWLoopNum,
-                                         GTChiller(ChillerNum).CWLoopSideNum,
-                                         GTChiller(ChillerNum).CWBranchNum,
-                                         GTChiller(ChillerNum).CWCompNum);
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                     {
-                        auto const SELECT_CASE_var(DataPlant::PlantLoop(GTChiller(ChillerNum).CWLoopNum).LoopDemandCalcScheme);
+                        auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                         if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                            GTChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempSetPoint;
+                            this->EvapOutletTemp = Node(EvapOutletNode).TempSetPoint;
                         } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                            GTChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempSetPointHi;
+                            this->EvapOutletTemp = Node(EvapOutletNode).TempSetPointHi;
                         }
                     }
                 } else {
                     // Try to request zero flow
-                    GTChiller(ChillerNum).EvapMassFlowRate = 0.0;
+                    this->EvapMassFlowRate = 0.0;
                     // Use SetComponentFlowRate to decide actual flow
-                    PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).EvapMassFlowRate,
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                          EvapInletNode,
                                          EvapOutletNode,
-                                         GTChiller(ChillerNum).CWLoopNum,
-                                         GTChiller(ChillerNum).CWLoopSideNum,
-                                         GTChiller(ChillerNum).CWBranchNum,
-                                         GTChiller(ChillerNum).CWCompNum);
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                     // No deltaT since component is not running
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (GTChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (GTChiller(ChillerNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = GTChiller(ChillerNum).FaultyChillerSWTIndex;
-                bool VarFlowFlag = (GTChiller(ChillerNum).FlowMode == LeavingSetPointModulated);
+                int FaultIndex = this->FaultyChillerSWTIndex;
+                bool VarFlowFlag = (this->FlowMode == LeavingSetPointModulated);
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        GTChiller(ChillerNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         Cp,
                                         Node(EvapInletNode).Temp,
-                                        GTChiller(ChillerNum).EvapOutletTemp,
-                                        GTChiller(ChillerNum).EvapMassFlowRate,
-                                        GTChiller(ChillerNum).QEvaporator);
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (GTChiller(ChillerNum).QEvaporator / AvailChillerCap) : 0.0;
+                PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
                 // ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
+                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
 
-            GTChiller(ChillerNum).EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
-            PlantUtilities::SetComponentFlowRate(GTChiller(ChillerNum).EvapMassFlowRate,
+            this->EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
+            PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
                                  EvapInletNode,
                                  EvapOutletNode,
-                                 GTChiller(ChillerNum).CWLoopNum,
-                                 GTChiller(ChillerNum).CWLoopSideNum,
-                                 GTChiller(ChillerNum).CWBranchNum,
-                                 GTChiller(ChillerNum).CWCompNum);
+                                 this->CWLoopNum,
+                                 this->CWLoopSideNum,
+                                 this->CWBranchNum,
+                                 this->CWCompNum);
             //       Some other component set the flow to 0. No reason to continue with calculations.
-            if (GTChiller(ChillerNum).EvapMassFlowRate == 0.0) {
+            if (this->EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;
-                if (GTChiller(ChillerNum).CondenserType == EvapCooled) {
-                    CalcBasinHeaterPower(GTChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                         GTChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                         GTChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                         GTChiller(ChillerNum).BasinHeaterPower);
+                if (this->CondenserType == EvapCooled) {
+                    CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                         this->BasinHeaterSchedulePtr,
+                                         this->BasinHeaterSetPointTemp,
+                                         this->BasinHeaterPower);
                 }
-                GTChiller(ChillerNum).PrintMessage = false;
+                this->PrintMessage = false;
                 return;
             }
 
-            if (GTChiller(ChillerNum).PossibleSubcooling) {
-                GTChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
-                GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            if (this->PossibleSubcooling) {
+                this->QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
             } else { // No subcooling in this case.No recalculation required.Still need to check chiller low temp limit
                 {
                     auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                        if ((GTChiller(ChillerNum).FlowMode == LeavingSetPointModulated) ||
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
                             (DataPlant::PlantLoop(LoopNum)
                                  .LoopSide(LoopSideNum)
-                                 .Branch(GTChiller(ChillerNum).CWBranchNum)
-                                 .Comp(GTChiller(ChillerNum).CWCompNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
                             (Node(EvapOutletNode).TempSetPoint != SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = Node(EvapOutletNode).TempSetPoint;
@@ -7137,11 +7142,11 @@ namespace PlantChillers {
                             TempEvapOutSetPoint = Node(DataPlant::PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
                         }
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                        if ((GTChiller(ChillerNum).FlowMode == LeavingSetPointModulated) ||
+                        if ((this->FlowMode == LeavingSetPointModulated) ||
                             (DataPlant::PlantLoop(LoopNum)
                                  .LoopSide(LoopSideNum)
-                                 .Branch(GTChiller(ChillerNum).CWBranchNum)
-                                 .Comp(GTChiller(ChillerNum).CWCompNum)
+                                 .Branch(this->CWBranchNum)
+                                 .Comp(this->CWCompNum)
                                  .CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
                             (Node(EvapOutletNode).TempSetPointHi != SensedNodeFlagValue)) {
                             TempEvapOutSetPoint = Node(EvapOutletNode).TempSetPointHi;
@@ -7151,71 +7156,71 @@ namespace PlantChillers {
                     }
                 }
                 EvapDeltaTemp = Node(EvapInletNode).Temp - TempEvapOutSetPoint;
-                GTChiller(ChillerNum).QEvaporator = std::abs(GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp);
-                GTChiller(ChillerNum).EvapOutletTemp = TempEvapOutSetPoint;
+                this->QEvaporator = std::abs(this->EvapMassFlowRate * Cp * EvapDeltaTemp);
+                this->EvapOutletTemp = TempEvapOutSetPoint;
             }
             // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
-            if (GTChiller(ChillerNum).EvapOutletTemp < TempLowLimitEout) {
+            if (this->EvapOutletTemp < TempLowLimitEout) {
                 if ((Node(EvapInletNode).Temp - TempLowLimitEout) > DeltaTempTol) {
-                    GTChiller(ChillerNum).EvapOutletTemp = TempLowLimitEout;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
-                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = TempLowLimitEout;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
-                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
-            if (GTChiller(ChillerNum).EvapOutletTemp < Node(EvapOutletNode).TempMin) {
+            if (this->EvapOutletTemp < Node(EvapOutletNode).TempMin) {
                 if ((Node(EvapInletNode).Temp - Node(EvapOutletNode).TempMin) > DeltaTempTol) {
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapOutletNode).TempMin;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
-                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapOutletNode).TempMin;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                    EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
-                    GTChiller(ChillerNum).QEvaporator = GTChiller(ChillerNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                    EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
+                    this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
                 }
             }
             // If load exceeds the distributed load set to the distributed load
-            if (GTChiller(ChillerNum).QEvaporator > std::abs(MyLoad)) {
-                if (GTChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    GTChiller(ChillerNum).QEvaporator = std::abs(MyLoad);
-                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            if (this->QEvaporator > std::abs(MyLoad)) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    this->QEvaporator = std::abs(MyLoad);
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).QEvaporator = 0.0;
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->QEvaporator = 0.0;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
 
             // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-            if (GTChiller(ChillerNum).FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-                (GTChiller(ChillerNum).EvapMassFlowRate > 0)) {
+            if (this->FaultyChillerSWTFlag && (!WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-                int FaultIndex = GTChiller(ChillerNum).FaultyChillerSWTIndex;
+                int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
                 FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
-                                        GTChiller(ChillerNum).FaultyChillerSWTOffset,
+                                        this->FaultyChillerSWTOffset,
                                         Cp,
                                         Node(EvapInletNode).Temp,
-                                        GTChiller(ChillerNum).EvapOutletTemp,
-                                        GTChiller(ChillerNum).EvapMassFlowRate,
-                                        GTChiller(ChillerNum).QEvaporator);
+                                        this->EvapOutletTemp,
+                                        this->EvapMassFlowRate,
+                                        this->QEvaporator);
                 // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - GTChiller(ChillerNum).EvapOutletTemp;
+                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
-            if (GTChiller(ChillerNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
-                if (GTChiller(ChillerNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    GTChiller(ChillerNum).QEvaporator = AvailChillerCap * PartLoadRat;
-                    EvapDeltaTemp = GTChiller(ChillerNum).QEvaporator / GTChiller(ChillerNum).EvapMassFlowRate / Cp;
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
+            if (this->QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
+                if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    this->QEvaporator = AvailChillerCap * PartLoadRat;
+                    EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp - EvapDeltaTemp;
                 } else {
-                    GTChiller(ChillerNum).QEvaporator = 0.0;
-                    GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
+                    this->QEvaporator = 0.0;
+                    this->EvapOutletTemp = Node(EvapInletNode).Temp;
                 }
             }
 
@@ -7226,19 +7231,19 @@ namespace PlantChillers {
             }
 
             // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
-            GTChiller(ChillerNum).Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
+            this->Power = FracFullLoadPower * FullLoadPowerRat * AvailChillerCap / COP * FRAC;
 
-            if (GTChiller(ChillerNum).EvapMassFlowRate == 0.0) {
-                GTChiller(ChillerNum).QEvaporator = 0.0;
-                GTChiller(ChillerNum).EvapOutletTemp = Node(EvapInletNode).Temp;
-                GTChiller(ChillerNum).Power = 0.0;
-                GTChiller(ChillerNum).PrintMessage = false;
+            if (this->EvapMassFlowRate == 0.0) {
+                this->QEvaporator = 0.0;
+                this->EvapOutletTemp = Node(EvapInletNode).Temp;
+                this->Power = 0.0;
+                this->PrintMessage = false;
             }
-            if (GTChiller(ChillerNum).QEvaporator == 0.0 && GTChiller(ChillerNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(GTChiller(ChillerNum).BasinHeaterPowerFTempDiff,
-                                     GTChiller(ChillerNum).BasinHeaterSchedulePtr,
-                                     GTChiller(ChillerNum).BasinHeaterSetPointTemp,
-                                     GTChiller(ChillerNum).BasinHeaterPower);
+            if (this->QEvaporator == 0.0 && this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
 
         } // This is the end of the FlowLock Block
@@ -7246,32 +7251,32 @@ namespace PlantChillers {
         // Now determine Cooling
         // QCondenser is calculated the same for each type, but the power consumption should be different
         //  depending on the performance coefficients used for the chiller model.
-        GTChiller(ChillerNum).QCondenser = GTChiller(ChillerNum).Power + GTChiller(ChillerNum).QEvaporator;
+        this->QCondenser = this->Power + this->QEvaporator;
 
-        if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
+        if (this->CondenserType == WaterCooled) {
 
-            if (GTChiller(ChillerNum).CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillerNum).CDLoopNum).FluidName,
+            if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                                 _CondInletTemp,
-                                               DataPlant::PlantLoop(GTChiller(ChillerNum).CDLoopNum).FluidIndex,
+                                               DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                RoutineName);
-                GTChiller(ChillerNum).CondOutletTemp = GTChiller(ChillerNum).QCondenser / GTChiller(ChillerNum).CondMassFlowRate / CpCond + _CondInletTemp;
+                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + _CondInletTemp;
             } else {
-                ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + GTChiller(ChillerNum).Name);
+                ShowSevereError("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + this->Name);
                 ShowContinueErrorTimeStamp("");
             }
 
         } else { // Air Cooled or Evap Cooled
 
             // don't care about outlet temp for Air-Cooled or Evap Cooled and there is no CondMassFlowRate and would divide by zero
-            GTChiller(ChillerNum).CondOutletTemp = _CondInletTemp;
+            this->CondOutletTemp = _CondInletTemp;
         }
 
         // Special GT Chiller Variables
         // Gas Turbine Driven Portion of the Chiller:
 
-        GTEngineCapacity = GTChiller(ChillerNum).GTEngineCapacity;
-        MaxExhaustperGTPower = GTChiller(ChillerNum).MaxExhaustperGTPower;
+        GTEngineCapacity = this->GTEngineCapacity;
+        MaxExhaustperGTPower = this->MaxExhaustperGTPower;
 
         // Note: All Old Blast Code comments begin at left.
 
@@ -7281,12 +7286,12 @@ namespace PlantChillers {
         //               IF (RFLAGS(81)) WRITE (OUTPUT,703) PREQD,ETOWER(TypeIndex),RPLOAD
         //               IF (PREQD .GT. 0.0d0) THEN
         if (AvailChillerCap > 0) {
-            RPLoad = GTChiller(ChillerNum).Power / AvailChillerCap;
+            RPLoad = this->Power / AvailChillerCap;
         } else {
             RPLoad = 0.0;
         }
 
-        if (GTChiller(ChillerNum).Power > 0) {
+        if (this->Power > 0) {
             // D$                               FOR EACH CHILLER OPERATING
             //                  MAXSZ = NUMCHSIZ(TypeIndex,IPLCTR)
             //                  DO IS = 1,MAXSZ
@@ -7313,7 +7318,7 @@ namespace PlantChillers {
 
             // ??? Not sure about this Ambient Actual Temp - also do we need to have design ambient as input?
 
-            if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
+            if (this->CondenserType == WaterCooled) {
                 AmbientDeltaT = DataEnvironment::OutDryBulbTemp - 25.0;
             } else { // air or evap cooled
                 AmbientDeltaT = Node(CondInletNode).OutAirDryBulb - 25.0;
@@ -7325,39 +7330,39 @@ namespace PlantChillers {
             //                              FUL2GC(3,IPLCTR)*TAR2)
 
             FuelEnergyIn = PLoad *
-                           (GTChiller(ChillerNum).PLBasedFuelInputCoef(1) + GTChiller(ChillerNum).PLBasedFuelInputCoef(2) * RL +
-                            GTChiller(ChillerNum).PLBasedFuelInputCoef(3) * RL2) *
-                           (GTChiller(ChillerNum).TempBasedFuelInputCoef(1) + GTChiller(ChillerNum).TempBasedFuelInputCoef(2) * AmbientDeltaT +
-                            GTChiller(ChillerNum).TempBasedFuelInputCoef(3) * pow_2(AmbientDeltaT));
+                           (this->PLBasedFuelInputCoef(1) + this->PLBasedFuelInputCoef(2) * RL +
+                            this->PLBasedFuelInputCoef(3) * RL2) *
+                           (this->TempBasedFuelInputCoef(1) + this->TempBasedFuelInputCoef(2) * AmbientDeltaT +
+                            this->TempBasedFuelInputCoef(3) * pow_2(AmbientDeltaT));
 
             //                        FEX=GTDSLCAP(IS,TypeIndex,IPLCTR)*(FEXGC(1,IPLCTR)+      &
             //                            FEXGC(2,IPLCTR)*ATAIR+FEXGC(3,IPLCTR)*TAR2)
 
-            ExhaustFlow = GTEngineCapacity * (GTChiller(ChillerNum).ExhaustFlowCoef(1) + GTChiller(ChillerNum).ExhaustFlowCoef(2) * AmbientDeltaT +
-                                              GTChiller(ChillerNum).ExhaustFlowCoef(3) * pow_2(AmbientDeltaT));
+            ExhaustFlow = GTEngineCapacity * (this->ExhaustFlowCoef(1) + this->ExhaustFlowCoef(2) * AmbientDeltaT +
+                                              this->ExhaustFlowCoef(3) * pow_2(AmbientDeltaT));
 
             //                        TEX=(TEX1GC(1,IPLCTR)+TEX1GC(2,IPLCTR)*RLOAD+    &
             //                            TEX1GC(3,IPLCTR)*RLD2)*(TEX2GC(1,IPLCTR)+    &
             //                            TEX2GC(2,IPLCTR)*ATAIR+TEX2GC(3,IPLCTR)*     &
             //                            TAR2)-273.
 
-            ExhaustTemp = (GTChiller(ChillerNum).PLBasedExhaustTempCoef(1) + GTChiller(ChillerNum).PLBasedExhaustTempCoef(2) * RL +
-                           GTChiller(ChillerNum).PLBasedExhaustTempCoef(3) * RL2) *
-                              (GTChiller(ChillerNum).TempBasedExhaustTempCoef(1) + GTChiller(ChillerNum).TempBasedExhaustTempCoef(2) * AmbientDeltaT +
-                               GTChiller(ChillerNum).TempBasedExhaustTempCoef(3) * pow_2(AmbientDeltaT)) -
+            ExhaustTemp = (this->PLBasedExhaustTempCoef(1) + this->PLBasedExhaustTempCoef(2) * RL +
+                           this->PLBasedExhaustTempCoef(3) * RL2) *
+                              (this->TempBasedExhaustTempCoef(1) + this->TempBasedExhaustTempCoef(2) * AmbientDeltaT +
+                               this->TempBasedExhaustTempCoef(3) * pow_2(AmbientDeltaT)) -
                           273;
 
             //                        UAG=UACGC(1,IPLCTR)*GTDSLCAP(IS,TypeIndex,IPLCTR)**      &
             //                            UACGC(2,IPLCTR)
             if (PLoad != 0.0) {
-                UAtoCapRat = GTChiller(ChillerNum).UAtoCapCoef(1) * std::pow(GTEngineCapacity, GTChiller(ChillerNum).UAtoCapCoef(2));
+                UAtoCapRat = this->UAtoCapCoef(1) * std::pow(GTEngineCapacity, this->UAtoCapCoef(2));
 
                 //     TSTACK = EXHAUST STACK TEMPERATURE, C.
                 //                        TSTACK=TSATUR(IPLCTR)+(TEX-TSATUR(IPLCTR))/      &
                 //                               EXP(UAG/(AMAX1(FEX,RMXKGC(IPLCTR)*        &
                 //                               GTDSLCAP(IS,TypeIndex,IPLCTR)) * 1.047))
 
-                DesignSteamSatTemp = GTChiller(ChillerNum).DesignSteamSatTemp;
+                DesignSteamSatTemp = this->DesignSteamSatTemp;
                 _ExhaustStackTemp =
                     DesignSteamSatTemp + (ExhaustTemp - DesignSteamSatTemp) /
                                              std::exp(UAtoCapRat / (max(ExhaustFlow, MaxExhaustperGTPower * GTEngineCapacity) * ExhaustCP));
@@ -7367,9 +7372,9 @@ namespace PlantChillers {
                 //                              *RLOAD+ELUBEGC(3,IPLCTR)*RLD2 )
             }
 
-            if (GTChiller(ChillerNum).HeatRecActive) {
-                QHeatRecLube = PLoad * (GTChiller(ChillerNum).HeatRecLubeEnergyCoef(1) + GTChiller(ChillerNum).HeatRecLubeEnergyCoef(2) * RL +
-                                        GTChiller(ChillerNum).HeatRecLubeEnergyCoef(3) * RL2);
+            if (this->HeatRecActive) {
+                QHeatRecLube = PLoad * (this->HeatRecLubeEnergyCoef(1) + this->HeatRecLubeEnergyCoef(2) * RL +
+                                        this->HeatRecLubeEnergyCoef(3) * RL2);
 
             } else {
                 QHeatRecLube = 0.0;
@@ -7386,13 +7391,13 @@ namespace PlantChillers {
             // Need to set the HeatRecRatio to 1.0 if it is not modified
             HeatRecRatio = 1.0;
 
-            if (GTChiller(ChillerNum).HeatRecActive) {
+            if (this->HeatRecActive) {
                 // This mdot is input specified mdot "Desired Flowrate", already set at node in init routine
                 HeatRecMdot = Node(HeatRecInNode).MassFlowRate;
                 HeatRecInTemp = Node(HeatRecInNode).Temp;
-                HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(GTChiller(ChillerNum).HRLoopNum).FluidName,
+                HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
                                                   HeatRecInTemp,
-                                                  DataPlant::PlantLoop(GTChiller(ChillerNum).HRLoopNum).FluidIndex,
+                                                  DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                                   RoutineNameHeatRecovery);
 
                 // Don't divide by zero
@@ -7403,9 +7408,9 @@ namespace PlantChillers {
                 }
 
                 // Now verify that the design flowrate was large enough to prevent phase change
-                if (HeatRecOutTemp > GTChiller(ChillerNum).HeatRecMaxTemp) {
-                    if (GTChiller(ChillerNum).HeatRecMaxTemp != HeatRecInTemp) {
-                        MinHeatRecMdot = (QHeatRecLube) / (HeatRecCp * (GTChiller(ChillerNum).HeatRecMaxTemp - HeatRecInTemp));
+                if (HeatRecOutTemp > this->HeatRecMaxTemp) {
+                    if (this->HeatRecMaxTemp != HeatRecInTemp) {
+                        MinHeatRecMdot = (QHeatRecLube) / (HeatRecCp * (this->HeatRecMaxTemp - HeatRecInTemp));
                         if (MinHeatRecMdot < 0.0) MinHeatRecMdot = 0.0;
                     }
 
@@ -7428,32 +7433,32 @@ namespace PlantChillers {
             }
         }
 
-        GTChiller(ChillerNum).HeatRecInletTemp = HeatRecInTemp;
-        GTChiller(ChillerNum).HeatRecOutletTemp = HeatRecOutTemp;
-        GTChiller(ChillerNum).HeatRecMdot = HeatRecMdot;
-        GTChiller(ChillerNum).HeatRecLubeEnergy = QHeatRecLube * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        GTChiller(ChillerNum).HeatRecLubeRate = QHeatRecLube;
-        GTChiller(ChillerNum).FuelEnergyIn = std::abs(FuelEnergyIn);
+        this->HeatRecInletTemp = HeatRecInTemp;
+        this->HeatRecOutletTemp = HeatRecOutTemp;
+        this->HeatRecMdot = HeatRecMdot;
+        this->HeatRecLubeEnergy = QHeatRecLube * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->HeatRecLubeRate = QHeatRecLube;
+        this->FuelEnergyIn = std::abs(FuelEnergyIn);
 
-        FuelHeatingValue = GTChiller(ChillerNum).FuelHeatingValue;
+        FuelHeatingValue = this->FuelHeatingValue;
 
-        GTChiller(ChillerNum).FuelMassUsedRate = std::abs(FuelEnergyIn) / (FuelHeatingValue * KJtoJ);
+        this->FuelMassUsedRate = std::abs(FuelEnergyIn) / (FuelHeatingValue * KJtoJ);
 
-        GTChiller(ChillerNum).ExhaustStackTemp = _ExhaustStackTemp;
+        this->ExhaustStackTemp = _ExhaustStackTemp;
 
         // Calculate Energy
-        GTChiller(ChillerNum).CondenserEnergy = GTChiller(ChillerNum).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).Energy = GTChiller(ChillerNum).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        GTChiller(ChillerNum).EvaporatorEnergy = GTChiller(ChillerNum).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->CondenserEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
-        if (GTChiller(ChillerNum).Energy < 0.0) { // there is a serious problem
+        if (this->Energy < 0.0) { // there is a serious problem
 
-            if (GTChiller(ChillerNum).CondenserType == WaterCooled) {
+            if (this->CondenserType == WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (_CondInletTemp > 70.0) {
                     ShowSevereError("CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" +
-                                    GTChiller(ChillerNum).Name);
+                                    this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Condenser loop water temperatures are too high at" + RoundSigDigits(_CondInletTemp, 2));
                     ShowContinueError("Check input for condenser plant loop, especially cooling tower");
@@ -7464,7 +7469,7 @@ namespace PlantChillers {
             }
             if (!WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
-                    ShowSevereError("CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + GTChiller(ChillerNum).Name);
+                    ShowSevereError("CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + this->Name);
                     ShowContinueErrorTimeStamp("");
                     ShowContinueError("Check input for Capacity Ratio Curve");
                     ShowContinueError("Condenser inlet temperature: " + RoundSigDigits(_CondInletTemp, 2));
@@ -7474,8 +7479,8 @@ namespace PlantChillers {
             }
             // If makes it here, set limits, chiller can't have negative energy/power
             // proceeding silently for now but may want to throw error here
-            GTChiller(ChillerNum).Power = 0.0;
-            GTChiller(ChillerNum).Energy = 0.0;
+            this->Power = 0.0;
+            this->Energy = 0.0;
         }
     }
 
@@ -8101,7 +8106,7 @@ namespace PlantChillers {
         }
     }
 
-    void CalcEngineChillerHeatRec(int const ChillerNum,         // Chiller number
+    void EngineDrivenChillerSpecs::calcHeatRecovery(
                                   Real64 const EnergyRecovered, // Amount of heat recovered
                                   Real64 &HeatRecRatio          // Max Heat recovery ratio
     )
@@ -8123,48 +8128,48 @@ namespace PlantChillers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;
-        Real64 HeatRecMdot;
+        Real64 _HeatRecMdot;
         Real64 MinHeatRecMdot(0.0);
         Real64 HeatRecInTemp;
         Real64 HeatRecOutTemp;
         Real64 HeatRecCp;
 
         // Load inputs to local structure
-        HeatRecInNode = EngineDrivenChiller(ChillerNum).HeatRecInletNodeNum;
+        HeatRecInNode = this->HeatRecInletNodeNum;
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HeatRecRatio = 1.0;
 
         //  !This mdot is input specified mdot "Desired Flowrate", already set in init routine
-        HeatRecMdot = Node(HeatRecInNode).MassFlowRate;
+        _HeatRecMdot = Node(HeatRecInNode).MassFlowRate;
 
         HeatRecInTemp = Node(HeatRecInNode).Temp;
-        HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).HRLoopNum).FluidName,
-                                                           EngineDrivenChiller(ChillerNum).HeatRecInletTemp,
-                                          DataPlant::PlantLoop(EngineDrivenChiller(ChillerNum).HRLoopNum).FluidIndex,
+        HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                           this->HeatRecInletTemp,
+                                          DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
                                           RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
         //  design Mdot for Heat Recovery - Specified on Chiller Input - is zero
         //  In order to see what minimum heat recovery flow rate is for the design temperature
         //  The design heat recovery flow rate can be set very small, but greater than zero.
-        if ((HeatRecMdot > 0) && (HeatRecCp > 0)) {
-            HeatRecOutTemp = (EnergyRecovered) / (HeatRecMdot * HeatRecCp) + HeatRecInTemp;
+        if ((_HeatRecMdot > 0) && (HeatRecCp > 0)) {
+            HeatRecOutTemp = (EnergyRecovered) / (_HeatRecMdot * HeatRecCp) + HeatRecInTemp;
         } else {
             HeatRecOutTemp = HeatRecInTemp;
         }
 
         // Now verify that the design flowrate was large enough to prevent phase change
-        if (HeatRecOutTemp > EngineDrivenChiller(ChillerNum).HeatRecMaxTemp) {
-            if (EngineDrivenChiller(ChillerNum).HeatRecMaxTemp != HeatRecInTemp) {
-                MinHeatRecMdot = (EnergyRecovered) / (HeatRecCp * (EngineDrivenChiller(ChillerNum).HeatRecMaxTemp - HeatRecInTemp));
+        if (HeatRecOutTemp > this->HeatRecMaxTemp) {
+            if (this->HeatRecMaxTemp != HeatRecInTemp) {
+                MinHeatRecMdot = (EnergyRecovered) / (HeatRecCp * (this->HeatRecMaxTemp - HeatRecInTemp));
                 if (MinHeatRecMdot < 0.0) MinHeatRecMdot = 0.0;
             }
 
             // Recalculate Outlet Temperature, with adjusted flowrate
             if ((MinHeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
                 HeatRecOutTemp = (EnergyRecovered) / (MinHeatRecMdot * HeatRecCp) + HeatRecInTemp;
-                HeatRecRatio = HeatRecMdot / MinHeatRecMdot;
+                HeatRecRatio = _HeatRecMdot / MinHeatRecMdot;
             } else {
                 HeatRecOutTemp = HeatRecInTemp;
                 HeatRecRatio = 0.0;
@@ -8172,9 +8177,9 @@ namespace PlantChillers {
         }
 
         // Update global variables for reporting later
-        EngineDrivenChiller(ChillerNum).HeatRecInletTemp = HeatRecInTemp;
-        EngineDrivenChiller(ChillerNum).HeatRecOutletTemp = HeatRecOutTemp;
-        EngineDrivenChiller(ChillerNum).HeatRecMdotActual = HeatRecMdot;
+        this->HeatRecInletTemp = HeatRecInTemp;
+        this->HeatRecOutletTemp = HeatRecOutTemp;
+        this->HeatRecMdotActual = _HeatRecMdot;
     }
 
     void ElectricChillerSpecs::update(Real64 const MyLoad, // current load
@@ -8280,9 +8285,9 @@ namespace PlantChillers {
         }
     }
 
-    void UpdateEngineDrivenChiller(Real64 const MyLoad, // current load
-                                   bool const RunFlag,  // TRUE if chiller operating
-                                   int const Num        // chiller number
+    void EngineDrivenChillerSpecs::update(Real64 const MyLoad, // current load
+                                   bool const RunFlag  // TRUE if chiller operating
+                                   
     )
     {
         // SUBROUTINE INFORMATION:
@@ -8300,67 +8305,67 @@ namespace PlantChillers {
 
         ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        EvapInletNode = EngineDrivenChiller(Num).EvapInletNodeNum;
-        EvapOutletNode = EngineDrivenChiller(Num).EvapOutletNodeNum;
-        CondInletNode = EngineDrivenChiller(Num).CondInletNodeNum;
-        CondOutletNode = EngineDrivenChiller(Num).CondOutletNodeNum;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
 
-        HeatRecInletNode = EngineDrivenChiller(Num).HeatRecInletNodeNum;
-        HeatRecOutletNode = EngineDrivenChiller(Num).HeatRecOutletNodeNum;
+        HeatRecInletNode = this->HeatRecInletNodeNum;
+        HeatRecOutletNode = this->HeatRecOutletNodeNum;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
             Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
-            EngineDrivenChiller(Num).Power = 0.0;
-            EngineDrivenChiller(Num).QEvaporator = 0.0;
-            EngineDrivenChiller(Num).QCondenser = 0.0;
-            EngineDrivenChiller(Num).Energy = 0.0;
-            EngineDrivenChiller(Num).EvaporatorEnergy = 0.0;
-            EngineDrivenChiller(Num).CondenserEnergy = 0.0;
-            EngineDrivenChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
-            EngineDrivenChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
-            EngineDrivenChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
-            EngineDrivenChiller(Num).EvapOutletTemp = Node(EvapOutletNode).Temp;
-            EngineDrivenChiller(Num).FuelCOP = 0.0;
-            if (EngineDrivenChiller(Num).CondenserType == EvapCooled) {
-                EngineDrivenChiller(Num).BasinHeaterPower = EngineDrivenChiller(Num).BasinHeaterPower;
-                EngineDrivenChiller(Num).BasinHeaterConsumption = EngineDrivenChiller(Num).BasinHeaterPower * ReportingConstant;
+            this->Power = 0.0;
+            this->QEvaporator = 0.0;
+            this->QCondenser = 0.0;
+            this->Energy = 0.0;
+            this->EvaporatorEnergy = 0.0;
+            this->CondenserEnergy = 0.0;
+            this->EvapInletTemp = Node(EvapInletNode).Temp;
+            this->CondInletTemp = Node(CondInletNode).Temp;
+            this->CondOutletTemp = Node(CondOutletNode).Temp;
+            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->FuelCOP = 0.0;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterPower = this->BasinHeaterPower;
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         } else { // Chiller is running
             // set node temperatures
-            Node(EvapOutletNode).Temp = EngineDrivenChiller(Num).EvapOutletTemp;
-            Node(CondOutletNode).Temp = EngineDrivenChiller(Num).CondOutletTemp;
+            Node(EvapOutletNode).Temp = this->EvapOutletTemp;
+            Node(CondOutletNode).Temp = this->CondOutletTemp;
 
-            EngineDrivenChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
-            EngineDrivenChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
-            EngineDrivenChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
-            EngineDrivenChiller(Num).EvapOutletTemp = Node(EvapOutletNode).Temp;
-            if (EngineDrivenChiller(Num).FuelEnergyUseRate != 0.0) {
-                EngineDrivenChiller(Num).FuelCOP = EngineDrivenChiller(Num).QEvaporator / EngineDrivenChiller(Num).FuelEnergyUseRate;
+            this->EvapInletTemp = Node(EvapInletNode).Temp;
+            this->CondInletTemp = Node(CondInletNode).Temp;
+            this->CondOutletTemp = Node(CondOutletNode).Temp;
+            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            if (this->FuelEnergyUseRate != 0.0) {
+                this->FuelCOP = this->QEvaporator / this->FuelEnergyUseRate;
             } else {
-                EngineDrivenChiller(Num).FuelCOP = 0.0;
+                this->FuelCOP = 0.0;
             }
-            if (EngineDrivenChiller(Num).CondenserType == EvapCooled) {
-                EngineDrivenChiller(Num).BasinHeaterPower = EngineDrivenChiller(Num).BasinHeaterPower;
-                EngineDrivenChiller(Num).BasinHeaterConsumption = EngineDrivenChiller(Num).BasinHeaterPower * ReportingConstant;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterPower = this->BasinHeaterPower;
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
 
         // Update Heat Recovery Stuff whether running or not, variables should be set correctly
-        EngineDrivenChiller(Num).HeatRecMdot = EngineDrivenChiller(Num).HeatRecMdotActual;
+        this->HeatRecMdot = this->HeatRecMdotActual;
 
         // Update the Heat Recovery outlet
-        if (EngineDrivenChiller(Num).HeatRecActive) {
+        if (this->HeatRecActive) {
             PlantUtilities::SafeCopyPlantNode(HeatRecInletNode, HeatRecOutletNode);
-            Node(HeatRecOutletNode).Temp = EngineDrivenChiller(Num).HeatRecOutletTemp;
+            Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
 
-    void UpdateGTChillerRecords(Real64 const MyLoad, // current load
-                                bool const RunFlag,  // TRUE if chiller operating
-                                int const Num        // chiller number
+    void GTChillerSpecs::update(Real64 const MyLoad, // current load
+                                bool const RunFlag  // TRUE if chiller operating
+                               
     )
     {
         // SUBROUTINE INFORMATION:
@@ -8379,13 +8384,13 @@ namespace PlantChillers {
 
         ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        EvapInletNode = GTChiller(Num).EvapInletNodeNum;
-        EvapOutletNode = GTChiller(Num).EvapOutletNodeNum;
-        CondInletNode = GTChiller(Num).CondInletNodeNum;
-        CondOutletNode = GTChiller(Num).CondOutletNodeNum;
-        if (GTChiller(Num).HeatRecActive) {
-            HeatRecInletNode = GTChiller(Num).HeatRecInletNodeNum;
-            HeatRecOutletNode = GTChiller(Num).HeatRecOutletNodeNum;
+        EvapInletNode = this->EvapInletNodeNum;
+        EvapOutletNode = this->EvapOutletNodeNum;
+        CondInletNode = this->CondInletNodeNum;
+        CondOutletNode = this->CondOutletNodeNum;
+        if (this->HeatRecActive) {
+            HeatRecInletNode = this->HeatRecInletNodeNum;
+            HeatRecOutletNode = this->HeatRecOutletNodeNum;
         }
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
@@ -8393,70 +8398,70 @@ namespace PlantChillers {
             Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
             Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
 
-            if (GTChiller(Num).HeatRecActive) {
+            if (this->HeatRecActive) {
                 PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
-                GTChiller(Num).HeatRecInletTemp = Node(HeatRecInletNode).Temp;
-                GTChiller(Num).HeatRecOutletTemp = Node(HeatRecOutletNode).Temp;
+                this->HeatRecInletTemp = Node(HeatRecInletNode).Temp;
+                this->HeatRecOutletTemp = Node(HeatRecOutletNode).Temp;
             }
 
-            GTChiller(Num).Power = 0.0;
-            GTChiller(Num).QEvaporator = 0.0;
-            GTChiller(Num).QCondenser = 0.0;
-            GTChiller(Num).Energy = 0.0;
-            GTChiller(Num).EvaporatorEnergy = 0.0;
-            GTChiller(Num).CondenserEnergy = 0.0;
-            GTChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
-            GTChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
-            GTChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
-            GTChiller(Num).EvapOutletTemp = Node(EvapOutletNode).Temp;
-            GTChiller(Num).FuelEnergyUsedRate = 0.0;
-            GTChiller(Num).FuelMassUsedRate = 0.0;
-            GTChiller(Num).FuelEnergyUsed = 0.0;
-            GTChiller(Num).FuelMassUsed = 0.0;
+            this->Power = 0.0;
+            this->QEvaporator = 0.0;
+            this->QCondenser = 0.0;
+            this->Energy = 0.0;
+            this->EvaporatorEnergy = 0.0;
+            this->CondenserEnergy = 0.0;
+            this->EvapInletTemp = Node(EvapInletNode).Temp;
+            this->CondInletTemp = Node(CondInletNode).Temp;
+            this->CondOutletTemp = Node(CondOutletNode).Temp;
+            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->FuelEnergyUsedRate = 0.0;
+            this->FuelMassUsedRate = 0.0;
+            this->FuelEnergyUsed = 0.0;
+            this->FuelMassUsed = 0.0;
 
-            GTChiller(Num).HeatRecLubeEnergy = 0.0;
-            GTChiller(Num).HeatRecLubeRate = 0.0;
-            GTChiller(Num).ExhaustStackTemp = 0.0;
-            GTChiller(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
-            GTChiller(Num).FuelCOP = 0.0;
-            if (GTChiller(Num).CondenserType == EvapCooled) {
-                GTChiller(Num).BasinHeaterPower = GTChiller(Num).BasinHeaterPower;
-                GTChiller(Num).BasinHeaterConsumption = GTChiller(Num).BasinHeaterPower * ReportingConstant;
+            this->HeatRecLubeEnergy = 0.0;
+            this->HeatRecLubeRate = 0.0;
+            this->ExhaustStackTemp = 0.0;
+            this->HeatRecMdot = this->HeatRecMdot;
+            this->FuelCOP = 0.0;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterPower = this->BasinHeaterPower;
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
         } else { // Chiller is running so report calculated values
             // set node temperatures
-            Node(EvapOutletNode).Temp = GTChiller(Num).EvapOutletTemp;
-            Node(CondOutletNode).Temp = GTChiller(Num).CondOutletTemp;
+            Node(EvapOutletNode).Temp = this->EvapOutletTemp;
+            Node(CondOutletNode).Temp = this->CondOutletTemp;
 
-            if (GTChiller(Num).HeatRecActive) {
+            if (this->HeatRecActive) {
                 PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
-                Node(HeatRecOutletNode).Temp = GTChiller(Num).HeatRecOutletTemp;
+                Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
             }
 
-            GTChiller(Num).EvapInletTemp = Node(EvapInletNode).Temp;
-            GTChiller(Num).CondInletTemp = Node(CondInletNode).Temp;
-            GTChiller(Num).CondOutletTemp = Node(CondOutletNode).Temp;
-            GTChiller(Num).EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(EvapInletNode).Temp;
+            this->CondInletTemp = Node(CondInletNode).Temp;
+            this->CondOutletTemp = Node(CondOutletNode).Temp;
+            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
 
-            GTChiller(Num).HeatRecLubeEnergy = GTChiller(Num).HeatRecLubeEnergy;
-            GTChiller(Num).HeatRecLubeRate = GTChiller(Num).HeatRecLubeRate;
-            GTChiller(Num).FuelEnergyUsedRate = GTChiller(Num).FuelEnergyIn;
-            GTChiller(Num).FuelMassUsedRate = GTChiller(Num).FuelMassUsedRate;
-            GTChiller(Num).FuelEnergyUsed = GTChiller(Num).FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            GTChiller(Num).FuelMassUsed = GTChiller(Num).FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            GTChiller(Num).ExhaustStackTemp = GTChiller(Num).ExhaustStackTemp;
-            GTChiller(Num).HeatRecInletTemp = GTChiller(Num).HeatRecInletTemp;
-            GTChiller(Num).HeatRecOutletTemp = GTChiller(Num).HeatRecOutletTemp;
-            GTChiller(Num).HeatRecMdot = GTChiller(Num).HeatRecMdot;
-            if (GTChiller(Num).FuelEnergyUsedRate != 0.0) {
-                GTChiller(Num).FuelCOP = GTChiller(Num).QEvaporator / GTChiller(Num).FuelEnergyUsedRate;
+            this->HeatRecLubeEnergy = this->HeatRecLubeEnergy;
+            this->HeatRecLubeRate = this->HeatRecLubeRate;
+            this->FuelEnergyUsedRate = this->FuelEnergyIn;
+            this->FuelMassUsedRate = this->FuelMassUsedRate;
+            this->FuelEnergyUsed = this->FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->FuelMassUsed = this->FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->ExhaustStackTemp = this->ExhaustStackTemp;
+            this->HeatRecInletTemp = this->HeatRecInletTemp;
+            this->HeatRecOutletTemp = this->HeatRecOutletTemp;
+            this->HeatRecMdot = this->HeatRecMdot;
+            if (this->FuelEnergyUsedRate != 0.0) {
+                this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
-                GTChiller(Num).FuelCOP = 0.0;
+                this->FuelCOP = 0.0;
             }
-            if (GTChiller(Num).CondenserType == EvapCooled) {
-                GTChiller(Num).BasinHeaterPower = GTChiller(Num).BasinHeaterPower;
-                GTChiller(Num).BasinHeaterConsumption = GTChiller(Num).BasinHeaterPower * ReportingConstant;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterPower = this->BasinHeaterPower;
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
     }
