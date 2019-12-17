@@ -8191,31 +8191,15 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EvapInletNode;  // evaporator inlet node number, water side
-        int EvapOutletNode; // evaporator outlet node number, water side
-        int CondInletNode;  // condenser inlet node number, water side
-        int CondOutletNode; // condenser outlet node number, water side
-        int HeatRecInNode;
-        int HeatRecOutNode;
-        Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-        EvapInletNode = this->EvapInletNodeNum;
-        EvapOutletNode = this->EvapOutletNodeNum;
-        CondInletNode = this->CondInletNodeNum;
-        CondOutletNode = this->CondOutletNodeNum;
-        HeatRecInNode = this->HeatRecInletNodeNum;
-        HeatRecOutNode = this->HeatRecOutletNodeNum;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
-            Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
-            Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
+            Node(this->EvapOutletNodeNum).Temp = Node(this->EvapInletNodeNum).Temp;
+            Node(this->CondOutletNodeNum).Temp = Node(this->CondInletNodeNum).Temp;
             if (this->CondenserType != WaterCooled) {
-                Node(CondOutletNode).HumRat = Node(CondInletNode).HumRat;
-                Node(CondOutletNode).Enthalpy = Node(CondInletNode).Enthalpy;
+                Node(this->CondOutletNodeNum).HumRat = Node(this->CondInletNodeNum).HumRat;
+                Node(this->CondOutletNodeNum).Enthalpy = Node(this->CondInletNodeNum).Enthalpy;
             }
 
             this->Power = 0.0;
@@ -8224,10 +8208,10 @@ namespace PlantChillers {
             this->Energy = 0.0;
             this->EvaporatorEnergy = 0.0;
             this->CondenserEnergy = 0.0;
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
             this->ActualCOP = 0.0;
             if (this->CondenserType == EvapCooled) {
                 this->BasinHeaterPower = this->BasinHeaterPower;
@@ -8236,31 +8220,31 @@ namespace PlantChillers {
 
             if (this->HeatRecActive) {
 
-                PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
 
                 this->QHeatRecovery = 0.0;
                 this->EnergyHeatRecovery = 0.0;
-                this->HeatRecInletTemp = Node(HeatRecInNode).Temp;
-                this->HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
-                this->HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
+                this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
+                this->HeatRecOutletTemp = Node(this->HeatRecOutletNodeNum).Temp;
+                this->HeatRecMassFlow = Node(this->HeatRecInletNodeNum).MassFlowRate;
 
                 this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
             }
 
         } else { // Chiller is running, so pass calculated values
             // set node temperatures
-            Node(EvapOutletNode).Temp = this->EvapOutletTemp;
-            Node(CondOutletNode).Temp = this->CondOutletTemp;
+            Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
+            Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
             if (this->CondenserType != WaterCooled) {
-                Node(CondOutletNode).HumRat = this->CondOutletHumRat;
-                Node(CondOutletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(this->CondOutletTemp, this->CondOutletHumRat);
+                Node(this->CondOutletNodeNum).HumRat = this->CondOutletHumRat;
+                Node(this->CondOutletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->CondOutletTemp, this->CondOutletHumRat);
             }
             // set node flow rates;  for these load based models
             // assume that the sufficient evaporator flow rate available
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
             if (this->CondenserType == EvapCooled) {
                 this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
@@ -8273,13 +8257,13 @@ namespace PlantChillers {
 
             if (this->HeatRecActive) {
 
-                PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
                 this->QHeatRecovery = this->QHeatRecovered;
                 this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                Node(HeatRecOutNode).Temp = this->HeatRecOutletTemp;
-                this->HeatRecInletTemp = Node(HeatRecInNode).Temp;
-                this->HeatRecOutletTemp = Node(HeatRecOutNode).Temp;
-                this->HeatRecMassFlow = Node(HeatRecInNode).MassFlowRate;
+                Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
+                this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
+                this->HeatRecOutletTemp = Node(this->HeatRecOutletNodeNum).Temp;
+                this->HeatRecMassFlow = Node(this->HeatRecInletNodeNum).MassFlowRate;
                 this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
             }
         }
@@ -8294,29 +8278,12 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EvapInletNode;  // evaporator inlet node number, water side
-        int EvapOutletNode; // evaporator outlet node number, water side
-        int CondInletNode;  // condenser inlet node number, water side
-        int CondOutletNode; // condenser outlet node number, water side
-        int HeatRecInletNode;
-        int HeatRecOutletNode;
-        Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-        EvapInletNode = this->EvapInletNodeNum;
-        EvapOutletNode = this->EvapOutletNodeNum;
-        CondInletNode = this->CondInletNodeNum;
-        CondOutletNode = this->CondOutletNodeNum;
-
-        HeatRecInletNode = this->HeatRecInletNodeNum;
-        HeatRecOutletNode = this->HeatRecOutletNodeNum;
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
-            Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
-            Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
+            Node(this->EvapOutletNodeNum).Temp = Node(this->EvapInletNodeNum).Temp;
+            Node(this->CondOutletNodeNum).Temp = Node(this->CondInletNodeNum).Temp;
 
             this->Power = 0.0;
             this->QEvaporator = 0.0;
@@ -8324,10 +8291,10 @@ namespace PlantChillers {
             this->Energy = 0.0;
             this->EvaporatorEnergy = 0.0;
             this->CondenserEnergy = 0.0;
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
             this->FuelCOP = 0.0;
             if (this->CondenserType == EvapCooled) {
                 this->BasinHeaterPower = this->BasinHeaterPower;
@@ -8335,13 +8302,13 @@ namespace PlantChillers {
             }
         } else { // Chiller is running
             // set node temperatures
-            Node(EvapOutletNode).Temp = this->EvapOutletTemp;
-            Node(CondOutletNode).Temp = this->CondOutletTemp;
+            Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
+            Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
 
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
             if (this->FuelEnergyUseRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUseRate;
             } else {
@@ -8358,8 +8325,8 @@ namespace PlantChillers {
 
         // Update the Heat Recovery outlet
         if (this->HeatRecActive) {
-            PlantUtilities::SafeCopyPlantNode(HeatRecInletNode, HeatRecOutletNode);
-            Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+            PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
+            Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         }
     }
 
@@ -8372,36 +8339,17 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EvapInletNode;  // evaporator inlet node number, water side
-        int EvapOutletNode; // evaporator outlet node number, water side
-        int CondInletNode;  // condenser inlet node number, water side
-        int CondOutletNode; // condenser outlet node number, water side
-
-        int HeatRecInletNode;
-        int HeatRecOutletNode;
-        Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-
-        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-
-        EvapInletNode = this->EvapInletNodeNum;
-        EvapOutletNode = this->EvapOutletNodeNum;
-        CondInletNode = this->CondInletNodeNum;
-        CondOutletNode = this->CondOutletNodeNum;
-        if (this->HeatRecActive) {
-            HeatRecInletNode = this->HeatRecInletNodeNum;
-            HeatRecOutletNode = this->HeatRecOutletNodeNum;
-        }
+        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
-            Node(EvapOutletNode).Temp = Node(EvapInletNode).Temp;
-            Node(CondOutletNode).Temp = Node(CondInletNode).Temp;
+            Node(this->EvapOutletNodeNum).Temp = Node(this->EvapInletNodeNum).Temp;
+            Node(this->CondOutletNodeNum).Temp = Node(this->CondInletNodeNum).Temp;
 
             if (this->HeatRecActive) {
-                PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
-                this->HeatRecInletTemp = Node(HeatRecInletNode).Temp;
-                this->HeatRecOutletTemp = Node(HeatRecOutletNode).Temp;
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecOutletNodeNum, this->HeatRecInletNodeNum);
+                this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
+                this->HeatRecOutletTemp = Node(this->HeatRecOutletNodeNum).Temp;
             }
 
             this->Power = 0.0;
@@ -8410,10 +8358,10 @@ namespace PlantChillers {
             this->Energy = 0.0;
             this->EvaporatorEnergy = 0.0;
             this->CondenserEnergy = 0.0;
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
             this->FuelEnergyUsedRate = 0.0;
             this->FuelMassUsedRate = 0.0;
             this->FuelEnergyUsed = 0.0;
@@ -8431,29 +8379,22 @@ namespace PlantChillers {
 
         } else { // Chiller is running so report calculated values
             // set node temperatures
-            Node(EvapOutletNode).Temp = this->EvapOutletTemp;
-            Node(CondOutletNode).Temp = this->CondOutletTemp;
+            Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
+            Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
 
             if (this->HeatRecActive) {
-                PlantUtilities::SafeCopyPlantNode(HeatRecOutletNode, HeatRecInletNode);
-                Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecOutletNodeNum, this->HeatRecInletNodeNum);
+                Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             }
 
-            this->EvapInletTemp = Node(EvapInletNode).Temp;
-            this->CondInletTemp = Node(CondInletNode).Temp;
-            this->CondOutletTemp = Node(CondOutletNode).Temp;
-            this->EvapOutletTemp = Node(EvapOutletNode).Temp;
+            this->EvapInletTemp = Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = Node(this->EvapOutletNodeNum).Temp;
 
-            this->HeatRecLubeEnergy = this->HeatRecLubeEnergy;
-            this->HeatRecLubeRate = this->HeatRecLubeRate;
             this->FuelEnergyUsedRate = this->FuelEnergyIn;
-            this->FuelMassUsedRate = this->FuelMassUsedRate;
             this->FuelEnergyUsed = this->FuelEnergyUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             this->FuelMassUsed = this->FuelMassUsedRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            this->ExhaustStackTemp = this->ExhaustStackTemp;
-            this->HeatRecInletTemp = this->HeatRecInletTemp;
-            this->HeatRecOutletTemp = this->HeatRecOutletTemp;
-            this->HeatRecMdot = this->HeatRecMdot;
             if (this->FuelEnergyUsedRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
