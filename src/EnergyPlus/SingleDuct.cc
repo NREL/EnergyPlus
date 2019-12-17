@@ -300,7 +300,7 @@ namespace SingleDuct {
                 thisATU.SimConstVol(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) { // AirTerminal:SingleDuct:ConstantVolume:NoReheat
-                Sys(SysNum).SimConstVolNoReheat(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                thisATU.SimConstVolNoReheat(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctVAVReheat) { // SINGLE DUCT:VAV:REHEAT
                 thisATU.SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
