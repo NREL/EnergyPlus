@@ -1977,7 +1977,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
 {
 
     std::string const routineName = "GeneratorController constructor ";
-    bool errorsFound = false;
 
     name = objectName;
     typeOfName = objectType;
@@ -2012,7 +2011,8 @@ GeneratorController::GeneratorController(std::string const &objectName,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        FuelCellElectricGenerator::getFuelCellGeneratorHeatRecoveryInfo(name, compPlantName);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::microCHP;
         compGenTypeOf_Num = DataGlobalConstants::iGeneratorMicroCHP;
@@ -2025,7 +2025,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
     } else {
         ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + " invalid entry.");
         ShowContinueError("Invalid " + objectType + " associated with generator = " + objectName);
-        errorsFound = true;
     }
 
     availSched = availSchedName;
@@ -2037,7 +2036,6 @@ GeneratorController::GeneratorController(std::string const &objectName,
             ShowSevereError(routineName + DataIPShortCuts::cCurrentModuleObject + ", invalid entry.");
             ShowContinueError("Invalid availability schedule = " + availSchedName);
             ShowContinueError("Schedule was not found ");
-            errorsFound = true;
         } else {
             if (generatorType == GeneratorType::pvWatts) {
                 ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
@@ -2109,15 +2107,29 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->InitICEngineGenerators(runFlag, FirstHVACIteration);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->CalcICEngineGeneratorModel(runFlag, tempLoad);
         dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->update();
-        electricPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
-        thermalPowerOutput = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
+        electProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecPowerGenerated;
+        electricityProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->ElecEnergyGenerated;
+        thermProdRate = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->QTotalHeatRecovered;
+        thermalProd = dynamic_cast<ICEngineElectricGenerator::ICEngineGeneratorSpecs*> (thisICE)->TotalHeatEnergyRec;
+        electricPowerOutput = electProdRate;
+        thermalPowerOutput = thermProdRate;
         break;
     }
     case GeneratorType::combTurbine: {
-        CTElectricGenerator::SimCTGenerator(
-            DataGlobalConstants::iGeneratorCombTurbine, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration);
-        CTElectricGenerator::GetCTGeneratorResults(
-            DataGlobalConstants::iGeneratorCombTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
+
+        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(name);
+        // dummy vars
+        PlantLocation L(0,0,0,0);
+        Real64 tempLoad = myElecLoadRequest;
+
+        // simulate
+        thisCTE->simulate(L, FirstHVACIteration, tempLoad, runFlag);
+        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->InitCTGenerators(runFlag, FirstHVACIteration);
+        dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->CalcCTGeneratorModel(runFlag, tempLoad, FirstHVACIteration);
+        electProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecPowerGenerated;
+        electricityProd = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->ElecEnergyGenerated;
+        thermProdRate = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->QTotalHeatRecovered;
+        thermalProd = dynamic_cast<CTElectricGenerator::CTGeneratorData*> (thisCTE)->TotalHeatEnergyRec;
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
         break;
@@ -2139,25 +2151,36 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         break;
     }
     case GeneratorType::fuelCell: {
-        FuelCellElectricGenerator::SimFuelCellGenerator(
-            DataGlobalConstants::iGeneratorFuelCell, name, generatorIndex, runFlag, myElecLoadRequest, FirstHVACIteration);
-        FuelCellElectricGenerator::GetFuelCellGeneratorResults(
-            DataGlobalConstants::iGeneratorFuelCell, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(runFlag, myElecLoadRequest, FirstHVACIteration);
+        electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
+        electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACEnergyGen;
+        thermProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.qHX;
+        thermalProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.HXenergy;
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
         break;
     }
     case GeneratorType::microCHP: {
-        MicroCHPElectricGenerator::SimMicroCHPGenerator(DataGlobalConstants::iGeneratorMicroCHP,
-                                                        name,
-                                                        generatorIndex,
-                                                        runFlag,
-                                                        false,
-                                                        myElecLoadRequest,
-                                                        DataPrecisionGlobals::constant_zero,
-                                                        FirstHVACIteration);
-        MicroCHPElectricGenerator::GetMicroCHPGeneratorResults(
-            DataGlobalConstants::iGeneratorMicroCHP, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
+        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(name);
+
+        // simulate
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators();
+
+        if (!DataPlant::PlantFirstSizeCompleted) break;
+
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(runFlag,
+                                                                                                                       false,
+                                                                                                                       myElecLoadRequest,
+                                                                                                                       DataPrecisionGlobals::constant_zero,
+                                                                                                                       FirstHVACIteration);
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcUpdateHeatRecovery();
+        dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->UpdateMicroCHPGeneratorRecords();
+
+        electProdRate = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.ACPowerGen;
+        electricityProd = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.ACEnergyGen;
+        thermProdRate = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.QdotHR;
+        thermalProd = dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->A42Model.TotalHeatEnergyRec;
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
         break;
@@ -2173,8 +2196,12 @@ void GeneratorController::simGeneratorGetPowerOutput(bool const runFlag,
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->InitMTGenerators(runFlag, tempLoad, FirstHVACIteration);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CalcMTGeneratorModel(runFlag, tempLoad);
         dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->UpdateMTGeneratorRecords();
-        electricPowerOutput = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
-        thermalPowerOutput = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;
+        electProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ElecPowerGenerated;
+        electricityProd = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->EnergyGen;
+        thermProdRate = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->QHeatRecovered;
+        thermalProd = dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->ExhaustEnergyRec;
+        electricPowerOutput = electProdRate;
+        thermalPowerOutput = thermProdRate;
         break;
     }
     case GeneratorType::windTurbine: {

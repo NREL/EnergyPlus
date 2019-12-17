@@ -1118,7 +1118,7 @@ namespace HeatBalanceManager {
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
-                    if ((SELECT_CASE_var == "3RDORDERBACKWARDDIFFERENCE") || (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE")) {
+                    if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
                         ZoneAirSolutionAlgo = Use3rdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                     } else if (SELECT_CASE_var == "ANALYTICALSOLUTION") {
@@ -1362,7 +1362,7 @@ namespace HeatBalanceManager {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
-                    } else if (SELECT_CASE_var == "BiSECTION") {
+                    } else if (SELECT_CASE_var == "BISECTION") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
@@ -5107,7 +5107,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOWITT") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = MoWiTTHcOutside;
 
-                } else if ((SELECT_CASE_var == "DOE2") || (SELECT_CASE_var == "DOE-2")) {
+                } else if (SELECT_CASE_var == "DOE-2") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = DOE2HcOutside;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
