@@ -136,7 +136,7 @@ namespace PlantChillers {
         bool MyEnvrnFlag;
         Real64 TimeStepSysLast;
         Real64 CurrentEndTimeLast;
-        Real64 modCondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
+        Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
         Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
         Real64 modCondOutletTemp;      // C - condenser outlet temperature, air or water side
         Real64 modEvapOutletTemp;      // C - evaporator outlet temperature, water side
@@ -156,7 +156,6 @@ namespace PlantChillers {
         Real64 EvapInletTemp;
         Real64 CondOutletTemp;
         Real64 EvapOutletTemp;
-        Real64 Condmdot;
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
 
         // Default Constructor
@@ -169,7 +168,7 @@ namespace PlantChillers {
               BasinHeaterSchedulePtr(0), ErrCount1(0), ErrCount2(0), MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), CheckEquipName(true),
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
-              TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), modCondMassFlowRate(0.0), EvapMassFlowRate(0.0), modCondOutletTemp(0.0),
+              TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), modCondOutletTemp(0.0),
         modEvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
               QEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
               QCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
@@ -181,7 +180,7 @@ namespace PlantChillers {
          AvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
               BasinHeaterPower(0.0),    // Basin heater power (W)
               Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              CondOutletTemp(0.0), EvapOutletTemp(0.0), Condmdot(0.0), BasinHeaterConsumption(0.0)
+              CondOutletTemp(0.0), EvapOutletTemp(0.0), BasinHeaterConsumption(0.0)
 
         {
         }
