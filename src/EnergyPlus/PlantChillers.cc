@@ -115,10 +115,6 @@ namespace PlantChillers {
     using DataGlobals::WarmupFlag;
     using DataHVACGlobals::SmallWaterVolFlow;
     using DataPlant::DeltaTempTol;
-    using DataPlant::TypeOf_Chiller_CombTurbine;
-    using DataPlant::TypeOf_Chiller_ConstCOP;
-    using DataPlant::TypeOf_Chiller_Electric;
-    using DataPlant::TypeOf_Chiller_EngineDriven;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
 
@@ -204,11 +200,11 @@ namespace PlantChillers {
         {
             auto const SELECT_CASE_var(ChillerType);
 
-            if (SELECT_CASE_var == TypeOf_Chiller_Electric) {
+            if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_Electric) {
 
                 // Get chiller data from input file
                 if (GetElectricInput) {
-                    GetElectricChillerInput();
+                    ElectricChillerSpecs::getInput();
                     GetElectricInput = false;
                 }
 
@@ -275,7 +271,7 @@ namespace PlantChillers {
                 } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
                     PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
                                                                         thisChiller.CDLoopSideNum,
-                                                        TypeOf_Chiller_Electric,
+                                                        thisChiller.plantTypeOfNum,
                                                                         thisChiller.CondInletNodeNum,
                                                                         thisChiller.CondOutletNodeNum,
                                                                         thisChiller.QCondenser,
@@ -286,7 +282,7 @@ namespace PlantChillers {
                 } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
                     PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
                                                                     thisChiller.HRLoopSideNum,
-                                                    TypeOf_Chiller_Electric,
+                                                    thisChiller.plantTypeOfNum,
                                                                     thisChiller.HeatRecInletNodeNum,
                                                                     thisChiller.HeatRecOutletNodeNum,
                                                                     thisChiller.QHeatRecovery,
@@ -296,10 +292,10 @@ namespace PlantChillers {
                                                     FirstHVACIteration);
                 }
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_EngineDriven) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_EngineDriven) {
 
                 if (GetEngineDrivenInput) {
-                    GetEngineDrivenChillerInput();
+                    EngineDrivenChillerSpecs::getInput();
                     GetEngineDrivenInput = false;
                 }
 
@@ -334,61 +330,61 @@ namespace PlantChillers {
 
                 auto & thisChiller(EngineDrivenChiller(ChillNum));
                 if (InitLoopEquip) {
-                    TempEvapOutDesign = EngineDrivenChiller(ChillNum).TempDesEvapOut;
-                    TempCondInDesign = EngineDrivenChiller(ChillNum).TempDesCondIn;
+                    TempEvapOutDesign = thisChiller.TempDesEvapOut;
+                    TempCondInDesign = thisChiller.TempDesCondIn;
 
 
                     thisChiller.initialize(RunFlag, MyLoad);
 
-                    if (LoopNum == EngineDrivenChiller(ChillNum).CWLoopNum) {
+                    if (LoopNum == thisChiller.CWLoopNum) {
                         thisChiller.size();
-                        MinCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).MinPartLoadRat;
-                        MaxCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).MaxPartLoadRat;
-                        OptCap = EngineDrivenChiller(ChillNum).NomCap * EngineDrivenChiller(ChillNum).OptPartLoadRat;
+                        MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
+                        MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
+                        OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
                     } else {
                         MinCap = 0.0;
                         MaxCap = 0.0;
                         OptCap = 0.0;
                     }
                     if (GetSizingFactor) {
-                        SizingFactor = EngineDrivenChiller(ChillNum).SizFac;
+                        SizingFactor = thisChiller.SizFac;
                     }
                     return;
                 }
 
                 // calculate model depending on where called from
-                if (LoopNum == EngineDrivenChiller(ChillNum).CWLoopNum) { // chilled water loop
+                if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
                     thisChiller.initialize(RunFlag, MyLoad);
                     thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
                     thisChiller.update(MyLoad, RunFlag);
-                } else if (LoopNum == EngineDrivenChiller(ChillNum).CDLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(EngineDrivenChiller(ChillNum).CDLoopNum,
-                                                        EngineDrivenChiller(ChillNum).CDLoopSideNum,
-                                                        TypeOf_Chiller_EngineDriven,
-                                                        EngineDrivenChiller(ChillNum).CondInletNodeNum,
-                                                        EngineDrivenChiller(ChillNum).CondOutletNodeNum,
-                                                                        EngineDrivenChiller(ChillNum).QCondenser,
-                                                                        EngineDrivenChiller(ChillNum).CondInletTemp,
-                                                                        EngineDrivenChiller(ChillNum).CondOutletTemp,
-                                                                        EngineDrivenChiller(ChillNum).CondMassFlowRate,
+                } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
+                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                        thisChiller.CDLoopSideNum,
+                                                                        thisChiller.plantTypeOfNum,
+                                                        thisChiller.CondInletNodeNum,
+                                                        thisChiller.CondOutletNodeNum,
+                                                                        thisChiller.QCondenser,
+                                                                        thisChiller.CondInletTemp,
+                                                                        thisChiller.CondOutletTemp,
+                                                                        thisChiller.CondMassFlowRate,
                                                         FirstHVACIteration);
-                } else if (LoopNum == EngineDrivenChiller(ChillNum).HRLoopNum) { // heat recovery loop
-                    PlantUtilities::UpdateComponentHeatRecoverySide(EngineDrivenChiller(ChillNum).HRLoopNum,
-                                                    EngineDrivenChiller(ChillNum).HRLoopSideNum,
-                                                    TypeOf_Chiller_EngineDriven,
-                                                    EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
-                                                    EngineDrivenChiller(ChillNum).HeatRecOutletNodeNum,
-                                                                    EngineDrivenChiller(ChillNum).QTotalHeatRecovered,
-                                                                    EngineDrivenChiller(ChillNum).HeatRecInletTemp,
-                                                                    EngineDrivenChiller(ChillNum).HeatRecOutletTemp,
-                                                                    EngineDrivenChiller(ChillNum).HeatRecMdot,
+                } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
+                    PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
+                                                    thisChiller.HRLoopSideNum,
+                                                                    thisChiller.plantTypeOfNum,
+                                                    thisChiller.HeatRecInletNodeNum,
+                                                    thisChiller.HeatRecOutletNodeNum,
+                                                                    thisChiller.QTotalHeatRecovered,
+                                                                    thisChiller.HeatRecInletTemp,
+                                                                    thisChiller.HeatRecOutletTemp,
+                                                                    thisChiller.HeatRecMdot,
                                                     FirstHVACIteration);
                 }
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_CombTurbine) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_CombTurbine) {
 
                 if (GetGasTurbineInput) {
-                    GetGTChillerInput();
+                    GTChillerSpecs::getInput();
                     GetGasTurbineInput = false;
                 }
 
@@ -423,63 +419,63 @@ namespace PlantChillers {
                 auto &thisChiller(GTChiller(ChillNum));
                 
                 if (InitLoopEquip) {
-                    TempEvapOutDesign = GTChiller(ChillNum).TempDesEvapOut;
-                    TempCondInDesign = GTChiller(ChillNum).TempDesCondIn;
+                    TempEvapOutDesign = thisChiller.TempDesEvapOut;
+                    TempCondInDesign = thisChiller.TempDesCondIn;
 
                     thisChiller.initialize(RunFlag, MyLoad);
 
-                    if (LoopNum == GTChiller(ChillNum).CWLoopNum) {
+                    if (LoopNum == thisChiller.CWLoopNum) {
                         thisChiller.size();
-                        MinCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).MinPartLoadRat;
-                        MaxCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).MaxPartLoadRat;
-                        OptCap = GTChiller(ChillNum).NomCap * GTChiller(ChillNum).OptPartLoadRat;
+                        MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
+                        MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
+                        OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
                     } else {
                         MinCap = 0.0;
                         MaxCap = 0.0;
                         OptCap = 0.0;
                     }
                     if (GetSizingFactor) {
-                        SizingFactor = GTChiller(ChillNum).SizFac;
+                        SizingFactor = thisChiller.SizFac;
                     }
                     return;
                 }
 
                 // calculate model depending on where called from
-                if (LoopNum == GTChiller(ChillNum).CWLoopNum) { // chilled water loop
+                if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
 
                     thisChiller.initialize(RunFlag, MyLoad);
                     thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
                     thisChiller.update(MyLoad, RunFlag);
 
-                } else if (LoopNum == GTChiller(ChillNum).CDLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(GTChiller(ChillNum).CDLoopNum,
-                                                        GTChiller(ChillNum).CDLoopSideNum,
-                                                        TypeOf_Chiller_CombTurbine,
-                                                        GTChiller(ChillNum).CondInletNodeNum,
-                                                        GTChiller(ChillNum).CondOutletNodeNum,
-                                                                        GTChiller(ChillNum).QCondenser,
-                                                                        GTChiller(ChillNum).CondInletTemp,
-                                                                        GTChiller(ChillNum).CondOutletTemp,
-                                                                        GTChiller(ChillNum).CondMassFlowRate,
+                } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
+                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                        thisChiller.CDLoopSideNum,
+                                                        thisChiller.plantTypeOfNum,
+                                                        thisChiller.CondInletNodeNum,
+                                                        thisChiller.CondOutletNodeNum,
+                                                                        thisChiller.QCondenser,
+                                                                        thisChiller.CondInletTemp,
+                                                                        thisChiller.CondOutletTemp,
+                                                                        thisChiller.CondMassFlowRate,
                                                         FirstHVACIteration);
-                } else if (LoopNum == GTChiller(ChillNum).HRLoopNum) { // heat recovery loop
-                    PlantUtilities::UpdateComponentHeatRecoverySide(GTChiller(ChillNum).HRLoopNum,
-                                                    GTChiller(ChillNum).HRLoopSideNum,
-                                                    TypeOf_Chiller_CombTurbine,
-                                                    GTChiller(ChillNum).HeatRecInletNodeNum,
-                                                    GTChiller(ChillNum).HeatRecOutletNodeNum,
-                                                                    GTChiller(ChillNum).HeatRecLubeRate,
-                                                                    GTChiller(ChillNum).HeatRecInletTemp,
-                                                                    GTChiller(ChillNum).HeatRecOutletTemp,
-                                                                    GTChiller(ChillNum).HeatRecMdot,
+                } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
+                    PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
+                                                    thisChiller.HRLoopSideNum,
+                                                                    thisChiller.plantTypeOfNum,
+                                                    thisChiller.HeatRecInletNodeNum,
+                                                    thisChiller.HeatRecOutletNodeNum,
+                                                                    thisChiller.HeatRecLubeRate,
+                                                                    thisChiller.HeatRecInletTemp,
+                                                                    thisChiller.HeatRecOutletTemp,
+                                                                    thisChiller.HeatRecMdot,
                                                     FirstHVACIteration);
                 }
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_ConstCOP) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_ConstCOP) {
 
                 // GET INPUT
                 if (GetConstCOPInput) {
-                    GetConstCOPChillerInput();
+                    ConstCOPChillerSpecs::getInput();
                     GetConstCOPInput = false;
                 }
 
@@ -543,7 +539,7 @@ namespace PlantChillers {
                 } else if (LoopNum == ConstCOPChiller(ChillNum).CDLoopNum) {
                     PlantUtilities::UpdateChillerComponentCondenserSide(ConstCOPChiller(ChillNum).CDLoopNum,
                                                         ConstCOPChiller(ChillNum).CDLoopSideNum,
-                                                        TypeOf_Chiller_ConstCOP,
+                                                        ConstCOPChiller(ChillNum).plantTypeOfNum,
                                                         ConstCOPChiller(ChillNum).CondInletNodeNum,
                                                         ConstCOPChiller(ChillNum).CondOutletNodeNum,
                                                                         ConstCOPChiller(ChillNum).QCondenser,
@@ -556,7 +552,7 @@ namespace PlantChillers {
         }
     }
 
-    void GetElectricChillerInput()
+    void ElectricChillerSpecs::getInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -626,6 +622,7 @@ namespace PlantChillers {
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
             ElectricChiller(ChillerNum).Name = cAlphaArgs(1);
+            ElectricChiller(ChillerNum).plantTypeOfNum = DataPlant::TypeOf_Chiller_Electric;
 
             if (cAlphaArgs(2) == "AIRCOOLED") {
                 ElectricChiller(ChillerNum).CondenserType = AirCooled;
@@ -1111,7 +1108,7 @@ namespace PlantChillers {
         }
     }
 
-    void GetEngineDrivenChillerInput()
+    void EngineDrivenChillerSpecs::getInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -1177,7 +1174,8 @@ namespace PlantChillers {
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             
             EngineDrivenChiller(ChillerNum).Name = cAlphaArgs(1);
-
+            EngineDrivenChiller(ChillerNum).plantTypeOfNum = DataPlant::TypeOf_Chiller_EngineDriven;
+                    
             EngineDrivenChiller(ChillerNum).NomCap = rNumericArgs(1);
             if (EngineDrivenChiller(ChillerNum).NomCap == AutoSize) {
                 EngineDrivenChiller(ChillerNum).NomCapWasAutoSized = true;
@@ -1791,7 +1789,7 @@ namespace PlantChillers {
         }
     }
 
-    void GetGTChillerInput()
+    void GTChillerSpecs::getInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher / Brandon Anderson
@@ -1859,6 +1857,7 @@ namespace PlantChillers {
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             
             GTChiller(ChillerNum).Name = cAlphaArgs(1);
+            GTChiller(ChillerNum).plantTypeOfNum = DataPlant::TypeOf_Chiller_CombTurbine;
 
             GTChiller(ChillerNum).NomCap = rNumericArgs(1);
 
@@ -2400,7 +2399,7 @@ namespace PlantChillers {
         }
     }
 
-    void GetConstCOPChillerInput()
+    void ConstCOPChillerSpecs::getInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -2471,6 +2470,7 @@ namespace PlantChillers {
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             
             ConstCOPChiller(ChillerNum).Name = cAlphaArgs(1);
+            ConstCOPChiller(ChillerNum).plantTypeOfNum = DataPlant::TypeOf_Chiller_ConstCOP;
             ConstCOPChiller(ChillerNum).NomCap = rNumericArgs(1);
             if (ConstCOPChiller(ChillerNum).NomCap == AutoSize) {
                 ConstCOPChiller(ChillerNum).NomCapWasAutoSized = true;
@@ -2792,7 +2792,7 @@ namespace PlantChillers {
             }
         }
     }
-
+    
     void ElectricChillerSpecs::initialize(
                              bool const RunFlag, // TRUE when chiller operating
                              Real64 const MyLoad)
@@ -2842,7 +2842,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    TypeOf_Chiller_Electric,
+                                    this->plantTypeOfNum,
                                     this->CWLoopNum,
                                     this->CWLoopSideNum,
                                     this->CWBranchNum,
@@ -2855,7 +2855,7 @@ namespace PlantChillers {
                                     _);
             if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_Electric,
+                                        this->plantTypeOfNum,
                                         this->CDLoopNum,
                                         this->CDLoopSideNum,
                                         this->CDBranchNum,
@@ -2870,12 +2870,12 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->CDLoopNum,
                                               this->CDLoopSideNum,
-                                              TypeOf_Chiller_Electric,
+                                              this->plantTypeOfNum,
                                               true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_Electric,
+                                        this->plantTypeOfNum,
                                         this->HRLoopNum,
                                         this->HRLoopSideNum,
                                         this->HRBranchNum,
@@ -2890,7 +2890,7 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_Electric,
+                                              this->plantTypeOfNum,
                                               true);
             }
 
@@ -2900,7 +2900,7 @@ namespace PlantChillers {
                                               this->CDLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_Electric,
+                                              this->plantTypeOfNum,
                                               false);
             }
 
@@ -3203,7 +3203,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    TypeOf_Chiller_EngineDriven,
+                                    this->plantTypeOfNum,
                                     this->CWLoopNum,
                                     this->CWLoopSideNum,
                                     this->CWBranchNum,
@@ -3216,7 +3216,7 @@ namespace PlantChillers {
                                     _);
             if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_EngineDriven,
+                                                        this->plantTypeOfNum,
                                         this->CDLoopNum,
                                         this->CDLoopSideNum,
                                         this->CDBranchNum,
@@ -3231,12 +3231,12 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->CDLoopNum,
                                               this->CDLoopSideNum,
-                                              TypeOf_Chiller_EngineDriven,
+                                                              this->plantTypeOfNum,
                                               true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_EngineDriven,
+                                                        this->plantTypeOfNum,
                                         this->HRLoopNum,
                                         this->HRLoopSideNum,
                                         this->HRBranchNum,
@@ -3251,7 +3251,7 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_EngineDriven,
+                                                              this->plantTypeOfNum,
                                               true);
             }
 
@@ -3261,7 +3261,7 @@ namespace PlantChillers {
                                               this->CDLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_EngineDriven,
+                                                              this->plantTypeOfNum,
                                               false);
             }
             if (errFlag) {
@@ -3508,7 +3508,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    TypeOf_Chiller_CombTurbine,
+                                                    this->plantTypeOfNum,
                                     this->CWLoopNum,
                                     this->CWLoopSideNum,
                                     this->CWBranchNum,
@@ -3521,7 +3521,7 @@ namespace PlantChillers {
                                     _);
             if (this->CondenserType != AirCooled && this->CondenserType != EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_CombTurbine,
+                                                        this->plantTypeOfNum,
                                         this->CDLoopNum,
                                         this->CDLoopSideNum,
                                         this->CDBranchNum,
@@ -3536,12 +3536,12 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->CDLoopNum,
                                               this->CDLoopSideNum,
-                                              TypeOf_Chiller_CombTurbine,
+                                                              this->plantTypeOfNum,
                                               true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                        TypeOf_Chiller_CombTurbine,
+                                                        this->plantTypeOfNum,
                                         this->HRLoopNum,
                                         this->HRLoopSideNum,
                                         this->HRBranchNum,
@@ -3556,7 +3556,7 @@ namespace PlantChillers {
                                               this->CWLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_CombTurbine,
+                                                              this->plantTypeOfNum,
                                               true);
             }
 
@@ -3566,7 +3566,7 @@ namespace PlantChillers {
                                               this->CDLoopSideNum,
                                               this->HRLoopNum,
                                               this->HRLoopSideNum,
-                                              TypeOf_Chiller_CombTurbine,
+                                                              this->plantTypeOfNum,
                                               false);
             }
             if (errFlag) {
@@ -3806,7 +3806,7 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ConstCOPChiller(ChillNum).Name,
-                                    TypeOf_Chiller_ConstCOP,
+                                    ConstCOPChiller(ChillNum).plantTypeOfNum,
                                     ConstCOPChiller(ChillNum).CWLoopNum,
                                     ConstCOPChiller(ChillNum).CWLoopSideNum,
                                     ConstCOPChiller(ChillNum).CWBranchNum,
@@ -3819,7 +3819,7 @@ namespace PlantChillers {
                                     _);
             if (ConstCOPChiller(ChillNum).CondenserType != AirCooled && ConstCOPChiller(ChillNum).CondenserType != EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(ConstCOPChiller(ChillNum).Name,
-                                        TypeOf_Chiller_ConstCOP,
+                                                        ConstCOPChiller(ChillNum).plantTypeOfNum,
                                         ConstCOPChiller(ChillNum).CDLoopNum,
                                         ConstCOPChiller(ChillNum).CDLoopSideNum,
                                         ConstCOPChiller(ChillNum).CDBranchNum,
@@ -3834,7 +3834,7 @@ namespace PlantChillers {
                                               ConstCOPChiller(ChillNum).CWLoopSideNum,
                                               ConstCOPChiller(ChillNum).CDLoopNum,
                                               ConstCOPChiller(ChillNum).CDLoopSideNum,
-                                              TypeOf_Chiller_ConstCOP,
+                                                              ConstCOPChiller(ChillNum).plantTypeOfNum,
                                               true);
             }
 

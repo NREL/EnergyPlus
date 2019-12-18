@@ -153,6 +153,7 @@ namespace PlantChillers {
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+        int plantTypeOfNum;
 
         // Default Constructor
         BaseChillerSpecs()
@@ -176,7 +177,7 @@ namespace PlantChillers {
          AvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
               BasinHeaterPower(0.0),    // Basin heater power (W)
               Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              BasinHeaterConsumption(0.0)
+              BasinHeaterConsumption(0.0), plantTypeOfNum(0)
 
         {
         }
@@ -233,6 +234,8 @@ namespace PlantChillers {
         {
         }
 
+        static void getInput();
+
         void initialize(         bool RunFlag, // TRUE when chiller operating
                                  Real64 MyLoad);
 
@@ -252,6 +255,7 @@ namespace PlantChillers {
                                              Real64 _CondInletTemp, // current condenser Inlet Temp
                                              Real64 &QHeatRec            // amount of heat recovered
         );
+
 
     };
 
@@ -331,6 +335,9 @@ namespace PlantChillers {
               ExhaustStackTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
         {
         }
+
+
+        static void getInput();
 
         void initialize(         bool RunFlag, // TRUE when chiller operating
                                  Real64 MyLoad);
@@ -426,6 +433,7 @@ namespace PlantChillers {
         {
         }
 
+        static void getInput();
 
         void initialize(   bool RunFlag, // TRUE when chiller operating
                            Real64 MyLoad);
@@ -452,6 +460,9 @@ namespace PlantChillers {
 
         // Default Constructor
         ConstCOPChillerSpecs() : ActualCOP(0.0) {}
+
+        static void getInput();
+
     };
 
     // Object Data
@@ -482,14 +493,6 @@ namespace PlantChillers {
                     Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
                     Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
     );
-
-    void GetElectricChillerInput();
-
-    void GetEngineDrivenChillerInput();
-
-    void GetGTChillerInput();
-
-    void GetConstCOPChillerInput();
 
 
     void InitConstCOPChiller(int ChillNum, // number of the current electric chiller being simulated
