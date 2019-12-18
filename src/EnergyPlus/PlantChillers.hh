@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -81,10 +82,17 @@ namespace PlantChillers {
     extern bool GetGasTurbineInput;   // then TRUE, calls subroutine to read input file.
     extern bool GetConstCOPInput;
 
-    struct BaseChillerSpecs
+    struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
         // Members
         std::string Name;                 // user identifier
+        Real64 MinPartLoadRat; // (GT MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat; // (GT MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat; // (GT BEST) optimal operating frac full load
+        Real64 TempDesCondIn;  // C - (GT ADJTC(1)The design secondary loop fluid
+        // temperature at the chiller condenser side inlet
+        Real64 TempRiseCoef;   // (GT ADJTC(2)) correction factor for off ChillDesign oper.
+        Real64 TempDesEvapOut; // C - (GT ADJTC(3)The design primary loop fluid
         int CondenserType;                // Type of Condenser - Air or Water Cooled
         Real64 NomCap;                    // design nominal capacity of chiller
         bool NomCapWasAutoSized;          // true if NomCap was autosize on input
@@ -157,7 +165,8 @@ namespace PlantChillers {
 
         // Default Constructor
         BaseChillerSpecs()
-            : CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+            : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
+            CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), HRSPErrDone(false), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
@@ -180,18 +189,27 @@ namespace PlantChillers {
 
         {
         }
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &EP_UNUSED(MaxLoad),
+                                 Real64 &EP_UNUSED(MinLoad),
+                                 Real64 &EP_UNUSED(OptLoad)) override;
+
+        void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut)) override;
+
+        virtual void initialize(bool RunFlag, Real64 MyLoad) = 0;
+
+        virtual void size() = 0;
+
     };
 
     struct ElectricChillerSpecs : BaseChillerSpecs
     {
         // Members
-        Real64 MinPartLoadRat; // (Electric MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat; // (Electric MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat; // (Electric BEST) optimal operating frac full load
-        Real64 TempDesCondIn;  // C - (Electric ADJTC(1)The design secondary loop fluid
-        // temperature at the chiller condenser side inlet
-        Real64 TempRiseCoef;   // (Electric ADJTC(2)) correction factor for off ChillDesign oper.
-        Real64 TempDesEvapOut; // C - (Electric ADJTC(3)The design primary loop fluid
         // temperature at the chiller evaporator side outlet
         Array1D<Real64> CapRatCoef;                // (Electric RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (Electric ADJEC() ) coeff of power rat poly fit
@@ -223,8 +241,7 @@ namespace PlantChillers {
 
         // Default Constructor
         ElectricChillerSpecs()
-            : MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
+            : CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0), ActualCOP(0.0),
@@ -237,27 +254,13 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        static void simElectricChiller(int LoopNum,              // Flow control mode for the equipment
-                                       std::string const &ChillerName, // user specified name of chiller
-                                       int EquipFlowCtrl,        // Flow control mode for the equipment
-                                       int &CompIndex,                 // chiller number pointer
-                                       bool RunFlag,             // simulate chiller when TRUE
-                                       bool FirstHVACIteration,  // initialize variables when TRUE
-                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                                       Real64 &MyLoad,                 // loop demand component will meet
-                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
-                                       Real64 &SizingFactor,           // sizing factor
-                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-        );
+        static ElectricChillerSpecs* factory(std::string const & chillerName);
 
-        void initialize(bool RunFlag, // TRUE when chiller operating
-                        Real64 MyLoad);
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void size();
+        void initialize(bool RunFlag, Real64 MyLoad) override;
+
+        void size() override;
 
         void calculate(Real64 &MyLoad,    // operating load
                        bool RunFlag,       // TRUE when chiller operating
@@ -279,13 +282,6 @@ namespace PlantChillers {
     {
         // Members
         std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 MinPartLoadRat; // (EngineDriven MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat; // (EngineDriven MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat; // (EngineDriven BEST) optimal operating frac full load
-        Real64 TempDesCondIn;  // C - (EngineDriven ADJTC(1)The design secondary loop fluid
-        // temperature at the chiller condenser side inlet
-        Real64 TempRiseCoef;   // (EngineDriven ADJTC(2)) correction factor for off ChillDesign oper.
-        Real64 TempDesEvapOut; // C - (EngineDriven ADJTC(3)The design primary loop fluid
         // temperature at the chiller evaporator side outlet
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
@@ -337,8 +333,7 @@ namespace PlantChillers {
 
         // Default Constructor
         EngineDrivenChillerSpecs()
-            : MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), ClngLoadtoFuelCurve(0),
+            : CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), ClngLoadtoFuelCurve(0),
               RecJacHeattoFuelCurve(0), RecLubeHeattoFuelCurve(0), TotExhausttoFuelCurve(0), ExhaustTemp(0.0), ExhaustTempCurve(0), UA(0.0),
               UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0), DesignMinExitGasTemp(0.0), FuelHeatingValue(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
@@ -352,31 +347,17 @@ namespace PlantChillers {
         {
         }
 
+        static EngineDrivenChillerSpecs* factory(std::string const & chillerName);
+
         static void getInput();
 
-        static void simEngineDrivenChiller(int LoopNum,              // Flow control mode for the equipment
-                                       std::string const &ChillerName, // user specified name of chiller
-                                       int EquipFlowCtrl,        // Flow control mode for the equipment
-                                       int &CompIndex,                 // chiller number pointer
-                                       bool RunFlag,             // simulate chiller when TRUE
-                                       bool FirstHVACIteration,  // initialize variables when TRUE
-                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                                       Real64 &MyLoad,                 // loop demand component will meet
-                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
-                                       Real64 &SizingFactor,           // sizing factor
-                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-        );
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, // TRUE when chiller operating
-                        Real64 MyLoad);
+        void initialize(bool RunFlag, Real64 MyLoad) override;
 
-        void size();
+        void size() override;
 
         void calculate(Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
@@ -396,14 +377,6 @@ namespace PlantChillers {
     {
         // Members
         std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 MinPartLoadRat; // (GT MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat; // (GT MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat; // (GT BEST) optimal operating frac full load
-        Real64 TempDesCondIn;  // C - (GT ADJTC(1)The design secondary loop fluid
-        // temperature at the chiller condenser side inlet
-        Real64 TempRiseCoef;   // (GT ADJTC(2)) correction factor for off ChillDesign oper.
-        Real64 TempDesEvapOut; // C - (GT ADJTC(3)The design primary loop fluid
-        // temperature at the chiller evaporator side outlet
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
@@ -454,8 +427,7 @@ namespace PlantChillers {
 
         // Default Constructor
         GTChillerSpecs()
-            : MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), FuelEnergyIn(0.0),
+            : CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), FuelEnergyIn(0.0),
               PLBasedFuelInputCoef(3, 0.0), TempBasedFuelInputCoef(3, 0.0), ExhaustFlow(0.0), ExhaustFlowCoef(3, 0.0), ExhaustTemp(0.0),
               PLBasedExhaustTempCoef(3, 0.0), TempBasedExhaustTempCoef(3, 0.0), HeatRecLubeEnergy(0.0), HeatRecLubeRate(0.0),
               HeatRecLubeEnergyCoef(3, 0.0), UAtoCapRat(0.0), UAtoCapCoef(3, 0.0), GTEngineCapacity(0.0), GTEngineCapacityWasAutoSized(false),
@@ -467,31 +439,17 @@ namespace PlantChillers {
         {
         }
 
+        static GTChillerSpecs* factory(std::string const & chillerName);
+
         static void getInput();
 
-        static void simGasTurbineChiller(int LoopNum,              // Flow control mode for the equipment
-                                       std::string const &ChillerName, // user specified name of chiller
-                                       int EquipFlowCtrl,        // Flow control mode for the equipment
-                                       int &CompIndex,                 // chiller number pointer
-                                       bool RunFlag,             // simulate chiller when TRUE
-                                       bool FirstHVACIteration,  // initialize variables when TRUE
-                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                                       Real64 &MyLoad,                 // loop demand component will meet
-                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
-                                       Real64 &SizingFactor,           // sizing factor
-                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-        );
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, // TRUE when chiller operating
-                        Real64 MyLoad);
+        void initialize(bool RunFlag, Real64 MyLoad) override;
 
-        void size();
+        void size() override;
 
         void calculate(Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
@@ -513,31 +471,17 @@ namespace PlantChillers {
         {
         }
 
+        static ConstCOPChillerSpecs* factory(std::string const & chillerName);
+
         static void getInput();
 
-        static void simConstCOPChiller(int LoopNum,              // Flow control mode for the equipment
-                                       std::string const &ChillerName, // user specified name of chiller
-                                       int EquipFlowCtrl,        // Flow control mode for the equipment
-                                       int &CompIndex,                 // chiller number pointer
-                                       bool RunFlag,             // simulate chiller when TRUE
-                                       bool FirstHVACIteration,  // initialize variables when TRUE
-                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                                       Real64 &MyLoad,                 // loop demand component will meet
-                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
-                                       Real64 &SizingFactor,           // sizing factor
-                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-        );
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables();
 
-        void initialize(bool RunFlag, // TRUE when chiller operating
-                        Real64 MyLoad);
+        void initialize(bool RunFlag, Real64 MyLoad) override;
 
-        void size();
+        void size() override;
 
         void calculate(Real64 &MyLoad,
                        bool RunFlag,
@@ -554,8 +498,6 @@ namespace PlantChillers {
     extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
     extern Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
     extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
-
-    // Functions
 
     void clear_state();
 
