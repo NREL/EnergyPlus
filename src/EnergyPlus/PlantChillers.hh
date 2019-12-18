@@ -236,6 +236,8 @@ namespace PlantChillers {
 
         static void getInput();
 
+        void setupOutputVariables();
+
         void initialize(         bool RunFlag, // TRUE when chiller operating
                                  Real64 MyLoad);
 
@@ -338,7 +340,7 @@ namespace PlantChillers {
 
 
         static void getInput();
-
+        void setupOutputVariables();
         void initialize(         bool RunFlag, // TRUE when chiller operating
                                  Real64 MyLoad);
 
@@ -434,7 +436,7 @@ namespace PlantChillers {
         }
 
         static void getInput();
-
+        void setupOutputVariables();
         void initialize(   bool RunFlag, // TRUE when chiller operating
                            Real64 MyLoad);
 
@@ -462,7 +464,7 @@ namespace PlantChillers {
         ConstCOPChillerSpecs() : ActualCOP(0.0) {}
 
         static void getInput();
-
+        void setupOutputVariables();
         void initialize(         bool RunFlag, // TRUE when chiller operating
                                  Real64 MyLoad);
 
