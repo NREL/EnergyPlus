@@ -165,391 +165,112 @@ namespace PlantChillers {
         ConstCOPChiller.deallocate();
     }
 
-    void SimChiller(int const LoopNum,              // Flow control mode for the equipment
-                    int const EP_UNUSED(LoopSide),  // chiller number pointer
-                    int const ChillerType,          // type of chiller
-                    std::string const &ChillerName, // user specified name of chiller
-                    int const EquipFlowCtrl,        // Flow control mode for the equipment
-                    int &CompIndex,                 // chiller number pointer
-                    bool const RunFlag,             // simulate chiller when TRUE
-                    bool const FirstHVACIteration,  // initialize variables when TRUE
-                    bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                    Real64 &MyLoad,                 // loop demand component will meet
-                    Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                    Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                    Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                    bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
-                    Real64 &SizingFactor,           // sizing factor
-                    Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                    Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-    )
+    void ElectricChillerSpecs::simElectricChiller(int const LoopNum,              // Flow control mode for the equipment
+                                                  std::string const &ChillerName, // user specified name of chiller
+                                                  int const EquipFlowCtrl,        // Flow control mode for the equipment
+                                                  int &CompIndex,                 // chiller number pointer
+                                                  bool const RunFlag,             // simulate chiller when TRUE
+                                                  bool const FirstHVACIteration,  // initialize variables when TRUE
+                                                  bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                                  Real64 &MyLoad,                 // loop demand component will meet
+                                                  Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                                  Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                                  Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                                  bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                                  Real64 &SizingFactor,           // sizing factor
+                                                  Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                                  Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+                                                  )
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Dan Fisher
-        //       DATE WRITTEN   Sept. 1998
-        //       MODIFIED       April 1999, May 200-Taecheol Kim
-        //       RE-ENGINEERED  na
+        // Get chiller data from input file
+        if (GetElectricInput) {
+            ElectricChillerSpecs::getInput();
+            GetElectricInput = false;
+        }
 
-        // PURPOSE OF THIS SUBROUTINE: This is the Electric chiller model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ChillNum = 0; // chiller number pointer
-
-        {
-            auto const SELECT_CASE_var(ChillerType);
-
-            if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_Electric) {
-
-                // Get chiller data from input file
-                if (GetElectricInput) {
-                    ElectricChillerSpecs::getInput();
-                    GetElectricInput = false;
-                }
-
-                // Find the correct Chiller
-                if (CompIndex == 0) {
-                    int thisIndex = 0;
-                    for (auto &ch : ElectricChiller) {
-                        thisIndex++;
-                        if (ch.Name == ChillerName) {
-                            ChillNum = thisIndex;
-                            break;
-                        }
-                    }
-                    if (ChillNum == 0) {
-                        ShowFatalError("SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName);
-                    }
-                    CompIndex = ChillNum;
-                } else {
-                    ChillNum = CompIndex;
-                    if (ChillNum > NumElectricChillers || ChillNum < 1) {
-                        ShowFatalError("SimElectricChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                                       ", Number of Units=" + TrimSigDigits(NumElectricChillers) + ", Entered Unit name=" + ChillerName);
-                    }
-                    if (ElectricChiller(ChillNum).CheckEquipName) {
-                        if (ChillerName != ElectricChiller(ChillNum).Name) {
-                            ShowFatalError("SimElectricChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
-                                           ", stored Unit Name for that index=" + ElectricChiller(ChillNum).Name);
-                        }
-                        ElectricChiller(ChillNum).CheckEquipName = false;
-                    }
-                }
-
-                auto &thisChiller(ElectricChiller(ChillNum));
-
-                if (InitLoopEquip) {
-                    TempEvapOutDesign = thisChiller.TempDesEvapOut;
-                    TempCondInDesign = thisChiller.TempDesCondIn;
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-
-                    if (LoopNum == thisChiller.CWLoopNum) {
-                        thisChiller.size();
-                        MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
-                        MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
-                        OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
-                    } else {
-                        MinCap = 0.0;
-                        MaxCap = 0.0;
-                        OptCap = 0.0;
-                    }
-                    if (GetSizingFactor) {
-                        SizingFactor = thisChiller.SizFac;
-                    }
-                    return;
-                }
-
-                // calculate model depending on where called from
-                if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
-                    thisChiller.update(MyLoad, RunFlag);
-
-                } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
-                                                                        thisChiller.CDLoopSideNum,
-                                                                        thisChiller.plantTypeOfNum,
-                                                                        thisChiller.CondInletNodeNum,
-                                                                        thisChiller.CondOutletNodeNum,
-                                                                        thisChiller.QCondenser,
-                                                                        thisChiller.CondInletTemp,
-                                                                        thisChiller.CondOutletTemp,
-                                                                        thisChiller.CondMassFlowRate,
-                                                                        FirstHVACIteration);
-                } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
-                    PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
-                                                                    thisChiller.HRLoopSideNum,
-                                                                    thisChiller.plantTypeOfNum,
-                                                                    thisChiller.HeatRecInletNodeNum,
-                                                                    thisChiller.HeatRecOutletNodeNum,
-                                                                    thisChiller.QHeatRecovery,
-                                                                    thisChiller.HeatRecInletTemp,
-                                                                    thisChiller.HeatRecOutletTemp,
-                                                                    thisChiller.HeatRecMdot,
-                                                                    FirstHVACIteration);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_EngineDriven) {
-
-                if (GetEngineDrivenInput) {
-                    EngineDrivenChillerSpecs::getInput();
-                    GetEngineDrivenInput = false;
-                }
-
-                // Find the correct Chiller
-                if (CompIndex == 0) {
-                    int thisIndex = 0;
-                    for (auto &ch : EngineDrivenChiller) {
-                        thisIndex++;
-                        if (ch.Name == ChillerName) {
-                            ChillNum = thisIndex;
-                            break;
-                        }
-                    }
-                    if (ChillNum == 0) {
-                        ShowFatalError("SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName);
-                    }
-                    CompIndex = ChillNum;
-                } else {
-                    ChillNum = CompIndex;
-                    if (ChillNum > NumEngineDrivenChillers || ChillNum < 1) {
-                        ShowFatalError("SimEngineDrivenChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                                       ", Number of Units=" + TrimSigDigits(NumEngineDrivenChillers) + ", Entered Unit name=" + ChillerName);
-                    }
-                    if (EngineDrivenChiller(ChillNum).CheckEquipName) {
-                        if (ChillerName != EngineDrivenChiller(ChillNum).Name) {
-                            ShowFatalError("SimEngineDrivenChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                                           ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + EngineDrivenChiller(ChillNum).Name);
-                        }
-                        EngineDrivenChiller(ChillNum).CheckEquipName = false;
-                    }
-                }
-
-                auto &thisChiller(EngineDrivenChiller(ChillNum));
-                if (InitLoopEquip) {
-                    TempEvapOutDesign = thisChiller.TempDesEvapOut;
-                    TempCondInDesign = thisChiller.TempDesCondIn;
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-
-                    if (LoopNum == thisChiller.CWLoopNum) {
-                        thisChiller.size();
-                        MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
-                        MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
-                        OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
-                    } else {
-                        MinCap = 0.0;
-                        MaxCap = 0.0;
-                        OptCap = 0.0;
-                    }
-                    if (GetSizingFactor) {
-                        SizingFactor = thisChiller.SizFac;
-                    }
-                    return;
-                }
-
-                // calculate model depending on where called from
-                if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
-                    thisChiller.initialize(RunFlag, MyLoad);
-                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
-                    thisChiller.update(MyLoad, RunFlag);
-                } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
-                                                                        thisChiller.CDLoopSideNum,
-                                                                        thisChiller.plantTypeOfNum,
-                                                                        thisChiller.CondInletNodeNum,
-                                                                        thisChiller.CondOutletNodeNum,
-                                                                        thisChiller.QCondenser,
-                                                                        thisChiller.CondInletTemp,
-                                                                        thisChiller.CondOutletTemp,
-                                                                        thisChiller.CondMassFlowRate,
-                                                                        FirstHVACIteration);
-                } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
-                    PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
-                                                                    thisChiller.HRLoopSideNum,
-                                                                    thisChiller.plantTypeOfNum,
-                                                                    thisChiller.HeatRecInletNodeNum,
-                                                                    thisChiller.HeatRecOutletNodeNum,
-                                                                    thisChiller.QTotalHeatRecovered,
-                                                                    thisChiller.HeatRecInletTemp,
-                                                                    thisChiller.HeatRecOutletTemp,
-                                                                    thisChiller.HeatRecMdot,
-                                                                    FirstHVACIteration);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_CombTurbine) {
-
-                if (GetGasTurbineInput) {
-                    GTChillerSpecs::getInput();
-                    GetGasTurbineInput = false;
-                }
-
-                if (CompIndex == 0) {
-                    int thisIndex = 0;
-                    for (auto &ch : GTChiller) {
-                        thisIndex++;
-                        if (ch.Name == ChillerName) {
-                            ChillNum = thisIndex;
-                            break;
-                        }
-                    }
-                    if (ChillNum == 0) {
-                        ShowFatalError("SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName);
-                    }
-                    CompIndex = ChillNum;
-                } else {
-                    ChillNum = CompIndex;
-                    if (ChillNum > NumGTChillers || ChillNum < 1) {
-                        ShowFatalError("SimGTChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                                       ", Number of Units=" + TrimSigDigits(NumGTChillers) + ", Entered Unit name=" + ChillerName);
-                    }
-                    if (GTChiller(ChillNum).CheckEquipName) {
-                        if (ChillerName != GTChiller(ChillNum).Name) {
-                            ShowFatalError("SimGTChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
-                                           ", stored Unit Name for that index=" + GTChiller(ChillNum).Name);
-                        }
-                        GTChiller(ChillNum).CheckEquipName = false;
-                    }
-                }
-
-                auto &thisChiller(GTChiller(ChillNum));
-
-                if (InitLoopEquip) {
-                    TempEvapOutDesign = thisChiller.TempDesEvapOut;
-                    TempCondInDesign = thisChiller.TempDesCondIn;
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-
-                    if (LoopNum == thisChiller.CWLoopNum) {
-                        thisChiller.size();
-                        MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
-                        MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
-                        OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
-                    } else {
-                        MinCap = 0.0;
-                        MaxCap = 0.0;
-                        OptCap = 0.0;
-                    }
-                    if (GetSizingFactor) {
-                        SizingFactor = thisChiller.SizFac;
-                    }
-                    return;
-                }
-
-                // calculate model depending on where called from
-                if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
-                    thisChiller.update(MyLoad, RunFlag);
-
-                } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
-                                                                        thisChiller.CDLoopSideNum,
-                                                                        thisChiller.plantTypeOfNum,
-                                                                        thisChiller.CondInletNodeNum,
-                                                                        thisChiller.CondOutletNodeNum,
-                                                                        thisChiller.QCondenser,
-                                                                        thisChiller.CondInletTemp,
-                                                                        thisChiller.CondOutletTemp,
-                                                                        thisChiller.CondMassFlowRate,
-                                                                        FirstHVACIteration);
-                } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
-                    PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
-                                                                    thisChiller.HRLoopSideNum,
-                                                                    thisChiller.plantTypeOfNum,
-                                                                    thisChiller.HeatRecInletNodeNum,
-                                                                    thisChiller.HeatRecOutletNodeNum,
-                                                                    thisChiller.HeatRecLubeRate,
-                                                                    thisChiller.HeatRecInletTemp,
-                                                                    thisChiller.HeatRecOutletTemp,
-                                                                    thisChiller.HeatRecMdot,
-                                                                    FirstHVACIteration);
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_Chiller_ConstCOP) {
-
-                // GET INPUT
-                if (GetConstCOPInput) {
-                    ConstCOPChillerSpecs::getInput();
-                    GetConstCOPInput = false;
-                }
-
-                // Find the correct Chiller
-                if (CompIndex == 0) {
-                    int thisIndex = 0;
-                    for (auto &ch : ConstCOPChiller) {
-                        thisIndex++;
-                        if (ch.Name == ChillerName) {
-                            ChillNum = thisIndex;
-                            break;
-                        }
-                    }
-                    if (ChillNum == 0) {
-                        ShowFatalError("SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName);
-                    }
-                    CompIndex = ChillNum;
-                } else {
-                    ChillNum = CompIndex;
-                    if (ChillNum > NumConstCOPChillers || ChillNum < 1) {
-                        ShowFatalError("SimConstCOPChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                                       ", Number of Units=" + TrimSigDigits(NumConstCOPChillers) + ", Entered Unit name=" + ChillerName);
-                    }
-                    if (ConstCOPChiller(ChillNum).CheckEquipName) {
-                        if (ChillerName != ConstCOPChiller(ChillNum).Name) {
-                            ShowFatalError("SimConstCOPChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
-                                           ", stored Unit Name for that index=" + ConstCOPChiller(ChillNum).Name);
-                        }
-                        ConstCOPChiller(ChillNum).CheckEquipName = false;
-                    }
-                }
-
-                auto &thisChiller(ConstCOPChiller(ChillNum));
-
-                if (InitLoopEquip) {
-                    TempEvapOutDesign = 0.0;
-                    TempCondInDesign = 0.0;
-
-                    thisChiller.initialize(RunFlag, MyLoad);
-
-                    if (LoopNum == ConstCOPChiller(ChillNum).CWLoopNum) {
-                        thisChiller.size();
-                        MinCap = 0.0;
-                        MaxCap = thisChiller.NomCap;
-                        OptCap = thisChiller.NomCap;
-                    } else {
-                        MinCap = 0.0;
-                        MaxCap = 0.0;
-                        OptCap = 0.0;
-                    }
-                    if (GetSizingFactor) {
-                        SizingFactor = thisChiller.SizFac;
-                    }
-                    return;
-                }
-
-                if (LoopNum == thisChiller.CWLoopNum) {
-                    // Calculate Load
-                    // IF MinPlr, MaxPlr, OptPlr are not defined, assume min = 0, max=opt=Nomcap
-                    thisChiller.initialize(RunFlag, MyLoad);
-                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
-                    thisChiller.update(MyLoad, RunFlag);
-                } else if (LoopNum == thisChiller.CDLoopNum) {
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
-                                                                        thisChiller.CDLoopSideNum,
-                                                                        thisChiller.plantTypeOfNum,
-                                                                        thisChiller.CondInletNodeNum,
-                                                                        thisChiller.CondOutletNodeNum,
-                                                                        thisChiller.QCondenser,
-                                                                        thisChiller.CondInletTemp,
-                                                                        thisChiller.CondOutletTemp,
-                                                                        thisChiller.CondMassFlowRate,
-                                                                        FirstHVACIteration);
+        int ChillNum = 0;
+        // Find the correct Chiller
+        if (CompIndex == 0) {
+            int thisIndex = 0;
+            for (auto &ch : ElectricChiller) {
+                thisIndex++;
+                if (ch.Name == ChillerName) {
+                    ChillNum = thisIndex;
+                    break;
                 }
             }
+            if (ChillNum == 0) {
+                ShowFatalError("SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName);
+            }
+            CompIndex = ChillNum;
+        } else {
+            ChillNum = CompIndex;
+            if (ChillNum > NumElectricChillers || ChillNum < 1) {
+                ShowFatalError("SimElectricChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
+                               ", Number of Units=" + TrimSigDigits(NumElectricChillers) + ", Entered Unit name=" + ChillerName);
+            }
+            if (ElectricChiller(ChillNum).CheckEquipName) {
+                if (ChillerName != ElectricChiller(ChillNum).Name) {
+                    ShowFatalError("SimElectricChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
+                                   ", stored Unit Name for that index=" + ElectricChiller(ChillNum).Name);
+                }
+                ElectricChiller(ChillNum).CheckEquipName = false;
+            }
+        }
+
+        auto &thisChiller(ElectricChiller(ChillNum));
+
+        if (InitLoopEquip) {
+            TempEvapOutDesign = thisChiller.TempDesEvapOut;
+            TempCondInDesign = thisChiller.TempDesCondIn;
+
+            thisChiller.initialize(RunFlag, MyLoad);
+
+            if (LoopNum == thisChiller.CWLoopNum) {
+                thisChiller.size();
+                MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
+                MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
+                OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
+            } else {
+                MinCap = 0.0;
+                MaxCap = 0.0;
+                OptCap = 0.0;
+            }
+            if (GetSizingFactor) {
+                SizingFactor = thisChiller.SizFac;
+            }
+            return;
+        }
+
+        // calculate model depending on where called from
+        if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
+
+            thisChiller.initialize(RunFlag, MyLoad);
+            thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+            thisChiller.update(MyLoad, RunFlag);
+
+        } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
+            PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                                thisChiller.CDLoopSideNum,
+                                                                thisChiller.plantTypeOfNum,
+                                                                thisChiller.CondInletNodeNum,
+                                                                thisChiller.CondOutletNodeNum,
+                                                                thisChiller.QCondenser,
+                                                                thisChiller.CondInletTemp,
+                                                                thisChiller.CondOutletTemp,
+                                                                thisChiller.CondMassFlowRate,
+                                                                FirstHVACIteration);
+        } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
+            PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
+                                                            thisChiller.HRLoopSideNum,
+                                                            thisChiller.plantTypeOfNum,
+                                                            thisChiller.HeatRecInletNodeNum,
+                                                            thisChiller.HeatRecOutletNodeNum,
+                                                            thisChiller.QHeatRecovery,
+                                                            thisChiller.HeatRecInletTemp,
+                                                            thisChiller.HeatRecOutletTemp,
+                                                            thisChiller.HeatRecMdot,
+                                                            FirstHVACIteration);
         }
     }
 
@@ -1027,6 +748,112 @@ namespace PlantChillers {
             SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
+
+void EngineDrivenChillerSpecs::simEngineDrivenChiller(int const LoopNum,              // Flow control mode for the equipment
+                                              std::string const &ChillerName, // user specified name of chiller
+                                              int const EquipFlowCtrl,        // Flow control mode for the equipment
+                                              int &CompIndex,                 // chiller number pointer
+                                              bool const RunFlag,             // simulate chiller when TRUE
+                                              bool const FirstHVACIteration,  // initialize variables when TRUE
+                                              bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                              Real64 &MyLoad,                 // loop demand component will meet
+                                              Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                              Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                              Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                              bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                              Real64 &SizingFactor,           // sizing factor
+                                              Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                              Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+)
+{
+
+    if (GetEngineDrivenInput) {
+        EngineDrivenChillerSpecs::getInput();
+        GetEngineDrivenInput = false;
+    }
+
+    int ChillNum = 0;
+    // Find the correct Chiller
+    if (CompIndex == 0) {
+        int thisIndex = 0;
+        for (auto &ch : EngineDrivenChiller) {
+            thisIndex++;
+            if (ch.Name == ChillerName) {
+                ChillNum = thisIndex;
+                break;
+            }
+        }
+        if (ChillNum == 0) {
+            ShowFatalError("SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName);
+        }
+        CompIndex = ChillNum;
+    } else {
+        ChillNum = CompIndex;
+        if (ChillNum > NumEngineDrivenChillers || ChillNum < 1) {
+            ShowFatalError("SimEngineDrivenChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
+                           ", Number of Units=" + TrimSigDigits(NumEngineDrivenChillers) + ", Entered Unit name=" + ChillerName);
+        }
+        if (EngineDrivenChiller(ChillNum).CheckEquipName) {
+            if (ChillerName != EngineDrivenChiller(ChillNum).Name) {
+                ShowFatalError("SimEngineDrivenChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
+                               ", Unit name=" + ChillerName + ", stored Unit Name for that index=" + EngineDrivenChiller(ChillNum).Name);
+            }
+            EngineDrivenChiller(ChillNum).CheckEquipName = false;
+        }
+    }
+
+    auto &thisChiller(EngineDrivenChiller(ChillNum));
+    if (InitLoopEquip) {
+        TempEvapOutDesign = thisChiller.TempDesEvapOut;
+        TempCondInDesign = thisChiller.TempDesCondIn;
+
+        thisChiller.initialize(RunFlag, MyLoad);
+
+        if (LoopNum == thisChiller.CWLoopNum) {
+            thisChiller.size();
+            MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
+            MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
+            OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
+        } else {
+            MinCap = 0.0;
+            MaxCap = 0.0;
+            OptCap = 0.0;
+        }
+        if (GetSizingFactor) {
+            SizingFactor = thisChiller.SizFac;
+        }
+        return;
+    }
+
+    // calculate model depending on where called from
+    if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
+        thisChiller.initialize(RunFlag, MyLoad);
+        thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+        thisChiller.update(MyLoad, RunFlag);
+    } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
+        PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                            thisChiller.CDLoopSideNum,
+                                                            thisChiller.plantTypeOfNum,
+                                                            thisChiller.CondInletNodeNum,
+                                                            thisChiller.CondOutletNodeNum,
+                                                            thisChiller.QCondenser,
+                                                            thisChiller.CondInletTemp,
+                                                            thisChiller.CondOutletTemp,
+                                                            thisChiller.CondMassFlowRate,
+                                                            FirstHVACIteration);
+    } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
+        PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
+                                                        thisChiller.HRLoopSideNum,
+                                                        thisChiller.plantTypeOfNum,
+                                                        thisChiller.HeatRecInletNodeNum,
+                                                        thisChiller.HeatRecOutletNodeNum,
+                                                        thisChiller.QTotalHeatRecovered,
+                                                        thisChiller.HeatRecInletTemp,
+                                                        thisChiller.HeatRecOutletTemp,
+                                                        thisChiller.HeatRecMdot,
+                                                        FirstHVACIteration);
+    }
+}
 
     void EngineDrivenChillerSpecs::getInput()
     {
@@ -1598,6 +1425,115 @@ namespace PlantChillers {
         }
     }
 
+void GTChillerSpecs::simGasTurbineChiller(int const LoopNum,              // Flow control mode for the equipment
+                                                      std::string const &ChillerName, // user specified name of chiller
+                                                      int const EquipFlowCtrl,        // Flow control mode for the equipment
+                                                      int &CompIndex,                 // chiller number pointer
+                                                      bool const RunFlag,             // simulate chiller when TRUE
+                                                      bool const FirstHVACIteration,  // initialize variables when TRUE
+                                                      bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                                      Real64 &MyLoad,                 // loop demand component will meet
+                                                      Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                                      Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                                      Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                                      bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                                      Real64 &SizingFactor,           // sizing factor
+                                                      Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                                      Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+)
+{
+
+    if (GetGasTurbineInput) {
+        GTChillerSpecs::getInput();
+        GetGasTurbineInput = false;
+    }
+
+    int ChillNum = 0;
+    if (CompIndex == 0) {
+        int thisIndex = 0;
+        for (auto &ch : GTChiller) {
+            thisIndex++;
+            if (ch.Name == ChillerName) {
+                ChillNum = thisIndex;
+                break;
+            }
+        }
+        if (ChillNum == 0) {
+            ShowFatalError("SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName);
+        }
+        CompIndex = ChillNum;
+    } else {
+        ChillNum = CompIndex;
+        if (ChillNum > NumGTChillers || ChillNum < 1) {
+            ShowFatalError("SimGTChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
+                           ", Number of Units=" + TrimSigDigits(NumGTChillers) + ", Entered Unit name=" + ChillerName);
+        }
+        if (GTChiller(ChillNum).CheckEquipName) {
+            if (ChillerName != GTChiller(ChillNum).Name) {
+                ShowFatalError("SimGTChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
+                               ", stored Unit Name for that index=" + GTChiller(ChillNum).Name);
+            }
+            GTChiller(ChillNum).CheckEquipName = false;
+        }
+    }
+
+    auto &thisChiller(GTChiller(ChillNum));
+
+    if (InitLoopEquip) {
+        TempEvapOutDesign = thisChiller.TempDesEvapOut;
+        TempCondInDesign = thisChiller.TempDesCondIn;
+
+        thisChiller.initialize(RunFlag, MyLoad);
+
+        if (LoopNum == thisChiller.CWLoopNum) {
+            thisChiller.size();
+            MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
+            MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
+            OptCap = thisChiller.NomCap * thisChiller.OptPartLoadRat;
+        } else {
+            MinCap = 0.0;
+            MaxCap = 0.0;
+            OptCap = 0.0;
+        }
+        if (GetSizingFactor) {
+            SizingFactor = thisChiller.SizFac;
+        }
+        return;
+    }
+
+    // calculate model depending on where called from
+    if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
+
+        thisChiller.initialize(RunFlag, MyLoad);
+        thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+        thisChiller.update(MyLoad, RunFlag);
+
+    } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
+        PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                            thisChiller.CDLoopSideNum,
+                                                            thisChiller.plantTypeOfNum,
+                                                            thisChiller.CondInletNodeNum,
+                                                            thisChiller.CondOutletNodeNum,
+                                                            thisChiller.QCondenser,
+                                                            thisChiller.CondInletTemp,
+                                                            thisChiller.CondOutletTemp,
+                                                            thisChiller.CondMassFlowRate,
+                                                            FirstHVACIteration);
+    } else if (LoopNum == thisChiller.HRLoopNum) { // heat recovery loop
+        PlantUtilities::UpdateComponentHeatRecoverySide(thisChiller.HRLoopNum,
+                                                        thisChiller.HRLoopSideNum,
+                                                        thisChiller.plantTypeOfNum,
+                                                        thisChiller.HeatRecInletNodeNum,
+                                                        thisChiller.HeatRecOutletNodeNum,
+                                                        thisChiller.HeatRecLubeRate,
+                                                        thisChiller.HeatRecInletTemp,
+                                                        thisChiller.HeatRecOutletTemp,
+                                                        thisChiller.HeatRecMdot,
+                                                        FirstHVACIteration);
+    }
+
+}
+
     void GTChillerSpecs::getInput()
     {
         // SUBROUTINE INFORMATION:
@@ -2113,6 +2049,104 @@ namespace PlantChillers {
             SetupEMSInternalVariable("Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
+
+void ConstCOPChillerSpecs::simConstCOPChiller(int const LoopNum,              // Flow control mode for the equipment
+                                                      std::string const &ChillerName, // user specified name of chiller
+                                                      int const EquipFlowCtrl,        // Flow control mode for the equipment
+                                                      int &CompIndex,                 // chiller number pointer
+                                                      bool const RunFlag,             // simulate chiller when TRUE
+                                                      bool const FirstHVACIteration,  // initialize variables when TRUE
+                                                      bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                                      Real64 &MyLoad,                 // loop demand component will meet
+                                                      Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                                      Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                                      Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                                      bool const GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                                      Real64 &SizingFactor,           // sizing factor
+                                                      Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                                      Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+)
+{
+
+    // GET INPUT
+    if (GetConstCOPInput) {
+        ConstCOPChillerSpecs::getInput();
+        GetConstCOPInput = false;
+    }
+
+    int ChillNum = 0;
+    // Find the correct Chiller
+    if (CompIndex == 0) {
+        int thisIndex = 0;
+        for (auto &ch : ConstCOPChiller) {
+            thisIndex++;
+            if (ch.Name == ChillerName) {
+                ChillNum = thisIndex;
+                break;
+            }
+        }
+        if (ChillNum == 0) {
+            ShowFatalError("SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName);
+        }
+        CompIndex = ChillNum;
+    } else {
+        ChillNum = CompIndex;
+        if (ChillNum > NumConstCOPChillers || ChillNum < 1) {
+            ShowFatalError("SimConstCOPChiller:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
+                           ", Number of Units=" + TrimSigDigits(NumConstCOPChillers) + ", Entered Unit name=" + ChillerName);
+        }
+        if (ConstCOPChiller(ChillNum).CheckEquipName) {
+            if (ChillerName != ConstCOPChiller(ChillNum).Name) {
+                ShowFatalError("SimConstCOPChiller: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + ChillerName +
+                               ", stored Unit Name for that index=" + ConstCOPChiller(ChillNum).Name);
+            }
+            ConstCOPChiller(ChillNum).CheckEquipName = false;
+        }
+    }
+
+    auto &thisChiller(ConstCOPChiller(ChillNum));
+
+    if (InitLoopEquip) {
+        TempEvapOutDesign = 0.0;
+        TempCondInDesign = 0.0;
+
+        thisChiller.initialize(RunFlag, MyLoad);
+
+        if (LoopNum == ConstCOPChiller(ChillNum).CWLoopNum) {
+            thisChiller.size();
+            MinCap = 0.0;
+            MaxCap = thisChiller.NomCap;
+            OptCap = thisChiller.NomCap;
+        } else {
+            MinCap = 0.0;
+            MaxCap = 0.0;
+            OptCap = 0.0;
+        }
+        if (GetSizingFactor) {
+            SizingFactor = thisChiller.SizFac;
+        }
+        return;
+    }
+
+    if (LoopNum == thisChiller.CWLoopNum) {
+        // Calculate Load
+        // IF MinPlr, MaxPlr, OptPlr are not defined, assume min = 0, max=opt=Nomcap
+        thisChiller.initialize(RunFlag, MyLoad);
+        thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
+        thisChiller.update(MyLoad, RunFlag);
+    } else if (LoopNum == thisChiller.CDLoopNum) {
+        PlantUtilities::UpdateChillerComponentCondenserSide(thisChiller.CDLoopNum,
+                                                            thisChiller.CDLoopSideNum,
+                                                            thisChiller.plantTypeOfNum,
+                                                            thisChiller.CondInletNodeNum,
+                                                            thisChiller.CondOutletNodeNum,
+                                                            thisChiller.QCondenser,
+                                                            thisChiller.CondInletTemp,
+                                                            thisChiller.CondOutletTemp,
+                                                            thisChiller.CondMassFlowRate,
+                                                            FirstHVACIteration);
+    }
+}
 
     void ConstCOPChillerSpecs::getInput()
     {

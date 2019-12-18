@@ -237,6 +237,23 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
+        static void simElectricChiller(int LoopNum,              // Flow control mode for the equipment
+                                       std::string const &ChillerName, // user specified name of chiller
+                                       int EquipFlowCtrl,        // Flow control mode for the equipment
+                                       int &CompIndex,                 // chiller number pointer
+                                       bool RunFlag,             // simulate chiller when TRUE
+                                       bool FirstHVACIteration,  // initialize variables when TRUE
+                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                       Real64 &MyLoad,                 // loop demand component will meet
+                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                       Real64 &SizingFactor,           // sizing factor
+                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+        );
+
         void initialize(bool RunFlag, // TRUE when chiller operating
                         Real64 MyLoad);
 
@@ -336,7 +353,26 @@ namespace PlantChillers {
         }
 
         static void getInput();
+
+        static void simEngineDrivenChiller(int LoopNum,              // Flow control mode for the equipment
+                                       std::string const &ChillerName, // user specified name of chiller
+                                       int EquipFlowCtrl,        // Flow control mode for the equipment
+                                       int &CompIndex,                 // chiller number pointer
+                                       bool RunFlag,             // simulate chiller when TRUE
+                                       bool FirstHVACIteration,  // initialize variables when TRUE
+                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                       Real64 &MyLoad,                 // loop demand component will meet
+                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                       Real64 &SizingFactor,           // sizing factor
+                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+        );
+
         void setupOutputVariables();
+
         void initialize(bool RunFlag, // TRUE when chiller operating
                         Real64 MyLoad);
 
@@ -432,7 +468,26 @@ namespace PlantChillers {
         }
 
         static void getInput();
+
+        static void simGasTurbineChiller(int LoopNum,              // Flow control mode for the equipment
+                                       std::string const &ChillerName, // user specified name of chiller
+                                       int EquipFlowCtrl,        // Flow control mode for the equipment
+                                       int &CompIndex,                 // chiller number pointer
+                                       bool RunFlag,             // simulate chiller when TRUE
+                                       bool FirstHVACIteration,  // initialize variables when TRUE
+                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                       Real64 &MyLoad,                 // loop demand component will meet
+                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                       Real64 &SizingFactor,           // sizing factor
+                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+        );
+
         void setupOutputVariables();
+
         void initialize(bool RunFlag, // TRUE when chiller operating
                         Real64 MyLoad);
 
@@ -459,7 +514,26 @@ namespace PlantChillers {
         }
 
         static void getInput();
+
+        static void simConstCOPChiller(int LoopNum,              // Flow control mode for the equipment
+                                       std::string const &ChillerName, // user specified name of chiller
+                                       int EquipFlowCtrl,        // Flow control mode for the equipment
+                                       int &CompIndex,                 // chiller number pointer
+                                       bool RunFlag,             // simulate chiller when TRUE
+                                       bool FirstHVACIteration,  // initialize variables when TRUE
+                                       bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
+                                       Real64 &MyLoad,                 // loop demand component will meet
+                                       Real64 &MaxCap,                 // W - maximum operating capacity of chiller
+                                       Real64 &MinCap,                 // W - minimum operating capacity of chiller
+                                       Real64 &OptCap,                 // W - optimal operating capacity of chiller
+                                       bool GetSizingFactor,     // TRUE when just the sizing factor is requested
+                                       Real64 &SizingFactor,           // sizing factor
+                                       Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
+                                       Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
+        );
+
         void setupOutputVariables();
+
         void initialize(bool RunFlag, // TRUE when chiller operating
                         Real64 MyLoad);
 
@@ -484,25 +558,6 @@ namespace PlantChillers {
     // Functions
 
     void clear_state();
-
-    void SimChiller(int LoopNum,                    // Flow control mode for the equipment
-                    int LoopSide,                   // chiller number pointer
-                    int ChillerType,                // type of chiller
-                    std::string const &ChillerName, // user specified name of chiller
-                    int EquipFlowCtrl,              // Flow control mode for the equipment
-                    int &CompIndex,                 // chiller number pointer
-                    bool RunFlag,                   // simulate chiller when TRUE
-                    bool FirstHVACIteration,        // initialize variables when TRUE
-                    bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
-                    Real64 &MyLoad,                 // loop demand component will meet
-                    Real64 &MaxCap,                 // W - maximum operating capacity of chiller
-                    Real64 &MinCap,                 // W - minimum operating capacity of chiller
-                    Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                    bool GetSizingFactor,           // TRUE when just the sizing factor is requested
-                    Real64 &SizingFactor,           // sizing factor
-                    Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
-                    Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
-    );
 
 } // namespace PlantChillers
 

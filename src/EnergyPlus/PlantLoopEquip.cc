@@ -182,7 +182,6 @@ namespace PlantLoopEquip {
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
@@ -309,25 +308,103 @@ namespace PlantLoopEquip {
 
             // CHILLERS
         } else if (GeneralEquipType == GenEquipTypes_Chiller) {
-            if ((EquipTypeNum == TypeOf_Chiller_EngineDriven) || (EquipTypeNum == TypeOf_Chiller_Electric) ||
-                (EquipTypeNum == TypeOf_Chiller_ConstCOP) || (EquipTypeNum == TypeOf_Chiller_CombTurbine)) {
-                SimChiller(LoopNum,
-                           LoopSideNum,
-                           EquipTypeNum,
-                           sim_component.Name,
-                           EquipFlowCtrl,
-                           EquipNum,
-                           RunFlag,
-                           FirstHVACIteration,
-                           InitLoopEquip,
-                           CurLoad,
-                           MaxLoad,
-                           MinLoad,
-                           OptLoad,
-                           GetCompSizFac,
-                           SizingFac,
-                           TempCondInDesign,
-                           TempEvapOutDesign);
+            if (EquipTypeNum == TypeOf_Chiller_Electric) {
+                PlantChillers::ElectricChillerSpecs::simElectricChiller(LoopNum,
+                                                                        sim_component.Name,
+                                                                        EquipFlowCtrl,
+                                                                        EquipNum,
+                                                                        RunFlag,
+                                                                        FirstHVACIteration,
+                                                                        InitLoopEquip,
+                                                                        CurLoad,
+                                                                        MaxLoad,
+                                                                        MinLoad,
+                                                                        OptLoad,
+                                                                        GetCompSizFac,
+                                                                        SizingFac,
+                                                                        TempCondInDesign,
+                                                                        TempEvapOutDesign);
+                if (InitLoopEquip) {
+                    sim_component.MaxLoad = MaxLoad;
+                    sim_component.MinLoad = MinLoad;
+                    sim_component.OptLoad = OptLoad;
+                    sim_component.CompNum = EquipNum;
+                    sim_component.TempDesCondIn = TempCondInDesign;
+                    sim_component.TempDesEvapOut = TempEvapOutDesign;
+                }
+                if (GetCompSizFac) {
+                    sim_component.SizFac = SizingFac;
+                }
+            } else if (EquipTypeNum == TypeOf_Chiller_EngineDriven) {
+                PlantChillers::EngineDrivenChillerSpecs::simEngineDrivenChiller(LoopNum,
+                                                                        sim_component.Name,
+                                                                        EquipFlowCtrl,
+                                                                        EquipNum,
+                                                                        RunFlag,
+                                                                        FirstHVACIteration,
+                                                                        InitLoopEquip,
+                                                                        CurLoad,
+                                                                        MaxLoad,
+                                                                        MinLoad,
+                                                                        OptLoad,
+                                                                        GetCompSizFac,
+                                                                        SizingFac,
+                                                                        TempCondInDesign,
+                                                                        TempEvapOutDesign);
+                if (InitLoopEquip) {
+                    sim_component.MaxLoad = MaxLoad;
+                    sim_component.MinLoad = MinLoad;
+                    sim_component.OptLoad = OptLoad;
+                    sim_component.CompNum = EquipNum;
+                    sim_component.TempDesCondIn = TempCondInDesign;
+                    sim_component.TempDesEvapOut = TempEvapOutDesign;
+                }
+                if (GetCompSizFac) {
+                    sim_component.SizFac = SizingFac;
+                }
+            } else if (EquipTypeNum == TypeOf_Chiller_CombTurbine) {
+                PlantChillers::GTChillerSpecs::simGasTurbineChiller(LoopNum,
+                                                                                sim_component.Name,
+                                                                                EquipFlowCtrl,
+                                                                                EquipNum,
+                                                                                RunFlag,
+                                                                                FirstHVACIteration,
+                                                                                InitLoopEquip,
+                                                                                CurLoad,
+                                                                                MaxLoad,
+                                                                                MinLoad,
+                                                                                OptLoad,
+                                                                                GetCompSizFac,
+                                                                                SizingFac,
+                                                                                TempCondInDesign,
+                                                                                TempEvapOutDesign);
+                if (InitLoopEquip) {
+                    sim_component.MaxLoad = MaxLoad;
+                    sim_component.MinLoad = MinLoad;
+                    sim_component.OptLoad = OptLoad;
+                    sim_component.CompNum = EquipNum;
+                    sim_component.TempDesCondIn = TempCondInDesign;
+                    sim_component.TempDesEvapOut = TempEvapOutDesign;
+                }
+                if (GetCompSizFac) {
+                    sim_component.SizFac = SizingFac;
+                }
+            } else if (EquipTypeNum == TypeOf_Chiller_ConstCOP) {
+                PlantChillers::ConstCOPChillerSpecs::simConstCOPChiller(LoopNum,
+                                                                                sim_component.Name,
+                                                                                EquipFlowCtrl,
+                                                                                EquipNum,
+                                                                                RunFlag,
+                                                                                FirstHVACIteration,
+                                                                                InitLoopEquip,
+                                                                                CurLoad,
+                                                                                MaxLoad,
+                                                                                MinLoad,
+                                                                                OptLoad,
+                                                                                GetCompSizFac,
+                                                                                SizingFac,
+                                                                                TempCondInDesign,
+                                                                                TempEvapOutDesign);
                 if (InitLoopEquip) {
                     sim_component.MaxLoad = MaxLoad;
                     sim_component.MinLoad = MinLoad;
