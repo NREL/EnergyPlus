@@ -310,7 +310,7 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_Chiller) {
             if (EquipTypeNum == TypeOf_Chiller_Electric) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-                
+
             } else if (EquipTypeNum == TypeOf_Chiller_EngineDriven) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
@@ -321,7 +321,6 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {

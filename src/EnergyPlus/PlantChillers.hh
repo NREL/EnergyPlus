@@ -85,14 +85,14 @@ namespace PlantChillers {
     struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
         // Members
-        std::string Name;                 // user identifier
+        std::string Name;      // user identifier
         Real64 MinPartLoadRat; // (GT MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat; // (GT MAX) max allowed operating frac full load
         Real64 OptPartLoadRat; // (GT BEST) optimal operating frac full load
         Real64 TempDesCondIn;  // C - (GT ADJTC(1)The design secondary loop fluid
         // temperature at the chiller condenser side inlet
-        Real64 TempRiseCoef;   // (GT ADJTC(2)) correction factor for off ChillDesign oper.
-        Real64 TempDesEvapOut; // C - (GT ADJTC(3)The design primary loop fluid
+        Real64 TempRiseCoef;              // (GT ADJTC(2)) correction factor for off ChillDesign oper.
+        Real64 TempDesEvapOut;            // C - (GT ADJTC(3)The design primary loop fluid
         int CondenserType;                // Type of Condenser - Air or Water Cooled
         Real64 NomCap;                    // design nominal capacity of chiller
         bool NomCapWasAutoSized;          // true if NomCap was autosize on input
@@ -166,7 +166,7 @@ namespace PlantChillers {
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-            CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              CondenserType(0), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), HRSPErrDone(false), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
@@ -204,7 +204,6 @@ namespace PlantChillers {
         virtual void initialize(bool RunFlag, Real64 MyLoad) = 0;
 
         virtual void size() = 0;
-
     };
 
     struct ElectricChillerSpecs : BaseChillerSpecs
@@ -245,8 +244,7 @@ namespace PlantChillers {
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0), ActualCOP(0.0),
-              QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0),
-              ChillerCondAvgTemp(0.0)
+              QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), ChillerCondAvgTemp(0.0)
         {
         }
 
@@ -254,7 +252,7 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        static ElectricChillerSpecs* factory(std::string const & chillerName);
+        static ElectricChillerSpecs *factory(std::string const &chillerName);
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -262,8 +260,8 @@ namespace PlantChillers {
 
         void size() override;
 
-        void calculate(Real64 &MyLoad,    // operating load
-                       bool RunFlag,       // TRUE when chiller operating
+        void calculate(Real64 &MyLoad,   // operating load
+                       bool RunFlag,     // TRUE when chiller operating
                        int EquipFlowCtrl // Flow control mode for the equipment
         );
 
@@ -281,7 +279,7 @@ namespace PlantChillers {
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
         // Members
-        std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
+        std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
         // temperature at the chiller evaporator side outlet
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
@@ -347,7 +345,7 @@ namespace PlantChillers {
         {
         }
 
-        static EngineDrivenChillerSpecs* factory(std::string const & chillerName);
+        static EngineDrivenChillerSpecs *factory(std::string const &chillerName);
 
         static void getInput();
 
@@ -376,7 +374,7 @@ namespace PlantChillers {
     struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        std::string FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
+        std::string FuelType;         // Type of Fuel - DIESEL, GASOLINE, GAS
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
@@ -439,7 +437,7 @@ namespace PlantChillers {
         {
         }
 
-        static GTChillerSpecs* factory(std::string const & chillerName);
+        static GTChillerSpecs *factory(std::string const &chillerName);
 
         static void getInput();
 
@@ -471,7 +469,7 @@ namespace PlantChillers {
         {
         }
 
-        static ConstCOPChillerSpecs* factory(std::string const & chillerName);
+        static ConstCOPChillerSpecs *factory(std::string const &chillerName);
 
         static void getInput();
 
