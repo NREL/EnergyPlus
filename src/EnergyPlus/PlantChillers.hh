@@ -463,6 +463,21 @@ namespace PlantChillers {
 
         static void getInput();
 
+        void initialize(         bool RunFlag, // TRUE when chiller operating
+                                 Real64 MyLoad);
+
+        void size();
+
+
+        void calculate(               Real64 &MyLoad,
+                                      bool RunFlag,
+                                      int EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        void update(Real64 MyLoad, // unused1208
+                                          bool RunFlag  // unused1208
+                                          );
+
     };
 
     // Object Data
@@ -494,23 +509,6 @@ namespace PlantChillers {
                     Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
     );
 
-
-    void InitConstCOPChiller(int ChillNum, // number of the current electric chiller being simulated
-                             bool RunFlag, // TRUE when chiller operating
-                             Real64 MyLoad);
-
-    void SizeConstCOPChiller(int ChillNum);
-
-
-    void CalcConstCOPChillerModel(int ChillNum,
-                                  Real64 &MyLoad,
-                                  bool RunFlag,
-                                  int EquipFlowCtrl // Flow control mode for the equipment
-    );
-
-    void UpdateConstCOPChillerRecords(Real64 MyLoad, // unused1208
-                                      bool RunFlag,  // unused1208
-                                      int Num);
 
 } // namespace PlantChillers
 

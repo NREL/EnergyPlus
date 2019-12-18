@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricChillerInput();
+    ElectricChillerSpecs::getInput();
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";

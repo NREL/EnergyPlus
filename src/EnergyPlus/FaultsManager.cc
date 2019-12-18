@@ -546,7 +546,7 @@ namespace FaultsManager {
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetElectricInput) {
-                        PlantChillers::GetElectricChillerInput();
+                        PlantChillers::ElectricChillerSpecs::getInput();
                         PlantChillers::GetElectricInput = false;
                     }
 
@@ -640,7 +640,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:ConstantCOP")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetConstCOPInput) {
-                        PlantChillers::GetConstCOPChillerInput();
+                        PlantChillers::ConstCOPChillerSpecs::getInput();
                         PlantChillers::GetConstCOPInput = false;
                     }
 
@@ -675,7 +675,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:EngineDriven")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetEngineDrivenInput) {
-                        PlantChillers::GetEngineDrivenChillerInput();
+                        PlantChillers::EngineDrivenChillerSpecs::getInput();
                         PlantChillers::GetEngineDrivenInput = false;
                     }
 
@@ -710,7 +710,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:CombustionTurbine")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetGasTurbineInput) {
-                        PlantChillers::GetGTChillerInput();
+                        PlantChillers::GTChillerSpecs::getInput();
                         PlantChillers::GetGasTurbineInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1310,7 +1310,7 @@ namespace FaultsManager {
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetElectricInput) {
-                        PlantChillers::GetElectricChillerInput();
+                        PlantChillers::ElectricChillerSpecs::getInput();
                         PlantChillers::GetElectricInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1373,7 +1373,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:EngineDriven")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetEngineDrivenInput) {
-                        PlantChillers::GetEngineDrivenChillerInput();
+                        PlantChillers::EngineDrivenChillerSpecs::getInput();
                         PlantChillers::GetEngineDrivenInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1398,7 +1398,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:CombustionTurbine")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetGasTurbineInput) {
-                        PlantChillers::GetGTChillerInput();
+                        PlantChillers::GTChillerSpecs::getInput();
                         PlantChillers::GetGasTurbineInput = false;
                     }
                     ChillerNum = 0;
@@ -1422,7 +1422,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:ConstantCOP")) {
                     // Read in chiller if not done yet
                     if (PlantChillers::GetConstCOPInput) {
-                        PlantChillers::GetConstCOPChillerInput();
+                        PlantChillers::ConstCOPChillerSpecs::getInput();
                         PlantChillers::GetConstCOPInput = false;
                     }
                     ChillerNum = 0;
