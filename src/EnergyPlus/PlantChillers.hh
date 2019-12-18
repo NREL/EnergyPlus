@@ -71,9 +71,9 @@ namespace PlantChillers {
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    extern int NumElectricChillers;    // number of Electric chillers specified in input
+    extern int NumElectricChillers;     // number of Electric chillers specified in input
     extern int NumEngineDrivenChillers; // number of EngineDriven chillers specified in input
-    extern int NumGTChillers; // number of GT chillers specified in input
+    extern int NumGTChillers;           // number of GT chillers specified in input
     extern int NumConstCOPChillers;
 
     extern bool GetEngineDrivenInput; // then TRUE, calls subroutine to read input file.
@@ -136,19 +136,19 @@ namespace PlantChillers {
         bool MyEnvrnFlag;
         Real64 TimeStepSysLast;
         Real64 CurrentEndTimeLast;
-        Real64 CondMassFlowRate;    // Kg/s - condenser mass flow rate, water side
-        Real64 EvapMassFlowRate;    // Kg/s - evaporator mass flow rate, water side
-        Real64 CondOutletTemp;      // C - condenser outlet temperature, air or water side
-        Real64 EvapOutletTemp;      // C - evaporator outlet temperature, water side
-        Real64 QEvaporator;         // W - rate of heat transfer to the evaporator coil
-        Real64 QCondenser;          // W - rate of heat transfer to the condenser coil
-        Real64 Energy;              // J - chiller energy use
-        Real64 EvaporatorEnergy;    // J - rate of heat transfer to the evaporator coil
-        Real64 CondenserEnergy;     // J - rate of heat transfer to the condenser coil
-        Real64 QHeatRecovered;      // W - rate of heat transfer to the Heat Recovery coil
-        Real64 HeatRecOutletTemp;   // C - Heat Rec outlet temperature, water side
-        Real64 AvgCondSinkTemp;     // condenser temperature value for use in curves [C]
-        Real64 BasinHeaterPower;    // Basin heater power (W)
+        Real64 CondMassFlowRate;  // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;  // Kg/s - evaporator mass flow rate, water side
+        Real64 CondOutletTemp;    // C - condenser outlet temperature, air or water side
+        Real64 EvapOutletTemp;    // C - evaporator outlet temperature, water side
+        Real64 QEvaporator;       // W - rate of heat transfer to the evaporator coil
+        Real64 QCondenser;        // W - rate of heat transfer to the condenser coil
+        Real64 Energy;            // J - chiller energy use
+        Real64 EvaporatorEnergy;  // J - rate of heat transfer to the evaporator coil
+        Real64 CondenserEnergy;   // J - rate of heat transfer to the condenser coil
+        Real64 QHeatRecovered;    // W - rate of heat transfer to the Heat Recovery coil
+        Real64 HeatRecOutletTemp; // C - Heat Rec outlet temperature, water side
+        Real64 AvgCondSinkTemp;   // condenser temperature value for use in curves [C]
+        Real64 BasinHeaterPower;  // Basin heater power (W)
         Real64 Power;
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
@@ -166,18 +166,17 @@ namespace PlantChillers {
               PossibleSubcooling(false), CondMassFlowIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyFlag(true), MyEnvrnFlag(true),
               TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), CondOutletTemp(0.0),
-        EvapOutletTemp(0.0),      // C - evaporator outlet temperature, water side
-              QEvaporator(0.0)   ,      // W - rate of heat transfer to the evaporator coil
-              QCondenser(0.0)   ,       // W - rate of heat transfer to the condenser coil
-         Energy(0.0)       ,      // J - chiller energy use
-              EvaporatorEnergy(0.0) ,   // J - rate of heat transfer to the evaporator coil
-              CondenserEnergy(0.0) ,    // J - rate of heat transfer to the condenser coil
-         QHeatRecovered(0.0)  ,    // W - rate of heat transfer to the Heat Recovery coil
-              HeatRecOutletTemp(0.0) ,  // C - Heat Rec outlet temperature, water side
-         AvgCondSinkTemp(0.0)  ,   // condenser temperature value for use in curves [C]
-              BasinHeaterPower(0.0),    // Basin heater power (W)
-              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              BasinHeaterConsumption(0.0), plantTypeOfNum(0)
+              EvapOutletTemp(0.0),    // C - evaporator outlet temperature, water side
+              QEvaporator(0.0),       // W - rate of heat transfer to the evaporator coil
+              QCondenser(0.0),        // W - rate of heat transfer to the condenser coil
+              Energy(0.0),            // J - chiller energy use
+              EvaporatorEnergy(0.0),  // J - rate of heat transfer to the evaporator coil
+              CondenserEnergy(0.0),   // J - rate of heat transfer to the condenser coil
+              QHeatRecovered(0.0),    // W - rate of heat transfer to the Heat Recovery coil
+              HeatRecOutletTemp(0.0), // C - Heat Rec outlet temperature, water side
+              AvgCondSinkTemp(0.0),   // condenser temperature value for use in curves [C]
+              BasinHeaterPower(0.0),  // Basin heater power (W)
+              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), BasinHeaterConsumption(0.0), plantTypeOfNum(0)
 
         {
         }
@@ -213,7 +212,7 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
-        Real64 CondOutletHumRat;    // kg/kg - condenser outlet humditiy ratio, air side
+        Real64 CondOutletHumRat;                   // kg/kg - condenser outlet humditiy ratio, air side
         Real64 ActualCOP;
         Real64 QHeatRecovery;
         Real64 EnergyHeatRecovery;
@@ -228,9 +227,9 @@ namespace PlantChillers {
               CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
-              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0),
-              ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0),
-              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0)
+              HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0), ActualCOP(0.0),
+              QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0),
+              ChillerCondAvgTemp(0.0)
         {
         }
 
@@ -238,27 +237,25 @@ namespace PlantChillers {
 
         void setupOutputVariables();
 
-        void initialize(         bool RunFlag, // TRUE when chiller operating
-                                 Real64 MyLoad);
+        void initialize(bool RunFlag, // TRUE when chiller operating
+                        Real64 MyLoad);
 
         void size();
 
-        void calculate(               Real64 &MyLoad,          // operating load
-                                      int EquipFlowCtrl, // Flow control mode for the equipment
-                                      bool RunFlag       // TRUE when chiller operating
+        void calculate(Real64 &MyLoad,    // operating load
+                       int EquipFlowCtrl, // Flow control mode for the equipment
+                       bool RunFlag       // TRUE when chiller operating
         );
 
         void update(Real64 MyLoad, // current load
-                                          bool RunFlag  // TRUE if chiller operating
+                    bool RunFlag   // TRUE if chiller operating
         );
 
-        void calcHeatRecovery(               Real64 &QCond,              // current condenser load
-                                             Real64 CondMassFlow,  // current condenser Mass Flow
-                                             Real64 _CondInletTemp, // current condenser Inlet Temp
-                                             Real64 &QHeatRec            // amount of heat recovered
+        void calcHeatRecovery(Real64 &QCond,         // current condenser load
+                              Real64 CondMassFlow,   // current condenser Mass Flow
+                              Real64 _CondInletTemp, // current condenser Inlet Temp
+                              Real64 &QHeatRec       // amount of heat recovered
         );
-
-
     };
 
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
@@ -302,8 +299,8 @@ namespace PlantChillers {
         int HRCompNum;                             // heat recovery water plant loop component index
 
         // engine driven:
-        Real64 HeatRecInletTemp;   // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdotActual;  // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecInletTemp;    // Inlet Temperature of the heat recovery fluid
+        Real64 HeatRecMdotActual;   // reporting: Heat Recovery Loop Mass flow rate
         Real64 QTotalHeatRecovered; // total heat recovered (W)
         Real64 QJacketRecovered;    // heat recovered from jacket (W)
         Real64 QLubeOilRecovered;   // heat recovered from lube (W)
@@ -317,9 +314,9 @@ namespace PlantChillers {
         Real64 FuelMdot;            // Fuel Amount used (Kg/s)
         Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
 
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 FuelCOP;             // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
+        Real64 HeatRecOutletTemp; // reporting: Heat Recovery Loop Outlet Temperature (C)
+        Real64 HeatRecMdot;       // reporting: Heat Recovery Loop Mass flow rate (kg/s)
+        Real64 FuelCOP;           // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
 
         // Default Constructor
         EngineDrivenChillerSpecs()
@@ -328,35 +325,34 @@ namespace PlantChillers {
               RecJacHeattoFuelCurve(0), RecLubeHeattoFuelCurve(0), TotExhausttoFuelCurve(0), ExhaustTemp(0.0), ExhaustTempCurve(0), UA(0.0),
               UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0), DesignMinExitGasTemp(0.0), FuelHeatingValue(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0),
-              HeatRecInletTemp(0.0),HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0),
+              HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
+              HRCompNum(0), HeatRecInletTemp(0.0), HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0),
 
-                // engine driven:
-              QLubeOilRecovered(0.0), QExhaustRecovered(0.0),  FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0),
-              JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelMdot(0.0),
-              ExhaustStackTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
+              // engine driven:
+              QLubeOilRecovered(0.0), QExhaustRecovered(0.0), FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0),
+              LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecOutletTemp(0.0),
+              HeatRecMdot(0.0), FuelCOP(0.0)
         {
         }
 
-
         static void getInput();
         void setupOutputVariables();
-        void initialize(         bool RunFlag, // TRUE when chiller operating
-                                 Real64 MyLoad);
+        void initialize(bool RunFlag, // TRUE when chiller operating
+                        Real64 MyLoad);
 
         void size();
 
-        void calculate(                   Real64 &MyLoad,         // operating load
-                                          bool RunFlag,     // TRUE when chiller operating
-                                          int EquipFlowCtrl // Flow control mode for the equipment
+        void calculate(Real64 &MyLoad,   // operating load
+                       bool RunFlag,     // TRUE when chiller operating
+                       int EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void calcHeatRecovery(        Real64 EnergyRecovered, // Amount of heat recovered
-                                      Real64 &HeatRecRatio          // Max Heat recovery ratio
+        void calcHeatRecovery(Real64 EnergyRecovered, // Amount of heat recovered
+                              Real64 &HeatRecRatio    // Max Heat recovery ratio
         );
 
         void update(Real64 MyLoad, // current load
-                                       bool RunFlag  // TRUE if chiller operating
+                    bool RunFlag   // TRUE if chiller operating
         );
     };
 
@@ -437,22 +433,19 @@ namespace PlantChillers {
 
         static void getInput();
         void setupOutputVariables();
-        void initialize(   bool RunFlag, // TRUE when chiller operating
-                           Real64 MyLoad);
+        void initialize(bool RunFlag, // TRUE when chiller operating
+                        Real64 MyLoad);
 
         void size();
 
-
-        void calculate(         Real64 &MyLoad,         // operating load
-                                bool RunFlag,     // TRUE when chiller operating
-                                int EquipFlowCtrl // Flow control mode for the equipment
+        void calculate(Real64 &MyLoad,   // operating load
+                       bool RunFlag,     // TRUE when chiller operating
+                       int EquipFlowCtrl // Flow control mode for the equipment
         );
-
 
         void update(Real64 MyLoad, // current load
-                                    bool RunFlag  // TRUE if chiller operating
+                    bool RunFlag   // TRUE if chiller operating
         );
-
     };
 
     struct ConstCOPChillerSpecs : BaseChillerSpecs
@@ -461,56 +454,55 @@ namespace PlantChillers {
         Real64 ActualCOP;
 
         // Default Constructor
-        ConstCOPChillerSpecs() : ActualCOP(0.0) {}
+        ConstCOPChillerSpecs() : ActualCOP(0.0)
+        {
+        }
 
         static void getInput();
         void setupOutputVariables();
-        void initialize(         bool RunFlag, // TRUE when chiller operating
-                                 Real64 MyLoad);
+        void initialize(bool RunFlag, // TRUE when chiller operating
+                        Real64 MyLoad);
 
         void size();
 
-
-        void calculate(               Real64 &MyLoad,
-                                      bool RunFlag,
-                                      int EquipFlowCtrl // Flow control mode for the equipment
+        void calculate(Real64 &MyLoad,
+                       bool RunFlag,
+                       int EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // unused1208
-                                          bool RunFlag  // unused1208
-                                          );
-
+                    bool RunFlag   // unused1208
+        );
     };
 
     // Object Data
-    extern Array1D<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
+    extern Array1D<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
     extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    extern Array1D<GTChillerSpecs> GTChiller; // dimension to number of machines
-    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
+    extern Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
+    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
 
     // Functions
 
     void clear_state();
 
-    void SimChiller(int LoopNum,              // Flow control mode for the equipment
-                    int LoopSide,             // chiller number pointer
-                    int ChillerType,          // type of chiller
+    void SimChiller(int LoopNum,                    // Flow control mode for the equipment
+                    int LoopSide,                   // chiller number pointer
+                    int ChillerType,                // type of chiller
                     std::string const &ChillerName, // user specified name of chiller
-                    int EquipFlowCtrl,        // Flow control mode for the equipment
+                    int EquipFlowCtrl,              // Flow control mode for the equipment
                     int &CompIndex,                 // chiller number pointer
-                    bool RunFlag,             // simulate chiller when TRUE
-                    bool FirstHVACIteration,  // initialize variables when TRUE
+                    bool RunFlag,                   // simulate chiller when TRUE
+                    bool FirstHVACIteration,        // initialize variables when TRUE
                     bool &InitLoopEquip,            // If not zero, calculate the max load for operating conditions
                     Real64 &MyLoad,                 // loop demand component will meet
                     Real64 &MaxCap,                 // W - maximum operating capacity of chiller
                     Real64 &MinCap,                 // W - minimum operating capacity of chiller
                     Real64 &OptCap,                 // W - optimal operating capacity of chiller
-                    bool GetSizingFactor,     // TRUE when just the sizing factor is requested
+                    bool GetSizingFactor,           // TRUE when just the sizing factor is requested
                     Real64 &SizingFactor,           // sizing factor
                     Real64 &TempCondInDesign,       // design condenser inlet temperature, water side
                     Real64 &TempEvapOutDesign       // design evaporator outlet temperature, water side
     );
-
 
 } // namespace PlantChillers
 
