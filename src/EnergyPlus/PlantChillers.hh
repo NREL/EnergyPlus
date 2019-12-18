@@ -218,7 +218,7 @@ namespace PlantChillers {
         Real64 EnergyHeatRecovery;
         Real64 HeatRecInletTemp;
         Real64 HeatRecOutletTemp;
-        Real64 HeatRecMassFlow;
+        Real64 HeatRecMdot;
         Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
 
         // Default Constructor
@@ -228,7 +228,7 @@ namespace PlantChillers {
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondOutletHumRat(0.0), ActualCOP(0.0),
-              QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0),
+              QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0),
               ChillerCondAvgTemp(0.0)
         {
         }
@@ -243,8 +243,8 @@ namespace PlantChillers {
         void size();
 
         void calculate(Real64 &MyLoad,    // operating load
-                       int EquipFlowCtrl, // Flow control mode for the equipment
-                       bool RunFlag       // TRUE when chiller operating
+                       bool RunFlag,       // TRUE when chiller operating
+                       int EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // current load
@@ -383,7 +383,7 @@ namespace PlantChillers {
         Array1D<Real64> TempBasedExhaustTempCoef; // (TEX2GC) Ambient Temperature Based Exhaust Gas Temp to
         // Fuel Energy Input Coeffs Poly Fit
         Real64 HeatRecLubeEnergy;                  // (ELUBE) Recoverable Lube Oil Energy
-        Real64 HeatRecLubeRate;                    // (ELUBE) Recoverable Lube Oil Rate of Rwecovery (W)
+        Real64 HeatRecLubeRate;                    // (ELUBE) Recoverable Lube Oil Rate of Recovery (W)
         Array1D<Real64> HeatRecLubeEnergyCoef;     // (ELUBEGC)  Recoverable Lube Oil Energy Input Coef Poly Fit
         Real64 UAtoCapRat;                         // (UACGC) Heat Exchanger UA to Capacity
         Array1D<Real64> UAtoCapCoef;               // Heat Exchanger UA to Capacity Coeffs Poly Fit

@@ -245,7 +245,7 @@ namespace PlantChillers {
 
                     thisChiller.initialize(RunFlag, MyLoad);
 
-                    if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
+                    if (LoopNum == thisChiller.CWLoopNum) {
                         thisChiller.size();
                         MinCap = thisChiller.NomCap * thisChiller.MinPartLoadRat;
                         MaxCap = thisChiller.NomCap * thisChiller.MaxPartLoadRat;
@@ -265,7 +265,7 @@ namespace PlantChillers {
                 if (LoopNum == thisChiller.CWLoopNum) { // chilled water loop
 
                     thisChiller.initialize(RunFlag, MyLoad);
-                    thisChiller.calculate(MyLoad, EquipFlowCtrl, RunFlag);
+                    thisChiller.calculate(MyLoad, RunFlag, EquipFlowCtrl);
                     thisChiller.update(MyLoad, RunFlag);
 
                 } else if (LoopNum == thisChiller.CDLoopNum) { // condenser loop
@@ -288,7 +288,7 @@ namespace PlantChillers {
                                                                     thisChiller.QHeatRecovery,
                                                                     thisChiller.HeatRecInletTemp,
                                                                     thisChiller.HeatRecOutletTemp,
-                                                                    thisChiller.HeatRecMassFlow,
+                                                                    thisChiller.HeatRecMdot,
                                                                     FirstHVACIteration);
                 }
 
@@ -1018,7 +1018,7 @@ namespace PlantChillers {
                 "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMassFlow, "System", "Average", this->Name);
+                "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
 
             SetupOutputVariable(
                 "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, this->ChillerCondAvgTemp, "System", "Average", this->Name);
@@ -4698,8 +4698,9 @@ namespace PlantChillers {
     }
 
     void ElectricChillerSpecs::calculate(Real64 &MyLoad,          // operating load
-                                         int const EquipFlowCtrl, // Flow control mode for the equipment
-                                         bool const RunFlag       // TRUE when chiller operating
+                                         bool const RunFlag,
+                                         int const EquipFlowCtrl // Flow control mode for the equipment
+                                                // TRUE when chiller operating
     )
     {
         // SUBROUTINE INFORMATION:
@@ -7436,7 +7437,7 @@ namespace PlantChillers {
                 this->EnergyHeatRecovery = 0.0;
                 this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecOutletTemp = Node(this->HeatRecOutletNodeNum).Temp;
-                this->HeatRecMassFlow = Node(this->HeatRecInletNodeNum).MassFlowRate;
+                this->HeatRecMdot = Node(this->HeatRecInletNodeNum).MassFlowRate;
 
                 this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
             }
@@ -7473,7 +7474,7 @@ namespace PlantChillers {
                 Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
                 this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecOutletTemp = Node(this->HeatRecOutletNodeNum).Temp;
-                this->HeatRecMassFlow = Node(this->HeatRecInletNodeNum).MassFlowRate;
+                this->HeatRecMdot = Node(this->HeatRecInletNodeNum).MassFlowRate;
                 this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
             }
         }
