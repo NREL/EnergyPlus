@@ -190,8 +190,6 @@ namespace PlantLoopEquip {
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
-        using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using UserDefinedComponents::SimUserDefinedPlantComponent;
@@ -868,17 +866,9 @@ namespace PlantLoopEquip {
 
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
-
             } else if (EquipTypeNum == TypeOf_PVTSolarCollectorFlatPlate) {
 
-                SimPVTcollectors(EquipNum, FirstHVACIteration, CalledFromPlantLoopEquipMgr, sim_component.Name, InitLoopEquip);
-
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Solar Collector Type=" + sim_component.TypeOf);
