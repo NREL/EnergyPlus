@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.50" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.51" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -1847,6 +1847,7 @@ Call resizeClassGroupArray(2)
 IDDClassGroup(maxUsedClassGroup + 1).classStart = maxUsedIDDClass + 1
 'Stop
 Call associateUnits
+Call checkMinFields
 If extraObjListWarning <> "" Then
   MsgBox "The following fields have more than one \object-list slash codes. Only one is allowed per field." & vbCrLf & vbCrLf & extraObjListWarning, vbInformation, "Reading IDD"
 End If
@@ -1973,6 +1974,18 @@ End If
 End Sub
 
 
+Sub checkMinFields()
+Dim numfields As Integer
+Dim i As Integer
+For i = 1 To maxUsedIDDClass
+    numfields = 1 + IDDClassDat(i).fieldEnd - IDDClassDat(i).fieldStart
+    If IDDClassDat(i).minFields > numfields Then
+        Call MsgBox("\min-field is greater than the number of fiels in: " & IDDClassDat(i).name, vbInformation, "Warning")
+    End If
+Next i
+End Sub
+
+
 '-----------------------------------------------------------------------------
 ' Removes the last slash and what ever is right of it
 ' This effectively is like moving up one directory for a string
@@ -1992,6 +2005,7 @@ Else
   upDirectory = p
 End If
 End Function
+
 
 '-----------------------------------------------------------------------------
 'This displays errors in a pop up dialog box
