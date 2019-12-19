@@ -108,7 +108,7 @@ void Penumbra::submitPSSA() {
   penumbra->context.submitPSSA(penumbra->sun.getView());
 }
 
-float Penumbra::calculatePSSA(unsigned surfaceIndex) {
+float Penumbra::fetchPSSA(unsigned surfaceIndex) {
   if (penumbra->checkSurface(surfaceIndex)) {
     return penumbra->context.calculatePSSA(surfaceIndex);
   } else {
@@ -118,18 +118,33 @@ float Penumbra::calculatePSSA(unsigned surfaceIndex) {
   }
 }
 
-std::vector<float> Penumbra::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
+std::vector<float> Penumbra::fetchPSSA(const std::vector<unsigned> &surfaceIndices) {
   for (auto const surfaceIndex : surfaceIndices) {
     if (!penumbra->checkSurface(surfaceIndex)) {
       showMessage(MSG_ERR, "Surface index, X, does not exist. Cannot calculate PSSA."); // TODO format string
       return {};
     }
   }
-  return penumbra->context.calculatePSSA(surfaceIndices);;
+  return penumbra->context.calculatePSSA(surfaceIndices);
+}
+
+std::vector<float> Penumbra::fetchPSSA() {
+  return penumbra->context.calculatePSSA();;
+}
+
+float Penumbra::calculatePSSA(unsigned surfaceIndex) {
+    submitPSSA(surfaceIndex);
+    return fetchPSSA(surfaceIndex);
+}
+
+std::vector<float> Penumbra::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
+    submitPSSA(surfaceIndices);
+    return fetchPSSA(surfaceIndices);
 }
 
 std::vector<float> Penumbra::calculatePSSA() {
-  return penumbra->context.calculatePSSA();;
+    submitPSSA();
+    return fetchPSSA();
 }
 
 std::map<unsigned, float>

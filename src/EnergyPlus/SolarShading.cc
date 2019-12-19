@@ -5352,15 +5352,15 @@ namespace SolarShading {
                 auto id = Surface(HTS).PenumbraID;
                 if (penumbra && id >= 0 && !compareShadingMethods) {
                     // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
-                    SAREA(HTS) = penumbra->calculatePSSA(id) / CTHETA(HTS);
-                    // SAREA(HTS) = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                    SAREA(HTS) = penumbra->fetchPSSA(id) / CTHETA(HTS);
+                    // SAREA(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         id = Surface(HTSS).PenumbraID;
                         if (id >= 0) {
                             // SAREA(HTSS) = buildingPSSF.at(id) / CTHETA(HTSS);
-                            SAREA(HTSS) = penumbra->calculatePSSA(id) / CTHETA(HTSS);
-                            // SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->fetchPSSA(id) / CTHETA(HTSS);
+                            // SAREA(HTSS) = penumbra->fetchPSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
                             }
