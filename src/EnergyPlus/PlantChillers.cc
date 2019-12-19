@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -108,7 +107,6 @@ namespace PlantChillers {
     // 1. BLAST Users Manual
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::MaxNameLength;
@@ -133,7 +131,6 @@ namespace PlantChillers {
 
     static std::string const BlankString;
 
-    // const COP
     int NumElectricChillers(0);     // number of Electric chillers specified in input
     int NumEngineDrivenChillers(0); // number of EngineDriven chillers specified in input
     int NumGTChillers(0);           // number of GT chillers specified in input
@@ -1328,7 +1325,6 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         // Locals
-        Real64 _EvapInletTemp; // C - evaporator inlet temperature, water side
         Real64 _CondInletTemp; // C - condenser inlet temperature, water side
 
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
@@ -1383,12 +1379,10 @@ namespace PlantChillers {
         EvapOutletNode = this->EvapOutletNodeNum;
         CondInletNode = this->CondInletNodeNum;
         CondOutletNode = this->CondOutletNodeNum;
-        FRAC = 1.0;
         LoopNum = this->CWLoopNum;
         LoopSideNum = this->CWLoopSideNum;
         BranchNum = this->CWBranchNum;
         CompNum = this->CWCompNum;
-        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         //   calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -1452,7 +1446,6 @@ namespace PlantChillers {
         }
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        _CondInletTemp = Node(CondInletNode).Temp;
 
         // Set mass flow rates
         if (this->CondenserType == WaterCooled) {
@@ -1709,11 +1702,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
-                PartLoadRat = max(0.0, min(PartLoadRat, _MaxPartLoadRat));
-                // ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -1816,8 +1804,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
@@ -1943,10 +1929,6 @@ namespace PlantChillers {
         static std::string const RoutineName("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CondInletNode;  // condenser inlet node number, water side
-        int CondOutletNode; // condenser outlet node number, water side
-        int HeatRecInNode;
-        int HeatRecOutNode;
         Real64 QTotal;
         Real64 HeatRecMassFlowRate;
         Real64 TAvgIn;
@@ -1958,12 +1940,8 @@ namespace PlantChillers {
         Real64 HeatRecHighInletLimit;
 
         // Begin routine
-        HeatRecInNode = this->HeatRecInletNodeNum;
-        HeatRecOutNode = this->HeatRecOutletNodeNum;
-        CondInletNode = this->CondInletNodeNum;
-        CondOutletNode = this->CondOutletNodeNum;
-        _HeatRecInletTemp = Node(HeatRecInNode).Temp;
-        HeatRecMassFlowRate = Node(HeatRecInNode).MassFlowRate;
+        _HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
+        HeatRecMassFlowRate = Node(this->HeatRecInletNodeNum).MassFlowRate;
 
         CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
             DataPlant::PlantLoop(this->HRLoopNum).FluidName, _HeatRecInletTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
@@ -1972,7 +1950,7 @@ namespace PlantChillers {
             CpCond = FluidProperties::GetSpecificHeatGlycol(
                 DataPlant::PlantLoop(this->CDLoopNum).FluidName, _CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
         } else {
-            CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
+            CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(this->CondInletNodeNum).HumRat, _CondInletTemp);
         }
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot
@@ -3030,9 +3008,6 @@ namespace PlantChillers {
         tmpNomCap = this->NomCap;
         tmpEvapVolFlowRate = this->EvapVolFlowRate;
         tmpCondVolFlowRate = this->CondVolFlowRate;
-        EvapVolFlowRateUser = 0.0;
-        NomCapUser = 0.0;
-        CondVolFlowRateUser = 0.0;
 
         if (this->CondenserType == WaterCooled) {
             PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
@@ -3317,7 +3292,6 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         // Locals
-        Real64 _EvapInletTemp; // C - evaporator inlet temperature, water side
         Real64 _CondInletTemp; // C - condenser inlet temperature, water side
 
         Real64 const ExhaustCP(1.047);    // Exhaust Gas Specific Heat (J/kg-K)
@@ -3371,7 +3345,6 @@ namespace PlantChillers {
         Real64 ExhaustGasFlow; // exhaust gas mass flow rate
         Real64 _DesignMinExitGasTemp;
         Real64 _UA;       // (UACDC) exhaust gas Heat Exchanger UA
-        Real64 HeatRecCp; // Specific Heat of the Heat Recovery Fluid (J/kg-K)
         Real64 EngineDrivenFuelEnergy;
         Real64 HeatRecRatio; // When Max Temp is reached the amount of recovered heat has to be reduced.
 
@@ -3384,13 +3357,11 @@ namespace PlantChillers {
         this->Energy = 0.0;
         this->CondenserEnergy = 0.0;
         this->EvaporatorEnergy = 0.0;
-        HeatRecCp = 0.0;
         this->HeatRecMdotActual = 0.0;
         this->QTotalHeatRecovered = 0.0;
         this->QJacketRecovered = 0.0;
         this->QLubeOilRecovered = 0.0;
         this->QExhaustRecovered = 0.0;
-        EngineDrivenFuelEnergy = 0.0;
         this->FuelEnergyUseRate = 0.0;
         this->TotalHeatEnergyRec = 0.0;
         this->JacketEnergyRec = 0.0;
@@ -3399,7 +3370,6 @@ namespace PlantChillers {
         this->FuelEnergy = 0.0;
         this->FuelMdot = 0.0;
         this->ExhaustStackTemp = 0.0;
-        FRAC = 1.0;
 
         if (this->HeatRecActive) {
             this->HeatRecInletTemp = Node(this->HeatRecInletNodeNum).Temp;
@@ -3412,7 +3382,6 @@ namespace PlantChillers {
         CondOutletNode = this->CondOutletNodeNum;
         LoopNum = this->CWLoopNum;
         LoopSideNum = this->CWLoopSideNum;
-        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         //   calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -3697,7 +3666,6 @@ namespace PlantChillers {
                 // update corresponding variables at faulty case
                 PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, _MaxPartLoadRat));
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -3802,8 +3770,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
@@ -4962,17 +4928,11 @@ namespace PlantChillers {
         Real64 GTEngineCapacityDes;  // Autosized GT engine capacity for reporting
         Real64 GTEngineCapacityUser; // Hardsized GT engine capacity for reporting
 
-        PltSizNum = 0;
         PltSizCondNum = 0;
         ErrorsFound = false;
         tmpNomCap = this->NomCap;
         tmpEvapVolFlowRate = this->EvapVolFlowRate;
         tmpCondVolFlowRate = this->CondVolFlowRate;
-        EvapVolFlowRateUser = 0.0;
-        NomCapUser = 0.0;
-        CondVolFlowRateUser = 0.0;
-        GTEngineCapacityDes = 0.0;
-        GTEngineCapacityUser = 0.0;
 
         if (this->CondenserType == WaterCooled) {
             PltSizCondNum = DataPlant::PlantLoop(this->CDLoopNum).PlantSizNum;
@@ -5297,7 +5257,6 @@ namespace PlantChillers {
 
         // Locals
         Real64 _ExhaustStackTemp(0.0); // Temperature of Exhaust Gases
-        Real64 _EvapInletTemp;         // C - evaporator inlet temperature, water side
         Real64 _CondInletTemp;         // C - condenser inlet temperature, water side
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
@@ -5378,10 +5337,8 @@ namespace PlantChillers {
         CondOutletNode = this->CondOutletNodeNum;
         HeatRecInNode = this->HeatRecInletNodeNum;
         QHeatRecLube = 0.0;
-        FRAC = 1.0;
         LoopNum = this->CWLoopNum;
         LoopSideNum = this->CWLoopSideNum;
-        _EvapInletTemp = Node(EvapInletNode).Temp;
 
         // calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -5662,11 +5619,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
-                PartLoadRat = max(0.0, min(PartLoadRat, _MaxPartLoadRat));
-                // ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -5765,8 +5717,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
@@ -5977,7 +5927,6 @@ namespace PlantChillers {
             } else {
                 HeatRecInTemp = 0.0;
                 _HeatRecMdot = 0.0;
-                HeatRecCp = 0.0;
                 HeatRecOutTemp = 0.0;
             }
         }
@@ -6707,14 +6656,12 @@ namespace PlantChillers {
         Real64 NomCapUser;          // Hardsized reference capacity for reporting
         Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
 
-        PltSizNum = 0;
         PltSizCondNum = 0;
         ErrorsFound = false;
         tmpNomCap = this->NomCap;
         tmpEvapVolFlowRate = this->EvapVolFlowRate;
         tmpCondVolFlowRate = this->CondVolFlowRate;
 
-        EvapVolFlowRateUser = 0.0;
         NomCapUser = 0.0;
         CondVolFlowRateUser = 0.0;
 
@@ -7228,11 +7175,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                // PartLoadRat = ( AvailChillerCap > 0.0 ) ? ( QEvaporator / AvailChillerCap ) : 0.0;
-                // PartLoadRat = max( 0.0, min( PartLoadRat, MaxPartLoadRat ));
-                // ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -7306,8 +7248,6 @@ namespace PlantChillers {
                                         this->EvapOutletTemp,
                                         this->EvapMassFlowRate,
                                         this->QEvaporator);
-                // update corresponding variables at faulty case
-                EvapDeltaTemp = Node(EvapInletNode).Temp - this->EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
