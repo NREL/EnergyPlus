@@ -68,7 +68,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,9.2;
+  Version,9.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -3068,61 +3068,61 @@
   InternalMass,
     LGstore1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    LGstore1,                !- Zone Name
+    LGstore1,                !- Zone or ZoneList Name
     696.7728;                !- Surface Area {m2}
 
   InternalMass,
     LGstore2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    LGstore2,                !- Zone Name
+    LGstore2,                !- Zone or ZoneList Name
     696.7728;                !- Surface Area {m2}
 
   InternalMass,
     SMstore1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore1,                !- Zone Name
+    SMstore1,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore2,                !- Zone Name
+    SMstore2,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore3,                !- Zone Name
+    SMstore3,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore4,                !- Zone Name
+    SMstore4,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore5,                !- Zone Name
+    SMstore5,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore6 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore6,                !- Zone Name
+    SMstore6,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore7 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore7,                !- Zone Name
+    SMstore7,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
   InternalMass,
     SMstore8 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SMstore8,                !- Zone Name
+    SMstore8,                !- Zone or ZoneList Name
     348.3864;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -3688,8 +3688,8 @@
     LGstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
@@ -3698,8 +3698,8 @@
     LGstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
@@ -3708,8 +3708,8 @@
     SMstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
@@ -3718,8 +3718,8 @@
     SMstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
@@ -3728,8 +3728,8 @@
     SMstore3 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
@@ -3738,8 +3738,8 @@
     SMstore4 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
@@ -3748,8 +3748,8 @@
     SMstore5 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
@@ -3758,8 +3758,8 @@
     SMstore6 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
@@ -3768,8 +3768,8 @@
     SMstore7 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
@@ -3778,8 +3778,8 @@
     SMstore8 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 

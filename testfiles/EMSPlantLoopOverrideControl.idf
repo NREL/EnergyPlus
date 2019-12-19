@@ -54,7 +54,7 @@
 ! Environmental Emissions:
 ! Utility Tariffs:
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     AutoBuilt Model,         !- Name
@@ -1840,61 +1840,61 @@
   InternalMass,
     ZN1_S_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN1_S_Space_1,           !- Zone Name
+    ZN1_S_Space_1,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN2_E_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN2_E_Space_1,           !- Zone Name
+    ZN2_E_Space_1,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN3_N_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN3_N_Space_1,           !- Zone Name
+    ZN3_N_Space_1,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN4_W_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN4_W_Space_1,           !- Zone Name
+    ZN4_W_Space_1,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN5_Core_Space_1,        !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN5_Core_Space_1,        !- Zone Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList Name
     503.079;                 !- Surface Area {m2}
 
   InternalMass,
     ZN6_S_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN6_S_Space_2,           !- Zone Name
+    ZN6_S_Space_2,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN7_E_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN7_E_Space_2,           !- Zone Name
+    ZN7_E_Space_2,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN8_N_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN8_N_Space_2,           !- Zone Name
+    ZN8_N_Space_2,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN9_W_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN9_W_Space_2,           !- Zone Name
+    ZN9_W_Space_2,           !- Zone or ZoneList Name
     186.730;                 !- Surface Area {m2}
 
   InternalMass,
     ZN10_Core_Space_2,       !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN10_Core_Space_2,       !- Zone Name
+    ZN10_Core_Space_2,       !- Zone or ZoneList Name
     503.079;                 !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -5980,8 +5980,8 @@
     ZN1_S_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN2_E_Space_1 Equipment, !- Name
@@ -5990,8 +5990,8 @@
     ZN2_E_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN3_N_Space_1 Equipment, !- Name
@@ -6000,8 +6000,8 @@
     ZN3_N_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN4_W_Space_1 Equipment, !- Name
@@ -6010,8 +6010,8 @@
     ZN4_W_Space_1 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN5_Core_Space_1 Equipment,  !- Name
@@ -6020,8 +6020,8 @@
     ZN5_Core_Space_1 ATU,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN6_S_Space_2 Equipment, !- Name
@@ -6030,8 +6030,8 @@
     ZN6_S_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential $1 Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN7_E_Space_2 Equipment, !- Name
@@ -6040,8 +6040,8 @@
     ZN7_E_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN8_N_Space_2 Equipment, !- Name
@@ -6050,8 +6050,8 @@
     ZN8_N_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN9_W_Space_2 Equipment, !- Name
@@ -6060,8 +6060,8 @@
     ZN9_W_Space_2 ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZN10_Core_Space_2 Equipment,  !- Name
@@ -6070,8 +6070,8 @@
     ZN10_Core_Space_2 ATU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZN1_S_Space_1 ATU,       !- Name
@@ -6560,9 +6560,9 @@
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Fan Power {W}
     autosize,                !- Design U-Factor Times Area Value {W/K}
-    autocalculate,           !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    autocalculate,           !- Free Convection U-Factor Times Area Value {W/K}
+    autocalculate,           !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    autocalculate,           !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     ,                        !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio

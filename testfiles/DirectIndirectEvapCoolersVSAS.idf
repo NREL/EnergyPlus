@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.2;
+  Version,9.3;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
@@ -2933,7 +2933,7 @@
   InternalMass,
     units_gr_lf_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    units_gr_lf,             !- Zone Name
+    units_gr_lf,             !- Zone or ZoneList Name
     499.4097;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
@@ -3141,8 +3141,8 @@
     units_gr_lf Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     units_gr_lf Direct Air,  !- Name
@@ -3460,7 +3460,7 @@
   InternalMass,
     units_gr_rt_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    units_gr_rt,             !- Zone Name
+    units_gr_rt,             !- Zone or ZoneList Name
     749.1145;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
@@ -3668,8 +3668,8 @@
     units_gr_rt Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     units_gr_rt Direct Air,  !- Name
@@ -3816,7 +3816,7 @@
   InternalMass,
     unit_s_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
-    unit_s_g,                !- Zone Name
+    unit_s_g,                !- Zone or ZoneList Name
     111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
@@ -4026,8 +4026,8 @@
     unit_s_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     unit_s_g Direct Air,     !- Name
@@ -4174,7 +4174,7 @@
   InternalMass,
     unit_n_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
-    unit_n_g,                !- Zone Name
+    unit_n_g,                !- Zone or ZoneList Name
     111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
@@ -4384,8 +4384,8 @@
     unit_n_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     unit_n_g Direct Air,     !- Name

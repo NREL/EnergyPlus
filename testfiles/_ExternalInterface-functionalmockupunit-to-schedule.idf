@@ -26,7 +26,7 @@
 !           Overhang depth also design parameter (for West and East window separately)
 !           Solar, visible, and thermal transmittance of shading device also design parameter
 
-  Version,9.2;
+  Version,9.3;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
@@ -558,7 +558,7 @@
   InternalMass,
     HALLWAY WALL,            !- Name
     INTWALL,                 !- Construction Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or ZoneList Name
     54.24;                   !- Surface Area {m2}
 
 ! 54.24 = 4 * ( 2.7 * 6 - 2.2 * 1.2 )

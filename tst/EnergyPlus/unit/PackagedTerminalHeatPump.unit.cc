@@ -109,7 +109,9 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
+class PTHPFixture : public EnergyPlusFixture {};
+
+TEST_F(PTHPFixture, PackagedTerminalHP_VSCoils_Sizing)
 {
     std::string const idf_objects = delimited_string({
 
@@ -566,7 +568,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(ZoneEqSizing(1).CoolingAirVolFlow, ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
-TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
+TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 {
 
     bool ErrorsFound(false);
@@ -581,7 +583,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
 
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -916,7 +918,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     ASSERT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 2217.0, 1.0);
 }
 
-TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
+TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
 {
 
     bool ErrorsFound(false);

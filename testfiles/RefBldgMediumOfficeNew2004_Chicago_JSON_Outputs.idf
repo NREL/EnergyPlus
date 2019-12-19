@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,9.2;
+  Version,9.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4083,91 +4083,91 @@
   InternalMass,
     Core_bottom Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_bottom,             !- Zone Name
+    Core_bottom,             !- Zone or ZoneList Name
     1967.0731;               !- Surface Area {m2}
 
   InternalMass,
     Core_mid Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_mid,                !- Zone Name
+    Core_mid,                !- Zone or ZoneList Name
     1967.0731;               !- Surface Area {m2}
 
   InternalMass,
     Core_top Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_top,                !- Zone Name
+    Core_top,                !- Zone or ZoneList Name
     1967.0731;               !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_1,      !- Zone Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_2,      !- Zone Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
     262.5244;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_3,      !- Zone Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_bot_ZN_4,      !- Zone Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
     262.5072;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_1,      !- Zone Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_2,      !- Zone Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
     262.5244;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_3,      !- Zone Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_mid_ZN_4,      !- Zone Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
     262.5072;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_1,      !- Zone Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_2,      !- Zone Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
     262.5244;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_3,      !- Zone Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
     414.6763;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_top_ZN_4,      !- Zone Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
     262.5072;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -4961,8 +4961,8 @@
     Core_bottom VAV Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_mid Equipment,      !- Name
@@ -4971,8 +4971,8 @@
     Core_mid VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_top Equipment,      !- Name
@@ -4981,8 +4981,8 @@
     Core_top VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_1 Equipment,  !- Name
@@ -4991,8 +4991,8 @@
     Perimeter_bot_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_2 Equipment,  !- Name
@@ -5001,8 +5001,8 @@
     Perimeter_bot_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_3 Equipment,  !- Name
@@ -5011,8 +5011,8 @@
     Perimeter_bot_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_4 Equipment,  !- Name
@@ -5021,8 +5021,8 @@
     Perimeter_bot_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_1 Equipment,  !- Name
@@ -5031,8 +5031,8 @@
     Perimeter_mid_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_2 Equipment,  !- Name
@@ -5041,8 +5041,8 @@
     Perimeter_mid_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_3 Equipment,  !- Name
@@ -5051,8 +5051,8 @@
     Perimeter_mid_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_4 Equipment,  !- Name
@@ -5061,8 +5061,8 @@
     Perimeter_mid_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_1 Equipment,  !- Name
@@ -5071,8 +5071,8 @@
     Perimeter_top_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential $1 Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_2 Equipment,  !- Name
@@ -5081,8 +5081,8 @@
     Perimeter_top_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_3 Equipment,  !- Name
@@ -5091,8 +5091,8 @@
     Perimeter_top_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_4 Equipment,  !- Name
@@ -5101,8 +5101,8 @@
     Perimeter_top_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 

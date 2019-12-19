@@ -65,7 +65,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.2;
+  Version,9.3;
 
   Timestep,6;
 
@@ -1457,7 +1457,7 @@
   InternalMass,
     Core_ZN_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_ZN,                 !- Zone Name
+    Core_ZN,                 !- Zone or ZoneList Name
     299.3148;                !- Surface Area {m2}
 
   People,
@@ -1619,8 +1619,8 @@
     Core_ZN Direct Air,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Core_ZN Direct Air,      !- Name
@@ -1912,7 +1912,7 @@
   InternalMass,
     Perimeter_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_1,          !- Zone Name
+    Perimeter_ZN_1,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2103,8 +2103,8 @@
     Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Perimeter_ZN_1 Direct Air,  !- Name
@@ -2296,7 +2296,7 @@
   InternalMass,
     Perimeter_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_2,          !- Zone Name
+    Perimeter_ZN_2,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2487,8 +2487,8 @@
     Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Perimeter_ZN_2 Direct Air,  !- Name
@@ -2710,7 +2710,7 @@
   InternalMass,
     Perimeter_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_3,          !- Zone Name
+    Perimeter_ZN_3,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2901,8 +2901,8 @@
     Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Perimeter_ZN_3 Direct Air,  !- Name
@@ -3094,7 +3094,7 @@
   InternalMass,
     Perimeter_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_4,          !- Zone Name
+    Perimeter_ZN_4,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3285,8 +3285,8 @@
     Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Perimeter_ZN_4 Direct Air,  !- Name
@@ -5689,7 +5689,7 @@
     !
 
   FuelFactors,
-    FuelOil#1,               !- Existing Fuel Resource Name
+    FuelOilNo1,                !- Existing Fuel Resource Name
     m3,                      !- Units of Measure
     38.656E+09,              !- Energy per Unit Factor
     1.158,                   !- Source Energy Factor {J/J}
