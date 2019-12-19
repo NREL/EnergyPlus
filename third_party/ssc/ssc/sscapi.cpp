@@ -72,7 +72,7 @@ SSCEXPORT const char *ssc_build_info()
 	and add it to 'module_table'
 */
 
-extern module_entry_info 
+extern module_entry_info
 /* extern declarations of modules for linking */
 	cm_entry_singlediode,
 	cm_entry_singlediodeparams,
@@ -173,7 +173,7 @@ static module_entry_info *module_table[] = {
 	&cm_entry_6parsolve,
 	&cm_entry_pv6parmod,
 	&cm_entry_pvsamv1,
-	//&cm_entry_pvwattsv0,
+	&cm_entry_pvwattsv0,
 	&cm_entry_pvwattsv1,
 	&cm_entry_pvwattsv1_1ts,
 	&cm_entry_pvwattsv1_poa,

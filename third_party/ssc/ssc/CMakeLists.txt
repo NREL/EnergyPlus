@@ -20,108 +20,15 @@ endif()
 
 Project(ssc)
 
-include_directories(. ../splinter ../shared ../nlopt ../lpsolve ../solarpilot ../tcs ../ssc)
+include_directories(../shared)
 
 set(SSC_SRC
-#		cmod_6parsolve.cpp
-#		cmod_annualoutput.cpp
-#		cmod_battery.cpp
-#		cmod_battwatts.cpp
-#		cmod_belpe.cpp
-#		cmod_biomass.cpp
-#		cmod_cashloan.cpp
-#		cmod_cb_construction_financing.cpp
-#		cmod_cb_empirical_hce_heat_loss.cpp
-#		cmod_cb_mspt_system_costs.cpp
-#		cmod_dsg_flux_preprocess.cpp
-#		cmod_equpartflip.cpp
-#		cmod_fossilgen.cpp
-#		cmod_fuelcell.cpp
-#		cmod_generic_system.cpp
-#		cmod_geothermal.cpp
-#		cmod_geothermal_costs.cpp
-#		cmod_grid.cpp
-#		cmod_hcpv.cpp
-#		cmod_host_developer.cpp
-#		cmod_iec61853par.cpp
-#		cmod_inv_cec_cg.cpp
-#		cmod_iph_to_lcoefcr.cpp
-#		cmod_ippppa.cpp
-#		cmod_irradproc.cpp
-#		cmod_iscc_design_point.cpp
-#		cmod_layoutarea.cpp
-#		cmod_lcoefcr.cpp
-#		cmod_levpartflip.cpp
-#		cmod_linear_fresnel_dsg_iph.cpp
-#		cmod_merchantplant.cpp
-#		cmod_merchantplant_eqns.cpp
-#		cmod_mhk_eqns.cpp
-#		cmod_mhk_costs.cpp
-#		cmod_mhk_wave.cpp
-#		cmod_mhk_tidal.cpp
-#		cmod_poacalib.cpp
-#		cmod_pv6parmod.cpp
-#		cmod_pv_get_shade_loss_mpp.cpp
-#		cmod_pvsamv1.cpp
-#		cmod_pvsandiainv.cpp
-#		cmod_pvwattsv0.cpp
-#		cmod_pvwattsv1.cpp
-#		cmod_pvwattsv1_1ts.cpp
-#		cmod_pvwattsv1_poa.cpp
-#		cmod_pvwattsv5.cpp
-#		cmod_saleleaseback.cpp
-#		cmod_sco2_air_cooler.cpp
-#		cmod_sco2_csp_system.cpp
-#		cmod_sco2_csp_ud_pc_tables.cpp
-#		cmod_sco2_design_cycle.cpp
-#		cmod_sco2_design_point.cpp
-#		cmod_sco2_design_point.cpp
-#		cmod_singlediode.cpp
-#		cmod_singleowner.cpp
-#		cmod_snowmodel.cpp
-#		cmod_solarpilot.cpp
-#		cmod_swh.cpp
-#		cmod_tcsdirect_steam.cpp
-#		cmod_tcsdish.cpp
-#		cmod_tcsgeneric_solar.cpp
-#		cmod_tcsiscc.cpp
-#		cmod_tcslinear_fresnel.cpp
-#		cmod_tcsmolten_salt.cpp
-#		cmod_tcsmslf.cpp
-#		cmod_tcstrough_empirical.cpp
-#		cmod_tcstrough_physical.cpp
-#		cmod_tcstrough_physical_csp_solver.cpp
-#		cmod_thermalrate.cpp
-#		cmod_thirdpartyownership.cpp
-#		cmod_timeseq.cpp
-#		cmod_trough_physical.cpp
-#		cmod_trough_physical_iph.cpp
-#		cmod_ui_tes_calcs.cpp
-#		cmod_user_htf_comparison.cpp
-#		cmod_utilityrate.cpp
-#		cmod_utilityrate2.cpp
-#		cmod_utilityrate3.cpp
-#		cmod_utilityrate4.cpp
-#		cmod_utilityrate5.cpp
-#		cmod_wfcheck.cpp
-#		cmod_wfcsv.cpp
-#		cmod_wfreader.cpp
-#		cmod_wind_obos.cpp
-#		cmod_windbos.cpp
-#		cmod_windcsm.cpp
-#		cmod_windfile.cpp
-#		cmod_wavefile.cpp
-#		cmod_windpower.cpp
-#        cmod_windpower_eqns.cpp
-#        cmod_ui_udpc_checks.cpp
-#		common.cpp
-#		common_financial.cpp
 		core.cpp
-#		csp_common.cpp
+		core.h
 		sscapi.cpp
-#		tckernel.cpp
+		sscapi.h
 		vartab.cpp
-		)
+		vartab.h)
 
 
 #####################################################################################################################
@@ -202,20 +109,14 @@ endif()
 #
 #####################################################################################################################
 
-set( DEPENDENCIES
-#	solarpilot
-#	tcs
-#	nlopt
-	shared
-#	lpsolve
-#	splinter
-	)
+set( DEPENDENCIES shared )
+
 foreach( name ${DEPENDENCIES} )
 	target_link_libraries(ssc ${name})
 endforeach()
 
 if (UNIX)
-	target_link_libraries(ssc -lm -ldl -lstdc++)
+	target_link_libraries( ssc )
 endif()
 
 if (MSVC)

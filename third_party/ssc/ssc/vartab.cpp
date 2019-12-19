@@ -20,7 +20,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT(INCLUDING NEGLIGENCE OR OTHERWISE
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "lib_util.h"
+#include "../shared/lib_util.h"
 #include "vartab.h"
 
 static const char *var_data_types[] = 

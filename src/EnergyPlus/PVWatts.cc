@@ -65,10 +65,10 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 // SSC Headers
-#include <lib_irradproc.h>
-#include <lib_pvwatts.h>
-#include <lib_pvshade.h>
-#include <lib_pv_incidence_modifier.h>
+#include <../third_party/ssc/shared/lib_irradproc.h>
+#include <../third_party/ssc/shared/lib_pvwatts.h>
+#include <../third_party/ssc/shared/lib_pvshade.h>
+#include <../third_party/ssc/shared/lib_pv_incidence_modifier.h>
 
 namespace EnergyPlus {
 

@@ -28,19 +28,5 @@ endif (POLICY CMP0043)
 
 Project(sam_simulation_core)
 
-#add_subdirectory(splinter)
-#add_subdirectory(shared)
-#add_subdirectory(nlopt)
-#add_subdirectory(lpsolve)
-#add_subdirectory(solarpilot)
-#add_subdirectory(tcs)
 add_subdirectory(ssc)
-
-#if (NOT skip_tools)
-#	add_subdirectory(sdktool)
-#	add_subdirectory(tcsconsole)
-#endif()
-#
-#if (NOT skip_tests)
-#	add_subdirectory(test)
-#endif()
+add_subdirectory(shared)

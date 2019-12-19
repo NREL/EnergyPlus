@@ -19,47 +19,19 @@ endif()
 
 Project(shared)
 
-
-#include_directories(. ../splinter)
-
 set(SHARED_SRC
-#	lsqfit.cpp
-#	lib_fuel_cell.cpp
-#	lib_fuel_cell_dispatch.cpp
-#	lib_battery.cpp
-#	lib_battery_dispatch.cpp
-#	lib_battery_powerflow.cpp
-#	lib_cec6par.cpp
-#	lib_financial.cpp
-#	lib_geothermal.cpp
-#	lib_iec61853.cpp
-	lib_irradproc.cpp
-#	lib_miniz.cpp
-#	lib_physics.cpp
-#	lib_powerblock.cpp
-#	lib_power_electronics.cpp
-#	lib_pvinv.cpp
-	lib_pv_incidence_modifier.cpp
-#	lib_pv_io_manager.cpp
-#	lib_pvmodel.cpp
-	lib_pvshade.cpp
-#	lib_pv_shade_loss_mpp.cpp
-	lib_pvwatts.cpp
-#	lib_sandia.cpp
-#	lib_shared_inverter.cpp
-#	lib_snowmodel.cpp
-#	lib_time.cpp
-	lib_util.cpp
-#	lib_utility_rate.cpp
-	lib_weatherfile.cpp)
-#	lib_windfile.cpp
-#	lib_wind_obos.cpp
-#	lib_wind_obos_cable_vessel.cpp
-#	lib_windwakemodel.cpp
-#	lib_windwatts.cpp
-#	lib_mlmodel.cpp
-#	lib_ondinv.cpp)
-
+		lib_irradproc.cpp
+		lib_irradproc.h
+		lib_pv_incidence_modifier.cpp
+		lib_pv_incidence_modifier.h
+		lib_pvshade.cpp
+		lib_pvshade.h
+		lib_pvwatts.cpp
+		lib_pvwatts.h
+		lib_util.cpp
+		lib_util.h
+		lib_weatherfile.cpp
+		lib_weatherfile.h)
 
 #####################################################################################################################
 #
