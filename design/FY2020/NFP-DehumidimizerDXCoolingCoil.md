@@ -5,7 +5,10 @@ Condenser hot gas reheat model for DX Cooling Coil System
 
 **Florida Solar Energy Center**
 
- - Eightth edition
+ - Nineth edition
+ - Revised design document based on the comments from Mike 
+ - Revision Date: 12/11/19
+ - Eighth edition
  - Revised design document based on the conference call and discussion with Rich on 12/11/19 
  - Revision Date: 12/11/19
  - Seventh edition
@@ -39,6 +42,28 @@ In applications where active humidity control is used to control either discharg
 Currently EnergyPlus does not provide modeling capabilities for hot gas reheat. Addition of this feature to EnergyPlus would allow engineers to evaluate the energy-efficient humidity control options. An EnergyPlus model for this feature would need to model not just the use of hot gas for free reheat, but also controls for these  dehumidification modes. 
 
 ## E-mail and  Conference Call Conclusions ##
+
+###Address comments from Mike on 12/13/19
+
+Mike:
+
+Thanks for your comments. I am going to incorporate your suggestions. For Comment1, I will select OperatingMode.
+
+Gu
+
+From: Michael J Witte <mjwitte@gard.com> 
+Sent: Friday, December 13, 2019 11:04 AM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Lawrence Scheier' <lscheier@sei-associates.com>; 'Brent Griffith' <brent.griffith@energyarchmage.com>; 'Richard Raustad' <rraustad@fsec.ucf.edu>; 'Edwin Lee' <leeed2001@gmail.com>; 'Spielbauer, Jim' <jspielbauer@trane.com>; 'Chidambaram, Nagappan' <nagappan.chidambaram@trane.com>; 'Tianzhen Hong' <thong@lbl.gov>; 'Roth, Amir' <amir.roth@ee.doe.gov>; 'Jason Turner' <jason@emptycrate.com>; 'jason.degraw' <jason.degraw@gmail.com>
+Subject: Re: Sizing, etc. call this Wednesday
+
+Gu,
+A couple of comments.
+
+2. ModeStage might get confuse with Multi-stage operation. Perhaps just Mode or OperatingMode or ModeNumber?
+
+3. Excellent to use an argument instead of a (bad) global variable! But for LoadSHR, a default of 1.0 may be hard to distinguish from a valid SHR of 1.0. A default of zero may be better.
+
+Mike
 
 ### Conference call on 12/11/19
 
@@ -1042,13 +1067,13 @@ recoeredHeatEnergy = (SensibleEnergy_NormalOperation - SensibleEnergy_ReheatMode
 
 ModeRatio is a ratio between either subcool and normal operation or reheat mode and normal operation to keep combined output with the same SHR as load SHR
 
-    int ModeStage = 1; // 1 Normal; 2 Subcool and Normal; 3 Reheat and Normal
+    int OperatingMode = 1; // 1 Normal; 2 Subcool and Normal; 3 Reheat and Normal
 
-ModeStage is a stage to show which mode is operated at the current time
+OperatingMode is a stage to show which mode is operated at the current time
 
         SetupOutputVariable("SubcooReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
-                            this->performance.ModeStage,
+                            this->performance.OperatingMode,
                             "System",
                             "Average",
                             this->name);
