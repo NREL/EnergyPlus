@@ -52,10 +52,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <EMSManager.hh>
-#include <RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 
 using namespace EnergyPlus;
 

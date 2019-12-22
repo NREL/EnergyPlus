@@ -53,9 +53,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <VariableSpeedCoils.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -521,14 +521,12 @@ namespace PackagedTerminalHeatPump {
                                     Real64 &PartLoadRatio          // coil part-load ratio
     );
 
-    void SetMinOATCompressor(int const FurnaceNum,                   // index to furnace
-                             std::string const FurnaceName,          // name of furnace
-                             std::string const cCurrentModuleObject, // type of furnace
-                             std::string const CoolingCoilType,      // type of cooling coil
-                             std::string const CoolingCoilName,      // name of cooling coil
-                             std::string const HeatingCoilType,      // type of heating coil
-                             std::string const HeatingCoilName,      // name of heating coil
-                             bool &ErrorsFound                       // GetInput logical that errors were found
+    void SetMinOATCompressor(int const FurnaceNum,                    // index to furnace
+                             std::string const &FurnaceName,          // name of furnace
+                             std::string const &cCurrentModuleObject, // type of furnace
+                             int const CoolingCoilIndex,              // index of cooling coil
+                             int const HeatingCoilIndex,              // index of heating coil
+                             bool &ErrorsFound                        // GetInput logical that errors were found
     );
 
     Real64 CalcPTUnitWaterFlowResidual(Real64 const PartLoadRatio, // coil PLR

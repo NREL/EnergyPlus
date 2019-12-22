@@ -49,8 +49,8 @@
 #include <utility>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <SortAndStringUtilities.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/SortAndStringUtilities.hh>
 
 namespace EnergyPlus {
 

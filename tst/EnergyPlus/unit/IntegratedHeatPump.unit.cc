@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <IntegratedHeatPump.hh>
-#include <VariableSpeedCoils.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 

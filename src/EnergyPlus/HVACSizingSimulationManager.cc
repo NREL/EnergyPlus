@@ -52,26 +52,26 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataPlant.hh>
-#include <DataReportingFlags.hh>
-#include <DataSizing.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <HVACSizingSimulationManager.hh>
-#include <HeatBalanceManager.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <SQLiteProcedures.hh>
-#include <SimulationManager.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 

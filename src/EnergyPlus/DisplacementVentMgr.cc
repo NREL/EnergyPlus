@@ -54,25 +54,25 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <ConvectionCoefficients.hh>
-#include <AirflowNetwork/Elements.hpp>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSurfaces.hh>
-#include <DataUCSDSharedData.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplacementVentMgr.hh>
-#include <InternalHeatGains.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -575,7 +575,7 @@ namespace DisplacementVentMgr {
         // REFERENCES:
         // Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
         // Work funded by the California Energy Comission. More information on the model can found in:
-        // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graça, Ph.D. thesis UCSD. December 2003.
+        // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
 
         // Using/Aliasing
         using namespace DataHeatBalFanSys;

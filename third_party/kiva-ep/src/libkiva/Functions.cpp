@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Functions_CPP
@@ -8,24 +8,15 @@
 
 namespace Kiva {
 
-static const double EPSILON = 1E-7;
-
-bool isLessThan(double first, double second) {
-  if (first - second < -EPSILON)
+bool isLessThan(double first, double second, double epsilon) {
+  if (first - second < -epsilon)
     return true;
   else
     return false;
 }
 
-bool isLessOrEqual(double first, double second) {
-  if (first - second < EPSILON)
-    return true;
-  else
-    return false;
-}
-
-bool isEqual(double first, double second) {
-  if (fabs(first - second) < EPSILON)
+bool isLessOrEqual(double first, double second, double epsilon) {
+  if (first - second < epsilon)
     return true;
   else
     return false;
@@ -38,15 +29,15 @@ bool isEqual(double first, double second, double epsilon) {
     return false;
 }
 
-bool isGreaterThan(double first, double second) {
-  if (first - second > EPSILON)
+bool isGreaterThan(double first, double second, double epsilon) {
+  if (first - second > epsilon)
     return true;
   else
     return false;
 }
 
-bool isGreaterOrEqual(double first, double second) {
-  if (first - second > -EPSILON)
+bool isGreaterOrEqual(double first, double second, double epsilon) {
+  if (first - second > -epsilon)
     return true;
   else
     return false;

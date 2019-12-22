@@ -130,7 +130,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.1;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -249,7 +249,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -264,7 +264,7 @@
     No;                      !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1248,25 +1248,25 @@
   InternalMass,
     BackRoom_Furniture1,     !- Name
     FurnitureConstruction,   !- Construction Name
-    BackRoom,                !- Zone Name
+    BackRoom,                !- Zone or ZoneList Name
     95.0;                    !- Surface Area {m2}
 
   InternalMass,
     BackRoom_Furniture2,     !- Name
     FurnitureConstruction,   !- Construction Name
-    BackRoom,                !- Zone Name
+    BackRoom,                !- Zone or ZoneList Name
     95.0;                    !- Surface Area {m2}
 
   InternalMass,
     SalesFloor_Furniture1,   !- Name
     FurnitureConstruction,   !- Construction Name
-    SalesFloor,              !- Zone Name
+    SalesFloor,              !- Zone or ZoneList Name
     845.0;                   !- Surface Area {m2}
 
   InternalMass,
     SalesFloor_Furniture2,   !- Name
     FurnitureConstruction,   !- Construction Name
-    SalesFloor,              !- Zone Name
+    SalesFloor,              !- Zone or ZoneList Name
     845.0;                   !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -1421,8 +1421,8 @@
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1431,8 +1431,8 @@
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -5223,3 +5223,4 @@
 
   Output:SQLite,
     Simple;                  !- Option Type
+

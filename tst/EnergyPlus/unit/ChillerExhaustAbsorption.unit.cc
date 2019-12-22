@@ -52,15 +52,17 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <ChillerExhaustAbsorption.hh>
-#include <DataGlobals.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerExhaustAbsorption;
 
-TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Test)
+class ExhAbsorptionFixture : public EnergyPlusFixture {};
+
+TEST_F(ExhAbsorptionFixture, ExhAbsorption_GetInput_Test)
 {
     std::string const idf_objects = delimited_string({
         "  ChillerHeater:Absorption:DoubleEffect,                                                                     ",

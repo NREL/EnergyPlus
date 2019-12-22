@@ -56,19 +56,19 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchInputManager.hh>
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataErrorTracking.hh>
-#include <DataHVACGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -527,7 +527,10 @@ namespace BranchInputManager {
         return GetAirBranchIndex;
     }
 
-    void GetBranchFanTypeName(int const BranchNum, std::string &FanType, std::string &FanName, bool &ErrFound)
+    void GetBranchFanTypeName(int const BranchNum, std::string &FanType,
+                              std::string &FanName,
+                              bool &ErrFound               // Set to true if error found, false otherwise
+    )
     {
 
         // FUNCTION INFORMATION:
@@ -832,7 +835,7 @@ namespace BranchInputManager {
     void GetLoopMixer(std::string const &LoopName,          // Loop Name for Mixer
                       std::string const &ConnectorListName, // Requested Connector List Name
                       std::string &MixerName,               // Name of Mixer
-                      bool &IsMixer,                        // True when Mixer is on this connector
+                      bool &IsMixer,                        // True when Mixer is on this connector, false otherwise
                       std::string &OutletNodeName,          // Outlet Node ID
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
@@ -992,7 +995,7 @@ namespace BranchInputManager {
     void GetLoopSplitter(std::string const &LoopName,          // Loop Name for this Splitter
                          std::string const &ConnectorListName, // Requested Connector List Name
                          std::string &SplitterName,            // Name of Splitter
-                         bool &IsSplitter,                     // True if splitter on this connector list
+                         bool &IsSplitter,                     // True if splitter on this connector list, false otherwise
                          std::string &InletNodeName,           // Inlet Node ID
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes

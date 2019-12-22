@@ -55,26 +55,26 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <ConvectionCoefficients.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <TranspiredCollector.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1555,6 +1555,81 @@ namespace TranspiredCollector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         TsColl = UTSC(UTSCNum).Tcoll;
+    }
+
+    int GetAirInletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air inlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).InletNode(1);
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetAirOutletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air outlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).OutletNode(1);
+        }
+        else {
+            ShowSevereError("GetAirOutletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
     }
 
 } // namespace TranspiredCollector

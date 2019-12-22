@@ -57,10 +57,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataIPShortCuts.hh>
-#include <HeatBalanceManager.hh>
-#include <WindowManager.hh>
-#include <WindowManagerExteriorData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({ "Version,9.1;",
+        delimited_string({ "Version,9.3;",
             "WindowsCalculationEngine,",
             "ExternalWindowsModel;",
             "WindowMaterial:Glazing,",
@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({"Version,9.1;",
+        delimited_string({"Version,9.3;",
                           "WindowsCalculationEngine,",
                           "ExternalWindowsModel;",
                           "WindowMaterial:Glazing,",
@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
     bool ErrorsFound(false);
 
     std::string const idf_objects =
-        delimited_string({ "Version,9.1;",
+        delimited_string({ "Version,9.3;",
             "WindowsCalculationEngine,",
             "ExternalWindowsModel;",
             "WindowMaterial:Glazing,",

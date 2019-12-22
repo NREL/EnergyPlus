@@ -127,7 +127,7 @@
 !
 !
 
-  Version,9.1;
+  Version,9.3;
 
   Building,
     Exercise 2A,             !- Name
@@ -163,7 +163,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1848,5 +1848,5 @@
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    ABUPS;                   !- Report 1 Name
+    AnnualBuildingUtilityPerformanceSummary;  !- Report 1 Name
 

@@ -54,8 +54,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -267,6 +267,7 @@ namespace WaterCoils {
         std::string ControllerName;     // controller name used by water coil
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
+        bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -291,7 +292,7 @@ namespace WaterCoils {
               WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true)
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
         {
         }
     };

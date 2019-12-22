@@ -53,30 +53,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 
 namespace EnergyPlus {
 
@@ -128,6 +130,7 @@ namespace WaterToAirHeatPumpSimple {
     using DataHVACGlobals::WaterCycling;
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -372,6 +375,7 @@ namespace WaterToAirHeatPumpSimple {
         if (NumWatertoAirHPs > 0) {
             SimpleWatertoAirHP.allocate(NumWatertoAirHPs);
             SimpleHPTimeStepFlag.dimension(NumWatertoAirHPs, true);
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(NumWatertoAirHPs);
         }
 
         inputProcessor->getObjectDefMaxArgs("Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
@@ -405,8 +409,8 @@ namespace WaterToAirHeatPumpSimple {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
-
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
             SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
             SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingEquationFit;
@@ -433,6 +437,8 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).CoolPower5 = NumArray(21);
             SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(22);
             SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(23);
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = SimpleWatertoAirHP(HPNum).Name;
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
             SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
@@ -527,6 +533,7 @@ namespace WaterToAirHeatPumpSimple {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
@@ -1115,6 +1122,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP(HPNum).EnergyLatent = 0.0;
         SimpleWatertoAirHP(HPNum).EnergySource = 0.0;
         SimpleWatertoAirHP(HPNum).COP = 0.0;
+        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
     void SizeHVACWaterToAir(int const HPNum)
@@ -1881,6 +1889,7 @@ namespace WaterToAirHeatPumpSimple {
             if (SimpleWatertoAirHP(HPNum).RatedCapHeat == AutoSize && SimpleWatertoAirHP(HPNum).WatertoAirHPType == "HEATING") {
                 IsAutoSize = true;
             }
+            if (SizingDesRunThisAirSys || SizingDesRunThisZone) HardSizeNoDesRun = false;
             //   simply set heating capacity equal to the cooling capacity
             if (SimpleWatertoAirHP(HPNum).WatertoAirHPType == "HEATING") {
                 RatedCapHeatDes = DXCoolCap;
@@ -1928,6 +1937,14 @@ namespace WaterToAirHeatPumpSimple {
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                         }
+                    }
+                } else {
+                    if (SimpleWatertoAirHP(HPNum).RatedCapHeat > 0.0) {
+                        RatedCapHeatUser = SimpleWatertoAirHP(HPNum).RatedCapHeat;
+                        ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Heating Capacity [W]",
+                                           RatedCapHeatUser);
                     }
                 }
             }
@@ -2367,11 +2384,19 @@ namespace WaterToAirHeatPumpSimple {
         QSensible *= PartLoadRatio;
         Winput *= RuntimeFrac;
         QSource = QSource_fullload * PartLoadRatio;
-
+        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = QSource;
+        
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = Winput;
 
         ReportingConstant = TimeStepSys * SecInHour;
+        DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
+        HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+        if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
+            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
+        }
+        QSource -= HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal;
+
         // Update heat pump data structure
         SimpleWatertoAirHP(HPNum).Power = Winput;
         SimpleWatertoAirHP(HPNum).QLoadTotal = QLoadTotal;

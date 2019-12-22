@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -237,6 +237,8 @@ namespace ZonePlenum {
     int GetReturnPlenumIndex(int const &ExNodeNum);
 
     void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum);
 
     //        End of mining functions for the ZonePlenum Module
     // *****************************************************************************

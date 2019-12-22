@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -160,6 +160,8 @@ namespace MixerComponent {
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
     void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
+
+    int getZoneMixerIndexFromInletNode(int const &InNodeNum);
 
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************

@@ -55,32 +55,32 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <ChillerReformulatedEIR.hh>
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FaultsManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <StandardRatings.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -332,7 +332,6 @@ namespace ChillerReformulatedEIR {
         int NumNums;                      // Number of elements in the numeric array
         int IOStat;                       // IO Status when calling get input subroutine
         static bool ErrorsFound(false);   // True when input errors found
-        bool errFlag;                     // Error flag, used to tell if a unique chiller name has been specified
         static bool AllocatedFlag(false); // True when arrays are allocated
         std::string PartLoadCurveType;    // Part load curve type
 
@@ -367,10 +366,10 @@ namespace ChillerReformulatedEIR {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             ElecReformEIRChiller(EIRChillerNum).Name = cAlphaArgs(1);
             // Performance curves
             ElecReformEIRChiller(EIRChillerNum).ChillerCapFT = GetCurveIndex(cAlphaArgs(2));
@@ -460,11 +459,6 @@ namespace ChillerReformulatedEIR {
                 auto const SELECT_CASE_var(cAlphaArgs(10));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
                     ElecReformEIRChiller(EIRChillerNum).FlowMode = ConstantFlow;
-                } else if (SELECT_CASE_var == "VARIABLEFLOW") {
-                    ElecReformEIRChiller(EIRChillerNum).FlowMode = LeavingSetPointModulated;
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(10) + '=' + cAlphaArgs(10));
-                    ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
                     ElecReformEIRChiller(EIRChillerNum).FlowMode = LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
@@ -1568,6 +1562,7 @@ namespace ChillerReformulatedEIR {
 
         if (PlantFinalSizesOkayToReport) {
             if (MyFlag(EIRChillNum)) {
+                Real64 IPLV;
                 CalcChillerIPLV(ElecReformEIRChiller(EIRChillNum).Name,
                                 TypeOf_Chiller_ElectricReformEIR,
                                 ElecReformEIRChiller(EIRChillNum).RefCap,
@@ -1577,6 +1572,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillNum).ChillerEIRFT,
                                 ElecReformEIRChiller(EIRChillNum).ChillerEIRFPLR,
                                 ElecReformEIRChiller(EIRChillNum).MinUnloadRat,
+                                IPLV,
                                 ElecReformEIRChiller(EIRChillNum).EvapVolFlowRate,
                                 ElecReformEIRChiller(EIRChillNum).CDLoopNum,
                                 ElecReformEIRChiller(EIRChillNum).CompPowerToCondenserFrac);

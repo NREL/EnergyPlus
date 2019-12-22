@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -189,6 +189,11 @@ namespace HVACDXHeatPumpSystem {
     Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
+
+    int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName);
+
+    int GetHeatingCoilOutletNodeNum(std::string const &DXCoilSysName);
+
 
 } // namespace HVACDXHeatPumpSystem
 

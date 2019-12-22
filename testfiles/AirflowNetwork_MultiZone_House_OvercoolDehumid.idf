@@ -112,7 +112,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.1;
+  Version,9.3;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -148,7 +148,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     8,                       !- Begin Month
     16,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -1018,7 +1018,7 @@
   InternalMass,
     InternalMass_LivingZone, !- Name
     FURNITURE,               !- Construction Name
-    LIVING ZONE,             !- Zone Name
+    LIVING ZONE,             !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -2126,8 +2126,8 @@
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   Sizing:System,
     Residential System,      !- AirLoop Name

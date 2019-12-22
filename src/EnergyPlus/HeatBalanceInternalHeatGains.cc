@@ -49,10 +49,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

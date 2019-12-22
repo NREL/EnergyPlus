@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -156,11 +156,11 @@ namespace HeatPumpWaterToWaterSimple {
         Real64 reportQSource;                // Source Side Heat Transfer Rate [W]
         Real64 reportQSourceEnergy;          // Source Side Heat Transfer [J]
         Real64 reportLoadSideMassFlowRate;   // Load side volumetric flow rate m3/s
-        Real64 reportLoadSideInletTemp;      // Load Side outlet temperature �C
-        Real64 reportLoadSideOutletTemp;     // Load Side outlet temperature �C
+        Real64 reportLoadSideInletTemp;      // Load Side outlet temperature degC
+        Real64 reportLoadSideOutletTemp;     // Load Side outlet temperature degC
         Real64 reportSourceSideMassFlowRate; // Source side volumetric flow rate m3/s
-        Real64 reportSourceSideInletTemp;    // Source Side outlet temperature �C
-        Real64 reportSourceSideOutletTemp;   // Source Side outlet temperature �C
+        Real64 reportSourceSideInletTemp;    // Source Side outlet temperature degC
+        Real64 reportSourceSideOutletTemp;   // Source Side outlet temperature degC
 
         // init flags
         bool MyPlantScanFlag;

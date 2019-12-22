@@ -69,7 +69,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.1;
+  Version,9.3;
 
   Building,
     Building,                !- Name
@@ -97,7 +97,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     10,                      !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1103,25 +1103,25 @@
   InternalMass,
     ZSF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
-    ZSF1,                    !- Zone Name
+    ZSF1,                    !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     ZNF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
-    ZNF1,                    !- Zone Name
+    ZNF1,                    !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     ZSF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
-    ZSF2,                    !- Zone Name
+    ZSF2,                    !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     ZNF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
-    ZNF2,                    !- Zone Name
+    ZNF2,                    !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -2071,8 +2071,8 @@
     ZSF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZNF1Equipment,           !- Name
@@ -2081,8 +2081,8 @@
     ZNF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZSF2Equipment,           !- Name
@@ -2091,8 +2091,8 @@
     ZSF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ZNF2Equipment,           !- Name
@@ -2101,8 +2101,8 @@
     ZNF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZSF1DirectAir,           !- Name

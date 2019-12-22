@@ -57,45 +57,46 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDaylighting.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEquipment.hh>
-#include <DaylightingDevices.hh>
-#include <EMSManager.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FuelCellElectricGenerator.hh>
-#include <General.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <MicroCHPElectricGenerator.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <PipeHeatTransfer.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
-#include <ZonePlenum.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -707,8 +708,24 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
+                        
+                        // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
+                        // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
+                        // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
+                        // comfort model.
+                        int const NumFirstTCModel = 14;
+                        if (NumAlpha < NumFirstTCModel) {
+                            bool NoTCModelSelectedWithSchedules = false;
+                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
+                            if (NoTCModelSelectedWithSchedules) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
+                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                            }
+                        }
 
-                        for (OptionNum = 14; OptionNum <= lastOption; ++OptionNum) {
+                        for (OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
                                 auto const thermalComfortType(AlphaName(OptionNum));
@@ -3778,6 +3795,7 @@ namespace InternalHeatGains {
                 }
 
                 if (!lAlphaFieldBlanks(15)) {
+                    // If this field isn't blank, it must point to a valid curve
                     ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
                     if (ZoneITEq(Loop).RecircFLTCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
@@ -3785,10 +3803,12 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
                 } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
                     ZoneITEq(Loop).RecircFLTCurve = 0;
                 }
 
                 if (!lAlphaFieldBlanks(16)) {
+                    // If this field isn't blank, it must point to a valid curve
                     ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
                     if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
@@ -3796,6 +3816,7 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
                 } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
                     ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
                 }
 
@@ -5627,7 +5648,6 @@ namespace InternalHeatGains {
         using OutputReportTabular::AllocateLoadComponentArrays;
         using OutputReportTabular::radiantPulseReceived;
         using OutputReportTabular::radiantPulseTimestep;
-        using OutputReportTabular::radiantPulseUsed;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using RefrigeratedCase::FigureRefrigerationZoneGains;
         using WaterThermalTanks::CalcWaterThermalTankZoneGains;
@@ -6005,12 +6025,22 @@ namespace InternalHeatGains {
         UpdateInternalGainValues();
 
         for (NZ = 1; NZ <= NumOfZones; ++NZ) {
-            SumAllInternalRadiationGains(NZ, QL(NZ));
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
             if (HybridModel::FlagHybridModel_PC) {
                 SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+            }
+        }
+
+        // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
+        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            QL(enclosureNum) = 0.0;
+            for (int const zoneNum : thisEnclosure.ZoneNums) {
+                Real64 zoneQL;
+                SumAllInternalRadiationGains(zoneNum, zoneQL);
+                QL(enclosureNum) += zoneQL;
             }
         }
 
@@ -6021,23 +6051,23 @@ namespace InternalHeatGains {
             AllocateLoadComponentArrays();
         }
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            NZ = Surface(SurfNum).Zone;
+            int const NZ = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
+            int const radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
             if (!doLoadComponentPulseNow) {
-                QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum);
+                QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
             } else {
-                curQL = QL(NZ);
+                curQL = QL(radEnclosureNum);
                 // for the loads component report during the special sizing run increase the radiant portion
-                // a small amount to create a "pulse" of heat that is used for the
-                adjQL = curQL + Zone(NZ).FloorArea * pulseMultipler;
+                // a small amount to create a "pulse" of heat that is used for the delayed loads
+                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
                 // TMULT is a mulipliter for each zone
                 // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                QRadThermInAbs(SurfNum) = adjQL * TMULT(NZ) * ITABSF(SurfNum);
+                QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 // store the magnitude and time of the pulse
-                radiantPulseUsed(CurOverallSimDay, NZ) = adjQL - curQL;
                 radiantPulseTimestep(CurOverallSimDay, NZ) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(NZ) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
             }
         }
     }
@@ -6796,7 +6826,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
+                                      bool const CloInsSch,  // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch) // Blank air velocity schedule = true
+    {
+        bool TCSchedsPresent = false;
+        
+        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
+            TCSchedsPresent = true;
+        }
+        
+        return TCSchedsPresent;
+    }
+    
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 

@@ -127,7 +127,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.1;
+  Version,9.3;
 
   Building,
     NONE,                    !- Name
@@ -157,7 +157,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -949,18 +949,18 @@
   Schedule:Compact,
     INF-SCHED,               !- Name
     Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: WeekDays SummerDesignDay, !- Field 6
-    Until: 6:00,1.0,         !- Field 7
-    Until: 18:00,0.0,        !- Field 9
-    Until: 24:00,1.0,        !- Field 11
-    For: AllOtherDays,       !- Field 13
-    Until: 6:00,1.0,         !- Field 14
-    Until: 13:00,0.0,        !- Field 16
-    Until: 24:00,1.0;        !- Field 18
+    Through: 9/30,           !- Field 1
+    For: WeekDays SummerDesignDay, !- Field 2
+    Until: 6:00,1.0,         !- Field 3
+    Until: 18:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 6:00,1.0,         !- Field 10
+    Until: 13:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    Through: 12/31,          !- Field 16
+    For: AllDays,            !- Field 17
+    Until: 24:00,0.0;        !- Field 18
 
   Schedule:Compact,
     Seasonal Relative Humidity Sch,  !- Name
@@ -1277,8 +1277,8 @@
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1287,8 +1287,8 @@
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1297,8 +1297,8 @@
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:Unitary:Furnace:HeatCool,
     GasHeat DXAC Furnace 1,  !- Name

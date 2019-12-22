@@ -50,9 +50,9 @@
 
 // C++ Headers
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -63,14 +63,16 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/DataStorage.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
 
 class IdfParser;
 class Validation;
 
 namespace EnergyPlus {
+
+void cleanEPJSON(nlohmann::json &epjson);
 
 class InputProcessor
 {
@@ -177,6 +179,8 @@ public:
 
     void reportOrphanRecordObjects();
 
+    const json &getObjectInstances(std::string const &ObjType);
+
 private:
     struct ObjectInfo
     {
@@ -190,10 +194,10 @@ private:
         {
         }
 
-        bool operator<(const ObjectInfo& rhs) const
+        bool operator<(const ObjectInfo &rhs) const
         {
             int cmp = this->objectType.compare(rhs.objectType);
-            if(cmp == 0) {
+            if (cmp == 0) {
                 return this->objectName < rhs.objectName;
             }
             return cmp < 0;
@@ -221,6 +225,31 @@ private:
         std::vector<json::const_iterator> inputObjectIterators;
     };
 
+    struct MaxFields
+    {
+        MaxFields() = default;
+        std::size_t max_fields = 0;
+        std::size_t max_extensible_fields = 0;
+    };
+
+    MaxFields findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd);
+
+    void setObjectItemValue(json const &ep_object,
+                            json const &ep_schema_object,
+                            std::string const &field,
+                            json const &legacy_field_info,
+                            int &alpha_index,
+                            int &numeric_index,
+                            bool within_max_fields,
+                            Array1S_string Alphas,
+                            int &NumAlphas,
+                            Array1S<Real64> Numbers,
+                            int &NumNumbers,
+                            Optional<Array1D_bool> NumBlank = _,
+                            Optional<Array1D_bool> AlphaBlank = _,
+                            Optional<Array1D_string> AlphaFieldNames = _,
+                            Optional<Array1D_string> NumericFieldNames = _);
+
     void addVariablesForMonthlyReport(std::string const &reportName);
 
     void addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName);
@@ -236,6 +265,8 @@ private:
     json const &getFields(std::string const &objectType, std::string const &objectName);
 
     json const &getFields(std::string const &objectType);
+
+    json const &getPatternProperties(json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {
@@ -257,9 +288,11 @@ private:
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
-    public:
+
+public:
     json epJSON;
-    private:
+
+private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
     UnusedObjectSet unusedInputs;

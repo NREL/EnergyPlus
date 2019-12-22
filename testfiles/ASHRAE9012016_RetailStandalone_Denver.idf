@@ -111,7 +111,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.1;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -166,7 +166,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -4781,31 +4781,31 @@
   InternalMass,
     Back_Space_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Back_Space,              !- Zone Name
+    Back_Space,              !- Zone or ZoneList Name
     759.7800;                !- Surface Area {m2}
 
   InternalMass,
     Core_Retail_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or ZoneList Name
     3200.9658;               !- Surface Area {m2}
 
   InternalMass,
     Point_Of_Sale_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Point_Of_Sale,           !- Zone Name
+    Point_Of_Sale,           !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
   InternalMass,
     Front_Retail_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Retail,            !- Zone Name
+    Front_Retail,            !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
   InternalMass,
     Front_Entry_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Entry,             !- Zone Name
+    Front_Entry,             !- Zone or ZoneList Name
     24.0000;                 !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -5640,7 +5640,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Back_Space Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_Retail Equipment,   !- Name
@@ -5648,7 +5650,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Core_Retail Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Point_Of_Sale Equipment, !- Name
@@ -5656,7 +5660,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Point_Of_Sale Direct Air,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Retail Equipment,  !- Name
@@ -5664,7 +5670,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Front_Retail Direct Air, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Entry Equipment,   !- Name
@@ -5672,7 +5680,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Front_Entry Unit Heater, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 

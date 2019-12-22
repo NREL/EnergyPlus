@@ -50,8 +50,8 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <OutputReportPredefined.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 namespace EnergyPlus {
 
@@ -376,6 +376,7 @@ namespace OutputReportPredefined {
     int pdchCoilDateTimeTotIdealPeak;
     int pdchCoilDDnameAirFlowIdealPeak;
     int pdchCoilDateTimeAirFlowIdealPeak;
+    int pdchCoilPeakLoadTypeToSizeOn;
     int pdchCoilTotalCapIdealPeak;
     int pdchCoilSensCapIdealPeak;
     int pdchCoilAirMassFlowIdealPeak;
@@ -1158,6 +1159,7 @@ namespace OutputReportPredefined {
         pdchCoilDateTimeTotIdealPeak = 0;
         pdchCoilDDnameAirFlowIdealPeak = 0;
         pdchCoilDateTimeAirFlowIdealPeak = 0;
+        pdchCoilPeakLoadTypeToSizeOn = 0;
         pdchCoilTotalCapIdealPeak = 0;
         pdchCoilSensCapIdealPeak = 0;
         pdchCoilAirMassFlowIdealPeak = 0;
@@ -2072,6 +2074,7 @@ namespace OutputReportPredefined {
         pdchCoilDateTimeTotIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Date/Time at Total Ideal Loads Peak");
         pdchCoilDDnameAirFlowIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Design Day Name at Air Flow Ideal Loads Peak");
         pdchCoilDateTimeAirFlowIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak");
+        pdchCoilPeakLoadTypeToSizeOn = newPreDefColumn(pdstCoilSummaryCoilSelection, "Peak Load Type to Size On");
 
         pdchCoilTotalCapIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]");
         pdchCoilSensCapIdealPeak = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]");

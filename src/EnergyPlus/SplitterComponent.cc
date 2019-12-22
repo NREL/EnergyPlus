@@ -49,16 +49,16 @@
 #include <cmath>
 
 // EnergyPlus Headers
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <Psychrometrics.hh>
-#include <SplitterComponent.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

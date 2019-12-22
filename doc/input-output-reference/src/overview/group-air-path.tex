@@ -6,7 +6,7 @@ The zone supply and return air paths are used to describe the configuration of t
 
 For a typical single duct air system there will be one \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} and one \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}. A typical dual duct system would have 2 \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath}s one for the hot air and one for the cold air and 1 \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}.
 
-The \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} component provides the capability to have supply air distributed to the conditioned zones through one or more plenum zones such as would occur in an underfloor air distribution system (UFAD). The \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} component allows the program to model return air plenums. Of course plenums are always optional. The simplest \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} would consist of only an \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}; similarly the simplest return air path consists of a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}. A UFAD system supply air path might consist of a single \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} connecting to multiple \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}s which in turn could each supply one or more conditioned zones. A system with return plenums would have an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} in which the conditioned zones connect to the return plenum inlets and the return plenum s outlets connect to a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}.
+The \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} component provides the capability to have supply air distributed to the conditioned zones through one or more plenum zones such as would occur in an underfloor air distribution system (UFAD). The \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} component allows the program to model return air plenums. Of course plenums are always optional. The simplest \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} would consist of only an \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}; similarly the simplest return air path consists of a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}. A UFAD system supply air path might consist of a single \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} connecting to multiple \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}s which in turn could each supply one or more conditioned zones. A system with return plenums would have an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} in which the conditioned zones connect to the return plenum inlets and the outlets of the return plenum connect to a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}.
 
 Both the zone supply and return plenums are solved in the heat balance as thermal zones which couple through heat conduction with adjacent zones. Since they are solved as thermal zones the solution scheme involves the zone predictor-corrector technique which will lag the temperature at the system timestep in every zone. See Summary of Predictor-Corrector Procedure in the EnergyPlus Engineering Reference.
 
@@ -278,3 +278,139 @@ AirLoopHVAC:ZoneMixer,
   Zone 2 Outlet Node,                     ! Inlet 2 Node Name
   Zone 3 Outlet Node;                     ! Inlet 3 Node Name
 \end{lstlisting}
+
+\subsection{AirLoopHVAC:DedicatedOutdoorAirSystem}\label{airloophvacdedicatedoutdoorairsystem}
+
+The AirLoopHVAC:DedicatedOutdoorAirSystem is a central dedicated outdoor air system (DOAS) and deliveres outdoor air to multiple \hyperref[airloophvac]{AirLoopHVAC} systems. The amount of delivered outdoor air is based on a sum of outdoor air flow rates from outdoor air stream nodes defined in the \hyperref[outdoorairmixe]{OutdoorAir:Mixer}. These OutdoorAir:Mixer objects are a component of served multiple AirLoopHVAC systems. The central DOAS system also pretreates outdoor air before outdoor air distribution into multiple AirLoopHVAC, with given precool and preheat air conditions.
+
+After the object name, the object has four fields to provide the name of AirLoopHVAC:OutdoorAirSystem, system availability, and names of AirLoopHVAC:Mixer and AirLoopHVAC:Splitter. The AirLoopHVAC:OutdoorAirSystem lists a controller to perform controls, and coils and fans to pretreat outdoor air before delivery to served AirLoopHVAC. The Availability Schedule determines times when a system is operationa or shutdownl. The AirLoopHVAC:Mixer and AirLoopHVAC:Splitter provide connection into distribution and relief nodes, respectively.
+
+The next four fields requires inputs for pretreat air conditions, including precooling and preheating.
+
+The last section lists the number of AirLoopHVAC to be served and names of served AirLoopHVAC objects.
+
+\subsubsection{Inputs}\label{inputs-002}
+
+\paragraph{Field: Name}\label{field-name-002}
+
+This field is a unique, user assigned name for a single instance of an AirLoopHVAC:DedicatedOutdoorAirSystem object. Any other object referencing this AirLoopHVAC:DedicatedOutdoorAirSystem will use this name.
+
+\paragraph{Field: AirLoopHVAC:OutdoorAirSystem Name}\label{field-airLoophvac-outdoorairsystem-name}
+
+This field is the name of a AirLoopHVAC:OutdoorAirSystem object. It handles outdoor air based on its own controller.
+
+\paragraph{Availability Schedule Name}\label{availability-schedule-name}
+
+The name of a schedule that specifies when the system is available.
+
+\paragraph{Field: Preheat Design Temperature}\label{field-preheat-design-temperature}
+
+The design air temperature exiting the preheat coil (if any) in degrees Celsius.
+
+\paragraph{Field: Preheat Design Humidity Ratio}\label{field-preheat-design-humidity-ratio}
+
+The design humidity ratio exiting the preheat coil (if any) in kilograms of water per kilogram of dry air. (kgWater/kgDryAir)
+
+\paragraph{Field: Precool Design Temperature}\label{field-precool-design-temperature}
+
+The design air temperature exiting the precooling coil (if any) in degrees Celsius.
+
+\paragraph{Field: Precool Design Humidity Ratio}\label{field-precool-design-humidity-ratio}
+
+The design humidity ratio exiting the precooling coil (if any) in kilograms of water per kilogram of dry air. (kgWater/kgDryAir)
+
+\paragraph{Field: Number of AirLoopHVAC}\label{field-number-of-airloophvac}
+
+The number of AirLoopHVAC, which will be served by this central DOAS. 
+
+\paragraph{Field: AirLoopHVAC \textless{}\#\textgreater{} Name}\label{field-airloophvac-name}
+
+The name of an AirLoopHVAC. There is no limit to the number of AirLoopHVACs, and there may be no duplicate AirLoopHVAC names. (Note that some EnergyPlus editing tools may allow only 20 AirLoopHVAC names, but this may be increased by extending the object in the Energy+.idd file.)
+
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+  AirLoopHVAC:DedicatedOutdoorAirSystem,
+    AirLoopHVAC DOAS,        !- Name
+    AirLoopDOAS OA system,   !- AirLoopHVAC:OutdoorAirSystem Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    AirLoopDOASMixer,        !- AirLoopHVAC:Mixer Name
+    AirLoopDOASSplitter,     !- AirLoopHVAC:Splitter Name
+    4.5,                     !- Preheat Design Temperature {C}
+    0.004,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    17.5,                    !- Precool Design Temperature {C}
+    0.012,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    5,                       !- Number of AirLoopHVAC
+    PSZ-AC:1,                !- AirLoopHVAC 1 Name
+    PSZ-AC:2,                !- AirLoopHVAC 2 Name
+    PSZ-AC:3,                !- AirLoopHVAC 3 Name
+    PSZ-AC:4,                !- AirLoopHVAC 4 Name
+    PSZ-AC:5;                !- AirLoopHVAC 5 Name
+\end{lstlisting}
+
+\subsection{AirLoopHVAC:Mixer}\label{airloophvacmixer}
+
+The AirLoopHVAC:Mixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The multiple inlet nodes are relief nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object. The single outlet node is connected into either outdoor or a heat exchanger. The heat exchanger must be lisdted as a compoenent in AirLoopHVAC:OutdoorAirSystem, referenced in the AirLoopHVAC:DedicatedOutdoorAirSystem object. 
+
+\subsubsection{Inputs}\label{inputs-5-002}
+
+\paragraph{Field: Name}\label{field-name-5-002}
+
+Unique name for this mixer.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-3}
+
+The name of the single outlet node leaving the mixer.
+
+\paragraph{Field: Inlet \textless{}\#\textgreater{} Node Name}\label{field-inlet-node-name-3}
+
+The name of a mixer inlet node. There is no limit to the number of inlet nodes, and there may be no duplicate inlet node names. (Note that some EnergyPlus editing tools may allow only 50 inlet node names, but this may be increased by extending the object in the Energy+.idd file.)
+
+An input example is shown below.
+
+\begin{lstlisting}
+
+  AirLoopHVAC:Mixer,
+    AirLoopDOASMixer,        !- Name
+    AirLoopDOASMixerOutlet,  !- Outlet Node Name
+    PSZ-AC:1_OARelief Node,  !- Inlet 1 Node Name
+    PSZ-AC:2_OARelief Node,  !- Inlet 2 Node Name
+    PSZ-AC:3_OARelief Node,  !- Inlet 3 Node Name
+    PSZ-AC:4_OARelief Node,  !- Inlet 4 Node Name
+    PSZ-AC:5_OARelief Node;  !- Inlet 5 Node Name
+\end{lstlisting}
+
+\subsection{AirLoopHVAC:Splitter}\label{airloophvacsplitter}
+
+The AirLoopHVAC:Splitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem} object. The input contains only node connection information. The multiple outlet nodes must be outdoor air stream nodes of \hyperref[outdoorairmixe]{OutdoorAir:Mixer}, whihc is a component of AirLoopHVAC, served by the AirLoopHVAC:DedicatedOutdoorAirSystem object.
+
+\subsubsection{Inputs}\label{inputs-4-002}
+
+\paragraph{Field: Name}\label{field-name-4-002}
+
+Unique name for this splitter.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2}
+
+The name of the single inlet node going into the splitter.
+
+\paragraph{Field: Outlet \textless{}\#\textgreater{} Node Name}\label{field-outlet-node-name-2}
+
+The name of a splitter outlet node. There is no limit to the number of outlet nodes, and there may be no duplicate outlet node names. (Note that some EnergyPlus editing tools may allow only 50 outlet node names, but this may be increased by extending the object in the Energy+.idd file.)
+
+An input example is shown below.
+
+\begin{lstlisting}
+
+  AirLoopHVAC:Splitter,
+    AirLoopDOASSplitter,     !- Name
+    AirLoopDOASSplitterInlet, !- Inlet Node Name
+    PSZ-AC:1_OAInlet Node,  !- Outlet 1 Node Name
+    PSZ-AC:2_OAInlet Node,  !- Outlet 2 Node Name
+    PSZ-AC:3_OAInlet Node,  !- Outlet 3 Node Name
+    PSZ-AC:4_OAInlet Node,  !- Outlet 4 Node Name
+    PSZ-AC:5_OAInlet Node;  !- Outlet 5 Node Name
+\end{lstlisting}
+
+

@@ -18,10 +18,10 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,9.1;
+  Version,9.3;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -836,8 +836,8 @@
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
@@ -846,8 +846,8 @@
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone2Air,                !- Name

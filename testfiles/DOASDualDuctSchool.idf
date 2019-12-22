@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,9.1;
+  Version,9.3;
 
   Timestep,6;
 
@@ -1511,7 +1511,7 @@
   InternalMass,
     Corner_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1,    !- Zone Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1647,14 +1647,14 @@
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2376,7 +2376,7 @@
   InternalMass,
     Mult_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1,      !- Zone Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2512,14 +2512,14 @@
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2788,7 +2788,7 @@
   InternalMass,
     Corridor_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1,          !- Zone Name
+    Corridor_Pod_1,          !- Zone or ZoneList Name
     384.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2889,14 +2889,14 @@
     Corridor_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corridor_Pod_1 Fan Coil, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corridor_Pod_1 Dual Duct Box,  !- Name
@@ -3238,7 +3238,7 @@
   InternalMass,
     Corner_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1,    !- Zone Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3374,14 +3374,14 @@
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -3903,7 +3903,7 @@
   InternalMass,
     Mult_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1,      !- Zone Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4039,14 +4039,14 @@
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -4481,7 +4481,7 @@
   InternalMass,
     Main_Corridor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor,           !- Zone Name
+    Main_Corridor,           !- Zone or ZoneList Name
     1092.0000;               !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4577,14 +4577,14 @@
     Main_Corridor Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Main_Corridor Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Main_Corridor Dual Duct Box,  !- Name
@@ -4953,7 +4953,7 @@
   InternalMass,
     Lobby Internal Mass,     !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby,                   !- Zone Name
+    Lobby,                   !- Zone or ZoneList Name
     342.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5049,14 +5049,14 @@
     Lobby Dual Duct Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Lobby Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Lobby Dual Duct Box,     !- Name
@@ -5390,7 +5390,7 @@
   InternalMass,
     Mech Internal Mass,      !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech,                    !- Zone Name
+    Mech,                    !- Zone or ZoneList Name
     504.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5486,14 +5486,14 @@
     Mech Dual Duct Box,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Mech Baseboard Heater,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mech Dual Duct Box,      !- Name
@@ -5782,7 +5782,7 @@
   InternalMass,
     Bathrooms Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms,               !- Zone Name
+    Bathrooms,               !- Zone or ZoneList Name
     380.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5882,20 +5882,20 @@
     Bathrooms Dual Duct Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Bathrooms Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 3 Object Type
     Bathrooms Exhaust Fan 1, !- Zone Equipment 3 Name
     3,                       !- Zone Equipment 3 Cooling Sequence
     3,                       !- Zone Equipment 3 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 3 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Bathrooms Dual Duct Box, !- Name
@@ -6609,7 +6609,7 @@
   InternalMass,
     Offices Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices,                 !- Zone Name
+    Offices,                 !- Zone or ZoneList Name
     882.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -6740,14 +6740,14 @@
     Offices Dual Duct Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Offices Baseboard Heater,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Offices Dual Duct Box,   !- Name
@@ -7261,7 +7261,7 @@
   InternalMass,
     Media_Center Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Media_Center,            !- Zone Name
+    Media_Center,            !- Zone or ZoneList Name
     798.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -7392,14 +7392,14 @@
     Media_Center Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Media_Center Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Media_Center Dual Duct Box,  !- Name

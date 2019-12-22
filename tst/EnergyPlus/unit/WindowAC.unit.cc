@@ -48,18 +48,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "DataGlobals.hh"
-#include "DataHVACGlobals.hh"
-#include "DataZoneEnergyDemands.hh"
-#include "ElectricPowerServiceManager.hh"
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "HeatBalanceManager.hh"
-#include "OutputProcessor.hh"
-#include "OutputReportPredefined.hh"
-#include "ScheduleManager.hh"
-#include "SimulationManager.hh"
-#include "SizingManager.hh"
-#include "WindowAC.hh"
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WindowAC.hh>
 
 using namespace EnergyPlus;
 
@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
     std::string const idf_objects = delimited_string({
-        " Version,9.1;",
+        " Version,9.3;",
 
         "  Timestep,6;",
 
@@ -437,7 +437,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     SimulationManager::GetProjectData();

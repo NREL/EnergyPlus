@@ -1,10 +1,11 @@
-/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef TYPICAL_FIXTURE_HPP_
 #define TYPICAL_FIXTURE_HPP_
 
 #include "base-fixture.hpp"
+#include "foundation-fixture.hpp"
 
 using namespace Kiva;
 

@@ -50,14 +50,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGGasses90.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGParams.hh>
-#include <TarcogShading.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/TarcogShading.hh>
 
-#include <DataGlobals.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -1036,7 +1036,12 @@ namespace TarcogShading {
                 H0 = (dens2 * cp2 * s * speed) / (4.0 * hc + 8.0 * speed);
 
                 P = -H / H0;
-                beta = std::pow(e, P);
+                if (P < -700.0) {
+                    beta = 0.0;
+                }
+                else {
+                    beta = std::pow(e, P);
+                }
                 Tgapout = Tav - (Tav - Tenv) * beta;
                 Tgap = Tav - (H0 / H) * (Tgapout - Tenv);
             } else {

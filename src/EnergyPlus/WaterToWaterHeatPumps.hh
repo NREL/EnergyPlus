@@ -48,7 +48,7 @@
 #ifndef ENERGYPLUS_WATERTOWATERHEATPUMPS_HH
 #define ENERGYPLUS_WATERTOWATERHEATPUMPS_HH
 
-#include <PlantComponent.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 

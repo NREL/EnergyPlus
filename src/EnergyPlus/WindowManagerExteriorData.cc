@@ -47,15 +47,14 @@
 
 #include <cassert>
 
-#include <DataBSDFWindow.hh>
-#include <DataHeatBalance.hh>
-#include <UtilityRoutines.hh>
-#include <WindowComplexManager.hh>
-#include <WindowManager.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 
 #include <WCEMultiLayerOptics.hpp>
-
-#include "WindowManagerExteriorData.hh"
 
 namespace EnergyPlus {
 

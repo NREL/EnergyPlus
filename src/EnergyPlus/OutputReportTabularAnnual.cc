@@ -61,19 +61,19 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportData.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -176,7 +176,7 @@ namespace OutputReportTabularAnnual {
         int keyCount = 0;
         int typeVar = 0;
         OutputProcessor::StoreType avgSumVar;
-        int stepTypeVar = 0;
+        OutputProcessor::TimeStepType stepTypeVar;
         OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
         Array1D_string namesOfKeys;   // keyNames
         Array1D_int indexesForKeyVar; // keyVarIndexes
@@ -304,7 +304,7 @@ namespace OutputReportTabularAnnual {
         return (missingHourAggError || missingMaxOrMinError);
     }
 
-    void GatherAnnualResultsForTimeStep(int kindOfTimeStep)
+    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
@@ -315,7 +315,7 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    void AnnualTable::gatherForTimestep(int kindOfTimeStep)
+    void AnnualTable::gatherForTimestep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // For each cell of the table, gather the value as indicated by the type of aggregation
@@ -337,7 +337,7 @@ namespace OutputReportTabularAnnual {
         for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
             for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
                 int curTypeOfVar = fldStIt->m_typeOfVar;
-                int curStepType = fldStIt->m_varStepType;
+                OutputProcessor::TimeStepType curStepType = fldStIt->m_varStepType;
                 if (curStepType == kindOfTimeStep) // this is a much simpler conditional than the code in monthly gathering
                 {
                     int curVarNum = fldStIt->m_cell[row].indexesForKeyVar;
@@ -542,7 +542,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue > oldScanValue) {
+                                        if (scanValue < oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -550,7 +550,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue < oldScanValue) {
+                                        if (scanValue > oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -601,10 +601,10 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    Real64 AnnualTable::getElapsedTime(int kindOfTimeStep)
+    Real64 AnnualTable::getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 elapsedTime;
-        if (kindOfTimeStep == DataGlobals::HVACTSReporting) {
+        if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             elapsedTime = DataHVACGlobals::TimeStepSys;
         } else {
             elapsedTime = DataGlobals::TimeStepZone;
@@ -612,10 +612,10 @@ namespace OutputReportTabularAnnual {
         return elapsedTime;
     }
 
-    Real64 AnnualTable::getSecondsInTimeStep(int kindOfTimeStep)
+    Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 secondsInTimeStep;
-        if (kindOfTimeStep == DataGlobals::HVACTSReporting) {
+        if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         } else {
             secondsInTimeStep = DataGlobals::TimeStepZoneSec;
@@ -1399,7 +1399,7 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(static_cast<int>(fldSt.m_varAvgSum));
         ret.push_back(outStr);
-        outStr = std::to_string(fldSt.m_varStepType);
+        outStr = std::to_string(static_cast<int>(fldSt.m_varStepType));
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_aggregate);
         ret.push_back(outStr);
@@ -1412,6 +1412,11 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_timeBelowBottomBinTotal);
         ret.push_back(outStr);
+        // cell value
+        if (fldSt.m_cell.size() > 0) {
+            outStr = std::to_string(fldSt.m_cell[0].result);
+            ret.push_back(outStr);
+        }
         return ret;
     }
 
