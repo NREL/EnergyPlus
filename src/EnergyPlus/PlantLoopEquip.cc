@@ -192,7 +192,6 @@ namespace PlantLoopEquip {
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
-        using UserDefinedComponents::SimUserDefinedPlantComponent;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -934,15 +933,7 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_PlantComponent) {
 
             if (EquipTypeNum == TypeOf_PlantComponentUserDefined) {
-
-                SimUserDefinedPlantComponent(
-                    LoopNum, LoopSideNum, sim_component.TypeOf, sim_component.Name, EquipNum, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_WaterSource) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
