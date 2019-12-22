@@ -5,7 +5,7 @@
 
 // Penumbra
 #include <gl/context.h>
-#include <error.h>
+#include <penumbra/src/error.h>
 
 namespace Pumbra {
 
@@ -210,6 +210,10 @@ void Context::toggleCameraMode() {
   } else {
     setMVP();
   }
+}
+
+std::string Context::vendorName() {
+    return reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 }
 
 void Context::clearModel() {

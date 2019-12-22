@@ -22,6 +22,13 @@ const int MSG_INFO = 0;
 const int MSG_WARN = 1;
 const int MSG_ERR = 2;
 
+enum class VendorName {
+  None,
+  NVIDIA,
+  AMD,
+  Intel
+};
+
 typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string message,
                                          void *contextPtr);
 
@@ -66,6 +73,7 @@ public:
       std::vector<unsigned> transparentSurfaceIndices,
       std::vector<unsigned> interiorSurfaceIndices); // Primarily for debug purposes
   void setMessageCallback(PenumbraCallbackFunction callbackFunction, void *contextPtr);
+  VendorName getVendorName();
 
 private:
   std::unique_ptr<PenumbraPrivate> penumbra;

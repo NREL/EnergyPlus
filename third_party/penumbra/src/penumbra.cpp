@@ -8,7 +8,7 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra-private.h>
-#include <error.h>
+#include <penumbra/src/error.h>
 
 namespace Pumbra {
 
@@ -29,6 +29,21 @@ Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, void *contextPtr, 
 }
 
 Penumbra::~Penumbra() {}
+
+VendorName Penumbra::getVendorName() {
+  auto vendorType = VendorName::None;
+  auto vendorName = penumbra->context.vendorName();
+  if (vendorName == "NVIDIA") {
+      vendorType = VendorName::NVIDIA;
+  } else if (vendorName == "AMD" || vendorName == "ATI" || vendorName == "Advanced Micro Devices" || vendorName == "ATI Technologies Inc.") {
+      vendorType = VendorName::AMD;
+  } else if (vendorName == "Intel" || vendorName == "INTEL") {
+      vendorType = VendorName::Intel;
+  } else {
+      showMessage(MSG_ERR, "Failed to find GPU or vendor name (" + vendorName + ") is not in list.");
+  }
+  return vendorType;
+}
 
 unsigned Penumbra::addSurface(const Surface &surface) {
   penumbra->addSurface(surface);

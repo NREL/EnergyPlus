@@ -49,6 +49,7 @@ public:
                              const unsigned interiorSurfaceIndex,
                              mat4x4 sunView);
   void clearModel();
+  std::string vendorName();
 
 private:
   GLFWwindow *window;
