@@ -59,9 +59,16 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
@@ -74,9 +81,6 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CalcInteriorRadExchange)
 {
     std::string const idf_objects = delimited_string({
-         "Version,",
-         "  8.9;                                    !- Version Identifier",
-         "",
          "Zone,",
          "  Space 0 ZN,                             !- Name",
          "  ,                                       !- Direction of Relative North {deg}",

@@ -1572,7 +1572,7 @@ namespace HeatBalanceIntRadExchange {
                 RowSum = fixedF.sum(); // needs to be recalculated
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
-            F = FixedF;
+            viewFactors = fixedF;
             for (int zoneNum : zoneNums) {
                 Zone(zoneNum).EnforcedReciprocity = true;
             }
