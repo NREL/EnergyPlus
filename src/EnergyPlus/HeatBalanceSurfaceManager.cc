@@ -226,7 +226,7 @@ namespace HeatBalanceSurfaceManager {
 
         using HeatBalanceAirManager::ManageAirHeatBalance;
         using HeatBalFiniteDiffManager::SurfaceFD;
-        using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
+        using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular component loads output reports
         using ThermalComfort::ManageThermalComfort;
 
         int SurfNum;

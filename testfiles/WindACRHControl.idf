@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     NONE,                    !- Name
@@ -762,19 +762,19 @@
   InternalMass,
     InternalMassWest,        !- Name
     Medium Furniture,        !- Construction Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or ZoneList Name
     18.;                     !- Surface Area {m2}
 
   InternalMass,
     InternalMassEast,        !- Name
     Medium Furniture,        !- Construction Name
-    EAST ZONE,               !- Zone Name
+    EAST ZONE,               !- Zone or ZoneList Name
     18.;                     !- Surface Area {m2}
 
   InternalMass,
     InternalMassNorth,       !- Name
     Medium Furniture,        !- Construction Name
-    NORTH ZONE,              !- Zone Name
+    NORTH ZONE,              !- Zone or ZoneList Name
     27.;                     !- Surface Area {m2}
 
   FenestrationSurface:Detailed,
@@ -1569,14 +1569,14 @@
     Zone1WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone1Baseboard,          !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1585,14 +1585,14 @@
     Zone2WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone2Baseboard,          !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1601,20 +1601,20 @@
     Zone3WindAC,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Zone3Baseboard,          !- Zone Equipment 2 Name
     3,                       !- Zone Equipment 2 Cooling Sequence
     3,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Dehumidifier:DX,!- Zone Equipment 3 Object Type
     North Zone Dehumidifier, !- Zone Equipment 3 Name
     2,                       !- Zone Equipment 3 Cooling Sequence
     2,                       !- Zone Equipment 3 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 3 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:WindowAirConditioner,
     Zone1WindAC,             !- Name

@@ -67,7 +67,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,9.2;
+  Version,9.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -1372,19 +1372,19 @@
   InternalMass,
     BulkStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    BulkStorage,             !- Zone Name
+    BulkStorage,             !- Zone or ZoneList Name
     6409.6813;               !- Surface Area {m2}
 
   InternalMass,
     FineStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    FineStorage,             !- Zone Name
+    FineStorage,             !- Zone or ZoneList Name
     2786.8199;               !- Surface Area {m2}
 
   InternalMass,
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
-    Office,                  !- Zone Name
+    Office,                  !- Zone or ZoneList Name
     473.7584;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -1650,8 +1650,8 @@
     BulkStorage Unit Heater, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     FineStorage Equipment,   !- Name
@@ -1660,8 +1660,8 @@
     FineStorage Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office Equipment,        !- Name
@@ -1670,8 +1670,8 @@
     Office Direct Air,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
 

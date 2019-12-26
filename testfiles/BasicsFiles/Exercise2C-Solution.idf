@@ -426,7 +426,7 @@
 !
 !
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Exercise 2C,             !- Name
@@ -2147,6 +2147,6 @@
     HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    ABUPS,                   !- Report 1 Name
+    AnnualBuildingUtilityPerformanceSummary,  !- Report 1 Name
     EquipmentSummary;        !- Report 2 Name
 

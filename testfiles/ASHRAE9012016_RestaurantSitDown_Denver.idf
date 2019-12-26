@@ -1,12 +1,12 @@
-  Version,9.2;               !- Version Identifier
+  Version,9.3;
 
   SimulationControl,
-    Yes,
-    Yes,
-    No,
-    Yes,
-    No,
-    No;
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No;                      !- Do HVAC Sizing Simulation for Sizing Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -4084,13 +4084,13 @@
   InternalMass,
     Dining_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Dining,                  !- Zone Name
+    Dining,                  !- Zone or ZoneList Name
     743.4961;                !- Surface Area {m2}
 
   InternalMass,
     Kitchen_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Kitchen,                 !- Zone Name
+    Kitchen,                 !- Zone or ZoneList Name
     278.8105;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -4618,14 +4618,14 @@
     Dining Exhaust Fan,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Dining Direct Air,       !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Kitchen Equipment,       !- Name
@@ -4634,14 +4634,14 @@
     Kitchen Exhaust Fan,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Kitchen Direct Air,      !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 

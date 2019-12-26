@@ -83,7 +83,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.2;
+  Version,9.3;
 
   Timestep,6;
 
@@ -748,7 +748,7 @@
   InternalMass,
     TRUSSES,                 !- Name
     Trusses,                 !- Construction Name
-    Attic Thermal Zone,      !- Zone Name
+    Attic Thermal Zone,      !- Zone or ZoneList Name
     3.9;                     !- Surface Area {m2}
 
   Schedule:Compact,
@@ -1244,8 +1244,8 @@
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 1,!- Name

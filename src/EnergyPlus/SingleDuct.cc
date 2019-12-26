@@ -5452,7 +5452,7 @@ namespace SingleDuct {
         NumATMixers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         SysATMixer.allocate(NumATMixers);
 
-        // Need air disribution units first
+        // Need air distribution units first
         ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
