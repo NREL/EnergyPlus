@@ -626,6 +626,41 @@ namespace PluginManagement {
             EnergyPlus::ShowFatalError("Python main() function error causes program termination");
         }
 
+        // check which methods are overridden in the derived class
+        std::string const detectOverriddenFunctionName = "_detect_overridden";
+        PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
+        if (!detectFunction || !PyCallable_Check(detectFunction)) {
+            EnergyPlus::ShowSevereError("Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("This function should be available on the base class, so this is strange.");
+            }
+            EnergyPlus::ShowFatalError("Python _detect_overridden() function error causes program termination");
+        }
+        PyObject *pFunctionResponse = PyObject_CallFunction(detectFunction, nullptr);
+        if (!pFunctionResponse) {
+            EnergyPlus::ShowSevereError("Call to _detect_overridden() on " + this->stringIdentifier + " failed!");
+            if (PyErr_Occurred()) {
+                PluginInstance::reportPythonError();
+            } else {
+                EnergyPlus::ShowContinueError("This is available on the base class and should not be overridden...strange.");
+            }
+            EnergyPlus::ShowFatalError("Program terminates after call to _detect_overridden() on " + this->stringIdentifier + " failed!");
+        }
+        if (PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
+            int numVals = PyList_Size(pFunctionResponse);
+            for (int itemNum = 0; itemNum < numVals; itemNum++) {
+                PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
+                std::string overriddenFunctionName = PyBytes_AsString(item);
+                int i = 1;
+            }
+            // PyList_Size returns a borrowed reference, do not decrement
+        } else {
+            EnergyPlus::ShowFatalError("Invalid return from _detect_overridden() on class \"" + this->stringIdentifier + ", this is weird");
+        }
+        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+
         // and grab the initialize function pointer
         std::string const initFunctionName = "initialize";
         this->pPluginInitFunction = PyObject_GetAttrString(this->pClassInstance, initFunctionName.c_str());
@@ -680,7 +715,7 @@ namespace PluginManagement {
     }
 
     void PluginInstance::init() {
-        // then call the main function
+        // then call the init function
         PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginInitFunction, nullptr);
         if (!pFunctionResponse) {
             EnergyPlus::ShowSevereError("Call to initialize() on " + this->stringIdentifier + " failed!");

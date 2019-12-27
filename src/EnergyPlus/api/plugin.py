@@ -1,3 +1,4 @@
+from typing import List
 
 from pyenergyplus.api import EnergyPlusAPI
 
@@ -54,6 +55,22 @@ class EnergyPlusPlugin(object):
         raise NotImplementedError(
             "Encountered EnergyPlusPlugin::main base function -- override this in your plugin class"
         )
+
+    def _detect_overridden(self) -> List[str]:
+        """
+        This function allows for detection of methods that are overridden in derived classes.
+        It first collects all the members of the class which share the same name into a single list.
+        It then looks up each member name in the EnergyPlusPlugin base class dictionary and the current instance
+        dictionary.  If they share the same address, they are the same function, and the derived class must not
+        be overriding the base class version.  If they have different addresses, the derived class is overriding it.
+
+        :return: A list of function names which are overridden in the derived class instance of this base class
+        """
+        common = EnergyPlusPlugin.__dict__.keys() & self.__class__.__dict__.keys()
+        diff = [m for m in common if EnergyPlusPlugin.__dict__[m] != self.__class__.__dict__[m]]
+        if '__init__' in diff:
+            diff.remove('__init__')
+        return diff
 
     # \key BeginNewEnvironment
     # \key AfterNewEnvironmentWarmUpIsComplete
