@@ -77,10 +77,12 @@ namespace PluginManagement {
 
     struct PluginInstance {
         PluginInstance(const std::string& fileName, const std::string& className, const std::string& emsName, bool runPluginDuringWarmup);
+        ~PluginInstance();
         static void reportPythonError();
         std::string stringIdentifier; // for diagnostic reporting
         bool runDuringWarmup;
         std::string emsAlias;
+        PyObject *pClassInstance = nullptr;  // pointer to the instantiated class instance
         PyObject *pPluginMainFunction = nullptr;  // pointer to the main plugin function
         PyObject *pPluginInitFunction = nullptr;  // pointer to the init plugin function
         void run(); // calls main() on this plugin instance

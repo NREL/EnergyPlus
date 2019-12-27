@@ -597,9 +597,9 @@ namespace PluginManagement {
             }
             EnergyPlus::ShowFatalError("Python class check error causes program termination");
         }
-        PyObject *pClassInstance = PyObject_CallObject(pClass, nullptr);
+        this->pClassInstance = PyObject_CallObject(pClass, nullptr);
         // Py_DECREF(pClass);  // PyDict_GetItemString returns a borrowed reference, DO NOT decrement
-        if (!pClassInstance) {
+        if (!this->pClassInstance) {
             EnergyPlus::ShowSevereError("Something went awry calling class constructor for class \"" + className + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
@@ -615,7 +615,7 @@ namespace PluginManagement {
 
         // now grab the function pointer to the main call function
         std::string const mainFunctionName = "main";
-        this->pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
+        this->pPluginMainFunction = PyObject_GetAttrString(this->pClassInstance, mainFunctionName.c_str());
         if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
             EnergyPlus::ShowSevereError("Could not find or call function \"" + mainFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
             if (PyErr_Occurred()) {
@@ -628,7 +628,7 @@ namespace PluginManagement {
 
         // and grab the initialize function pointer
         std::string const initFunctionName = "initialize";
-        this->pPluginInitFunction = PyObject_GetAttrString(pClassInstance, initFunctionName.c_str());
+        this->pPluginInitFunction = PyObject_GetAttrString(this->pClassInstance, initFunctionName.c_str());
         if (!this->pPluginInitFunction || !PyCallable_Check(this->pPluginInitFunction)) {
             EnergyPlus::ShowSevereError("Could not find or call function \"" + initFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
             if (PyErr_Occurred()) {
@@ -643,6 +643,13 @@ namespace PluginManagement {
         this->stringIdentifier = moduleName + "." + className;
         this->emsAlias = emsName;
         this->runDuringWarmup = runPluginDuringWarmup;
+    }
+
+    PluginInstance::~PluginInstance() {
+        // clean up things that we needed to hold onto previously
+        Py_DECREF(this->pClassInstance);
+        Py_DECREF(this->pPluginInitFunction);
+        Py_DECREF(this->pPluginMainFunction);
     }
 
     void PluginInstance::run()

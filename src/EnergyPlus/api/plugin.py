@@ -54,3 +54,21 @@ class EnergyPlusPlugin(object):
         raise NotImplementedError(
             "Encountered EnergyPlusPlugin::main base function -- override this in your plugin class"
         )
+
+    # \key BeginNewEnvironment
+    # \key AfterNewEnvironmentWarmUpIsComplete
+    # \key BeginZoneTimestepBeforeInitHeatBalance
+    # \key BeginZoneTimestepAfterInitHeatBalance
+    # \key BeginTimestepBeforePredictor
+    # \key AfterPredictorBeforeHVACManagers
+    # \key AfterPredictorAfterHVACManagers
+    # \key InsideHVACSystemIterationLoop
+    # \key EndOfZoneTimestepBeforeZoneReporting
+    # \key EndOfZoneTimestepAfterZoneReporting
+    # \key EndOfSystemTimestepBeforeHVACReporting
+    # \key EndOfSystemTimestepAfterHVACReporting
+    # \key EndOfZoneSizing
+    # \key EndOfSystemSizing
+    # \key AfterComponentInputReadIn
+    # \key UserDefinedComponentModel
+    # \key UnitarySystemSizing
