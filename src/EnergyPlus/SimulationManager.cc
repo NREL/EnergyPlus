@@ -409,7 +409,7 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
-            UpdateMeterReporting();
+            //UpdateMeterReporting();//moved the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
@@ -438,6 +438,7 @@ namespace SimulationManager {
             }
 
             CreateEnergyReportStructure();
+            UpdateMeterReporting(); //moved the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
 
