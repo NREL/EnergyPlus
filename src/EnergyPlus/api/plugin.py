@@ -68,8 +68,9 @@ class EnergyPlusPlugin(object):
         """
         common = EnergyPlusPlugin.__dict__.keys() & self.__class__.__dict__.keys()
         diff = [m for m in common if EnergyPlusPlugin.__dict__[m] != self.__class__.__dict__[m]]
-        if '__init__' in diff:
-            diff.remove('__init__')
+        for known_skip in ['__init__', '__doc__', '__module__']:
+            if known_skip in diff:
+                diff.remove(known_skip)
         return diff
 
     # \key BeginNewEnvironment

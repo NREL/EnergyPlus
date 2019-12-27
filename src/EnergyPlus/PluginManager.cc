@@ -652,8 +652,12 @@ namespace PluginManagement {
             int numVals = PyList_Size(pFunctionResponse);
             for (int itemNum = 0; itemNum < numVals; itemNum++) {
                 PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
-                std::string overriddenFunctionName = PyBytes_AsString(item);
+                if (PyUnicode_Check(item)) {
+                    std::string functionName = PyUnicode_AsUTF8(item);
+                    int j = 1;
+                }
                 int i = 1;
+                // PyList_GetItem returns a borrowed reference, do not decrement
             }
             // PyList_Size returns a borrowed reference, do not decrement
         } else {
