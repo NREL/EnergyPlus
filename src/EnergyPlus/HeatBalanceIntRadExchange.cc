@@ -390,34 +390,42 @@ namespace HeatBalanceIntRadExchange {
 
             // These are the money loops
             size_type lSR(0u);
-            for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
-                int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
-                int const ConstrNumRec = Surface(RecSurfNum).Construction;
-                auto const &rec_construct(Construct(ConstrNumRec));
-                auto &rec_surface_window(SurfaceWindow(RecSurfNum));
-                auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
-
-                // Calculate net long-wave radiation for opaque surfaces and incident
-                // long-wave radiation for windows.
-                if (CarrollMethod) {
+            if (CarrollMethod) {
+                for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
+                    int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
+                    int const ConstrNumRec = Surface(RecSurfNum).Construction;
+                    auto const& rec_construct(Construct(ConstrNumRec));
+                    auto& netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
                     if (rec_construct.TypeIsWindow) {
-                        Real64 CarrollMRTInKTo4thWin = CarrollMRTInKTo4th;  // arbitrary value, IR will be zero
+                        auto& rec_surface_window(SurfaceWindow(RecSurfNum));
+                        Real64 CarrollMRTInKTo4thWin = CarrollMRTInKTo4th; // arbitrary value, IR will be zero
                         Real64 CarrollMRTNumeratorWin(0.0);
                         Real64 CarrollMRTDenominatorWin(0.0);
                         for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
                             if (SendZoneSurfNum != RecZoneSurfNum) {
-                                CarrollMRTNumeratorWin += SurfaceTempRad[SendZoneSurfNum]*zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
-                                CarrollMRTDenominatorWin += zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
+                                CarrollMRTNumeratorWin +=
+                                    SurfaceTempRad[SendZoneSurfNum] * zone_info.Fp[SendZoneSurfNum] * zone_info.Area[SendZoneSurfNum];
+                                CarrollMRTDenominatorWin += zone_info.Fp[SendZoneSurfNum] * zone_info.Area[SendZoneSurfNum];
                             }
                         }
                         if (CarrollMRTDenominatorWin > 0.0) {
-                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin/CarrollMRTDenominatorWin + KelvinConv);
+                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + KelvinConv);
                         }
                         rec_surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
                     }
                     netLWRadToRecSurf += zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - SurfaceTempInKto4th[RecZoneSurfNum]);
-                } else {
-                    if (rec_construct.TypeIsWindow) {          // Window
+                }
+            } else {
+                for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
+                    int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
+                    int const ConstrNumRec = Surface(RecSurfNum).Construction;
+                    auto const &rec_construct(Construct(ConstrNumRec));
+                    auto &netLWRadToRecSurf(NetLWRadToSurf(RecSurfNum));
+
+                    // Calculate net long-wave radiation for opaque surfaces and incident
+                    // long-wave radiation for windows.
+                    if (rec_construct.TypeIsWindow) {      // Window
+                        auto& rec_surface_window(SurfaceWindow(RecSurfNum));
                         Real64 scriptF_acc(0.0);           // Local accumulator
                         Real64 netLWRadToRecSurf_cor(0.0); // Correction
                         Real64 IRfromParentZone_acc(0.0);  // Local accumulator
