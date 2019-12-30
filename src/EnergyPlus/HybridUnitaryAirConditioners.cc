@@ -299,11 +299,6 @@ namespace HybridUnitaryAirConditioners {
                                                                          "InitZoneHybridUnitaryAirConditioners");
 
 
-//        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Temp;
-//        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).HumRat;
-//        ZoneHybridUnitaryAirConditioner(UnitNum).ZoneEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Enthalpy;
-//        ZoneHybridUnitaryAirConditioner(UnitNum).ZonePressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum).Press;
-
         // Set default outlet state to inlet states, just to be safe
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;   // Supply Air Node
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
