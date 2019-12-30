@@ -92,8 +92,8 @@ namespace UserDefinedComponents {
         // Members
         int ErlInitProgramMngr;      // points to an EMS:ProgramManager to run for setup and sizing
         int ErlSimProgramMngr;       // points to an EMS:ProgramManager to run only when this connection is called
-        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
-        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
         int LoopNum;                 // plant loop connection index
         int LoopSideNum;             // plant loop side connection index
         int BranchNum;               // plant loop branch connection index
@@ -120,7 +120,7 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         PlantConnectionStruct()
-            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0), OutletNodeNum(0),
+            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0), OutletNodeNum(0),
               FlowPriority(LoopFlowStatus_Unknown), HowLoadServed(HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0),
               MassFlowRateRequest(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0),
               MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
@@ -196,7 +196,7 @@ namespace UserDefinedComponents {
         // Members
         std::string Name;                    // user identifier
         int ErlSimProgramMngr;               // EMS:ProgramManager to always run when this model is called
-        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int simPluginLocation;               // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         int NumPlantConnections;             // count of how many plant loop connections there are
         Array1D<PlantConnectionStruct> Loop; // collect data for each plant loop connection
         AirConnectionStruct Air;
@@ -204,7 +204,7 @@ namespace UserDefinedComponents {
         ZoneInternalGainsStruct Zone;
 
         // Default Constructor
-        UserPlantComponentStruct() : ErlSimProgramMngr(0), NumPlantConnections(0)
+        UserPlantComponentStruct() : ErlSimProgramMngr(0), simPluginLocation(-1), NumPlantConnections(0)
         {
         }
     };
@@ -215,8 +215,8 @@ namespace UserDefinedComponents {
         std::string Name;       // user identifier
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
-        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         int NumAirConnections;  // count of how many air connectiosn there are
         bool PlantIsConnected;
         Array1D<AirConnectionStruct> Air;
@@ -225,7 +225,7 @@ namespace UserDefinedComponents {
         ZoneInternalGainsStruct Zone;
 
         // Default Constructor
-        UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumAirConnections(0), PlantIsConnected(false)
+        UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumAirConnections(0), PlantIsConnected(false)
         {
         }
     };
@@ -236,8 +236,8 @@ namespace UserDefinedComponents {
         std::string Name;       // user identifier
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
-        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct ZoneAir;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
@@ -251,7 +251,7 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         UserZoneHVACForcedAirComponentStruct()
-            : ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0),
+            : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0),
               RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0)
         {
         }
@@ -265,8 +265,8 @@ namespace UserDefinedComponents {
         int ADUNum;             // index of corresponding air distribution unit
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
-        std::pair<int, int> initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        std::pair<int, int> simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct AirLoop;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
@@ -280,7 +280,7 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         UserAirTerminalComponentStruct()
-            : ActualCtrlZoneNum(0), ADUNum(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0),
+            : ActualCtrlZoneNum(0), ADUNum(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0),
               RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0)
         {
         }

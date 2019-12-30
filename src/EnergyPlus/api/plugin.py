@@ -73,20 +73,53 @@ class EnergyPlusPlugin(object):
                 diff.remove(known_skip)
         return diff
 
-    # \key BeginNewEnvironment
-    # \key AfterNewEnvironmentWarmUpIsComplete
-    # \key BeginZoneTimestepBeforeInitHeatBalance
-    # \key BeginZoneTimestepAfterInitHeatBalance
-    # \key BeginTimestepBeforePredictor
-    # \key AfterPredictorBeforeHVACManagers
-    # \key AfterPredictorAfterHVACManagers
-    # \key InsideHVACSystemIterationLoop
-    # \key EndOfZoneTimestepBeforeZoneReporting
-    # \key EndOfZoneTimestepAfterZoneReporting
-    # \key EndOfSystemTimestepBeforeHVACReporting
-    # \key EndOfSystemTimestepAfterHVACReporting
-    # \key EndOfZoneSizing
-    # \key EndOfSystemSizing
-    # \key AfterComponentInputReadIn
-    # \key UserDefinedComponentModel
-    # \key UnitarySystemSizing
+    def on_begin_new_environment(self):
+        pass
+
+    def on_after_new_environment_warmup_is_complete(self):
+        pass
+
+    def on_begin_zone_timestep_before_init_heat_balance(self):
+        pass
+
+    def on_begin_zone_timestep_after_init_heat_balance(self):
+        pass
+
+    def on_begin_timestep_before_predictor(self):
+        pass
+
+    def on_after_predictor_before_hvac_managers(self):
+        pass
+
+    def on_after_predictor_after_hvac_managers(self):
+        pass
+
+    def on_inside_hvac_system_iteration_loop(self):
+        pass
+
+    def on_end_of_zone_timestep_before_zone_reporting(self):
+        pass
+
+    def on_end_of_zone_timestep_after_zone_reporting(self):
+        pass
+
+    def on_end_of_system_timestep_before_hvac_reporting(self):
+        pass
+
+    def on_end_of_system_timestep_after_hvac_reporting(self):
+        pass
+
+    def on_end_of_zone_sizing(self):
+        pass
+
+    def on_end_of_system_sizing(self):
+        pass
+
+    def on_end_of_component_input_read_in(self):
+        pass
+
+    def on_user_defined_component_model(self):
+        pass
+
+    def on_unitary_system_sizing(self):
+        pass

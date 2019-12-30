@@ -72,7 +72,7 @@ namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
     std::map<int, std::vector<void (*)()>> callbacks;
-    std::map<int, std::vector<PluginInstance>> plugins;
+    std::vector<PluginInstance> plugins;
 
     void registerNewCallback(int iCalledFrom, void (*f)())
     {
@@ -85,16 +85,8 @@ namespace PluginManagement {
         for (auto const &cb : callbacks[iCalledFrom]) {
             cb();
         }
-        for (auto &plugin : plugins[iCalledFrom]) {
-            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
-        }
-    }
-
-    void PluginManager::initAllRegisteredPlugins() {
-        for (auto &pair : plugins) {
-            for (auto &plugin: pair.second) {
-                plugin.init();
-            }
+        for (auto &plugin : plugins) {
+            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run(iCalledFrom);
         }
     }
 
@@ -458,10 +450,7 @@ namespace PluginManagement {
                 if (sWarmup == "YES") {
                     warmup = true;
                 }
-                int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
-                //auto thisInstance = PluginInstance(fileName, className, thisObjectName, warmup);
-                //plugins[iCalledFrom].push_back(thisInstance);
-                plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
+                plugins.emplace_back(fileName, className, thisObjectName, warmup);
             }
         }
 
@@ -554,7 +543,6 @@ namespace PluginManagement {
             EnergyPlus::ShowFatalError("Python import error causes program termination");
         }
         PyObject *pModuleDict = PyModule_GetDict(pModule);
-        Py_DECREF(pModule); // PyImport_Import returns a new reference, decrement it
         if (!pModuleDict) {
             EnergyPlus::ShowSevereError("Failed to read module dictionary from module \"" + moduleName + "\"");
             if (PyErr_Occurred()) {
@@ -613,19 +601,6 @@ namespace PluginManagement {
         // so I don't intend on decrementing it, at least not until the manager destructor
         // In any case, it will be an **extremely** tiny memory use if we hold onto it a bit too long
 
-        // now grab the function pointer to the main call function
-        std::string const mainFunctionName = "main";
-        this->pPluginMainFunction = PyObject_GetAttrString(this->pClassInstance, mainFunctionName.c_str());
-        if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
-            EnergyPlus::ShowSevereError("Could not find or call function \"" + mainFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("Make sure the plugin class overrides the main() function, and does not require arguments.");
-            }
-            EnergyPlus::ShowFatalError("Python main() function error causes program termination");
-        }
-
         // check which methods are overridden in the derived class
         std::string const detectOverriddenFunctionName = "_detect_overridden";
         PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
@@ -639,6 +614,7 @@ namespace PluginManagement {
             EnergyPlus::ShowFatalError("Python _detect_overridden() function error causes program termination");
         }
         PyObject *pFunctionResponse = PyObject_CallFunction(detectFunction, nullptr);
+        Py_DECREF(detectFunction);  // PyObject_GetAttrString returns a new reference, decrement it
         if (!pFunctionResponse) {
             EnergyPlus::ShowSevereError("Call to _detect_overridden() on " + this->stringIdentifier + " failed!");
             if (PyErr_Occurred()) {
@@ -650,13 +626,68 @@ namespace PluginManagement {
         }
         if (PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
             int numVals = PyList_Size(pFunctionResponse);
+            // at this point we know which base class methods are being overridden by the derived class
+            // we can loop over them and based on the name check the appropriate flag and assign the function pointer
             for (int itemNum = 0; itemNum < numVals; itemNum++) {
                 PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
-                if (PyUnicode_Check(item)) {
+                if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
                     std::string functionName = PyUnicode_AsUTF8(item);
-                    int j = 1;
+                    if (functionName == this->sHookBeginNewEnvironment) {
+                        this->bHasBeginNewEnvironment = true;
+                        this->fHookBeginNewEnvironment = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
+                        this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
+                        this->fHookAfterNewEnvironmentWarmUpIsComplete = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookBeginZoneTimestepBeforeInitHeatBalance) {
+                        this->bHasBeginZoneTimestepBeforeInitHeatBalance = true;
+                        this->fHookBeginZoneTimestepBeforeInitHeatBalance = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookBeginZoneTimestepAfterInitHeatBalance) {
+                        this->bHasBeginZoneTimestepAfterInitHeatBalance = true;
+                        this->fHookBeginZoneTimestepAfterInitHeatBalance = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookBeginTimestepBeforePredictor) {
+                        this->bHasBeginTimestepBeforePredictor = true;
+                        this->fHookBeginTimestepBeforePredictor = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookAfterPredictorBeforeHVACManagers) {
+                        this->bHasAfterPredictorBeforeHVACManagers = true;
+                        this->fHookAfterPredictorBeforeHVACManagers = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookAfterPredictorAfterHVACManagers) {
+                        this->bHasAfterPredictorAfterHVACManagers = true;
+                        this->fHookAfterPredictorAfterHVACManagers = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookInsideHVACSystemIterationLoop) {
+                        this->bHasInsideHVACSystemIterationLoop = true;
+                        this->fHookInsideHVACSystemIterationLoop = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfZoneTimestepBeforeZoneReporting) {
+                        this->bHasEndOfZoneTimestepBeforeZoneReporting = true;
+                        this->fHookEndOfZoneTimestepBeforeZoneReporting = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfZoneTimestepAfterZoneReporting) {
+                        this->bHasEndOfZoneTimestepAfterZoneReporting = true;
+                        this->fHookEndOfZoneTimestepAfterZoneReporting = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfSystemTimestepBeforeHVACReporting) {
+                        this->bHasEndOfSystemTimestepBeforeHVACReporting = true;
+                        this->fHookEndOfSystemTimestepBeforeHVACReporting = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfSystemTimestepAfterHVACReporting) {
+                        this->bHasEndOfSystemTimestepAfterHVACReporting = true;
+                        this->fHookEndOfSystemTimestepAfterHVACReporting = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfZoneSizing) {
+                        this->bHasEndOfZoneSizing = true;
+                        this->fHookEndOfZoneSizing = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookEndOfSystemSizing) {
+                        this->bHasEndOfSystemSizing = true;
+                        this->fHookEndOfSystemSizing = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookAfterComponentInputReadIn) {
+                        this->bHasAfterComponentInputReadIn = true;
+                        this->fHookAfterComponentInputReadIn = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookUserDefinedComponentModel) {
+                        this->bHasUserDefinedComponentModel = true;
+                        this->fHookUserDefinedComponentModel = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else if (functionName == this->sHookUnitarySystemSizing) {
+                        this->bHasUnitarySystemSizing = true;
+                        this->fHookUnitarySystemSizing = PyObject_GetAttrString(this->pClassInstance, functionName.c_str());
+                    } else {
+                        // the Python _detect_function worker is supposed to ignore any other functions so they don't show up at this point
+                        // I don't think it's appropriate to warn here, so just ignore and move on
+                    }
                 }
-                int i = 1;
                 // PyList_GetItem returns a borrowed reference, do not decrement
             }
             // PyList_Size returns a borrowed reference, do not decrement
@@ -665,18 +696,8 @@ namespace PluginManagement {
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
 
-        // and grab the initialize function pointer
-        std::string const initFunctionName = "initialize";
-        this->pPluginInitFunction = PyObject_GetAttrString(this->pClassInstance, initFunctionName.c_str());
-        if (!this->pPluginInitFunction || !PyCallable_Check(this->pPluginInitFunction)) {
-            EnergyPlus::ShowSevereError("Could not find or call function \"" + initFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("The base class defines an empty initialize() function, so this should not occur.  Make sure the class inherits the EnergyPlusPlugin base class.");
-            }
-            EnergyPlus::ShowFatalError("Python initialize() function error causes program termination");
-        }
+        // I don't want to decrement the module itself too soon in case that would wipe out the class on it
+        Py_DECREF(pModule); // PyImport_Import returns a new reference, decrement it
 
         // update the rest of the plugin call instance and store it
         this->stringIdentifier = moduleName + "." + className;
@@ -686,15 +707,140 @@ namespace PluginManagement {
 
     PluginInstance::~PluginInstance() {
         // clean up things that we needed to hold onto previously
+        if (this->bHasBeginNewEnvironment) {
+            Py_DECREF(this->fHookBeginNewEnvironment);
+        }
+        if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
+            Py_DECREF(this->fHookAfterNewEnvironmentWarmUpIsComplete);
+        }
+        if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
+            Py_DECREF(this->fHookBeginZoneTimestepBeforeInitHeatBalance);
+        }
+        if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
+            Py_DECREF(this->fHookBeginZoneTimestepAfterInitHeatBalance);
+        }
+        if (this->bHasBeginTimestepBeforePredictor) {
+            Py_DECREF(this->fHookBeginTimestepBeforePredictor);
+        }
+        if (this->bHasAfterPredictorBeforeHVACManagers) {
+            Py_DECREF(this->fHookAfterPredictorBeforeHVACManagers);
+        }
+        if (this->bHasAfterPredictorAfterHVACManagers) {
+            Py_DECREF(this->fHookAfterPredictorAfterHVACManagers);
+        }
+        if (this->bHasInsideHVACSystemIterationLoop) {
+            Py_DECREF(this->fHookInsideHVACSystemIterationLoop);
+        }
+        if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
+            Py_DECREF(this->fHookEndOfZoneTimestepBeforeZoneReporting);
+        }
+        if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
+            Py_DECREF(this->fHookEndOfZoneTimestepAfterZoneReporting);
+        }
+        if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
+            Py_DECREF(this->fHookEndOfSystemTimestepBeforeHVACReporting);
+        }
+        if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
+            Py_DECREF(this->fHookEndOfSystemTimestepAfterHVACReporting);
+        }
+        if (this->bHasEndOfZoneSizing) {
+            Py_DECREF(this->fHookEndOfZoneSizing);
+        }
+        if (this->bHasEndOfSystemSizing) {
+            Py_DECREF(this->fHookEndOfSystemSizing);
+        }
+        if (this->bHasAfterComponentInputReadIn) {
+            Py_DECREF(this->fHookAfterComponentInputReadIn);
+        }
+        if (this->bHasUserDefinedComponentModel) {
+            Py_DECREF(this->fHookUserDefinedComponentModel);
+        }
+        if (this->bHasUnitarySystemSizing) {
+            Py_DECREF(this->fHookUnitarySystemSizing);
+        }
         Py_DECREF(this->pClassInstance);
-        Py_DECREF(this->pPluginInitFunction);
-        Py_DECREF(this->pPluginMainFunction);
     }
 
-    void PluginInstance::run()
+    void PluginInstance::run(int iCalledFrom)
     {
+        PyObject *functionToCall = nullptr;
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+            if (this->bHasBeginNewEnvironment) {
+                functionToCall = this->fHookBeginNewEnvironment;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
+            if (this->bHasEndOfZoneSizing) {
+                functionToCall = this->fHookEndOfZoneSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromSystemSizing) {
+            if (this->bHasEndOfSystemSizing) {
+                functionToCall = this->fHookEndOfSystemSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
+            if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
+                functionToCall = this->fHookAfterNewEnvironmentWarmUpIsComplete;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
+            if (this->bHasBeginTimestepBeforePredictor) {
+                functionToCall = this->fHookBeginTimestepBeforePredictor;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeforeHVACManagers) {
+            if (this->bHasAfterPredictorBeforeHVACManagers) {
+                functionToCall = this->fHookAfterPredictorBeforeHVACManagers;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromAfterHVACManagers) {
+            if (this->bHasAfterPredictorAfterHVACManagers) {
+                functionToCall = this->fHookAfterPredictorAfterHVACManagers;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromHVACIterationLoop) {
+            if (this->bHasInsideHVACSystemIterationLoop) {
+                functionToCall = this->fHookInsideHVACSystemIterationLoop;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
+            if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
+                functionToCall = this->fHookEndOfSystemTimestepBeforeHVACReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
+            if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
+                functionToCall = this->fHookEndOfSystemTimestepAfterHVACReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
+            if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
+                functionToCall = this->fHookEndOfZoneTimestepBeforeZoneReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
+            if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
+                functionToCall = this->fHookEndOfZoneTimestepAfterZoneReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromComponentGetInput) {
+            if (this->bHasAfterComponentInputReadIn) {
+                functionToCall = this->fHookAfterComponentInputReadIn;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromUserDefinedComponentModel) {
+            if (this->bHasUserDefinedComponentModel) {
+                functionToCall = this->fHookUserDefinedComponentModel;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromUnitarySystemSizing) {
+            if (this->bHasUnitarySystemSizing) {
+                functionToCall = this->fHookUnitarySystemSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
+            if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
+                functionToCall = this->fHookBeginZoneTimestepBeforeInitHeatBalance;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
+            if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
+                functionToCall = this->fHookBeginZoneTimestepAfterInitHeatBalance;
+            }
+        }
+
+        // leave if we didn't find a match
+        if (!functionToCall) {
+            return;
+        }
+
         // then call the main function
-        PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginMainFunction, nullptr);
+        PyObject *pFunctionResponse = PyObject_CallFunction(functionToCall, nullptr);
         if (!pFunctionResponse) {
             EnergyPlus::ShowSevereError("Call to main() on " + this->stringIdentifier + " failed!");
             if (PyErr_Occurred()) {
@@ -713,22 +859,7 @@ namespace PluginManagement {
             }
         } else {
             EnergyPlus::ShowFatalError("Invalid return from main() on class \"" + this->stringIdentifier +
-                                       ", make sure it returns an integer exit code");
-        }
-        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-    }
-
-    void PluginInstance::init() {
-        // then call the init function
-        PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginInitFunction, nullptr);
-        if (!pFunctionResponse) {
-            EnergyPlus::ShowSevereError("Call to initialize() on " + this->stringIdentifier + " failed!");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
-            }
-            EnergyPlus::ShowFatalError("Program terminates after call to initialize() on " + this->stringIdentifier + " failed!");
+                                       ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
     }
@@ -799,60 +930,18 @@ namespace PluginManagement {
         }
     }
 
-    int PluginManager::calledFromFromString(std::string const &calledFrom) {
-        if (calledFrom == "BEGINNEWENVIRONMENT") {
-            return DataGlobals::emsCallFromBeginNewEvironment;
-        } else if (calledFrom == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
-            return DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
-        } else if (calledFrom == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
-            return DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
-        } else if (calledFrom == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
-            return DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
-        } else if (calledFrom == "BEGINTIMESTEPBEFOREPREDICTOR") {
-            return DataGlobals::emsCallFromBeginTimestepBeforePredictor;
-        } else if (calledFrom == "AFTERPREDICTORBEFOREHVACMANAGERS") {
-            return DataGlobals::emsCallFromBeforeHVACManagers;
-        } else if (calledFrom == "AFTERPREDICTORAFTERHVACMANAGERS") {
-            return DataGlobals::emsCallFromAfterHVACManagers;
-        } else if (calledFrom == "INSIDEHVACSYSTEMITERATIONLOOP") {
-            return DataGlobals::emsCallFromHVACIterationLoop;
-        } else if (calledFrom == "ENDOFZONETIMESTEPBEFOREZONEREPORTING") {
-            return DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
-        } else if (calledFrom == "ENDOFZONETIMESTEPAFTERZONEREPORTING") {
-            return DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
-        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING") {
-            return DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
-        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING") {
-            return DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
-        } else if (calledFrom == "ENDOFZONESIZING") {
-            return DataGlobals::emsCallFromZoneSizing;
-        } else if (calledFrom == "ENDOFSYSTEMSIZING") {
-            return DataGlobals::emsCallFromSystemSizing;
-        } else if (calledFrom == "AFTERCOMPONENTINPUTREADIN") {
-            return DataGlobals::emsCallFromComponentGetInput;
-        } else if (calledFrom == "USERDEFINEDCOMPONENTMODEL") {
-            return DataGlobals::emsCallFromUserDefinedComponentModel;
-        } else if (calledFrom == "UNITARYSYSTEMSIZING") {
-            return DataGlobals::emsCallFromUnitarySystemSizing;
-        } else {
-            EnergyPlus::ShowFatalError("Invalid calledFrom string passed to calledFromFromString");
-            return -1;
-        }
-    }
-
-    std::pair<int, int> PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
-        for (auto &pair : plugins) {
-            for (size_t handle = 0; handle < pair.second.size(); handle++) {
-                auto const thisPlugin = pair.second[handle];
-                if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
-                    return {pair.first, handle};
-                }
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
+        for (size_t handle = 0; handle < plugins.size(); handle++) {
+            auto const thisPlugin = plugins[handle];
+            if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
+                return handle;
             }
         }
-        return {-1, -1};
+        return -1;
     }
+
     void PluginManager::runSingleUserDefinedPlugin(int callingPoint, int index) {
-        plugins[callingPoint][index].run();
+        plugins[index].run(callingPoint);
     }
 
 } // namespace PluginManagement

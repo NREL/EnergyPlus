@@ -82,11 +82,60 @@ namespace PluginManagement {
         std::string stringIdentifier; // for diagnostic reporting
         bool runDuringWarmup;
         std::string emsAlias;
-        PyObject *pClassInstance = nullptr;  // pointer to the instantiated class instance
-        PyObject *pPluginMainFunction = nullptr;  // pointer to the main plugin function
-        PyObject *pPluginInitFunction = nullptr;  // pointer to the init plugin function
-        void run(); // calls main() on this plugin instance
-        void init(); // calls initialize() on this plugin instance
+        PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        void run(int iCallingPoint); // calls main() on this plugin instance
+        // plugin calling point hooks
+        std::string sHookBeginNewEnvironment = "on_begin_new_environment";
+        bool bHasBeginNewEnvironment = false;
+        PyObject *fHookBeginNewEnvironment = nullptr;
+        std::string sHookAfterNewEnvironmentWarmUpIsComplete = "on_after_new_environment_warmup_is_complete";
+        bool bHasAfterNewEnvironmentWarmUpIsComplete = false;
+        PyObject *fHookAfterNewEnvironmentWarmUpIsComplete = nullptr;
+        std::string sHookBeginZoneTimestepBeforeInitHeatBalance = "on_begin_zone_timestep_before_init_heat_balance";
+        bool bHasBeginZoneTimestepBeforeInitHeatBalance = false;
+        PyObject *fHookBeginZoneTimestepBeforeInitHeatBalance = nullptr;
+        std::string sHookBeginZoneTimestepAfterInitHeatBalance = "on_begin_zone_timestep_after_init_heat_balance";
+        bool bHasBeginZoneTimestepAfterInitHeatBalance = false;
+        PyObject *fHookBeginZoneTimestepAfterInitHeatBalance = nullptr;
+        std::string sHookBeginTimestepBeforePredictor = "on_begin_timestep_before_predictor";
+        bool bHasBeginTimestepBeforePredictor = false;
+        PyObject *fHookBeginTimestepBeforePredictor = nullptr;
+        std::string sHookAfterPredictorBeforeHVACManagers = "on_after_predictor_before_hvac_managers";
+        bool bHasAfterPredictorBeforeHVACManagers = false;
+        PyObject *fHookAfterPredictorBeforeHVACManagers = nullptr;
+        std::string sHookAfterPredictorAfterHVACManagers = "on_after_predictor_after_hvac_managers";
+        bool bHasAfterPredictorAfterHVACManagers = false;
+        PyObject *fHookAfterPredictorAfterHVACManagers = nullptr;
+        std::string sHookInsideHVACSystemIterationLoop = "on_inside_hvac_system_iteration_loop";
+        bool bHasInsideHVACSystemIterationLoop = false;
+        PyObject *fHookInsideHVACSystemIterationLoop = nullptr;
+        std::string sHookEndOfZoneTimestepBeforeZoneReporting = "on_end_of_zone_timestep_before_zone_reporting";
+        bool bHasEndOfZoneTimestepBeforeZoneReporting = false;
+        PyObject *fHookEndOfZoneTimestepBeforeZoneReporting = nullptr;
+        std::string sHookEndOfZoneTimestepAfterZoneReporting = "on_end_of_zone_timestep_after_zone_reporting";
+        bool bHasEndOfZoneTimestepAfterZoneReporting = false;
+        PyObject *fHookEndOfZoneTimestepAfterZoneReporting = nullptr;
+        std::string sHookEndOfSystemTimestepBeforeHVACReporting = "on_end_of_system_timestep_before_hvac_reporting";
+        bool bHasEndOfSystemTimestepBeforeHVACReporting = false;
+        PyObject *fHookEndOfSystemTimestepBeforeHVACReporting = nullptr;
+        std::string sHookEndOfSystemTimestepAfterHVACReporting = "on_end_of_system_timestep_after_hvac_reporting";
+        bool bHasEndOfSystemTimestepAfterHVACReporting = false;
+        PyObject *fHookEndOfSystemTimestepAfterHVACReporting = nullptr;
+        std::string sHookEndOfZoneSizing = "on_end_of_zone_sizing";
+        bool bHasEndOfZoneSizing = false;
+        PyObject *fHookEndOfZoneSizing = nullptr;
+        std::string sHookEndOfSystemSizing = "on_end_of_system_sizing";
+        bool bHasEndOfSystemSizing = false;
+        PyObject *fHookEndOfSystemSizing = nullptr;
+        std::string sHookAfterComponentInputReadIn = "on_end_of_component_input_read_in";
+        bool bHasAfterComponentInputReadIn = false;
+        PyObject *fHookAfterComponentInputReadIn = nullptr;
+        std::string sHookUserDefinedComponentModel = "on_user_defined_component_model";
+        bool bHasUserDefinedComponentModel = false;
+        PyObject *fHookUserDefinedComponentModel = nullptr;
+        std::string sHookUnitarySystemSizing = "on_unitary_system_sizing";
+        bool bHasUnitarySystemSizing = false;
+        PyObject *fHookUnitarySystemSizing = nullptr;
     };
 
     class PluginManager {
@@ -97,14 +146,12 @@ namespace PluginManagement {
         }
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static int calledFromFromString(std::string const &calledFrom);
-        static void initAllRegisteredPlugins();
         void setupOutputVariables();
         void addGlobalVariable(const std::string& name);
         int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         Real64 getGlobalVariableValue(int handle);
         void setGlobalVariableValue(int handle, Real64 value);
-        static std::pair<int, int> getLocationOfUserDefinedPlugin(std::string const &programName);
+        static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(int callingPoint, int index);
         std::vector<std::string> globalVariableNames;
         std::vector<Real64> globalVariableValues;
