@@ -73,6 +73,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -514,9 +515,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput();  // read schedules
 
-    auto *ostream = ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits);
-    assert(ostream);
-    GetZoneAirSetPoints(*ostream);
+    GetZoneAirSetPoints(OutputFiles::getSingleton());
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);

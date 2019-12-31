@@ -70,6 +70,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -1273,9 +1274,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimAirServingZones::GetAirPathData();
     SimAirServingZones::InitAirLoops(FirstHVACIteration);
 
-    auto *ostream = ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits);
-    assert(ostream);
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*ostream);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
 
     CurDeadBandOrSetback.allocate(2);
     CurDeadBandOrSetback(1) = false;

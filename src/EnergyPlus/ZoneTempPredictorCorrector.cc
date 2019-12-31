@@ -97,6 +97,7 @@
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -356,9 +357,7 @@ namespace ZoneTempPredictorCorrector {
         // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
-            auto *ostream = ObjexxFCL::gio::out_stream(OutputFileInits);
-            assert(ostream);
-            GetZoneAirSetPoints(*ostream);
+            GetZoneAirSetPoints(OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -388,7 +387,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints(std::ostream &OutputFile)
+    void GetZoneAirSetPoints(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1890,8 +1889,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        OutputFile << Header;
-        fmt::print(OutputFile, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
+        outputFiles.eio << Header;
+        fmt::print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -6868,9 +6867,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            auto *ostream = ObjexxFCL::gio::out_stream(OutputFileInits);
-            assert(ostream);
-            GetZoneAirSetPoints(*ostream);
+            GetZoneAirSetPoints(OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {

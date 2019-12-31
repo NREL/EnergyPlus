@@ -96,6 +96,7 @@
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -6507,8 +6508,7 @@ namespace DXCoils {
 
                 // call for standard ratings for two-speeed DX coil
                 if (DXCoil(DXCoilNum).CondenserType(1) == AirCooled) {
-                    assert(ObjexxFCL::gio::out_stream(OutputFileInits));
-                    CalcTwoSpeedDXCoilStandardRating(DXCoilNum, *ObjexxFCL::gio::out_stream(OutputFileInits));
+                    CalcTwoSpeedDXCoilStandardRating(OutputFiles::getSingleton(), DXCoilNum);
                 }
             }
 
@@ -13429,7 +13429,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum, std::ostream &OutputFile)
+    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
@@ -13814,8 +13814,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            OutputFile << Header;
-            ObjexxFCL::gio::write(OutputFileInits, Header);
+            outputFiles.eio << Header;
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -13865,7 +13864,7 @@ namespace DXCoils {
           }
         }();
 
-        fmt::print(OutputFile, Format_891
+        fmt::print(outputFiles.eio, Format_891
             , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
             , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP) , IEER
             , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)
