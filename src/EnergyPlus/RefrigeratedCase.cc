@@ -179,7 +179,7 @@ namespace RefrigeratedCase {
     // requirements. The gas cooler fans can be described as single-speed, two-speed, or variable speed. During
     // transcritical operation, the optimal gas cooler pressure, which maximizes the system's COP, is determined as
     // a function of the ambient air temperature. During subcritical operation, the condensing pressure is allowed to
-    // float with ambient temperature in order to acheive maximum performance.
+    // float with ambient temperature in order to achieve maximum performance.
 
     // This module was designed to be accessed once for each time step.  It uses several accumulating variables
     //  to carry unmet loads from one time step to the next (cases/walk-ins and compressors.  Also, it meets
@@ -1369,7 +1369,7 @@ namespace RefrigeratedCase {
 
                 // Set return air node number
                 RefrigCase(CaseNum).ZoneRANode = 0;
-                std::string retNodeName = "";
+                std::string retNodeName;
                 if (!lAlphaBlanks(15)) {
                     retNodeName = Alphas(15);
                 }

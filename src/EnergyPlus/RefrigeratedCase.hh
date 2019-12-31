@@ -60,11 +60,6 @@ namespace EnergyPlus {
 
 namespace RefrigeratedCase {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
     // Anti-sweat heater control type
     extern int const ASNone;
     extern int const ASConstant;
@@ -136,7 +131,6 @@ namespace RefrigeratedCase {
     extern int const DefrostElec;
     extern int const DefrostNone;
     extern int const DefrostOffCycle;
-
     extern int const RatedCapacityTotal;
     extern int const EuropeanSC1Std;
     extern int const EuropeanSC1Nom;
@@ -293,7 +287,6 @@ namespace RefrigeratedCase {
     {
         // Members
         std::string Name; // Name of refrigerated display case
-        // CHARACTER(len=MaxNameLength) :: Schedule=' '               ! Display case availability schedule name
         std::string ZoneName;        // Zone or Location of Display Case
         int NumSysAttach;            // Number of systems attached to case, error if /=1
         int SchedPtr;                // Index to the correct availability schedule
@@ -413,8 +406,6 @@ namespace RefrigeratedCase {
               WarmEnvEnergySaved(0.0), KgFrostSaved(0.0), HotDefrostCondCredit(0.0), DeltaDefrostEnergy(0.0)
         {
         }
-
-        void clear_state();
 
         // Reset Initialization Values to Zeros
         void reset_init()
@@ -546,7 +537,8 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigRackData()
-            : CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(0), CondenserType(0), EvapEffect(0.9), CondenserAirFlowRate(0.0),
+            : CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(0), CondenserType(0), LaggedUsedWaterHeater(0.0),
+              LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0),
               EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0),
               EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0),
               RatedCOP(0.0), COPFTempPtr(0), NumCases(0), NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupplyFromMains),
@@ -1334,7 +1326,6 @@ namespace RefrigeratedCase {
         Array1D_int StockDoorProtectType;  // Index to door protection type
         Array1D_int ZoneNodeNum;           // Index to Zone Node
         Array1D_int ZoneNum;               // Index to Zone
-        Real64 CircFanConsumption;         // Operating energy of  Walk In fan [J]
         Real64 CircFanPower;               // Operating power of  Walk In fan [W]
         Real64 CoilFanPower;               // Operating power of  Walk In evap coil fan [W]
         Real64 IceTemp;                    // Temperature of Ice Mass [C]
@@ -1558,7 +1549,7 @@ namespace RefrigeratedCase {
         WarehouseCoilData()
             : SecStatusFirst(false), SecStatusLast(false), SysStatusFirst(false), SysStatusLast(false), CoilFanSchedPtr(0),
               DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(0), DefrostType(0), FanType(0), HeaterSchedPtr(0), NumSysAttach(0),
-              RatingType(0), SchedPtr(0), SCIndex(0), SecServeID(0), SysServeID(0), VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0),
+              RatingType(0), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0), VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0),
               CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0), DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0),
               DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0), HeaterPower(0.0), HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0),
               KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0), RatedAirVolumeFlow(0.0), RatedCapTotal(0.0), RatedFanPower(0.0), RatedRH(0.0),
@@ -1610,7 +1601,7 @@ namespace RefrigeratedCase {
         std::string ZoneName; // Name of zone where chiller set is located
         Array1D_int CoilNum;  // ID number of Individual Chiller in set
         int ChillerSetID;     // ID number for this set of chillers (all serving one zone,
-        //                       but can be chilled by mult systems)
+        //                       but can be chilled by multi systems)
         int SchedPtr;      // Schedule to take whole set off-line if needed
         int NodeNumInlet;  // Node ID Number of inlet for chiller set as a whole, not identified for specific coils
         int NodeNumOutlet; // Node ID Number of outlet for chiller set as a whole, not identified for specific coils
@@ -1705,70 +1696,70 @@ namespace RefrigeratedCase {
 
     void InitRefrigerationPlantConnections();
 
-    void CalcRackSystem(int const RackNum);
+    void CalcRackSystem(int RackNum);
 
-    void ReportRackSystem(int const RackNum);
+    void ReportRackSystem(int RackNum);
 
-    void CalculateCase(int const CaseID); // Absolute pointer to refrigerated case
+    void CalculateCase(int CaseID); // Absolute pointer to refrigerated case
 
-    void SimRefrigCondenser(int const SysType, std::string const &CompName, int &CompIndex, bool const FirstHVACIteration, bool const InitLoopEquip);
+    void SimRefrigCondenser(int SysType, std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
 
-    void UpdateRefrigCondenser(int const Num, int const SysType);
+    void UpdateRefrigCondenser(int Num, int SysType);
 
     void SimulateDetailedRefrigerationSystems();
 
     void SimulateDetailedTransRefrigSystems();
 
-    void CalcDetailedSystem(int const SysNum);
+    void CalcDetailedSystem(int SysNum);
 
-    void CalcDetailedTransSystem(int const SysNum);
+    void CalcDetailedTransSystem(int SysNum);
 
-    void CalculateCondensers(int const SysNum);
+    void CalculateCondensers(int SysNum);
 
-    void CalcGasCooler(int const SysNum);
+    void CalcGasCooler(int SysNum);
 
-    void CalculateCompressors(int const SysNum);
+    void CalculateCompressors(int SysNum);
 
-    void CalculateTransCompressors(int const SysNum);
+    void CalculateTransCompressors(int SysNum);
 
-    void CalculateSubcoolers(int const SysNum);
+    void CalculateSubcoolers(int SysNum);
 
     void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,
-                                  int const SysType,
+                                  int SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   Optional_bool_const SuppressWarning = _);
 
     void ReportRefrigerationComponents();
 
-    void CalculateWalkIn(int const WalkInID); // Absolute pointer to  Walk In
+    void CalculateWalkIn(int WalkInID); // Absolute pointer to  Walk In
 
-    void CalculateSecondary(int const SecondaryNum);
+    void CalculateSecondary(int SecondaryNum);
 
     void SumZoneImpacts();
 
     void CheckRefrigerationInput();
 
     void SimAirChillerSet(std::string const &AirChillerSetName,
-                          int const ZoneNum,
-                          bool const FirstHVACIteration,
+                          int ZoneNum,
+                          bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
                           Real64 &LatOutputProvided,
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    void CalculateAirChillerSets(int const AirChillerSetID);
+    void CalculateAirChillerSets(int AirChillerSetID);
 
-    void FinalRateCoils(bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
-                        int const SystemSourceType,     // Secondarysystem or DetailedSystem
-                        int const SystemID,             // ID for Secondary loop or detailed system calling for derate
-                        Real64 const InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
-                        Real64 const AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
+    void FinalRateCoils(bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
+                        int SystemSourceType,     // SecondarySystem or DetailedSystem
+                        int SystemID,             // ID for Secondary loop or detailed system calling for derate
+                        Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
+                        Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    void CalculateCoil(int const CoilID,
-                       Real64 const QZnReq // sensible load required
+    void CalculateCoil(int CoilID,
+                       Real64 QZnReq // sensible load required
     );
 
     void FigureRefrigerationZoneGains();
