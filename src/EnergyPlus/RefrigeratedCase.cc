@@ -195,13 +195,6 @@ namespace RefrigeratedCase {
     // REFERENCES:
     // Specific references are provided for the equipment simulation subroutines below.
 
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHeatBalance::HeatReclaimRefrigCondenser;
     using DataHeatBalance::HeatReclaimRefrigeratedRack;
     using DataHeatBalance::NumRefrigChillerSets;
@@ -225,8 +218,6 @@ namespace RefrigeratedCase {
     using namespace DataEnvironment;
     using namespace FluidProperties;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
 
     // Anti-sweat heater control type
@@ -248,11 +239,6 @@ namespace RefrigeratedCase {
     // Refrigerated display case rack heat rejection location
     int const LocationOutdoors(1);
     int const LocationZone(2);
-    // Condenser cooling type -- See DataHeatBalance - RefrigxxxTypexxx
-    // INTEGER, PARAMETER :: CondenserCoolingAir   = 1
-    // INTEGER, PARAMETER :: CondenserCoolingEvap  = 2
-    // INTEGER, PARAMETER :: CondenserCoolingWater = 3
-    // INTEGER, PARAMETER :: CondenserCascade      = 4
     // Air- and evap-cooled condenser fan speed control types
     int const FanVariableSpeed(1);
     int const FanConstantSpeedLinear(2);
@@ -300,9 +286,6 @@ namespace RefrigeratedCase {
     int const RatedReturnGasTemperature(2);
     int const RatedSubcooling(1);
     int const RatedLiquidTemperature(2);
-    // System service types (applies to system, cascade condenser, and secondary loops)
-    // INTEGER, PARAMETER :: SupermarketService =1
-    // INTEGER, PARAMETER :: WarehouseService   =2
     // Warehouse coil Defrost type
     int const DefrostFluid(1);
     int const DefrostElec(2);
@@ -361,10 +344,6 @@ namespace RefrigeratedCase {
     Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
     Array1D<Real64> const EuropeanEvapTemp(5, {0.0, -8.0, -25.0, -31.0, -40.0});
     Array1D<Real64> const EuropeanDT1(5, {10.0, 8.0, 7.0, 7.0, 6.0});
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumSimulationCondAir(0);            // Number of air-cooled condensers in simulation
     int NumSimulationCondEvap(0);           // Number of evaporative condensers in simulation
@@ -464,7 +443,6 @@ namespace RefrigeratedCase {
     // refrigerated cases or walkins exist in the input deck
     bool HaveChillers(true); // Is initialized as TRUE and remains true when
     // chillers exist in the input deck
-    // SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
 
     // Object Data
     Array1D<RefrigCaseData> RefrigCase;
@@ -486,8 +464,6 @@ namespace RefrigeratedCase {
     Array1D<AirChillerSetData> AirChillerSet;
     Array1D<CoilCreditData> CoilSysCredit;
     Array1D<CaseWIZoneReportData> CaseWIZoneReport;
-
-    // Functions
 
     void clear_state()
     {
@@ -518,25 +494,7 @@ namespace RefrigeratedCase {
         // Inter-system heat transfer via subcoolers and cascade condensers can be accomodated.
         // Secondary refrigeration cycles are also available.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int RackNum;                     // Index to the refrigerated compressor rack being modeled
         static bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
@@ -597,7 +555,6 @@ namespace RefrigeratedCase {
         // METHODOLOGY EMPLOYED:
         // GetObjectItem is called to read refrigerated case information
 
-        // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
@@ -618,16 +575,12 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyWFnTdbRhPb;
         using WaterManager::SetupTankDemandComponent;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const TrackMessage("from refrigerated case");
         static std::string const RoutineName("GetRefrigerationInput: ");
         static std::string const TrackMessageAlt("GetInput in RefrigeratedCase");
         static std::string const RoutineNameNoColon("GetRefrigerationInput");
 
         int const AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
-        // unused INTEGER, Parameter   ::  InputTypeSecond = 1  ! Indicator that flow used to specify capacity of secondary heat exchanger
-        // unused INTEGER, Parameter   ::  InputTypeFirst = 2   ! Indicator that capacity of secondary heat exchanger is input directly
-        // unused INTEGER, Parameter   ::  InputTypeBoth = 3    ! Indicator that capacity of secondary heat exchanger is
         //     input in both watts and flow rate
         int const NumWIAlphaFieldsBeforeZoneInput(9);   // Used to cycle through zones on input for walk in coolers
         int const NumWIAlphaFieldsPerZone(4);           // Used to cycle through zones on input for walk in coolers
@@ -642,9 +595,6 @@ namespace RefrigeratedCase {
         Real64 const SecondsPerHour(3600.0);
         Real64 const DefaultCascadeCondApproach(3.0); // Cascade condenser approach temperature difference (deltaC)
         Real64 const DefaultCircRate(2.5);            // Phase change liquid overfeed circulating rate (ASHRAE definition)
-        // unused REAL(r64), PARAMETER ::  DefaultVarSpdCoeffA    =  0.9d0     !Variable speed pump power curve coefficients based
-        // unused REAL(r64), PARAMETER ::  DefaultVarSpdCoeffB    = -0.1d0     !      upon paper by John Bittner of Hill Phoenix
-        // unused REAL(r64), PARAMETER ::  DefaultVarSpdCoeffC    =  0.2d0     !      A is cube term, B square term, C linear term
         Real64 const DefaultWISurfaceUValue(0.3154); // equiv R18 in Archaic American units (W/m2-delta T)
         Real64 const DefaultWIUValueGlassDr(1.136);  // equiv R5 in Archaic American units (W/m2-delta T)
         Real64 const DefaultWIUValueStockDr(0.3785); // equiv R15 in Archaic American units (W/m2-delta T)
@@ -652,9 +602,7 @@ namespace RefrigeratedCase {
         Real64 const DefaultWIHeightStockDr(3.0);    // stock door height in walk-in cooler (m)
         Real64 const PumpImpellerEfficiency(0.78);   // same as used in pump auto-sizing, dimensionless
         Real64 const PumpMotorEfficiency(0.85);      // suggested as average value in ITT/Gould pump references,
-        //     dimensionless
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas;                  // Alpha items for object
         Array1D_string cAlphaFieldNames;        // Alpha field names (from input processor)
         Array1D_string cNumericFieldNames;      // Numeric field names (from input processor)
@@ -670,7 +618,6 @@ namespace RefrigeratedCase {
         static int AlphaNum(0);     // Used to cycle through input
         static int AlphaStartList(0);
         static int AStart(0); // Used to cycle through zones on input for walk in coolers
-        // INTEGER    :: CascadeCondenserID= 0       ! Used to match load on system to Condenser absolute index
         static int CascadeLoadNum(0);       // counters while associating cascade loads with systems
         static int CascadeLoadIndex(0);     // Counters while inputting cascade loads
         static int CaseID(0);               // ID of refrigerated case in rack
@@ -687,7 +634,6 @@ namespace RefrigeratedCase {
         static int CondIndex(0); // Index  of refrigeration condenser attached to a system
         static int CondNum(0);   // Index of refrigeration condenser
         static int DefType(0);   // Local value for case defrost type
-        // INTEGER    :: FlowIndex         = 0       ! Index of pump flow numeric field
         static int GCNum(0);                         // Index of refrigeration gas cooler
         static int HRNum(0);                         // Counter for hours in day
         static int IOStatus(0);                      // Used in GetObjectItem
@@ -713,7 +659,6 @@ namespace RefrigeratedCase {
         static int MaxNumAlphasCase(0);              // Maximum number of alphas for case object
         static int MaxNumAlphasCaseAndWalkInList(0); // Maximum number of alphas in CaseAndWalkInList
         static int MaxNumAlphasWalkIn(0);            // Maximum number of alphas for walkin object
-        // INTEGER    :: MaxNumAlphasWalkInList  = 0 ! Maximum number of alphas for walkin list object
         static int MaxNumAlphasSecond(0);             // Maximum number of alphas for air chiller object
         static int MaxNumNumbersAirChiller(0);        // Maximum number of numbers for air chiller object
         static int MaxNumNumbersSecond(0);            // Maximum number of numbers for secondary system object
@@ -775,10 +720,7 @@ namespace RefrigeratedCase {
         static int SecondaryID(0);       // Index of secondary loops
         static int SetID(0);             // Index of refrigerated chilller SETS
         static int SecondaryNum(0);      // Index of secondary loops
-        // INTEGER    :: TransferLoadListIndex = 0      ! Index of TransferLoad lists
-        // INTEGER    :: TransferLoadListID    = 0      ! Index of TransferLoad lists
         static int TransferLoadListNum(0); // Index of TransferLoad lists
-        //  INTEGER    :: InputType         = 0       ! Type of inlet, capcity in W or brine flow rate in m3/s
         static int SubcoolerNum(0);                  // Index of subcooler
         static int TSNum(0);                         // Counter for time steps in hour
         static int WalkInIndex(0);                   // Index of walk ins
@@ -6474,9 +6416,6 @@ namespace RefrigeratedCase {
         }
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void SetupReportInput()
     {
         // SUBROUTINE INFORMATION:
@@ -6507,21 +6446,6 @@ namespace RefrigeratedCase {
         using DataHeatBalance::IntGainTypeOf_RefrigerationWalkIn;
         using DataHeatBalance::Zone;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // LOGICAL, SAVE :: MyBeginEnvrnFlag = .TRUE.
-        // INTEGER       :: SystemID
         static int CaseNum(0);
         static int CoilNum(0);
         static int SecondNum(0);
@@ -9064,26 +8988,9 @@ namespace RefrigeratedCase {
         // addition/subtraction to/from each accumulating variable.  If the time step is repeated,
         // this most recent addition/subtraction is reversed before the rest of the refrigeration simulation begins.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::SysTimeElapsed;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyBeginEnvrnFlag(true);
         static int SystemID(0);
         static int CaseID(0);
@@ -9431,33 +9338,12 @@ namespace RefrigeratedCase {
         // do inits that should only occur when component model routines
         // are entered from plant, for water cooled Condensers and Refrigeration Racks
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_RefrigerationWaterCoolRack;
         using DataPlant::TypeOf_RefrigSystemWaterCondenser;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitRefrigerationPlantConnections");
         static bool MyBeginEnvrnFlag(true);
         static bool errFlag(false);
@@ -9594,9 +9480,6 @@ namespace RefrigeratedCase {
         if (!BeginEnvrnFlag) MyBeginEnvrnFlag = true;
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcRackSystem(int const RackNum)
     {
 
@@ -9616,7 +9499,6 @@ namespace RefrigeratedCase {
         // "Impact of ASHRAE Standard 62-1989 on Florida Supermarkets",
         //  Florida Solar Energy Center, FSEC-CR-910-96, Final Report, Oct. 1996
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
@@ -9627,23 +9509,8 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyWFnTdbTwbPb;
         using Psychrometrics::RhoH2O;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CaseID;  // Index to absolute case ID
         int CaseNum; // Index to refrigerated case attached to rack
-        // INTEGER     :: SecondID                    ! Index to absolute secondary loop ID
-        // INTEGER     :: SecondIndex                 ! Index to secondary loop attached to rack
         int WalkInID;                     // Index to absolute walk-in ID
         int WalkInIndex;                  // Index to walk-in attached to rack
         int NumCases;                     // Total number of refrigerated cases attached to rack
@@ -9897,8 +9764,6 @@ namespace RefrigeratedCase {
         }     // rack heat rejection to zone
     }
 
-    //***************************************************************************************************
-
     void ReportRackSystem(int const RackNum)
     {
 
@@ -9911,29 +9776,9 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // To report compressor rack variables
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 LocalTimeStep(0.0); // TimeStepZone for case/walkin systems, TimeStepSys for coil systems
         static int DemandARRID(0);        // Index to water tank Demand used for evap condenser on rack
         static int RackTankID(0);         // Index to water tank used for evap condenser on rack
@@ -9977,8 +9822,6 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    //***************************************************************************************************
-
     void CalculateCase(int const CaseID) // Absolute pointer to refrigerated case
     {
 
@@ -10016,27 +9859,14 @@ namespace RefrigeratedCase {
         // "Impact of ASHRAE Standard 62-1989 on Florida Supermarkets",
         //  Florida Solar Energy Center, FSEC-CR-910-96, Final Report, Oct. 1996
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using namespace DataLoopNode;
         using DataEnvironment::OutBaroPress; // , Month
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdpFnWPb;
 
-        // Locals
         static Real64 CaseRAFraction(0.0); // Fraction of case credits applied to return air
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int ActualZoneNum(0); // Index to zone
         static int DefCapCurvePtr(0);
         static int DefrostEnergyCurveType(0);
@@ -10509,7 +10339,6 @@ namespace RefrigeratedCase {
         // Called from SimPlantEquip in PlantLoopEquipment , previously was called from Non-Zone Equipment Manager
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
-        // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_RefrigerationWaterCoolRack;
         using DataPlant::TypeOf_RefrigSystemWaterCondenser;
@@ -10518,7 +10347,6 @@ namespace RefrigeratedCase {
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SimRefrigCondenser");
         static Real64 DeltaT(0.0);
         static Real64 InletTemp(0.0);
@@ -10529,8 +10357,6 @@ namespace RefrigeratedCase {
         static Real64 VolFlowRate(0.0);
         static Real64 OutletTemp(0.0);
         static int FlowType(0);
-        // INTEGER   :: HighFlowWarn = 0
-        // INTEGER   :: HighTempWarn = 0
         static int NoFlowWarnIndex(0);
         static int HighFlowWarnIndex(0);
         static int HighInletWarnIndex(0);
@@ -10598,15 +10424,6 @@ namespace RefrigeratedCase {
                 }
             }
         }
-
-        // this next block may not be necessary, should only get called from plant now.
-        //  SELECT CASE (SysType)
-        //   CASE (TypeOf_RefrigerationWaterCoolRack)
-        //       IF(RefrigRack(Num)%CondenserType/=RefrigCondenserTypeWater) RETURN
-        //   CASE (TypeOf_RefrigSystemWaterCondenser)
-        //       IF(Condenser(Num)%CondenserType/=RefrigCondenserTypeWater) RETURN
-        //  END SELECT
-        // Return if not water cooled condenser
 
         if (InitLoopEquip) {
             InitRefrigeration();
@@ -10782,9 +10599,6 @@ namespace RefrigeratedCase {
         UpdateRefrigCondenser(Num, SysType);
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void UpdateRefrigCondenser(int const Num, int const SysType)
     {
 
@@ -10797,21 +10611,11 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::TypeOf_RefrigerationWaterCoolRack;
         using DataPlant::TypeOf_RefrigSystemWaterCondenser;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
         {
             auto const SELECT_CASE_var(SysType);
             if (SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack) {
@@ -10837,9 +10641,6 @@ namespace RefrigeratedCase {
         }
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void SimulateDetailedRefrigerationSystems()
     {
 
@@ -10861,31 +10662,12 @@ namespace RefrigeratedCase {
         // The logical variable, UseSysTimeStep, determines whether we are evaluating only systems driven by
         // ZoneEquipmentManager on the system time step, or only system driven by HVACManager on the zone time step.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SimulateDetailedRefrigerationSystems");
         int SysNum;                    // Index to the detailed refrigerated system being modeled
         static bool DeRate(false);     // If true, need to derate aircoils because load can't be met by system
         static bool FirstSCLoop(true); // Flag first time through multi-system loop used when mech subcoolers present
 
         static int StartMechSubcoolLoop(3); // if no mechanical subcoolers transfer energy between system,
-        //    don't loop
         static int LoopNum(0);                  // Index to overall repeat necessary for mechanical subcoolers
         static int SubcoolID(0);                // Subcooler ID number
         static int SubcoolerIndex(0);           // Subcooler ID number
@@ -11323,25 +11105,6 @@ namespace RefrigeratedCase {
         // the load on the compressors. Iterations are used here to account for sharing of gas coolers
         // between independent refrigeration systems.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("SimulateDetailedTransRefrigSystems");
         int SysNum;                             // Index to the detailed transcritical refrigeration system being modeled
         static bool FirstSCLoop(true);          // Flag first time through multi-system loop used when mech subcoolers present
@@ -11562,9 +11325,6 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcDetailedSystem(int const SysNum)
     {
 
@@ -11598,22 +11358,8 @@ namespace RefrigeratedCase {
         //  A thesis submitted in partial fulfillment of the requirements for the degree of
         //  Master of Science, University of Wisconsin-Madison, 1999
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumIter;
         bool NotBalanced;
         Real64 TCondStart;
@@ -11661,9 +11407,6 @@ namespace RefrigeratedCase {
         } // error check
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcDetailedTransSystem(int const SysNum)
     {
 
@@ -11686,25 +11429,10 @@ namespace RefrigeratedCase {
         // calculated refrigerant mass flow through the receiver bypass converges, which typically
         // requires less than 5 iterations.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumIter;          // Iteration counter
         bool NotBalanced;     // Flag to indicate convergence, based on system balance
         Real64 MassFlowStart; // Initial refrigerant mass flow through receiver bypass
@@ -11735,9 +11463,6 @@ namespace RefrigeratedCase {
             if (ErrorMassFlow < ErrorTol) NotBalanced = false;
         } // error check
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void CalculateCondensers(int const SysNum)
     {
@@ -11776,7 +11501,6 @@ namespace RefrigeratedCase {
         // Lawrence Berkeley Laboratory and Resource Dynamics, Improving Fan Systrem Performance,
         //   A Sourcebook for Industry, DOE/GO-102003-1294, April 2003
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
@@ -11791,20 +11515,9 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyWFnTdpPb;
         using Psychrometrics::RhoH2O;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const BleedRateConstant(5.0E-10); // water purge rate for evaporative
         //  condensers (m3/W-s) equal to 3 GPM per 100 tons (BAC Engineering Reference)
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondID;               // Condenser Number
         int CondCreditWarnIndex1; // Used to sum up warning count
         int CondCreditWarnIndex2; // Used to sum up warning count
@@ -12204,25 +11917,8 @@ namespace RefrigeratedCase {
         //     Part II: System modifications and comparisons of different solutions. International Journal of
         //     Refrigeration 31: 525-534.
 
-        // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("RefrigeratedCase:CalcGasCooler");
 
         int GasCoolerCreditWarnIndex;     // Warning counter
@@ -12398,11 +12094,7 @@ namespace RefrigeratedCase {
         // ARI Standard 540, 2004, Standard for Performance Rating of Positive Displacement Refrigerant
         //  Comprssors and Compressor Units, Air-Conditionig & Refrigeration Institute,Arlington VA
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Following constants approp for R22, R134a, R404a, R507, R410a, R407c, future allow input?
@@ -12411,13 +12103,6 @@ namespace RefrigeratedCase {
         Real64 const DelTSuctPipes(1.0);  // Tsat drop corresponding to P drop in suction pipes, ASHRAE 2006 p 2.4 (C)
         Real64 const DelTDischPipes(0.5); // Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("RefrigeratedCase:CalculateCompressors");
         int CompIndex;                    // Compressor index within system
         int CompID;                       // Compressor index within all compressors
@@ -12773,12 +12458,7 @@ namespace RefrigeratedCase {
         //     Part II: System modifications and comparisons of different solutions. International Journal of
         //     Refrigeration 31: 525-534.
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
-        // unused  USE DataEnvironment,   ONLY : OutDryBulbTemp
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Following constants approp for R22, R134a, R404a, R507, R410a, R407c.
@@ -12789,13 +12469,6 @@ namespace RefrigeratedCase {
         // REAL(r64), PARAMETER ::DelTDischPipes = 0.5d0 ! Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("RefrigeratedCase:CalculateTransCompressors");
         int CompIndex;                      // Compressor index within system
         int CompID;                         // Compressor index within all compressors
@@ -13186,9 +12859,6 @@ namespace RefrigeratedCase {
             (TransSystem(SysNum).TotCompCapacityLP + TransSystem(SysNum).TotCompCapacityHP) * LocalTimeStep * SecInHour;
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalculateSubcoolers(int const SysNum)
     {
 
@@ -13209,22 +12879,8 @@ namespace RefrigeratedCase {
         // REFERENCES:
         // ASHRAE 1006 Section 2: Refrigeration Accessories
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalculateSubcoolers");
         int SubcoolerIndex;               // Counter through number of subcoolers on this system
         int SubcoolerID;                  // ID number for each unique subcooler
@@ -13337,10 +12993,6 @@ namespace RefrigeratedCase {
         }
     }
 
-    //***************************************************************************************************
-
-    //***************************************************************************************************
-
     void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,
                                   int const SysType,
@@ -13408,30 +13060,9 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // To report information from the input deck for refrigerated cases and racks to the eio and err file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataLoopNode::NodeID;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CascadeLoadID;
         int CascadeLoadNum;
         int CaseID;
@@ -13458,7 +13089,6 @@ namespace RefrigeratedCase {
         std::string ChrOut;
         std::string ChrOut2;
 
-        // Formats
         static ObjexxFCL::gio::Fmt Format_101("(A)");
         static ObjexxFCL::gio::Fmt Format_102("(4X,A)");
         static ObjexxFCL::gio::Fmt Format_103("(2X,A)");
@@ -13515,21 +13145,6 @@ namespace RefrigeratedCase {
         static ObjexxFCL::gio::Fmt Format_152("('!',2x,'<Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,')");
         static ObjexxFCL::gio::Fmt Format_160("('!',2x,'<Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
                                    "(Pa),','Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)')");
-
-        // 111 FORMAT(',',1X,F6.3) ! compressor rack output line
-        // 112 FORMAT(',',1X,F16.0)! compressor output line
-        // 113 FORMAT(',',1X,F7.1,',',1X,F6.2,6(',',1X,F6.1)) !refrigerated case output line
-        // 135 FORMAT (6x,6(',',1X,F16.1),',',2x,I5)
-        // 136 FORMAT (6x,8(',',1X,F16.1))
-        // 137 FORMAT (2x, 2(',',1X,F12.1))!condenser output
-        // 138 FORMAT (2x, 3(',',1X,F12.1))!condenser output
-        // 139 FORMAT (2x, 4(',',1X,F12.1))!condenser output
-        // 140 FORMAT(7(',',1X,F8.1),1X,',',I5) !walkin output line
-        // 143 FORMAT(',',1X,F8.1,',',1X,F8.4,2(1X,',',F8.2,',',1x,F8.2,',',1x,F8.4)) !walkin/zone output line
-        // 144 FORMAT(',',1X,F7.1) !mech subcooler output line
-        // 145 FORMAT(3(',',1X,F7.1)) !lshx output line
-        // 147 FORMAT(',',1X,F7.1,1X,2(',',F6.2),2(',',1X,F9.3)) !secondary system output line
-        // 150 FORMAT('! <#Refrigeration Air Chiller>,Number of Refrigeration Air Chillers')
 
         // write all headers applicable to this simulation
         if (NumRefrigeratedRacks > 0) {
@@ -14052,7 +13667,6 @@ namespace RefrigeratedCase {
         // Gosney, W.B., Olama, G.A.-L., Heat and Enthalpy Gains through Cold Room Doorways,
         //     Proceedings of the Institute of Refrigeration, vol. 72, pp 31-41, 1975
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using namespace DataLoopNode;
         using Psychrometrics::PsyHFnTdbRhPb;
@@ -14065,23 +13679,11 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
         using Psychrometrics::PsyWFnTdpPb;
-        //  USE DataEnvironment, ONLY:   OutBaroPress, OutDryBulbTemp
         using DataEnvironment::OutBaroPress;
         using General::CreateSysTimeIntervalString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DefaultWalkInDoorOpenFactor(0.05); // walk in door open factor (fraction time open)
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("CalculateWalkIn");
         static int ZoneNodeNum(0);     // Zone node number
         static int ZoneNum(0);         // Index to zone
@@ -14524,7 +14126,6 @@ namespace RefrigeratedCase {
         // SCE report
         //  others
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using Psychrometrics::PsyHFnTdbRhPb;
         using Psychrometrics::PsyHFnTdbW;
@@ -14533,21 +14134,9 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyTwbFnTdbWPb;
         using Psychrometrics::PsyWFnTdbTwbPb;
         using Psychrometrics::PsyWFnTdpPb;
-        // unused  USE DataWater,         ONLY: WaterStorage
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool AtPartLoad;                  // Whether or not need to iterate on pump power
         bool DeRate;                      // If true, need to derate aircoils because don't carry over unmet energy
         int CaseID;                       // used in summing case loads on loop
@@ -14837,22 +14426,6 @@ namespace RefrigeratedCase {
         //   heat absorbed by suction piping, secondary loop distribution piping, and
         //   secondary receiver shells
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int ZoneNum(0); // used calculating total refrigeration interactions for zone
 
         if (UseSysTimeStep) { // air chillers
@@ -14924,30 +14497,6 @@ namespace RefrigeratedCase {
         // Provides the structure to get Refrigeration input so that
         // it can be called from internally or outside the module.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (GetRefrigerationInputFlag) {
 
             GetRefrigerationInput();
@@ -14964,9 +14513,6 @@ namespace RefrigeratedCase {
             }
         } // GetRefrigerationInputFlag
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SimAirChillerSet(std::string const &AirChillerSetName,
                           int const ZoneNum,
@@ -14989,13 +14535,11 @@ namespace RefrigeratedCase {
         // METHODOLOGY EMPLOYED:
         // Called from Zone Equipment Manager.
 
-        // Using/Aliasing
         using DataHeatBalFanSys::TempControlType;
         using DataHVACGlobals::SingleHeatingSetPoint;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ChillerSetID;
         Real64 RemainingOutputToCoolingSP; // Remaining requested load in zone
 
@@ -15070,14 +14614,6 @@ namespace RefrigeratedCase {
         // Called from Zone Equipment Manager.
         //       have however done the variable definitions for in and out.
 
-        // USE STATEMENTS:
-        // unused  USE DataZoneEnergyDemands, ONLY: ZoneSysEnergyDemand
-        // unused  USE InputProcessor,    ONLY: UtilityRoutines::FindItemInList(
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int CoilID(0);                     // Index to coil
         static int CoilIndex(0);                  // rank of coils within system
         static Real64 AirChillerSetSchedule(0.0); // Schedule value for air chiller SET
@@ -15127,25 +14663,10 @@ namespace RefrigeratedCase {
         //   Note that the coil fan, heater, and defrost would be unaffected because they
         //   would still be running at level calculated previously
 
-        // METHODOLOGY EMPLOYED:
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using namespace DataLoopNode;
         using General::CreateSysTimeIntervalString;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int NumCoils(0);                 // Number of coils on this system or secondary loop
         static int CoilID(0);                   // Index to coil
         static int CoilIndex(0);                // rank of coils within system
@@ -15208,10 +14729,6 @@ namespace RefrigeratedCase {
         } // DeRate == true
     }
 
-    //***************************************************************************************************
-
-    //***************************************************************************************************
-
     void CalculateCoil(int const CoilID,
                        Real64 const QZnReq // sensible load required
     )
@@ -15248,7 +14765,6 @@ namespace RefrigeratedCase {
         // Unit Load Factor, Total Capacity Map, or a set of European standards.
         // Correction factors for material and refrigerant are applied to all of these ratings.
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using namespace DataLoopNode;
         using General::CreateSysTimeIntervalString;
@@ -15264,23 +14780,10 @@ namespace RefrigeratedCase {
         using Psychrometrics::PsyWFnTdbTwbPb;
         using Psychrometrics::PsyWFnTdpPb;
 
-        // Locals
         static Real64 UnitLoadFactorSens(0.0); // Rated capacity divided by rated DT1 (T air in - Tevap) (W/delta C)
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // unused  REAL(r64), PARAMETER ::ErrorTol       = 0.001d0 !Iterative solution tolerance
         static std::string const TrackMessage("from RefrigeratedCase:CalculateCoil");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // INTEGER      :: Iter                    =0   ! counter for loop to solve for total coil capacity as a function of inlet air conditions
         static int FanSpeedControlType(0);         // from input
         static int SHRCorrectionCurvePtr(0);       // Points to curve entered by user to specify total/sensible capacity as a function of SHR
         static int SHRCorrectionType(0);           // SHR60, QuadraticSHR, European, or TabularRH_DT1_TRoom
@@ -15763,29 +15266,8 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize zone gain terms at begin environment
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyEnvrnFlag(true);
         int loop;
 
@@ -15842,13 +15324,7 @@ namespace RefrigeratedCase {
 
         return;
 
-        // should model above terms for use during sizing here
-        //  IF(DoingSizing)THEN
-
-        //  ENDIF
     }
-
-    //***************************************************************************************************
 
     void ZeroHVACValues()
     {
@@ -15864,30 +15340,8 @@ namespace RefrigeratedCase {
         // to zero when called on zone timestep. Otherwise, values may be held over when
         // no HVAC load calls module during that zone time step.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataWater::WaterStorage;
         using PlantUtilities::SetComponentFlowRate;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         static int DemandARRID(0);        // Index to water tank Demand used for evap condenser
         static int TankID(0);             // Index to water tank used for evap condenser

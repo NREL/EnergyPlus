@@ -84,11 +84,6 @@ namespace RefrigeratedCase {
     // Refrigerated display case rack heat rejection location
     extern int const LocationOutdoors;
     extern int const LocationZone;
-    // Condenser cooling type -- See DataHeatBalance - RefrigxxxTypexxx
-    // INTEGER, PARAMETER :: CondenserCoolingAir   = 1
-    // INTEGER, PARAMETER :: CondenserCoolingEvap  = 2
-    // INTEGER, PARAMETER :: CondenserCoolingWater = 3
-    // INTEGER, PARAMETER :: CondenserCascade      = 4
     // Air- and evap-cooled condenser fan speed control types
     extern int const FanVariableSpeed;
     extern int const FanConstantSpeedLinear;
@@ -136,9 +131,6 @@ namespace RefrigeratedCase {
     extern int const RatedReturnGasTemperature;
     extern int const RatedSubcooling;
     extern int const RatedLiquidTemperature;
-    // System service types (applies to system, cascade condenser, and secondary loops)
-    // INTEGER, PARAMETER :: SupermarketService =1
-    // INTEGER, PARAMETER :: WarehouseService   =2
     // Warehouse coil Defrost type
     extern int const DefrostFluid;
     extern int const DefrostElec;
@@ -197,10 +189,6 @@ namespace RefrigeratedCase {
     extern Array1D<Real64> const EuropeanAirInletTemp;
     extern Array1D<Real64> const EuropeanEvapTemp;
     extern Array1D<Real64> const EuropeanDT1;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
 
     extern int NumSimulationCondAir;            // Number of air-cooled condensers in simulation
     extern int NumSimulationCondEvap;           // Number of evaporative condensers in simulation
@@ -300,9 +288,6 @@ namespace RefrigeratedCase {
     // refrigerated cases or walkins exist in the input deck
     extern bool HaveChillers; // Is initialized as TRUE and remains true when
     // chillers exist in the input deck
-    // SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
-
-    // Types
 
     struct RefrigCaseData
     {
@@ -490,9 +475,7 @@ namespace RefrigeratedCase {
         Array1D_int CoilNum;
         Array1D_int WalkInNum;
         int HeatRejectionLocation; // Refrigeration Compressor Rack heat rejection location
-        // (1=LocationOutdoors or 2=LocationZone)
         int CondenserType; // Specifies cooling mode for outdoor condenser
-        // (1=Dry air, 2=Evap cooling, 3=Water-cooled)
         Real64 LaggedUsedWaterHeater;     // Heat reclaim used to heat water in previous zone/load time step(W)
         Real64 LaggedUsedHVACCoil;        // Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
         Real64 EvapEffect;                // Effectiveness of evaporative condenser
@@ -602,7 +585,6 @@ namespace RefrigeratedCase {
         // Members
         std::string Name;            // Name of refrigeration system
         std::string RefrigerantName; // Name of refrigerant, must match name in FluidName
-        //    (see fluidpropertiesrefdata.idf)
         std::string EndUseSubcategory;    // Used for reporting purposes
         bool SystemRejectHeatToZone;      // Flag to show air-cooled condenser located inside zone
         bool CoilFlag;                    // Flag to show if coil type load on system (even if below in a secondary)
@@ -617,9 +599,6 @@ namespace RefrigeratedCase {
         Array1D_int SubcoolerNum;         // Absolute Index of subcoolers (allocated NumSubcoolers)
         Array1D_int WalkInNum;            // absolute Index of walk ins (allocated NumWalkIns)
         int CompSuctControl;              // Index to suction control
-        // 2 =fixed, 1=floating
-        // INTEGER     :: ServiceType      = 1       ! Index to warehouse or supermarket
-        // 1 = supermarket, 2=warehouse
         int HiStageWarnIndex1; // Recurring warning index when hi stage compressors unable to meet coil loads
         int HiStageWarnIndex2; // Recurring warning index when hi stage compressors unable to meet coil loads
         int InsuffCapWarn;     // Recurring warning index when refrigeration system unable to meet coil loads
@@ -1115,10 +1094,6 @@ namespace RefrigeratedCase {
         Real64 TotalHeatRecoveredEnergy;  // All recovered heat for defrost purposes, J
         Real64 TotalHeatRecoveredLoad;    // All recovered heat for defrost purposes [W]
         Real64 TransitionTemperature;     // Transition temperature between subcritical and transcritical operation (C)
-        //  REAL(r64)   :: ExternalEnergyRecovered = 0.0d0   ! ExternalHeatRecovered, J
-        //  REAL(r64)   :: ExternalHeatRecoveredLoad = 0.0d0 ! Sum of LaggedUsedWaterHeater and LaggedUsedHVACCoil [W]
-        //  REAL(r64)   :: LaggedUsedWaterHeater =0.0d0      ! Heat reclaim used to heat water in previous zone/load time step(W)
-        //  REAL(r64)   :: LaggedUsedHVACCoil =0.0d0         ! Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
 
         // Default Constructor
         RefrigGasCoolerData()
@@ -1249,8 +1224,6 @@ namespace RefrigeratedCase {
         int ReceiverZoneNum;           // ID number for zone where receiver gains heat
         int ReceiverZoneNodeNum;       // ID number for zone node where receiver gains heat
         Real64 ReceiverZoneHeatGain;   // sensible heat gain rate to zone with receiver
-        // INTEGER     :: ServiceType        = 1   ! Index to warehouse or supermarket
-        // 1 = supermarket, 2=warehouse
         int VarSpeedCurvePtr;  // Pointer for variable speed pump power curve
         Real64 AvailLoadCoils; // Used to determine amount of avail heat for warehouse coils
         Real64 CpBrineRated;   // Specific heat of secondary loop fluid at rated average
@@ -1724,93 +1697,41 @@ namespace RefrigeratedCase {
 
     void ManageRefrigeratedCaseRacks();
 
-    //***************************************************************************************************
-
     void GetRefrigerationInput();
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void SetupReportInput();
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void InitRefrigeration();
 
     void InitRefrigerationPlantConnections();
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcRackSystem(int const RackNum);
-
-    //***************************************************************************************************
 
     void ReportRackSystem(int const RackNum);
 
-    //***************************************************************************************************
-
     void CalculateCase(int const CaseID); // Absolute pointer to refrigerated case
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SimRefrigCondenser(int const SysType, std::string const &CompName, int &CompIndex, bool const FirstHVACIteration, bool const InitLoopEquip);
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void UpdateRefrigCondenser(int const Num, int const SysType);
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SimulateDetailedRefrigerationSystems();
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void SimulateDetailedTransRefrigSystems();
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void CalcDetailedSystem(int const SysNum);
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcDetailedTransSystem(int const SysNum);
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void CalculateCondensers(int const SysNum);
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalcGasCooler(int const SysNum);
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void CalculateCompressors(int const SysNum);
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalculateTransCompressors(int const SysNum);
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalculateSubcoolers(int const SysNum);
-
-    //***************************************************************************************************
-
-    //***************************************************************************************************
 
     void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,
@@ -1821,22 +1742,13 @@ namespace RefrigeratedCase {
 
     void ReportRefrigerationComponents();
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void CalculateWalkIn(int const WalkInID); // Absolute pointer to  Walk In
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void CalculateSecondary(int const SecondaryNum);
 
     void SumZoneImpacts();
 
     void CheckRefrigerationInput();
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SimAirChillerSet(std::string const &AirChillerSetName,
                           int const ZoneNum,
@@ -1846,11 +1758,7 @@ namespace RefrigeratedCase {
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
 
-    //***************************************************************************************************
-
     void CalculateAirChillerSets(int const AirChillerSetID);
-
-    //***************************************************************************************************
 
     void FinalRateCoils(bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int const SystemSourceType,     // Secondarysystem or DetailedSystem
@@ -1859,19 +1767,11 @@ namespace RefrigeratedCase {
                         Real64 const AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    //***************************************************************************************************
-
-    //***************************************************************************************************
-
     void CalculateCoil(int const CoilID,
                        Real64 const QZnReq // sensible load required
     );
 
-    //***************************************************************************************************
-
     void FigureRefrigerationZoneGains();
-
-    //***************************************************************************************************
 
     void ZeroHVACValues();
 
