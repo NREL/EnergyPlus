@@ -50,10 +50,15 @@ else()
   set(GIT_DIR "")
 endif()
 
-find_package(OpenGL)
-if(NOT OPENGL_FOUND)
-  set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
-  message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
+set( OPENGL_REQUIRED OFF CACHE BOOL "Require OpenGL in order to build" )
+if(OPENGL_REQUIRED)
+  find_package(OpenGL)
+  if(NOT OPENGL_FOUND)
+    set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
+    message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
+  endif()
+else()
+  set( OPENGL_FOUND FALSE )
 endif()
 
 # Set a default build type if none was specified
