@@ -2242,7 +2242,7 @@ namespace RefrigeratedCase {
                         ShowContinueError("The \"CapacityTotalSpecificConditions\" Capacity Rating Type has been specified for this air chiller.  "
                                           "This rating type requires ");
                         ShowContinueError(
-                            "the \"TabularRHxDT1xTRoom\" correction curve.  Verify that a valid \"TabularRHxDT1xTRoom\" curve is specified in \"" +
+                            R"(the "TabularRHxDT1xTRoom" correction curve.  Verify that a valid "TabularRHxDT1xTRoom" curve is specified in ")" +
                             cAlphaFieldNames(AlphaNum + 1) + "\".");
                     }
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "LinearSHR60")) {
@@ -4539,7 +4539,7 @@ namespace RefrigeratedCase {
                     }
                 } else { // Invalid Mode of Operation
                     ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(5) + " for " + Compressor(CompNum).Name + '=' +
-                                    Alphas(5) + " is invalid. Valid choices are \"Subcritical\" or \"Transcritical\".");
+                                    Alphas(5) + R"( is invalid. Valid choices are "Subcritical" or "Transcritical".)");
                     ErrorsFound = true;
                 }
 
@@ -5259,7 +5259,7 @@ namespace RefrigeratedCase {
                     System(RefrigSysNum).NumStages = Numbers(3);
                     if (System(RefrigSysNum).NumStages < 1 || System(RefrigSysNum).NumStages > 2) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " + cNumericFieldNames(3) +
-                                        " has an invalid value.  Only \"1\" or \"2\" compressor stages are allowed.");
+                                        R"( has an invalid value.  Only \"1\" or \"2\" compressor stages are allowed.)");
                         ErrorsFound = true;
                     }
                 } else {
@@ -11284,17 +11284,11 @@ namespace RefrigeratedCase {
 
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
-        int NumIter;          // Iteration counter
-        bool NotBalanced;     // Flag to indicate convergence, based on system balance
-        Real64 MassFlowStart; // Initial refrigerant mass flow through receiver bypass
+        int NumIter(0);          // Iteration counter
+        bool NotBalanced(true);     // Flag to indicate convergence, based on system balance
+        Real64 MassFlowStart(0.5); // Initial refrigerant mass flow through receiver bypass
         Real64 ErrorMassFlow; // Error in calculated refrigerant mass flow trhough receiver bypass
 
-        // Balance this refrigeration system using calculated refrigerant flow
-        NotBalanced = true;
-        NumIter = 0;
-
-        // Set initial guess for receiver bypass refrigerant flow rate
-        MassFlowStart = 0.5;
         while (NotBalanced) {
             ++NumIter;
 
@@ -11410,7 +11404,6 @@ namespace RefrigeratedCase {
         TotalBasinHeatPower = 0.0;
         TotalCondenserHeat = 0.0;
         TotalEvapWaterUseRate = 0.0;
-        AirVolRatio = 1.0;
         ActualFanPower = 0.0;
         TotalCondDefrostCredit = 0.0;
         TotalLoadFromSystems = 0.0;
@@ -11780,7 +11773,6 @@ namespace RefrigeratedCase {
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         //! Initialize this gas cooler for this time step
-        TotalGasCoolerHeat = 0.0;
         AirVolRatio = 1.0;
         ActualFanPower = 0.0;
         TotalCondDefrostCredit = 0.0;
@@ -11960,7 +11952,7 @@ namespace RefrigeratedCase {
         Real64 TempInRated(0.0);          // Temperature entering compressor at rated superheat, C //Autodesk:Init
         Real64 TotalEnthalpyChangeActual; // Actual enthalpy change in cases and cold side of LSHX, J/kg
         Real64 TsatforPsuct;              // Tsat for PSuction, C
-        Real64 TsatforPdisch;             // Tsat for Pdischarge, c
+        Real64 TsatforPdisch(0.0);             // Tsat for Pdischarge, c
         int StageIndex;                   // Compression stage index
         int NumComps;                     // Number of low-stage or high-stage compressors in system
         Real64 HHiStageCompIn;            // Enthalpy at inlet of high-stage compressor (J/kg)
@@ -12303,7 +12295,6 @@ namespace RefrigeratedCase {
         static std::string const RoutineName("RefrigeratedCase:CalculateTransCompressors");
         int CompIndex;                      // Compressor index within system
         int CompID;                         // Compressor index within all compressors
-        int GasCoolerID;                    // Gas cooler index for this refrigeration system
         int Iter;                           // Iteration counter
         static Real64 AccumLoadMT(0.0);     // Load due to previously unmet medium temperature compressor loads (transcritical system)
         static Real64 AccumLoadLT(0.0);     // Load due to previously unmet low temperature compressor loads (transcritical system)
@@ -12318,7 +12309,7 @@ namespace RefrigeratedCase {
         Real64 HCaseInRatedLT;              // Enthalpy entering low temperature cases at rated subcooling, J/kg
         Real64 HCaseInRatedMT;              // Enthalpy entering medium temperature cases at rated subcooling, J/kg
         static Real64 HCaseOutLTMT(0.0);    // Combined enthalpy from the outlets of the LP compressor and MT loads, J/kg
-        Real64 HCompInRatedHP;              // Enthalpy entering high pressure compressor at rated superheat, J/kg
+        Real64 HCompInRatedHP(0.0);              // Enthalpy entering high pressure compressor at rated superheat, J/kg
         Real64 HCompInRatedLP;              // Enthalpy entering low pressure compressor at rated superheat, J/kg
         Real64 HGCOutlet;                   // Enthalpy at gas cooler outlet, J/kg
         Real64 HIdeal;                      // Ideal enthalpy at subcooler (for 100% effectiveness)
@@ -12336,7 +12327,7 @@ namespace RefrigeratedCase {
         Real64 PSuctionLT;                  // Suction pressure in low temperature cases, Pa
         Real64 PSuctionMT;                  // Suction pressure in medium temperature cases, Pa
         Real64 PGCOutlet;                   // Gas cooler outlet pressure, Pa
-        Real64 QualityReceiver;             // Refrigerant quality in the receiver
+        Real64 QualityReceiver(0.0);             // Refrigerant quality in the receiver
         Real64 SubcoolEffect;               // Heat exchanger effectiveness of the subcooler
         Real64 TempInRatedHP;               // Temperature entering high pressure compressor at rated superheat, C
         Real64 TempInRatedLP;               // Temperature entering low pressure compressor at rated superheat, C
@@ -12350,12 +12341,10 @@ namespace RefrigeratedCase {
         Real64 TotalRefMassFlow;            // Total mass flow through high pressure side of system, kg/s
         Real64 Xu;                          // Initial upper guess for iterative search
         Real64 Xl;                          // Initial lower guess for iterative search
-        Real64 Xnew;                        // New guess for iterative search
+        Real64 Xnew(0.0);                        // New guess for iterative search
 
         LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
-
-        GasCoolerID = TransSystem(SysNum).GasCoolerNum(1);
 
         // Determine refrigerating capacity needed
         AccumLoadLT = 0.0;
@@ -12540,7 +12529,7 @@ namespace RefrigeratedCase {
         }
         TSubcoolerColdIn = Xnew;
 
-        // Modify receiver inlet enthlapy and HP compressor inlet enthalpy to account for subcooler
+        // Modify receiver inlet enthalpy and HP compressor inlet enthalpy to account for subcooler
         HIdeal = FluidProperties::GetSupHeatEnthalpyRefrig(TransSystem(SysNum).RefrigerantName,
                                           GasCooler(TransSystem(SysNum).GasCoolerNum(1)).TGasCoolerOut,
                                           PSuctionMT,
@@ -12726,7 +12715,7 @@ namespace RefrigeratedCase {
         Real64 SubcoolerSupHeat;          // additional superheat added to vapor going to compressor from LSHX
         Real64 TVapInDes;                 // Design Vapor Inlet temperature for LSHX
         Real64 TLiqInDes;                 // Design Liquid Inlet temperature for LSHX
-        Real64 TLiqInActual;              // Liquid T in, after condenser, before any mechanical subcooler
+        Real64 TLiqInActual(0.0);              // Liquid T in, after condenser, before any mechanical subcooler
         Real64 TVapInActual;              // Vapor T in, after any superheat added by case control
 
         LocalTimeStep = DataGlobals::TimeStepZone;
@@ -12827,7 +12816,7 @@ namespace RefrigeratedCase {
                                   int const SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType,
-                                  Optional_bool_const SuppressWarning)
+                                  const Optional_bool_const& SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13954,12 +13943,11 @@ namespace RefrigeratedCase {
         int WalkInIndex;                  // used in summing walk-in loads on loop
         int ZoneNodeNum;                  // used to establish environmental temperature for dist piping heat gains
         Real64 CpBrine;                   // Specific heat (W/kg)
-        Real64 CircRatio;                 // Per ASHRAE definition = mass flow at pump/mass flow to condenser
         Real64 DensityBrine;              // Density (kg/m3)
         Real64 DiffTemp;                  // (C)
         Real64 DistPipeHeatGain;          // Optional (W)
         Real64 Error;                     // Used in iterative soln for pumps needed to meet load (that has to include pump energy)
-        Real64 Eta;                       // Secondary loop heat exchanger eta, dimensionless
+        Real64 Eta(0.0);                       // Secondary loop heat exchanger eta, dimensionless
         Real64 FlowVolNeeded;             // Flow rate needed to meet load (m3/s)
         static Real64 LoadRequested(0.0); // Load necessary to meet current and all stored energy needs (W)
         static Real64 LocalTimeStep(0.0); // DataGlobals::TimeStepZone for case/walkin systems, DataHVACGlobals::TimeStepSys for coil systems
@@ -13977,11 +13965,11 @@ namespace RefrigeratedCase {
         Real64 TBrineIn;                  // Brine temperature going to heat exchanger, C
         Real64 TCondense;                 // Condensing temperature for a phase change secondary loop, C
         Real64 TEvap;                     // Evaporating temperature in secondary loop heat exchanger (C)
-        Real64 TotalCoolingLoad(0);       // Cooling load reported back to compressor rack or detailed system (W)
+        Real64 TotalCoolingLoad(0.0);       // Cooling load reported back to compressor rack or detailed system (W)
         Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
         Real64 TotalPumpPower;            // Total Pumping power for loop, W
         Real64 TotalLoad;                 // Total Cooling Load on secondary loop, W
-        Real64 TPipesReceiver;            // Temperature used for contents of pipes and/or receiver in calculating shell losses (C)
+        Real64 TPipesReceiver(0.0);            // Temperature used for contents of pipes and/or receiver in calculating shell losses (C)
         Real64 VarFrac;                   // Pump power fraction for variable speed pump, dimensionless
         Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
         Real64 UnmetEnergy;               // Cumulative, grows and shrinks with defrost cycles on loads served by loop (J)
@@ -14004,7 +13992,6 @@ namespace RefrigeratedCase {
                 TBrineIn = Secondary(SecondaryNum).TBrineInRated;
                 TPipesReceiver = TBrineAverage;
             } else if (SELECT_CASE_var == SecFluidTypePhaseChange) {
-                CircRatio = Secondary(SecondaryNum).CircRate;
                 TCondense = Secondary(SecondaryNum).TCondense;
                 TPipesReceiver = TCondense;
             }

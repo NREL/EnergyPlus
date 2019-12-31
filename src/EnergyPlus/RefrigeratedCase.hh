@@ -1729,7 +1729,7 @@ namespace RefrigeratedCase {
                                   int SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
-                                  Optional_bool_const SuppressWarning = _);
+                                  const Optional_bool_const& SuppressWarning = _);
 
     void ReportRefrigerationComponents();
 
