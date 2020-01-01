@@ -1,6 +1,6 @@
-! EMSDiscreteAirSystemSizes.idf
+! PythonPluginDiscreteAirSystemSizes.idf
 !
-! Highlights:   Example of using Energy Management System and EnergyPlus Runtime Language to intervene into air system sizing results.
+! Highlights:   Example of using Python Plugin System to intervene into air system sizing results.
 !
 ! Description:  File derived from DOE Commercial Building Benchmark, Strip Mall, new construction, Benchmark V 1.1_3.1
 !               Single story, 10 single-zone stores, double size on end and middle.
@@ -8759,5 +8759,4 @@
     Apply Discrete Package Sizes to Air System Sizing,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginDiscreteAirSystemSizes, !- Python Module Name
-    ResizePSZToMatchProductAvailability,    !- Plugin Class Name
-    EndOfSystemSizing;       !- Calling Point
+    ResizePSZToMatchProductAvailability;    !- Plugin Class Name

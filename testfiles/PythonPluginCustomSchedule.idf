@@ -1,6 +1,6 @@
-! EMSCustomSchedule.idf
+! PythonPluginCustomSchedule.idf
 !
-! Highlights:   Demonstrates using Energy Management System adn EnergyPlus Runtime Language to "create" schedules from calculations.
+! Highlights:   Demonstrates using Python Plugin System to "create" schedules from calculations.
 !
 ! Description:  Derived from DOE Commercial Building Benchmark, Small Office, new construction, Benchmark V 1.1_3.1
 !               Single story, five zone office building.
@@ -6006,15 +6006,13 @@
     Heating Setpoint Override,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginCustomSchedule,  !- Python Module Name
-    HeatingSetPoint,         !- Plugin Class Name
-    BeginTimestepBeforePredictor;  !- Calling Point
+    HeatingSetPoint;         !- Plugin Class Name
 
   PythonPlugin:Instance,
     Cooling Setpoint Override,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginCustomSchedule,  !- Python Module Name
-    CoolingSetPoint,         !- Plugin Class Name
-    BeginTimestepBeforePredictor;         !- Calling Point
+    CoolingSetPoint;         !- Plugin Class Name
 
   Output:Variable,HTGSETP_SCH,Schedule Value,timestep;
 

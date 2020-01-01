@@ -1,6 +1,6 @@
-!EMSCustomOutputVariable.idf
+!PythonPluginCustomOutputVariable.idf
 !
-! Highlights:   Simple example of using Energy Management System and EnergyPlus Runtime Language to create a custom output variable
+! Highlights:   Simple example of using Python Plugin System to create a custom output variable
 !
 ! Description:  Derived from DOE Commercial Building Benchmark, Small Office, new construction, Benchmark V 1.1_3.1
 !               Single story, five zone office building.
@@ -6028,8 +6028,7 @@
     Average Zone Temp Calculation,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginCustomOutputVariable, !- Python Module Name
-    AverageZoneTemps,        !- Plugin Class Name
-    EndOfZoneTimestepBeforeZoneReporting;  !- Calling Point
+    AverageZoneTemps;        !- Plugin Class Name
 
   PythonPlugin:Variables,
     MyGlobalVariables,       !- Name

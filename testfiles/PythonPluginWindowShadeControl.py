@@ -14,7 +14,7 @@ class SetShadeControlState(EnergyPlusPlugin):
         self.handle_shading_deploy_status = None
         self.handle_global_shading_actuator_status = None  # only because actuators can be output vars ... yet
 
-    def main(self) -> int:
+    def on_begin_timestep_before_predictor(self) -> int:
         if not self.handles_set:
             self.handle_zone_sensible_cooling_rate = self.api.exchange.get_variable_handle(
                 "Zone Air System Sensible Cooling Rate", "West Zone"

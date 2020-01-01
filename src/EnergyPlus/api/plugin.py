@@ -31,31 +31,6 @@ class EnergyPlusPlugin(object):
         self.api = EnergyPlusAPI(True)
         self.data = {}
 
-    def initialize(self) -> None:
-        """
-        Provides a base class function that can be overridden to do some script initialization.  This function is called
-        at a point in the EnergyPlus simulation when structures have been populated and so EMS actuators and variables
-        can be accessed to get handles.  This function does not need to be overridden, users can still achieve the same
-        behavior by looking up handles at later, regular calling points in the simulation.  This is merely a
-        convenience.
-
-        :return: Does not return anything
-        """
-        pass
-
-    def main(self) -> int:
-        """
-        Performs the main plugin action, calling for sensor data and setting actuator data.
-        This function can call other functions as needed, as well as importing other Python libraries.
-
-        **Derived classes MUST override this function!**
-
-        :return: An integer exit code, for now zero is success and one indicates EnergyPlus should throw a fatal error
-        """
-        raise NotImplementedError(
-            "Encountered EnergyPlusPlugin::main base function -- override this in your plugin class"
-        )
-
     def _detect_overridden(self) -> List[str]:
         """
         This function allows for detection of methods that are overridden in derived classes.
@@ -66,6 +41,7 @@ class EnergyPlusPlugin(object):
 
         :return: A list of function names which are overridden in the derived class instance of this base class
         """
+        self.data['i'] = 12
         common = EnergyPlusPlugin.__dict__.keys() & self.__class__.__dict__.keys()
         diff = [m for m in common if EnergyPlusPlugin.__dict__[m] != self.__class__.__dict__[m]]
         for known_skip in ['__init__', '__doc__', '__module__']:
@@ -73,53 +49,53 @@ class EnergyPlusPlugin(object):
                 diff.remove(known_skip)
         return diff
 
-    def on_begin_new_environment(self):
+    def on_begin_new_environment(self) -> int:
         pass
 
-    def on_after_new_environment_warmup_is_complete(self):
+    def on_after_new_environment_warmup_is_complete(self) -> int:
         pass
 
-    def on_begin_zone_timestep_before_init_heat_balance(self):
+    def on_begin_zone_timestep_before_init_heat_balance(self) -> int:
         pass
 
-    def on_begin_zone_timestep_after_init_heat_balance(self):
+    def on_begin_zone_timestep_after_init_heat_balance(self) -> int:
         pass
 
-    def on_begin_timestep_before_predictor(self):
+    def on_begin_timestep_before_predictor(self) -> int:
         pass
 
-    def on_after_predictor_before_hvac_managers(self):
+    def on_after_predictor_before_hvac_managers(self) -> int:
         pass
 
-    def on_after_predictor_after_hvac_managers(self):
+    def on_after_predictor_after_hvac_managers(self) -> int:
         pass
 
-    def on_inside_hvac_system_iteration_loop(self):
+    def on_inside_hvac_system_iteration_loop(self) -> int:
         pass
 
-    def on_end_of_zone_timestep_before_zone_reporting(self):
+    def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
         pass
 
-    def on_end_of_zone_timestep_after_zone_reporting(self):
+    def on_end_of_zone_timestep_after_zone_reporting(self) -> int:
         pass
 
-    def on_end_of_system_timestep_before_hvac_reporting(self):
+    def on_end_of_system_timestep_before_hvac_reporting(self) -> int:
         pass
 
-    def on_end_of_system_timestep_after_hvac_reporting(self):
+    def on_end_of_system_timestep_after_hvac_reporting(self) -> int:
         pass
 
-    def on_end_of_zone_sizing(self):
+    def on_end_of_zone_sizing(self) -> int:
         pass
 
-    def on_end_of_system_sizing(self):
+    def on_end_of_system_sizing(self) -> int:
         pass
 
-    def on_end_of_component_input_read_in(self):
+    def on_end_of_component_input_read_in(self) -> int:
         pass
 
-    def on_user_defined_component_model(self):
+    def on_user_defined_component_model(self) -> int:
         pass
 
-    def on_unitary_system_sizing(self):
+    def on_unitary_system_sizing(self) -> int:
         pass

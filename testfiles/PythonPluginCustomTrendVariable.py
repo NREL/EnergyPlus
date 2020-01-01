@@ -14,7 +14,7 @@ class CalculateAverageTrend(EnergyPlusPlugin):
         self.trend_avg_var_handle = None
         self.last_five_avg_temps = deque(maxlen=5)
 
-    def main(self) -> int:
+    def on_end_of_zone_timestep_before_zone_reporting(self):
         if self.one_time:
             zone_names = ["perimeter_zn_" + str(i) for i in range(1, 5)] + ["core_zn"]
             for zone_name in zone_names:

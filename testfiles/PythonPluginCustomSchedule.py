@@ -7,7 +7,7 @@ class HeatingSetPoint(EnergyPlusPlugin):
     def actuate(self, x):
         self.api.exchange.set_actuator_value(self.data['actuator_heating'], x)
 
-    def main(self) -> int:
+    def on_begin_timestep_before_predictor(self) -> int:
         if 'handles_done' not in self.data:
             self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(
                 "HTGSETP_SCH", "Schedule:Constant", "Schedule Value"
@@ -38,10 +38,22 @@ class HeatingSetPoint(EnergyPlusPlugin):
 
 class CoolingSetPoint(EnergyPlusPlugin):
 
+    def __init__(self):
+        super().__init__()
+        print("OK HELLO I AM HERE")
+        print(self)
+        self.name = "hello"
+        print("self has api?: " + str(hasattr(self, "api")))
+
     def actuate(self, x):
         self.api.exchange.set_actuator_value(self.data['actuator_cooling'], x)
 
-    def main(self) -> int:
+    def on_begin_timestep_before_predictor(self) -> int:
+        print("FLKJDSFLKDSJFLKJSDFLKJSDFLKJSDFLKJSDFLKJSDLKJSDFLKJSDFLKJSDF")
+        print(self)
+        print("self has api?: " + str(hasattr(self, "api")))
+        print(self.name)
+
         if 'handles_done' not in self.data:
             self.data['actuator_cooling'] = self.api.exchange.get_actuator_handle(
                 "CLGSETP_SCH", "Schedule:Constant", "Schedule Value"

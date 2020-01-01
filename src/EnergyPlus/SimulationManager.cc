@@ -465,10 +465,6 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // need to think about this...for AfterSystemSizing, and maybe others, main() is called before initialize()
-        // I think I will fatal error in this case because it could prove problematic...
-        EnergyPlus::PluginManagement::PluginManager::initAllRegisteredPlugins();
-
         if (EnergyPlus::PluginManagement::pluginManager) {
             EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
         }

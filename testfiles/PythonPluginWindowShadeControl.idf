@@ -1,7 +1,7 @@
-! EMSWindowShadeControl.idf
+! PythonPluginWindowShadeControl.idf
 !
 !
-! Highlights:              Demonstrates using EMS to control a window blind.
+! Highlights:              Demonstrates using Python Plugin System to control a window blind.
 !
 ! Basic file description:  This file is derived from PurchAirWindowBlind.idf
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
@@ -1294,8 +1294,7 @@
     Window Shading Device Controller,  !- Name
     Yes,                     !- Run During Warmup Days
     PythonPluginWindowShadeControl, !- Python Module Name
-    SetShadeControlState,    !- Plugin Class Name
-    BeginTimestepBeforePredictor;  !- Calling Point
+    SetShadeControlState;    !- Plugin Class Name
 
   PythonPlugin:Variables,
     MyGlobalVariables,       !- Name

@@ -220,10 +220,7 @@ namespace UserDefinedComponents {
                 if (UserPlantComp(CompNum).Loop(ThisLoop).ErlInitProgramMngr > 0) {
                     ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).Loop(ThisLoop).ErlInitProgramMngr);
                 } else if (UserPlantComp(CompNum).Loop(ThisLoop).initPluginLocation > -1) {
-                    EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                            emsCallFromUserDefinedComponentModel,
-                        UserPlantComp(CompNum).Loop(ThisLoop).initPluginLocation
-                    );
+                    EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserPlantComp(CompNum).Loop(ThisLoop).initPluginLocation);
                 }
                 // now interface sizing related values with rest of E+
                 MinCap = UserPlantComp(CompNum).Loop(ThisLoop).MinLoad;
@@ -263,20 +260,14 @@ namespace UserDefinedComponents {
             if (UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr > 0) {
                 ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).Loop(ThisLoop).ErlSimProgramMngr);
             } else if (UserPlantComp(CompNum).Loop(ThisLoop).simPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                        emsCallFromUserDefinedComponentModel,
-                    UserPlantComp(CompNum).Loop(ThisLoop).simPluginLocation
-                );
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserPlantComp(CompNum).Loop(ThisLoop).simPluginLocation);
             }
         }
 
         if (UserPlantComp(CompNum).ErlSimProgramMngr > 0) {
             ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserPlantComp(CompNum).ErlSimProgramMngr);
         } else if (UserPlantComp(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                    DataGlobals::emsCallFromUserDefinedComponentModel,
-                    UserPlantComp(CompNum).simPluginLocation
-            );
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserPlantComp(CompNum).simPluginLocation);
         }
 
         ReportPlantUserComponent(CompNum, ThisLoop);
@@ -342,10 +333,7 @@ namespace UserDefinedComponents {
             if (UserCoil(CompNum).ErlInitProgramMngr > 0) {
                 ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
             } else if (UserCoil(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                        emsCallFromUserDefinedComponentModel,
-                    UserCoil(CompNum).initPluginLocation
-                );
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).initPluginLocation);
             }
 
             if (UserCoil(CompNum).PlantIsConnected) {
@@ -368,10 +356,7 @@ namespace UserDefinedComponents {
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
             ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
         } else if (UserCoil(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                    emsCallFromUserDefinedComponentModel,
-                UserCoil(CompNum).simPluginLocation
-            );
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).simPluginLocation);
         }
 
         ReportCoilUserDefined(CompNum);
@@ -460,10 +445,7 @@ namespace UserDefinedComponents {
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
             } else if (UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                        emsCallFromUserDefinedComponentModel,
-                    UserZoneAirHVAC(CompNum).initPluginLocation
-                );
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).initPluginLocation);
             }
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
@@ -489,10 +471,7 @@ namespace UserDefinedComponents {
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         } else if (UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                    emsCallFromUserDefinedComponentModel,
-                UserZoneAirHVAC(CompNum).simPluginLocation
-            );
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
         ReportZoneAirUserDefined(CompNum);
@@ -568,10 +547,7 @@ namespace UserDefinedComponents {
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
             } else if (UserAirTerminal(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                        emsCallFromUserDefinedComponentModel,
-                    UserAirTerminal(CompNum).initPluginLocation
-                );
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).initPluginLocation);
             }
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
@@ -597,10 +573,7 @@ namespace UserDefinedComponents {
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             ManageEMS(emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
         } else if (UserAirTerminal(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(
-                    emsCallFromUserDefinedComponentModel,
-                UserAirTerminal(CompNum).simPluginLocation
-            );
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).simPluginLocation);
         }
 
         ReportAirTerminalUserDefined(CompNum);

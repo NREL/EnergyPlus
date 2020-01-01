@@ -156,7 +156,7 @@ class EnergyPlusPluginTesting(object):
                 elif not issubclass(this_class_type, EnergyPlusPlugin):
                     print(" INFO : Skipping class that does not inherit plugin base class: " + this_class_name)
                     continue
-                else: # we found one!
+                else:  # we found one!
                     print("   OK : Basic inheritance checks out OK for class: " + this_class_name)
 
                     try:
@@ -172,31 +172,44 @@ class EnergyPlusPluginTesting(object):
                     # it's possible that you could override the API methods further here if you wanted to test
                     # the script in a very custom fashion
 
-                    try:
-                        response = plugin_instance.initialize()
-                        print("   OK : Overridden initialize() function execution works")
-                    except Exception as e:
-                        print("ERROR : initialize() function overridden improperly, or is broken; reason: " + str(e))
-                        return 1
+                    # check each overridden function and call it
+                    # noinspection PyProtectedMember
+                    functions_overridden = plugin_instance._detect_overridden()
 
-                    if response is None:
-                        print("   OK : initialize() returns a void, this is the expected condition")
-                    else:
-                        print(" WARN : Bad return from initialize(); it should return nothing!")
-                        return 1
+                    expected_overrides = [
+                        'on_begin_new_environment',
+                        'on_after_new_environment_warmup_is_complete',
+                        'on_begin_zone_timestep_before_init_heat_balance',
+                        'on_begin_zone_timestep_after_init_heat_balance',
+                        'on_begin_timestep_before_predictor',
+                        'on_after_predictor_before_hvac_managers',
+                        'on_after_predictor_after_hvac_managers',
+                        'on_inside_hvac_system_iteration_loop',
+                        'on_end_of_zone_timestep_before_zone_reporting',
+                        'on_end_of_zone_timestep_after_zone_reporting',
+                        'on_end_of_system_timestep_before_hvac_reporting',
+                        'on_end_of_system_timestep_after_hvac_reporting',
+                        'on_end_of_zone_sizing',
+                        'on_end_of_system_sizing',
+                        'on_end_of_component_input_read_in',
+                        'on_user_defined_component_model',
+                        'on_unitary_system_sizing',
+                    ]
 
-                    try:
-                        response = plugin_instance.main()
-                        print("   OK : Overridden main() function execution works")
-                    except Exception as e:
-                        print("ERROR : main() function not overridden, or is broken; reason: " + str(e))
-                        return 1
-
-                    if isinstance(response, int):
-                        print("   OK : main() returns an int, this is the expected condition")
-                    else:
-                        print("ERROR : Bad return from main(); it must return an integer!")
-                        return 1
+                    for func in functions_overridden:
+                        if func in expected_overrides:
+                            method_to_call = getattr(plugin_instance, func)
+                            try:
+                                response = method_to_call()
+                                print("   OK : Overridden %s() function execution works" % func)
+                            except Exception as e:
+                                print("ERROR : %s() function not overridden, or is broken; reason: %s" % (func, str(e)))
+                                return 1
+                            if isinstance(response, int):
+                                print("   OK : %s() returns an int, this is the expected condition" % func)
+                            else:
+                                print("ERROR : Bad return from %s(); it must return an integer!" % func)
+                                return 1
 
                     successful_classes.append(this_class_name)
 

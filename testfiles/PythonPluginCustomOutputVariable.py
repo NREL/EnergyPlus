@@ -8,7 +8,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
         super().__init__()
         self.do_setup = True
 
-    def main(self) -> int:
+    def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
         if self.do_setup:
             self.data["zone_volumes"] = []
             self.data["zone_temps"] = []

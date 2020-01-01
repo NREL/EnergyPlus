@@ -48,6 +48,8 @@
 #ifndef EPLUS_PLUGINMANAGER_HH
 #define EPLUS_PLUGINMANAGER_HH
 
+#include <iomanip>
+#include <utility>
 #include <vector>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -76,14 +78,32 @@ namespace PluginManagement {
     // STUFF RELATED TO PYTHON PLUGINS DOWN HERE
 
     struct PluginInstance {
-        PluginInstance(const std::string& fileName, const std::string& className, const std::string& emsName, bool runPluginDuringWarmup);
-        ~PluginInstance();
-        static void reportPythonError();
-        std::string stringIdentifier; // for diagnostic reporting
-        bool runDuringWarmup;
+        PluginInstance(std::string moduleName, std::string className, std::string emsName, bool runPluginDuringWarmup) :
+                moduleName(std::move(moduleName)), className(std::move(className)), emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
+        {
+            this->stringIdentifier = moduleName + "." + className;
+        }
+
+        // members
+        std::string moduleName;
+        std::string className;
         std::string emsAlias;
+        bool runDuringWarmup;
+        std::string stringIdentifier; // for diagnostic reporting
+        PyObject *pModule = nullptr;  // reference to module
         PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+
+        // setup/shutdown should only be called once construction is completely done, i.e., setup() should only be called once the vector holding all the
+        // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
+        // inside setup() and shutdown() are related to unmanaged memory, and it's tricky to manage inside existing constructor/move operations, so they
+        // are split out into these explicitly called methods.
+        void setup();
+        void shutdown();
+
+        // methods
+        static void reportPythonError();
         void run(int iCallingPoint); // calls main() on this plugin instance
+
         // plugin calling point hooks
         std::string sHookBeginNewEnvironment = "on_begin_new_environment";
         bool bHasBeginNewEnvironment = false;
@@ -152,7 +172,7 @@ namespace PluginManagement {
         Real64 getGlobalVariableValue(int handle);
         void setGlobalVariableValue(int handle, Real64 value);
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
-        static void runSingleUserDefinedPlugin(int callingPoint, int index);
+        static void runSingleUserDefinedPlugin(int index);
         std::vector<std::string> globalVariableNames;
         std::vector<Real64> globalVariableValues;
     };

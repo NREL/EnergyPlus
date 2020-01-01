@@ -11,7 +11,7 @@ class ResizePSZToMatchProductAvailability(EnergyPlusPlugin):
             self.api.runtime.issue_warning("Invalid airflow passed into Python Plugin")
             return 0.0
 
-    def main(self):
+    def on_end_of_system_sizing(self):
         for zone_num in range(1, 11):
             var_handle = self.api.exchange.get_internal_variable_handle(
                 "Intermediate Air System Main Supply Volume Flow Rate", "PSZ-AC_%s:%s" % (zone_num, zone_num)
