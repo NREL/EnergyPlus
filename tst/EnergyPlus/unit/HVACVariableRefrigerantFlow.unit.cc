@@ -7631,9 +7631,10 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         " !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========",
 
         " ShadowCalculation,",
-        "     AverageOverDaysInFrequency,  !- Calculation Method",
-        "     20,                      !- Calculation Frequency",
-        "     15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    20,                      !- Shading Calculation Update Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         " !-   ===========  ALL OBJECTS IN CLASS: ZONEAIRHEATBALANCEALGORITHM ===========",
 
@@ -10546,7 +10547,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
-  
+
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 {
     //   PURPOSE OF THIS TEST:
@@ -12212,7 +12213,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
     Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisZoneEquip.ZoneNode).Temp, Node(thisZoneEquip.ZoneNode).HumRat);
-    
+
     auto &thisVRFTU(VRFTU(1));
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
