@@ -7,7 +7,7 @@ import os
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2018'
+_previous_year = '2019'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
@@ -187,7 +187,7 @@ def mergeParagraphs(text):
 
 class Visitor:
     def __init__(self):
-        self.count = 0
+        self.checked_files = []
     def filecheck(self, filepath):
         pass
     def files(self, path):
@@ -195,7 +195,7 @@ class Visitor:
     def check(self, path):
         for file in self.files(path):
             self.filecheck(file)
-            self.count += 1
+            self.checked_files.append(file)
 
 class CodeChecker(Visitor):
     def __init__(self):
@@ -293,7 +293,7 @@ class Replacer(CodeChecker):
                 fp.close()
                 self.replaced += 1
     def summary(self):
-        txt = ['Checked %d files' % self.count]
+        txt = ['Checked %d files' % len(self.checked_files)]
         if self.dryrun:
             txt.append('Would have replaced text in %d files' % self.replaced)
         else:
