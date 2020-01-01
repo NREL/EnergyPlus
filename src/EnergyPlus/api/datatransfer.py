@@ -89,6 +89,10 @@ class DataExchange:
         self.api.getPluginGlobalVariableValue.restype = RealEP
         self.api.setPluginGlobalVariableValue.argtypes = [c_int, RealEP]
         self.api.setPluginGlobalVariableValue.restype = c_void_p
+        self.api.getPluginTrendVariableHandle.argtypes = [c_char_p]
+        self.api.getPluginTrendVariableHandle.restype = c_int
+        self.api.getPluginTrendVariableValue.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableValue.restype = RealEP
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
@@ -305,7 +309,7 @@ class DataExchange:
         :return: Floating point representation of the global variable value
         """
         if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+            raise EnergyPlusException("get_global_value is only available as part of a Python Plugin workflow")
         return self.api.getPluginGlobalVariableValue(handle)
 
     def set_global_value(self, handle: int, value: float) -> None:
@@ -329,8 +333,31 @@ class DataExchange:
         :param value: Floating point value to assign to the global variable
         """
         if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+            raise EnergyPlusException("set_global_handle is only available as part of a Python Plugin workflow")
         self.api.setPluginGlobalVariableValue(handle, value)
+
+    def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
+        """
+
+        :param trend_var_name:
+        :return:
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_handle is only available as part of a Python Plugin workflow")
+        if isinstance(trend_var_name, str):
+            trend_var_name = trend_var_name.encode('utf-8')
+        return self.api.getPluginTrendVariableHandle(trend_var_name)
+
+    def get_trend_value(self, trend_handle: int, time_index: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param time_index:
+        :return:
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
     def year(self) -> int:
         """

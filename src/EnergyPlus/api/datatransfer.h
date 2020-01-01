@@ -67,11 +67,13 @@ ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
 ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
-// There are also a couple API points for Python Plugins specifically.  It is expected these will only
+// There are also a few API points for Python Plugins specifically.  It is expected these will only
 // be exposed through the plugin base class, not through the regular Python bindings.
 ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
 ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
 ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
+ENERGYPLUSLIB_API int getPluginTrendVariableHandle(const char* name);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableValue(int handle, int timeIndex);
 
 // Then there are a plethora of specialty one-off EMSVariable values that need to be accessible
 // We could certainly add to this list

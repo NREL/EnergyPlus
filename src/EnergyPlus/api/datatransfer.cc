@@ -164,6 +164,12 @@ void setPluginGlobalVariableValue(int handle, Real64 value) {
     EnergyPlus::PluginManagement::pluginManager->setGlobalVariableValue(handle, value);
 }
 
+int getPluginTrendVariableHandle(const char* name) {
+    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableHandle(name);
+}
+Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
+    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableValue(handle, timeIndex);
+}
 
 int getInternalVariableHandle(const char* type, const char* key) {
     int handle;

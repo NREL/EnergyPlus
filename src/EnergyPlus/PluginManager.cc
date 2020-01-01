@@ -73,6 +73,7 @@ namespace PluginManagement {
 
     std::map<int, std::vector<void (*)()>> callbacks;
     std::vector<PluginInstance> plugins;
+    std::vector<PluginTrendVariable> trends;
 
     void registerNewCallback(int iCalledFrom, void (*f)())
     {
@@ -364,8 +365,6 @@ namespace PluginManagement {
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
     }
 
-    // Python Plugin stuff here
-
     PluginManager::PluginManager()
     {
         // from https://docs.python.org/3/c-api/init.html
@@ -474,6 +473,7 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                // TODO: Make this an extensible object
                 if (fields.find("variable_name_1") != fields.end()) {
                     PluginManager::addGlobalVariable(fields.at("variable_name_1"));
                 }
@@ -490,7 +490,39 @@ namespace PluginManagement {
                     PluginManager::addGlobalVariable(fields.at("variable_name_5"));
                 }
             }
+        }
 
+        // PythonPlugin:TrendVariable,
+        //       \memo This object sets up a Python plugin trend variable from an Python plugin variable
+        //       \memo A trend variable logs values across timesteps
+        //       \min-fields 3
+        //  A1 , \field Name
+        //       \required-field
+        //       \type alpha
+        //  A2 , \field Name of a Python Plugin Variable
+        //       \required-field
+        //       \type alpha
+        //  N1 ; \field Number of Timesteps to be Logged
+        //       \required-field
+        //       \type integer
+        //       \minimum 1
+        std::string const sTrends = "PythonPlugin:TrendVariable";
+        int trendInstances = inputProcessor->getNumObjectsFound(sTrends);
+        if (trendInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sTrends);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(sTrends + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                std::string variableName = fields.at("name_of_a_python_plugin_variable");
+                int variableIndex = this->getGlobalVariableHandle(variableName);
+                int numValues = fields.at("number_of_timesteps_to_be_logged");
+                trends.emplace_back(thisObjectName, numValues, variableIndex);
+            }
         }
 
         // setting up output variables deferred until later in the simulation setup process
@@ -638,6 +670,9 @@ namespace PluginManagement {
         int numVals = PyList_Size(pFunctionResponse);
         // at this point we know which base class methods are being overridden by the derived class
         // we can loop over them and based on the name check the appropriate flag and assign the function pointer
+        if (numVals == 0) {
+            EnergyPlus::ShowFatalError("Python plugin \"" + this->stringIdentifier + "\" did not override any base class methods; must override at least one");
+        }
         for (int itemNum = 0; itemNum < numVals; itemNum++) {
             PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
             if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
@@ -833,6 +868,29 @@ namespace PluginManagement {
                 EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
                 return -1; // hush the compiler warning
             }
+        }
+    }
+
+    int PluginManager::getTrendVariableHandle(const std::string& name) {
+        std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
+        for (size_t i = 0; i < trends.size(); i++) {
+            auto & thisTrend = trends[i];
+            if (thisTrend.name == varNameUC) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
+        return trends[handle].values[timeIndex];
+    }
+
+    void PluginManager::updatePluginValues() {
+        for (auto & trend : trends) {
+            Real64 newVarValue = this->getGlobalVariableValue(trend.indexOfPluginVariable);
+            trend.values.push_front(newVarValue);
+            trend.values.pop_back();
         }
     }
 

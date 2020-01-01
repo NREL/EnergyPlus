@@ -9558,43 +9558,57 @@
 !    Battery,                 !- Output:Variable or Output:Meter Index Key Name
 !    Electric Storage Simple Charge State;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:InternalVariable,
-    MaxSOC,                  !- Name
-    BATTERY,                 !- Internal Data Index Key Name
-    Electrical Storage Simple Maximum Capacity;  !- Internal Data Type
+!  EnergyManagementSystem:InternalVariable,
+!    MaxSOC,                  !- Name
+!    BATTERY,                 !- Internal Data Index Key Name
+!    Electrical Storage Simple Maximum Capacity;  !- Internal Data Type
 
-  EnergyManagementSystem:TrendVariable,
-    FacilityElectTrend,      !- Name
-    CurntFacilityElectDemand,!- EMS Variable Name
-    1008;                    !- Number of Timesteps to be Logged
+!  EnergyManagementSystem:TrendVariable,
+!    FacilityElectTrend,      !- Name
+!    CurntFacilityElectDemand,!- EMS Variable Name
+!    1008;                    !- Number of Timesteps to be Logged
 
-  EnergyManagementSystem:Actuator,
-    dischargeRate,           !- Name
-    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-    Electrical Storage,      !- Actuated Component Type
-    Power Draw Rate;         !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    dischargeRate,           !- Name
+!    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
+!    Electrical Storage,      !- Actuated Component Type
+!    Power Draw Rate;         !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    chargeRate,              !- Name
-    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
-    Electrical Storage,      !- Actuated Component Type
-    Power Charge Rate;       !- Actuated Component Control Type
+!  EnergyManagementSystem:Actuator,
+!    chargeRate,              !- Name
+!    GRID BATTERY LOAD CENTER,!- Actuated Component Unique Name
+!    Electrical Storage,      !- Actuated Component Type
+!    Power Charge Rate;       !- Actuated Component Control Type
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Demand Manager Demonstration,  !- Name
-    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
-    BatteryControlDemandDemo;!- Program Name 1
+!  EnergyManagementSystem:ProgramCallingManager,
+!    Demand Manager Demonstration,  !- Name
+!    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
+!    BatteryControlDemandDemo;!- Program Name 1
 
-  EnergyManagementSystem:Program,
-    BatteryControlDemandDemo,!- Name
-    Set fracSOC = CurntStorageSOC / MaxSOC,  !- Program Line 1
-    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,  !- Program Line 2
-    set dischargeRate = 0.0, !- <none>
-    set chargeRate = 0.0,    !- <none>
-    set dampenFactor = 0.8,  !- <none>
-    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),  !- <none>
-    set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor,  !- <none>
-    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),  !- <none>
-    set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,  !- <none>
-    ENDIF;                   !- <none>
+!  EnergyManagementSystem:Program,
+!    BatteryControlDemandDemo,!- Name
+!    Set fracSOC = CurntStorageSOC / MaxSOC,  !- Program Line 1
+!    Set avgFacilDemand = @trendAverage FacilityElectTrend 1008,  !- Program Line 2
+!    set dischargeRate = 0.0, !- <none>
+!    set chargeRate = 0.0,    !- <none>
+!    set dampenFactor = 0.8,  !- <none>
+!    If ( CurntFacilityElectDemand > (avgFacilDemand * 1.05 ) ),  !- <none>
+!    set dischargeRate = ( CurntFacilityElectDemand - avgFacilDemand ) * dampenFactor,  !- <none>
+!    ELSEIF ( CurntFacilityElectDemand < (avgFacilDemand * 0.95 ) ),  !- <none>
+!    set chargeRate = ( avgFacilDemand - CurntFacilityElectDemand ) * dampenFactor,  !- <none>
+!    ENDIF;                   !- <none>
 
+  PythonPlugin:Variables,
+    MyGlobalVariables,       !- Name
+    OutdoorTempCopy;     !- Variable Name 1
+
+  PythonPlugin:TrendVariable,
+    ThisTrendVariable,
+    OutdoorTempCopy,
+    5;
+
+  PythonPlugin:Instance,
+    Test Out Trends,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginLrgOff_GridStorageSmoothing,  !- Python Module Name
+    TestOutTrends;         !- Plugin Class Name

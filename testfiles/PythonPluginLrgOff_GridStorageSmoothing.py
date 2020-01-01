@@ -1,28 +1,27 @@
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-class CollectTrendVariable(EnergyPlusPlugin):
+class TestOutTrends(EnergyPlusPlugin):
 
-    def __init__(self):
-        super().__init__()
-        self.handles_set = False
-        self.handle_whole_building_demand_power = None
-        self.handle_electric_storage_simple_charge_state = None
-
-    def main(self) -> int:
-        if not self.handles_set:
-            self.handle_whole_building_demand_power = self.api.exchange.get_variable_handle(
-                "Facility Total Electric Demand Power", "Whole Building"
+    def on_begin_zone_timestep_before_init_heat_balance(self) -> int:
+        if 'handles_set' not in self.data:
+            self.data['outdoor_temp'] = self.api.exchange.get_variable_handle(
+                "Site Outdoor Air Drybulb Temperature", "Environment"
             )
-            self.handle_electric_storage_simple_charge_state = self.api.exchange.get_variable_handle(
-                "Electric Storage Simple Charge State", "Battery"
-            )
-            self.handles_set = True
-        # hour = self.api.exchange.hour()
-        # if hour < 7:
-        #     self.api.exchange.set_actuator_value(self.handle, 15)
-        # elif hour < 18:
-        #     self.api.exchange.set_actuator_value(self.handle, 23)
-        # else:
-        #     self.api.exchange.set_actuator_value(self.handle, 15)
+            self.data['global_var'] = self.api.exchange.get_global_handle('OutdoorTempCopy')
+            self.data['trend_var'] = self.api.exchange.get_trend_handle('ThisTrendVariable')
+            self.data['handles_set'] = True
+            print("%s, %s, %s" % (
+                self.data['outdoor_temp'], self.data['global_var'], self.data['trend_var']
+            ))
+        cur_temp = self.api.exchange.get_variable_value(self.data['outdoor_temp'])
+        self.api.exchange.set_global_value(self.data['global_var'], cur_temp)
+        val_1 = self.api.exchange.get_trend_value(self.data['trend_var'], 0)
+        val_2 = self.api.exchange.get_trend_value(self.data['trend_var'], 1)
+        val_3 = self.api.exchange.get_trend_value(self.data['trend_var'], 2)
+        val_4 = self.api.exchange.get_trend_value(self.data['trend_var'], 3)
+        val_5 = self.api.exchange.get_trend_value(self.data['trend_var'], 4)
+        print("TRENDING: %s, %s, %s, %s, %s" % (
+            round(val_1, 2), round(val_2, 2), round(val_3, 2), round(val_4, 2), round(val_5, 2)
+        ))
         return 0
