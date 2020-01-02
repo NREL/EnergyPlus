@@ -202,7 +202,7 @@ class Visitor:
 class CodeChecker(Visitor):
     def __init__(self):
         Visitor.__init__(self)
-    def files(self, path):
+    def files3(self, path):
         # This is the Python 3 version, switch to it after
         # the switch is made to require Python 3
         extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
@@ -210,7 +210,7 @@ class CodeChecker(Visitor):
         for ext in extensions:
             results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
         return results
-    def files27(self, path):
+    def files(self, path):
         # This is the old Python 2.7 version
         extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
         results = []
