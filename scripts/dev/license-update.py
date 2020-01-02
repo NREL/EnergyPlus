@@ -72,9 +72,6 @@ replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
 # Check files
 for base in dirs:
-    #subdirs = glob.glob(base + '*/')
     replacer.check(base)
-    #for sub in subdirs:
-    #    replacer.check(sub)
 
 print(replacer.summary())
