@@ -207,7 +207,6 @@ namespace RefrigeratedCase {
     extern int NumUnusedGasCoolers;             // Number of refrigeration gas coolers not connected to a system
     extern int NumUnusedCompressors;            // Number of refrigeration compressors not connected to a system
     extern int NumUnusedSecondarys;             // Number of refrigeration secondarys not connected to a system
-    extern int NumUnusedWalkIns;                // Number of refrigeration compressors not connected to a system
     extern bool MyReferPlantScanFlag;
 
     // Refrigerated case variables

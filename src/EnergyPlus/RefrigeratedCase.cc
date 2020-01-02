@@ -344,7 +344,6 @@ namespace RefrigeratedCase {
     int NumUnusedGasCoolers(0);             // Number of refrigeration gas coolers not connected to a system
     int NumUnusedCompressors(0);            // Number of refrigeration compressors not connected to a system
     int NumUnusedSecondarys(0);             // Number of refrigeration secondarys not connected to a system
-    int NumUnusedWalkIns(0);                // Number of refrigeration compressors not connected to a system
     bool MyReferPlantScanFlag(true);
 
     // Refrigerated case variables
@@ -553,89 +552,53 @@ namespace RefrigeratedCase {
         Array1D_string Alphas;                  // Alpha items for object
         Array1D_string cAlphaFieldNames;        // Alpha field names (from input processor)
         Array1D_string cNumericFieldNames;      // Numeric field names (from input processor)
-        static std::string CurrentModuleObject; // Object type for getting and error messages
+        std::string CurrentModuleObject; // Object type for getting and error messages
 
         Array1D_bool lAlphaBlanks;      // Logic array, alpha input blank = .TRUE.
         Array1D_bool lNumericBlanks;    // Logic array, numeric input blank = .TRUE.
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         int AlphaNum(0);     // Used to cycle through input
-        static int CaseAndWalkInListNum(0); // ID of refrigerated CaseAndWalkInList
-        static int ChillerIndex(0);
-        static int CoilID(0);    // Index of warehouse coil attached to a system
-        static int CoilIndex(0); // Index of warehouse coil attached to a system
-        static int CoilNum(0);   // Index of warehouse coil
-        static int CompIndex(0); // Index  of refrigeration compressor attached to a system
-        static int CompNum(0);   // Index of refrigeration compressor
-        static int CondID(0);    // Condenser ID used when associating condenser as a cascade load
-        static int CondIndex(0); // Index  of refrigeration condenser attached to a system
-        static int CondNum(0);   // Index of refrigeration condenser
-        static int DefType(0);   // Local value for case defrost type
-        static int GCNum(0);                         // Index of refrigeration gas cooler
-        static int HRNum(0);                         // Counter for hours in day
-        static int IOStatus(0);                      // Used in GetObjectItem
-        static int ListNum(0);                       // Index of Lists of cases, compressors, and subcoolers
-        static int LoadCascadeNum(0);                // Used to read transfer load list
-        static int LoadCount(0);                     // check for blank case and walkin names in caseand alkinlist
-        static int LoadSecondaryNum(0);              // Used to read transfer load list
-        static int LoadWalkInNum(0);                 // Used to read CaseAndWalkInList
-        static int LoadCaseNum(0);                   // Used to read CaseAndWalkInList
-        static int LoadCoilNum(0);                   // Used to read CaseAndWalkInList
-        static int MaxNumAlphasRack(0);              // Maximum number of alphas for rack object
-        static int MaxNumAlphasAirChiller(0);        // Maximum number of alphas for air chiller
-        static int MaxNumAlphasAll(0);               // Maximum number of alphas for all objects
-        static int MaxNumAlphasSys(0);               // Maximum number of alphas for system object
-        static int MaxNumAlphasTransSys(0);          // Maximum number of alphas for transcritical system object
-        static int MaxNumAlphasChillerSet(0);        // Maximum number of alphas for chiller set
-        static int MaxNumAlphasConda(0);             // Maximum number of alphas for air-cooled condenser object
-        static int MaxNumAlphasConde(0);             // Maximum number of alphas for evap-cooled condenser object
-        static int MaxNumAlphasCondw(0);             // Maximum number of alphas for water-cooled condenser object
-        static int MaxNumAlphasGasCoolera(0);        // Maximum number of alphas for air-cooled gas cooler object
-        static int MaxNumAlphasComp(0);              // Maximum number of alphas for compressor object
-        static int MaxNumAlphasCompressorList(0);    // Maximum number of alphas for compressor list objects
-        static int MaxNumAlphasCase(0);              // Maximum number of alphas for case object
-        static int MaxNumAlphasCaseAndWalkInList(0); // Maximum number of alphas in CaseAndWalkInList
-        static int MaxNumAlphasWalkIn(0);            // Maximum number of alphas for walkin object
-        static int MaxNumAlphasSecond(0);             // Maximum number of alphas for air chiller object
-        static int MaxNumNumbersAirChiller(0);        // Maximum number of numbers for air chiller object
-        static int MaxNumNumbersSecond(0);            // Maximum number of numbers for secondary system object
-        static int MaxNumNumbersWalkIn(0);            // Maximum number of numbers for walkin object
-        static int MaxNumNumbersCase(0);              // Maximum number of numbers for case object
-        static int MaxNumNumbersCaseAndWalkInList(0); // Maximum number of numbers in CaseAndWalkInList
-        static int MaxNumNumbersRack(0);              // Maximum number of numbers for rack object
-        static int MaxNumNumbersAll(0);               // Maximum number of numeric inputs for all objects
-        static int MaxNumNumbersSys(0);               // Maximum number of numbers for system object
-        static int MaxNumNumbersTransSys(0);          // Maximum number of numbers for transcritical system object
-        static int MaxNumNumbersChillerSet(0);        // Maximum number of numbers for chiller set object
-        static int MaxNumNumbersConda(0);             // Maximum number of numbers for air-cooled condenser object
-        static int MaxNumNumbersConde(0);             // Maximum number of numbers for evap-cooled condenser object
-        static int MaxNumNumbersCondw(0);             // Maximum number of numbers for water-cooled condenser object
-        static int MaxNumNumbersGasCoolera(0);        // Maximum number of numbers for air-cooled gas cooler object
-        static int MaxNumNumbersComp(0);              // Maximum number of numbers for compressor object
-        static int MaxNumNumbersCompressorList(0);    // Maximum number of numbers
-        static int MaxNumArgs(0);                     // Max number of alphas and numbers (arguments) for rack object
-        static int NStart(0);                         // Used to cycle through zones on input for walk in coolers
-        static int NumAlphas(0);                      // Number of Alphas for each GetObjectItem call
-        static int NumCascadeLoad(0);                 // Number of Cascade Loads on current system
-        static int NumCompressorsSys(0);              // Number of compressors on current system
-        static int NumHiStageCompressorsSys(0);       // Number of high-stage compressors on current system
-        static int NumCondensers(0);                  // Counter for condensers in GETInput do loop
-        static int NumGasCoolers(0);                  // Counter for gas coolers in GetInput do loop
-        static int NumDefCycles(0);                   // Number of defrost cycles per day
-        static int NumPumps(0);                       // Number of pumps on a secondary loop
-        static int NumCases(0);                       // Number of refrigerated cases for single system
-        static int NumCasesMT(0);                     // Number of medium temperature cases on a single transcritical system
-        static int NumCasesLT(0);                     // Number of low temperature cases on a single transcritical system
-        static int NumCoils(0);                       // Number of warehouse coils for single system
-        static int NumSubcooler(0);                   // Number of subcoolers on current system
-        static int NumNameMatches(0);                 // Used to check for uniqueness of name for transfer loads
-        static int NumNum(0);                         // Used to cycle through input
-        static int NumNumbers(0);                     // Number of Numbers for each GetObjectItem call
-        static int NumCompressorLists(0);             // Total number of Compressor Lists in IDF
-        static int NumDisplayCases(0);                // Counter for refrigerated cases in GetInput do loop
-        static int NumSecondary(0);                   // Number of secondary loops
-        static int NumWalkIns(0);                     // Number of walk ins
-        static int NumWalkInsMT(0);                   // Number of medium temperature walk-ins on a single transcritical system
+        int IOStatus(0);                      // Used in GetObjectItem
+        int MaxNumAlphasRack(0);              // Maximum number of alphas for rack object
+        int MaxNumAlphasAirChiller(0);        // Maximum number of alphas for air chiller
+        int MaxNumAlphasAll(0);               // Maximum number of alphas for all objects
+        int MaxNumAlphasSys(0);               // Maximum number of alphas for system object
+        int MaxNumAlphasTransSys(0);          // Maximum number of alphas for transcritical system object
+        int MaxNumAlphasChillerSet(0);        // Maximum number of alphas for chiller set
+        int MaxNumAlphasConda(0);             // Maximum number of alphas for air-cooled condenser object
+        int MaxNumAlphasConde(0);             // Maximum number of alphas for evap-cooled condenser object
+        int MaxNumAlphasCondw(0);             // Maximum number of alphas for water-cooled condenser object
+        int MaxNumAlphasGasCoolera(0);        // Maximum number of alphas for air-cooled gas cooler object
+        int MaxNumAlphasComp(0);              // Maximum number of alphas for compressor object
+        int MaxNumAlphasCompressorList(0);    // Maximum number of alphas for compressor list objects
+        int MaxNumAlphasCase(0);              // Maximum number of alphas for case object
+        int MaxNumAlphasCaseAndWalkInList(0); // Maximum number of alphas in CaseAndWalkInList
+        int MaxNumAlphasWalkIn(0);            // Maximum number of alphas for walkin object
+        int MaxNumAlphasSecond(0);             // Maximum number of alphas for air chiller object
+        int MaxNumNumbersAirChiller(0);        // Maximum number of numbers for air chiller object
+        int MaxNumNumbersSecond(0);            // Maximum number of numbers for secondary system object
+        int MaxNumNumbersWalkIn(0);            // Maximum number of numbers for walkin object
+        int MaxNumNumbersCase(0);              // Maximum number of numbers for case object
+        int MaxNumNumbersCaseAndWalkInList(0); // Maximum number of numbers in CaseAndWalkInList
+        int MaxNumNumbersRack(0);              // Maximum number of numbers for rack object
+        int MaxNumNumbersAll(0);               // Maximum number of numeric inputs for all objects
+        int MaxNumNumbersSys(0);               // Maximum number of numbers for system object
+        int MaxNumNumbersTransSys(0);          // Maximum number of numbers for transcritical system object
+        int MaxNumNumbersChillerSet(0);        // Maximum number of numbers for chiller set object
+        int MaxNumNumbersConda(0);             // Maximum number of numbers for air-cooled condenser object
+        int MaxNumNumbersConde(0);             // Maximum number of numbers for evap-cooled condenser object
+        int MaxNumNumbersCondw(0);             // Maximum number of numbers for water-cooled condenser object
+        int MaxNumNumbersGasCoolera(0);        // Maximum number of numbers for air-cooled gas cooler object
+        int MaxNumNumbersComp(0);              // Maximum number of numbers for compressor object
+        int MaxNumNumbersCompressorList(0);    // Maximum number of numbers
+        int MaxNumArgs(0);                     // Max number of alphas and numbers (arguments) for rack object
+        int NumAlphas(0);                      // Number of Alphas for each GetObjectItem call
+        int NumCases(0);                       // Number of refrigerated cases for single system
+        int NumNum(0);                         // Used to cycle through input
+        int NumNumbers(0);                     // Number of Numbers for each GetObjectItem call
+        int NumDisplayCases(0);                // Counter for refrigerated cases in GetInput do loop
+        int NumWalkIns(0);                     // Number of walk ins
         static int NumWalkInsLT(0);                   // Number of low temperature walk-ins on a single transcritical system
         static int NumWIFieldsPerZone(0);             // Used to calculate number of zones exposed to each walkin
         static int NumWIFieldsTotal(0);               // Used to calculate number of zones exposed to each walkin
@@ -662,7 +625,6 @@ namespace RefrigeratedCase {
         static int TSNum(0);                         // Counter for time steps in hour
         static int WalkInIndex(0);                   // Index of walk ins
         static int WalkInID(0);                      // Index of walk ins
-        static int WalkInNum(0);                     // Index of walk ins
         static int TotFields(0);                     // Used to calc number of zones on input for walk in coolers
         static int ZoneID(0);                        // Index to zone
         static int ZoneIndex(0);                     // Index to zone
@@ -740,7 +702,7 @@ namespace RefrigeratedCase {
         DataHeatBalance::NumRefrigCondensers = NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater + NumSimulationCascadeCondensers;
         NumSimulationCompressors = inputProcessor->getNumObjectsFound("Refrigeration:Compressor");
         NumSimulationSubcoolers = inputProcessor->getNumObjectsFound("Refrigeration:Subcooler");
-        NumCompressorLists = inputProcessor->getNumObjectsFound("Refrigeration:CompressorList");
+        int NumCompressorLists = inputProcessor->getNumObjectsFound("Refrigeration:CompressorList");
         DataHeatBalance::NumRefrigChillerSets = inputProcessor->getNumObjectsFound("ZoneHVAC:RefrigerationChillerSet");
         NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound("Refrigeration:AirChiller");
 
@@ -1204,7 +1166,7 @@ namespace RefrigeratedCase {
                     RefrigCase(CaseNum).DefrostType = DefNone;
                 }
 
-                DefType = RefrigCase(CaseNum).DefrostType;
+                int DefType = RefrigCase(CaseNum).DefrostType;
                 NumNum = 18;
                 if (!lNumericBlanks(NumNum)) {
                     RefrigCase(CaseNum).DefrostPower = Numbers(NumNum);
@@ -1253,10 +1215,10 @@ namespace RefrigeratedCase {
 
                 // Flag for counting defrost cycles
                 bool StartCycle = false;
-                NumDefCycles = 0;
+                int NumDefCycles = 0;
                 DayValues = 0.0;
                 ScheduleManager::GetScheduleValuesForDay(RefrigCase(CaseNum).DefrostSchedPtr, DayValues, 1);
-                for (HRNum = 1; HRNum <= 24; ++HRNum) {
+                for (int HRNum = 1; HRNum <= 24; ++HRNum) {
                     for (TSNum = 1; TSNum <= DataGlobals::NumOfTimeStepInHour; ++TSNum) {
                         if (DayValues(TSNum, HRNum) > 0.0) {
                             if (!StartCycle) {
@@ -1796,7 +1758,7 @@ namespace RefrigeratedCase {
                 if (!allocated(WalkIn(WalkInID).LatZoneCredit)) WalkIn(WalkInID).LatZoneCredit.allocate(NumZones) = 0.0;
 
                 int AStart = NumWIAlphaFieldsBeforeZoneInput + 1;
-                NStart = NumWINumberFieldsBeforeZoneInput + 1;
+                int NStart = NumWINumberFieldsBeforeZoneInput + 1;
                 for (ZoneID = 1; ZoneID <= NumZones; ++ZoneID) {
                     // Get the Zone node number from the zone name
                     // The Zone Node is needed to get the zone's ambient conditions, DataGlobals::NumOfZones from dataglobals
@@ -1936,7 +1898,7 @@ namespace RefrigeratedCase {
 
         if (NumSimulationRefrigAirChillers > 0) {
             CurrentModuleObject = "Refrigeration:AirChiller";
-            for (CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID) {
+            for (int CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID) {
                 // A1
                 AlphaNum = 1;
                 inputProcessor->getObjectItem(CurrentModuleObject,
@@ -2602,10 +2564,10 @@ namespace RefrigeratedCase {
                 int AlphaStartList = AlphaNum; //+ 1
                 AirChillerSet(SetID).NumCoils = NumChillersInSet;
                 if (!allocated(AirChillerSet(SetID).CoilNum)) AirChillerSet(SetID).CoilNum.allocate(NumChillersInSet);
-                for (ChillerIndex = 1; ChillerIndex <= NumChillersInSet; ++ChillerIndex) {
+                for (int ChillerIndex = 1; ChillerIndex <= NumChillersInSet; ++ChillerIndex) {
                     int AlphaListNum = AlphaStartList + ChillerIndex;
                     if (!lAlphaBlanks(AlphaListNum)) {
-                        CoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), WarehouseCoil);
+                        int CoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), WarehouseCoil);
                         if (CoilNum == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\", has an invalid " +
                                             cAlphaFieldNames(AlphaListNum) + " defined as " + Alphas(AlphaListNum));
@@ -2624,7 +2586,7 @@ namespace RefrigeratedCase {
         //**** Read CaseAndWalkIn Lists **********************************************************
         if (NumSimulationCaseAndWalkInLists > 0) {
             CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
-            for (ListNum = 1; ListNum <= NumSimulationCaseAndWalkInLists; ++ListNum) {
+            for (int ListNum = 1; ListNum <= NumSimulationCaseAndWalkInLists; ++ListNum) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               ListNum,
                                               Alphas,
@@ -2649,14 +2611,14 @@ namespace RefrigeratedCase {
                 NumCasesOnList = 0;
                 NumCoilsOnList = 0;
                 NumWalkInsOnList = 0;
-                LoadCount = 0;
+                int LoadCount = 0;
                 for (NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
                     int AlphaListNum = 1 + NumLoad;
                     if (!lAlphaBlanks(AlphaListNum)) {
                         ++LoadCount;
-                        LoadWalkInNum = 0;
-                        LoadCaseNum = 0;
-                        LoadCoilNum = 0;
+                        int LoadWalkInNum = 0;
+                        int LoadCaseNum = 0;
+                        int LoadCoilNum = 0;
                         if (NumSimulationWalkIns > 0) LoadWalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), WalkIn);
                         if (NumSimulationCases > 0) LoadCaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), RefrigCase);
                         if (NumSimulationRefrigAirChillers > 0) LoadCoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), WarehouseCoil);
@@ -2950,7 +2912,7 @@ namespace RefrigeratedCase {
 
                 // Read all loads on this rack: cases and walk-ins and coils
                 NumCases = 0;
-                NumCoils = 0;
+                int NumCoils = 0;
                 NumWalkIns = 0;
                 RefrigRack(RackNum).NumCases = 0;
                 RefrigRack(RackNum).NumCoils = 0;
@@ -2966,16 +2928,16 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 } else { // (.NOT. lAlphaBlanks(AlphaNum))
                     // Entry for Alphas(AlphaNum) can be either a Case, WalkIn, Coil, or CaseAndWalkInList name
-                    CaseAndWalkInListNum = 0;
+                    int CaseAndWalkInListNum = 0;
                     int CaseNum = 0;
-                    WalkInNum = 0;
-                    CoilNum = 0;
+                    int WalkInNum = 0;
+                    int CoilNum = 0;
                     if (NumSimulationCaseAndWalkInLists > 0)
                         CaseAndWalkInListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                     if (NumSimulationCases > 0) CaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), RefrigCase);
                     if (NumSimulationWalkIns > 0) WalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WalkIn);
                     if (NumSimulationRefrigAirChillers > 0) CoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
-                    NumNameMatches = 0;
+                    int NumNameMatches = 0;
                     if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                     if (CaseNum != 0) ++NumNameMatches;
                     if (WalkInNum != 0) ++NumNameMatches;
@@ -3048,8 +3010,8 @@ namespace RefrigeratedCase {
 
                 if (NumCoils > 0) {
                     RefrigRack(RackNum).CoilFlag = true;
-                    for (CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
-                        CoilNum = RefrigRack(RackNum).CoilNum(CoilIndex);
+                    for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
+                        int CoilNum = RefrigRack(RackNum).CoilNum(CoilIndex);
                         // mark all Coils on rack as used by this system (checking for unused or non-unique Coils)
                         ++WarehouseCoil(CoilNum).NumSysAttach;
                         // determine total capacity on rack
@@ -3127,7 +3089,7 @@ namespace RefrigeratedCase {
 
             if (NumSimulationCondAir > 0) {
                 CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
-                for (CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum) {
+                for (int CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum) {
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   CondNum,
                                                   Alphas,
@@ -3251,8 +3213,8 @@ namespace RefrigeratedCase {
 
             if (NumSimulationCondEvap > 0) {
                 CurrentModuleObject = "Refrigeration:Condenser:EvaporativeCooled";
-                for (CondIndex = 1; CondIndex <= NumSimulationCondEvap; ++CondIndex) {
-                    CondNum = CondIndex + NumSimulationCondAir;
+                for (int CondIndex = 1; CondIndex <= NumSimulationCondEvap; ++CondIndex) {
+                    int CondNum = CondIndex + NumSimulationCondAir;
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3478,8 +3440,8 @@ namespace RefrigeratedCase {
 
             if (NumSimulationCondWater > 0) {
                 CurrentModuleObject = "Refrigeration:Condenser:WaterCooled";
-                for (CondIndex = 1; CondIndex <= NumSimulationCondWater; ++CondIndex) {
-                    CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
+                for (int CondIndex = 1; CondIndex <= NumSimulationCondWater; ++CondIndex) {
+                    int CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3625,8 +3587,8 @@ namespace RefrigeratedCase {
             // cascade condensers assumed to provide zero subcooling
             if (NumSimulationCascadeCondensers > 0) {
                 CurrentModuleObject = "Refrigeration:Condenser:Cascade";
-                for (CondIndex = 1; CondIndex <= NumSimulationCascadeCondensers; ++CondIndex) {
-                    CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
+                for (int CondIndex = 1; CondIndex <= NumSimulationCascadeCondensers; ++CondIndex) {
+                    int CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   CondIndex,
                                                   Alphas,
@@ -3713,7 +3675,7 @@ namespace RefrigeratedCase {
 
             if (NumSimulationGasCooler > 0) {
                 CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
-                for (GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum) {
+                for (int GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum) {
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   GCNum,
                                                   Alphas,
@@ -3899,7 +3861,7 @@ namespace RefrigeratedCase {
                     NominalTotalCaseCap = 0.0;
                     NumCases = 0;
                     NominalTotalCoilCap = 0.0;
-                    NumCoils = 0;
+                    int NumCoils = 0;
                     NumWalkIns = 0;
                     NominalTotalWalkInCap = 0.0;
                     Secondary(SecondaryNum).RefInventory = 0.0;
@@ -3914,16 +3876,16 @@ namespace RefrigeratedCase {
                     } else { // (.NOT. lAlphaBlanks(AlphaNum))
 
                         // Entry for Alphas(AlphaNum) can be either a Case, WalkIn Coil, or CaseAndWalkInList name
-                        CaseAndWalkInListNum = 0;
+                        int CaseAndWalkInListNum = 0;
                         int CaseNum = 0;
-                        WalkInNum = 0;
-                        CoilNum = 0;
+                        int WalkInNum = 0;
+                        int CoilNum = 0;
                         if (NumSimulationCaseAndWalkInLists > 0)
                             CaseAndWalkInListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                         if (NumSimulationCases > 0) CaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), RefrigCase);
                         if (NumSimulationWalkIns > 0) WalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WalkIn);
                         if (NumSimulationRefrigAirChillers > 0) CoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
-                        NumNameMatches = 0;
+                        int NumNameMatches = 0;
                         if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                         if (CaseNum != 0) ++NumNameMatches;
                         if (WalkInNum != 0) ++NumNameMatches;
@@ -3991,9 +3953,9 @@ namespace RefrigeratedCase {
                     if (NumCoils > 0) {
                         // Find lowest design T loop fluid out of secondary chiller
                         // Sum rated capacity of all Coils on Secondary
-                        for (CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
+                        for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
                             // mark all Coils on Secondary as used by this Secondary - checking for unused or non-unique Coils
-                            CoilNum = Secondary(SecondaryNum).CoilNum(CoilIndex);
+                            int CoilNum = Secondary(SecondaryNum).CoilNum(CoilIndex);
                             ++WarehouseCoil(CoilNum).NumSysAttach;
                             NominalTotalCoilCap += WarehouseCoil(CoilNum).RatedSensibleCap;
                             Secondary(SecondaryNum).RefInventory += WarehouseCoil(CoilNum).DesignRefrigInventory;
@@ -4194,7 +4156,7 @@ namespace RefrigeratedCase {
                     } // fluid type AlwaysLiquid or PhaseChange ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
                     // Read number of pumps (or pump stages) in secondary loop
-                    NumPumps = 1; // default value
+                    int NumPumps = 1; // default value
                     if ((!lNumericBlanks(6)) && (Numbers(6) >= 1)) NumPumps = Numbers(6);
                     Secondary(SecondaryNum).NumPumps = NumPumps;
                     // Get pump power (users can input either power in W or head in Pa or both)
@@ -4453,7 +4415,7 @@ namespace RefrigeratedCase {
             //************ START Compressor INPUT  **************
 
             CurrentModuleObject = "Refrigeration:Compressor";
-            for (CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum) {
+            for (int CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               CompNum,
                                               Alphas,
@@ -4636,7 +4598,7 @@ namespace RefrigeratedCase {
             //**** Read TransferLoad Lists **********************************************************
             if (NumSimulationTransferLoadLists > 0) {
                 CurrentModuleObject = "Refrigeration:TransferLoadList";
-                for (ListNum = 1; ListNum <= NumSimulationTransferLoadLists; ++ListNum) {
+                for (int ListNum = 1; ListNum <= NumSimulationTransferLoadLists; ++ListNum) {
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   ListNum,
                                                   Alphas,
@@ -4664,8 +4626,8 @@ namespace RefrigeratedCase {
                     NumCascadeLoadsOnList = 0;
                     for (NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
                         int AlphaListNum = 1 + NumLoad;
-                        LoadCascadeNum = 0;
-                        LoadSecondaryNum = 0;
+                        int LoadCascadeNum = 0;
+                        int LoadSecondaryNum = 0;
                         if (DataHeatBalance::NumRefrigCondensers > 0) LoadCascadeNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), Condenser);
                         if (NumSimulationSecondarySystems > 0) LoadSecondaryNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), Secondary);
                         if ((LoadCascadeNum == 0) && (LoadSecondaryNum == 0)) {
@@ -4700,7 +4662,7 @@ namespace RefrigeratedCase {
 
             //**** Read Compressor Lists **********************************************************
             CurrentModuleObject = "Refrigeration:CompressorList";
-            for (ListNum = 1; ListNum <= NumCompressorLists; ++ListNum) {
+            for (int ListNum = 1; ListNum <= NumCompressorLists; ++ListNum) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               ListNum,
                                               Alphas,
@@ -4719,7 +4681,7 @@ namespace RefrigeratedCase {
                 if (!allocated(CompressorLists(ListNum).CompItemNum))
                     CompressorLists(ListNum).CompItemNum.allocate(CompressorLists(ListNum).NumCompressors);
 
-                for (CompIndex = 1; CompIndex <= CompressorLists(ListNum).NumCompressors; ++CompIndex) {
+                for (int CompIndex = 1; CompIndex <= CompressorLists(ListNum).NumCompressors; ++CompIndex) {
                     int AlphaListNum = CompIndex + 1; // same as do loop from 2 to end of list
                     if (!lAlphaBlanks(AlphaListNum)) {
                         CompressorLists(ListNum).CompItemNum(CompIndex) = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), Compressor);
@@ -4763,13 +4725,12 @@ namespace RefrigeratedCase {
                 }
                 NumCases = 0;
                 System(RefrigSysNum).NumCases = 0;
-                NumCoils = 0;
+                int NumCoils = 0;
                 System(RefrigSysNum).NumCoils = 0;
                 NumWalkIns = 0;
                 System(RefrigSysNum).NumWalkIns = 0;
-                NumSecondary = 0;
+                int NumSecondary = 0;
                 System(RefrigSysNum).NumSecondarys = 0;
-                NumCascadeLoad = 0;
                 System(RefrigSysNum).NumCascadeLoads = 0;
                 System(RefrigSysNum).NumNonCascadeLoads = 0;
                 NominalTotalCaseCap = 0.0;
@@ -4785,16 +4746,16 @@ namespace RefrigeratedCase {
                 if (!lAlphaBlanks(AlphaNum)) {
 
                     // Entry for Alphas(AlphaNum) can be either a Case, WalkIn or CaseAndWalkInList name
-                    CaseAndWalkInListNum = 0;
+                    int CaseAndWalkInListNum = 0;
                     int CaseNum = 0;
-                    WalkInNum = 0;
-                    CoilNum = 0;
+                    int WalkInNum = 0;
+                    int CoilNum = 0;
                     if (NumSimulationCaseAndWalkInLists > 0)
                         CaseAndWalkInListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                     if (NumSimulationCases > 0) CaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), RefrigCase);
                     if (NumSimulationWalkIns > 0) WalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WalkIn);
                     if (NumSimulationRefrigAirChillers > 0) CoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
-                    NumNameMatches = 0;
+                    int NumNameMatches = 0;
                     if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                     if (CaseNum != 0) ++NumNameMatches;
                     if (WalkInNum != 0) ++NumNameMatches;
@@ -4868,9 +4829,9 @@ namespace RefrigeratedCase {
                 if (NumCoils > 0) {
                     // Find lowest design evap T
                     // Sum rated capacity of all Coils on system
-                    for (CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
+                    for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
                         // mark all Coils on system as used by this system - checking for unused or non-unique Coils
-                        CoilNum = System(RefrigSysNum).CoilNum(CoilIndex);
+                        int CoilNum = System(RefrigSysNum).CoilNum(CoilIndex);
                         ++WarehouseCoil(CoilNum).NumSysAttach;
                         NominalTotalCoilCap += WarehouseCoil(CoilNum).RatedSensibleCap;
                         System(RefrigSysNum).RefInventory += WarehouseCoil(CoilNum).DesignRefrigInventory;
@@ -4924,10 +4885,11 @@ namespace RefrigeratedCase {
                     if (NumSimulationTransferLoadLists > 0) TransferLoadListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), TransferLoadList);
                     if (NumSimulationSecondarySystems > 0) SecondaryNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Secondary);
                     if (DataHeatBalance::NumRefrigCondensers > 0) CascadeLoadNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Condenser);
-                    NumNameMatches = 0;
+                    int NumNameMatches = 0;
                     if (TransferLoadListNum != 0) ++NumNameMatches;
                     if (SecondaryNum != 0) ++NumNameMatches;
                     if (CascadeLoadNum != 0) ++NumNameMatches;
+                    int NumCascadeLoad = 0;
 
                     if (NumNameMatches != 1) { // name must uniquely point to a list or a single transfer load
                         ErrorsFound = true;
@@ -4998,7 +4960,7 @@ namespace RefrigeratedCase {
 
                     if (NumCascadeLoad > 0) {
                         for (int cascadeLoadIndex = 1; cascadeLoadIndex <= NumCascadeLoad; ++cascadeLoadIndex) {
-                            CondID = System(RefrigSysNum).CascadeLoadNum(cascadeLoadIndex);
+                            int CondID = System(RefrigSysNum).CascadeLoadNum(cascadeLoadIndex);
                             if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) {
                                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", has a  " +
                                                 cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum) +
@@ -5052,11 +5014,11 @@ namespace RefrigeratedCase {
                 // read condenser
                 // currently assumes one condenser per refrigeration system and but multiple systems allowed per condenser
                 AlphaNum = 4;
-                NumCondensers = 1;
+                int NumCondensers = 1;
                 if (!allocated(System(RefrigSysNum).CondenserNum)) System(RefrigSysNum).CondenserNum.allocate(NumCondensers);
                 System(RefrigSysNum).NumCondensers = 1;
                 // Find condenser number, note condensers were read in one of four objects, but all read into same list
-                CondNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Condenser);
+                int CondNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Condenser);
                 if (CondNum == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", has an invalid " +
                                     cAlphaFieldNames(AlphaNum) + " defined as " + Alphas(AlphaNum));
@@ -5097,17 +5059,19 @@ namespace RefrigeratedCase {
                 // Read the compressor data.
                 // If the system consists of two stages of compression, these compressors will be the low-stage compressors.
                 AlphaNum = 5;
-                NumCompressorsSys = 0;
+                int NumCompressorsSys = 0;
                 if (lAlphaBlanks(AlphaNum)) {
                     // blank input where must have compressor or compressor list input.
                     ShowSevereError(RoutineName + CurrentModuleObject + ' ' + cAlphaFieldNames(AlphaNum) + "\" : must be input.");
                     ErrorsFound = true;
                 } else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
+                    int ListNum;
                     if (NumCompressorLists > 0) {
                         ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
                     } else {
                         ListNum = 0;
                     }
+                    int CompNum;
                     if (NumSimulationCompressors > 0) {
                         CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                     } else {
@@ -5192,7 +5156,7 @@ namespace RefrigeratedCase {
 
                 if (System(RefrigSysNum).NumSubcoolers > 0) {
                     if (!allocated(System(RefrigSysNum).SubcoolerNum)) System(RefrigSysNum).SubcoolerNum.allocate(System(RefrigSysNum).NumSubcoolers);
-                    NumSubcooler = 1;
+                    int NumSubcooler = 1;
                     if (!lAlphaBlanks(AlphaNum)) {
                         System(RefrigSysNum).SubcoolerNum(NumSubcooler) =
                             inputProcessor->getObjectItemNum("Refrigeration:Subcooler", Alphas(AlphaNum));
@@ -5315,7 +5279,7 @@ namespace RefrigeratedCase {
 
                 // Read the high-stage compressor info, if two-stage compression has been specified.
                 AlphaNum = 13;
-                NumHiStageCompressorsSys = 0;
+                int NumHiStageCompressorsSys = 0;
                 if (System(RefrigSysNum).NumStages == 2) {
                     if (lAlphaBlanks(AlphaNum)) {
                         // blank input where must have high-stage compressor or compressor list input.
@@ -5323,8 +5287,8 @@ namespace RefrigeratedCase {
                                         " must be input for two-stage compression systems.");
                         ErrorsFound = true;
                     } else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-                        ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
-                        CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
+                        int ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
+                        int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                         if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " +
                                             cAlphaFieldNames(AlphaNum) + " has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
@@ -5366,8 +5330,8 @@ namespace RefrigeratedCase {
 
                 // Sum capacity of single-stage compressors or low-stage compressors if two-stage system
                 NominalTotalCompCap = 0.0;
-                for (CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
-                    CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
+                for (int CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
+                    int CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
                     if (!Compressor(CompNum).TransFlag) {          //  Subcritical Compressor
                         if (System(RefrigSysNum).NumStages == 1) { //  Single-stage compression
                             Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
@@ -5392,8 +5356,8 @@ namespace RefrigeratedCase {
 
                 // Sum capacity of high-stage compressors if two stage system
                 if (System(RefrigSysNum).NumStages == 2) {
-                    for (CompIndex = 1; CompIndex <= NumHiStageCompressorsSys; ++CompIndex) {
-                        CompNum = System(RefrigSysNum).HiStageCompressorNum(CompIndex);
+                    for (int CompIndex = 1; CompIndex <= NumHiStageCompressorsSys; ++CompIndex) {
+                        int CompNum = System(RefrigSysNum).HiStageCompressorNum(CompIndex);
                         if (!Compressor(CompNum).TransFlag) { //  Subcritical Compressor
                             Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
                                                                     System(RefrigSysNum).TIntercooler,
@@ -5436,10 +5400,10 @@ namespace RefrigeratedCase {
             // can't mix on one system) need to do here once again after all cascade condensers and cascade sink systems have been identified
             for (RefrigSysNum = 1; RefrigSysNum <= DataHeatBalance::NumRefrigSystems; ++RefrigSysNum) {
                 // assign flags to all condensers to match system below condenser (system rejecting heat to cascade condenser)
-                CondNum = System(RefrigSysNum).CondenserNum(1); // right now only have one condenser per system
+                int CondNum = System(RefrigSysNum).CondenserNum(1); // right now only have one condenser per system
                 Condenser(CondNum).CoilFlag = System(RefrigSysNum).CoilFlag;
-                for (CompIndex = 1; CompIndex <= System(RefrigSysNum).NumCompressors; ++CompIndex) {
-                    CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
+                for (int CompIndex = 1; CompIndex <= System(RefrigSysNum).NumCompressors; ++CompIndex) {
+                    int CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
                     Compressor(CompNum).CoilFlag = System(RefrigSysNum).CoilFlag;
                 }
 
@@ -5452,7 +5416,7 @@ namespace RefrigeratedCase {
             for (RefrigSysNum = 1; RefrigSysNum <= DataHeatBalance::NumRefrigSystems; ++RefrigSysNum) { // check flags for systems reflect all cascade loads
                 if (System(RefrigSysNum).NumCascadeLoads == 0) continue;
                 if (System(RefrigSysNum).CoilFlag) { // system already identified as serving coils
-                    for (CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) {
+                    for (int CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) {
                         if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) continue;
                         if (RefrigSysNum != Condenser(CondID).CascadeSinkSystemID) continue; // this condenser is not a cascade load on this system
                         if (!Condenser(CondID).CoilFlag) {
@@ -5468,7 +5432,7 @@ namespace RefrigeratedCase {
                     // Flag to help verify load type with loads served by systems cooled by cascade condensers
                     bool CaseLoads = false;
                     NumCascadeLoadsChecked = 0;
-                    for (CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) { // look at All cascade condenser loads on system
+                    for (int CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) { // look at All cascade condenser loads on system
                         if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) continue;
                         if (RefrigSysNum != Condenser(CondID).CascadeSinkSystemID) continue; // this condenser is not a cascade load on this system
                         ++NumCascadeLoadsChecked;
@@ -5564,7 +5528,7 @@ namespace RefrigeratedCase {
                     // No system type specified
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                     "\", has no system type specified.");
-                    ShowContinueError("  System type must be specified as \"SingleStage\" or \"TwoStage\".");
+                    ShowContinueError(R"(  System type must be specified as "SingleStage" or "TwoStage".)");
                     ErrorsFound = true;
                 }
                 if (UtilityRoutines::SameString(Alphas(2), "SingleStage")) {
@@ -5599,11 +5563,11 @@ namespace RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                NumCasesMT = 0;
+                int NumCasesMT = 0;
                 TransSystem(TransRefrigSysNum).NumCasesMT = 0;
-                NumCasesLT = 0;
+                int NumCasesLT = 0;
                 TransSystem(TransRefrigSysNum).NumCasesLT = 0;
-                NumWalkInsMT = 0;
+                int NumWalkInsMT = 0;
                 TransSystem(TransRefrigSysNum).NumWalkInsMT = 0;
                 NumWalkInsLT = 0;
                 TransSystem(TransRefrigSysNum).NumWalkInsLT = 0;
@@ -5620,14 +5584,14 @@ namespace RefrigeratedCase {
                 if (!lAlphaBlanks(AlphaNum)) {
 
                     // Entry for Alphas(AlphaNum) can be either a Case, WalkIn or CaseAndWalkInList name
-                    CaseAndWalkInListNum = 0;
+                    int CaseAndWalkInListNum = 0;
                     int CaseNum = 0;
-                    WalkInNum = 0;
+                    int WalkInNum = 0;
                     if (NumSimulationCaseAndWalkInLists > 0)
                         CaseAndWalkInListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                     if (NumSimulationCases > 0) CaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), RefrigCase);
                     if (NumSimulationWalkIns > 0) WalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WalkIn);
-                    NumNameMatches = 0;
+                    int NumNameMatches = 0;
                     if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                     if (CaseNum != 0) ++NumNameMatches;
                     if (WalkInNum != 0) ++NumNameMatches;
@@ -5723,14 +5687,14 @@ namespace RefrigeratedCase {
                 if (!lAlphaBlanks(AlphaNum)) {
 
                     // Entry for Alphas(AlphaNum) can be either a Case, WalkIn or CaseAndWalkInList name
-                    CaseAndWalkInListNum = 0;
+                    int CaseAndWalkInListNum = 0;
                     int CaseNum = 0;
-                    WalkInNum = 0;
+                    int WalkInNum = 0;
                     if (NumSimulationCaseAndWalkInLists > 0)
                         CaseAndWalkInListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                     if (NumSimulationCases > 0) CaseNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), RefrigCase);
                     if (NumSimulationWalkIns > 0) WalkInNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), WalkIn);
-                    NumNameMatches = 0;
+                    int NumNameMatches = 0;
                     if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                     if (CaseNum != 0) ++NumNameMatches;
                     if (WalkInNum != 0) ++NumNameMatches;
@@ -5826,11 +5790,11 @@ namespace RefrigeratedCase {
                 // Read Gas Cooler
                 // currently assumes one gas cooler per refrigeration system and but multiple systems allowed per gas cooler
                 AlphaNum = 5;
-                NumGasCoolers = 1;
+                int NumGasCoolers = 1;
                 if (!allocated(TransSystem(TransRefrigSysNum).GasCoolerNum)) TransSystem(TransRefrigSysNum).GasCoolerNum.allocate(NumGasCoolers);
                 TransSystem(TransRefrigSysNum).NumGasCoolers = 1;
                 // Find gascooler number
-                GCNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), GasCooler);
+                int GCNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), GasCooler);
 
                 if (GCNum == 0) { //  Invalid Gas Cooler attached to Transcritical Refrigeration System
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has an invalid " +
@@ -5849,14 +5813,14 @@ namespace RefrigeratedCase {
 
                 // Read High Pressure Compressor
                 AlphaNum = 6;
-                NumCompressorsSys = 0;
+                int NumCompressorsSys = 0;
                 if (lAlphaBlanks(AlphaNum)) {
                     // blank input where must have compressor or compressor list input.
                     ShowSevereError(RoutineName + CurrentModuleObject + ' ' + cAlphaFieldNames(AlphaNum) + "\" : must be input.");
                     ErrorsFound = true;
                 } else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-                    ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
-                    CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
+                    int ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
+                    int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                     if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                         ShowSevereError(RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames(AlphaNum) +
                                         "\", has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
@@ -5881,7 +5845,7 @@ namespace RefrigeratedCase {
                     }
                     // Sum rated capacity of all HP compressors on system
                     NominalTotalCompCapHP = 0.0;
-                    for (CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
+                    for (int CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
                         CompNum = TransSystem(TransRefrigSysNum).CompressorNumHP(CompIndex);
 
                         if (Compressor(CompNum).TransFlag) { //  Calculate nominal capacity of transcritical Compressor
@@ -5920,8 +5884,8 @@ namespace RefrigeratedCase {
                                      "\" was found.  The low pressure compressors will be ignored and will not simulated.");
                 } else if ((!(lAlphaBlanks(AlphaNum))) && (TransSystem(TransRefrigSysNum).TransSysType == 2)) {
                     // TwoStage system with low pressure compressors specified
-                    ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
-                    CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
+                    int ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
+                    int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                     if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                         ShowSevereError(RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames(AlphaNum) +
                                         "\", has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
@@ -5946,7 +5910,7 @@ namespace RefrigeratedCase {
                     }
                     // Sum rated capacity of all LP compressors on system
                     NominalTotalCompCapLP = 0.0;
-                    for (CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
+                    for (int CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
                         CompNum = TransSystem(TransRefrigSysNum).CompressorNumLP(CompIndex);
                         if (TransSystem(TransRefrigSysNum).TransSysType == 2) { //  Calculate capacity of LP compressors
                             Compressor(CompNum).NomCap = CurveManager::CurveValue(Compressor(CompNum).CapacityCurvePtr,
@@ -6162,7 +6126,7 @@ namespace RefrigeratedCase {
             // check for compressors not connected to systems and compressors connected more than once
             // (twice in a system or to more than one system)
             NumUnusedCompressors = 0;
-            for (CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum) {
+            for (int CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum) {
                 if (Compressor(CompNum).NumSysAttach == 1) continue;
                 if (Compressor(CompNum).NumSysAttach < 1) {
                     ++NumUnusedCompressors;
@@ -6190,11 +6154,11 @@ namespace RefrigeratedCase {
             } // NumUnusedCompressors
         }     // NumSimulationCompressors > 0
 
+        int NumUnusedWalkIns = 0;
         if (NumSimulationWalkIns > 0) {
             // check for refrigeration WalkIns not connected to any systems and
             //  refrigeration WalkIns connected more than once
-            NumUnusedWalkIns = 0;
-            for (WalkInNum = 1; WalkInNum <= NumSimulationWalkIns; ++WalkInNum) {
+            for (int WalkInNum = 1; WalkInNum <= NumSimulationWalkIns; ++WalkInNum) {
                 if (WalkIn(WalkInNum).NumSysAttach == 1) continue;
                 if (WalkIn(WalkInNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
@@ -6227,7 +6191,7 @@ namespace RefrigeratedCase {
             // check for air chillers not connected to any systems and
             //  air chillers connected more than once
             NumUnusedCoils = 0;
-            for (CoilNum = 1; CoilNum <= NumSimulationRefrigAirChillers; ++CoilNum) {
+            for (int CoilNum = 1; CoilNum <= NumSimulationRefrigAirChillers; ++CoilNum) {
                 if (WarehouseCoil(CoilNum).NumSysAttach == 1) continue;
                 if (WarehouseCoil(CoilNum).NumSysAttach < 1) {
                     ++NumUnusedWalkIns;
@@ -6294,7 +6258,7 @@ namespace RefrigeratedCase {
             //       because of dependence of performance on total condenser load
             NumSimulationSharedCondensers = 0;
             NumUnusedCondensers = 0;
-            for (CondNum = 1; CondNum <= DataHeatBalance::NumRefrigCondensers; ++CondNum) {
+            for (int CondNum = 1; CondNum <= DataHeatBalance::NumRefrigCondensers; ++CondNum) {
                 if (Condenser(CondNum).NumSysAttach == 1) continue;
                 if (Condenser(CondNum).NumSysAttach < 1) {
                     ++NumUnusedCondensers;
@@ -6323,7 +6287,7 @@ namespace RefrigeratedCase {
             // Check for presence of shared gas coolers and for unused gas coolers
             NumSimulationSharedGasCoolers = 0;
             NumUnusedGasCoolers = 0;
-            for (GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum) {
+            for (int GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum) {
                 if (GasCooler(GCNum).NumSysAttach == 1) continue;
                 if (GasCooler(GCNum).NumSysAttach < 1) {
                     ++NumUnusedGasCoolers;
