@@ -599,87 +599,15 @@ namespace RefrigeratedCase {
         int NumNumbers(0);                     // Number of Numbers for each GetObjectItem call
         int NumDisplayCases(0);                // Counter for refrigerated cases in GetInput do loop
         int NumWalkIns(0);                     // Number of walk ins
-        static int NumWalkInsLT(0);                   // Number of low temperature walk-ins on a single transcritical system
-        static int NumWIFieldsPerZone(0);             // Used to calculate number of zones exposed to each walkin
-        static int NumWIFieldsTotal(0);               // Used to calculate number of zones exposed to each walkin
-        static int NumZones(0);                       // Used to cycle through zones on input for walk in coolers
-        static int NumTotalLoadsOnList(0);            // Used to read transfer load and caseandWalkIn lists
-        static int NumSecondarysOnList(0);            // Used to read transfer load lists
-        static int NumCascadeLoadsChecked(0);         // Used when checking for consistency of coil loads/time steps
-        static int NumCascadeLoadsOnList(0);          // Used to read transfer load lists
-        static int NumLoad(0);                        // Used to read transfer loadand caseandWalkIn lists
-        static int NumCasesOnList(0);                 // Used to read caseandWalkIn lists
-        static int NumChillersInSet(0);
-        static int NumCoilsOnList(0);    // Used to read caseandWalkIn lists
-        static int NumWalkInsOnList(0);  // Used to read caseandWalkIn lists
-        static int RackNum(0);           // Index of refrigerated display case compressor rack
-        static int RefrigIndex(0);       // Index used in fluid property routines
-        static int RefrigSysNum(0);      // Index of refrigeration system
-        static int TransRefrigSysNum(0); // Index of transcritical CO2 refrigeration system
-        static int SecondaryIndex(0);    // Index of secondary loops
-        static int SecondaryID(0);       // Index of secondary loops
-        static int SetID(0);             // Index of refrigerated chilller SETS
-        static int SecondaryNum(0);      // Index of secondary loops
-        static int TransferLoadListNum(0); // Index of TransferLoad lists
-        static int SubcoolerNum(0);                  // Index of subcooler
-        static int TSNum(0);                         // Counter for time steps in hour
-        static int WalkInIndex(0);                   // Index of walk ins
-        static int WalkInID(0);                      // Index of walk ins
-        static int TotFields(0);                     // Used to calc number of zones on input for walk in coolers
-        static int ZoneID(0);                        // Index to zone
-        static int ZoneIndex(0);                     // Index to zone
-        static int ZoneNum(0);                       // Index to zone
-        static Real64 CalcCircRate(0.0);             // Calculted circ rate in secondary phase change loop, dimensionless
-        static Real64 CalcTotFlowVol(0.0);           // Secondary loop flow in phase change liquid overfeed system (m3/s)
-        static Real64 CaseHeatGain(0.0);             // Case sensible heat gain used for error messages
-        static Real64 CapacityAtMaxVolFlow(0.0);     // Secondary loop capacity (W)
-        static Real64 CpBrineRated(0.0);             // specific heat of circ fluid in secondary loop
-        static Real64 Capmin(0.0);                   // min heat rej for heat rej curve for air cooled condenser (W)
-        static Real64 Capmax(0.0);                   // max heat rej for heat rej curve for air cooled condenser (W)
-        static Real64 DeltaCap1(0.0);                // fraction dif in capacity for input error check
-        static Real64 DeltaCap2(0.0);                // fraction dif in capacity for input error check
-        static Real64 DeltaHPhaseChange(0.0);        // Secondary loop enthalpy change in condenser w overfeed system (J/g)
-        static Real64 DelTempMin(0.0);               // min temperature for heat rej curve for air cooled condenser (C)
-        static Real64 DelTempMax(0.0);               // max temperature for heat rej curve for air cooled condenser (C)
-        static Real64 DensityBrineRated(0.0);        // density of circ fluid in secondary loop
-        static Real64 DensityPhaseChange(0.0);       // Secondary loop density at condensing temperature w overfeed system (g/m3)
-        static Real64 DesignSensibleCap(0.0);        // Case sensible capacity used for error messages
-        static Real64 DiffCircRates(0.0);            // Difference between calculated and specified circ rates, fraction
-        static Real64 ErrSecondPumpPower(0.0);       // Used to check consistency when both head and power input
-        static Real64 FlowMassRated(0.0);            // Design mass flow rate of circ fluid in secondary loop(kg/s)
-        static Real64 GCOutletH(0.0);                // Gas cooler outlet enthalpy (J/kg)
-        static Real64 NominalSecondaryCapacity(0.0); // Rated Capacity from input data, W
-        static Real64 NominalSecondaryRefLoad(0.0);  // Load from all connected cases and walkins, W
-        static Real64 NominalTotalCascadeLoad(0.0);  // Load from all connected cascade condensers, W
-        static Real64 NominalTotalCaseCap(0.0);      // Total of nominal case capacities, used for rough input check (W)
-        static Real64 NominalTotalCoilCap(0.0);      // Total of nominal case capacities, used for rough input check (W)
-        static Real64 NominalTotalWalkInCap(0.0);    // Total of nominal walk-in capacities, used for rough input check (W)
-        static Real64 NominalTotalSecondaryCap(0.0); // Total of nominal secondary capacities, used for rough input check (W)
-        static Real64 NominalTotalCaseCapMT(
-            0.0); // Total of nominal medium temperature case capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalTotalCaseCapLT(
-            0.0); // Total of nominal low temperature case capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalTotalWalkInCapMT(
-            0.0); // Total of nominal medium temperature walk-in capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalTotalWalkInCapLT(
-            0.0); // Total of nominal low temperature walk-in capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalTotalCoolingCap(0.0);     // Total of nominal load capacities, used for rough input check (W)
-        static Real64 NominalTotalCompCap(0.0);        // Total of nominal compressor capacities, used for rough input check (W)
-        static Real64 NominalTotalHiStageCompCap(0.0); // Total of nominal high-stage compressor capacities, used for rough input check (W)
-        static Real64 NominalTotalCompCapHP(
-            0.0); // Total of nominal high pressure compressor capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalTotalCompCapLP(
-            0.0);                          // Total of nominal low pressure compressor capacities, used for rough input check (W) (Transcritical CO2)
-        static Real64 NominalCondCap(0.0); // Nominal Condenser capacity, used for rough input check (W)
-        static Real64 PCond(0.0);          // Condensing Pressure (Pa)
-        static Real64 PEvap(0.0);          // Evaporating Pressure (Pa)
-        static Real64 PumpTotRatedHead(0.0);      // Total pump rated head on secondary loop (Pa)
-        static Real64 PumpTotRatedFlowVol(0.0);   // Rated flow from input pump data, m3/s
-        static Real64 Rcase(0.0);                 // Case thermal resistance used with anti-sweat heater control
-        static Real64 RcaseDenom(0.0);            // Denominator of case thermal resistance calculation for anti-sweat
-        static Real64 SecondaryFlowVolRated(0.0); // Rated flow of secondary fluid, used to calculate capacity (m3/s)
-        static Real64 TBrineOutRated(0.0);        // Rated temperature of circ fluid LEAVING heat exchanger,C
-        static Real64 TBrineInRated(0.0);         // Rated temperature of circ fluid going INTO heat exchanger, C
+        int RefrigIndex(0);       // Index used in fluid property routines
+        int RefrigSysNum(0);      // Index of refrigeration system
+        Real64 DeltaHPhaseChange(0.0);        // Secondary loop enthalpy change in condenser w overfeed system (J/g)
+        Real64 DelTempMin(0.0);               // min temperature for heat rej curve for air cooled condenser (C)
+        Real64 DelTempMax(0.0);               // max temperature for heat rej curve for air cooled condenser (C)
+        Real64 DensityBrineRated(0.0);        // density of circ fluid in secondary loop
+        Real64 DensityPhaseChange(0.0);       // Secondary loop density at condensing temperature w overfeed system (g/m3)
+        Real64 NominalTotalCompCapLP(0.0);                          // Total of nominal low pressure compressor capacities, used for rough input check (W) (Transcritical CO2)
+        Real64 NominalTotalCompCapHP(0.0);
         static Real64 TBrineAverage(0.0);         // Rated average of inlet and outlet temps, used for property look up, C
         static Real64 TempRAFraction(0.0);        // Temporary sum of Return Air fraction per zone for reporting
         static Real64 TestDelta(0.0);             // Used to compare secondary loop rated capacity to calculated capacity, fraction
@@ -1117,6 +1045,9 @@ namespace RefrigeratedCase {
 
                 //   initialize case resistance for anti-sweat heater control type = Heat Balance Method
                 if (RefrigCase(CaseNum).AntiSweatControlType == ASHeatBalance) {
+                    Real64 Rcase(0.0);                 // Case thermal resistance used with anti-sweat heater control
+                    Real64 RcaseDenom(0.0);            // Denominator of case thermal resistance calculation for anti-sweat
+
                     if (RefrigCase(CaseNum).Height == 0.0) {
                         Rcase = 0.0;
                     } else {
@@ -1219,7 +1150,7 @@ namespace RefrigeratedCase {
                 DayValues = 0.0;
                 ScheduleManager::GetScheduleValuesForDay(RefrigCase(CaseNum).DefrostSchedPtr, DayValues, 1);
                 for (int HRNum = 1; HRNum <= 24; ++HRNum) {
-                    for (TSNum = 1; TSNum <= DataGlobals::NumOfTimeStepInHour; ++TSNum) {
+                    for (int TSNum = 1; TSNum <= DataGlobals::NumOfTimeStepInHour; ++TSNum) {
                         if (DayValues(TSNum, HRNum) > 0.0) {
                             if (!StartCycle) {
                                 ++NumDefCycles;
@@ -1368,11 +1299,12 @@ namespace RefrigeratedCase {
                 }
 
                 //   calculate sensible case load at design conditions
-                DesignSensibleCap = RefrigCase(CaseNum).RateTotCapPerLength * (1.0 - RefrigCase(CaseNum).RatedLHR) * RefrigCase(CaseNum).RatedRTF *
+                // Case sensible capacity used for error messages
+                Real64 DesignSensibleCap = RefrigCase(CaseNum).RateTotCapPerLength * (1.0 - RefrigCase(CaseNum).RatedLHR) * RefrigCase(CaseNum).RatedRTF *
                                     RefrigCase(CaseNum).Length;
 
                 //   calculate case heat gain = lights + fans + anti-sweat
-                CaseHeatGain = ((RefrigCase(CaseNum).RatedLightingPower * RefrigCase(CaseNum).LightingFractionToCase) +
+                Real64 CaseHeatGain = ((RefrigCase(CaseNum).RatedLightingPower * RefrigCase(CaseNum).LightingFractionToCase) +
                                 (RefrigCase(CaseNum).AntiSweatPower * RefrigCase(CaseNum).ASHeaterFractionToCase) + RefrigCase(CaseNum).STDFanPower) *
                                RefrigCase(CaseNum).Length;
 
@@ -1449,7 +1381,7 @@ namespace RefrigeratedCase {
 
         if (NumSimulationWalkIns > 0) {
             CurrentModuleObject = "Refrigeration:WalkIn";
-            for (WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID) {
+            for (int WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               WalkInID,
                                               Alphas,
@@ -1722,10 +1654,9 @@ namespace RefrigeratedCase {
 
                 // Calculate the number of zones exposed to walk-in based on number of input fields, all integer math,
                 // This approach used because last zone could have less than NumWIFieldsPerZone due to optional values
-                TotFields = NumNumbers + NumAlphas;
-                NumWIFieldsPerZone = NumWIAlphaFieldsPerZone + NumWINumberFieldsPerZone;
-                NumWIFieldsTotal = TotFields - NumWIAlphaFieldsBeforeZoneInput - NumWINumberFieldsBeforeZoneInput;
-                NumZones = 1;
+                int NumWIFieldsPerZone = NumWIAlphaFieldsPerZone + NumWINumberFieldsPerZone;
+                int NumWIFieldsTotal = NumNumbers + NumAlphas - NumWIAlphaFieldsBeforeZoneInput - NumWINumberFieldsBeforeZoneInput;
+                int NumZones = 1;
                 if (NumWIFieldsTotal > NumWIFieldsPerZone) NumZones = 2;
                 if (NumWIFieldsTotal > (2 * NumWIFieldsPerZone)) NumZones = 3;
                 if (NumWIFieldsTotal > (3 * NumWIFieldsPerZone)) NumZones = 4;
@@ -1759,7 +1690,7 @@ namespace RefrigeratedCase {
 
                 int AStart = NumWIAlphaFieldsBeforeZoneInput + 1;
                 int NStart = NumWINumberFieldsBeforeZoneInput + 1;
-                for (ZoneID = 1; ZoneID <= NumZones; ++ZoneID) {
+                for (int ZoneID = 1; ZoneID <= NumZones; ++ZoneID) {
                     // Get the Zone node number from the zone name
                     // The Zone Node is needed to get the zone's ambient conditions, DataGlobals::NumOfZones from dataglobals
                     WalkIn(WalkInID).ZoneName(ZoneID) = Alphas(AStart);
@@ -2480,7 +2411,7 @@ namespace RefrigeratedCase {
             CheckChillerSetName.dimension(DataHeatBalance::NumRefrigChillerSets, true);
 
             CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
-            for (SetID = 1; SetID <= DataHeatBalance::NumRefrigChillerSets; ++SetID) {
+            for (int SetID = 1; SetID <= DataHeatBalance::NumRefrigChillerSets; ++SetID) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               SetID,
                                               Alphas,
@@ -2560,7 +2491,7 @@ namespace RefrigeratedCase {
 
                 // An extensible list is used to enter the individual names of each chiller in the set.
                 // These chillers will be dispatched in this list order to meet the required zone load
-                NumChillersInSet = NumAlphas - AlphaNum;
+                int NumChillersInSet = NumAlphas - AlphaNum;
                 int AlphaStartList = AlphaNum; //+ 1
                 AirChillerSet(SetID).NumCoils = NumChillersInSet;
                 if (!allocated(AirChillerSet(SetID).CoilNum)) AirChillerSet(SetID).CoilNum.allocate(NumChillersInSet);
@@ -2603,16 +2534,16 @@ namespace RefrigeratedCase {
 
                 // CaseAndWalkInList alphas include CaseAndWalkInList name and one name for each Case or WalkIn in list
                 // below allocates larger than needed (each allocated to sum of both), but avoids two loops through input fields
-                NumTotalLoadsOnList = NumAlphas - 1;
+                int NumTotalLoadsOnList = NumAlphas - 1;
                 if (!allocated(CaseAndWalkInList(ListNum).WalkInItemNum)) CaseAndWalkInList(ListNum).WalkInItemNum.allocate(NumTotalLoadsOnList);
                 if (!allocated(CaseAndWalkInList(ListNum).CaseItemNum)) CaseAndWalkInList(ListNum).CaseItemNum.allocate(NumTotalLoadsOnList);
                 if (!allocated(CaseAndWalkInList(ListNum).CoilItemNum)) CaseAndWalkInList(ListNum).CoilItemNum.allocate(NumTotalLoadsOnList);
 
-                NumCasesOnList = 0;
-                NumCoilsOnList = 0;
-                NumWalkInsOnList = 0;
+                int NumCasesOnList = 0;
+                int NumCoilsOnList = 0;
+                int NumWalkInsOnList = 0;
                 int LoadCount = 0;
-                for (NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
+                for (int NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
                     int AlphaListNum = 1 + NumLoad;
                     if (!lAlphaBlanks(AlphaListNum)) {
                         ++LoadCount;
@@ -2661,7 +2592,7 @@ namespace RefrigeratedCase {
 
             CurrentModuleObject = "Refrigeration:CompressorRack";
 
-            for (RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
+            for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
 
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               RackNum,
@@ -2996,7 +2927,7 @@ namespace RefrigeratedCase {
                     //     however, won't matter if walk-in specified
                     if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone && RefrigRack(RackNum).NumCases > 1 &&
                         RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum != 0 && NumWalkIns < 1 && NumCoils < 1) {
-                        ZoneNum = RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum;
+                        int ZoneNum = RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum;
                         for (int caseIndex = 2; caseIndex <= RefrigRack(RackNum).NumCases; ++caseIndex) {
                             if (RefrigCase(RefrigRack(RackNum).CaseNum(caseIndex)).ActualZoneNum == ZoneNum) continue;
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name +
@@ -3020,8 +2951,8 @@ namespace RefrigeratedCase {
                 }     // numcoils > 0
 
                 if (NumWalkIns > 0) {
-                    for (WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
-                        WalkInID = RefrigRack(RackNum).WalkInNum(WalkInIndex);
+                    for (int WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
+                        int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInIndex);
                         // mark all WalkIns on rack as used by this system (checking for unused or non-unique WalkIns)
                         ++WalkIn(WalkInID).NumSysAttach;
                         // determine total capacity on rack
@@ -3127,8 +3058,8 @@ namespace RefrigeratedCase {
                     Condenser(CondNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                     if (Condenser(CondNum).RatedCapacity > 0.0) {
                         CurveManager::GetCurveMinMaxValues(Condenser(CondNum).CapCurvePtr, DelTempMin, DelTempMax);
-                        Capmin = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug fix
-                        Capmax = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug
+                        Real64 Capmin = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug fix
+                        Real64 Capmax = CurveManager::CurveValue(Condenser(CondNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation); // Mar 2011 bug
                         Condenser(CondNum).TempSlope =
                             (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * DataEnvironment::Elevation ) ) //Mar 2011 bug fix
                         Condenser(CondNum).MinCondLoad = Capmax - DelTempMax / Condenser(CondNum).TempSlope;
@@ -3709,8 +3640,8 @@ namespace RefrigeratedCase {
                     GasCooler(GCNum).RatedCapacity *= (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                     if (GasCooler(GCNum).RatedCapacity > 0.0) {
                         CurveManager::GetCurveMinMaxValues(GasCooler(GCNum).CapCurvePtr, DelTempMin, DelTempMax);
-                        Capmin = CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
-                        Capmax = CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                        Real64 Capmin = CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMin) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
+                        Real64 Capmax = CurveManager::CurveValue(GasCooler(GCNum).CapCurvePtr, DelTempMax) * (1.0 - 7.17e-5 * DataEnvironment::Elevation);
                         GasCooler(GCNum).TempSlope = (DelTempMax - DelTempMin) / ((Capmax - Capmin));
                         GasCooler(GCNum).MinCondLoad = Capmax - DelTempMax / GasCooler(GCNum).TempSlope;
                     } else {
@@ -3841,7 +3772,7 @@ namespace RefrigeratedCase {
             //************ START SECONDARY LOOP INPUT (before system input) **************
             if (NumSimulationSecondarySystems > 0) {
                 CurrentModuleObject = "Refrigeration:SecondarySystem";
-                for (SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum) {
+                for (int SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum) {
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   SecondaryNum,
                                                   Alphas,
@@ -3858,12 +3789,12 @@ namespace RefrigeratedCase {
                     Secondary(SecondaryNum).Name = Alphas(1);
 
                     //   Find the loads on the secondary loop: can be input in form of case or walkin or CaseAndWalkInList names
-                    NominalTotalCaseCap = 0.0;
+                    Real64 NominalTotalCaseCap = 0.0;
                     NumCases = 0;
-                    NominalTotalCoilCap = 0.0;
+                    Real64 NominalTotalCoilCap = 0.0;
                     int NumCoils = 0;
                     NumWalkIns = 0;
-                    NominalTotalWalkInCap = 0.0;
+                    Real64 NominalTotalWalkInCap = 0.0;
                     Secondary(SecondaryNum).RefInventory = 0.0;
 
                     //   Read display case and walkin assignments for this secondary
@@ -3970,9 +3901,9 @@ namespace RefrigeratedCase {
                     if (NumWalkIns > 0) {
                         // Find lowest design T loop fluid out of secondary chiller
                         // Sum rated capacity of all WalkIns on Secondary
-                        for (WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
+                        for (int WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
                             // mark all WalkIns on Secondary as used by this Secondary - checking for unused or non-unique WalkIns
-                            WalkInID = Secondary(SecondaryNum).WalkInNum(WalkInIndex);
+                            int WalkInID = Secondary(SecondaryNum).WalkInNum(WalkInIndex);
                             ++WalkIn(WalkInID).NumSysAttach;
                             NominalTotalWalkInCap += WalkIn(WalkInID).DesignRatedCap;
                             Secondary(SecondaryNum).RefInventory += WalkIn(WalkInID).DesignRefrigInventory;
@@ -4033,6 +3964,12 @@ namespace RefrigeratedCase {
                                        "\", Program terminated due to previous condition(s).");
                     } // ErrorsFound
 
+                    Real64 CpBrineRated = 0.0;
+                    Real64 PumpTotRatedFlowVol(0.0);   // Rated flow from input pump data, m3/s
+                    Real64 SecondaryFlowVolRated(0.0); // Rated flow of secondary fluid, used to calculate capacity (m3/s)
+                    Real64 TBrineOutRated(0.0);        // Rated temperature of circ fluid LEAVING heat exchanger,C
+                    Real64 TBrineInRated(0.0);         // Rated temperature of circ fluid going INTO heat exchanger, C
+
                     if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
                         if (!lNumericBlanks(5)) {
                             Secondary(SecondaryNum).TRangeDifRated = Numbers(5);
@@ -4058,12 +3995,13 @@ namespace RefrigeratedCase {
                         // Users can input either design brine flow (m3/s), or capacity in W, or both.  Now have
                         //  temperatures needed to calculate either the loop cooling capacity or fluid flow rate, if one was not input
                         //  Don't need to save as a flow vol as a permanent var because calc whichever is missing here
+                        Real64 FlowMassRated(0.0);            // Design mass flow rate of circ fluid in secondary loop(kg/s)
                         if ((!lNumericBlanks(1)) && (!lNumericBlanks(2))) {
                             // Both values input, check for approximate agreement
                             Secondary(SecondaryNum).CoolingLoadRated = Numbers(1);
                             SecondaryFlowVolRated = Numbers(2);
                             FlowMassRated = SecondaryFlowVolRated * DensityBrineRated;
-                            NominalSecondaryCapacity = FlowMassRated * CpBrineRated * Secondary(SecondaryNum).TRangeDifRated;
+                            Real64 NominalSecondaryCapacity = FlowMassRated * CpBrineRated * Secondary(SecondaryNum).TRangeDifRated;
                             TestDelta = (NominalSecondaryCapacity - Secondary(SecondaryNum).CoolingLoadRated) / NominalSecondaryCapacity;
                             if (std::abs(TestDelta) > 0.2) {
                                 ShowWarningError(CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
@@ -4137,13 +4075,13 @@ namespace RefrigeratedCase {
                                                                  TrackMessageAlt);
 
                         // TotRatedFlowVol= capacity*circrate/deltahphasechange/density
-                        CalcTotFlowVol =
+                        Real64 CalcTotFlowVol =
                             Secondary(SecondaryNum).CoolingLoadRated * Secondary(SecondaryNum).CircRate / (DensityPhaseChange * DeltaHPhaseChange);
                         PumpTotRatedFlowVol = CalcTotFlowVol;
                         if (!lNumericBlanks(7)) {
                             PumpTotRatedFlowVol = Numbers(7);
-                            CalcCircRate = DensityPhaseChange * DeltaHPhaseChange * PumpTotRatedFlowVol / Secondary(SecondaryNum).CoolingLoadRated;
-                            DiffCircRates = (CalcCircRate - Secondary(SecondaryNum).CircRate) / Secondary(SecondaryNum).CircRate;
+                            Real64 CalcCircRate = DensityPhaseChange * DeltaHPhaseChange * PumpTotRatedFlowVol / Secondary(SecondaryNum).CoolingLoadRated;
+                            Real64 DiffCircRates = (CalcCircRate - Secondary(SecondaryNum).CircRate) / Secondary(SecondaryNum).CircRate;
                             if (std::abs(DiffCircRates) > 0.3) {
                                 ShowWarningError(CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + ' ' + cNumericFieldNames(7) +
                                                  " Produces a circulating rate of " + General::RoundSigDigits(CalcCircRate, 2) + " ;  A circulating rate of " +
@@ -4163,10 +4101,12 @@ namespace RefrigeratedCase {
                     // Assume pump impeller efficiency is 0.78 (consistent with E+ Pump auto sizing assumption)
                     // Assume pump motor efficiency is 0.85 (Goulds Pumps motor data sheet)
                     // It is important that tot rated head must be for specific fluid
+                    Real64 PumpTotRatedHead(0.0);      // Total pump rated head on secondary loop (Pa)
+
                     if ((!lNumericBlanks(8)) && (!lNumericBlanks(9))) {
                         Secondary(SecondaryNum).PumpTotRatedPower = Numbers(8);
                         PumpTotRatedHead = Numbers(9);
-                        ErrSecondPumpPower = (Secondary(SecondaryNum).PumpTotRatedPower -
+                        Real64 ErrSecondPumpPower = (Secondary(SecondaryNum).PumpTotRatedPower -
                                               PumpTotRatedFlowVol * PumpTotRatedHead / (PumpImpellerEfficiency * PumpMotorEfficiency)) /
                                              Secondary(SecondaryNum).PumpTotRatedPower;
                         if (std::abs(ErrSecondPumpPower) > 0.35)
@@ -4345,7 +4285,7 @@ namespace RefrigeratedCase {
                     //       (don't include dist piping or receiver heat gains).
                     // Load limit logic here (maxvolflow and maxload used in calcs later)
                     Secondary(SecondaryNum).MaxVolFlow = min(SecondaryFlowVolRated, PumpTotRatedFlowVol);
-                    NominalSecondaryRefLoad = NominalTotalCaseCap + NominalTotalWalkInCap + Secondary(SecondaryNum).PumpTotRatedPower;
+                    Real64 NominalSecondaryRefLoad = NominalTotalCaseCap + NominalTotalWalkInCap + Secondary(SecondaryNum).PumpTotRatedPower;
 
                     if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
                         if (TBrineOutRated > (Secondary(SecondaryNum).TMinNeeded + 0.5)) {
@@ -4357,10 +4297,10 @@ namespace RefrigeratedCase {
                                 " Compare your Approach and Evaporating Temperature to the design inlet temperatures needed for the loads.");
                             // ErrorsFound = .TRUE.
                         } // Tbrine out warning
-                        CapacityAtMaxVolFlow = Secondary(SecondaryNum).MaxVolFlow * Secondary(SecondaryNum).HeatExchangeEta *
+                        Real64 CapacityAtMaxVolFlow = Secondary(SecondaryNum).MaxVolFlow * Secondary(SecondaryNum).HeatExchangeEta *
                                                (CpBrineRated * DensityBrineRated) * (TBrineInRated - Secondary(SecondaryNum).TEvapDesign);
                         Secondary(SecondaryNum).MaxLoad = min(Secondary(SecondaryNum).CoolingLoadRated, CapacityAtMaxVolFlow);
-                        DeltaCap1 =
+                        Real64 DeltaCap1 =
                             std::abs((Secondary(SecondaryNum).CoolingLoadRated - CapacityAtMaxVolFlow) / Secondary(SecondaryNum).CoolingLoadRated);
                         if (DeltaCap1 > (0.3)) { // diff between chiller rating and capacity at max flow > 30%
                             ShowWarningError(CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
@@ -4390,7 +4330,7 @@ namespace RefrigeratedCase {
                         Secondary(SecondaryNum).MaxLoad = Secondary(SecondaryNum).CoolingLoadRated;
                     } // SecFluidType
 
-                    DeltaCap2 =
+                    Real64 DeltaCap2 =
                         std::abs((Secondary(SecondaryNum).CoolingLoadRated - NominalSecondaryRefLoad) / Secondary(SecondaryNum).CoolingLoadRated);
                     if (DeltaCap2 > (0.3)) { // diff between chiller rating and sum of nominal loads > 30%
                         ShowWarningError(CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
@@ -4513,7 +4453,7 @@ namespace RefrigeratedCase {
             if (NumSimulationSubcoolers > 0) {
                 CurrentModuleObject = "Refrigeration:Subcooler";
                 NumSimulationMechSubcoolers = 0;
-                for (SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
+                for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                     inputProcessor->getObjectItem(CurrentModuleObject,
                                                   SubcoolerNum,
                                                   Alphas,
@@ -4616,15 +4556,15 @@ namespace RefrigeratedCase {
 
                     // Transfer load list alphas include TransferLoadList name and one name for each Secondary or Cascade Condenser in list
                     // below allocates larger than needed (each allocated to sum of both), but avoids two loops through input fields
-                    NumTotalLoadsOnList = NumAlphas - 1;
+                    int NumTotalLoadsOnList = NumAlphas - 1;
                     if (!allocated(TransferLoadList(ListNum).CascadeLoadItemNum))
                         TransferLoadList(ListNum).CascadeLoadItemNum.allocate(NumTotalLoadsOnList);
                     if (!allocated(TransferLoadList(ListNum).SecondaryItemNum))
                         TransferLoadList(ListNum).SecondaryItemNum.allocate(NumTotalLoadsOnList);
 
-                    NumSecondarysOnList = 0;
-                    NumCascadeLoadsOnList = 0;
-                    for (NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
+                    int NumSecondarysOnList = 0;
+                    int NumCascadeLoadsOnList = 0;
+                    for (int NumLoad = 1; NumLoad <= NumTotalLoadsOnList; ++NumLoad) {
                         int AlphaListNum = 1 + NumLoad;
                         int LoadCascadeNum = 0;
                         int LoadSecondaryNum = 0;
@@ -4733,12 +4673,12 @@ namespace RefrigeratedCase {
                 System(RefrigSysNum).NumSecondarys = 0;
                 System(RefrigSysNum).NumCascadeLoads = 0;
                 System(RefrigSysNum).NumNonCascadeLoads = 0;
-                NominalTotalCaseCap = 0.0;
-                NominalTotalCoilCap = 0.0;
-                NominalTotalWalkInCap = 0.0;
-                NominalTotalSecondaryCap = 0.0;
-                NominalTotalCoolingCap = 0.0;
-                NominalTotalCascadeLoad = 0.0;
+                Real64 NominalTotalCaseCap = 0.0;
+                Real64 NominalTotalCoilCap = 0.0;
+                Real64 NominalTotalWalkInCap = 0.0;
+                Real64 NominalTotalSecondaryCap = 0.0;
+                Real64 NominalTotalCoolingCap = 0.0;
+                Real64 NominalTotalCascadeLoad = 0.0;
                 System(RefrigSysNum).RefInventory = 0.0;
 
                 //   Check for case or walkin or CaseAndWalkInList names
@@ -4845,8 +4785,8 @@ namespace RefrigeratedCase {
                 } // NumCoils > 0
 
                 if (NumWalkIns > 0) {
-                    for (WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
-                        WalkInID = System(RefrigSysNum).WalkInNum(WalkInIndex);
+                    for (int WalkInIndex = 1; WalkInIndex <= NumWalkIns; ++WalkInIndex) {
+                        int WalkInID = System(RefrigSysNum).WalkInNum(WalkInIndex);
                         // mark all WalkIns on rack as used by this system (checking for unused or non-unique WalkIns)
                         ++WalkIn(WalkInID).NumSysAttach;
                         NominalTotalWalkInCap += WalkIn(WalkInID).DesignRatedCap;
@@ -4879,8 +4819,8 @@ namespace RefrigeratedCase {
                 if (!lAlphaBlanks(AlphaNum)) {
 
                     // Entry for Alphas(AlphaNum) can be either a Secondary, CascadeLoad name or a TransferLoadList name
-                    TransferLoadListNum = 0;
-                    SecondaryNum = 0;
+                    int TransferLoadListNum = 0;
+                    int SecondaryNum = 0;
                     int CascadeLoadNum = 0;
                     if (NumSimulationTransferLoadLists > 0) TransferLoadListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), TransferLoadList);
                     if (NumSimulationSecondarySystems > 0) SecondaryNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Secondary);
@@ -4927,8 +4867,8 @@ namespace RefrigeratedCase {
                     System(RefrigSysNum).CoilFlag = false;
                     // Now need to loop through all transfer loads to see if they change the minimum required system evaporating temperature
                     if (NumSecondary > 0) {
-                        for (SecondaryIndex = 1; SecondaryIndex <= NumSecondary; ++SecondaryIndex) {
-                            SecondaryID = System(RefrigSysNum).SecondaryNum(SecondaryIndex);
+                        for (int SecondaryIndex = 1; SecondaryIndex <= NumSecondary; ++SecondaryIndex) {
+                            int SecondaryID = System(RefrigSysNum).SecondaryNum(SecondaryIndex);
                             if (SecondaryIndex == 1) { // check for consistency of loads (coils calc on sys time step, all others on zone time step)
                                 if (Secondary(SecondaryID).CoilFlag) System(RefrigSysNum).CoilFlag = true;
                             } else if (Secondary(SecondaryID).CoilFlag != System(RefrigSysNum).CoilFlag) {
@@ -5317,11 +5257,11 @@ namespace RefrigeratedCase {
 
                 // Determine intercooler pressure and temperature at design conditions
                 if (System(RefrigSysNum).NumStages == 2) {
-                    PCond = FluidProperties::GetSatPressureRefrig(System(RefrigSysNum).RefrigerantName,
+                    Real64 PCond = FluidProperties::GetSatPressureRefrig(System(RefrigSysNum).RefrigerantName,
                                                  Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense,
                                                  System(RefrigSysNum).RefIndex,
                                                  RoutineName);
-                    PEvap = FluidProperties::GetSatPressureRefrig(
+                    Real64 PEvap = FluidProperties::GetSatPressureRefrig(
                         System(RefrigSysNum).RefrigerantName, System(RefrigSysNum).TEvapDesign, System(RefrigSysNum).RefIndex, RoutineName);
                     System(RefrigSysNum).PIntercooler = std::sqrt(PCond * PEvap);
                     System(RefrigSysNum).TIntercooler = FluidProperties::GetSatTemperatureRefrig(
@@ -5329,7 +5269,7 @@ namespace RefrigeratedCase {
                 } // NumStages
 
                 // Sum capacity of single-stage compressors or low-stage compressors if two-stage system
-                NominalTotalCompCap = 0.0;
+                Real64 NominalTotalCompCap = 0.0;
                 for (int CompIndex = 1; CompIndex <= NumCompressorsSys; ++CompIndex) {
                     int CompNum = System(RefrigSysNum).CompressorNum(CompIndex);
                     if (!Compressor(CompNum).TransFlag) {          //  Subcritical Compressor
@@ -5354,6 +5294,8 @@ namespace RefrigeratedCase {
                     } // .NOT. Compressor(CompNum)%TransFlag
                 }
 
+                Real64 NominalTotalHiStageCompCap(0.0); // Total of nominal high-stage compressor capacities, used for rough input check (W)
+
                 // Sum capacity of high-stage compressors if two stage system
                 if (System(RefrigSysNum).NumStages == 2) {
                     for (int CompIndex = 1; CompIndex <= NumHiStageCompressorsSys; ++CompIndex) {
@@ -5376,7 +5318,7 @@ namespace RefrigeratedCase {
 
                 // Compare the rated capacity of compressor, condenser, and cases.
                 // Note, rated capacities can be far off from operating capacities, but rough check.
-                NominalCondCap = Condenser(System(RefrigSysNum).CondenserNum(1)).RatedCapacity;
+                Real64 NominalCondCap = Condenser(System(RefrigSysNum).CondenserNum(1)).RatedCapacity;
                 if (System(RefrigSysNum).SystemRejectHeatToZone) NominalCondCap *= 2.0;
                 if (System(RefrigSysNum).NumStages == 1) { // Single-stage system
                     if ((NominalTotalCompCap < (0.7 * NominalTotalCoolingCap)) || (NominalCondCap < (1.3 * NominalTotalCoolingCap))) {
@@ -5431,7 +5373,7 @@ namespace RefrigeratedCase {
                 } else { // %coilflag == false, so no coil loads prev identified directly or through secondary loop
                     // Flag to help verify load type with loads served by systems cooled by cascade condensers
                     bool CaseLoads = false;
-                    NumCascadeLoadsChecked = 0;
+                    int NumCascadeLoadsChecked = 0;
                     for (int CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) { // look at All cascade condenser loads on system
                         if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) continue;
                         if (RefrigSysNum != Condenser(CondID).CascadeSinkSystemID) continue; // this condenser is not a cascade load on this system
@@ -5465,7 +5407,7 @@ namespace RefrigeratedCase {
         // after the systems have been read, can finish the mechanical subcooler/system interactions
         // System%NumMechSCServed=0
         if (NumSimulationSubcoolers > 0) {
-            for (SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
+            for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                 if (Subcooler(SubcoolerNum).SubcoolerType == LiquidSuction) continue;
                 Subcooler(SubcoolerNum).MechSourceSysID =
                     inputProcessor->getObjectItemNum("Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
@@ -5486,7 +5428,7 @@ namespace RefrigeratedCase {
             }     // numsubcoolers
 
             for (RefrigSysNum = 1; RefrigSysNum <= DataHeatBalance::NumRefrigSystems; ++RefrigSysNum) {
-                for (SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
+                for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                     if (Subcooler(SubcoolerNum).SubcoolerType == LiquidSuction) continue;
                     if (Subcooler(SubcoolerNum).MechSourceSysID == RefrigSysNum) {
                         ++System(RefrigSysNum).NumMechSCServed;
@@ -5502,7 +5444,7 @@ namespace RefrigeratedCase {
 
         if (NumTransRefrigSystems > 0) {
             CurrentModuleObject = "Refrigeration:TranscriticalSystem";
-            for (TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum) {
+            for (int TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               TransRefrigSysNum,
                                               Alphas,
@@ -5569,13 +5511,13 @@ namespace RefrigeratedCase {
                 TransSystem(TransRefrigSysNum).NumCasesLT = 0;
                 int NumWalkInsMT = 0;
                 TransSystem(TransRefrigSysNum).NumWalkInsMT = 0;
-                NumWalkInsLT = 0;
+                int NumWalkInsLT = 0;
                 TransSystem(TransRefrigSysNum).NumWalkInsLT = 0;
-                NominalTotalCaseCapMT = 0.0;
-                NominalTotalCaseCapLT = 0.0;
-                NominalTotalWalkInCapMT = 0.0;
-                NominalTotalWalkInCapLT = 0.0;
-                NominalTotalCoolingCap = 0.0;
+                Real64 NominalTotalCaseCapMT = 0.0;
+                Real64 NominalTotalCaseCapLT = 0.0;
+                Real64 NominalTotalWalkInCapMT = 0.0;
+                Real64 NominalTotalWalkInCapLT = 0.0;
+                Real64 NominalTotalCoolingCap = 0.0;
                 TransSystem(TransRefrigSysNum).RefInventory = 0.0;
 
                 //   Check for Medium Temperature Case or Walk-In or CaseAndWalkInList names
@@ -5654,8 +5596,8 @@ namespace RefrigeratedCase {
                 }     // NumcasesMT > 0
 
                 if (NumWalkInsMT > 0) {
-                    for (WalkInIndex = 1; WalkInIndex <= NumWalkInsMT; ++WalkInIndex) {
-                        WalkInID = TransSystem(TransRefrigSysNum).WalkInNumMT(WalkInIndex);
+                    for (int WalkInIndex = 1; WalkInIndex <= NumWalkInsMT; ++WalkInIndex) {
+                        int WalkInID = TransSystem(TransRefrigSysNum).WalkInNumMT(WalkInIndex);
                         // mark all WalkIns on rack as used by this system (checking for unused or non-unique WalkIns)
                         ++WalkIn(WalkInID).NumSysAttach;
                         NominalTotalWalkInCapMT += WalkIn(WalkInID).DesignRatedCap;
@@ -5757,8 +5699,8 @@ namespace RefrigeratedCase {
                 }     // NumcasesLT > 0
 
                 if (NumWalkInsLT > 0) {
-                    for (WalkInIndex = 1; WalkInIndex <= NumWalkInsLT; ++WalkInIndex) {
-                        WalkInID = TransSystem(TransRefrigSysNum).WalkInNumLT(WalkInIndex);
+                    for (int WalkInIndex = 1; WalkInIndex <= NumWalkInsLT; ++WalkInIndex) {
+                        int WalkInID = TransSystem(TransRefrigSysNum).WalkInNumLT(WalkInIndex);
                         // mark all WalkIns on rack as used by this system (checking for unused or non-unique WalkIns)
                         ++WalkIn(WalkInID).NumSysAttach;
                         NominalTotalWalkInCapLT += WalkIn(WalkInID).DesignRatedCap;
@@ -5849,7 +5791,7 @@ namespace RefrigeratedCase {
                         CompNum = TransSystem(TransRefrigSysNum).CompressorNumHP(CompIndex);
 
                         if (Compressor(CompNum).TransFlag) { //  Calculate nominal capacity of transcritical Compressor
-                            GCOutletH = FluidProperties::GetSupHeatEnthalpyRefrig(TransSystem(TransRefrigSysNum).RefrigerantName,
+                            Real64 GCOutletH = FluidProperties::GetSupHeatEnthalpyRefrig(TransSystem(TransRefrigSysNum).RefrigerantName,
                                                                  GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(1)).RatedOutletT,
                                                                  GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(1)).RatedOutletP,
                                                                  RefrigIndex,
@@ -5870,6 +5812,7 @@ namespace RefrigeratedCase {
                 // Read Low Pressure Compressor
                 AlphaNum = 7;
                 NumCompressorsSys = 0;
+
                 if ((lAlphaBlanks(AlphaNum)) && (TransSystem(TransRefrigSysNum).TransSysType == 2)) {
                     // TwoStage system type is specified but low pressure compressor input is blank
                     ShowSevereError(RoutineName + CurrentModuleObject + ", The transcritical refrigeration system, \"" +
@@ -6047,8 +5990,8 @@ namespace RefrigeratedCase {
 
                 // Compare the rated capacity of compressor, condenser, and cases.
                 // Note, rated capacities can be far off from operating capacities, but rough check.
-                NominalCondCap = GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(1)).RatedCapacity;
-                NominalTotalCompCap = NominalTotalCompCapHP + NominalTotalCompCapLP;
+                Real64 NominalCondCap = GasCooler(TransSystem(TransRefrigSysNum).GasCoolerNum(1)).RatedCapacity;
+                Real64 NominalTotalCompCap = NominalTotalCompCapHP + NominalTotalCompCapLP;
                 if ((NominalTotalCompCap < (0.7 * NominalTotalCoolingCap)) || (NominalCondCap < (1.3 * NominalTotalCoolingCap))) {
                     ShowWarningError(CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                      "\", You may wish to check the system sizing.");
@@ -6072,7 +6015,7 @@ namespace RefrigeratedCase {
         if (NumSimulationCases > 0) {
             // Find unused and non-unique display case objects to report in eio and err file and sum
             //    all HVAC RA fractions and write error message if greater than 1 for any zone
-            for (ZoneIndex = 1; ZoneIndex <= DataGlobals::NumOfZones; ++ZoneIndex) { // numofzones from dataglobals
+            for (int ZoneIndex = 1; ZoneIndex <= DataGlobals::NumOfZones; ++ZoneIndex) { // numofzones from dataglobals
                 TempRAFraction = CaseRAFraction(ZoneIndex).TotalCaseRAFraction;
                 for (int CaseNum = 1; CaseNum <= NumSimulationCases; ++CaseNum) {
                     // TempRaFraction already includes contributions from ALL cases in zone
@@ -6224,7 +6167,7 @@ namespace RefrigeratedCase {
             // check for refrigeration Secondarys not connected to detailed systems and
             //  refrigeration Secondarys connected more than once
             NumUnusedSecondarys = 0;
-            for (SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum) {
+            for (int SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum) {
                 if (Secondary(SecondaryNum).NumSysAttach == 1) continue;
                 if (Secondary(SecondaryNum).NumSysAttach < 1) {
                     ++NumUnusedSecondarys;
