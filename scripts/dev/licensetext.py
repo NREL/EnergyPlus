@@ -192,6 +192,8 @@ class Visitor:
         pass
     def files(self, path):
         return glob.glob(path+'*')
+    def error(self, file, line_number, mesg):
+        pass
     def check(self, path):
         for file in self.files(path):
             self.filecheck(file)
@@ -201,6 +203,15 @@ class CodeChecker(Visitor):
     def __init__(self):
         Visitor.__init__(self)
     def files(self, path):
+        # This is the Python 3 version, switch to it after
+        # the switch is made to require Python 3
+        extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
+        results = []
+        for ext in extensions:
+            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+        return results
+    def files27(self, path):
+        # This is the old Python 2.7 version
         extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
         results = []
         for ext in extensions:
@@ -211,13 +222,20 @@ class CodeChecker(Visitor):
         return results
 
 class Checker(CodeChecker):
-    def __init__(self, boilerplate, toolname='unspecified', message=error):
+    def __init__(self, boilerplate, toolname='unspecified'):
         CodeChecker.__init__(self)
         lines = boilerplate.splitlines()
         self.n = len(lines)
         self.text = boilerplate
         self.toolname = toolname
-        self.message = message
+    def error(self, file, line_number, mesg):
+        dictionary = {'tool':self.toolname,
+                      'filename':file,
+                      'file':file,
+                      'line':line_number,
+                      'messagetype':'error',
+                      'message':mesg}
+        print(json.dumps(dictionary))
     def filecheck(self, filepath):
         fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
@@ -228,12 +246,7 @@ class Checker(CodeChecker):
                 fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':0,
-                              'messagetype':'error',
-                              'message':'UnicodeDecodeError: '+ str(exc)})
+                self.error(filepath, 0, 'UnicodeDecodeError: '+ str(exc))
                 fp.close()
                 return
         fp.close()
@@ -242,22 +255,12 @@ class Checker(CodeChecker):
             lines = txt.splitlines()[:self.n]
             shortened = '\n'.join(lines)+'\n'
             checkLicense(filepath,shortened,self.text,offset=3,
-                         toolname=self.toolname,message=self.message)
+                         toolname=self.toolname,message=error)
         else:
             if n > 1:
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':1,
-                              'messagetype':'error',
-                              'message':'Multiple instances of license text'})
+                self.error(filepath, 1, 'Multiple instances of license text')
             if not txt.startswith(self.text):
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':1,
-                              'messagetype':'error',
-                              'message':'License text is not at top of file'})
+                self.error(filepath, 1, 'License text is not at top of file')
 
 
 class Replacer(CodeChecker):
@@ -266,43 +269,87 @@ class Replacer(CodeChecker):
         self.oldtxt = oldtext
         self.newtxt = newtext
         self.dryrun = dryrun
-        self.replaced = 0
+        self.replaced = []
         self.failures = []
-    def filecheck(self,filepath):
+    def error(self, file, line, mesg):
+        self.failures.append(file + ', ' + mesg)
+    def readtext(self, filepath):
+        # This is the Python 3 version, move it up to the base class after
+        # the switch is made to require Python 3
+        fp = open(filepath, 'r', encoding='utf-8')
+        try:
+            txt = fp.read()
+        except UnicodeDecodeError as exc:
+            self.error(filepath, 0, 'UnicodeDecodeError: '+ str(exc))
+            txt = None
+            #fp.close()
+            #fp = open(filepath, 'r', encoding='utf-8') #errors='ignore')
+            #try:
+            #    txt = fp.read()
+            #except:
+            #    self.error(filepath, 0, 'UnicodeDecodeError: '+ str(exc))
+            #    txt = None
+        except Exception as exc:
+            self.error(filepath, 0, 'Exception: '+ str(exc))
+            txt = None
+        fp.close()
+        return txt
+    def readtext27(self, filepath):
+        # This is the old version for Python 2.7
         fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
             txt = fp.read()
         except UnicodeDecodeError as exc:
-            message = filepath + ', UnicodeDecodeError: '+ str(exc)
+            mesg = 'UnicodeDecodeError: '+ str(exc)
             try:
                 fp.close()
                 fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
-                self.failures.append(message)
-                return
+                self.error(filepath, 0, mesg)
+                txt = None
         fp.close()
-        if self.dryrun:
-            if self.oldtxt in txt:
-                self.replaced += 1
-        else:
-            txt = txt.replace(self.oldtxt, self.newtxt)
-            if self.newtxt in txt:
-                fp = codecs.open(filepath,'w',encoding='utf-8',errors='ignore')
-                fp.write(txt)
-                fp.close()
-                self.replaced += 1
+        return txt
+    def writetext(self, filepath, txt):
+        fp = open(filepath, 'w', encoding='utf-8')
+        fp.write(txt)
+        fp.close()
+    def writetext27(self, filepath, txt):
+        fp = codecs.open(filepath,'w',encoding='utf-8', errors='ignore')
+        fp.write(txt)
+        fp.close()
+    def filecheck(self,filepath):
+        txt = self.readtext(filepath)
+        if txt != None:
+            if self.dryrun:
+                if self.oldtxt in txt:
+                    self.replaced.append(filepath)
+            else:
+                txt = txt.replace(self.oldtxt, self.newtxt)
+                if self.newtxt in txt:
+                    self.writetext(filepath, txt)
+                    self.replaced.append(filepath)
     def summary(self):
         txt = ['Checked %d files' % len(self.checked_files)]
         if self.dryrun:
-            txt.append('Would have replaced text in %d files' % self.replaced)
+            txt.append('Would have replaced text in %d files' % len(self.replaced))
         else:
-            txt.append('Replaced text in %d files' % self.replaced)
+            txt.append('Replaced text in %d files' % len(self.replaced))
         if len(self.failures):
             txt.append('Failures in %d files' % len(self.failures))
             for message in self.failures:
                 txt.append('\t' + message)
         return '\n'.join(txt)
+    def report(self):
+        remaining = self.checked_files[:]
+        txt = ['Replaced text in the following files']
+        for file in self.replaced:
+            remaining.remove(file)
+            txt.append('\t'+file)
+        txt.append('No changes made to the following files')
+        for file in remaining:
+            txt.append('\t'+file)
+        return self.summary() + '\n\n' + '\n'.join(txt)
 
 if __name__ == '__main__':
     text = current()
