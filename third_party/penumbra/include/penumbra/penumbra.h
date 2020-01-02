@@ -26,7 +26,8 @@ enum class VendorName {
   None,
   NVIDIA,
   AMD,
-  Intel
+  Intel,
+  VMware
 };
 
 typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string message,

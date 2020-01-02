@@ -33,6 +33,10 @@ add_subdirectory(glfw)
 # tess2 library
 file(GLOB libtess2_sources "${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Source/[a-zA-Z]*.c")
 
+if (UNIX)
+  ADD_DEFINITIONS("-fPIC")
+endif()
+
 add_library(tess2 ${libtess2_sources})
 
 target_include_directories(tess2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libtess2/Include)

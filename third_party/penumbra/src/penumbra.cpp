@@ -39,6 +39,8 @@ VendorName Penumbra::getVendorName() {
       vendorType = VendorName::AMD;
   } else if (vendorName == "Intel" || vendorName == "INTEL") {
       vendorType = VendorName::Intel;
+  } else if (vendorName == "VMware, Inc.") {
+      vendorType = VendorName::VMware;
   } else {
       showMessage(MSG_ERR, "Failed to find GPU or vendor name (" + vendorName + ") is not in list.");
   }

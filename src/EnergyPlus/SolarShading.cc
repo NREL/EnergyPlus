@@ -268,8 +268,6 @@ namespace SolarShading {
     std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
 #endif
 
-    const static bool compareShadingMethods = false;
-
     int const NPhi = 6;                      // Number of altitude angle steps for sky integration
     int const NTheta = 24;                   // Number of azimuth angle steps for sky integration
     Real64 const Eps = 1.e-10;               // Small number
@@ -667,9 +665,12 @@ namespace SolarShading {
                     pixelRes = (unsigned)rNumericArgs(3);
                 }
 #ifdef EP_NO_OPENGL
-                ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
                 ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\"");
-                ShowFatalError("This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
+                ShowContinueError("This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
+                ShowContinueError("PolygonClipping will be used instead");
+                shadingMethod = ShadingMethod::PolygonClipping;
+                cAlphaArgs(aNum) = "PolygonClipping";
 #else
                 penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(pixelRes));
                 auto vendorName = penumbra->getVendorName();
@@ -677,6 +678,7 @@ namespace SolarShading {
                     ShowWarningError("No GPU found (required for PixelCounting)");
                     ShowContinueError("PolygonClipping will be used instead");
                     shadingMethod = ShadingMethod::PolygonClipping;
+                    cAlphaArgs(aNum) = "PolygonClipping";
                 }
 #endif
             } else {
@@ -5356,7 +5358,7 @@ namespace SolarShading {
 
 #ifndef EP_NO_OPENGL
                 auto id = Surface(HTS).PenumbraID;
-                if (penumbra && id >= 0 && !compareShadingMethods) {
+                if (penumbra && id >= 0) {
                     // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
                     SAREA(HTS) = penumbra->fetchPSSA(id) / CTHETA(HTS);
                     // SAREA(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
@@ -5372,7 +5374,7 @@ namespace SolarShading {
                             }
                         }
                     }
-                } else if (!penumbra || compareShadingMethods) {
+                } else if (!penumbra) {
 #else
                 {
 #endif
@@ -5965,7 +5967,7 @@ namespace SolarShading {
                 }
 #endif
 
-                if (!penumbra || compareShadingMethods) {
+                if (!penumbra) {
 
                     FINSHC = FSBSHC + NSBSHC;
 
@@ -6017,25 +6019,6 @@ namespace SolarShading {
                         }
 
                     } // End of loop over back surfaces
-
-#ifndef EP_NO_OPENGL
-                    if (penumbra && compareShadingMethods) {
-                        for (int IBKS = 1; IBKS <= MaxBkSurf; ++IBKS) {
-                            BackSurfNum = BackSurfaces(TS, iHour, IBKS, HTSS);
-                            if (BackSurfNum == 0) break;
-                            Real64 penumbraOverlapArea = pssas[Surface(BackSurfNum).PenumbraID]/CTHETA(HTSS);
-
-                            if (std::abs(OverlapAreas(TS, iHour, IBKS, HTSS) - penumbraOverlapArea)/Surface(HTSS).Area > 0.05) {
-                                std::cout << Surface(HTSS).Name << " -> " << Surface(BackSurfNum).Name << " CPU: " << OverlapAreas(TS, iHour, IBKS, HTSS)/Surface(HTSS).Area << ", GPU: " << penumbraOverlapArea/Surface(HTSS).Area <<  std::endl;
-                                std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTSS) << std::endl;
-                                penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, {(unsigned)Surface(BackSurfNum).PenumbraID});
-                            } else {
-                                std::cout << Surface(HTSS).Name << " -> " << Surface(BackSurfNum).Name << " GOOD!" << std::endl;// << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
-                            }
-                            OverlapAreas(TS, iHour, IBKS, HTSS) = penumbraOverlapArea;
-                        }
-                    }
-#endif
                 }
             }
         } // End of check that sunlit area > 0.
@@ -9179,7 +9162,7 @@ namespace SolarShading {
 
                 K = Surface(SBSNR).Construction;
 
-                if (!penumbra || compareShadingMethods) {
+                if (!penumbra) {
                     if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures) && (SAREA(HTS) > 0.0)) {
 
                         // Re-order vertices to clockwise sequential; compute homogeneous coordinates.

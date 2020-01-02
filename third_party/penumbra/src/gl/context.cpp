@@ -56,6 +56,7 @@ Context::Context(unsigned size)
 
   if (!glfwInit()) {
     showMessage(MSG_ERR, "Unable to initialize GLFW.");
+    showMessage(MSG_ERR, "Either there is no GPU, libraries are missing, or some other error happened.");
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -66,7 +67,7 @@ Context::Context(unsigned size)
   if (!window) {
     showMessage(
         MSG_ERR,
-        "Unable to create OpenGL context. OpenGL 2.1 is required to perform shading calculations.");
+        "Unable to create OpenGL context. OpenGL 2.1+ is required to perform GPU accelerated shading calculations.");
   }
 
   // OpenGL extension loader
@@ -76,10 +77,10 @@ Context::Context(unsigned size)
 
   if (!glfwExtensionSupported("GL_ARB_vertex_array_object") &&
       !glfwExtensionSupported("GL_APPLE_vertex_array_object")) {
-    showMessage(MSG_ERR, "Your version of OpenGL does not support vertex array objects.");
+    showMessage(MSG_ERR, "The current version of OpenGL does not support vertex array objects.");
   }
   if (!glfwExtensionSupported("GL_EXT_framebuffer_object")) {
-    showMessage(MSG_ERR, "Your version of OpenGL does not support framebuffer objects.");
+    showMessage(MSG_ERR, "The current version of OpenGL does not support framebuffer objects.");
   }
 
   // std::string glVersion = (char*)glGetString(GL_VERSION);
