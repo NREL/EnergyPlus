@@ -68,7 +68,7 @@ ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* ke
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
 // there are a few query functions for seeing what is available
-ENERGYPLUSLIB_API const char * listAllAPIStuff();
+ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
 
 // There are also a few API points for Python Plugins specifically.  It is expected these will only
 // be exposed through the plugin base class, not through the regular Python bindings.

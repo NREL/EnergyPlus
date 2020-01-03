@@ -151,7 +151,7 @@ void resetActuator(int handle) {
     theActuator.Actuated = false;
 }
 
-const char * listAllAPIStuff() {
+const char * listAllAPIDataCSV() {
     std::string output;
     output.append("**ACTUATORS**\n");
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {

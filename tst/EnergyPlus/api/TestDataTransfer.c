@@ -67,7 +67,7 @@ void afterZoneTimeStepHandler()
         }
         FILE *apiAvailFile;
         apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
-        const char * apiStuff = listAllAPIStuff();
+        const char * apiStuff = listAllAPIDataCSV();
         fputs(apiStuff, apiAvailFile);
         fclose(apiAvailFile);
     }

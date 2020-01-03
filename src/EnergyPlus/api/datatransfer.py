@@ -32,6 +32,8 @@ class DataExchange:
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
+        self.api.listAllAPIDataCSV.argtypes = []
+        self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.requestVariable.argtypes = [c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
@@ -93,6 +95,13 @@ class DataExchange:
         self.api.getPluginTrendVariableHandle.restype = c_int
         self.api.getPluginTrendVariableValue.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableValue.restype = RealEP
+
+    def list_available_api_data_csv(self) -> str:
+        """
+        Lists out all API data stuff in an easily parseable CSV form
+        :return:
+        """
+        return self.api.listAllAPIDataCSV()
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
