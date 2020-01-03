@@ -10395,14 +10395,7 @@ namespace RefrigeratedCase {
         // ZoneEquipmentManager on the system time step, or only system driven by HVACManager on the zone time step.
 
         static std::string const RoutineName("SimulateDetailedRefrigerationSystems");
-
-        static Real64 CurrentLoads(0.0);        // current loads on compressor, exclusive of unmet loads from prev time steps
-        static Real64 CurrentHiStageLoads(0.0); // Current loads on high-stage compressor, exclusive of unmet loads from
-        // prev time steps (two-stage systems only)
-        static Real64 MaxTEvap(0.0);         // Maximum evaporating temperature that can still meet load
-        static Real64 MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
-        //    relative to design temperature difference
-        Real64 SuctionPipeZoneTemp; // Temperature for zone identified as environment for suction pipe heat gains, C
+        Real64 const MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
 
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -10443,7 +10436,7 @@ namespace RefrigeratedCase {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
                             Real64 LoadFrac = min(1.0, (RefrigCase(CaseID).TotalCoolingLoad / RefrigCase(CaseID).DesignRatedCap));
-                            MaxTEvap = RefrigCase(CaseID).Temperature -
+                            Real64 MaxTEvap = RefrigCase(CaseID).Temperature -
                                        (RefrigCase(CaseID).Temperature - RefrigCase(CaseID).EvapTempDesign) * max(LoadFrac, MaxDelTFloatFrac);
                             // Compare Tevap for this case to max allowed for all previous cases on this suction group and set at the MINIMUM of the
                             // two
@@ -10467,7 +10460,7 @@ namespace RefrigeratedCase {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
                             Real64 LoadFrac = min(1.0, (WalkIn(WalkInID).TotalCoolingLoad / WalkIn(WalkInID).DesignRatedCap));
-                            MaxTEvap = WalkIn(WalkInID).Temperature -
+                            Real64 MaxTEvap = WalkIn(WalkInID).Temperature -
                                        (WalkIn(WalkInID).Temperature - WalkIn(WalkInID).TEvapDesign) * max(LoadFrac, MaxDelTFloatFrac);
                             //  Compare maxTevap for this walk in to max allowed for cases and for all
                             //  previous walk ins on this suction group and set at the MINIMUM of the two
@@ -10528,7 +10521,7 @@ namespace RefrigeratedCase {
                 //  in the total secondary system loads.
                 System(SysNum).PipeHeatLoad = 0.0;
                 if (System(SysNum).SumUASuctionPiping > MySmallNumber) {
-                    SuctionPipeZoneTemp = DataLoopNode::Node(System(SysNum).SuctionPipeZoneNodeNum).Temp;
+                    Real64 SuctionPipeZoneTemp = DataLoopNode::Node(System(SysNum).SuctionPipeZoneNodeNum).Temp;  // Temperature for zone identified as environment for suction pipe heat gains, C
                     System(SysNum).PipeHeatLoad = System(SysNum).SumUASuctionPiping * (SuctionPipeZoneTemp - System(SysNum).TEvapNeeded);
                     // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
                     //     from refrigcasecredit (- for cooling zone, + for heating zone)
@@ -10669,8 +10662,8 @@ namespace RefrigeratedCase {
                         bool DeRate = false;                        // If true, need to derate aircoils because load can't be met by system
 
                         // With air chiller coils, don't use unmet energy, instead reduce capacity on coils to match avail compressor/cond capacity
-                        CurrentLoads =
-                            System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
+                        // current loads on compressor, exclusive of unmet loads from prev time steps
+                        Real64 CurrentLoads = System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                         if ((System(SysNum).CoilFlag) && (CurrentLoads > (System(SysNum).TotCompCapacity * 1.001))) {
                             DeRate = true;
                             FinalRateCoils(DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
@@ -10713,7 +10706,8 @@ namespace RefrigeratedCase {
         for (int SysNum = 1; SysNum <= DataHeatBalance::NumRefrigSystems; ++SysNum) {
             // Only do those systems appropriate for this analysis, supermarket type on load time step or coil type on sys time step
             if ((((!UseSysTimeStep) && (!System(SysNum).CoilFlag)) || ((UseSysTimeStep) && (System(SysNum).CoilFlag))) && (!DataGlobals::WarmupFlag)) {
-                CurrentLoads = System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
+                Real64 CurrentLoads = System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
+                Real64 CurrentHiStageLoads(0.0); // Current loads on high-stage compressor, exclusive of unmet loads from
                 if (System(SysNum).NumStages == 2) {
                     CurrentHiStageLoads = CurrentLoads + System(SysNum).TotCompPower;
                 } // NumStages==2
@@ -14197,9 +14191,9 @@ namespace RefrigeratedCase {
         // Called from Zone Equipment Manager.
         //       have however done the variable definitions for in and out.
 
-        static Real64 AirChillerSetSchedule(0.0); // Schedule value for air chiller SET
-        static Real64 QZNReqSens(0.0);            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
-        static Real64 RemainQZNReqSens(0.0);      // Remaiing amount of sensible heat needed by the zone [W]
+        Real64 AirChillerSetSchedule(0.0); // Schedule value for air chiller SET
+        Real64 QZNReqSens(0.0);            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
+        Real64 RemainQZNReqSens(0.0);      // Remaining amount of sensible heat needed by the zone [W]
 
         // Note, all coils in a coil set are in the same zone
         // the coils may be served by different detailed systems
@@ -14245,10 +14239,10 @@ namespace RefrigeratedCase {
         //   would still be running at level calculated previously
 
         int NumCoils(0);
-        static Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
-        static Real64 InitLatCreditEnergy(0.0); // Latent credit energy before derate [W]
-        static Real64 InitKgFrost(0.0);         // Initial amount of frost on coils based on latent load before derate [kg]
-        static Real64 FrostReduction(0.0);      // Change in frost on coils based on derated latent load [kg]
+        Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
+        Real64 InitLatCreditEnergy(0.0); // Latent credit energy before derate [W]
+        Real64 InitKgFrost(0.0);         // Initial amount of frost on coils based on latent load before derate [kg]
+        Real64 FrostReduction(0.0);      // Change in frost on coils based on derated latent load [kg]
 
         {
             auto const SELECT_CASE_var(SystemSourceType);
