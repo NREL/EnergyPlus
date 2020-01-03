@@ -55,20 +55,30 @@
 extern "C" {
 #endif
 
+// this is a silly little no-op to make sure this file and its symbols are included by the linker
 ENERGYPLUSLIB_API void dataTransferNoOp();
-ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
-ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
-ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
-ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
-ENERGYPLUSLIB_API void resetActuator(int handle);
-ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
-ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
-ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
-ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
-ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
 // there are a few query functions for seeing what is available
 ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
+ENERGYPLUSLIB_API int apiDataFullyReady();
+
+// functions to gain access to an Output:Variable value
+ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
+ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
+
+// functions to gain access to output meters
+ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
+ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
+
+// functions to gain access to actuators
+ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
+ENERGYPLUSLIB_API void resetActuator(int handle);
+ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
+
+// functions to gain access to internal variables (static simulation data)
+ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
+ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
 // There are also a few API points for Python Plugins specifically.  It is expected these will only
 // be exposed through the plugin base class, not through the regular Python bindings.

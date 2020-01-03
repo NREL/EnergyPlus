@@ -185,6 +185,9 @@ namespace PluginManagement {
     extern std::vector<PluginTrendVariable> trends;
     extern std::vector<std::string> globalVariableNames;
     extern std::vector<Real64> globalVariableValues;
+
+    // some flags
+    extern bool fullyReady;
 }
 }
 

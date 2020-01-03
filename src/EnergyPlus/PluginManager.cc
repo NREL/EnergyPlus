@@ -77,6 +77,9 @@ namespace PluginManagement {
     std::vector<std::string> globalVariableNames;
     std::vector<Real64> globalVariableValues;
 
+    // some flags
+    bool fullyReady = false;
+
     void registerNewCallback(int iCalledFrom, void (*f)())
     {
         callbacks[iCalledFrom].push_back(f);
@@ -369,6 +372,7 @@ namespace PluginManagement {
         }
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
+        PluginManagement::fullyReady = false;
     }
 
     PluginManager::PluginManager()

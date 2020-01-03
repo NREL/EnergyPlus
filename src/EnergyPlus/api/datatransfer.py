@@ -34,6 +34,8 @@ class DataExchange:
         self.running_as_python_plugin = running_as_python_plugin
         self.api.listAllAPIDataCSV.argtypes = []
         self.api.listAllAPIDataCSV.restype = c_char_p
+        self.api.apiDataFullyReady.argtypes = []
+        self.api.apiDataFullyReady.restype = c_int
         self.api.requestVariable.argtypes = [c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
@@ -102,6 +104,12 @@ class DataExchange:
         :return:
         """
         return self.api.listAllAPIDataCSV()
+
+    def api_data_fully_ready(self) -> bool:
+        success = self.api.apiDataFullyReady()
+        if success == 0:
+            return True
+        return False
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """

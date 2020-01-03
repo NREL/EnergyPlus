@@ -57,100 +57,6 @@
 
 void dataTransferNoOp() {}
 
-void requestVariable(const char* type, const char* key) {
-    // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
-    // should be called before energyplus is run!
-    EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
-    request.varName = type;
-    request.varKey = key;
-    EnergyPlus::OutputProcessor::apiVarRequests.push_back(request);
-}
-
-int getVariableHandle(const char* type, const char* key) {
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
-    int handle;
-    handle = 0;
-    if (!EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
-        return -2;
-    }
-    for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
-        handle++;
-        if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
-            return handle;
-        }
-    }
-    return -1;
-}
-
-int getMeterHandle(const char* meterName) {
-    std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
-    auto i = EnergyPlus::GetMeterIndex(meterNameUC);
-    if (i == 0) {
-        // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
-        return -1;
-    } else {
-        return i;
-    }
-}
-
-int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType) {
-    int handle;
-    handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
-    std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
-        handle++;
-        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
-        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
-        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
-        if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
-            return handle;
-        }
-    }
-    return -1;
-}
-
-double getVariableValue(const int handle) {
-    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
-    // out of range too high.  I'm inclined to just let it fail?  Maybe?
-    // If it is to be checked, just do
-    //    if (handle < 0) {
-    //        return -999;
-    //    }
-    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
-}
-
-double getMeterValue(int handle) {
-    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
-    // out of range too high.  I'm inclined to just let it fail?  Maybe?
-    // If it is to be checked, just do
-    //    if (handle < 0) {
-    //        return -999;
-    //    }
-    return EnergyPlus::GetCurrentMeterValue(handle);
-}
-
-void setActuatorValue(const int handle, const double value) {
-    // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
-    // the handle is based on the available actuator list
-    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    if (theActuator.RealValue.associated()) {
-        theActuator.RealValue = value;
-    } else {
-        // try falling back to integer assignment; // TODO: Address this later
-        theActuator.IntValue = value;
-    }
-    theActuator.Actuated = true;
-}
-
-void resetActuator(int handle) {
-    // resets the actuator so that E+ will use the internally calculated value again
-    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    theActuator.Actuated = false;
-}
-
 const char * listAllAPIDataCSV() {
     std::string output;
     output.append("**ACTUATORS**\n");
@@ -203,25 +109,110 @@ const char * listAllAPIDataCSV() {
     return output.c_str();
 }
 
-int getPluginGlobalVariableHandle(const char* name) {
-    return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableHandle(name);
+int apiDataFullyReady() {
+    if (EnergyPlus::PluginManagement::fullyReady) {
+        return 0;
+    }
+    return 1;
 }
 
-Real64 getPluginGlobalVariableValue(int handle) {
-    return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableValue(handle);
+
+void requestVariable(const char* type, const char* key) {
+    // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
+    // should be called before energyplus is run!
+    EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
+    request.varName = type;
+    request.varKey = key;
+    EnergyPlus::OutputProcessor::apiVarRequests.push_back(request);
 }
 
-void setPluginGlobalVariableValue(int handle, Real64 value) {
-    EnergyPlus::PluginManagement::pluginManager->setGlobalVariableValue(handle, value);
+int getVariableHandle(const char* type, const char* key) {
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    int handle;
+    handle = 0;
+    if (!EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
+        return -2;
+    }
+    for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
+        handle++;
+        if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
+            return handle;
+        }
+    }
+    return -1;
 }
 
-int getPluginTrendVariableHandle(const char* name) {
-    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableHandle(name);
+double getVariableValue(const int handle) {
+    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
+    // out of range too high.  I'm inclined to just let it fail?  Maybe?
+    // If it is to be checked, just do
+    //    if (handle < 0) {
+    //        return -999;
+    //    }
+    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
 }
 
-Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
-    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableValue(handle, timeIndex);
+
+int getMeterHandle(const char* meterName) {
+    std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
+    auto i = EnergyPlus::GetMeterIndex(meterNameUC);
+    if (i == 0) {
+        // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
+        return -1;
+    } else {
+        return i;
+    }
 }
+
+double getMeterValue(int handle) {
+    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
+    // out of range too high.  I'm inclined to just let it fail?  Maybe?
+    // If it is to be checked, just do
+    //    if (handle < 0) {
+    //        return -999;
+    //    }
+    return EnergyPlus::GetCurrentMeterValue(handle);
+}
+
+
+int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType) {
+    int handle;
+    handle = 0;
+    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
+    std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
+    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
+        handle++;
+        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
+        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
+        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
+            return handle;
+        }
+    }
+    return -1;
+}
+
+void resetActuator(int handle) {
+    // resets the actuator so that E+ will use the internally calculated value again
+    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
+    theActuator.Actuated = false;
+}
+
+void setActuatorValue(const int handle, const double value) {
+    // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
+    // the handle is based on the available actuator list
+    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
+    if (theActuator.RealValue.associated()) {
+        theActuator.RealValue = value;
+    } else {
+        // try falling back to integer assignment; // TODO: Address this later
+        theActuator.IntValue = value;
+    }
+    theActuator.Actuated = true;
+}
+
 
 int getInternalVariableHandle(const char* type, const char* key) {
     int handle;
@@ -252,27 +243,56 @@ Real64 getInternalVariableValue(int handle) {
     return 1;
 }
 
+
+int getPluginGlobalVariableHandle(const char* name) {
+    return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableHandle(name);
+}
+
+Real64 getPluginGlobalVariableValue(int handle) {
+    return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableValue(handle);
+}
+
+void setPluginGlobalVariableValue(int handle, Real64 value) {
+    EnergyPlus::PluginManagement::pluginManager->setGlobalVariableValue(handle, value);
+}
+
+int getPluginTrendVariableHandle(const char* name) {
+    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableHandle(name);
+}
+
+Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
+    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableValue(handle, timeIndex);
+}
+
+
 int year() {
     return EnergyPlus::DataEnvironment::Year;
 }
+
 int month() {
     return EnergyPlus::DataEnvironment::Month;
 }
+
 int dayOfMonth() {
     return EnergyPlus::DataEnvironment::DayOfMonth;
 }
+
 int dayOfWeek() {
     return EnergyPlus::DataEnvironment::DayOfWeek;
 }
+
 int dayOfYear() {
     return EnergyPlus::DataEnvironment::DayOfYear;
 }
+
 int daylightSavingsTimeIndicator() {
     return EnergyPlus::DataEnvironment::DSTIndicator;
 }
+
 int hour() {
     return EnergyPlus::DataGlobals::HourOfDay - 1; // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
 }
+
 Real64 currentTime() {
     if (EnergyPlus::DataHVACGlobals::TimeStepSys < EnergyPlus::DataGlobals::TimeStepZone) {
         // CurrentTime is for end of zone timestep, need to account for system timestep
@@ -281,14 +301,17 @@ Real64 currentTime() {
         return EnergyPlus::DataGlobals::CurrentTime;
     }
 }
+
 int minutes() {
     // the -1 is to push us to the right minute, but this should be handled cautiously because if we are inside the HVAC iteration loop,
     // currentTime() returns a floating point fractional hour, so truncation could put this a few seconds from the expected minute.
     return ((int)std::round(currentTime()) - EnergyPlus::DataGlobals::HourOfDay - 1) * 60;
 }
+
 int holidayIndex() {
     return EnergyPlus::DataEnvironment::HolidayIndex;
 }
+
 int sunIsUp() { // maintain response convention from previous (EMS) implementation
     if (EnergyPlus::DataEnvironment::SunIsUp) {
         return 1;
@@ -296,6 +319,7 @@ int sunIsUp() { // maintain response convention from previous (EMS) implementati
         return 0;
     }
 }
+
 int isRaining() {
     if (EnergyPlus::DataEnvironment::IsRain) {
         return 1;
@@ -303,6 +327,7 @@ int isRaining() {
         return 0;
     }
 }
+
 int warmupFlag() {
     if (EnergyPlus::DataGlobals::WarmupFlag) {
         return 1;
@@ -310,15 +335,19 @@ int warmupFlag() {
         return 0;
     }
 }
+
 Real64 systemTimeStep() {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
+
 int currentEnvironmentNum() {
     return EnergyPlus::DataEnvironment::CurEnvirNum;
 }
+
 int kindOfSim() {
     return EnergyPlus::DataGlobals::KindOfSim;
 }
+
 int getConstructionHandle(const char* constructionName) {
     int handle;
     handle = 0;

@@ -64,6 +64,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -458,6 +459,9 @@ namespace SimulationManager {
                 ShowFatalError("Previous Conditions cause program termination.");
             }
         }
+
+        // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
+        PluginManagement::fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();
