@@ -16,12 +16,12 @@ class TestOutTrends(EnergyPlusPlugin):
             ))
         cur_temp = self.api.exchange.get_variable_value(self.data['outdoor_temp'])
         self.api.exchange.set_global_value(self.data['global_var'], cur_temp)
-        val_1 = self.api.exchange.get_trend_value(self.data['trend_var'], 0)
-        val_2 = self.api.exchange.get_trend_value(self.data['trend_var'], 1)
-        val_3 = self.api.exchange.get_trend_value(self.data['trend_var'], 2)
-        val_4 = self.api.exchange.get_trend_value(self.data['trend_var'], 3)
-        val_5 = self.api.exchange.get_trend_value(self.data['trend_var'], 4)
-        print("TRENDING: %s, %s, %s, %s, %s" % (
-            round(val_1, 2), round(val_2, 2), round(val_3, 2), round(val_4, 2), round(val_5, 2)
-        ))
+        # val_1 = self.api.exchange.get_trend_value(self.data['trend_var'], 0)
+        # val_2 = self.api.exchange.get_trend_value(self.data['trend_var'], 1)
+        # val_3 = self.api.exchange.get_trend_value(self.data['trend_var'], 2)
+        # val_4 = self.api.exchange.get_trend_value(self.data['trend_var'], 3)
+        # val_5 = self.api.exchange.get_trend_value(self.data['trend_var'], 4)
+        # print("TRENDING: %s, %s, %s, %s, %s" % (
+        #     round(val_1, 2), round(val_2, 2), round(val_3, 2), round(val_4, 2), round(val_5, 2)
+        # ))
         return 0

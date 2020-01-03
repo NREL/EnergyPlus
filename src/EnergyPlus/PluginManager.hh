@@ -72,7 +72,7 @@ namespace PluginManagement {
 
     void registerNewCallback(int iCalledFrom, void (*f)());
 
-    void runAnyRegisteredCallbacks(int iCalledFrom);
+    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
 
     void clear_state();
 

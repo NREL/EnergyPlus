@@ -80,14 +80,18 @@ namespace PluginManagement {
         callbacks[iCalledFrom].push_back(f);
     }
 
-    void runAnyRegisteredCallbacks(int iCalledFrom)
+    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
     {
         if (DataGlobals::KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
             cb();
+            anyRan = true;
         }
         for (auto &plugin : plugins) {
-            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run(iCalledFrom);
+            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
+                plugin.run(iCalledFrom);
+                anyRan = true;
+            }
         }
     }
 
