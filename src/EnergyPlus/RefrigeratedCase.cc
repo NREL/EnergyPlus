@@ -9418,7 +9418,7 @@ namespace RefrigeratedCase {
         // that's why important where init goes, don't want to zero out data should keep
         if (UseSysTimeStep) {
             for (int CoilSetIndex = 1; CoilSetIndex <= DataHeatBalance::NumRefrigChillerSets; ++CoilSetIndex) {
-                CalculateAirChillerSets(CoilSetIndex);
+                AirChillerSet(CoilSetIndex).CalculateAirChillerSets();
             }
         }
 
@@ -10476,7 +10476,7 @@ namespace RefrigeratedCase {
         // that's why important where init goes, don't want to zero out data should keep
         if (UseSysTimeStep) {
             for (int CoilSetIndex = 1; CoilSetIndex <= DataHeatBalance::NumRefrigChillerSets; ++CoilSetIndex) {
-                CalculateAirChillerSets(CoilSetIndex);
+                AirChillerSet(CoilSetIndex).CalculateAirChillerSets();
             }
         }
 
@@ -10557,7 +10557,7 @@ namespace RefrigeratedCase {
                 if (System(SysNum).NumSecondarys > 0) {
                     for (int SecondIndex = 1; SecondIndex <= System(SysNum).NumSecondarys; ++SecondIndex) {
                         int SecondID = System(SysNum).SecondaryNum(SecondIndex);
-                        CalculateSecondary(SecondID);
+                        Secondary(SecondID).CalculateSecondary(SecondID);
                         if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // check for lowest T evap design among the secondary systems and
@@ -13705,7 +13705,7 @@ namespace RefrigeratedCase {
     //***************************************************************************************************
     //***************************************************************************************************
 
-    void CalculateSecondary(int const SecondaryNum)
+    void SecondaryLoopData::CalculateSecondary(int const SecondaryNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Therese Stovall, ORNL
@@ -13736,67 +13736,39 @@ namespace RefrigeratedCase {
 
         bool AtPartLoad;                  // Whether or not need to iterate on pump power
         bool DeRate;                      // If true, need to derate aircoils because don't carry over unmet energy
-        int CaseID;                       // used in summing case loads on loop
-        int CaseNum;                      // used in summing case loads on loop
-        int CoilID;                       // used in summing coil loads on loop
-        int CoilIndex;                    // used in summing coil loads on loop
-        int DistPipeZoneNum;              // used to assign case credit to zone
         int Iter;                         // loop counter
-        int NumPumps;                     // number of pumps (or stages if used to approx var speed) on loop
-        int PumpID;                       // loop counter
-        int ReceiverZoneNum;              // used to assign case credit it zone
-        int WalkInID;                     // used in summing walk-in loads on loop
-        int WalkInIndex;                  // used in summing walk-in loads on loop
-        int ZoneNodeNum;                  // used to establish environmental temperature for dist piping heat gains
         Real64 CpBrine;                   // Specific heat (W/kg)
         Real64 DensityBrine;              // Density (kg/m3)
         Real64 DiffTemp;                  // (C)
-        Real64 DistPipeHeatGain;          // Optional (W)
+        Real64 distPipeHeatGain;          // Optional (W)
         Real64 Error;                     // Used in iterative soln for pumps needed to meet load (that has to include pump energy)
-        Real64 Eta(0.0);                       // Secondary loop heat exchanger eta, dimensionless
         Real64 FlowVolNeeded;             // Flow rate needed to meet load (m3/s)
-        Real64 MaxLoad;                   // Secondary loop capacity can be limited by heat exchanger or pumps (W)
-        Real64 MaxVolFlow;                // Flow can be limited by either total pump capacity or heat exchanger design (m3/s)
         Real64 PartLdFrac;                // Used to ratio pump power
         Real64 PartPumpFrac;              // Used to see if part pumps dispatched meets part pump load
         Real64 PrevTotalLoad;     // Used in pump energy convergence test
-        Real64 ReceiverHeatGain;  // Optional (W)
         Real64 RefrigerationLoad; // Load for cases and walk-ins served by loop, does not include pump energy (W)
         Real64 StoredEnergyRate;  // Used to meet loads unmet in previous time step (related to defrost cycles
         //     on cases/walk-ins served)(W)
-        Real64 TBrineAverage;             // (C)
         Real64 TBrineIn;                  // Brine temperature going to heat exchanger, C
-        Real64 TCondense;                 // Condensing temperature for a phase change secondary loop, C
-        Real64 TEvap;                     // Evaporating temperature in secondary loop heat exchanger (C)
-        Real64 TotalCoolingLoad(0.0);       // Cooling load reported back to compressor rack or detailed system (W)
         Real64 TotalHotDefrostCondCredit; // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
         Real64 TotalPumpPower;            // Total Pumping power for loop, W
         Real64 TotalLoad;                 // Total Cooling Load on secondary loop, W
         Real64 TPipesReceiver(0.0);            // Temperature used for contents of pipes and/or receiver in calculating shell losses (C)
         Real64 VarFrac;                   // Pump power fraction for variable speed pump, dimensionless
         Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
-        Real64 UnmetEnergy;               // Cumulative, grows and shrinks with defrost cycles on loads served by loop (J)
 
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
-        NumPumps = Secondary(SecondaryNum).NumPumps;
-        TEvap = Secondary(SecondaryNum).TEvapDesign;
-        MaxVolFlow = Secondary(SecondaryNum).MaxVolFlow;
-        MaxLoad = Secondary(SecondaryNum).MaxLoad;
-        UnmetEnergy = Secondary(SecondaryNum).UnmetEnergy;
         {
-            auto const SELECT_CASE_var(Secondary(SecondaryNum).FluidType);
+            auto const SELECT_CASE_var(this->FluidType);
             if (SELECT_CASE_var == SecFluidTypeAlwaysLiquid) {
-                CpBrine = Secondary(SecondaryNum).CpBrineRated;
-                DensityBrine = Secondary(SecondaryNum).DensityBrineRated;
-                Eta = Secondary(SecondaryNum).HeatExchangeEta;
-                TBrineAverage = Secondary(SecondaryNum).TBrineAverage;
-                TBrineIn = Secondary(SecondaryNum).TBrineInRated;
-                TPipesReceiver = TBrineAverage;
+                CpBrine = this->CpBrineRated;
+                DensityBrine = this->DensityBrineRated;
+                TBrineIn = this->TBrineInRated;
+                TPipesReceiver = this->TBrineAverage;
             } else if (SELECT_CASE_var == SecFluidTypePhaseChange) {
-                TCondense = Secondary(SecondaryNum).TCondense;
-                TPipesReceiver = TCondense;
+                TPipesReceiver = this->TCondense;
             }
         } // Fluid type
 
@@ -13813,43 +13785,41 @@ namespace RefrigeratedCase {
         //          However, another author shows this as a major diff between dx and secondary
         //          So - allow the user to include this in his total load, even though he has to do
         //          most of the calculations before the input (to get to SumUADistPiping)).
-        DistPipeHeatGain = 0.0;
-        if (Secondary(SecondaryNum).SumUADistPiping > MySmallNumber) {
-            ZoneNodeNum = Secondary(SecondaryNum).DistPipeZoneNodeNum;
+        distPipeHeatGain = 0.0;
+        if (this->SumUADistPiping > MySmallNumber) {
+            int ZoneNodeNum = this->DistPipeZoneNodeNum;
             DiffTemp = DataLoopNode::Node(ZoneNodeNum).Temp - TPipesReceiver;
-            DistPipeHeatGain = DiffTemp * Secondary(SecondaryNum).SumUADistPiping;
-            DistPipeZoneNum = Secondary(SecondaryNum).DistPipeZoneNum;
+            distPipeHeatGain = DiffTemp * this->SumUADistPiping;
             // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
-            Secondary(SecondaryNum).DistPipeZoneHeatGain = -DistPipeHeatGain;
-            DataHeatBalance::RefrigCaseCredit(DistPipeZoneNum).SenCaseCreditToZone -= DistPipeHeatGain;
+            this->DistPipeZoneHeatGain = -distPipeHeatGain;
+            DataHeatBalance::RefrigCaseCredit(this->DistPipeZoneNum).SenCaseCreditToZone -= distPipeHeatGain;
         } // calc distribution piping heat gains
 
-        ReceiverHeatGain = 0.0;
-        if (Secondary(SecondaryNum).SumUAReceiver > MySmallNumber) {
-            ZoneNodeNum = Secondary(SecondaryNum).ReceiverZoneNodeNum;
+        Real64 receiverHeatGain = 0.0;
+        if (this->SumUAReceiver > MySmallNumber) {
+            int ZoneNodeNum = this->ReceiverZoneNodeNum;
             DiffTemp = DataLoopNode::Node(ZoneNodeNum).Temp - TPipesReceiver;
-            ReceiverHeatGain = DiffTemp * Secondary(SecondaryNum).SumUAReceiver;
-            ReceiverZoneNum = Secondary(SecondaryNum).ReceiverZoneNum;
+            receiverHeatGain = DiffTemp * this->SumUAReceiver;
             // receiver heat load is a positive number (ie. heat absorbed by receiver, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
-            Secondary(SecondaryNum).ReceiverZoneHeatGain = -ReceiverHeatGain;
-            DataHeatBalance::RefrigCaseCredit(ReceiverZoneNum).SenCaseCreditToZone -= ReceiverHeatGain;
+            this->ReceiverZoneHeatGain = -receiverHeatGain;
+            DataHeatBalance::RefrigCaseCredit(this->ReceiverZoneNum).SenCaseCreditToZone -= receiverHeatGain;
         } // calc receiver heat gains
 
         // Sum up all the case and walk-in loads served by the secondary loop
-        if (Secondary(SecondaryNum).NumCases > 0) {
-            for (CaseNum = 1; CaseNum <= Secondary(SecondaryNum).NumCases; ++CaseNum) {
-                CaseID = Secondary(SecondaryNum).CaseNum(CaseNum);
+        if (this->NumCases > 0) {
+            for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
+                int CaseID = this->CaseNum(caseNum);
                 CalculateCase(CaseID);
                 // increment TotalCoolingLoad Hot gas/brine defrost credits for each secondary loop
                 RefrigerationLoad += RefrigCase(CaseID).TotalCoolingLoad;
                 TotalHotDefrostCondCredit += RefrigCase(CaseID).HotDefrostCondCredit;
             } // CaseNum
         }     // NumCases > 0
-        if (Secondary(SecondaryNum).NumWalkIns > 0) {
-            for (WalkInIndex = 1; WalkInIndex <= Secondary(SecondaryNum).NumWalkIns; ++WalkInIndex) {
-                WalkInID = Secondary(SecondaryNum).WalkInNum(WalkInIndex);
+        if (this->NumWalkIns > 0) {
+            for (int WalkInIndex = 1; WalkInIndex <= this->NumWalkIns; ++WalkInIndex) {
+                int WalkInID = this->WalkInNum(WalkInIndex);
                 CalculateWalkIn(WalkInID);
                 // increment TotalCoolingLoad for  each system
                 RefrigerationLoad += WalkIn(WalkInID).TotalCoolingLoad;
@@ -13857,9 +13827,9 @@ namespace RefrigeratedCase {
             } // NumWalkIns systems
         }     // Secondary(SecondaryNum)%NumWalkIns > 0
 
-        if (Secondary(SecondaryNum).NumCoils > 0) {
-            for (CoilIndex = 1; CoilIndex <= Secondary(SecondaryNum).NumCoils; ++CoilIndex) {
-                CoilID = Secondary(SecondaryNum).CoilNum(CoilIndex);
+        if (this->NumCoils > 0) {
+            for (int CoilIndex = 1; CoilIndex <= this->NumCoils; ++CoilIndex) {
+                int CoilID = this->CoilNum(CoilIndex);
                 // already CALL CalculateCoil(CoilID) for each coil, dispatched in coilset order for each zone
                 // increment TotalCoolingLoad for each system
                 //  here will find out if secondary can serve total load, if not will derate coil outout/case credits
@@ -13868,29 +13838,29 @@ namespace RefrigeratedCase {
             } // NumCoils on seocndary system
         }     // Secondary(SecondaryNum)%NumCoils > 0
 
-        TotalLoad = RefrigerationLoad + DistPipeHeatGain + ReceiverHeatGain;
+        TotalLoad = RefrigerationLoad + distPipeHeatGain + receiverHeatGain;
         AtPartLoad = true;
         // Check to see if load is already >+ maxload without pump heat
-        if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            FlowVolNeeded = TotalLoad / Eta / (CpBrine * DensityBrine * (TBrineIn - TEvap));
+        if (this->FluidType == SecFluidTypeAlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            FlowVolNeeded = TotalLoad / this->HeatExchangeEta / (CpBrine * DensityBrine * (TBrineIn - this->TEvapDesign));
             // For brine/glycol systems, find flow volume needed to meet load
             // Per ashrae 2006, p4.1, eval mass flow rate to pump at brine return (to chiller) temp
             //   because pumps located in return piping
-            if (FlowVolNeeded >= MaxVolFlow) {
+            if (FlowVolNeeded >= this->MaxVolFlow) {
                 // Don't need to iterate on pumps, just set to max.  Will have unmet load this time step (unless coils present)
-                VolFlowRate = MaxVolFlow;
-                TotalPumpPower = Secondary(SecondaryNum).PumpTotRatedPower;
-                TotalLoad += TotalPumpPower * Secondary(SecondaryNum).PumpPowerToHeat;
+                VolFlowRate = this->MaxVolFlow;
+                TotalPumpPower = this->PumpTotRatedPower;
+                TotalLoad += TotalPumpPower * this->PumpPowerToHeat;
                 AtPartLoad = false;
-                if (Secondary(SecondaryNum).NumCoils > 0) DeRate = true;
+                if (this->NumCoils > 0) DeRate = true;
             }    // flowvolneeded >= maxvolflow
         } else { // have SecFluidTypePhaseChange !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            if (TotalLoad >= MaxLoad) {
-                TotalPumpPower = Secondary(SecondaryNum).PumpTotRatedPower;
-                TotalLoad += TotalPumpPower * Secondary(SecondaryNum).PumpPowerToHeat;
-                VolFlowRate = MaxVolFlow;
+            if (TotalLoad >= this->MaxLoad) {
+                TotalPumpPower = this->PumpTotRatedPower;
+                TotalLoad += TotalPumpPower * this->PumpPowerToHeat;
+                VolFlowRate = this->MaxVolFlow;
                 AtPartLoad = false;
-                if (Secondary(SecondaryNum).NumCoils > 0) DeRate = true;
+                if (this->NumCoils > 0) DeRate = true;
             }
         } // fluid type check for max load or max flow       >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -13907,34 +13877,34 @@ namespace RefrigeratedCase {
                     break;
                 }
                 PrevTotalLoad = TotalLoad;
-                if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
-                    FlowVolNeeded = TotalLoad / Eta / (CpBrine * DensityBrine * (TBrineIn - TEvap));
-                    PartLdFrac = FlowVolNeeded / MaxVolFlow;
+                if (this->FluidType == SecFluidTypeAlwaysLiquid) {
+                    FlowVolNeeded = TotalLoad / this->HeatExchangeEta / (CpBrine * DensityBrine * (TBrineIn - this->TEvapDesign));
+                    PartLdFrac = FlowVolNeeded / this->MaxVolFlow;
                 } else {
-                    PartLdFrac = TotalLoad / MaxLoad;
+                    PartLdFrac = TotalLoad / this->MaxLoad;
                 }
-                if (Secondary(SecondaryNum).PumpControlType == SecPumpControlConstant) {
+                if (this->PumpControlType == SecPumpControlConstant) {
                     VolFlowRate = 0.0;
                     TotalPumpPower = 0.0;
-                    for (PumpID = 1; PumpID <= NumPumps; ++PumpID) {                         // dispatch pumps to meet needed flow rate
-                        if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>
-                            VolFlowRate += Secondary(SecondaryNum).PumpIncrementFlowVol;
-                            TotalPumpPower += Secondary(SecondaryNum).PumpIncrementPower;
+                    for (int PumpID = 1; PumpID <= this->NumPumps; ++PumpID) {                         // dispatch pumps to meet needed flow rate
+                        if (this->FluidType == SecFluidTypeAlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>
+                            VolFlowRate += this->PumpIncrementFlowVol;
+                            TotalPumpPower += this->PumpIncrementPower;
                             if (VolFlowRate >= FlowVolNeeded) break;
                         } else { // fluid type phase change >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                            VolFlowRate += Secondary(SecondaryNum).PumpIncrementFlowVol;
-                            TotalPumpPower += Secondary(SecondaryNum).PumpIncrementPower;
-                            PartPumpFrac = TotalPumpPower / Secondary(SecondaryNum).PumpTotRatedPower;
+                            VolFlowRate += this->PumpIncrementFlowVol;
+                            TotalPumpPower += this->PumpIncrementPower;
+                            PartPumpFrac = TotalPumpPower / this->PumpTotRatedPower;
                             if (PartPumpFrac >= PartLdFrac) break;
                         } // fluid type              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     }     // Dispatching pumps until fluid flow need is met
                 } else {  // pump type variable
-                    VarFrac = max(0.1, CurveManager::CurveValue(Secondary(SecondaryNum).VarSpeedCurvePtr, PartLdFrac));
-                    TotalPumpPower = Secondary(SecondaryNum).PumpTotRatedPower * VarFrac;
-                    VolFlowRate = MaxVolFlow * PartLdFrac;
+                    VarFrac = max(0.1, CurveManager::CurveValue(this->VarSpeedCurvePtr, PartLdFrac));
+                    TotalPumpPower = this->PumpTotRatedPower * VarFrac;
+                    VolFlowRate = this->MaxVolFlow * PartLdFrac;
                 } // pump type
 
-                TotalLoad = RefrigerationLoad + DistPipeHeatGain + ReceiverHeatGain + TotalPumpPower * Secondary(SecondaryNum).PumpPowerToHeat;
+                TotalLoad = RefrigerationLoad + distPipeHeatGain + receiverHeatGain + TotalPumpPower * this->PumpPowerToHeat;
                 Error = std::abs((TotalLoad - PrevTotalLoad) / PrevTotalLoad);
                 if (Error < ErrorTol) break;
             } // end iteration on pump energy convergence
@@ -13954,51 +13924,49 @@ namespace RefrigeratedCase {
         //  apply it to previously unmet/stored loads.  If capacity less than current load,
         //  (e.g. as it may be following defrost cycles on cases or walk-ins served by secondary loop)
         //  save the unmet/stored load to be met in succeeding time steps.
-        if (Secondary(SecondaryNum).NumCoils == 0) {
-            StoredEnergyRate = max(0.0, (UnmetEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour));
+        if (this->NumCoils == 0) {
+            StoredEnergyRate = max(0.0, (this->UnmetEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour));
             // Load necessary to meet current and all stored energy needs (W)
             Real64 LoadRequested = TotalLoad + StoredEnergyRate;
-            if (MaxLoad > LoadRequested) {
+            if (this->MaxLoad > LoadRequested) {
                 // Have at least as much capacity avail as needed, even counting stored energy
-                TotalCoolingLoad = LoadRequested;
+                this->TotalCoolingLoad = LoadRequested;
                 RefrigerationLoad += StoredEnergyRate;
-                UnmetEnergy = 0.0;
+                this->UnmetEnergy = 0.0;
             } else {
                 // Don't have as much capacity as needed (likely following defrost periods)
-                TotalCoolingLoad = MaxLoad;
-                RefrigerationLoad -= (TotalLoad - MaxLoad);
-                if (!DataGlobals::WarmupFlag) UnmetEnergy += ((TotalLoad - MaxLoad) * DataGlobals::TimeStepZoneSec);
+                this->TotalCoolingLoad = this->MaxLoad;
+                RefrigerationLoad -= (TotalLoad - this->MaxLoad);
+                if (!DataGlobals::WarmupFlag) this->UnmetEnergy += ((TotalLoad - this->MaxLoad) * DataGlobals::TimeStepZoneSec);
             } // load requested greater than MaxLoad
-            if (Secondary(SecondaryNum).UnmetEnergy > MyLargeNumber) {
-                Secondary(SecondaryNum).UnmetEnergy = MyLargeNumber;
+            if (this->UnmetEnergy > MyLargeNumber) {
+                this->UnmetEnergy = MyLargeNumber;
                 if (ShowUnmetSecondEnergyWarning(SecondaryNum)) {
-                    ShowWarningError("Secondary Refrigeration Loop: " + Secondary(SecondaryNum).Name);
+                    ShowWarningError("Secondary Refrigeration Loop: " + this->Name);
                     ShowContinueError(" This secondary system has insufficient capacity to meet the refrigeration loads.");
                     ShowUnmetSecondEnergyWarning(SecondaryNum) = false;
                 }
             } //>my large number
 
-            Secondary(SecondaryNum).UnmetEnergy = UnmetEnergy;
         } else { // air coils on secondary loop, no "unmet" energy accounting, just reduce amount of cooling provided to zone by coils
             DeRate = false;
-            if (TotalLoad > MaxLoad) DeRate = true;
+            if (TotalLoad > this->MaxLoad) DeRate = true;
             //  TotalLoad = RefrigerationLoad + DistPipeHeatGain  + ReceiverHeatGain &
             //           + TotalPumpPower*Secondary(SecondaryNum)%PumpPowertoHeat
-            FinalRateCoils(DeRate, SecondarySystem, SecondaryNum, TotalLoad, MaxLoad); // assign case credits for coils on this loop
+            FinalRateCoils(DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
             // Bug TotalCoolingLoad not set but used below
         } // no air coils on secondary loop
-        Secondary(SecondaryNum).PumpPowerTotal = TotalPumpPower;
-        Secondary(SecondaryNum).PumpElecEnergyTotal = TotalPumpPower * LocalTimeStep * DataGlobals::SecInHour;
-        Secondary(SecondaryNum).TotalRefrigLoad = RefrigerationLoad;
-        Secondary(SecondaryNum).TotalRefrigEnergy = RefrigerationLoad * LocalTimeStep * DataGlobals::SecInHour;
-        Secondary(SecondaryNum).TotalCoolingLoad = TotalCoolingLoad;
-        Secondary(SecondaryNum).TotalCoolingEnergy = TotalCoolingLoad * LocalTimeStep * DataGlobals::SecInHour;
-        Secondary(SecondaryNum).FlowVolActual = VolFlowRate;
-        Secondary(SecondaryNum).HotDefrostCondCredit = TotalHotDefrostCondCredit;
-        Secondary(SecondaryNum).DistPipeHeatGain = DistPipeHeatGain;
-        Secondary(SecondaryNum).DistPipeHeatGainEnergy = DistPipeHeatGain * LocalTimeStep * DataGlobals::SecInHour;
-        Secondary(SecondaryNum).ReceiverHeatGain = ReceiverHeatGain;
-        Secondary(SecondaryNum).ReceiverHeatGainEnergy = ReceiverHeatGain * LocalTimeStep * DataGlobals::SecInHour;
+        this->PumpPowerTotal = TotalPumpPower;
+        this->PumpElecEnergyTotal = TotalPumpPower * LocalTimeStep * DataGlobals::SecInHour;
+        this->TotalRefrigLoad = RefrigerationLoad;
+        this->TotalRefrigEnergy = RefrigerationLoad * LocalTimeStep * DataGlobals::SecInHour;
+        this->TotalCoolingEnergy = TotalCoolingLoad * LocalTimeStep * DataGlobals::SecInHour;
+        this->FlowVolActual = VolFlowRate;
+        this->HotDefrostCondCredit = TotalHotDefrostCondCredit;
+        this->DistPipeHeatGain = distPipeHeatGain;
+        this->DistPipeHeatGainEnergy = distPipeHeatGain * LocalTimeStep * DataGlobals::SecInHour;
+        this->ReceiverHeatGain = receiverHeatGain;
+        this->ReceiverHeatGainEnergy = receiverHeatGain * LocalTimeStep * DataGlobals::SecInHour;
     }
 
     void SumZoneImpacts()
@@ -14182,7 +14150,7 @@ namespace RefrigeratedCase {
 
     //***************************************************************************************************
 
-    void CalculateAirChillerSets(int const AirChillerSetID)
+    void AirChillerSetData::CalculateAirChillerSets()
     {
 
         // SUBROUTINE INFORMATION:
@@ -14207,14 +14175,14 @@ namespace RefrigeratedCase {
         // Note, all coils in a coil set are in the same zone
         // the coils may be served by different detailed systems
         // The coils are dispatched to meet the load specified in the previous time step in order listed in coilset object
-        AirChillerSetSchedule = ScheduleManager::GetCurrentScheduleValue(AirChillerSet(AirChillerSetID).SchedPtr);
+        AirChillerSetSchedule = ScheduleManager::GetCurrentScheduleValue(this->SchedPtr);
 
         if (AirChillerSetSchedule <= 0.0) return;
-        QZNReqSens = AirChillerSet(AirChillerSetID).QZnReqSens;
+        QZNReqSens = this->QZnReqSens;
         RemainQZNReqSens = QZNReqSens;
 
-        for (int CoilIndex = 1; CoilIndex <= AirChillerSet(AirChillerSetID).NumCoils; ++CoilIndex) {
-            int CoilID = AirChillerSet(AirChillerSetID).CoilNum(CoilIndex);
+        for (int CoilIndex = 1; CoilIndex <= this->NumCoils; ++CoilIndex) {
+            int CoilID = this->CoilNum(CoilIndex);
 
             CalculateCoil(CoilID, RemainQZNReqSens);
             RemainQZNReqSens += WarehouseCoil(CoilID).SensCreditRate;
@@ -14250,7 +14218,6 @@ namespace RefrigeratedCase {
         int NumCoils(0);
         Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
         Real64 InitLatCreditEnergy(0.0); // Latent credit energy before derate [W]
-        Real64 InitKgFrost(0.0);         // Initial amount of frost on coils based on latent load before derate [kg]
         Real64 FrostReduction(0.0);      // Change in frost on coils based on derated latent load [kg]
 
         {
@@ -14276,7 +14243,6 @@ namespace RefrigeratedCase {
 
                 // need to adjust ice on coil due to reduction in latent load met by coil
                 InitLatCreditEnergy = warehouse_coil.LatCreditEnergy;
-                InitKgFrost = warehouse_coil.KgFrost;
 
                 warehouse_coil.TotalCoolingLoad *= DeRateFactor;
                 warehouse_coil.TotalCoolingEnergy *= DeRateFactor;

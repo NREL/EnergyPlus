@@ -1068,6 +1068,8 @@ namespace RefrigeratedCase {
             ReceiverZoneHeatGain = 0.0;
             DistPipeZoneHeatGain = 0.0;
         }
+
+        void CalculateSecondary(int SecondaryNum);
     };
 
     struct TransferLoadListDef // Derived Type for Transfer Load (Secondary and Cascade) Lists
@@ -1396,6 +1398,8 @@ namespace RefrigeratedCase {
             : ChillerSetID(0), SchedPtr(0), NodeNumInlet(0), NodeNumOutlet(0), NumCoils(0), ZoneNum(0), ZoneNodeNum(0), QZnReqSens(0.0)
         {
         }
+
+        void CalculateAirChillerSets();
     };
 
     struct CoilCreditData // used to sum impact of all coils within a zone
@@ -1516,8 +1520,6 @@ namespace RefrigeratedCase {
 
     void CalculateWalkIn(int WalkInID); // Absolute pointer to  Walk In
 
-    void CalculateSecondary(int SecondaryNum);
-
     void SumZoneImpacts();
 
     void CheckRefrigerationInput();
@@ -1529,8 +1531,6 @@ namespace RefrigeratedCase {
                           Real64 &LatOutputProvided,
                           int &AirChillerSetPtr // from ZoneEquipList(CurZoneEqNum)%EquipIndex(EquipPtr)
     );
-
-    void CalculateAirChillerSets(int AirChillerSetID);
 
     void FinalRateCoils(bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int SystemSourceType,     // SecondarySystem or DetailedSystem
