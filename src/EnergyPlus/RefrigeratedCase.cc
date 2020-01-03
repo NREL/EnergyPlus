@@ -364,8 +364,7 @@ namespace RefrigeratedCase {
     Real64 CompressorCOPactual(0.0);        // Compressor coefficient of performance at specific operating conditions (W/W)
     Real64 RackSenCreditToZone(0.0);        // Amount of condenser heat applied to zone load (W)
     Real64 RackSenCreditToHVAC(0.0);        // Amount of condenser heat applied to HVAC RA duct (W)
-    int InletNode(0);                       // Water-cooled condenser inlet node number
-    int OutletNode(0);                      // Water-cooled condenser outlet node number
+
     Array1D_bool ShowCOPWarning;            // Used for one-time warning message for possible rack
     // input error regarding COP
     // Refrigeration condenser variables (used for both racks and detailed systems)
@@ -436,6 +435,95 @@ namespace RefrigeratedCase {
     Array1D<AirChillerSetData> AirChillerSet;
     Array1D<CoilCreditData> CoilSysCredit;
     Array1D<CaseWIZoneReportData> CaseWIZoneReport;
+    
+    void clear_state()
+    {
+        NumSimulationCondAir = 0;
+        NumSimulationCondEvap = 0;
+        NumSimulationCondWater = 0;
+        NumSimulationCascadeCondensers = 0;
+        NumSimulationGasCooler = 0;
+        NumSimulationSharedGasCoolers = 0;
+        NumTransRefrigSystems = 0;
+        NumSimulationSharedCondensers = 0;
+        NumSimulationCases = 0;
+        NumSimulationCaseAndWalkInLists = 0;
+        NumSimulationWalkIns = 0;
+        NumSimulationCompressors = 0;
+        NumSimulationSubcoolers = 0;
+        NumSimulationMechSubcoolers = 0;
+        NumSimulationRefrigAirChillers = 0;
+        NumSimulationSecondarySystems = 0;
+        NumSimulationTransferLoadLists = 0;
+        NumUnusedRefrigCases = 0;
+        NumUnusedCoils = 0;
+        NumUnusedCondensers = 0;
+        NumUnusedGasCoolers = 0;
+        NumUnusedCompressors = 0;
+        NumUnusedSecondarys = 0;
+        MyReferPlantScanFlag = true;
+
+        CaseRAFactor = 0.0;
+
+        ShowStockingWarning.deallocate();
+        ShowFrostWarning.deallocate();
+        ShowStoreEnergyWarning.deallocate();
+        ShowUnmetWIEnergyWarning.deallocate();
+        ShowWIFrostWarning.deallocate();
+
+        TotalRackDeliveredCapacity = 0.0;
+        TotalCompressorPower = 0.0;
+        CompressorCOPactual = 0.0;
+        RackSenCreditToZone = 0.0;
+        RackSenCreditToHVAC = 0.0;
+
+        ShowCOPWarning.deallocate();
+
+        TotalCondenserFanPower = 0.0;
+        TotalCondenserPumpPower = 0.0;
+        TotalCondenserHeat = 0.0;
+        TotalBasinHeatPower = 0.0;
+        TotalEvapWaterUseRate = 0.0;
+
+        ShowUnmetEnergyWarning.deallocate();
+        ShowHiStageUnmetEnergyWarning.deallocate();
+        ShowUnmetEnergyWarningTrans.deallocate();
+        ShowUnmetSecondEnergyWarning.deallocate();
+        ShowCoilFrostWarning.deallocate();
+        CheckEquipNameRackWaterCondenser.deallocate();
+        CheckEquipNameWaterCondenser.deallocate();
+        RefrigPresentInZone.deallocate();
+        CheckChillerSetName.deallocate();
+
+        GetRefrigerationInputFlag = true;
+        HaveRefrigRacks = true;
+        HaveDetailedRefrig = true;
+        HaveDetailedTransRefrig = true;
+        ManageRefrigeration = true;
+        UseSysTimeStep = false;
+        HaveCasesOrWalkins = true;
+        HaveChillers = true;
+
+        RefrigCase.deallocate();
+        RefrigRack.deallocate();
+        CaseRAFraction.deallocate();
+        System.deallocate();
+        TransSystem.deallocate();
+        Condenser.deallocate();
+        UniqueCondenserNames.clear();
+        Compressor.deallocate();
+        GasCooler.deallocate();
+        Subcooler.deallocate();
+        CaseAndWalkInList.deallocate();
+        CompressorLists.deallocate();
+        Secondary.deallocate();
+        TransferLoadList.deallocate();
+        WalkIn.deallocate();
+        WarehouseCoil.deallocate();
+        AirChillerSet.deallocate();
+        CoilSysCredit.deallocate();
+        CaseWIZoneReport.deallocate();
+    }
 
     void ManageRefrigeratedCaseRacks()
     {
@@ -2737,9 +2825,6 @@ namespace RefrigeratedCase {
                     // Get max/min allowed water temps
                     RefrigRack(RackNum).OutletTempMax = Numbers(5);
                     RefrigRack(RackNum).InletTempMin = Numbers(6);
-                    // set hardware limits on Node data structure for plant interactions
-                    // Node(RefrigRack(RackNum)%InletNode)%MassFlowRateMax = RefrigRack(RackNum)%MassFlowRateMax      !CR7425
-                    // Node(RefrigRack(RackNum)%InletNode)%MassFlowRateMin = 0.0D0                                    !CR7435
                     // set flow request for plant sizing.
                     PlantUtilities::RegisterPlantCompDesignFlow(RefrigRack(RackNum).InletNode, RefrigRack(RackNum).VolFlowRateMax);
                 } // Water cooled condenser data
@@ -9433,10 +9518,8 @@ namespace RefrigeratedCase {
 
             // Obtain water-cooled condenser inlet/outlet temps
             if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
-                InletNode = RefrigRack(RackNum).InletNode;
-                OutletNode = RefrigRack(RackNum).OutletNode;
-                RefrigRack(RackNum).InletTemp = DataLoopNode::Node(InletNode).Temp;
-                EffectTemp = DataLoopNode::Node(InletNode).Temp + 5.0; // includes approach temp
+                RefrigRack(RackNum).InletTemp = DataLoopNode::Node(RefrigRack(RackNum).InletNode).Temp;
+                EffectTemp = DataLoopNode::Node(RefrigRack(RackNum).InletNode).Temp + 5.0; // includes approach temp
                 if (RefrigRack(RackNum).InletTemp < RefrigRack(RackNum).InletTempMin) {
                     //   RefrigRack(RackNum)%LowTempWarn = RefrigRack(RackNum)%LowTempWarn +1
                     if (RefrigRack(RackNum).LowTempWarnIndex == 0) {
@@ -9653,22 +9736,7 @@ namespace RefrigeratedCase {
         // DefElectricOnDemand = 6 (not available)
         // DefElectricTerm     = 7
 
-        // Initialize this case for this time step (
-        //     All report variables prev set to zero for case when schedule for case is 'off')
-        TotalCap_Actual = 0.0;
-        LatentCap_Actual = 0.0;
-        SensibleCap_Actual = 0.0;
-        SensibleLoadPrime = 0.0;
-
-        LatentRatio = 0.0;
-
-        LatentCaseCredit = 0.0;
-
         CaseRAFactor = 0.0;
-
-        TotalLightingLoad = 0.0;
-        TotalAntiSweat = 0.0;
-        TotalFan = 0.0;
 
         // Set local subroutine variables for convenience
         int ActualZoneNum = RefrigCase(CaseID).ActualZoneNum;
@@ -10347,6 +10415,9 @@ namespace RefrigeratedCase {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
+
+        int InletNode(0);
+        int OutletNode(0);
 
         {
             auto const SELECT_CASE_var(SysType);
@@ -11307,9 +11378,8 @@ namespace RefrigeratedCase {
         //   Note, if condensing temperature falls below minimum, get warning and reset but no change in water-side calculations.
         if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
             // Obtain water-cooled condenser inlet/outlet temps
-            InletNode = condenser.InletNode;
-            condenser.InletTemp = DataLoopNode::Node(InletNode).Temp;
-            TCondCalc = DataLoopNode::Node(InletNode).Temp + condenser.RatedApproachT;
+            condenser.InletTemp = DataLoopNode::Node(condenser.InletNode).Temp;
+            TCondCalc = DataLoopNode::Node(condenser.InletNode).Temp + condenser.RatedApproachT;
             if ((condenser.InletTemp < condenser.InletTempMin) || (TCondCalc < System(SysNum).TCondenseMin)) {
                 System(SysNum).TCondense = System(SysNum).TCondenseMin;
                 // condenser.LowTempWarn += 1;
