@@ -13752,8 +13752,6 @@ namespace RefrigeratedCase {
         Real64 Error;                     // Used in iterative soln for pumps needed to meet load (that has to include pump energy)
         Real64 Eta(0.0);                       // Secondary loop heat exchanger eta, dimensionless
         Real64 FlowVolNeeded;             // Flow rate needed to meet load (m3/s)
-        static Real64 LoadRequested(0.0); // Load necessary to meet current and all stored energy needs (W)
-        static Real64 LocalTimeStep(0.0); // DataGlobals::TimeStepZone for case/walkin systems, DataHVACGlobals::TimeStepSys for coil systems
         Real64 MaxLoad;                   // Secondary loop capacity can be limited by heat exchanger or pumps (W)
         Real64 MaxVolFlow;                // Flow can be limited by either total pump capacity or heat exchanger design (m3/s)
         Real64 PartLdFrac;                // Used to ratio pump power
@@ -13776,7 +13774,7 @@ namespace RefrigeratedCase {
         Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
         Real64 UnmetEnergy;               // Cumulative, grows and shrinks with defrost cycles on loads served by loop (J)
 
-        LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         NumPumps = Secondary(SecondaryNum).NumPumps;
@@ -13955,7 +13953,8 @@ namespace RefrigeratedCase {
         //  save the unmet/stored load to be met in succeeding time steps.
         if (Secondary(SecondaryNum).NumCoils == 0) {
             StoredEnergyRate = max(0.0, (UnmetEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour));
-            LoadRequested = TotalLoad + StoredEnergyRate;
+            // Load necessary to meet current and all stored energy needs (W)
+            Real64 LoadRequested = TotalLoad + StoredEnergyRate;
             if (MaxLoad > LoadRequested) {
                 // Have at least as much capacity avail as needed, even counting stored energy
                 TotalCoolingLoad = LoadRequested;
@@ -14347,153 +14346,74 @@ namespace RefrigeratedCase {
         // Unit Load Factor, Total Capacity Map, or a set of European standards.
         // Correction factors for material and refrigerant are applied to all of these ratings.
 
-        static Real64 UnitLoadFactorSens(0.0); // Rated capacity divided by rated DT1 (T air in - Tevap) (W/delta C)
-
         static std::string const TrackMessage("from RefrigeratedCase:CalculateCoil");
-
-        static int FanSpeedControlType(0);         // from input
-        static int SHRCorrectionCurvePtr(0);       // Points to curve entered by user to specify total/sensible capacity as a function of SHR
-        static int SHRCorrectionType(0);           // SHR60, QuadraticSHR, European, or TabularRH_DT1_TRoom
-        static int ZoneNodeNum(0);                 // Zone node number
-        static Real64 AirVolRatio(0.0);            // used when operating at part load
-        static Real64 AirVolumeFlowMax(0.0);       // Coil air flow limited by drip down schedule (m3/s)
-        static Real64 AirVolumeFlowRated(0.0);     // Coil rated air flow (m3/s)
-        static Real64 AvailDefrostEnergy(0.0);     // available to melt ice with temp term control (J)
-        static Real64 CapFac(0.0);                 // used to reduce fan power when don't need full coil capacity
-        static Real64 CoilCapTotal(0.0);           // Sensible plus latent load (W)
-        static Real64 CoilCapTotEstimate(0.0);     // Part of loop to solve for total coil capacity as a function of inlet air conditions (W)
-        static Real64 CoilInletCp(0.0);            // Coil air inlet specific heat (J/kg-deltaC)
-        static Real64 CoilInletDensity(0.0);       // Coil air inlet density (kg/m3)
-        static Real64 CoilInletDryAirCp(0.0);      // Dry air specific heat at coil inlet temperature (J/kg-C)
-        static Real64 CoilInletDryAirDensity(0.0); // Dry Air density at coil inlet temperature (kg/m3)
-        static Real64 CoilInletHumRatio(0.0);      // Coil air inlet humidity ratio (kg water/kg air)
-        static Real64 CoilInletTemp(0.0);     // Inlet temperature of air to coil, not mixed zone temperature unless "middle" location selected (C)
-        static Real64 CoilInletEnthalpy(0.0); // Coil inlet air enthalpy (J/kg)
-        static Real64 CoilInletRHFrac(0.0);   // Coil inlet air relative humidity expressed as a fraction (0 to 1)
-        static Real64 CoilSchedule(0.0);      // Current value of Coil operating (availability) schedule
-        static Real64 CoolingLoadNet(0.0);    // Cooling capacity of the coil minus fan, heater, and defrost loads (W)
-        static Real64 DefrostCap(0.0);        // Design defrost capacity of Coil (W)
-        static Real64 DefrostEnergy(0.0);     // (J)
-        static Real64 DefEnergyFraction(0.0); // dimensionless
-        static Real64 DefrostLoad(0.0);       // Part of the defrost that is a heat load on the zone (W)
-        static Real64 DefrostSchedule(0.0);   // Coil defrost schedule, between 0 and 1
-        static Real64 DefrostDripDownSchedule(0.0); // Coil drip-down schedule (allows coil to drain after defrost)
-        static Real64 DefrostEnergyNeeded(0.0);     // Energy needed to melt all ice, used with temperature termination (J)
-        static Real64 DefrostRateNeeded(0.0);       // Defrost load that actually goes to melting ice (W)
-        static Real64 DryAirMassFlowMax(0.0);       // Rated volume flow rate times dry air density adjusted for schedules (kg/s)
-        static Real64 DryAirMassFlowRated(0.0);     // Rated volume flow rate times dry air density
-        // REAL(r64)    :: Error                   =0.0d0 ! Used in iterative solution for sensible heat ratio
-        static Real64 ExitHumRatio(0.0);            // kg water/kg air
-        static Real64 ExitTemperature(0.0);         // Air temperature leaving the coil (C)
-        static Real64 ExitTemperatureEstimate(0.0); // Estimated Air temperature leaving the coil (C)
-        static Real64 ExitEnthalpy(0.0);            // Air enthalpy leaving the coil (J/kg)
-        static Real64 ExitEnthalpyEstimate(0.0);    // Estimated Air enthalpy leaving the coil (J/kg)
-        static Real64 FanMinAirFlowRatio(0.0);      // From input
-        static Real64 FanPowerActual(0.0);          // (W)
-        static Real64 FanPowerRated(0.0);           // (W)
-        static Real64 FanPowerMax(0.0);             // Total fan energy rate, limited by dripdown period (W)
-        static Real64 FanPowerRatio(0.0);           // Used for variable speed fans, dimensionless
-        static Real64 FrostChangekg(0.0);           // Amount of frost added or melted  (kg)
-        static Real64 HeaterSchedule(0.0);          // zero to one
-        static Real64 HeaterLoad(0.0);              // Total heater (except defrost) energy rate (W)
-        static Real64 IceSensHeatNeeded(0.0);       // Energy to raise frost temperature to 0C, used w/ temp termination (J)
-        static Real64 LatLoadServed(0.0);           // Energy rate used to remove water from zone air (W)
-        static Real64 MaxTemperatureDif(0.0);       // Used to limit capacity during initial pulldown (deltaC)
-        static Real64 SensibleCapacityMax(0.0);     // Sensible capacity adjusted for any time in dripdown state (W)
-        // REAL(r64)    :: SensibleLoad            =0.0d0 ! Sensible load provided by coil (W)
-        static Real64 SensLoadRequested(0.0);      // Sensible load requested by zone balance (W)
-        static Real64 SensLoadFromZone(0.0);       // Net sensible load removed from zone after accounting for heaters, fans, defrost [W]
-        static Real64 SensLoadRequestedGross(0.0); // Gross sensible load removed by coil
-        static Real64 SensLoadGross(0.0);          // Sensible load met by coil (W)
-        static Real64 SHR(0.0);                    // Sensible heat ratio, sensible load/total load
-        static Real64 SHRCorrection(0.0);          // Actual total/sensible load, NOT = Inverse SHR (unless coil efficiency = 1.0),
-        // but function of SHR, which is why iteration needed
-        static Real64 SHRCorrection60(0.0);      // Total capacity as a fraction of sensible capacity at a SHR of 0.6, entered by user
-        static Real64 Slope(0.0);                // Part of linear SHR60 correction factor, dimensionless
-        static Real64 StartIceTemp(0.0);         // Frost temperature at start of time step [C]
-        static Real64 StartFrostKg(0.0);         // frost load at start of time step (kg of ice)
-        static Real64 TemperatureDif(0.0);       // difference between inlet air and evaporating temperature (deltaC)
-        static Real64 TEvap(0.0);                // Evaporating temperature in the coil (C)
-        static Real64 WaterRemovRate(0.0);       // Walk in cooler removes water at this rate in this zone (kg/s)
-        static Real64 Yint(0.0);                 // Part of linear SHR60 correction factor, dimensionless
-        static Real64 ZoneDryAirDensity(0.0);    // Dry air density at mixed zone conditions
-        static Real64 ZoneMixedAirCp(0.0);       // J/kg-deltaC
-        static Real64 ZoneMixedAirDensity(0.0);  // kg/m3
-        static Real64 ZoneMixedAirDryBulb(0.0);  // (C)
-        static Real64 ZoneMixedAirRHFrac(0.0);   // relative humidity of mixed air in the zone expressed as a fraction from 0 to 1
-        static Real64 ZoneMixedAirEnthalpy(0.0); // J/kg
-        static Real64 ZoneMixedAirHumRatio(0.0); // kg water/kg air in the zone mixed air
 
         // GET SCHEDULES
         auto &warehouse_coil(WarehouseCoil(CoilID));
-        CoilSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.SchedPtr);
 
+        Real64 CoilSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.SchedPtr); // Current value of Coil operating (availability) schedule
         if (CoilSchedule <= 0.0) return;
 
-        DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostSchedPtr);
-        DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostDripDownSchedPtr);
+        Real64 DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostSchedPtr); // Coil defrost schedule, between 0 and 1
+        Real64 DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostDripDownSchedPtr); // Coil drip-down schedule (allows coil to drain after defrost)
         // next statement In case user doesn't understand concept of drip down schedule
         DefrostDripDownSchedule = max(DefrostDripDownSchedule, DefrostSchedule);
         // next value optional, so set to default before checking for schedule
-        HeaterSchedule = 1.0;
+        Real64 HeaterSchedule = 1.0; // zero to one
         if (warehouse_coil.HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.HeaterSchedPtr);
 
-        AirVolRatio = 0.0;
-        AirVolumeFlowMax = 0.0;
-        CapFac = 0.0;
-        CoilCapTotal = 0.0;
-        CoilCapTotEstimate = 0.0;
-        CoolingLoadNet = 0.0;
-        DefrostLoad = 0.0;
-        DryAirMassFlowMax = 0.0;
-        ExitEnthalpyEstimate = 0.0;
-        ExitEnthalpy = 0.0;
-        ExitTemperature = 0.0;
-        ExitHumRatio = 0.0;
-        FanPowerActual = 0.0;
-        HeaterLoad = 0.0;
-        LatLoadServed = 0.0;
-        FanPowerRatio = 0.0;
-        FrostChangekg = 0.0;
-        SensLoadFromZone = 0.0;
-        SensLoadGross = 0.0;
-        SensibleCapacityMax = 0.0;
-        SHR = 0.0;
-        WaterRemovRate = 0.0;
-
         // Set local subroutine variables for convenience
-        ZoneNodeNum = warehouse_coil.ZoneNodeNum;
-        AirVolumeFlowRated = warehouse_coil.RatedAirVolumeFlow;
-        FanPowerRated = warehouse_coil.RatedFanPower;
-        HeaterLoad = warehouse_coil.HeaterPower * HeaterSchedule;
-        UnitLoadFactorSens = warehouse_coil.UnitLoadFactorSens;
-        DefrostCap = warehouse_coil.DefrostCapacity;
-        TEvap = warehouse_coil.TEvapDesign;
-        SHRCorrectionType = warehouse_coil.SHRCorrectionType;
-        SHRCorrection60 = warehouse_coil.SHRCorrection60;
-        SHRCorrectionCurvePtr = warehouse_coil.SHRCorrectionCurvePtr;
-        FanMinAirFlowRatio = warehouse_coil.FanMinAirFlowRatio;
-        FanSpeedControlType = warehouse_coil.FanType;
-        MaxTemperatureDif = warehouse_coil.MaxTemperatureDif;
+        int ZoneNodeNum = warehouse_coil.ZoneNodeNum; // Zone node number
+        int SHRCorrectionType = warehouse_coil.SHRCorrectionType;  // SHR60, QuadraticSHR, European, or TabularRH_DT1_TRoom
+        int SHRCorrectionCurvePtr = warehouse_coil.SHRCorrectionCurvePtr;
+        int FanSpeedControlType = warehouse_coil.FanType;
+        Real64 AirVolumeFlowRated = warehouse_coil.RatedAirVolumeFlow; // Coil rated air flow (m3/s)
+        Real64 FanPowerRated = warehouse_coil.RatedFanPower; // (W)
+        Real64 HeaterLoad = warehouse_coil.HeaterPower * HeaterSchedule; // Total heater (except defrost) energy rate (W)
+        Real64 DefrostCap = warehouse_coil.DefrostCapacity; // Design defrost capacity of Coil (W)
+        Real64 TEvap = warehouse_coil.TEvapDesign; // Evaporating temperature in the coil (C)
+        Real64 SHRCorrection60 = warehouse_coil.SHRCorrection60; // Total capacity as a fraction of sensible capacity at a SHR of 0.6, entered by user
+        Real64 FanMinAirFlowRatio = warehouse_coil.FanMinAirFlowRatio;  // From input
+        Real64 MaxTemperatureDif = warehouse_coil.MaxTemperatureDif;  // Used to limit capacity during initial pulldown (deltaC)
+
+        Real64 CoilCapTotEstimate(0.0);     // Part of loop to solve for total coil capacity as a function of inlet air conditions (W)
+        Real64 AirVolumeFlowMax(0.0);       // Coil air flow limited by drip down schedule (m3/s)
+        Real64 CoilCapTotal(0.0);           // Sensible plus latent load (W)
+        Real64 CoilInletDensity(0.0);       // Coil air inlet density (kg/m3)
+        Real64 CoilInletDryAirCp(0.0);      // Dry air specific heat at coil inlet temperature (J/kg-C)
+        Real64 CoilInletHumRatio(0.0);      // Coil air inlet humidity ratio (kg water/kg air)
+        Real64 CoilInletTemp(0.0);     // Inlet temperature of air to coil, not mixed zone temperature unless "middle" location selected (C)
+        Real64 CoilInletEnthalpy(0.0); // Coil inlet air enthalpy (J/kg)
+        Real64 CoilInletRHFrac(0.0);   // Coil inlet air relative humidity expressed as a fraction (0 to 1)
+        Real64 DefrostLoad(0.0);
+        Real64 DryAirMassFlowMax(0.0);       // Rated volume flow rate times dry air density adjusted for schedules (kg/s)
+        Real64 FanPowerActual(0.0);          // (W)
+        Real64 FrostChangekg(0.0);           // Amount of frost added or melted  (kg)
+        Real64 LatLoadServed(0.0);           // Energy rate used to remove water from zone air (W)
+        Real64 SensLoadRequestedGross(0.0); // Gross sensible load removed by coil
+        Real64 SensLoadGross(0.0);          // Sensible load met by coil (W)
+        Real64 SHR(0.0);                    // Sensible heat ratio, sensible load/total load
+        Real64 SHRCorrection(0.0);          // Actual total/sensible load, NOT = Inverse SHR (unless coil efficiency = 1.0)
+        Real64 WaterRemovRate(0.0);       // Walk in cooler removes water at this rate in this zone (kg/s)
 
         if (DefrostDripDownSchedule == 1.0) {
             AirVolumeFlowMax = 0.0;
             DryAirMassFlowMax = 0.0;
         } else {                            // DefrostDripDownSchedule < 1.0d0, cooling will occur at least part of the time step
-            SensLoadRequested = -QZnReq;    // here let cooling demand be positive within subroutine
+            // Sensible load requested by zone balance (W)
+            Real64 SensLoadRequested = -QZnReq;    // here let cooling demand be positive within subroutine
             if (SensLoadRequested <= 0.0) { // No load so assume control keeps off, except that scheduled defrost still occurs
                 AirVolumeFlowMax = 0.0;
                 DryAirMassFlowMax = 0.0;
             } else {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
-                ZoneMixedAirDryBulb = DataLoopNode::Node(ZoneNodeNum).Temp;
-                ZoneMixedAirHumRatio = DataLoopNode::Node(ZoneNodeNum).HumRat;
-                ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);
-                ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage);
-                ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
-                ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
-                ZoneMixedAirCp = Psychrometrics::PsyCpAirFnWTdb(ZoneMixedAirHumRatio, ZoneMixedAirDryBulb);
-                DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
+                Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(ZoneNodeNum).Temp; // (C)
+                Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
+                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);  // relative humidity of mixed air in the zone expressed as a fraction from 0 to 1
+                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage); // J/kg
+                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage); // kg/m3
+                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage); // Dry air density at mixed zone conditions
+                Real64 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity; // Rated volume flow rate times dry air density
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
                 // calc RH inlet to coil assuming at middle/mixed point in room
@@ -14508,9 +14428,7 @@ namespace RefrigeratedCase {
                     CoilInletEnthalpy = ZoneMixedAirEnthalpy;
                     CoilInletRHFrac = ZoneMixedAirRHFrac;
                     CoilInletDensity = ZoneMixedAirDensity;
-                    CoilInletCp = ZoneMixedAirCp;
                     CoilInletHumRatio = ZoneMixedAirHumRatio;
-                    CoilInletDryAirDensity = ZoneDryAirDensity;
                     CoilInletDryAirCp = Psychrometrics::PsyCpAirFnWTdb(0.0, CoilInletTemp);
                     break;
                 }
@@ -14522,7 +14440,7 @@ namespace RefrigeratedCase {
 
         if (AirVolumeFlowMax > 0.0) {
 
-            TemperatureDif = min(MaxTemperatureDif, (CoilInletTemp - TEvap));
+            Real64 TemperatureDif = min(MaxTemperatureDif, (CoilInletTemp - TEvap)); // difference between inlet air and evaporating temperature (deltaC)
 
             if (warehouse_coil.RatingType == RatedCapacityTotal) {
                 // RatingType = CapacityTotalSpecificConditions, will be doing a table lookup
@@ -14534,15 +14452,15 @@ namespace RefrigeratedCase {
                                      warehouse_coil.RatedCapTotal * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
 
             } else { // work with unit load factor (sensible only), function of DT1 (Tair in drybulb-Tevap)
-                SensibleCapacityMax = warehouse_coil.UnitLoadFactorSens * TemperatureDif * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
+                Real64 SensibleCapacityMax = warehouse_coil.UnitLoadFactorSens * TemperatureDif * (1.0 - DefrostDripDownSchedule) * CoilSchedule; // Sensible capacity adjusted for any time in dripdown state (W)
 
                 if (SensibleCapacityMax > 0.0) {
-                    ExitTemperatureEstimate = CoilInletTemp - (SensibleCapacityMax / (DryAirMassFlowMax * CoilInletDryAirCp));
+                    Real64 ExitTemperatureEstimate = CoilInletTemp - (SensibleCapacityMax / (DryAirMassFlowMax * CoilInletDryAirCp)); // Estimated Air temperature leaving the coil (C)
                     if (ExitTemperatureEstimate <= TEvap) {
                         ShowWarningError(TrackMessage + "Refrigeration:AirCoil: " + warehouse_coil.Name);
                         ShowContinueError(" The estimated air outlet temperature is less than the evaporating temperature.");
                     }
-                    ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(ExitTemperatureEstimate, 1.0, DataEnvironment::OutBaroPress, TrackMessage);
+                    Real64 ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(ExitTemperatureEstimate, 1.0, DataEnvironment::OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
                     if (ExitEnthalpyEstimate <= CoilInletEnthalpy) {
                         CoilCapTotEstimate = (CoilInletEnthalpy - ExitEnthalpyEstimate) * AirVolumeFlowMax * CoilInletDensity;
                     } else {
@@ -14562,8 +14480,8 @@ namespace RefrigeratedCase {
                         auto const SELECT_CASE_var(SHRCorrectionType);
                         if (SELECT_CASE_var == SHR60) {
                             // line from y = SHRCorrection60 value to 1. as x(SHR) goes from .6 to 1, from B. Nelson, ASHRAE August 2010
-                            Slope = (SHRCorrection60 - 1.0) / (0.6 - 1.0);
-                            Yint = SHRCorrection60 - (Slope * 0.6);
+                            Real64 Slope = (SHRCorrection60 - 1.0) / (0.6 - 1.0); // Part of linear SHR60 correction factor, dimensionless
+                            Real64 Yint = SHRCorrection60 - (Slope * 0.6); // Part of linear SHR60 correction factor, dimensionless
                             SHRCorrection = Slope * SHR + Yint;
                         } else if (SELECT_CASE_var == QuadraticSHR) {
                             SHRCorrection = CurveManager::CurveValue(SHRCorrectionCurvePtr, SHR);
@@ -14603,9 +14521,9 @@ namespace RefrigeratedCase {
             }     // Rating type : CapacityTotalSpecificConditions or Sensible Unit Load Factor
 
             if (CoilCapTotEstimate > 0.0) {
-                ExitEnthalpy = CoilInletEnthalpy - (CoilCapTotEstimate / (AirVolumeFlowMax * CoilInletDensity));
-                ExitTemperature = Psychrometrics::PsyTsatFnHPb(ExitEnthalpy, DataEnvironment::OutBaroPress, TrackMessage); // RH =1.0 at Tsat
-                ExitHumRatio = Psychrometrics::PsyWFnTdbH(ExitTemperature, ExitEnthalpy, TrackMessage);
+                Real64 ExitEnthalpy = CoilInletEnthalpy - (CoilCapTotEstimate / (AirVolumeFlowMax * CoilInletDensity)); // Air enthalpy leaving the coil (J/kg)
+                Real64 ExitTemperature = Psychrometrics::PsyTsatFnHPb(ExitEnthalpy, DataEnvironment::OutBaroPress, TrackMessage); // RH =1.0 at Tsat // Air temperature leaving the coil (C)
+                Real64 ExitHumRatio = Psychrometrics::PsyWFnTdbH(ExitTemperature, ExitEnthalpy, TrackMessage);  // kg water/kg air
                 if (ExitHumRatio > CoilInletHumRatio) ExitHumRatio = CoilInletHumRatio;
                 WaterRemovRate = DryAirMassFlowMax * (CoilInletHumRatio - ExitHumRatio);
                 LatLoadServed = WaterRemovRate * IcetoVaporEnthalpy;
@@ -14624,18 +14542,18 @@ namespace RefrigeratedCase {
                 FanPowerActual = 0.0;
             } //(CoilCapTotEstimate > 0.0d0)
 
-            FanPowerMax = FanPowerRated * (1.0 - DefrostDripDownSchedule);
+            Real64 FanPowerMax = FanPowerRated * (1.0 - DefrostDripDownSchedule); // Total fan energy rate, limited by dripdown period (W)
             if (SensLoadGross > SensLoadRequestedGross) { // part load operation
                 // don't need full chiller power, reduce fan speed to reduce air flow
                 // move fan to part power if need to
-                CapFac = SensLoadRequestedGross / SensLoadGross;
-                AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, EvaporatorAirVolExponent));
+                Real64 CapFac = SensLoadRequestedGross / SensLoadGross;  // used to reduce fan power when don't need full coil capacity
+                Real64 AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, EvaporatorAirVolExponent)); // used when operating at part load
                 // Fans limited by minimum air flow ratio
 
                 {
                     auto const SELECT_CASE_var(FanSpeedControlType);
                     if (SELECT_CASE_var == FanVariableSpeed) { // fan power law, adjusted for reality, applies
-                        FanPowerRatio = std::pow(AirVolRatio, 2.5);
+                        Real64 FanPowerRatio = std::pow(AirVolRatio, 2.5); // Used for variable speed fans, dimensionless
                         FanPowerActual = FanPowerRatio * FanPowerMax;
                     } else if (SELECT_CASE_var == FanConstantSpeed) {
                         FanPowerActual = AirVolRatio * std::exp(1.0 - AirVolRatio) * FanPowerMax;
@@ -14692,9 +14610,9 @@ namespace RefrigeratedCase {
         //                     on the coils that stops defrost if the coils get above
         //                     a certain temperature (such as when there's no load and no ice)
         if ((DefrostSchedule > 0.0) && (warehouse_coil.DefrostType != DefrostNone) && (warehouse_coil.DefrostType != DefrostOffCycle)) {
-            DefrostLoad = DefrostCap * DefrostSchedule;            // W
-            DefrostEnergy = DefrostLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // Joules
-            StartFrostKg = warehouse_coil.KgFrost;
+            DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
+            Real64 DefrostEnergy = DefrostLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // Joules
+            Real64 StartFrostKg = warehouse_coil.KgFrost; // frost load at start of time step (kg of ice)
 
             if (warehouse_coil.DefrostControlType == DefrostContTempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
@@ -14703,12 +14621,12 @@ namespace RefrigeratedCase {
                 //  others and xfer heat to environment)
                 //  Assume full ice melting satisfies temperature control.
                 //      (defaults for DefEnergyFraction are :=0.7 for elec, =0.3 for fluids)
-                DefEnergyFraction = warehouse_coil.DefEnergyFraction;
-                AvailDefrostEnergy = DefEnergyFraction * DefrostEnergy; // Joules avail to melt ice
-                IceSensHeatNeeded = 0.0;
+                Real64 DefEnergyFraction = warehouse_coil.DefEnergyFraction; // dimensionless
+                Real64 AvailDefrostEnergy = DefEnergyFraction * DefrostEnergy; // available to melt ice with temp term control (J)
+                Real64 IceSensHeatNeeded = 0.0; // Energy to raise frost temperature to 0C, used w/ temp termination (J)
                 if (StartFrostKg > 0.0) {
                     if (warehouse_coil.IceTemp < 0.0) {
-                        StartIceTemp = warehouse_coil.IceTemp;
+                        Real64 StartIceTemp = warehouse_coil.IceTemp; // Frost temperature at start of time step [C]
                         IceSensHeatNeeded = StartFrostKg * SpecificHeatIce * (0.0 - StartIceTemp); // Joules
                         if (AvailDefrostEnergy >= IceSensHeatNeeded) {
                             warehouse_coil.IceTemp = 0.0;
@@ -14727,11 +14645,12 @@ namespace RefrigeratedCase {
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 2010 page 3 notes
                         warehouse_coil.KgFrost = 0.0;
-                        DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
+                        Real64 DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                               DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
                         DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)));
                         // reduce heat load on warehouse by energy put into ice melting
-                        DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+                        // Defrost load that actually goes to melting ice (W)
+                        Real64 DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
                         DefrostLoad = max(0.0, (DefrostSchedule * DefrostCap - DefrostRateNeeded));
                         warehouse_coil.IceTemp = warehouse_coil.TEvapDesign;
                     } // frost melted during time step less than amount of ice at start
@@ -14756,8 +14675,7 @@ namespace RefrigeratedCase {
             DefrostLoad = 0.0;
         } // Defrost calculations
 
-        SensLoadFromZone = SensLoadGross - HeaterLoad - DefrostLoad - FanPowerActual;
-        CoolingLoadNet = SensLoadFromZone + LatLoadServed;
+        Real64 SensLoadFromZone = SensLoadGross - HeaterLoad - DefrostLoad - FanPowerActual; // Net sensible load removed from zone after accounting for heaters, fans, defrost [W]
 
         // ReportWarehouseCoil(CoilID)
         warehouse_coil.ThermalDefrostPower = DefrostLoad;

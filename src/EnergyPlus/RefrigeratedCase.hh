@@ -167,7 +167,7 @@ namespace RefrigeratedCase {
     extern Real64 const IceMeltEnthalpy;       // heat of fusion of water J/kg
     extern Real64 const TempTooHotToFrost;     // C, used to check for frosting conditions on evaporator coils
     extern Real64 const IcetoVaporEnthalpy;    // J/kg to freeze water vapor to ice
-    extern Real64 const WatertoVaporEnthalpy;  // at 0C
+
     extern Real64 const SpecificHeatIce;       // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
     extern Real64 const CondAirVolExponentDry; // exponent for forced air over a cylinder, = 1/.633
     // per ASHRAE 2005 (page 3.15)
@@ -253,8 +253,6 @@ namespace RefrigeratedCase {
     extern Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
     // compressor input error regarding secondary loop heat exchanger capacity
     // Refrigerated warehouse coil variables
-    extern Array1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
-    // LOGICAL, ALLOCATABLE,DIMENSION(:) :: CheckZoneNum  !used when simrefrigcoil called for a zone
     extern Array1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
 
     // Refrigeration Plant connections checks
