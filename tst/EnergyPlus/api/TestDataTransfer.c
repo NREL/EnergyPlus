@@ -65,6 +65,11 @@ void afterZoneTimeStepHandler()
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
+        FILE *apiAvailFile;
+        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
+        const char * apiStuff = listAllAPIStuff();
+        fputs(apiStuff, apiAvailFile);
+        fclose(apiAvailFile);
     }
     setActuatorValue(outdoorDewPointActuator, -25);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);

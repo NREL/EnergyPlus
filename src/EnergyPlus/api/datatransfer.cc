@@ -151,6 +151,28 @@ void resetActuator(int handle) {
     theActuator.Actuated = false;
 }
 
+const char * listAllAPIStuff() {
+    std::string output;
+    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
+        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
+            break;
+        }
+        output.append("Actuator,");
+        output.append(availActuator.ComponentTypeName).append(",");
+        output.append(availActuator.UniqueIDName).append(",");
+        output.append(availActuator.ControlTypeName).append(";\n");
+    }
+    for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) {
+        if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
+            break;
+        }
+        output.append("InternalVariable,");
+        output.append(availVariable.DataTypeName).append(",");
+        output.append(availVariable.UniqueIDName).append("\n");
+    }
+    // add output vars and meters
+    return output.c_str();
+}
 
 int getPluginGlobalVariableHandle(const char* name) {
     return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableHandle(name);
@@ -167,6 +189,7 @@ void setPluginGlobalVariableValue(int handle, Real64 value) {
 int getPluginTrendVariableHandle(const char* name) {
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableHandle(name);
 }
+
 Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableValue(handle, timeIndex);
 }
