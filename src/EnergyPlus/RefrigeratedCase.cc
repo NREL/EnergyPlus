@@ -14016,10 +14016,8 @@ namespace RefrigeratedCase {
         //   heat absorbed by suction piping, secondary loop distribution piping, and
         //   secondary receiver shells
 
-        static int ZoneNum(0); // used calculating total refrigeration interactions for zone
-
         if (UseSysTimeStep) { // air chillers
-            for (ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
                 CoilSysCredit(ZoneNum).ReportH20RemovedKgPerS_FromZoneRate = -CoilSysCredit(ZoneNum).LatKgPerS_ToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneRate = -CoilSysCredit(ZoneNum).LatCreditToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneEnergy = -CoilSysCredit(ZoneNum).LatCreditToZoneEnergy;
@@ -14045,7 +14043,7 @@ namespace RefrigeratedCase {
 
         // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
         if ((!UseSysTimeStep) && ((NumSimulationCases > 0) || (NumSimulationWalkIns > 0))) {
-            for (ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
                 CaseWIZoneReport(ZoneNum).SenCaseCreditToZoneEnergy = DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * DataGlobals::TimeStepZoneSec;
                 // Latent always negative
                 CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
@@ -14199,8 +14197,6 @@ namespace RefrigeratedCase {
         // Called from Zone Equipment Manager.
         //       have however done the variable definitions for in and out.
 
-        static int CoilID(0);                     // Index to coil
-        static int CoilIndex(0);                  // rank of coils within system
         static Real64 AirChillerSetSchedule(0.0); // Schedule value for air chiller SET
         static Real64 QZNReqSens(0.0);            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
         static Real64 RemainQZNReqSens(0.0);      // Remaiing amount of sensible heat needed by the zone [W]
@@ -14214,8 +14210,8 @@ namespace RefrigeratedCase {
         QZNReqSens = AirChillerSet(AirChillerSetID).QZnReqSens;
         RemainQZNReqSens = QZNReqSens;
 
-        for (CoilIndex = 1; CoilIndex <= AirChillerSet(AirChillerSetID).NumCoils; ++CoilIndex) {
-            CoilID = AirChillerSet(AirChillerSetID).CoilNum(CoilIndex);
+        for (int CoilIndex = 1; CoilIndex <= AirChillerSet(AirChillerSetID).NumCoils; ++CoilIndex) {
+            int CoilID = AirChillerSet(AirChillerSetID).CoilNum(CoilIndex);
 
             CalculateCoil(CoilID, RemainQZNReqSens);
             RemainQZNReqSens += WarehouseCoil(CoilID).SensCreditRate;
@@ -14248,9 +14244,7 @@ namespace RefrigeratedCase {
         //   Note that the coil fan, heater, and defrost would be unaffected because they
         //   would still be running at level calculated previously
 
-        static int NumCoils(0);                 // Number of coils on this system or secondary loop
-        static int CoilID(0);                   // Index to coil
-        static int CoilIndex(0);                // rank of coils within system
+        int NumCoils(0);
         static Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
         static Real64 InitLatCreditEnergy(0.0); // Latent credit energy before derate [W]
         static Real64 InitKgFrost(0.0);         // Initial amount of frost on coils based on latent load before derate [kg]
@@ -14273,8 +14267,8 @@ namespace RefrigeratedCase {
 
             DeRateFactor = AvailableTotalLoad / InitialTotalLoad;
             Real64 const time_step_sec(DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-            for (CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
-                CoilID = System(SystemID).CoilNum(CoilIndex);
+            for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
+                int CoilID = System(SystemID).CoilNum(CoilIndex);
                 auto &warehouse_coil(WarehouseCoil(CoilID));
 
                 // need to adjust ice on coil due to reduction in latent load met by coil
@@ -14752,7 +14746,6 @@ namespace RefrigeratedCase {
         // initialize zone gain terms at begin environment
 
         static bool MyEnvrnFlag(true);
-        int loop;
 
         CheckRefrigerationInput();
 
@@ -14788,7 +14781,7 @@ namespace RefrigeratedCase {
             }
 
             if (NumSimulationWalkIns > 0) {
-                for (loop = 1; loop <= NumSimulationWalkIns; ++loop) {
+                for (int loop = 1; loop <= NumSimulationWalkIns; ++loop) {
                     WalkIn(loop).SensZoneCreditRate = 0.0;
                     WalkIn(loop).LatZoneCreditRate = 0.0;
                 }
@@ -14820,37 +14813,27 @@ namespace RefrigeratedCase {
         // to zero when called on zone timestep. Otherwise, values may be held over when
         // no HVAC load calls module during that zone time step.
 
-        static int DemandARRID(0);        // Index to water tank Demand used for evap condenser
-        static int TankID(0);             // Index to water tank used for evap condenser
-        static int RackNum(0);            // Index to refrigerated rack
-        static int CondID(0);             // Index to condenser
-        static int PlantInletNode(0);     // Used to zero request for cooling water for condenser
-        static int PlantOutletNode(0);    // Used to zero request for cooling water for condenser
-        static int PlantLoopIndex(0);     // Used to zero request for cooling water for condenser
-        static int PlantLoopSideIndex(0); // Used to zero request for cooling water for condenser
-        static int PlantBranchIndex(0);   // Used to zero request for cooling water for condenser
-        static int PlantCompIndex(0);     // Used to zero request for cooling water for condenser
-        static Real64 MassFlowRate(0.0);  // Used to zero request for cooling water for condenser
+        int DemandARRID(0);        // Index to water tank Demand used for evap condenser
 
         if (HaveRefrigRacks) {
             // HaveRefrigRacks is TRUE when NumRefrigeratedRAcks > 0
             // RefrigRack ALLOCATED to NumRefrigeratedRacks
-            for (RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
+            for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
-                    PlantInletNode = RefrigRack(RackNum).InletNode;
-                    PlantOutletNode = RefrigRack(RackNum).OutletNode;
-                    PlantLoopIndex = RefrigRack(RackNum).PlantLoopNum;
-                    PlantLoopSideIndex = RefrigRack(RackNum).PlantLoopSideNum;
-                    PlantBranchIndex = RefrigRack(RackNum).PlantBranchNum;
-                    PlantCompIndex = RefrigRack(RackNum).PlantCompNum;
-                    MassFlowRate = 0.0;
+                    Real64 MassFlowRate = 0.0;
                     PlantUtilities::SetComponentFlowRate(
-                        MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+                            MassFlowRate,
+                            RefrigRack(RackNum).InletNode,
+                            RefrigRack(RackNum).OutletNode,
+                            RefrigRack(RackNum).PlantLoopNum,
+                            RefrigRack(RackNum).PlantLoopSideNum,
+                            RefrigRack(RackNum).PlantBranchNum,
+                            RefrigRack(RackNum).PlantCompNum);
                 }
                 if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
                     if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
                         DemandARRID = RefrigRack(RackNum).EvapWaterTankDemandARRID;
-                        TankID = RefrigRack(RackNum).EvapWaterSupTankID;
+                        int TankID = RefrigRack(RackNum).EvapWaterSupTankID;
                         DataWater::WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
                     }
                 }
@@ -14859,22 +14842,22 @@ namespace RefrigeratedCase {
 
         if (DataHeatBalance::NumRefrigCondensers > 0) {
             // Condenser ALLOCATED to DataHeatBalance::NumRefrigCondensers
-            for (CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) {
+            for (int CondID = 1; CondID <= DataHeatBalance::NumRefrigCondensers; ++CondID) {
                 if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
-                    PlantInletNode = Condenser(CondID).InletNode;
-                    PlantOutletNode = Condenser(CondID).OutletNode;
-                    PlantLoopIndex = Condenser(CondID).PlantLoopNum;
-                    PlantLoopSideIndex = Condenser(CondID).PlantLoopSideNum;
-                    PlantBranchIndex = Condenser(CondID).PlantBranchNum;
-                    PlantCompIndex = Condenser(CondID).PlantCompNum;
-                    MassFlowRate = 0.0;
+                    Real64 MassFlowRate = 0.0;
                     PlantUtilities::SetComponentFlowRate(
-                        MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+                            MassFlowRate,
+                            Condenser(CondID).InletNode,
+                            Condenser(CondID).OutletNode,
+                            Condenser(CondID).PlantLoopNum,
+                            Condenser(CondID).PlantLoopSideNum,
+                            Condenser(CondID).PlantBranchNum,
+                            Condenser(CondID).PlantCompNum);
                 }
                 if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
                     if (Condenser(CondID).EvapWaterSupplyMode == WaterSupplyFromTank) {
                         DemandARRID = Condenser(CondID).EvapWaterTankDemandARRID;
-                        TankID = Condenser(CondID).EvapWaterSupTankID;
+                        int TankID = Condenser(CondID).EvapWaterSupTankID;
                         DataWater::WaterStorage(TankID).VdotRequestDemand(DemandARRID) = 0.0;
                     }
                 }
