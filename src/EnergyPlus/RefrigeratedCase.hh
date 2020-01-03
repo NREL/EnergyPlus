@@ -166,6 +166,8 @@ namespace RefrigeratedCase {
         Real64 KgFrostSaved;             // Amount of frost on case evaporator (Kg)
         Real64 HotDefrostCondCredit;     // Used to credit condenser when heat reclaim used for hot gas/brine defrost (W)
         Real64 DeltaDefrostEnergy;       // Used to reverse accumulation if the zone/load time step is repeated (J)
+        bool ShowStoreEnergyWarning;
+        bool ShowFrostWarning;
 
         // Default Constructor
         RefrigCaseData()
@@ -184,7 +186,8 @@ namespace RefrigeratedCase {
               ElecAntiSweatConsumption(0.0), ElecFanPower(0.0), ElecFanConsumption(0.0), ElecLightingPower(0.0), ElecLightingConsumption(0.0),
               ElecDefrostPower(0.0), ElecDefrostConsumption(0.0), DefEnergyCurveValue(0.0), LatEnergyCurveValue(0.0), MaxKgFrost(0.0), Rcase(0.0),
               DefrostEnergy(0.0), StockingEnergy(0.0), WarmEnvEnergy(0.0), KgFrost(0.0), DefrostEnergySaved(0.0), StockingEnergySaved(0.0),
-              WarmEnvEnergySaved(0.0), KgFrostSaved(0.0), HotDefrostCondCredit(0.0), DeltaDefrostEnergy(0.0)
+              WarmEnvEnergySaved(0.0), KgFrostSaved(0.0), HotDefrostCondCredit(0.0), DeltaDefrostEnergy(0.0), ShowStoreEnergyWarning(true),
+              ShowFrostWarning(true)
         {
         }
 
@@ -233,6 +236,8 @@ namespace RefrigeratedCase {
             KgFrost = 0.0;
             StoredEnergy = 0.0;
         }
+
+        void CalculateCase(); // Absolute pointer to refrigerated case
     };
 
     struct RefrigRackData
@@ -1170,6 +1175,8 @@ namespace RefrigeratedCase {
         Array1D<Real64> SensZoneCreditCool;     // Amount of sensible cooling provided to the zone (J)
         Array1D<Real64> SensZoneCreditHeatRate; // Amount of sensible heat provided to the zone (W)
         Array1D<Real64> SensZoneCreditHeat;     // Amount of sensible heat provided to the zone (J)
+        bool ShowUnmetWIEnergyWarning;
+        bool ShowWIFrostWarning;
 
         // Default Constructor
         WalkInData()
@@ -1181,7 +1188,7 @@ namespace RefrigeratedCase {
               ElecHeaterPower(0.0), ElecHeaterConsumption(0.0), ElecFanPower(0.0), ElecFanConsumption(0.0), ElecLightingPower(0.0),
               ElecLightingConsumption(0.0), ElecDefrostPower(0.0), ElecDefrostConsumption(0.0), TotalCoolingLoad(0.0), TotalCoolingEnergy(0.0),
               TotalElecPower(0.0), TotalElecConsumption(0.0), TotLatCoolingEnergyRate(0.0), TotLatCoolingEnergy(0.0), TotSensCoolingEnergyRate(0.0),
-              TotSensCoolingEnergy(0.0)
+              TotSensCoolingEnergy(0.0), ShowUnmetWIEnergyWarning(true), ShowWIFrostWarning(true)
         {
         }
 
@@ -1206,6 +1213,8 @@ namespace RefrigeratedCase {
             ElecDefrostPower = 0.0;
             ElecDefrostConsumption = 0.0;
         }
+
+        void CalculateWalkIn();
     };
 
     struct CaseWIZoneReportData
@@ -1486,8 +1495,6 @@ namespace RefrigeratedCase {
 
     void InitRefrigerationPlantConnections();
 
-    void CalculateCase(int CaseID); // Absolute pointer to refrigerated case
-
     void SimRefrigCondenser(int SysType, std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
 
     void UpdateRefrigCondenser(int Num, int SysType);
@@ -1518,8 +1525,6 @@ namespace RefrigeratedCase {
                                   const Optional_bool_const& SuppressWarning = _);
 
     void ReportRefrigerationComponents();
-
-    void CalculateWalkIn(int WalkInID); // Absolute pointer to  Walk In
 
     void SumZoneImpacts();
 

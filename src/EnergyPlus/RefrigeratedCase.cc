@@ -350,13 +350,6 @@ namespace RefrigeratedCase {
     Real64 CaseRAFactor(0.0);         // Factor determining case credit allocation (e.g. % to zone or HVAC)
     Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
     // input error regarding stocking
-    Array1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
-    // input error regarding frost
-    Array1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
-    // input error regarding defrost or stocking
-    //  Walk In variables
-    Array1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
-    Array1D_bool ShowWIFrostWarning;       // Used for one-time warning message
 
     // Refrigeration compressor rack variables
     Real64 TotalRackDeliveredCapacity(0.0); // Total capacity of all refrigerated cases attached to rack (W)
@@ -462,10 +455,6 @@ namespace RefrigeratedCase {
         CaseRAFactor = 0.0;
 
         ShowStockingWarning.deallocate();
-        ShowFrostWarning.deallocate();
-        ShowStoreEnergyWarning.deallocate();
-        ShowUnmetWIEnergyWarning.deallocate();
-        ShowWIFrostWarning.deallocate();
 
         TotalRackDeliveredCapacity = 0.0;
         TotalCompressorPower = 0.0;
@@ -746,13 +735,9 @@ namespace RefrigeratedCase {
             CaseRAFraction.allocate(DataGlobals::NumOfZones);
             RefrigCase.allocate(NumSimulationCases);
             ShowStockingWarning.dimension(NumSimulationCases, true);
-            ShowFrostWarning.dimension(NumSimulationCases, true);
-            ShowStoreEnergyWarning.dimension(NumSimulationCases, true);
         }
         if (NumSimulationWalkIns > 0) {
             WalkIn.allocate(NumSimulationWalkIns);
-            ShowUnmetWIEnergyWarning.dimension(NumSimulationWalkIns, true);
-            ShowWIFrostWarning.dimension(NumSimulationWalkIns, true);
         }
         if ((NumSimulationWalkIns > 0) || (NumSimulationCases > 0)) {
             CaseWIZoneReport.allocate(DataGlobals::NumOfZones);
@@ -9425,7 +9410,7 @@ namespace RefrigeratedCase {
         if (this->NumCases > 0) {
             for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
                 int CaseID = this->CaseNum(caseNum);
-                CalculateCase(CaseID);
+                RefrigCase(CaseID).CalculateCase();
 
                 //   add evaporator load for all cases connected to rack
                 TotalRackDeliveredCapacity += RefrigCase(CaseID).TotalCoolingLoad;
@@ -9453,7 +9438,7 @@ namespace RefrigeratedCase {
         if (this->NumWalkIns > 0) {
             for (int WalkInIndex = 1; WalkInIndex <= this->NumWalkIns; ++WalkInIndex) {
                 int WalkInID = this->WalkInNum(WalkInIndex);
-                CalculateWalkIn(WalkInID);
+                WalkIn(WalkInID).CalculateWalkIn();
                 TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
                 if (this->HeatRejectionLocation == LocationZone) {
                     TotalHeatRejectedToZone += WalkIn(WalkInID).TotalCoolingLoad;
@@ -9654,7 +9639,7 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    void CalculateCase(int const CaseID) // Absolute pointer to refrigerated case
+    void RefrigCaseData::CalculateCase() // Absolute pointer to refrigerated case
     {
 
         // SUBROUTINE INFORMATION:
@@ -9719,38 +9704,25 @@ namespace RefrigeratedCase {
 
         CaseRAFactor = 0.0;
 
-        // Set local subroutine variables for convenience
-        int ActualZoneNum = RefrigCase(CaseID).ActualZoneNum;
-        int ZoneNodeNum = RefrigCase(CaseID).ZoneNodeNum;
-
         // Zone relative humidity (%)
-        Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(DataLoopNode::Node(ZoneNodeNum).Temp, DataLoopNode::Node(ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress) * 100.0;
+        Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(DataLoopNode::Node(this->ZoneNodeNum).Temp, DataLoopNode::Node(this->ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress) * 100.0;
 
         // Zone dew point (C)
-        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(DataLoopNode::Node(ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress);
-        Real64 Length = RefrigCase(CaseID).Length;
+        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(DataLoopNode::Node(this->ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress);
 
         // Display case operating temperature
-        Real64 TCase = RefrigCase(CaseID).Temperature;
-        Real64 DesignRatedCap = RefrigCase(CaseID).DesignRatedCap;
-        Real64 DesignLatentCap = RefrigCase(CaseID).DesignLatentCap;
-        Real64 DesignDefrostCap = RefrigCase(CaseID).DesignDefrostCap;
-        Real64 DesignLighting = RefrigCase(CaseID).DesignLighting;
-        int DefCapCurvePtr = RefrigCase(CaseID).DefCapCurvePtr;
-        int DefrostEnergyCurveType = RefrigCase(CaseID).DefrostEnergyCurveType;
-        int DefrostType = RefrigCase(CaseID).DefrostType;
-        Real64 RatedAmbientRH = RefrigCase(CaseID).RatedAmbientRH;
+        Real64 TCase = this->Temperature;
 
         // GET ALL SCHEDULES (note all schedules can be fractions if on/off a portion of time step)
         // case schedule should be coincident with the zone time step otherwise the simulation proceeds
 
         // Current value of case operating (availability) schedule
-        Real64 CaseSchedule = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).SchedPtr);
+        Real64 CaseSchedule = ScheduleManager::GetCurrentScheduleValue(this->SchedPtr);
         if (CaseSchedule <= 0) return;
         // get defrost schedule
-        if (DefrostType > DefNone) {
-            DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).DefrostSchedPtr);
-            DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).DefrostDripDownSchedPtr);
+        if (this->DefrostType > DefNone) {
+            DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostSchedPtr);
+            DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostDripDownSchedPtr);
             // next statement In case user doesn't understand concept of drip down schedule
             DefrostDripDownSchedule = max(DefrostDripDownSchedule, DefrostSchedule);
         } else {
@@ -9761,68 +9733,68 @@ namespace RefrigeratedCase {
         Real64 StockingSchedule(0.0);    // Current value of product stocking schedule (W/m)
 
         // get product stocking schedule and load due to product stocking, if no schedule exists load is 0
-        if (RefrigCase(CaseID).StockingSchedPtr > 0) {
-            StockingSchedule = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).StockingSchedPtr);
+        if (this->StockingSchedPtr > 0) {
+            StockingSchedule = ScheduleManager::GetCurrentScheduleValue(this->StockingSchedPtr);
         } else {
             StockingSchedule = 0.0;
         }
         // get lighting schedule and total load due to lighting
-        Real64 LightingSchedule = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).LightingSchedPtr);
+        Real64 LightingSchedule = ScheduleManager::GetCurrentScheduleValue(this->LightingSchedPtr);
 
         // if case credit reduction fraction schedule exists, modify both sensible and latent case credits
         // according to schedule - used to account for variable case envelope, such as night covers.
-        if (RefrigCase(CaseID).CaseCreditFracSchedPtr != 0) {
-            CaseCreditFraction = ScheduleManager::GetCurrentScheduleValue(RefrigCase(CaseID).CaseCreditFracSchedPtr);
+        if (this->CaseCreditFracSchedPtr != 0) {
+            CaseCreditFraction = ScheduleManager::GetCurrentScheduleValue(this->CaseCreditFracSchedPtr);
         } else {
             CaseCreditFraction = 1.0;
         }
 
         // CALCULATE AUX LOADS DUE TO LIGHTS, FAN AND STOCKING
-        TotalLightingLoad = DesignLighting * LightingSchedule;
+        TotalLightingLoad = this->DesignLighting * LightingSchedule;
 
         // Lighting energy to case
-        Real64 TotalLightToCase = TotalLightingLoad * RefrigCase(CaseID).LightingFractionToCase;
+        Real64 TotalLightToCase = TotalLightingLoad * this->LightingFractionToCase;
 
         // Lighting energy to zone
         Real64 TotalLightToZone = TotalLightingLoad - TotalLightToCase;
         // cycle fan according to defrost schedule
         // turn fan on for none or off-cycle defrost types
-        if (DefrostType == DefNone || DefrostType == DefOffCycle) {
-            TotalFan = RefrigCase(CaseID).DesignFanPower;
+        if (this->DefrostType == DefNone || this->DefrostType == DefOffCycle) {
+            TotalFan = this->DesignFanPower;
         } else {
-            TotalFan = RefrigCase(CaseID).DesignFanPower * (1.0 - DefrostDripDownSchedule);
+            TotalFan = this->DesignFanPower * (1.0 - DefrostDripDownSchedule);
         }
         // get  load due to product stocking
         // accumulate stocking loads for reporting to help evaluate any cumulative unmet loads problems
         // only accumulate energy during actual simulation (so same if DD's are switched)
 
         // Total load due to stocking case product (W)
-        Real64 StockingLoad = StockingSchedule * Length;
+        Real64 StockingLoad = StockingSchedule * this->Length;
         if (!DataGlobals::WarmupFlag) {
             Real64 DeltaStockingEnergy = (StockingLoad * DataGlobals::TimeStepZoneSec);
-            RefrigCase(CaseID).StockingEnergy += DeltaStockingEnergy;
+            this->StockingEnergy += DeltaStockingEnergy;
         } // warm up
         // CALCULTE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
         // Anti-sweat heater capacity
         {
-            auto const SELECT_CASE_var(RefrigCase(CaseID).AntiSweatControlType);
+            auto const SELECT_CASE_var(this->AntiSweatControlType);
             if (SELECT_CASE_var == ASNone) {
                 TotalAntiSweat = 0.0;
             } else if (SELECT_CASE_var == ASConstant) {
-                TotalAntiSweat = RefrigCase(CaseID).AntiSweatPower;
+                TotalAntiSweat = this->AntiSweatPower;
             } else if (SELECT_CASE_var == ASLinear) {
-                TotalAntiSweat = RefrigCase(CaseID).AntiSweatPower *
-                                 min(1.0, max(0.0, 1.0 - (RatedAmbientRH - ZoneRHPercent) / (RatedAmbientRH - RefrigCase(CaseID).HumAtZeroAS)));
-                TotalAntiSweat = max(RefrigCase(CaseID).MinimumASPower, TotalAntiSweat);
+                TotalAntiSweat = this->AntiSweatPower *
+                                 min(1.0, max(0.0, 1.0 - (this->RatedAmbientRH - ZoneRHPercent) / (this->RatedAmbientRH - this->HumAtZeroAS)));
+                TotalAntiSweat = max(this->MinimumASPower, TotalAntiSweat);
             } else if (SELECT_CASE_var == ASDewPoint) {
-                TotalAntiSweat = RefrigCase(CaseID).AntiSweatPower *
-                                 min(1.0, max(0.0, (ZoneDewPoint - TCase) / (RefrigCase(CaseID).RatedAmbientDewPoint - TCase)));
-                TotalAntiSweat = max(RefrigCase(CaseID).MinimumASPower, TotalAntiSweat);
+                TotalAntiSweat = this->AntiSweatPower *
+                                 min(1.0, max(0.0, (ZoneDewPoint - TCase) / (this->RatedAmbientDewPoint - TCase)));
+                TotalAntiSweat = max(this->MinimumASPower, TotalAntiSweat);
             } else if (SELECT_CASE_var == ASHeatBalance) {
-                if (RefrigCase(CaseID).Rcase > 0.0) {
-                    TotalAntiSweat = (((ZoneDewPoint - DataLoopNode::Node(ZoneNodeNum).Temp) * RefrigCase(CaseID).Height / Rair) +
-                                      ((ZoneDewPoint - TCase) * RefrigCase(CaseID).Height / RefrigCase(CaseID).Rcase));
-                    TotalAntiSweat = min(RefrigCase(CaseID).AntiSweatPower, max(RefrigCase(CaseID).MinimumASPower, TotalAntiSweat));
+                if (this->Rcase > 0.0) {
+                    TotalAntiSweat = (((ZoneDewPoint - DataLoopNode::Node(this->ZoneNodeNum).Temp) * this->Height / Rair) +
+                                      ((ZoneDewPoint - TCase) * this->Height / this->Rcase));
+                    TotalAntiSweat = min(this->AntiSweatPower, max(this->MinimumASPower, TotalAntiSweat));
                 } else {
                     TotalAntiSweat = 0.0;
                 }
@@ -9831,24 +9803,24 @@ namespace RefrigeratedCase {
                 TotalAntiSweat = 0.0;
             }
         }
-        TotalAntiSweat *= Length;
+        TotalAntiSweat *= this->Length;
 
         // Anti-sweat heater energy to case
-        Real64 TotalASHeaterToCase = RefrigCase(CaseID).ASHeaterFractionToCase * TotalAntiSweat;
+        Real64 TotalASHeaterToCase = this->ASHeaterFractionToCase * TotalAntiSweat;
 
         // Anti-sweat heater energy to zone
         Real64 TotalASHeaterToZone = TotalAntiSweat - TotalASHeaterToCase;
 
         // latent capacity correction term at off-design conditions
         {
-            auto const SELECT_CASE_var(RefrigCase(CaseID).LatentEnergyCurveType);
+            auto const SELECT_CASE_var(this->LatentEnergyCurveType);
             if (SELECT_CASE_var == CaseTemperatureMethod) {
-                Real64 LatCapModFrac = CurveManager::CurveValue(RefrigCase(CaseID).LatCapCurvePtr, TCase);
-                LatentRatio = max(0.0, (1.0 - (RatedAmbientRH - ZoneRHPercent) * LatCapModFrac));
+                Real64 LatCapModFrac = CurveManager::CurveValue(this->LatCapCurvePtr, TCase);
+                LatentRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * LatCapModFrac));
             } else if (SELECT_CASE_var == RHCubic) {
-                LatentRatio = max(0.0, CurveManager::CurveValue(RefrigCase(CaseID).LatCapCurvePtr, ZoneRHPercent));
+                LatentRatio = max(0.0, CurveManager::CurveValue(this->LatCapCurvePtr, ZoneRHPercent));
             } else if (SELECT_CASE_var == DPCubic) {
-                LatentRatio = max(0.0, CurveManager::CurveValue(RefrigCase(CaseID).LatCapCurvePtr, ZoneDewPoint));
+                LatentRatio = max(0.0, CurveManager::CurveValue(this->LatCapCurvePtr, ZoneDewPoint));
             }
         }
 
@@ -9857,7 +9829,7 @@ namespace RefrigeratedCase {
         //    but latent credits/load and capacity only applied outside dripdownschedule
 
         // Latent load placed on case at actual zone conditions (W)
-        Real64 LatentLoad = DesignLatentCap * LatentRatio * CaseCreditFraction * (1.0 - DefrostDripDownSchedule);
+        Real64 LatentLoad = this->DesignLatentCap * LatentRatio * CaseCreditFraction * (1.0 - DefrostDripDownSchedule);
         LatentCaseCredit = -LatentLoad;
         // adjust sensible loads and case credit for actual zone temperature
         // If zone temp rises above rated ambient temperature, total load can exceed case design capacity,
@@ -9865,8 +9837,8 @@ namespace RefrigeratedCase {
         //  extra insulation, e.g. night covers, or imitating a better insulated walk-in cooler)
 
         // used to look at extra sensible load due to excursions in zone T
-        Real64 ZoneTempFactor = (DataLoopNode::Node(ZoneNodeNum).Temp - TCase) / (RefrigCase(CaseID).RatedAmbientTemp - TCase);
-        SensibleLoadPrime = RefrigCase(CaseID).DesignSensCaseCredit * ZoneTempFactor * CaseCreditFraction;
+        Real64 ZoneTempFactor = (DataLoopNode::Node(ZoneNodeNum).Temp - TCase) / (this->RatedAmbientTemp - TCase);
+        SensibleLoadPrime = this->DesignSensCaseCredit * ZoneTempFactor * CaseCreditFraction;
 
         // Sensible load due to heaters, lighting (W)
         Real64 SensibleLoadAux = TotalLightToCase + TotalASHeaterToCase + TotalFan + StockingLoad;
@@ -9882,29 +9854,29 @@ namespace RefrigeratedCase {
         // avoid accumulation during warm-up to avoid reverse dd test problem
         if (!DataGlobals::WarmupFlag) {
             Real64 DeltaFreezeKgFrost = LatentLoad * DataGlobals::TimeStepZoneSec / IcetoVaporEnthalpy;
-            RefrigCase(CaseID).KgFrost += DeltaFreezeKgFrost;
+            this->KgFrost += DeltaFreezeKgFrost;
         }
 
-        if (TCase > TempTooHotToFrost) RefrigCase(CaseID).KgFrost = 0.0;
+        if (TCase > TempTooHotToFrost) this->KgFrost = 0.0;
 
         Real64 DefrostLoad_Actual(0.0);  // heat load on case due to defrost (W)
         Real64 DefrostCap_Actual(0.0);   // power used to defrost (W)
 
         // DEFROST CALCULATIONS
         if (DefrostSchedule > 0.0) {
-            if (DefrostType != DefNone && DefrostType != DefOffCycle) {
-                DefrostCap_Actual = DesignDefrostCap * DefrostSchedule;
-                if (DefrostType == DefElectricTerm || DefrostType == DefHotFluidTerm) {
+            if (this->DefrostType != DefNone && this->DefrostType != DefOffCycle) {
+                DefrostCap_Actual = this->DesignDefrostCap * DefrostSchedule;
+                if (this->DefrostType == DefElectricTerm || this->DefrostType == DefHotFluidTerm) {
                     // calculate correction term for temperature termination defrost control
                     {
-                        auto const SELECT_CASE_var(DefrostEnergyCurveType);
+                        auto const SELECT_CASE_var(this->DefrostEnergyCurveType);
                         if (SELECT_CASE_var == CaseTemperatureMethod) {
-                            Real64 DefCapModFrac = CurveManager::CurveValue(DefCapCurvePtr, TCase);
-                            DefrostRatio = max(0.0, (1.0 - (RatedAmbientRH - ZoneRHPercent) * DefCapModFrac));
+                            Real64 DefCapModFrac = CurveManager::CurveValue(this->DefCapCurvePtr, TCase);
+                            DefrostRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * DefCapModFrac));
                         } else if (SELECT_CASE_var == RHCubic) {
-                            DefrostRatio = max(0.0, CurveManager::CurveValue(DefCapCurvePtr, ZoneRHPercent));
+                            DefrostRatio = max(0.0, CurveManager::CurveValue(this->DefCapCurvePtr, ZoneRHPercent));
                         } else if (SELECT_CASE_var == DPCubic) {
-                            DefrostRatio = max(0.0, CurveManager::CurveValue(DefCapCurvePtr, ZoneDewPoint));
+                            DefrostRatio = max(0.0, CurveManager::CurveValue(this->DefCapCurvePtr, ZoneDewPoint));
                         } else if (SELECT_CASE_var == None) {
                             DefrostRatio = 1.0;
                         }
@@ -9913,14 +9885,14 @@ namespace RefrigeratedCase {
                 }
 
                 // frost load at start of time step (kg of ice)
-                Real64 StartFrostKg = RefrigCase(CaseID).KgFrost;
+                Real64 StartFrostKg = this->KgFrost;
 
                 // Energy form of defrost capacity (J)
                 Real64 DefrostEnergy = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
 
                 // Frost melted by defrost during a time step (kg)
                 Real64 FrostMeltedKg = min(DefrostEnergy / IceMeltEnthalpy, StartFrostKg);
-                RefrigCase(CaseID).KgFrost -= FrostMeltedKg;
+                this->KgFrost -= FrostMeltedKg;
 
                 // Reduce defrost heat load on case by amount of ice melted during time step
                 // However, don't reduce the defrost capacity applied
@@ -9930,17 +9902,17 @@ namespace RefrigeratedCase {
                 if (!DataGlobals::WarmupFlag) { // avoid reverse dd test problems
                     // keep running total of defrost energy above that needed to melt frost for use in evaluating
                     //      problems of excessive unmet loads
-                    RefrigCase(CaseID).DeltaDefrostEnergy = max(0.0, (DefrostEnergy - (FrostMeltedKg * IceMeltEnthalpy)));
-                    RefrigCase(CaseID).DefrostEnergy += RefrigCase(CaseID).DeltaDefrostEnergy;
+                    this->DeltaDefrostEnergy = max(0.0, (DefrostEnergy - (FrostMeltedKg * IceMeltEnthalpy)));
+                    this->DefrostEnergy += this->DeltaDefrostEnergy;
                 }
                 // If hot brine or hot gas is used for defrost, need to reduce condenser load
                 // Note this condenser credit is not applied in compressor-rack systems.
-                if (DefrostType != DefElectric && DefrostType != DefElectricOnDemand && DefrostType != DefElectricTerm)
-                    RefrigCase(CaseID).HotDefrostCondCredit = DefrostCap_Actual * DefrostSchedule;
+                if (this->DefrostType != DefElectric && this->DefrostType != DefElectricOnDemand && this->DefrostType != DefElectricTerm)
+                    this->HotDefrostCondCredit = DefrostCap_Actual * DefrostSchedule;
             } else { // no defrost or off-cycle defrost
                 DefrostCap_Actual = 0.0;
                 DefrostLoad_Actual = 0.0;
-                RefrigCase(CaseID).KgFrost = 0.0;
+                this->KgFrost = 0.0;
                 // Off-Cycle defrost is assumed to melt all the ice
             } // defrost type
 
@@ -9954,29 +9926,29 @@ namespace RefrigeratedCase {
         Real64 TotalLoad_Actual = SensibleLoadTotal + LatentLoad + DefrostLoad_Actual;
 
         // Rate needed to serve all stored energy during single time step (W)
-        Real64 StoredEnergyRate = RefrigCase(CaseID).StoredEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
+        Real64 StoredEnergyRate = this->StoredEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
         Real64 LoadRequested = TotalLoad_Actual + StoredEnergyRate;
 
         // prorate available cooling capacity for portion of time off due to drip down.
-        Real64 CapAvail = DesignRatedCap * (1.0 - DefrostDripDownSchedule);
+        Real64 CapAvail = this->DesignRatedCap * (1.0 - DefrostDripDownSchedule);
         if (CapAvail >= LoadRequested) {
             // Have more at least as much capacity available as needed, even counting stored energy
             TotalCap_Actual = LoadRequested;
             SensibleCap_Actual = SensibleLoadTotal + StoredEnergyRate;
             LatentCap_Actual = LatentLoad;
-            RefrigCase(CaseID).StoredEnergy = 0.0;
+            this->StoredEnergy = 0.0;
         } else {
             // Don't have as much capacity as needed (during dripdown or period following dripdown)
             TotalCap_Actual = CapAvail;
             LatentCap_Actual = min(LatentLoad, CapAvail); // Latent load should never be > capavail, but just in case...
             SensibleCap_Actual = TotalCap_Actual - LatentCap_Actual;
-            if (!DataGlobals::WarmupFlag) RefrigCase(CaseID).StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
+            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (TotalLoad_Actual - CapAvail) * DataGlobals::TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
-        if (DefrostType != DefElectric && DefrostType != DefElectricOnDemand && DefrostType != DefElectricTerm) DefrostCap_Actual = 0.0;
+        if (this->DefrostType != DefElectric && this->DefrostType != DefElectricOnDemand && this->DefrostType != DefElectricTerm) DefrostCap_Actual = 0.0;
 
-        Real64 caseRAFraction = min(0.8, RefrigCase(CaseID).RAFrac);
+        Real64 caseRAFraction = min(0.8, this->RAFrac);
         CaseRAFactor = (1.0 - ((0.8 - caseRAFraction) / 0.8)) * 0.5;
 
         // Update globals for use in ZoneTemperaturePredictorCorrector (Air Heat Balance) and
@@ -9997,66 +9969,66 @@ namespace RefrigeratedCase {
         // Amount of latent case credit applied to HVAC RA duct (W)
         Real64 CaseLatCreditToHVAC = LatentCaseCredit * CaseRAFactor;
 
-        DataHeatBalance::RefrigCaseCredit(ActualZoneNum).SenCaseCreditToZone += CaseSenCreditToZone;
-        DataHeatBalance::RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone += CaseLatCreditToZone;
-        DataHeatBalance::RefrigCaseCredit(ActualZoneNum).SenCaseCreditToHVAC += CaseSenCreditToHVAC;
-        DataHeatBalance::RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC += CaseLatCreditToHVAC;
+        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToZone += CaseSenCreditToZone;
+        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToZone += CaseLatCreditToZone;
+        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToHVAC += CaseSenCreditToHVAC;
+        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToHVAC += CaseLatCreditToHVAC;
 
         // ReportRefrigeratedCase(CaseID)
-        RefrigCase(CaseID).TotalCoolingLoad = TotalCap_Actual;
-        RefrigCase(CaseID).TotalCoolingEnergy = TotalCap_Actual * DataGlobals::TimeStepZoneSec;
-        RefrigCase(CaseID).SensCoolingEnergyRate = SensibleCap_Actual;
-        RefrigCase(CaseID).SensCoolingEnergy = SensibleCap_Actual * DataGlobals::TimeStepZoneSec;
-        RefrigCase(CaseID).LatCoolingEnergyRate = LatentCap_Actual;
-        RefrigCase(CaseID).LatCoolingEnergy = LatentCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingLoad = TotalCap_Actual;
+        this->TotalCoolingEnergy = TotalCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->SensCoolingEnergyRate = SensibleCap_Actual;
+        this->SensCoolingEnergy = SensibleCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->LatCoolingEnergyRate = LatentCap_Actual;
+        this->LatCoolingEnergy = LatentCap_Actual * DataGlobals::TimeStepZoneSec;
 
-        RefrigCase(CaseID).SensZoneCreditRate = CaseSenCreditToZone; // both positive or negative
+        this->SensZoneCreditRate = CaseSenCreditToZone; // both positive or negative
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToZone <= 0.0) {
-            RefrigCase(CaseID).SensZoneCreditCoolRate = -CaseSenCreditToZone;
-            RefrigCase(CaseID).SensZoneCreditCool = -CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
-            RefrigCase(CaseID).SensZoneCreditHeatRate = 0.0;
-            RefrigCase(CaseID).SensZoneCreditHeat = 0.0;
+            this->SensZoneCreditCoolRate = -CaseSenCreditToZone;
+            this->SensZoneCreditCool = -CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditHeatRate = 0.0;
+            this->SensZoneCreditHeat = 0.0;
         } else {
-            RefrigCase(CaseID).SensZoneCreditHeatRate = CaseSenCreditToZone;
-            RefrigCase(CaseID).SensZoneCreditHeat = CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
-            RefrigCase(CaseID).SensZoneCreditCoolRate = 0.0;
-            RefrigCase(CaseID).SensZoneCreditCool = 0.0;
+            this->SensZoneCreditHeatRate = CaseSenCreditToZone;
+            this->SensZoneCreditHeat = CaseSenCreditToZone * DataGlobals::TimeStepZoneSec;
+            this->SensZoneCreditCoolRate = 0.0;
+            this->SensZoneCreditCool = 0.0;
         }
 
         // This rate should always be negative
-        RefrigCase(CaseID).LatZoneCreditRate = CaseLatCreditToZone;
-        RefrigCase(CaseID).LatZoneCredit = CaseLatCreditToZone * DataGlobals::TimeStepZoneSec;
+        this->LatZoneCreditRate = CaseLatCreditToZone;
+        this->LatZoneCredit = CaseLatCreditToZone * DataGlobals::TimeStepZoneSec;
 
-        RefrigCase(CaseID).SensHVACCreditRate = CaseSenCreditToHVAC;
+        this->SensHVACCreditRate = CaseSenCreditToHVAC;
         // This rate can be positive or negative, split into separate output variables and always report positive value
         if (CaseSenCreditToHVAC <= 0.0) {
-            RefrigCase(CaseID).SensHVACCreditCoolRate = -CaseSenCreditToHVAC;
-            RefrigCase(CaseID).SensHVACCreditCool = -CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
-            RefrigCase(CaseID).SensHVACCreditHeatRate = 0.0;
-            RefrigCase(CaseID).SensHVACCreditHeat = 0.0;
+            this->SensHVACCreditCoolRate = -CaseSenCreditToHVAC;
+            this->SensHVACCreditCool = -CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditHeatRate = 0.0;
+            this->SensHVACCreditHeat = 0.0;
         } else {
-            RefrigCase(CaseID).SensHVACCreditHeatRate = CaseSenCreditToHVAC;
-            RefrigCase(CaseID).SensHVACCreditHeat = CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
-            RefrigCase(CaseID).SensHVACCreditCoolRate = 0.0;
-            RefrigCase(CaseID).SensHVACCreditCool = 0.0;
+            this->SensHVACCreditHeatRate = CaseSenCreditToHVAC;
+            this->SensHVACCreditHeat = CaseSenCreditToHVAC * DataGlobals::TimeStepZoneSec;
+            this->SensHVACCreditCoolRate = 0.0;
+            this->SensHVACCreditCool = 0.0;
         }
 
         // This rate should always be negative
-        RefrigCase(CaseID).LatHVACCreditRate = CaseLatCreditToHVAC;
-        RefrigCase(CaseID).LatHVACCredit = CaseLatCreditToHVAC * DataGlobals::TimeStepZoneSec;
+        this->LatHVACCreditRate = CaseLatCreditToHVAC;
+        this->LatHVACCredit = CaseLatCreditToHVAC * DataGlobals::TimeStepZoneSec;
 
-        RefrigCase(CaseID).ElecFanPower = TotalFan;
-        RefrigCase(CaseID).ElecFanConsumption = TotalFan * DataGlobals::TimeStepZoneSec;
-        RefrigCase(CaseID).ElecAntiSweatPower = TotalAntiSweat;
-        RefrigCase(CaseID).ElecAntiSweatConsumption = TotalAntiSweat * DataGlobals::TimeStepZoneSec;
-        RefrigCase(CaseID).ElecLightingPower = TotalLightingLoad;
-        RefrigCase(CaseID).ElecLightingConsumption = TotalLightingLoad * DataGlobals::TimeStepZoneSec;
-        RefrigCase(CaseID).ElecDefrostPower = DefrostCap_Actual;
-        RefrigCase(CaseID).ElecDefrostConsumption = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
+        this->ElecFanPower = TotalFan;
+        this->ElecFanConsumption = TotalFan * DataGlobals::TimeStepZoneSec;
+        this->ElecAntiSweatPower = TotalAntiSweat;
+        this->ElecAntiSweatConsumption = TotalAntiSweat * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingPower = TotalLightingLoad;
+        this->ElecLightingConsumption = TotalLightingLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecDefrostPower = DefrostCap_Actual;
+        this->ElecDefrostConsumption = DefrostCap_Actual * DataGlobals::TimeStepZoneSec;
 
-        RefrigCase(CaseID).DefEnergyCurveValue = DefrostRatio;
-        RefrigCase(CaseID).LatEnergyCurveValue = LatentRatio;
+        this->DefEnergyCurveValue = DefrostRatio;
+        this->LatEnergyCurveValue = LatentRatio;
 
         //**************************************************************************************************
         // Cap Energy and Kg Frost to avoid floating overflow errors
@@ -10066,20 +10038,20 @@ namespace RefrigeratedCase {
         // excessively large stored energy
         if ((ZoneTempFactor * CaseCreditFraction) > 1.0) {
             if (!DataGlobals::WarmupFlag) {
-                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - RefrigCase(CaseID).DesignSensCaseCredit) * DataGlobals::TimeStepZoneSec;
-                RefrigCase(CaseID).WarmEnvEnergy += DeltaWarmEnvEnergy;
+                Real64 DeltaWarmEnvEnergy = (SensibleLoadPrime - this->DesignSensCaseCredit) * DataGlobals::TimeStepZoneSec;
+                this->WarmEnvEnergy += DeltaWarmEnvEnergy;
             }
         }
 
-        if (RefrigCase(CaseID).DefrostEnergy > MyLargeNumber) RefrigCase(CaseID).DefrostEnergy = MyLargeNumber;
-        if (RefrigCase(CaseID).WarmEnvEnergy > MyLargeNumber) RefrigCase(CaseID).WarmEnvEnergy = MyLargeNumber;
-        if (RefrigCase(CaseID).StockingEnergy > MyLargeNumber) RefrigCase(CaseID).StockingEnergy = MyLargeNumber;
-        if (RefrigCase(CaseID).StoredEnergy > MyLargeNumber) {
-            RefrigCase(CaseID).StoredEnergy = MyLargeNumber;
-            if (ShowStoreEnergyWarning(CaseID)) {
-                ShowWarningError("Refrigeration:Case: " + RefrigCase(CaseID).Name);
-                if (RefrigCase(CaseID).StockingEnergy >= RefrigCase(CaseID).DefrostEnergy) {
-                    if (RefrigCase(CaseID).StockingEnergy >= RefrigCase(CaseID).WarmEnvEnergy) {
+        if (this->DefrostEnergy > MyLargeNumber) this->DefrostEnergy = MyLargeNumber;
+        if (this->WarmEnvEnergy > MyLargeNumber) this->WarmEnvEnergy = MyLargeNumber;
+        if (this->StockingEnergy > MyLargeNumber) this->StockingEnergy = MyLargeNumber;
+        if (this->StoredEnergy > MyLargeNumber) {
+            this->StoredEnergy = MyLargeNumber;
+            if (this->ShowStoreEnergyWarning) {
+                ShowWarningError("Refrigeration:Case: " + this->Name);
+                if (this->StockingEnergy >= this->DefrostEnergy) {
+                    if (this->StockingEnergy >= this->WarmEnvEnergy) {
                         ShowContinueError(" This case has insufficient capacity to meet excess energy associated with stocking.");
                         ShowContinueError(" Refer to documentation for further explanation of product stocking requirements and");
                         ShowContinueError(" Total Cooling Capacity.");
@@ -10090,7 +10062,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(" Total Cooling Capacity.");
                     } // Stocking energy > warm environment energy
                 } else {
-                    if (RefrigCase(CaseID).DefrostEnergy >= RefrigCase(CaseID).WarmEnvEnergy) {
+                    if (this->DefrostEnergy >= this->WarmEnvEnergy) {
                         ShowContinueError(" This case has insufficient capacity to meet excess energy associated with defrost.");
                         ShowContinueError(" Refer to documentation for further explanation of defrost control requirements and");
                         ShowContinueError(" recommendations regarding Total Cooling Capacity, Sensible Heat Ratio, and Defrost Capacity.");
@@ -10101,18 +10073,18 @@ namespace RefrigeratedCase {
                         ShowContinueError(" Total Cooling Capacity.");
                     }                                   // defrost energy > warm environment energy
                 }                                       // stock > defrost ELSE
-                ShowStoreEnergyWarning(CaseID) = false; // only give this warning once for any one case
+                this->ShowStoreEnergyWarning = false; // only give this warning once for any one case
             }                                           // showstoreenergy warning true
         }                                               // stored energy > large number
 
-        if (RefrigCase(CaseID).KgFrost > MyLargeNumber) {
-            RefrigCase(CaseID).KgFrost = MyLargeNumber;
-            if (ShowFrostWarning(CaseID)) {
-                ShowWarningError("Refrigeration:Case: " + RefrigCase(CaseID).Name);
+        if (this->KgFrost > MyLargeNumber) {
+            this->KgFrost = MyLargeNumber;
+            if (this->ShowFrostWarning) {
+                ShowWarningError("Refrigeration:Case: " + this->Name);
                 ShowContinueError(" This case has insufficient defrost capacity to remove the excess frost accumulation.");
                 ShowContinueError(" Refer to documentation for further explanation of product stocking requirements and");
                 ShowContinueError(" recommendations regarding Total Cooling Capacity, Sensible Heat Ratio, and Latent Heat Ratio.");
-                ShowFrostWarning(CaseID) = false;
+                this->ShowFrostWarning = false;
             }
         }
     }
@@ -10477,7 +10449,7 @@ namespace RefrigeratedCase {
                 if (System(SysNum).NumCases > 0) {
                     for (int CaseIndex = 1; CaseIndex <= System(SysNum).NumCases; ++CaseIndex) {
                         int CaseID = System(SysNum).CaseNum(CaseIndex);
-                        CalculateCase(CaseID);
+                        RefrigCase(CaseID).CalculateCase();
                         //  TevapDesign calc in Get Input to meet lowest evap temp of any load on the system.
                         //  Tevap needed is either fixed at this design value,
                         //  or allowed to float to meet lowest T needed among all loads served by the system
@@ -10505,7 +10477,7 @@ namespace RefrigeratedCase {
                 if (System(SysNum).NumWalkIns > 0) {
                     for (int WalkInIndex = 1; WalkInIndex <= System(SysNum).NumWalkIns; ++WalkInIndex) {
                         int WalkInID = System(SysNum).WalkInNum(WalkInIndex);
-                        CalculateWalkIn(WalkInID);
+                        WalkIn(WalkInID).CalculateWalkIn();
                         if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
@@ -10873,7 +10845,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumCasesMT > 0) {
                 for (int CaseIndex = 1; CaseIndex <= TransSystem(SysNum).NumCasesMT; ++CaseIndex) {
                     int CaseID = TransSystem(SysNum).CaseNumMT(CaseIndex);
-                    CalculateCase(CaseID);
+                    RefrigCase(CaseID).CalculateCase();
                     //  TEvapDesignMT calc in Get Input to meet lowest evap temp of any MT load on the system.
                     //  TEvapNeededMT is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededMT = TransSystem(SysNum).TEvapDesignMT;
@@ -10886,7 +10858,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumCasesLT > 0) {
                 for (int CaseIndex = 1; CaseIndex <= TransSystem(SysNum).NumCasesLT; ++CaseIndex) {
                     int CaseID = TransSystem(SysNum).CaseNumLT(CaseIndex);
-                    CalculateCase(CaseID);
+                    RefrigCase(CaseID).CalculateCase();
                     //  TEvapDesignLT calc in Get Input to meet lowest evap temp of any LT load on the system.
                     //  TEvapNeededLT is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededLT = TransSystem(SysNum).TEvapDesignLT;
@@ -10899,7 +10871,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumWalkInsMT > 0) {
                 for (int WalkInIndex = 1; WalkInIndex <= TransSystem(SysNum).NumWalkInsMT; ++WalkInIndex) {
                     int WalkInID = TransSystem(SysNum).WalkInNumMT(WalkInIndex);
-                    CalculateWalkIn(WalkInID);
+                    WalkIn(WalkInID).CalculateWalkIn();
                     //  TEvapDesignMT calc in Get Input to meet lowest evap temp of any MT load on the system.
                     //  TEvapNeededMT is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededMT = TransSystem(SysNum).TEvapDesignMT;
@@ -10912,7 +10884,7 @@ namespace RefrigeratedCase {
             if (TransSystem(SysNum).NumWalkInsLT > 0) {
                 for (int WalkInIndex = 1; WalkInIndex <= TransSystem(SysNum).NumWalkInsLT; ++WalkInIndex) {
                     int WalkInID = TransSystem(SysNum).WalkInNumLT(WalkInIndex);
-                    CalculateWalkIn(WalkInID);
+                    WalkIn(WalkInID).CalculateWalkIn();
                     //  TEvapDesignLT calc in Get Input to meet lowest evap temp of any LT load on the system.
                     //  TEvapNeeded is fixed at this design value.
                     TransSystem(SysNum).TEvapNeededLT = TransSystem(SysNum).TEvapDesignLT;
@@ -13276,7 +13248,7 @@ namespace RefrigeratedCase {
     //***************************************************************************************************
     //***************************************************************************************************
 
-    void CalculateWalkIn(int const WalkInID) // Absolute pointer to  Walk In
+    void WalkInData::CalculateWalkIn() // Absolute pointer to  Walk In
     {
 
         // SUBROUTINE INFORMATION:
@@ -13320,11 +13292,11 @@ namespace RefrigeratedCase {
         Real64 DensitySqRtFactor(0.0);       // from ASHRAE 2010 eq 12 page 24.4 for door infiltration
 
         // Current value of WalkIn operating (availability) schedule
-        Real64 WalkInSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).SchedPtr);
+        Real64 WalkInSchedule = ScheduleManager::GetCurrentScheduleValue(this->SchedPtr);
         if (WalkInSchedule <= 0) return;
         // GET OTHER SCHEDULES
-        DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).DefrostSchedPtr);
-        Real64 DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).DefrostDripDownSchedPtr);
+        DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostSchedPtr);
+        Real64 DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostDripDownSchedPtr);
         // next statement In case user doesn't understand concept of drip down schedule
         DefrostDripDownSchedule = max(DefrostDripDownSchedule, DefrostSchedule);
 
@@ -13333,20 +13305,13 @@ namespace RefrigeratedCase {
         Real64 LightingSchedule = 1.0;
         Real64 HeaterSchedule = 1.0;
         Real64 CircFanSchedule = 1.0;
-        if (WalkIn(WalkInID).StockingSchedPtr > 0) StockingLoad = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).StockingSchedPtr);
-        if (WalkIn(WalkInID).LightingSchedPtr > 0) LightingSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).LightingSchedPtr);
-        if (WalkIn(WalkInID).HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).HeaterSchedPtr);
-        if (WalkIn(WalkInID).CircFanSchedPtr > 0) CircFanSchedule = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).CircFanSchedPtr);
+        if (this->StockingSchedPtr > 0) StockingLoad = ScheduleManager::GetCurrentScheduleValue(this->StockingSchedPtr);
+        if (this->LightingSchedPtr > 0) LightingSchedule = ScheduleManager::GetCurrentScheduleValue(this->LightingSchedPtr);
+        if (this->HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(this->HeaterSchedPtr);
+        if (this->CircFanSchedPtr > 0) CircFanSchedule = ScheduleManager::GetCurrentScheduleValue(this->CircFanSchedPtr);
 
         // Set local subroutine variables for convenience
-        Real64 TWalkIn = WalkIn(WalkInID).Temperature; // WalkIn operating temperature (C)
-
-        // Rated capacity of walk in cooler coil (W)
-        Real64 DesignRatedCap = WalkIn(WalkInID).DesignRatedCap;
-        Real64 DefrostCap = WalkIn(WalkInID).DefrostCapacity;
-        // %DefrostCapacity already set to zero for WalkInDefrostNone , WalkInDefrostOffCycle
-        // Total design display WalkIn lighting power (W)
-        Real64 DesignLighting = WalkIn(WalkInID).DesignLighting;
+        Real64 TWalkIn = this->Temperature; // WalkIn operating temperature (C)
 
         // Enthalpy of air corresponding to walk in temperature and 90% assumed RH (J/kg)
         Real64 EnthalpyAirWalkIn = Psychrometrics::PsyHFnTdbRhPb(TWalkIn, 0.9, DataEnvironment::OutBaroPress); // assume 90%RH in cooler
@@ -13363,23 +13328,23 @@ namespace RefrigeratedCase {
         Real64 LatentLoadTotal(0.0);    // total latent load on WalkIn over all zones (W)
         Real64 ZoneLatentLoad(0.0);     // Latent WalkIn credit delivered to zone (W)
 
-        WalkIn(WalkInID).SensZoneCreditRate = 0.0;
-        WalkIn(WalkInID).SensZoneCreditCoolRate = 0.0;
-        WalkIn(WalkInID).SensZoneCreditCool = 0.0;
-        WalkIn(WalkInID).SensZoneCreditHeatRate = 0.0;
-        WalkIn(WalkInID).SensZoneCreditHeat = 0.0;
-        WalkIn(WalkInID).LatZoneCreditRate = 0.0;
+        this->SensZoneCreditRate = 0.0;
+        this->SensZoneCreditCoolRate = 0.0;
+        this->SensZoneCreditCool = 0.0;
+        this->SensZoneCreditHeatRate = 0.0;
+        this->SensZoneCreditHeat = 0.0;
+        this->LatZoneCreditRate = 0.0;
 
         // Start zone loop:
-        for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-            int ZoneNum = WalkIn(WalkInID).ZoneNum(ZoneID);
-            int ZoneNodeNum = WalkIn(WalkInID).ZoneNodeNum(ZoneID);
-            Real64 ZoneDryBulb = DataLoopNode::Node(ZoneNodeNum).Temp; // Dry Bulb Temperature of adjacent zone
+        for (int ZoneID = 1; ZoneID <= this->NumZones; ++ZoneID) {
+            int zoneNum = this->ZoneNum(ZoneID);
+            int zoneNodeNum = this->ZoneNodeNum(ZoneID);
+            Real64 ZoneDryBulb = DataLoopNode::Node(zoneNodeNum).Temp; // Dry Bulb Temperature of adjacent zone
             Real64 WalkInLatLoad = -ZoneLatentLoad;  // Walk in cooler latent load facing particular zone (W)
             Real64 DelTemp = ZoneDryBulb - TWalkIn;  // Difference between zone and walk in temperatures (C)
-            Real64 StockDoorArea = WalkIn(WalkInID).AreaStockDr(ZoneID);
-            Real64 GlassDoorArea = WalkIn(WalkInID).AreaGlassDr(ZoneID);  // facing a particular zone (m2)
-            Real64 UAOtherSurfaces = WalkIn(WalkInID).SurfaceArea(ZoneID) * WalkIn(WalkInID).UValue(ZoneID); // UA for non-door surfaces facing a certain zone (W/C)
+            Real64 StockDoorArea = this->AreaStockDr(ZoneID);
+            Real64 GlassDoorArea = this->AreaGlassDr(ZoneID);  // facing a particular zone (m2)
+            Real64 UAOtherSurfaces = this->SurfaceArea(ZoneID) * this->UValue(ZoneID); // UA for non-door surfaces facing a certain zone (W/C)
             Real64 ZInfilSensLoad(0.0);     // Sensible load due to infiltration in one zone
             Real64 ZdoorSensLoad(0.0);      // Sensible load due to UA delta T through closed door in one zone
 
@@ -13390,7 +13355,7 @@ namespace RefrigeratedCase {
             // Get infiltration loads if either type of door is present in this zone
             if (StockDoorArea > 0.0 || GlassDoorArea > 0.0) {
                 // Zone relative humidity fraction (decimal)
-                Real64 ZoneRHFrac = Psychrometrics::PsyRhFnTdbWPb(DataLoopNode::Node(ZoneNodeNum).Temp, DataLoopNode::Node(ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress, RoutineName);
+                Real64 ZoneRHFrac = Psychrometrics::PsyRhFnTdbWPb(DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, DataEnvironment::OutBaroPress, RoutineName);
                 // Enthalpy of the air in a particular zone (J/kg)
                 Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(ZoneDryBulb, ZoneRHFrac, DataEnvironment::OutBaroPress, RoutineName);
                 Real64 HumRatioZoneAir = Psychrometrics::PsyWFnTdbH(ZoneDryBulb, EnthalpyZoneAir, RoutineName);
@@ -13415,7 +13380,7 @@ namespace RefrigeratedCase {
 
                 if (StockDoorArea > 0.0) {
                     {
-                        auto const SELECT_CASE_var(WalkIn(WalkInID).StockDoorProtectType(ZoneID));
+                        auto const SELECT_CASE_var(this->StockDoorProtectType(ZoneID));
                         // Values from ASHRAE Ref p 13.6
                         if (SELECT_CASE_var == WIStockDoorNone) {
                             DoorProtectEff = 0.0;
@@ -13425,17 +13390,17 @@ namespace RefrigeratedCase {
                             DoorProtectEff = 0.9;
                         }
                     }
-                    DrHeight = WalkIn(WalkInID).HeightStockDr(ZoneID);
+                    DrHeight = this->HeightStockDr(ZoneID);
                     DrArea = StockDoorArea;
                     // if exists, get Stock Door Zone schedule
                     Real64 DoorOpenFactor = DefaultWalkInDoorOpenFactor;
-                    if (WalkIn(WalkInID).StockDoorOpenSchedPtr(ZoneID) > 0)
-                        DoorOpenFactor = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).StockDoorOpenSchedPtr(ZoneID));
+                    if (this->StockDoorOpenSchedPtr(ZoneID) > 0)
+                        DoorOpenFactor = ScheduleManager::GetCurrentScheduleValue(this->StockDoorOpenSchedPtr(ZoneID));
 
                     FullFlowInfLoad = 0.221 * DrArea * (EnthalpyZoneAir - EnthalpyAirWalkIn) * DensityAirWalkIn * DensitySqRtFactor *
                                       std::sqrt(Gravity * DrHeight) * DensityFactorFm;
                     StockDoorInfLoad = FullFlowInfLoad * DoorOpenFactor * DoorFlowFactor * (1.0 - DoorProtectEff);
-                    StockDoorSensHeat = DrArea * WalkIn(WalkInID).UValueStockDr(ZoneID) * DelTemp;
+                    StockDoorSensHeat = DrArea * this->UValueStockDr(ZoneID) * DelTemp;
                 } // have stock doors
 
                 Real64 GlassDoorSensHeat(0.0);       // sensible heat gain through glass reach-in doors (UA*delta T) (W)
@@ -13443,17 +13408,17 @@ namespace RefrigeratedCase {
 
                 if (GlassDoorArea > 0.0) {
                     DoorProtectEff = 0.5; // Assume glass doors have air curtain
-                    DrHeight = WalkIn(WalkInID).HeightGlassDr(ZoneID);
+                    DrHeight = this->HeightGlassDr(ZoneID);
                     DrArea = GlassDoorArea;
                     // get Glass Door Zone schedule
                     Real64 DoorOpenFactor = DefaultWalkInDoorOpenFactor; // default value
-                    if (WalkIn(WalkInID).GlassDoorOpenSchedPtr(ZoneID) > 0)
-                        DoorOpenFactor = ScheduleManager::GetCurrentScheduleValue(WalkIn(WalkInID).GlassDoorOpenSchedPtr(ZoneID));
+                    if (this->GlassDoorOpenSchedPtr(ZoneID) > 0)
+                        DoorOpenFactor = ScheduleManager::GetCurrentScheduleValue(this->GlassDoorOpenSchedPtr(ZoneID));
 
                     FullFlowInfLoad = 0.221 * DrArea * (EnthalpyZoneAir - EnthalpyAirWalkIn) * DensityAirWalkIn * DensitySqRtFactor *
                                       std::sqrt(Gravity * DrHeight) * DensityFactorFm;
                     GlassDoorInfLoad = FullFlowInfLoad * DoorOpenFactor * DoorFlowFactor * (1.0 - DoorProtectEff);
-                    GlassDoorSensHeat = DrArea * WalkIn(WalkInID).UValueGlassDr(ZoneID) * DelTemp;
+                    GlassDoorSensHeat = DrArea * this->UValueGlassDr(ZoneID) * DelTemp;
                 } // have Glass doors
 
                 // assume mass dry air infiltrating into walk-in == mass out into zone,
@@ -13470,13 +13435,13 @@ namespace RefrigeratedCase {
                 ZInfilSensLoad = ZoneInfilLoad - (-WaterRemovRate * IcetoVaporEnthalpy); // done to avoid moving latent to sens during dripdown
                 ZdoorSensLoad = -GlassDoorSensHeat - StockDoorSensHeat;
                 WalkInLatLoad = -ZoneLatentLoad;
-                if (WalkIn(WalkInID).TEvapDesign <= 0.0) { // water turned to ice on coil
+                if (this->TEvapDesign <= 0.0) { // water turned to ice on coil
                     WalkInLatLoad = WaterRemovRate * IcetoVaporEnthalpy * (1.0 - DefrostDripDownSchedule);
                     // FROST:  keep track of frost build up on evaporator coil
                     //         avoid accumulation during warm-up to avoid reverse dd test problem
                     if (!DataGlobals::WarmupFlag) {
                         Real64 FrostChangekg = (WaterRemovRate * DataGlobals::TimeStepZoneSec) * (1.0 - DefrostDripDownSchedule);
-                        WalkIn(WalkInID).KgFrost += FrostChangekg;
+                        this->KgFrost += FrostChangekg;
                     }
                 } // water to ice
             }     // No doors
@@ -13489,26 +13454,26 @@ namespace RefrigeratedCase {
             //   Zone Equipment Manager. Sum walk-in credits to zone using existing 'casecredit' variable
             //   No return air fractions are applied to walk-ins, and no latent in stocking -
 
-            DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone += ZoneSensLoad;
-            DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += ZoneLatentLoad;
+            DataHeatBalance::RefrigCaseCredit(zoneNum).SenCaseCreditToZone += ZoneSensLoad;
+            DataHeatBalance::RefrigCaseCredit(zoneNum).LatCaseCreditToZone += ZoneLatentLoad;
 
             // Set up report variables for each zone for this walk-in
             // Sensible heat exchange can be positive or negative, split into separate output variables and always report positive value
-            WalkIn(WalkInID).SensZoneCreditRate(ZoneID) = ZoneSensLoad;
+            this->SensZoneCreditRate(ZoneID) = ZoneSensLoad;
             if (ZoneSensLoad <= 0.0) {
-                WalkIn(WalkInID).SensZoneCreditCoolRate(ZoneID) = -ZoneSensLoad;
-                WalkIn(WalkInID).SensZoneCreditCool(ZoneID) = -ZoneSensLoad * DataGlobals::TimeStepZoneSec;
-                WalkIn(WalkInID).SensZoneCreditHeatRate(ZoneID) = 0.0;
-                WalkIn(WalkInID).SensZoneCreditHeat(ZoneID) = 0.0;
+                this->SensZoneCreditCoolRate(ZoneID) = -ZoneSensLoad;
+                this->SensZoneCreditCool(ZoneID) = -ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditHeatRate(ZoneID) = 0.0;
+                this->SensZoneCreditHeat(ZoneID) = 0.0;
             } else {
-                WalkIn(WalkInID).SensZoneCreditHeatRate(ZoneID) = ZoneSensLoad;
-                WalkIn(WalkInID).SensZoneCreditHeat(ZoneID) = ZoneSensLoad * DataGlobals::TimeStepZoneSec;
-                WalkIn(WalkInID).SensZoneCreditCoolRate(ZoneID) = 0.0;
-                WalkIn(WalkInID).SensZoneCreditCool(ZoneID) = 0.0;
+                this->SensZoneCreditHeatRate(ZoneID) = ZoneSensLoad;
+                this->SensZoneCreditHeat(ZoneID) = ZoneSensLoad * DataGlobals::TimeStepZoneSec;
+                this->SensZoneCreditCoolRate(ZoneID) = 0.0;
+                this->SensZoneCreditCool(ZoneID) = 0.0;
             }
             // This rate should always be negative
-            WalkIn(WalkInID).LatZoneCreditRate(ZoneID) = ZoneLatentLoad;
-            WalkIn(WalkInID).LatZoneCredit(ZoneID) = ZoneLatentLoad * DataGlobals::TimeStepZoneSec;
+            this->LatZoneCreditRate(ZoneID) = ZoneLatentLoad;
+            this->LatZoneCredit(ZoneID) = ZoneLatentLoad * DataGlobals::TimeStepZoneSec;
 
             // Running total over all zones, use later to dispatch capacity
             SensibleLoadTotal += WalkInSensLoad;
@@ -13519,44 +13484,43 @@ namespace RefrigeratedCase {
         // cooling coil fan power default is 375W, = 1/2 HP (Tyler showed 1/3 to 3/4 hp)
 
         // CALCULATE AUX LOADS DUE TO LIGHTS, FANS AND HEATERS
-        Real64 LightLoad = DesignLighting * LightingSchedule; // Total lighting energy rate (W)
+        Real64 LightLoad = this->DesignLighting * LightingSchedule; // Total lighting energy rate (W)
         // turn coil fan off during defrost/drip - down period
 
         // Total fan energy rate (W)
-        Real64 FanLoad = WalkIn(WalkInID).CircFanPower * CircFanSchedule + WalkIn(WalkInID).CoilFanPower * (1.0 - DefrostDripDownSchedule);
-        Real64 HeaterLoad = WalkIn(WalkInID).HeaterPower * HeaterSchedule;  // Total heater (except defrost) energy rate (W)
+        Real64 FanLoad = this->CircFanPower * CircFanSchedule + this->CoilFanPower * (1.0 - DefrostDripDownSchedule);
+        Real64 HeaterLoad = this->HeaterPower * HeaterSchedule;  // Total heater (except defrost) energy rate (W)
         // Calculate floor load - using 'DataEnvironment::GroundTemp' assigned in weather manager (can be entered by user if desired)
         //    Default value is 18C.
         // Total floor energy rate (W)
-        Real64 FloorLoad = WalkIn(WalkInID).FloorArea * WalkIn(WalkInID).FloorUValue * (DataEnvironment::GroundTemp - TWalkIn);
+        Real64 FloorLoad = this->FloorArea * this->FloorUValue * (DataEnvironment::GroundTemp - TWalkIn);
 
         Real64 DefrostLoad;
 
         // DEFROST CALCULATIONS
-        if ((DefrostSchedule > 0.0) && (WalkIn(WalkInID).DefrostType != WalkInDefrostNone) &&
-            (WalkIn(WalkInID).DefrostType != WalkInDefrostOffCycle)) {
-            DefrostLoad = DefrostCap * DefrostSchedule; // W
-            Real64 StartFrostKg = WalkIn(WalkInID).KgFrost; // frost load at start of time step (kg of ice)
+        if ((DefrostSchedule > 0.0) && (this->DefrostType != WalkInDefrostNone) &&
+            (this->DefrostType != WalkInDefrostOffCycle)) {
+            DefrostLoad = this->DefrostCapacity * DefrostSchedule; // W
+            Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
             Real64 DefrostEnergy = DefrostLoad * DataGlobals::TimeStepZoneSec; // Joules
-            if (WalkIn(WalkInID).DefrostControlType == DefrostContTempTerm) {
+            if (this->DefrostControlType == DefrostContTempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
                 //  Some goes to misc losses (for fluid defrost, some coil areas bare earlier than
                 //  others and xfer heat to environment)
                 //  Assume full ice melting satisfies temperature control.
                 //      (defaults for DefEnergyFraction are :=0.7 for elec, =0.3 for fluids)
-                Real64 DefEnergyFraction = WalkIn(WalkInID).DefEnergyFraction;
-                Real64 AvailDefrostEnergy = DefEnergyFraction * DefrostEnergy; // Joules avail to melt ice
+                Real64 AvailDefrostEnergy = this->DefEnergyFraction * DefrostEnergy; // Joules avail to melt ice
                 Real64 IceSensHeatNeeded = 0.0; // Energy to raise frost temperature to 0C, used w/ temp termination (J)
                 if (StartFrostKg > 0.0) {
-                    if (WalkIn(WalkInID).IceTemp < 0.0) {
-                        Real64 StartIceTemp = WalkIn(WalkInID).IceTemp; // Frost temperature at start of time step [C]
+                    if (this->IceTemp < 0.0) {
+                        Real64 StartIceTemp = this->IceTemp; // Frost temperature at start of time step [C]
                         IceSensHeatNeeded = StartFrostKg * SpecificHeatIce * (0.0 - StartIceTemp); // Joules
                         if (AvailDefrostEnergy >= IceSensHeatNeeded) {
-                            WalkIn(WalkInID).IceTemp = 0.0;
+                            this->IceTemp = 0.0;
                             AvailDefrostEnergy -= IceSensHeatNeeded; // Joules
                         } else {                                     // DefrostEnergy < IceSensHeatNeeded
-                            WalkIn(WalkInID).IceTemp = StartIceTemp + AvailDefrostEnergy / (SpecificHeatIce * StartFrostKg);
+                            this->IceTemp = StartIceTemp + AvailDefrostEnergy / (SpecificHeatIce * StartFrostKg);
                             AvailDefrostEnergy = 0.0;
                         } // AvailDefrostEnergy >= IceSensHeatNeeded
                     }     // IceTemp < 0,  need to raise temperature of ice
@@ -13564,31 +13528,31 @@ namespace RefrigeratedCase {
                     Real64 FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
                         DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
-                        if (!DataGlobals::WarmupFlag) WalkIn(WalkInID).KgFrost = StartFrostKg - FrostChangekg;
+                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 page 3 notes
-                        WalkIn(WalkInID).KgFrost = 0.0;
+                        this->KgFrost = 0.0;
                         DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
-                                              DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
-                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * DataGlobals::TimeStepZoneSec)));
+                                this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
+                        DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (this->DefrostCapacity * DataGlobals::TimeStepZoneSec)));
                         // reduce load on walkin by energy put into ice melting
                         DefrostLoad =
-                            max(0.0, (DefrostSchedule * DefrostCap - (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / DataGlobals::TimeStepZoneSec));
-                        WalkIn(WalkInID).IceTemp = WalkIn(WalkInID).TEvapDesign;
+                            max(0.0, (DefrostSchedule * this->DefrostCapacity - (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / DataGlobals::TimeStepZoneSec));
+                        this->IceTemp = this->TEvapDesign;
 
                     }    // frost melted during time step less than amount of ice at start
                 } else { // no frost present so terminate defrost and reset ice temperature for start of next defrost
                     DefrostLoad = 0.0;
                     DefrostSchedule = 0.0;
-                    WalkIn(WalkInID).IceTemp = WalkIn(WalkInID).TEvapDesign;
+                    this->IceTemp = this->TEvapDesign;
                 } // have frost present
 
             } else { // Not temperature control type
                 Real64 FrostChangekg = min(DefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                 // Reduce defrost heat load on walkin by amount of ice melted during time step
                 DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
-                if (!DataGlobals::WarmupFlag) WalkIn(WalkInID).KgFrost = StartFrostKg - FrostChangekg;
+                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                 // DefrostSchedule not changed
             } // Temperature termination control type
 
@@ -13596,16 +13560,16 @@ namespace RefrigeratedCase {
             DefrostLoad = 0.0;
         } // Defrost calculations
 
-        if (WalkIn(WalkInID).DefrostType == WalkInDefrostElec) {
-            WalkIn(WalkInID).ElecDefrostConsumption = DefrostCap * DefrostSchedule * DataGlobals::TimeStepZoneSec;
-            WalkIn(WalkInID).ElecDefrostPower = DefrostCap * DefrostSchedule;
+        if (this->DefrostType == WalkInDefrostElec) {
+            this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * DataGlobals::TimeStepZoneSec;
+            this->ElecDefrostPower = this->DefrostCapacity * DefrostSchedule;
         } else {
-            WalkIn(WalkInID).ElecDefrostConsumption = 0.0;
-            WalkIn(WalkInID).ElecDefrostPower = 0.0;
+            this->ElecDefrostConsumption = 0.0;
+            this->ElecDefrostPower = 0.0;
         }
 
         // If hot brine or hot gas is used for defrost, need to reduce condenser load by heat reclaimed for defrost
-        if (WalkIn(WalkInID).DefrostType == WalkInDefrostFluid) WalkIn(WalkInID).HotDefrostCondCredit = DefrostCap * DefrostSchedule;
+        if (this->DefrostType == WalkInDefrostFluid) this->HotDefrostCondCredit = this->DefrostCapacity * DefrostSchedule;
 
         // loads reflects that walk ins continue to accumulate loads, even during defrost
         // but cap is used to report portion met by active system while operating
@@ -13625,67 +13589,67 @@ namespace RefrigeratedCase {
         //  run full out until the temperature is brought back down.
 
         // Rate needed to serve all stored energy during single time step (W)
-        Real64 StoredEnergyRate = WalkIn(WalkInID).StoredEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
+        Real64 StoredEnergyRate = this->StoredEnergy / DataGlobals::TimeStepZone / DataGlobals::SecInHour;
         Real64 LoadRequested = LoadTotal + StoredEnergyRate; // Load necessary to meet current and all stored energy needs (W)
 
         Real64 LatentCapApplied;   // Walk In latent capacity at specific operating conditions
         Real64 SensibleCapApplied(0.0); // Walk In sensible capacity at specific operating conditions
 
         // prorate available cooling capacity for portion of time off due to drip down.
-        Real64 MaxCap = DesignRatedCap * (1.0 - DefrostDripDownSchedule); // Design chilling capacity reduced according to drip-down schedule (W)
+        Real64 MaxCap = this->DesignRatedCap * (1.0 - DefrostDripDownSchedule); // Design chilling capacity reduced according to drip-down schedule (W)
 
         if (MaxCap >= LoadRequested) {
             // Have more at least as much capacity available as needed, even counting stored energy
             CapApplied = LoadRequested;
             SensibleCapApplied = SensibleLoadTotal + StoredEnergyRate;
             LatentCapApplied = LatentLoadTotal;
-            WalkIn(WalkInID).StoredEnergy = 0.0;
+            this->StoredEnergy = 0.0;
         } else {
             // Don't have as much capacity as needed (during dripdown or period following dripdown)
             CapApplied = MaxCap;
             LatentCapApplied = min(LatentLoadTotal, MaxCap); // Latent load should never be > capavail, but just in case...
             SensibleCapApplied = CapApplied - LatentCapApplied;
-            if (!DataGlobals::WarmupFlag) WalkIn(WalkInID).StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
+            if (!DataGlobals::WarmupFlag) this->StoredEnergy += (LoadTotal - MaxCap) * DataGlobals::TimeStepZoneSec;
         } // CapAvail vs Load requested
 
         // ReportWalkIn( WalkInID)
-        WalkIn(WalkInID).TotalCoolingLoad = CapApplied;
-        WalkIn(WalkInID).TotalCoolingEnergy = CapApplied * DataGlobals::TimeStepZoneSec;
-        WalkIn(WalkInID).TotSensCoolingEnergyRate = SensibleCapApplied;
-        WalkIn(WalkInID).TotSensCoolingEnergy = SensibleCapApplied * DataGlobals::TimeStepZoneSec;
-        WalkIn(WalkInID).TotLatCoolingEnergyRate = LatentCapApplied;
-        WalkIn(WalkInID).TotLatCoolingEnergy = LatentCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotalCoolingLoad = CapApplied;
+        this->TotalCoolingEnergy = CapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotSensCoolingEnergyRate = SensibleCapApplied;
+        this->TotSensCoolingEnergy = SensibleCapApplied * DataGlobals::TimeStepZoneSec;
+        this->TotLatCoolingEnergyRate = LatentCapApplied;
+        this->TotLatCoolingEnergy = LatentCapApplied * DataGlobals::TimeStepZoneSec;
 
-        WalkIn(WalkInID).ElecFanPower = FanLoad;
-        WalkIn(WalkInID).ElecFanConsumption = FanLoad * DataGlobals::TimeStepZoneSec;
-        WalkIn(WalkInID).ElecHeaterPower = HeaterLoad;
-        WalkIn(WalkInID).ElecHeaterConsumption = HeaterLoad * DataGlobals::TimeStepZoneSec;
-        WalkIn(WalkInID).ElecLightingPower = LightLoad;
-        WalkIn(WalkInID).ElecLightingConsumption = LightLoad * DataGlobals::TimeStepZoneSec;
-        WalkIn(WalkInID).TotalElecPower = FanLoad + HeaterLoad + LightLoad + WalkIn(WalkInID).ElecDefrostPower;
-        WalkIn(WalkInID).TotalElecConsumption = WalkIn(WalkInID).TotalElecPower * DataGlobals::TimeStepZoneSec;
+        this->ElecFanPower = FanLoad;
+        this->ElecFanConsumption = FanLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecHeaterPower = HeaterLoad;
+        this->ElecHeaterConsumption = HeaterLoad * DataGlobals::TimeStepZoneSec;
+        this->ElecLightingPower = LightLoad;
+        this->ElecLightingConsumption = LightLoad * DataGlobals::TimeStepZoneSec;
+        this->TotalElecPower = FanLoad + HeaterLoad + LightLoad + this->ElecDefrostPower;
+        this->TotalElecConsumption = this->TotalElecPower * DataGlobals::TimeStepZoneSec;
 
         //**************************************************************************************************
         // Cap Energy and Kg Frost to avoid floating overflow errors
         // 1-time warning is issued. It should be rare but could happen with unrealistic inputs.
-        if (WalkIn(WalkInID).StoredEnergy > MyLargeNumber) {
-            WalkIn(WalkInID).StoredEnergy = MyLargeNumber;
-            if (ShowUnmetWIEnergyWarning(WalkInID)) {
-                ShowWarningError("Refrigeration:WalkIn: " + WalkIn(WalkInID).Name);
+        if (this->StoredEnergy > MyLargeNumber) {
+            this->StoredEnergy = MyLargeNumber;
+            if (this->ShowUnmetWIEnergyWarning) {
+                ShowWarningError("Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(" This walk-in cooler has insufficient capacity to meet the loads");
                 ShowContinueError("... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString());
                 ShowContinueError(" Refer to documentation for further explanation of Total Cooling Capacity.");
-                ShowUnmetWIEnergyWarning(WalkInID) = false;
+                this->ShowUnmetWIEnergyWarning = false;
             } // ShowStoreEnergyWarning
         }     // stored energy > large number
-        if (WalkIn(WalkInID).KgFrost > MyLargeNumber) {
-            WalkIn(WalkInID).KgFrost = MyLargeNumber;
-            if (ShowWIFrostWarning(WalkInID)) {
-                ShowWarningError("Refrigeration:WalkIn: " + WalkIn(WalkInID).Name);
+        if (this->KgFrost > MyLargeNumber) {
+            this->KgFrost = MyLargeNumber;
+            if (this->ShowWIFrostWarning) {
+                ShowWarningError("Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(" This walkin cooler has insufficient defrost capacity to remove the excess frost accumulation.");
                 ShowContinueError(" Check the defrost schedule or defrost capacity. ");
                 ShowContinueError("... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString());
-                ShowWIFrostWarning(WalkInID) = false;
+                this->ShowWIFrostWarning = false;
             }
         }
     }
@@ -13799,7 +13763,7 @@ namespace RefrigeratedCase {
         if (this->NumCases > 0) {
             for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
                 int CaseID = this->CaseNum(caseNum);
-                CalculateCase(CaseID);
+                RefrigCase(CaseID).CalculateCase();
                 // increment TotalCoolingLoad Hot gas/brine defrost credits for each secondary loop
                 RefrigerationLoad += RefrigCase(CaseID).TotalCoolingLoad;
                 TotalHotDefrostCondCredit += RefrigCase(CaseID).HotDefrostCondCredit;
@@ -13808,7 +13772,7 @@ namespace RefrigeratedCase {
         if (this->NumWalkIns > 0) {
             for (int WalkInIndex = 1; WalkInIndex <= this->NumWalkIns; ++WalkInIndex) {
                 int WalkInID = this->WalkInNum(WalkInIndex);
-                CalculateWalkIn(WalkInID);
+                WalkIn(WalkInID).CalculateWalkIn();
                 // increment TotalCoolingLoad for  each system
                 RefrigerationLoad += WalkIn(WalkInID).TotalCoolingLoad;
                 TotalHotDefrostCondCredit += WalkIn(WalkInID).HotDefrostCondCredit;
