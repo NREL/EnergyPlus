@@ -7,7 +7,7 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 
-void errorCallback(const int messageType, const std::string message, void * /*contextPtr*/
+void errorCallback(const int messageType, const std::string &message, void * /*contextPtr*/
 ) {
   if (messageType == Pumbra::MSG_INFO) {
     std::cout << "  NOTE: " << message << std::endl;

@@ -30,7 +30,7 @@ enum class VendorName {
   VMware
 };
 
-typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string message,
+typedef void (*PenumbraCallbackFunction)(const int messageType, const std::string &message,
                                          void *contextPtr);
 
 class PenumbraPrivate;

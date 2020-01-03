@@ -13,7 +13,7 @@ PenumbraCallbackFunction penumbraCallbackFunction;
 void *messageCallbackContextPtr;
 
 void showMessage(const int messageType, const std::string message) {
-  if (penumbraCallbackFunction != NULL) {
+  if (penumbraCallbackFunction != nullptr) {
     (*penumbraCallbackFunction)(messageType, message, messageCallbackContextPtr);
   } else {
     if (messageType == MSG_ERR) {

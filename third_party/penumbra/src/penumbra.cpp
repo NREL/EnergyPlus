@@ -19,7 +19,7 @@ Penumbra::Penumbra(unsigned int size) {
 }
 
 Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, unsigned size) {
-  setMessageCallback(callbackFunction, NULL);
+  setMessageCallback(callbackFunction, nullptr);
   penumbra = std::unique_ptr<PenumbraPrivate>(new PenumbraPrivate(size));
 }
 
