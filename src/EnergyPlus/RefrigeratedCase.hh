@@ -315,6 +315,7 @@ namespace RefrigeratedCase {
         Real64 InletTempMin;            // Minimum condenser water inlet temperature (C)
         Real64 OutletTempMax;           // Maximum condenser water outlet temperature (C)
         Real64 TotalCoolingLoad;
+        bool ShowCOPWarning;
 
         // Default Constructor
         RefrigRackData()
@@ -330,7 +331,7 @@ namespace RefrigeratedCase {
               NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0),
               InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
               OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0),
-              FlowType(1), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0)
+              FlowType(1), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
 
@@ -351,6 +352,10 @@ namespace RefrigeratedCase {
             ActualCondenserFanPower = 0.0;
             ActualEvapPumpPower = 0.0;
         }
+
+        void CalcRackSystem();
+
+        void ReportRackSystem(int RackNum);
     };
 
     struct RefrigSystemData
@@ -1259,8 +1264,6 @@ namespace RefrigeratedCase {
         int DefrostType;             // Coil defrost type, Hot-gas,Electric, Hot-brine
         int FanType;                 // Index to coil fan type (fixed, two-speed, etc.)
         int HeaterSchedPtr;          // Index to the correct availability schedule
-        // INTEGER          :: NodeNumInlet=0            ! Node number for inlet to coil
-        // INTEGER          :: NodeNumOutlet=0           ! Node number for outlet from coil
         int NumSysAttach;          // Number of refrigerating systems cooling this coil (error check purpose)
         int RatingType;            // Indicates which type of manufacturer's rating is used
         int SchedPtr;              // Index to the correct availability schedule
@@ -1325,8 +1328,8 @@ namespace RefrigeratedCase {
         Real64 TotalCoolingLoad;            // Gross total cooling rate (W)
         Real64 TotalCoolingEnergy;          // Gross total cooling energy (J)
         Real64 TotalElecPower;              // Coil total electric
-        //   (fans, heaters, and elec defrost) rate (W)
         Real64 TotalElecConsumption; // Coil total electric energy (J)
+        bool ShowCoilFrostWarning;
 
         // Default Constructor
         WarehouseCoilData()
@@ -1342,7 +1345,7 @@ namespace RefrigeratedCase {
               LatKgPerS_ToZone(0.0), LatCreditEnergy(0.0), ReportSensCoolCreditRate(0.0), ReportHeatingCreditRate(0.0),
               ReportSensCoolCreditEnergy(0.0), ReportHeatingCreditEnergy(0.0), ReportTotalCoolCreditRate(0.0), ReportTotalCoolCreditEnergy(0.0),
               SensCreditRate(0.0), SensCreditEnergy(0.0), SensCoolingEnergyRate(0.0), SensCoolingEnergy(0.0), TotalCoolingLoad(0.0),
-              TotalCoolingEnergy(0.0), TotalElecPower(0.0), TotalElecConsumption(0.0)
+              TotalCoolingEnergy(0.0), TotalElecPower(0.0), TotalElecConsumption(0.0), ShowCoilFrostWarning(true)
         {
         }
 
@@ -1374,6 +1377,8 @@ namespace RefrigeratedCase {
             ReportSensCoolCreditEnergy = 0.0;
             ReportHeatingCreditEnergy = 0.0;
         }
+
+        void CalculateCoil(Real64 QZnReq);
     };
 
     struct AirChillerSetData
@@ -1481,10 +1486,6 @@ namespace RefrigeratedCase {
 
     void InitRefrigerationPlantConnections();
 
-    void CalcRackSystem(int RackNum);
-
-    void ReportRackSystem(int RackNum);
-
     void CalculateCase(int CaseID); // Absolute pointer to refrigerated case
 
     void SimRefrigCondenser(int SysType, std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
@@ -1537,10 +1538,6 @@ namespace RefrigeratedCase {
                         int SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
-    );
-
-    void CalculateCoil(int CoilID,
-                       Real64 QZnReq // sensible load required
     );
 
     void FigureRefrigerationZoneGains();

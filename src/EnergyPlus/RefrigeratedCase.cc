@@ -365,8 +365,6 @@ namespace RefrigeratedCase {
     Real64 RackSenCreditToZone(0.0);        // Amount of condenser heat applied to zone load (W)
     Real64 RackSenCreditToHVAC(0.0);        // Amount of condenser heat applied to HVAC RA duct (W)
 
-    Array1D_bool ShowCOPWarning;            // Used for one-time warning message for possible rack
-    // input error regarding COP
     // Refrigeration condenser variables (used for both racks and detailed systems)
     Real64 TotalCondenserFanPower(0.0);  // Total condenser fan electric power (W)
     Real64 TotalCondenserPumpPower(0.0); // Total condenser pump electric power (W)
@@ -387,8 +385,6 @@ namespace RefrigeratedCase {
     // Refrigeration Secondary Loop variables
     Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
     // compressor input error regarding secondary loop heat exchanger capacity
-    // Refrigerated warehouse coil variables
-    Array1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
 
     // Refrigeration Plant connections checks
     Array1D_bool CheckEquipNameRackWaterCondenser;
@@ -477,8 +473,6 @@ namespace RefrigeratedCase {
         RackSenCreditToZone = 0.0;
         RackSenCreditToHVAC = 0.0;
 
-        ShowCOPWarning.deallocate();
-
         TotalCondenserFanPower = 0.0;
         TotalCondenserPumpPower = 0.0;
         TotalCondenserHeat = 0.0;
@@ -489,7 +483,6 @@ namespace RefrigeratedCase {
         ShowHiStageUnmetEnergyWarning.deallocate();
         ShowUnmetEnergyWarningTrans.deallocate();
         ShowUnmetSecondEnergyWarning.deallocate();
-        ShowCoilFrostWarning.deallocate();
         CheckEquipNameRackWaterCondenser.deallocate();
         CheckEquipNameWaterCondenser.deallocate();
         RefrigPresentInZone.deallocate();
@@ -579,8 +572,8 @@ namespace RefrigeratedCase {
 
         if (HaveRefrigRacks) {
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
-                CalcRackSystem(RackNum);
-                ReportRackSystem(RackNum);
+                RefrigRack(RackNum).CalcRackSystem();
+                RefrigRack(RackNum).ReportRackSystem(RackNum);
             }
         }
 
@@ -728,7 +721,6 @@ namespace RefrigeratedCase {
         if (DataHeatBalance::NumRefrigeratedRacks > 0) {
             RefrigRack.allocate(DataHeatBalance::NumRefrigeratedRacks);
             DataHeatBalance::HeatReclaimRefrigeratedRack.allocate(DataHeatBalance::NumRefrigeratedRacks);
-            ShowCOPWarning.dimension(DataHeatBalance::NumRefrigeratedRacks, true);
         }
         if (DataHeatBalance::NumRefrigSystems > 0) {
             System.allocate(DataHeatBalance::NumRefrigSystems);
@@ -774,9 +766,7 @@ namespace RefrigeratedCase {
         }
         if (NumSimulationRefrigAirChillers > 0) {
             WarehouseCoil.allocate(NumSimulationRefrigAirChillers);
-            ShowCoilFrostWarning.allocate(NumSimulationRefrigAirChillers);
             CoilSysCredit.allocate(DataGlobals::NumOfZones);
-            ShowCoilFrostWarning = true;
         }
         if (NumSimulationCompressors > 0) Compressor.allocate(NumSimulationCompressors);
         if (NumSimulationSubcoolers > 0) Subcooler.allocate(NumSimulationSubcoolers);
@@ -9358,7 +9348,7 @@ namespace RefrigeratedCase {
         if (!DataGlobals::BeginEnvrnFlag) MyBeginEnvrnFlag = true;
     }
 
-    void CalcRackSystem(int const RackNum)
+    void RefrigRackData::CalcRackSystem()
     {
 
         // SUBROUTINE INFORMATION:
@@ -9422,9 +9412,9 @@ namespace RefrigeratedCase {
             }
         }
 
-        if (RefrigRack(RackNum).NumCoils > 0) {
-            for (int CoilIndex = 1; CoilIndex <= RefrigRack(RackNum).NumCoils; ++CoilIndex) {
-                int CoilID = RefrigRack(RackNum).CoilNum(CoilIndex);
+        if (this->NumCoils > 0) {
+            for (int CoilIndex = 1; CoilIndex <= this->NumCoils; ++CoilIndex) {
+                int CoilID = this->CoilNum(CoilIndex);
                 // already CALLed CalculateCoil(CoilID) in CoilSet specified order
                 // increment TotalCoolingLoad for Compressors/condenser on each system
                 TotalRackDeliveredCapacity += WarehouseCoil(CoilID).TotalCoolingLoad;
@@ -9432,9 +9422,9 @@ namespace RefrigeratedCase {
             } // NumCoils systems
         }     // System(SysNum)%NumCoils > 0
 
-        if (RefrigRack(RackNum).NumCases > 0) {
-            for (int CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
-                int CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
+        if (this->NumCases > 0) {
+            for (int caseNum = 1; caseNum <= this->NumCases; ++caseNum) {
+                int CaseID = this->CaseNum(caseNum);
                 CalculateCase(CaseID);
 
                 //   add evaporator load for all cases connected to rack
@@ -9445,14 +9435,14 @@ namespace RefrigeratedCase {
                 //                                     (used when HeatRejectionLocation = LocationZone)
                 //   if walk-ins are served by rack, user must specify heat rejection zone and 100% of heat
                 //   rejection goes to that zone - that is, no heat rejection goes to the HVAC return air
-                if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
-                    if (RefrigRack(RackNum).NumWalkIns == 0) {
+                if (this->HeatRejectionLocation == LocationZone) {
+                    if (this->NumWalkIns == 0) {
                         TotalHeatRejectedToZone += RefrigCase(CaseID).TotalCoolingLoad * (1.0 - CaseRAFactor);
                         //  CaseRAFactor is a module variable calculated in CalculateCase
                         //   find zone number of first case on rack (all cases are in the same zone
                         //  if HeatRejectionLocation = LocationZone and no walk-ins)
-                        HeatRejectZoneNum = RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum;
-                        HeatRejectZoneNodeNum = RefrigCase(RefrigRack(RackNum).CaseNum(1)).ZoneNodeNum;
+                        HeatRejectZoneNum = RefrigCase(this->CaseNum(1)).ActualZoneNum;
+                        HeatRejectZoneNodeNum = RefrigCase(this->CaseNum(1)).ZoneNodeNum;
                     } else { // have walk ins so no reduction in condenser heat rejection for caseRA factor
                         TotalHeatRejectedToZone += RefrigCase(CaseID).TotalCoolingLoad;
                     } // no walk ins
@@ -9460,26 +9450,26 @@ namespace RefrigeratedCase {
             } // NumCases
         }     // Numcases on rack > 0
 
-        if (RefrigRack(RackNum).NumWalkIns > 0) {
-            for (int WalkInIndex = 1; WalkInIndex <= RefrigRack(RackNum).NumWalkIns; ++WalkInIndex) {
-                int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInIndex);
+        if (this->NumWalkIns > 0) {
+            for (int WalkInIndex = 1; WalkInIndex <= this->NumWalkIns; ++WalkInIndex) {
+                int WalkInID = this->WalkInNum(WalkInIndex);
                 CalculateWalkIn(WalkInID);
                 TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
-                if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+                if (this->HeatRejectionLocation == LocationZone) {
                     TotalHeatRejectedToZone += WalkIn(WalkInID).TotalCoolingLoad;
-                    HeatRejectZoneNum = RefrigRack(RackNum).HeatRejectionZoneNum;
-                    HeatRejectZoneNodeNum = RefrigRack(RackNum).HeatRejectionZoneNodeNum;
+                    HeatRejectZoneNum = this->HeatRejectionZoneNum;
+                    HeatRejectZoneNodeNum = this->HeatRejectionZoneNodeNum;
                 } // reject heat to zone
             }     // WalkInIndex
         }         // NumWalkIns>0
 
-        if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
-            COPFTempOutput = CurveManager::CurveValue(RefrigRack(RackNum).COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
+        if (this->HeatRejectionLocation == LocationZone) {
+            COPFTempOutput = CurveManager::CurveValue(this->COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
             EvapAvail = false;
         } else {
-            if (RefrigRack(RackNum).OutsideAirNodeNum != 0) {
-                OutDbTemp = DataLoopNode::Node(RefrigRack(RackNum).OutsideAirNodeNum).Temp;
-                BPress = DataLoopNode::Node(RefrigRack(RackNum).OutsideAirNodeNum).Press;
+            if (this->OutsideAirNodeNum != 0) {
+                OutDbTemp = DataLoopNode::Node(this->OutsideAirNodeNum).Temp;
+                BPress = DataLoopNode::Node(this->OutsideAirNodeNum).Press;
             } else {
                 OutDbTemp = DataEnvironment::OutDryBulbTemp;
                 BPress = DataEnvironment::OutBaroPress;
@@ -9488,105 +9478,103 @@ namespace RefrigeratedCase {
 
             // IF schedule exists, evap condenser can be scheduled OFF
             // Check schedule to determine evap condenser availability
-            if (RefrigRack(RackNum).EvapSchedPtr > 0 && ScheduleManager::GetCurrentScheduleValue(RefrigRack(RackNum).EvapSchedPtr) == 0) EvapAvail = false;
+            if (this->EvapSchedPtr > 0 && ScheduleManager::GetCurrentScheduleValue(this->EvapSchedPtr) == 0) EvapAvail = false;
 
             // Evaporative condensers will have their water flow shut off in cold months to avoid
             //  'spectacular' icing problems.  Ideally, the user will use the evaporative schedule input
             //  to set such a schedule.  However, sometimes, users will use a single input deck to model
             //  one building in multiple climates, and may not think to put in such a schedule in the colder
-            //  climates.  To accomodate such applications, the variable EvapCutOutTdb is used as an extra
+            //  climates.  To accommodate such applications, the variable EvapCutOutTdb is used as an extra
             //  check.
             if (OutDbTemp < EvapCutOutTdb) EvapAvail = false;
 
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
+            if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
                 // determine temps for evap cooling
-                if (RefrigRack(RackNum).OutsideAirNodeNum != 0) {
-                    HumRatIn = DataLoopNode::Node(RefrigRack(RackNum).OutsideAirNodeNum).HumRat;
+                if (this->OutsideAirNodeNum != 0) {
+                    HumRatIn = DataLoopNode::Node(this->OutsideAirNodeNum).HumRat;
                 } else {
                     HumRatIn = DataEnvironment::OutHumRat;
                 } // outsideairnode
                 OutWbTemp = Psychrometrics::PsyTwbFnTdbWPb(OutDbTemp, HumRatIn, BPress);
-                EffectTemp = OutWbTemp + (1.0 - RefrigRack(RackNum).EvapEffect) * (OutDbTemp - OutWbTemp);
+                EffectTemp = OutWbTemp + (1.0 - this->EvapEffect) * (OutDbTemp - OutWbTemp);
             } // evapAvail
 
             // Obtain water-cooled condenser inlet/outlet temps
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
-                RefrigRack(RackNum).InletTemp = DataLoopNode::Node(RefrigRack(RackNum).InletNode).Temp;
-                EffectTemp = DataLoopNode::Node(RefrigRack(RackNum).InletNode).Temp + 5.0; // includes approach temp
-                if (RefrigRack(RackNum).InletTemp < RefrigRack(RackNum).InletTempMin) {
-                    //   RefrigRack(RackNum)%LowTempWarn = RefrigRack(RackNum)%LowTempWarn +1
-                    if (RefrigRack(RackNum).LowTempWarnIndex == 0) {
-                        ShowWarningMessage("Refrigeration:CompressorRack: " + RefrigRack(RackNum).Name);
+            if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+                this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
+                EffectTemp = DataLoopNode::Node(this->InletNode).Temp + 5.0; // includes approach temp
+                if (this->InletTemp < this->InletTempMin) {
+                    if (this->LowTempWarnIndex == 0) {
+                        ShowWarningMessage("Refrigeration:CompressorRack: " + this->Name);
                         ShowContinueError("Water-cooled condenser inlet temp lower than minimum allowed temp. Check returning water temperature "
                                           "and/or minimum temperature setpoints.");
                     } // LowTempWarnIndex
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + RefrigRack(RackNum).Name +
+                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
                                                        " - Condenser inlet temp lower than minimum allowed ... continues",
-                                                   RefrigRack(RackNum).LowTempWarnIndex);
+                                                   this->LowTempWarnIndex);
                     // END IF  !LowTempWarn
                 } // InletTempMin
             }     // DataHeatBalance::RefrigCondenserTypeWater
 
-            COPFTempOutput = CurveManager::CurveValue(RefrigRack(RackNum).COPFTempPtr, EffectTemp);
+            COPFTempOutput = CurveManager::CurveValue(this->COPFTempPtr, EffectTemp);
         } // Location Zone
 
-        CompressorCOPactual = RefrigRack(RackNum).RatedCOP * COPFTempOutput;
+        CompressorCOPactual = this->RatedCOP * COPFTempOutput;
 
         if (CompressorCOPactual > 0.0) {
             TotalCompressorPower = TotalRackDeliveredCapacity / CompressorCOPactual;
             TotalCondenserHeat = TotalCompressorPower + TotalRackDeliveredCapacity;
         } else {
-            if (ShowCOPWarning(RackNum)) {
-                ShowWarningError("Refrigeration:CompressorRack: " + RefrigRack(RackNum).Name);
+            if (this->ShowCOPWarning) {
+                ShowWarningError("Refrigeration:CompressorRack: " + this->Name);
                 ShowContinueError(" The calculated COP has a value of zero or is negative. Refer to Engineering Documentation for");
                 ShowContinueError(" further explanation of Compressor Rack COP as a Function of Temperature Curve.");
-                ShowCOPWarning(RackNum) = false;
+                this->ShowCOPWarning = false;
             }
         }
 
         // calculate condenser fan usage here if not water-cooled; if water-cooled, fan is in separate tower object
         // fan loads > 0 only if the connected cases are operating
-        if (TotalRackDeliveredCapacity > 0.0 && RefrigRack(RackNum).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
-            if (RefrigRack(RackNum).TotCondFTempPtr != 0) {
-                if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
-                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(RefrigRack(RackNum).TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
-                    TotalCondenserFanPower = RefrigRack(RackNum).CondenserFanPower * CondenserFrac;
-                    DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += RefrigRack(RackNum).CondenserFanPower * CondenserFrac;
+        if (TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
+            if (this->TotCondFTempPtr != 0) {
+                if (this->HeatRejectionLocation == LocationZone) {
+                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
+                    TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
+                    DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
                 } else {
-                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(RefrigRack(RackNum).TotCondFTempPtr, EffectTemp)));
-                    TotalCondenserFanPower = RefrigRack(RackNum).CondenserFanPower * CondenserFrac;
+                    CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(this->TotCondFTempPtr, EffectTemp)));
+                    TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                 } // location zone
             } else {
                 CondenserFrac = 1.0;
-                TotalCondenserFanPower = RefrigRack(RackNum).CondenserFanPower * CondenserFrac;
+                TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
             } // TotCondFTempPtr
         }     // Cooling Water type
 
         // calculate evap water use and water pump power, if applicable
         // assumes pump runs whenever evap cooling is available to minimize scaling
-        if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
-            TotalCondenserPumpPower = RefrigRack(RackNum).EvapPumpPower;
+        if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
+            TotalCondenserPumpPower = this->EvapPumpPower;
             HumRatOut = Psychrometrics::PsyWFnTdbTwbPb(EffectTemp, OutWbTemp, BPress);
-            TotalEvapWaterUseRate = RefrigRack(RackNum).CondenserAirFlowRate * CondenserFrac * Psychrometrics::PsyRhoAirFnPbTdbW(BPress, OutDbTemp, HumRatIn) *
+            TotalEvapWaterUseRate = this->CondenserAirFlowRate * CondenserFrac * Psychrometrics::PsyRhoAirFnPbTdbW(BPress, OutDbTemp, HumRatIn) *
                                     (HumRatOut - HumRatIn) / Psychrometrics::RhoH2O(EffectTemp);
         } // evapAvail
         // calculate basin water heater load
-        if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-            if ((TotalRackDeliveredCapacity == 0.0) && (EvapAvail) && (OutDbTemp < RefrigRack(RackNum).BasinHeaterSetPointTemp)) {
+        if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+            if ((TotalRackDeliveredCapacity == 0.0) && (EvapAvail) && (OutDbTemp < this->BasinHeaterSetPointTemp)) {
                 TotalBasinHeatPower =
-                    max(0.0, RefrigRack(RackNum).BasinHeaterPowerFTempDiff * (RefrigRack(RackNum).BasinHeaterSetPointTemp - OutDbTemp));
+                    max(0.0, this->BasinHeaterPowerFTempDiff * (this->BasinHeaterSetPointTemp - OutDbTemp));
                 // provide warning if no heater power exists
                 if (TotalBasinHeatPower == 0.0) {
-                    // RefrigRack(RackNum)%EvapFreezeWarn = RefrigRack(RackNum)%EvapFreezeWarn + 1
-                    if (RefrigRack(RackNum).EvapFreezeWarnIndex == 0) {
-                        ShowWarningMessage("Refrigeration Compressor Rack " + RefrigRack(RackNum).Name +
+                    if (this->EvapFreezeWarnIndex == 0) {
+                        ShowWarningMessage("Refrigeration Compressor Rack " + this->Name +
                                            " - Evap cooling of condenser underway with no basin heater power");
                         ShowContinueError("and condenser inlet air dry-bulb temp at or below the basin heater setpoint temperature.");
                         ShowContinueErrorTimeStamp("Continuing simulation.");
                     } // EvapFreezeWarnIndex == 0
-                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + RefrigRack(RackNum).Name +
+                    ShowRecurringWarningErrorAtEnd("Refrigeration Compressor Rack " + this->Name +
                                                        " - Evap cooling of condenser underway with no basin heater power ... continues",
-                                                   RefrigRack(RackNum).EvapFreezeWarnIndex);
+                                                   this->EvapFreezeWarnIndex);
                     // END IF
                 } // TotalBasinHeatPower == 0 when at outdoor freezing conditions
             }     // cap
@@ -9595,10 +9583,10 @@ namespace RefrigeratedCase {
         // add in compressor and condenser fan power to rack heat rejection variables if the heat rejection location is to the zone
         //   if walk-ins are served by rack, user must specify heat rejection zone and 100% of heat
         //   rejection goes to that zone - that is, no condenser heat rejection goes to the HVAC return air
-        if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+        if (this->HeatRejectionLocation == LocationZone) {
             TotalCondenserHeat = TotalRackDeliveredCapacity + TotalCompressorPower + TotalCondenserFanPower;
             if (HeatRejectZoneNum > 0 && TotalRackDeliveredCapacity > 0.0) {
-                if (RefrigRack(RackNum).NumWalkIns == 0) {
+                if (this->NumWalkIns == 0) {
                     //       rack report variables for condenser heat to Zone and/or HVAC
                     //       The difference between TotalHeatRejectedToZone and TotalRackDeliveredCapacity is the heat sent to return air
                     RackSenCreditToZone = TotalCondenserHeat * (TotalHeatRejectedToZone / TotalRackDeliveredCapacity);
@@ -9615,7 +9603,7 @@ namespace RefrigeratedCase {
         }     // rack heat rejection to zone
     }
 
-    void ReportRackSystem(int const RackNum)
+    void RefrigRackData::ReportRackSystem(int const RackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9630,37 +9618,37 @@ namespace RefrigeratedCase {
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
-        RefrigRack(RackNum).RackCompressorPower = TotalCompressorPower;
-        RefrigRack(RackNum).RackElecConsumption = TotalCompressorPower * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).ActualCondenserFanPower = TotalCondenserFanPower;
-        RefrigRack(RackNum).CondenserFanConsumption = TotalCondenserFanPower * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).RackCapacity = TotalRackDeliveredCapacity;
-        RefrigRack(RackNum).RackCoolingEnergy = TotalRackDeliveredCapacity * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).RackCompressorCOP = CompressorCOPactual;
-        RefrigRack(RackNum).SensHVACCreditHeatRate = RackSenCreditToHVAC;
-        RefrigRack(RackNum).SensHVACCreditHeat = RackSenCreditToHVAC * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).SensZoneCreditHeatRate = RackSenCreditToZone;
-        RefrigRack(RackNum).SensZoneCreditHeat = RackSenCreditToZone * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).EvapWaterConsumpRate = TotalEvapWaterUseRate;
-        RefrigRack(RackNum).EvapWaterConsumption = TotalEvapWaterUseRate * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).ActualEvapPumpPower = TotalCondenserPumpPower;
-        RefrigRack(RackNum).EvapPumpConsumption = TotalCondenserPumpPower * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).BasinHeaterPower = TotalBasinHeatPower;
-        RefrigRack(RackNum).BasinHeaterConsumption = TotalBasinHeatPower * LocalTimeStep * DataGlobals::SecInHour;
-        RefrigRack(RackNum).CondLoad = TotalCondenserHeat;
-        RefrigRack(RackNum).CondEnergy = TotalCondenserHeat * LocalTimeStep * DataGlobals::SecInHour;
+        this->RackCompressorPower = TotalCompressorPower;
+        this->RackElecConsumption = TotalCompressorPower * LocalTimeStep * DataGlobals::SecInHour;
+        this->ActualCondenserFanPower = TotalCondenserFanPower;
+        this->CondenserFanConsumption = TotalCondenserFanPower * LocalTimeStep * DataGlobals::SecInHour;
+        this->RackCapacity = TotalRackDeliveredCapacity;
+        this->RackCoolingEnergy = TotalRackDeliveredCapacity * LocalTimeStep * DataGlobals::SecInHour;
+        this->RackCompressorCOP = CompressorCOPactual;
+        this->SensHVACCreditHeatRate = RackSenCreditToHVAC;
+        this->SensHVACCreditHeat = RackSenCreditToHVAC * LocalTimeStep * DataGlobals::SecInHour;
+        this->SensZoneCreditHeatRate = RackSenCreditToZone;
+        this->SensZoneCreditHeat = RackSenCreditToZone * LocalTimeStep * DataGlobals::SecInHour;
+        this->EvapWaterConsumpRate = TotalEvapWaterUseRate;
+        this->EvapWaterConsumption = TotalEvapWaterUseRate * LocalTimeStep * DataGlobals::SecInHour;
+        this->ActualEvapPumpPower = TotalCondenserPumpPower;
+        this->EvapPumpConsumption = TotalCondenserPumpPower * LocalTimeStep * DataGlobals::SecInHour;
+        this->BasinHeaterPower = TotalBasinHeatPower;
+        this->BasinHeaterConsumption = TotalBasinHeatPower * LocalTimeStep * DataGlobals::SecInHour;
+        this->CondLoad = TotalCondenserHeat;
+        this->CondEnergy = TotalCondenserHeat * LocalTimeStep * DataGlobals::SecInHour;
         // Set total rack heat rejection used for heat reclaim. Do not allow heat reclaim on stand alone (indoor) display cases.
-        if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+        if (this->HeatRejectionLocation == LocationZone) {
             DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = 0.0;
         } else {
             DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = TotalRackDeliveredCapacity * (1.0 + 1.0 / CompressorCOPactual);
         }
 
         // set water system demand request (if needed)
-        if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            int DemandARRID = RefrigRack(RackNum).EvapWaterTankDemandARRID;
-            int RackTankID = RefrigRack(RackNum).EvapWaterSupTankID;
-            DataWater::WaterStorage(RackTankID).VdotRequestDemand(DemandARRID) = RefrigRack(RackNum).EvapWaterConsumpRate;
+        if (this->EvapWaterSupplyMode == WaterSupplyFromTank) {
+            int DemandARRID = this->EvapWaterTankDemandARRID;
+            int RackTankID = this->EvapWaterSupTankID;
+            DataWater::WaterStorage(RackTankID).VdotRequestDemand(DemandARRID) = this->EvapWaterConsumpRate;
         }
 
         SumZoneImpacts();
@@ -14184,7 +14172,7 @@ namespace RefrigeratedCase {
         for (int CoilIndex = 1; CoilIndex <= this->NumCoils; ++CoilIndex) {
             int CoilID = this->CoilNum(CoilIndex);
 
-            CalculateCoil(CoilID, RemainQZNReqSens);
+            WarehouseCoil(CoilID).CalculateCoil(RemainQZNReqSens);
             RemainQZNReqSens += WarehouseCoil(CoilID).SensCreditRate;
             // should be a negative minus a negative, so a smaller negative, that is, going toward zero, but senscoolingenergyrate expressed as
             // positive  Need to go over all the coils so that the defrosts occur on schedule, even when the chiller isn't called for at that
@@ -14273,9 +14261,7 @@ namespace RefrigeratedCase {
         } // DeRate == true
     }
 
-    void CalculateCoil(int const CoilID,
-                       Real64 const QZnReq // sensible load required
-    )
+    void WarehouseCoilData::CalculateCoil(Real64 const QZnReq)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14311,33 +14297,24 @@ namespace RefrigeratedCase {
 
         static std::string const TrackMessage("from RefrigeratedCase:CalculateCoil");
 
-        // GET SCHEDULES
-        auto &warehouse_coil(WarehouseCoil(CoilID));
-
-        Real64 CoilSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.SchedPtr); // Current value of Coil operating (availability) schedule
+        Real64 CoilSchedule = ScheduleManager::GetCurrentScheduleValue(this->SchedPtr); // Current value of Coil operating (availability) schedule
         if (CoilSchedule <= 0.0) return;
 
-        Real64 DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostSchedPtr); // Coil defrost schedule, between 0 and 1
-        Real64 DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.DefrostDripDownSchedPtr); // Coil drip-down schedule (allows coil to drain after defrost)
+        Real64 DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostSchedPtr); // Coil defrost schedule, between 0 and 1
+        Real64 DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(this->DefrostDripDownSchedPtr); // Coil drip-down schedule (allows coil to drain after defrost)
         // next statement In case user doesn't understand concept of drip down schedule
         DefrostDripDownSchedule = max(DefrostDripDownSchedule, DefrostSchedule);
         // next value optional, so set to default before checking for schedule
         Real64 HeaterSchedule = 1.0; // zero to one
-        if (warehouse_coil.HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(warehouse_coil.HeaterSchedPtr);
+        if (this->HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(this->HeaterSchedPtr);
 
         // Set local subroutine variables for convenience
-        int ZoneNodeNum = warehouse_coil.ZoneNodeNum; // Zone node number
-        int SHRCorrectionType = warehouse_coil.SHRCorrectionType;  // SHR60, QuadraticSHR, European, or TabularRH_DT1_TRoom
-        int SHRCorrectionCurvePtr = warehouse_coil.SHRCorrectionCurvePtr;
-        int FanSpeedControlType = warehouse_coil.FanType;
-        Real64 AirVolumeFlowRated = warehouse_coil.RatedAirVolumeFlow; // Coil rated air flow (m3/s)
-        Real64 FanPowerRated = warehouse_coil.RatedFanPower; // (W)
-        Real64 HeaterLoad = warehouse_coil.HeaterPower * HeaterSchedule; // Total heater (except defrost) energy rate (W)
-        Real64 DefrostCap = warehouse_coil.DefrostCapacity; // Design defrost capacity of Coil (W)
-        Real64 TEvap = warehouse_coil.TEvapDesign; // Evaporating temperature in the coil (C)
-        Real64 SHRCorrection60 = warehouse_coil.SHRCorrection60; // Total capacity as a fraction of sensible capacity at a SHR of 0.6, entered by user
-        Real64 FanMinAirFlowRatio = warehouse_coil.FanMinAirFlowRatio;  // From input
-        Real64 MaxTemperatureDif = warehouse_coil.MaxTemperatureDif;  // Used to limit capacity during initial pulldown (deltaC)
+        int FanSpeedControlType = this->FanType;
+        Real64 AirVolumeFlowRated = this->RatedAirVolumeFlow; // Coil rated air flow (m3/s)
+        Real64 FanPowerRated = this->RatedFanPower; // (W)
+        Real64 HeaterLoad = this->HeaterPower * HeaterSchedule; // Total heater (except defrost) energy rate (W)
+        Real64 DefrostCap = this->DefrostCapacity; // Design defrost capacity of Coil (W)
+        Real64 TEvap = this->TEvapDesign; // Evaporating temperature in the coil (C)
 
         Real64 CoilCapTotEstimate(0.0);     // Part of loop to solve for total coil capacity as a function of inlet air conditions (W)
         Real64 AirVolumeFlowMax(0.0);       // Coil air flow limited by drip down schedule (m3/s)
@@ -14352,7 +14329,7 @@ namespace RefrigeratedCase {
         Real64 DryAirMassFlowMax(0.0);       // Rated volume flow rate times dry air density adjusted for schedules (kg/s)
         Real64 FanPowerActual(0.0);          // (W)
         Real64 FrostChangekg(0.0);           // Amount of frost added or melted  (kg)
-        Real64 LatLoadServed(0.0);           // Energy rate used to remove water from zone air (W)
+        Real64 latLoadServed(0.0);           // Energy rate used to remove water from zone air (W)
         Real64 SensLoadRequestedGross(0.0); // Gross sensible load removed by coil
         Real64 SensLoadGross(0.0);          // Sensible load met by coil (W)
         Real64 SHR(0.0);                    // Sensible heat ratio, sensible load/total load
@@ -14370,8 +14347,8 @@ namespace RefrigeratedCase {
                 DryAirMassFlowMax = 0.0;
             } else {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
-                Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(ZoneNodeNum).Temp; // (C)
-                Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
+                Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(this->ZoneNodeNum).Temp; // (C)
+                Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
                 Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);  // relative humidity of mixed air in the zone expressed as a fraction from 0 to 1
                 Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage); // J/kg
                 Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage); // kg/m3
@@ -14381,7 +14358,7 @@ namespace RefrigeratedCase {
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
                 // calc RH inlet to coil assuming at middle/mixed point in room
                 // calc coilcap, sens and latent, available as f(inlet T,RH)
-                switch (WarehouseCoil(CoilID).VerticalLocation) {
+                switch (this->VerticalLocation) {
                 case Floor:
                     // purposely fall through
                 case Ceiling:
@@ -14403,24 +14380,24 @@ namespace RefrigeratedCase {
 
         if (AirVolumeFlowMax > 0.0) {
 
-            Real64 TemperatureDif = min(MaxTemperatureDif, (CoilInletTemp - TEvap)); // difference between inlet air and evaporating temperature (deltaC)
+            Real64 TemperatureDif = min(this->MaxTemperatureDif, (CoilInletTemp - TEvap)); // difference between inlet air and evaporating temperature (deltaC)
 
-            if (warehouse_coil.RatingType == RatedCapacityTotal) {
+            if (this->RatingType == RatedCapacityTotal) {
                 // RatingType = CapacityTotalSpecificConditions, will be doing a table lookup
                 //    based upon RHInlet, DT1, CoilInletTemperature - see excel files from B. Nelson, CoilCom
                 //    In the table, X1== inlet air dry bulb temperature
                 //                  X2== Difference between inlet T and evap T
                 //                  X3== RH expressed as decimal
-                CoilCapTotEstimate = CurveManager::CurveValue(SHRCorrectionCurvePtr, CoilInletTemp, TemperatureDif, CoilInletRHFrac) *
-                                     warehouse_coil.RatedCapTotal * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
+                CoilCapTotEstimate = CurveManager::CurveValue(this->SHRCorrectionCurvePtr, CoilInletTemp, TemperatureDif, CoilInletRHFrac) *
+                                     this->RatedCapTotal * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
 
             } else { // work with unit load factor (sensible only), function of DT1 (Tair in drybulb-Tevap)
-                Real64 SensibleCapacityMax = warehouse_coil.UnitLoadFactorSens * TemperatureDif * (1.0 - DefrostDripDownSchedule) * CoilSchedule; // Sensible capacity adjusted for any time in dripdown state (W)
+                Real64 SensibleCapacityMax = this->UnitLoadFactorSens * TemperatureDif * (1.0 - DefrostDripDownSchedule) * CoilSchedule; // Sensible capacity adjusted for any time in dripdown state (W)
 
                 if (SensibleCapacityMax > 0.0) {
                     Real64 ExitTemperatureEstimate = CoilInletTemp - (SensibleCapacityMax / (DryAirMassFlowMax * CoilInletDryAirCp)); // Estimated Air temperature leaving the coil (C)
                     if (ExitTemperatureEstimate <= TEvap) {
-                        ShowWarningError(TrackMessage + "Refrigeration:AirCoil: " + warehouse_coil.Name);
+                        ShowWarningError(TrackMessage + "Refrigeration:AirCoil: " + this->Name);
                         ShowContinueError(" The estimated air outlet temperature is less than the evaporating temperature.");
                     }
                     Real64 ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(ExitTemperatureEstimate, 1.0, DataEnvironment::OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
@@ -14440,14 +14417,14 @@ namespace RefrigeratedCase {
                     }
 
                     {
-                        auto const SELECT_CASE_var(SHRCorrectionType);
+                        auto const SELECT_CASE_var(this->SHRCorrectionType);
                         if (SELECT_CASE_var == SHR60) {
                             // line from y = SHRCorrection60 value to 1. as x(SHR) goes from .6 to 1, from B. Nelson, ASHRAE August 2010
-                            Real64 Slope = (SHRCorrection60 - 1.0) / (0.6 - 1.0); // Part of linear SHR60 correction factor, dimensionless
-                            Real64 Yint = SHRCorrection60 - (Slope * 0.6); // Part of linear SHR60 correction factor, dimensionless
+                            Real64 Slope = (this->SHRCorrection60 - 1.0) / (0.6 - 1.0); // Part of linear SHR60 correction factor, dimensionless
+                            Real64 Yint = this->SHRCorrection60 - (Slope * 0.6); // Part of linear SHR60 correction factor, dimensionless
                             SHRCorrection = Slope * SHR + Yint;
                         } else if (SELECT_CASE_var == QuadraticSHR) {
-                            SHRCorrection = CurveManager::CurveValue(SHRCorrectionCurvePtr, SHR);
+                            SHRCorrection = CurveManager::CurveValue(this->SHRCorrectionCurvePtr, SHR);
                         } else if (SELECT_CASE_var == European) {
                             // With European ratings, either start with rated total sensible capacity or rated total capacity
                             //    If rated total capacity is used, 'get input'
@@ -14489,18 +14466,18 @@ namespace RefrigeratedCase {
                 Real64 ExitHumRatio = Psychrometrics::PsyWFnTdbH(ExitTemperature, ExitEnthalpy, TrackMessage);  // kg water/kg air
                 if (ExitHumRatio > CoilInletHumRatio) ExitHumRatio = CoilInletHumRatio;
                 WaterRemovRate = DryAirMassFlowMax * (CoilInletHumRatio - ExitHumRatio);
-                LatLoadServed = WaterRemovRate * IcetoVaporEnthalpy;
-                SensLoadGross = CoilCapTotEstimate - LatLoadServed;
+                latLoadServed = WaterRemovRate * IcetoVaporEnthalpy;
+                SensLoadGross = CoilCapTotEstimate - latLoadServed;
                 FanPowerActual = FanPowerRated;
                 if (SensLoadGross < 0.0) {
                     // Could rarely happen during initial cooldown of a warm environment
                     SensLoadGross = 0.0;
-                    LatLoadServed = CoilCapTotEstimate;
-                    WaterRemovRate = LatLoadServed / IcetoVaporEnthalpy;
+                    latLoadServed = CoilCapTotEstimate;
+                    WaterRemovRate = latLoadServed / IcetoVaporEnthalpy;
                 }    // SensLoadGross < 0
             } else { // NOT (SensibleCapacityMax > 0.0d0)
                 WaterRemovRate = 0.0;
-                LatLoadServed = 0.0;
+                latLoadServed = 0.0;
                 SensLoadGross = 0.0;
                 FanPowerActual = 0.0;
             } //(CoilCapTotEstimate > 0.0d0)
@@ -14510,7 +14487,7 @@ namespace RefrigeratedCase {
                 // don't need full chiller power, reduce fan speed to reduce air flow
                 // move fan to part power if need to
                 Real64 CapFac = SensLoadRequestedGross / SensLoadGross;  // used to reduce fan power when don't need full coil capacity
-                Real64 AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, EvaporatorAirVolExponent)); // used when operating at part load
+                Real64 AirVolRatio = max(this->FanMinAirFlowRatio, std::pow(CapFac, EvaporatorAirVolExponent)); // used when operating at part load
                 // Fans limited by minimum air flow ratio
 
                 {
@@ -14537,13 +14514,13 @@ namespace RefrigeratedCase {
                 // reduce latent capacity according to value called for for sensible  - recalc latent.
                 //   recalc coilcaptotal
                 WaterRemovRate *= AirVolRatio;
-                LatLoadServed = WaterRemovRate * IcetoVaporEnthalpy;
+                latLoadServed = WaterRemovRate * IcetoVaporEnthalpy;
                 SensLoadGross = SensLoadRequestedGross;
             } else { // at full load
                 FanPowerActual = FanPowerMax;
             } // part load and sensload served > 0.
 
-            CoilCapTotal = SensLoadGross + LatLoadServed;
+            CoilCapTotal = SensLoadGross + latLoadServed;
             if (CoilCapTotal > 0.0) {
                 SHR = SensLoadGross / CoilCapTotal;
             } else {
@@ -14555,13 +14532,13 @@ namespace RefrigeratedCase {
             //         avoid accumulation during warm-up to avoid reverse dd test problem
             if (!DataGlobals::WarmupFlag) {
                 FrostChangekg = (WaterRemovRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-                warehouse_coil.KgFrost += FrostChangekg;
+                this->KgFrost += FrostChangekg;
             }
 
         } else { // NOT (AirVolumeFlowMax > 0.0d0)
             CoilCapTotEstimate = 0.0;
             WaterRemovRate = 0.0;
-            LatLoadServed = 0.0;
+            latLoadServed = 0.0;
             FrostChangekg = 0.0;
             SensLoadGross = 0.0;
             FanPowerActual = 0.0;
@@ -14572,30 +14549,29 @@ namespace RefrigeratedCase {
         //                     in starting IF are there to mimic temperature override
         //                     on the coils that stops defrost if the coils get above
         //                     a certain temperature (such as when there's no load and no ice)
-        if ((DefrostSchedule > 0.0) && (warehouse_coil.DefrostType != DefrostNone) && (warehouse_coil.DefrostType != DefrostOffCycle)) {
+        if ((DefrostSchedule > 0.0) && (this->DefrostType != DefrostNone) && (this->DefrostType != DefrostOffCycle)) {
             DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
             Real64 DefrostEnergy = DefrostLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour; // Joules
-            Real64 StartFrostKg = warehouse_coil.KgFrost; // frost load at start of time step (kg of ice)
+            Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
 
-            if (warehouse_coil.DefrostControlType == DefrostContTempTerm) {
+            if (this->DefrostControlType == DefrostContTempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
                 //  Some goes to misc losses (for fluid defrost, some coil areas bare earlier than
                 //  others and xfer heat to environment)
                 //  Assume full ice melting satisfies temperature control.
                 //      (defaults for DefEnergyFraction are :=0.7 for elec, =0.3 for fluids)
-                Real64 DefEnergyFraction = warehouse_coil.DefEnergyFraction; // dimensionless
-                Real64 AvailDefrostEnergy = DefEnergyFraction * DefrostEnergy; // available to melt ice with temp term control (J)
+                Real64 AvailDefrostEnergy = this->DefEnergyFraction * DefrostEnergy; // available to melt ice with temp term control (J)
                 Real64 IceSensHeatNeeded = 0.0; // Energy to raise frost temperature to 0C, used w/ temp termination (J)
                 if (StartFrostKg > 0.0) {
-                    if (warehouse_coil.IceTemp < 0.0) {
-                        Real64 StartIceTemp = warehouse_coil.IceTemp; // Frost temperature at start of time step [C]
+                    if (this->IceTemp < 0.0) {
+                        Real64 StartIceTemp = this->IceTemp; // Frost temperature at start of time step [C]
                         IceSensHeatNeeded = StartFrostKg * SpecificHeatIce * (0.0 - StartIceTemp); // Joules
                         if (AvailDefrostEnergy >= IceSensHeatNeeded) {
-                            warehouse_coil.IceTemp = 0.0;
+                            this->IceTemp = 0.0;
                             AvailDefrostEnergy -= IceSensHeatNeeded; // Joules
                         } else {                                     // DefrostEnergy < IceSensHeatNeeded
-                            warehouse_coil.IceTemp = StartIceTemp + AvailDefrostEnergy / (SpecificHeatIce * StartFrostKg);
+                            this->IceTemp = StartIceTemp + AvailDefrostEnergy / (SpecificHeatIce * StartFrostKg);
                             AvailDefrostEnergy = 0.0;
                         } // AvailDefrostEnergy >= IceSensHeatNeeded
                     }     // IceTemp < 0,  need to raise temperature of ice
@@ -14603,26 +14579,26 @@ namespace RefrigeratedCase {
                     FrostChangekg = min(AvailDefrostEnergy / IceMeltEnthalpy, StartFrostKg);
                     if (FrostChangekg < StartFrostKg) {
                         DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobals::SecInHour;
-                        if (!DataGlobals::WarmupFlag) warehouse_coil.KgFrost = StartFrostKg - FrostChangekg;
+                        if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
                         // DefrostSchedule not changed because ice not all melted, temp term not triggered
                     } else { // all frost melted during time step, so need to terminate defrost
                         //  see Aug 8 2010 page 3 notes
-                        warehouse_coil.KgFrost = 0.0;
+                        this->KgFrost = 0.0;
                         Real64 DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
-                                              DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
+                                this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
                         DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour)));
                         // reduce heat load on warehouse by energy put into ice melting
                         // Defrost load that actually goes to melting ice (W)
                         Real64 DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
                         DefrostLoad = max(0.0, (DefrostSchedule * DefrostCap - DefrostRateNeeded));
-                        warehouse_coil.IceTemp = warehouse_coil.TEvapDesign;
+                        this->IceTemp = this->TEvapDesign;
                     } // frost melted during time step less than amount of ice at start
                 } else {
                     // no frost present so terminate defrost and reset ice temperature for start of next defrost
                     // However, dripdown schedule still prevents/limits cooling capacity during time step
                     DefrostLoad = 0.0;
                     DefrostSchedule = 0.0;
-                    warehouse_coil.IceTemp = warehouse_coil.TEvapDesign;
+                    this->IceTemp = this->TEvapDesign;
                 } // have frost present
 
             } else {
@@ -14631,7 +14607,7 @@ namespace RefrigeratedCase {
                 // But DefrostSchedule not changed
                 FrostChangekg = max(0.0, min((DefrostEnergy / IceMeltEnthalpy), StartFrostKg));
                 DefrostLoad -= FrostChangekg * IceMeltEnthalpy / DataHVACGlobals::TimeStepSys / DataGlobals::SecInHour;
-                if (!DataGlobals::WarmupFlag) warehouse_coil.KgFrost = StartFrostKg - FrostChangekg;
+                if (!DataGlobals::WarmupFlag) this->KgFrost = StartFrostKg - FrostChangekg;
             } // Temperature termination vs. time-clock control type
 
         } else { // DefrostSchedule <= 0 or have None or OffCycle
@@ -14641,61 +14617,61 @@ namespace RefrigeratedCase {
         Real64 SensLoadFromZone = SensLoadGross - HeaterLoad - DefrostLoad - FanPowerActual; // Net sensible load removed from zone after accounting for heaters, fans, defrost [W]
 
         // ReportWarehouseCoil(CoilID)
-        warehouse_coil.ThermalDefrostPower = DefrostLoad;
-        if (warehouse_coil.DefrostType == DefrostElec) {
-            warehouse_coil.ElecDefrostConsumption = DefrostCap * DefrostSchedule * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            warehouse_coil.ElecDefrostPower = DefrostCap * DefrostSchedule;
+        this->ThermalDefrostPower = DefrostLoad;
+        if (this->DefrostType == DefrostElec) {
+            this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->ElecDefrostPower = DefrostCap * DefrostSchedule;
         } else {
-            warehouse_coil.ElecDefrostConsumption = 0.0;
-            warehouse_coil.ElecDefrostPower = 0.0;
+            this->ElecDefrostConsumption = 0.0;
+            this->ElecDefrostPower = 0.0;
         }
 
         // If hot brine or hot gas is used for defrost, need to reduce condenser load by heat reclaimed for defrost
-        if (warehouse_coil.DefrostType == DefrostFluid) warehouse_coil.HotDefrostCondCredit = DefrostCap * DefrostSchedule;
+        if (this->DefrostType == DefrostFluid) this->HotDefrostCondCredit = DefrostCap * DefrostSchedule;
         // LatentLoadServed is positive for latent heat removed from zone
         // SensLoadFromZone positive for heat REMOVED from zone, switch when do credit to zone
-        warehouse_coil.SensCreditRate = SensLoadFromZone;
-        warehouse_coil.SensCreditEnergy = SensLoadFromZone * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.LatCreditRate = LatLoadServed;
-        warehouse_coil.LatCreditEnergy = LatLoadServed * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.LatKgPerS_ToZone = WaterRemovRate;
-        warehouse_coil.TotalCoolingLoad = CoilCapTotal;
-        warehouse_coil.TotalCoolingEnergy = CoilCapTotal * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.SensCoolingEnergyRate = SensLoadGross;
-        warehouse_coil.SensCoolingEnergy = SensLoadGross * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.SensHeatRatio = SHR;
-        warehouse_coil.ElecFanPower = FanPowerActual;
-        warehouse_coil.ElecFanConsumption = FanPowerActual * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.ElecHeaterPower = HeaterLoad;
-        warehouse_coil.ElecHeaterConsumption = HeaterLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->SensCreditRate = SensLoadFromZone;
+        this->SensCreditEnergy = SensLoadFromZone * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->LatCreditRate = latLoadServed;
+        this->LatCreditEnergy = latLoadServed * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->LatKgPerS_ToZone = WaterRemovRate;
+        this->TotalCoolingLoad = CoilCapTotal;
+        this->TotalCoolingEnergy = CoilCapTotal * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->SensCoolingEnergyRate = SensLoadGross;
+        this->SensCoolingEnergy = SensLoadGross * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->SensHeatRatio = SHR;
+        this->ElecFanPower = FanPowerActual;
+        this->ElecFanConsumption = FanPowerActual * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ElecHeaterPower = HeaterLoad;
+        this->ElecHeaterConsumption = HeaterLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        warehouse_coil.TotalElecPower = FanPowerActual + HeaterLoad + warehouse_coil.ElecDefrostPower;
-        warehouse_coil.TotalElecConsumption = warehouse_coil.TotalElecPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->TotalElecPower = FanPowerActual + HeaterLoad + this->ElecDefrostPower;
+        this->TotalElecConsumption = this->TotalElecPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        if (warehouse_coil.SensCreditRate >= 0.0) {
-            warehouse_coil.ReportSensCoolCreditRate = warehouse_coil.SensCreditRate;
-            warehouse_coil.ReportHeatingCreditRate = 0.0;
+        if (this->SensCreditRate >= 0.0) {
+            this->ReportSensCoolCreditRate = this->SensCreditRate;
+            this->ReportHeatingCreditRate = 0.0;
         } else {
-            warehouse_coil.ReportSensCoolCreditRate = 0.0;
-            warehouse_coil.ReportHeatingCreditRate = -warehouse_coil.SensCreditRate;
+            this->ReportSensCoolCreditRate = 0.0;
+            this->ReportHeatingCreditRate = -this->SensCreditRate;
         }
-        warehouse_coil.ReportSensCoolCreditEnergy = warehouse_coil.ReportSensCoolCreditRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.ReportHeatingCreditEnergy = warehouse_coil.ReportHeatingCreditRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        warehouse_coil.ReportTotalCoolCreditRate = warehouse_coil.ReportSensCoolCreditRate + warehouse_coil.LatCreditRate;
-        warehouse_coil.ReportTotalCoolCreditEnergy = warehouse_coil.ReportSensCoolCreditEnergy + warehouse_coil.LatCreditEnergy;
+        this->ReportSensCoolCreditEnergy = this->ReportSensCoolCreditRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ReportHeatingCreditEnergy = this->ReportHeatingCreditRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        this->ReportTotalCoolCreditRate = this->ReportSensCoolCreditRate + this->LatCreditRate;
+        this->ReportTotalCoolCreditEnergy = this->ReportSensCoolCreditEnergy + this->LatCreditEnergy;
 
         //**************************************************************************************************
         // Cap Kg Frost to avoid floating overflow errors
         // 1-time warning is issued. It should be rare but could happen with unrealistic inputs.
 
-        if (warehouse_coil.KgFrost > MyLargeNumber) {
-            warehouse_coil.KgFrost = MyLargeNumber;
-            if (ShowCoilFrostWarning(CoilID)) {
-                ShowWarningError("Refrigeration:AirCoil: " + warehouse_coil.Name);
+        if (this->KgFrost > MyLargeNumber) {
+            this->KgFrost = MyLargeNumber;
+            if (this->ShowCoilFrostWarning) {
+                ShowWarningError("Refrigeration:AirCoil: " + this->Name);
                 ShowContinueError(" This refrigerated air coil has insufficient defrost capacity to remove the excess frost accumulation.");
                 ShowContinueError(" Check the defrost schedule or defrost capacity. ");
                 ShowContinueErrorTimeStamp("... Occurrence info");
-                ShowCoilFrostWarning(CoilID) = false;
+                this->ShowCoilFrostWarning = false;
             }
         }
     }
