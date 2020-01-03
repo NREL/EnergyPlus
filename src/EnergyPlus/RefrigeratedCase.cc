@@ -550,7 +550,6 @@ namespace RefrigeratedCase {
         // Inter-system heat transfer via subcoolers and cascade condensers can be accommodated.
         // Secondary refrigeration cycles are also available.
 
-        int RackNum;                     // Index to the refrigerated compressor rack being modeled
         static bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
 
         if (!ManageRefrigeration) return;
@@ -579,7 +578,7 @@ namespace RefrigeratedCase {
         if (!DataGlobals::BeginEnvrnFlag) MyOneTimeFlag = true;
 
         if (HaveRefrigRacks) {
-            for (RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
+            for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                 CalcRackSystem(RackNum);
                 ReportRackSystem(RackNum);
             }
@@ -687,8 +686,8 @@ namespace RefrigeratedCase {
         int NumNumbers(0);                     // Number of Numbers for each GetObjectItem call
         int NumDisplayCases(0);                // Counter for refrigerated cases in GetInput do loop
         int NumWalkIns(0);                     // Number of walk ins
+        int RefrigSysNum(0);
         int RefrigIndex(0);       // Index used in fluid property routines
-        int RefrigSysNum(0);      // Index of refrigeration system
         Real64 DeltaHPhaseChange(0.0);        // Secondary loop enthalpy change in condenser w overfeed system (J/g)
         Real64 DelTempMin(0.0);               // min temperature for heat rej curve for air cooled condenser (C)
         Real64 DelTempMax(0.0);               // max temperature for heat rej curve for air cooled condenser (C)
@@ -5562,7 +5561,7 @@ namespace RefrigeratedCase {
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
                                     "\", has an incorrect System Type specified as \"" + Alphas(2) + "\".");
-                    ShowContinueError("  System type must be specified as \"SingleStage\" or \"TwoStage\".");
+                    ShowContinueError(R"(  System type must be specified as "SingleStage" or "TwoStage".)");
                     ErrorsFound = true;
                 }
 
@@ -5576,13 +5575,13 @@ namespace RefrigeratedCase {
                 } else if (lAlphaBlanks(3) && TransSystem(TransRefrigSysNum).TransSysType == 1) {
                     // No medium temperature loads specified for a SingleStage system - display error
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
-                                    "\", is a \"SingleStage\" system but no medium temperature loads are specified.");
+                                    R"(", is a "SingleStage" system but no medium temperature loads are specified.)");
                     ShowContinueError("  The system must have at least one " + cAlphaFieldNames(3) + " object attached.");
                     ErrorsFound = true;
                 } else if (lAlphaBlanks(4) && TransSystem(TransRefrigSysNum).TransSysType == 2) {
                     // No low temperature loads specified for a TwoStage system - display error
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
-                                    "\", is a \"TwoStage\" system but no low temperature loads are specified.");
+                                    R"(", is a "TwoStage" system but no low temperature loads are specified.)");
                     ShowContinueError("  The system must have at least one " + cAlphaFieldNames(4) + " object attached.");
                     ErrorsFound = true;
                 }
@@ -9378,11 +9377,6 @@ namespace RefrigeratedCase {
         // "Impact of ASHRAE Standard 62-1989 on Florida Supermarkets",
         //  Florida Solar Energy Center, FSEC-CR-910-96, Final Report, Oct. 1996
 
-        int CaseID;  // Index to absolute case ID
-        int CaseNum; // Index to refrigerated case attached to rack
-        int WalkInID;                     // Index to absolute walk-in ID
-        int WalkInIndex;                  // Index to walk-in attached to rack
-        int NumCases;                     // Total number of refrigerated cases attached to rack
         Real64 COPFTempOutput;            // Curve value for COPFTemp curve object
         Real64 CondenserFrac;             // Fraction of condenser power as a function of outdoor temperature
         Real64 TotalHeatRejectedToZone;   // Total compressor and condenser fan heat rejected to zone (based on CaseRAFactor)
@@ -9396,7 +9390,6 @@ namespace RefrigeratedCase {
         Real64 BPress;                    // Barometric pressure at condenser air inlet node [Pa]
         bool EvapAvail;                   // Control for evap condenser availability
 
-        NumCases = RefrigRack(RackNum).NumCases;
         TotalRackDeliveredCapacity = 0.0;
         CompressorCOPactual = 0.0;
         TotalCompressorPower = 0.0;
@@ -9439,9 +9432,9 @@ namespace RefrigeratedCase {
             } // NumCoils systems
         }     // System(SysNum)%NumCoils > 0
 
-        if (NumCases > 0) {
-            for (CaseNum = 1; CaseNum <= NumCases; ++CaseNum) {
-                CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
+        if (RefrigRack(RackNum).NumCases > 0) {
+            for (int CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
+                int CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
                 CalculateCase(CaseID);
 
                 //   add evaporator load for all cases connected to rack
@@ -9468,8 +9461,8 @@ namespace RefrigeratedCase {
         }     // Numcases on rack > 0
 
         if (RefrigRack(RackNum).NumWalkIns > 0) {
-            for (WalkInIndex = 1; WalkInIndex <= RefrigRack(RackNum).NumWalkIns; ++WalkInIndex) {
-                WalkInID = RefrigRack(RackNum).WalkInNum(WalkInIndex);
+            for (int WalkInIndex = 1; WalkInIndex <= RefrigRack(RackNum).NumWalkIns; ++WalkInIndex) {
+                int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInIndex);
                 CalculateWalkIn(WalkInID);
                 TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
                 if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
@@ -10161,15 +10154,13 @@ namespace RefrigeratedCase {
         // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
 
         static std::string const RoutineName("SimRefrigCondenser");
-        int PlantInletNode(0); // Autodesk:Init
+        int PlantInletNode(0);
         int PlantOutletNode(0);
-        int PlantLoopIndex(0); // Autodesk:Init
+        int PlantLoopIndex(0);
         int PlantLoopSideIndex(0);
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
-        int Num(0); // local index //Autodesk:Init
-        Real64 rho; // local fluid density
-        Real64 Cp;  // local fluid specific heat
+        int Num(0);
 
         if (CompIndex == 0) {
             {
@@ -10300,8 +10291,8 @@ namespace RefrigeratedCase {
         // Make demand request on first HVAC iteration
 
         // get cooling fluid properties
-        rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
-        Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
         // first determine desired flow
         Real64 OutletTemp(0.0);
@@ -11279,26 +11270,20 @@ namespace RefrigeratedCase {
         Real64 HRCFFullFlow;           // Heat Rejection Capacity Factor at full air flow
         Real64 HumRatIn;               // Humidity ratio of inlet air to condenser [kg/kg]
         Real64 HumRatOut;              // Humidity ratio of outlet air from condenser (assumed saturated) [kg/kg]
-        Real64 LocalTimeStep;          // Set equal to either DataHVACGlobals::TimeStepSys or DataGlobals::TimeStepZone
         Real64 OutWbTemp(0.0);         // Outdoor wet bulb temp at condenser air inlet node [C]
         Real64 OutDbTemp;              // Outdoor dry bulb temp at condenser air inlet node [C]
         Real64 PurgeRate;              // Rate of water blow-down/bleed/purge in evap condenseer (m3/s)
         Real64 RatedFanPower;          // local variable equal to input condenser value
         Real64 RatedAirFlowRate;       // local variable equal to input condenser value
-        Real64 QuadBterm;              // calculation step in solving quadratic equation for hrcf
-        Real64 Sqrtterm;               // calculation step in solving quadratic equation for hrcf
         Real64 SinkTemp;               // Heat sink temperature used to derate fan power at reduced loads [C]
-        Real64 TAirOut;                // Temperature of air leaving condenser [C]
         Real64 TCondCalc;              // Calculated Condensing temperature
         Real64 TotalCondDefrostCredit; // total cond credit from hot gas/brine defr for cases etc. served
         //     directly by all systems served by this condenser [W]
         Real64 TotalCondDefCredfromSysID;    // cond credit for single system [W]
-        Real64 TotalLoadFromSysID;           // total heat rejection load from a single detailed system [W]
         Real64 TotalLoadFromThisSystem(0.0); // total heat rejection load from the detailed system id'd in subroutine call [W]
         Real64 TotalLoadFromSystems;         // total heat rejection load from all systems served by this condenser [W]
-        Real64 CurMaxCapacity;               // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
 
-        LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Initialize this condenser for this time step
@@ -11331,7 +11316,8 @@ namespace RefrigeratedCase {
             SystemID = condenser.SysNum(Sysloop);
             TotalCondDefCredfromSysID = System(SystemID).TotalCondDefrostCredit + System(SystemID).SumCascadeCondCredit;
             TotalCondDefrostCredit += TotalCondDefCredfromSysID;
-            TotalLoadFromSysID = System(SystemID).TotalSystemLoad + System(SystemID).TotCompPower + System(SystemID).TotHiStageCompPower +
+            // total heat rejection load from a single detailed system [W]
+            Real64 TotalLoadFromSysID = System(SystemID).TotalSystemLoad + System(SystemID).TotCompPower + System(SystemID).TotHiStageCompPower +
                                  System(SystemID).PipeHeatLoad;
             TotalLoadFromSystems += TotalLoadFromSysID;
             if (SystemID == SysNum) TotalLoadFromThisSystem = TotalLoadFromSysID;
@@ -11473,15 +11459,16 @@ namespace RefrigeratedCase {
                 TCondCalc = System(SysNum).TCondenseMin;
                 // recalculate CapFac at current delta T
                 if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
-                    CurMaxCapacity = CurveManager::CurveValue(condenser.CapCurvePtr, (System(SysNum).TCondenseMin - OutDbTemp));
+                    // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
+                    Real64 CurMaxCapacity = CurveManager::CurveValue(condenser.CapCurvePtr, (System(SysNum).TCondenseMin - OutDbTemp));
                     CapFac = TotalCondenserHeat / CurMaxCapacity;
                     AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry)); // Fans limited by minimum air flow ratio
                     AirVolRatio = min(AirVolRatio, 1.0);
                 } else { // condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap
                     HRCFFullFlow = HRCF;
                     // if evap condenser need to back calculate the operating capacity using HRCF relationship, given known Tcond
-                    QuadBterm = condenser.EvapCoeff1 - (System(SysNum).TCondense - SinkTemp) + condenser.EvapCoeff4 * SinkTemp;
-                    Sqrtterm = pow_2(QuadBterm) - 4.0 * condenser.EvapCoeff2 * condenser.EvapCoeff3;
+                    Real64 QuadBterm = condenser.EvapCoeff1 - (System(SysNum).TCondense - SinkTemp) + condenser.EvapCoeff4 * SinkTemp;
+                    Real64 Sqrtterm = pow_2(QuadBterm) - 4.0 * condenser.EvapCoeff2 * condenser.EvapCoeff3;
                     if (Sqrtterm < 0.0) { // only happens for very high wet bulb temps
                         HRCF = condenser.EvapElevFact * condenser.MaxCapFacEvap;
                         if (!EvapAvail) HRCF /= 3.0;
@@ -11537,7 +11524,7 @@ namespace RefrigeratedCase {
                 Effectiveness = min(Effectiveness, 0.9);
                 EnthalpyAirOut = EnthalpyAirIn + Effectiveness * (EnthalpyAtTcond - EnthalpyAirIn);
                 // Air leaving the evaporative condenser is saturated
-                TAirOut = Psychrometrics::PsyTsatFnHPb(EnthalpyAirOut, BPress);
+                Real64 TAirOut = Psychrometrics::PsyTsatFnHPb(EnthalpyAirOut, BPress);
                 HumRatOut = Psychrometrics::PsyWFnTdpPb(TAirOut, BPress);
                 TotalEvapWaterUseRate = PurgeRate + RatedAirFlowRate * AirVolRatio * AirDensityDry * (HumRatOut - HumRatIn) / Psychrometrics::RhoH2O(OutWbTemp);
                 // assumes evap water pump runs whenever evap cooling is available to minimize scaling
@@ -11651,15 +11638,10 @@ namespace RefrigeratedCase {
         static std::string const RoutineName("RefrigeratedCase:CalcGasCooler");
 
         int GasCoolerCreditWarnIndex;     // Warning counter
-        int GasCoolerID;                  // Gas cooler number
-        int Sysloop;                      // Counter over number of systems attached to this gas cooler
-        int SystemID;                     // System number rejecting heat to this gas cooler
         Real64 ActualFanPower;            // Fan power after adjustments for partially loaded gas cooler [W]
         Real64 AirVolRatio;               // Ratio of air volume needed to remove load relative to design load
-        Real64 CapFac;                    // Capacity factor
         Real64 FanMinAirFlowRatio;        // Minimum fan air flow ratio
         Real64 FanPowerRatio;             // Calculated fan power ratio
-        Real64 LocalTimeStep;             // Set equal to either DataHVACGlobals::TimeStepSys or DataGlobals::TimeStepZone
         Real64 OutDbTemp;                 // Outdoor dry bulb temperature at gas cooler air inlet node [C]
         Real64 RatedFanPower;             // Rated fan power for this gas cooler [W]
         Real64 TotalCondDefCredfromSysID; // Gas cooler defrost credit for single system [W]
@@ -11670,7 +11652,7 @@ namespace RefrigeratedCase {
         Real64 TotalLoadFromSystems;         // Total heat rejection load from all systems served by this condenser [W]
         Real64 TotalLoadFromThisSystem(0.0); // Total heat rejection load from the detailed system identified in subroutine call [W]
 
-        LocalTimeStep = DataGlobals::TimeStepZone;
+        Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         //! Initialize this gas cooler for this time step
@@ -11678,13 +11660,13 @@ namespace RefrigeratedCase {
         ActualFanPower = 0.0;
         TotalCondDefrostCredit = 0.0;
         TotalLoadFromSystems = 0.0;
-        GasCoolerID = TransSystem(SysNum).GasCoolerNum(1);
+        int GasCoolerID = TransSystem(SysNum).GasCoolerNum(1);
         RatedFanPower = GasCooler(GasCoolerID).RatedFanPower;
         FanMinAirFlowRatio = GasCooler(GasCoolerID).FanMinAirFlowRatio;
         GasCoolerCreditWarnIndex = GasCooler(GasCoolerID).GasCoolerCreditWarnIndex;
 
-        for (Sysloop = 1; Sysloop <= GasCooler(GasCoolerID).NumSysAttach; ++Sysloop) {
-            SystemID = GasCooler(GasCoolerID).SysNum(Sysloop);
+        for (int Sysloop = 1; Sysloop <= GasCooler(GasCoolerID).NumSysAttach; ++Sysloop) {
+            int SystemID = GasCooler(GasCoolerID).SysNum(Sysloop);
             TotalCondDefCredfromSysID = TransSystem(SystemID).TotalCondDefrostCredit;
             TotalCondDefrostCredit += TotalCondDefCredfromSysID;
             TotalLoadFromSysID = TransSystem(SystemID).TotalSystemLoadLT + TransSystem(SystemID).TotalSystemLoadMT +
@@ -11710,7 +11692,7 @@ namespace RefrigeratedCase {
         } // total gas cooler heat < 0
 
         // The rated capacity of air-cooled gas cooler was adjusted for elevation in get input step
-        CapFac = TotalGasCoolerHeat / GasCooler(GasCoolerID).RatedCapacity;
+        Real64 CapFac = TotalGasCoolerHeat / GasCooler(GasCoolerID).RatedCapacity;
         // See whether gas cooler is at ground level or if other air conditions (ie node) have been specified.
         // Note that air-cooled gas coolers can draw air from, and reject heat to, a conditioned zone.
         if (GasCooler(GasCoolerID).InletAirNodeNum != 0) {
@@ -11830,9 +11812,6 @@ namespace RefrigeratedCase {
         Real64 const DelTDischPipes(0.5); // Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
 
         static std::string const RoutineName("RefrigeratedCase:CalculateCompressors");
-        int CompIndex;                    // Compressor index within system
-        int CompID;                       // Compressor index within all compressors
-        int CondID;                       // Condenser index for this refrigeration system
         Real64 CaseEnthalpyChangeRated;   // Enthalpy change in cases at compressor rated cond, J/kg
         Real64 CapacityCorrection;        // Capacity at existing subcool/superheat over cap at rated conditions
         Real64 CpSatVapCondense;          // Specific heat of vapor at cond temp J/kg-C
@@ -11853,7 +11832,6 @@ namespace RefrigeratedCase {
         Real64 TotalEnthalpyChangeActual; // Actual enthalpy change in cases and cold side of LSHX, J/kg
         Real64 TsatforPsuct;              // Tsat for PSuction, C
         Real64 TsatforPdisch(0.0);             // Tsat for Pdischarge, c
-        int StageIndex;                   // Compression stage index
         int NumComps;                     // Number of low-stage or high-stage compressors in system
         Real64 HHiStageCompIn;            // Enthalpy at inlet of high-stage compressor (J/kg)
         Real64 HCaseInRated_base(0.0), HCompInRated_base(0.0); // Autodesk:Tuned Intermediate values for performance tuning
@@ -11871,7 +11849,7 @@ namespace RefrigeratedCase {
         auto &TIntercooler(System_SysNum.TIntercooler);
         auto &HSatLiqCond(System_SysNum.HSatLiqCond);
         auto &CpSatLiqCond(System_SysNum.CpSatLiqCond);
-        CondID = System_SysNum.CondenserNum(1);
+        int CondID = System_SysNum.CondenserNum(1);
         auto const &Condenser1(Condenser(CondID));
         Real64 const AccumLoad = max(0.0, (System_SysNum.UnmetEnergy / LocalTimeStepSec)); // Load due to previously unmet compressor loads
         Real64 const NeededCapacity_base(System_SysNum.TotalSystemLoad + AccumLoad + System_SysNum.PipeHeatLoad + System_SysNum.LSHXTrans);
@@ -11886,8 +11864,8 @@ namespace RefrigeratedCase {
             System_SysNum.TotHiStageCompPower = 0.0;
         }
 
-        for (CompIndex = 1; CompIndex <= System_SysNum.NumCompressors; ++CompIndex) {
-            CompID = System_SysNum.CompressorNum(CompIndex);
+        for (int CompIndex = 1; CompIndex <= System_SysNum.NumCompressors; ++CompIndex) {
+            int CompID = System_SysNum.CompressorNum(CompIndex);
             auto &Compressor_CompID(Compressor(CompID));
             Compressor_CompID.Power = 0.0;
             Compressor_CompID.MassFlow = 0.0;
@@ -11897,8 +11875,8 @@ namespace RefrigeratedCase {
             Compressor_CompID.LoadFactor = 0.0;
         }
         if (NumStages == 2) {
-            for (CompIndex = 1; CompIndex <= System_SysNum.NumHiStageCompressors; ++CompIndex) {
-                CompID = System_SysNum.HiStageCompressorNum(CompIndex);
+            for (int CompIndex = 1; CompIndex <= System_SysNum.NumHiStageCompressors; ++CompIndex) {
+                int CompID = System_SysNum.HiStageCompressorNum(CompIndex);
                 auto &Compressor_CompID(Compressor(CompID));
                 Compressor_CompID.Power = 0.0;
                 Compressor_CompID.MassFlow = 0.0;
@@ -11910,7 +11888,7 @@ namespace RefrigeratedCase {
         }
 
         // Determine properties at case inlet and compressor inlet
-        for (StageIndex = 1; StageIndex <= min(2, NumStages); ++StageIndex) {
+        for (int StageIndex = 1; StageIndex <= min(2, NumStages); ++StageIndex) {
             if (StageIndex == 1) {                              // Do single-stage or low-stage calculations
                 if (NumStages == 1) {                           // Single-stage system
                     NeededCapacity = NeededCapacity_base;       // because compressor capacity rated from txv to comp inlet
@@ -12000,7 +11978,8 @@ namespace RefrigeratedCase {
                     HCompInRated_base = FluidProperties::GetSatEnthalpyRefrig(RefrigerantName, TIntercooler, 1.0, RefIndex, RoutineName);
                 }
             }
-            for (CompIndex = 1; CompIndex <= NumComps; ++CompIndex) {
+            for (int CompIndex = 1; CompIndex <= NumComps; ++CompIndex) {
+                int CompID;
                 if (StageIndex == 1) {
                     CompID = System_SysNum.CompressorNum(CompIndex);
                 } else {
@@ -12193,10 +12172,7 @@ namespace RefrigeratedCase {
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
         static std::string const RoutineName("RefrigeratedCase:CalculateTransCompressors");
-        int CompIndex;                      // Compressor index within system
-        int CompID;                         // Compressor index within all compressors
         int Iter;                           // Iteration counter
-        Real64 CapacityCorrectionLT;        // Capacity at existing subcool/superheat over cap at rated conditions for LT loads
         Real64 CapacityCorrectionMT;        // Capacity at existing subcool/superheat over cap at rated conditions for MT loads
         Real64 CaseEnthalpyChangeRatedMT;   // Enthalpy change in medium temperature cases at compressor rated cond, J/kg
         Real64 CaseEnthalpyChangeRatedLT;   // Enthalpy change in low temperature cases at compressor rated cond, J/kg
@@ -12289,8 +12265,8 @@ namespace RefrigeratedCase {
             TransSystem(SysNum).RefMassFlowCompsLP = 0.0;
             TransSystem(SysNum).TotCompPowerLP = 0.0;
 
-            for (CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsLP; ++CompIndex) {
-                CompID = TransSystem(SysNum).CompressorNumLP(CompIndex);
+            for (int CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsLP; ++CompIndex) {
+                int CompID = TransSystem(SysNum).CompressorNumLP(CompIndex);
                 Compressor(CompID).Power = 0.0;
                 Compressor(CompID).MassFlow = 0.0;
                 Compressor(CompID).Capacity = 0.0;
@@ -12299,8 +12275,8 @@ namespace RefrigeratedCase {
                 Compressor(CompID).LoadFactor = 0.0;
             }
 
-            for (CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsLP; ++CompIndex) {
-                CompID = TransSystem(SysNum).CompressorNumLP(CompIndex);
+            for (int CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsLP; ++CompIndex) {
+                int CompID = TransSystem(SysNum).CompressorNumLP(CompIndex);
                 // need to use indiv compressor's rated subcool and superheat to adjust capacity to actual conditions
                 {
                     auto const SELECT_CASE_var(Compressor(CompID).SubcoolRatingType);
@@ -12333,7 +12309,8 @@ namespace RefrigeratedCase {
                 //  Adjust capacity and mass flow to reflect the specific volume change due to superheating and
                 //  the increase in capacity due to extra subcooling
                 MassCorrectionLT = DensityActualLT / DensityRatedLP;
-                CapacityCorrectionLT = MassCorrectionLT * TotalEnthalpyChangeActualLT / CaseEnthalpyChangeRatedLT;
+                // Capacity at existing subcool/superheat over cap at rated conditions for LT loads
+                Real64 CapacityCorrectionLT = MassCorrectionLT * TotalEnthalpyChangeActualLT / CaseEnthalpyChangeRatedLT;
                 Compressor(CompID).Power = CurveManager::CurveValue(Compressor(CompID).ElecPowerCurvePtr, TsatforPsucLT, TsatforPdisLT);
                 Compressor(CompID).Capacity = CapacityCorrectionLT * CurveManager::CurveValue(Compressor(CompID).CapacityCurvePtr, TsatforPsucLT, TsatforPdisLT);
                 Compressor(CompID).MassFlow = Compressor(CompID).Capacity / TotalEnthalpyChangeActualLT;
@@ -12475,8 +12452,8 @@ namespace RefrigeratedCase {
         TransSystem(SysNum).RefMassFlowCompsHP = 0.0;
         TransSystem(SysNum).TotCompPowerHP = 0.0;
 
-        for (CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsHP; ++CompIndex) {
-            CompID = TransSystem(SysNum).CompressorNumHP(CompIndex);
+        for (int CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsHP; ++CompIndex) {
+            int CompID = TransSystem(SysNum).CompressorNumHP(CompIndex);
             Compressor(CompID).Power = 0.0;
             Compressor(CompID).MassFlow = 0.0;
             Compressor(CompID).Capacity = 0.0;
@@ -12486,8 +12463,8 @@ namespace RefrigeratedCase {
         }
 
         // Dispatch High Pressure compressors to meet load, note they were listed in compressor list in dispatch order
-        for (CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsHP; ++CompIndex) {
-            CompID = TransSystem(SysNum).CompressorNumHP(CompIndex);
+        for (int CompIndex = 1; CompIndex <= TransSystem(SysNum).NumCompressorsHP; ++CompIndex) {
+            int CompID = TransSystem(SysNum).CompressorNumHP(CompIndex);
 
             // Need to use indiv compressor's rated subcool and superheat to adjust capacity to actual conditions
             // Transcritical operation requires rated superheat
@@ -12602,22 +12579,7 @@ namespace RefrigeratedCase {
         // ASHRAE 1006 Section 2: Refrigeration Accessories
 
         static std::string const RoutineName("CalculateSubcoolers");
-        int SubcoolerIndex;               // Counter through number of subcoolers on this system
-        int SubcoolerID;                  // ID number for each unique subcooler
-        int SysProvideID;                 // ID number of system providing refrigeration effect (ie compressor work) for mech sc
-        Real64 CpLiquid;                  // specific heat at liquid Tsat, best avail in Fluid Properties
-        Real64 CpVapor;                   // specific heat at vapor Tsat, best avail in Fluid Properties
-        Real64 ControlTLiqOut;            // Controlled temperature of liquid leaving Mechanical subcooler
-        Real64 DelTempActual;             // Actual subcooling, T liquid in - T liquid out
-        Real64 DelTLiqDes;                // Design Temperature Change on liquid side of LSHX
-        Real64 LSHXeffectiveness;         // EFfectiveness of liquid suction heat exchanger (LSHX)
-        Real64 MechSCLoad;                // Mechanical subcooler load
-        Real64 SubcoolLoad;               // energy transferred from warmer liquid to cool vapor
-        Real64 SubcoolerSupHeat;          // additional superheat added to vapor going to compressor from LSHX
-        Real64 TVapInDes;                 // Design Vapor Inlet temperature for LSHX
-        Real64 TLiqInDes;                 // Design Liquid Inlet temperature for LSHX
         Real64 TLiqInActual(0.0);              // Liquid T in, after condenser, before any mechanical subcooler
-        Real64 TVapInActual;              // Vapor T in, after any superheat added by case control
 
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -12653,15 +12615,15 @@ namespace RefrigeratedCase {
             System(SysNum).HCaseIn = System(SysNum).HSatLiqCond - System(SysNum).CpSatLiqCond * (System(SysNum).TCondense - TLiqInActual);
         } // NumStages and IntercoolerType
 
-        for (SubcoolerIndex = 1; SubcoolerIndex <= System(SysNum).NumSubcoolers; ++SubcoolerIndex) {
-            SubcoolerID = System(SysNum).SubcoolerNum(SubcoolerIndex);
+        for (int SubcoolerIndex = 1; SubcoolerIndex <= System(SysNum).NumSubcoolers; ++SubcoolerIndex) {
+            int SubcoolerID = System(SysNum).SubcoolerNum(SubcoolerIndex);
             // set up local variables for convenience
-            DelTLiqDes = Subcooler(SubcoolerID).LiqSuctDesignDelT;
-            TVapInDes = Subcooler(SubcoolerID).LiqSuctDesignTvapIn;
-            TLiqInDes = Subcooler(SubcoolerID).LiqSuctDesignTliqIn;
-            ControlTLiqOut = Subcooler(SubcoolerID).MechControlTliqOut;
-            CpLiquid = System(SysNum).CpSatLiqCond;
-            CpVapor = System(SysNum).CpSatVapEvap;
+            Real64 DelTLiqDes = Subcooler(SubcoolerID).LiqSuctDesignDelT;
+            Real64 TVapInDes = Subcooler(SubcoolerID).LiqSuctDesignTvapIn;
+            Real64 TLiqInDes = Subcooler(SubcoolerID).LiqSuctDesignTliqIn;
+            Real64 ControlTLiqOut = Subcooler(SubcoolerID).MechControlTliqOut;
+            Real64 CpLiquid = System(SysNum).CpSatLiqCond;
+            Real64 CpVapor = System(SysNum).CpSatVapEvap;
             if (System(SysNum).NumStages == 1) { // Single-stage compression system
                 TLiqInActual = System(SysNum).TCondense - Condenser(System(SysNum).CondenserNum(1)).RatedSubcool;
 
@@ -12682,11 +12644,11 @@ namespace RefrigeratedCase {
                 //  from lshx. taken care of because subcooler ID assigned in that order in input.
 
                 if (SELECT_CASE_var == Mechanical) {
-                    MechSCLoad = System(SysNum).RefMassFlowtoLoads * CpLiquid * (TLiqInActual - ControlTLiqOut);
+                    Real64 MechSCLoad = System(SysNum).RefMassFlowtoLoads * CpLiquid * (TLiqInActual - ControlTLiqOut);
                     System(SysNum).HCaseIn -= CpLiquid * (TLiqInActual - ControlTLiqOut);
                     // refrigeration benefit to System(sysnum)
                     // refrigeration load must be assigned properly according to input
-                    SysProvideID = Subcooler(SubcoolerID).MechSourceSysID;
+                    int SysProvideID = Subcooler(SubcoolerID).MechSourceSysID;
                     System(SysProvideID).MechSCLoad(SubcoolerID) = MechSCLoad;
                     Subcooler(SubcoolerID).MechSCTransLoad = MechSCLoad;
                     Subcooler(SubcoolerID).MechSCTransEnergy = MechSCLoad * LocalTimeStep * DataGlobals::SecInHour;
@@ -12695,12 +12657,12 @@ namespace RefrigeratedCase {
                     System(SysNum).TCompIn = System(SysNum).TEvapNeeded + CaseSuperheat;
 
                 } else if (SELECT_CASE_var == LiquidSuction) {
-                    LSHXeffectiveness = DelTLiqDes / (TLiqInDes - TVapInDes);
-                    TVapInActual = System(SysNum).TEvapNeeded + CaseSuperheat;
-                    DelTempActual = LSHXeffectiveness * (TLiqInActual - TVapInActual);
+                    Real64 LSHXeffectiveness = DelTLiqDes / (TLiqInDes - TVapInDes);
+                    Real64 TVapInActual = System(SysNum).TEvapNeeded + CaseSuperheat;
+                    Real64 DelTempActual = LSHXeffectiveness * (TLiqInActual - TVapInActual);
                     TLiqInActual -= DelTempActual;
-                    SubcoolLoad = System(SysNum).RefMassFlowtoLoads * CpLiquid * DelTempActual;
-                    SubcoolerSupHeat = SubcoolLoad / CpVapor / System(SysNum).RefMassFlowComps;
+                    Real64 SubcoolLoad = System(SysNum).RefMassFlowtoLoads * CpLiquid * DelTempActual;
+                    Real64 SubcoolerSupHeat = SubcoolLoad / CpVapor / System(SysNum).RefMassFlowComps;
                     System(SysNum).TCompIn = TVapInActual + SubcoolerSupHeat;
                     System(SysNum).HCaseIn -= SubcoolLoad / System(SysNum).RefMassFlowtoLoads;
                     System(SysNum).LSHXTrans = SubcoolLoad;
@@ -12779,29 +12741,6 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // To report information from the input deck for refrigerated cases and racks to the eio and err file.
 
-        int CascadeLoadID;
-        int CascadeLoadNum;
-        int CaseID;
-        int CaseNum;
-        int ChillerSetNum;
-        int CoilID;
-        int CoilNum;
-        int CompID;
-        int CompressorNum;
-        int CondID;
-        int CountSecPhase;
-        int CountSecBrine;
-        int GasCoolerID;
-        int RackNum;
-        int SecondaryID;
-        int SecondaryNum;
-        int SubcoolerNum;
-        int SubcoolerID;
-        int SystemNum;
-        int TransSystemNum;
-        int WalkInID;
-        int WalkInNum;
-        int ZoneID;
         std::string ChrOut;
         std::string ChrOut2;
 
@@ -12874,9 +12813,9 @@ namespace RefrigeratedCase {
         }                                            //(NumRefrigSystems > 0)
         if (NumSimulationSecondarySystems > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_142); // Intro to Secondary systems
-            CountSecPhase = 0;
-            CountSecBrine = 0;
-            for (SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
+            int CountSecPhase = 0;
+            int CountSecBrine = 0;
+            for (int SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
                 if ((Secondary(SecondaryID).FluidType == SecFluidTypeAlwaysLiquid) && (CountSecBrine == 0)) {
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_133); // Secondary system header for brine type systems
                     ++CountSecBrine;
@@ -12940,7 +12879,7 @@ namespace RefrigeratedCase {
 
         if (DataHeatBalance::NumRefrigeratedRacks > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101) << "#Refrigeration Compressor Racks, " + General::RoundSigDigits(DataHeatBalance::NumRefrigeratedRacks);
-            for (RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
+            for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                 if (RefrigRack(RackNum).HeatRejectionLocation == LocationOutdoors) {
                     ChrOut = "Outdoors";
                 } else {
@@ -12960,8 +12899,8 @@ namespace RefrigeratedCase {
                                                                General::RoundSigDigits(RefrigRack(RackNum).NumCases) + ',' +
                                                                General::RoundSigDigits(RefrigRack(RackNum).NumWalkIns) + ',' + ChrOut + ',' + ChrOut2 + ',' +
                                                                General::RoundSigDigits(RefrigRack(RackNum).RatedCOP, 3);
-                for (CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
-                    CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
+                for (int CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
+                    int CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                             << " Refrigeration Case," + General::RoundSigDigits(CaseID) + ',' + RefrigCase(CaseID).Name + ',' + RefrigCase(CaseID).ZoneName +
@@ -12974,8 +12913,8 @@ namespace RefrigeratedCase {
                     }
                 } // numcases
 
-                for (WalkInNum = 1; WalkInNum <= RefrigRack(RackNum).NumWalkIns; ++WalkInNum) {
-                    WalkInID = RefrigRack(RackNum).WalkInNum(WalkInNum);
+                for (int WalkInNum = 1; WalkInNum <= RefrigRack(RackNum).NumWalkIns; ++WalkInNum) {
+                    int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Refrigeration Walk In Cooler,  " + General::RoundSigDigits(WalkInID) + ',' + WalkIn(WalkInID).Name + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignRatedCap, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).Temperature, 1) + ',' +
@@ -12983,7 +12922,7 @@ namespace RefrigeratedCase {
                                General::RoundSigDigits(WalkIn(WalkInID).ElecFanPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).NumZones);
-                    for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
+                    for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
@@ -12996,8 +12935,8 @@ namespace RefrigeratedCase {
                     } // zones for walk ins on rack
                 }     // walk ins on rack
 
-                for (CoilNum = 1; CoilNum <= RefrigRack(RackNum).NumCoils; ++CoilNum) {
-                    CoilID = RefrigRack(RackNum).CoilNum(CoilNum);
+                for (int CoilNum = 1; CoilNum <= RefrigRack(RackNum).NumCoils; ++CoilNum) {
+                    int CoilID = RefrigRack(RackNum).CoilNum(CoilNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Air Chiller Load," + WarehouseCoil(CoilID).Name + ',' + General::RoundSigDigits(CoilID) + ',' + WarehouseCoil(CoilID).ZoneName;
                 } // numairchillers
@@ -13006,7 +12945,7 @@ namespace RefrigeratedCase {
 
         if (DataHeatBalance::NumRefrigSystems > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101) << "#Detailed Refrigeration Systems," + General::RoundSigDigits(DataHeatBalance::NumRefrigSystems);
-            for (SystemNum = 1; SystemNum <= DataHeatBalance::NumRefrigSystems; ++SystemNum) {
+            for (int SystemNum = 1; SystemNum <= DataHeatBalance::NumRefrigSystems; ++SystemNum) {
                 ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101)
                     << " Detailed Refrigeration System," + System(SystemNum).Name + ',' + System(SystemNum).RefrigerantName + ',' +
                            General::RoundSigDigits(System(SystemNum).NumCases) + ',' + General::RoundSigDigits(System(SystemNum).NumWalkIns) + ',' +
@@ -13017,8 +12956,8 @@ namespace RefrigeratedCase {
                            General::RoundSigDigits(System(SystemNum).IntercoolerEffectiveness, 2) + ',' + General::RoundSigDigits(System(SystemNum).NumSubcoolers) +
                            ',' + General::RoundSigDigits(System(SystemNum).TCondenseMin, 1);
 
-                for (CaseNum = 1; CaseNum <= System(SystemNum).NumCases; ++CaseNum) {
-                    CaseID = System(SystemNum).CaseNum(CaseNum);
+                for (int CaseNum = 1; CaseNum <= System(SystemNum).NumCases; ++CaseNum) {
+                    int CaseID = System(SystemNum).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                             << " Refrigeration Case," + General::RoundSigDigits(CaseID) + ',' + RefrigCase(CaseID).Name + ',' + RefrigCase(CaseID).ZoneName +
@@ -13030,15 +12969,15 @@ namespace RefrigeratedCase {
                                    ',' + General::RoundSigDigits(RefrigCase(CaseID).DefrostPower, 1);
                     }
                 } // NumCases on system
-                for (WalkInNum = 1; WalkInNum <= System(SystemNum).NumWalkIns; ++WalkInNum) {
-                    WalkInID = System(SystemNum).WalkInNum(WalkInNum);
+                for (int WalkInNum = 1; WalkInNum <= System(SystemNum).NumWalkIns; ++WalkInNum) {
+                    int WalkInID = System(SystemNum).WalkInNum(WalkInNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Refrigeration Walk In Cooler," + General::RoundSigDigits(WalkInID) + ',' + WalkIn(WalkInID).Name + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignRatedCap, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).Temperature, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).CoilFanPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).CircFanPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).NumZones);
-                    for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
+                    for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_102) << "  Walk-In Surfaces Facing Zone, " + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
@@ -13051,51 +12990,51 @@ namespace RefrigeratedCase {
                     } // Num zones for each walk in on system
                 }     // NumWalkIns on system
 
-                for (CoilNum = 1; CoilNum <= System(SystemNum).NumCoils; ++CoilNum) {
-                    CoilID = System(SystemNum).CoilNum(CoilNum);
+                for (int CoilNum = 1; CoilNum <= System(SystemNum).NumCoils; ++CoilNum) {
+                    int CoilID = System(SystemNum).CoilNum(CoilNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Air Chiller Load," + WarehouseCoil(CoilID).Name + ',' + General::RoundSigDigits(CoilID) + ',' + WarehouseCoil(CoilID).ZoneName;
                 } // numairchillers
 
-                for (CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
-                    CascadeLoadID = System(SystemNum).CascadeLoadNum(CascadeLoadNum);
+                for (int CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
+                    int CascadeLoadID = System(SystemNum).CascadeLoadNum(CascadeLoadNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Cascade Load," + System(Condenser(CascadeLoadID).CascadeSysID).Name + ',' +
                                                                    General::RoundSigDigits(CascadeLoadID) + ',' + Condenser(CascadeLoadID).Name;
                 } // cascade load on detailed system
 
-                for (SecondaryNum = 1; SecondaryNum <= System(SystemNum).NumSecondarys; ++SecondaryNum) {
-                    SecondaryID = System(SystemNum).SecondaryNum(SecondaryNum);
+                for (int SecondaryNum = 1; SecondaryNum <= System(SystemNum).NumSecondarys; ++SecondaryNum) {
+                    int SecondaryID = System(SystemNum).SecondaryNum(SecondaryNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Secondary Load," + Secondary(SecondaryID).Name + ',' + General::RoundSigDigits(SecondaryID);
                 } // secondary load on detailed system
 
-                for (SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
+                for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                     if (Subcooler(SubcoolerNum).MechSourceSysID != SystemNum) continue;
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Mechanical Subcooler Load, " + General::RoundSigDigits(SubcoolerNum) + ',' + Subcooler(SubcoolerNum).Name;
                 } // Num sim subcoolers, looking only for NumSMech Subcoolers served by this system
 
                 if (System(SystemNum).NumStages == 1) { // Single-stage compression system
-                    for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
-                        CompID = System(SystemNum).CompressorNum(CompressorNum);
+                    for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
+                        int CompID = System(SystemNum).CompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Refrigeration Compressor," + General::RoundSigDigits(CompID) + ',' +
                                                                        Compressor(CompID).Name + ',' + General::RoundSigDigits(Compressor(CompID).NomCap, 0);
                     }                                          // NumCompressors
                 } else if (System(SystemNum).NumStages == 2) { // Two-stage compression system
                     // Low-stage compressors
-                    for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
-                        CompID = System(SystemNum).CompressorNum(CompressorNum);
+                    for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
+                        int CompID = System(SystemNum).CompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Refrigeration Low-Stage Compressor," + General::RoundSigDigits(CompID) + ',' +
                                                                        Compressor(CompID).Name + ',' + General::RoundSigDigits(Compressor(CompID).NomCap, 0);
                     } // NumCompressors
                     // High-stage compressors
-                    for (CompressorNum = 1; CompressorNum <= System(SystemNum).NumHiStageCompressors; ++CompressorNum) {
-                        CompID = System(SystemNum).HiStageCompressorNum(CompressorNum);
+                    for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumHiStageCompressors; ++CompressorNum) {
+                        int CompID = System(SystemNum).HiStageCompressorNum(CompressorNum);
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Refrigeration High-Stage Compressor," + General::RoundSigDigits(CompID) + ',' +
                                                                        Compressor(CompID).Name + ',' + General::RoundSigDigits(Compressor(CompID).NomCap, 0);
                     } // NumHiStageCompressors
                 }     // NumStages
 
-                CondID = System(SystemNum).CondenserNum(1);
+                int CondID = System(SystemNum).CondenserNum(1);
                 {
                     auto const SELECT_CASE_var(Condenser(CondID).CondenserType);
                     if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
@@ -13129,8 +13068,8 @@ namespace RefrigeratedCase {
                     }
                 } // condenser type
 
-                for (SubcoolerNum = 1; SubcoolerNum <= System(SystemNum).NumSubcoolers; ++SubcoolerNum) {
-                    SubcoolerID = System(SystemNum).SubcoolerNum(SubcoolerNum);
+                for (int SubcoolerNum = 1; SubcoolerNum <= System(SystemNum).NumSubcoolers; ++SubcoolerNum) {
+                    int SubcoolerID = System(SystemNum).SubcoolerNum(SubcoolerNum);
                     {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
                         if (SELECT_CASE_var == LiquidSuction) {
@@ -13152,7 +13091,7 @@ namespace RefrigeratedCase {
 
         if (NumTransRefrigSystems > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101) << "#Detailed Transcritical Refrigeration Systems," + General::RoundSigDigits(NumTransRefrigSystems);
-            for (TransSystemNum = 1; TransSystemNum <= NumTransRefrigSystems; ++TransSystemNum) {
+            for (int TransSystemNum = 1; TransSystemNum <= NumTransRefrigSystems; ++TransSystemNum) {
                 ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101)
                     << " Detailed Transcritical Refrigeration System," + TransSystem(TransSystemNum).Name + ',' +
                            TransSystem(TransSystemNum).RefrigerantName + ',' + General::RoundSigDigits(TransSystem(TransSystemNum).NumCasesMT) + ',' +
@@ -13162,8 +13101,8 @@ namespace RefrigeratedCase {
                            General::RoundSigDigits(TransSystem(TransSystemNum).NumCompressorsLP) + ',' +
                            General::RoundSigDigits(GasCooler(TransSystem(TransSystemNum).GasCoolerNum(1)).MinCondTemp, 1);
 
-                for (CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesMT; ++CaseNum) {
-                    CaseID = TransSystem(TransSystemNum).CaseNumMT(CaseNum);
+                for (int CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesMT; ++CaseNum) {
+                    int CaseID = TransSystem(TransSystemNum).CaseNumMT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                             << " Medium Temperature Refrigeration Case," + General::RoundSigDigits(CaseID) + ',' + RefrigCase(CaseID).Name + ',' +
@@ -13175,8 +13114,8 @@ namespace RefrigeratedCase {
                                    General::RoundSigDigits(RefrigCase(CaseID).AntiSweatPower, 1) + ',' + General::RoundSigDigits(RefrigCase(CaseID).DefrostPower, 1);
                     }
                 } // NumCasesMT on system
-                for (CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesLT; ++CaseNum) {
-                    CaseID = TransSystem(TransSystemNum).CaseNumLT(CaseNum);
+                for (int CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesLT; ++CaseNum) {
+                    int CaseID = TransSystem(TransSystemNum).CaseNumLT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                             << " Low Temperature Refrigeration Case," + General::RoundSigDigits(CaseID) + ',' + RefrigCase(CaseID).Name + ',' +
@@ -13188,15 +13127,15 @@ namespace RefrigeratedCase {
                                    General::RoundSigDigits(RefrigCase(CaseID).AntiSweatPower, 1) + ',' + General::RoundSigDigits(RefrigCase(CaseID).DefrostPower, 1);
                     }
                 } // NumCasesLT on system
-                for (WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsMT; ++WalkInNum) {
-                    WalkInID = TransSystem(TransSystemNum).WalkInNumMT(WalkInNum);
+                for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsMT; ++WalkInNum) {
+                    int WalkInID = TransSystem(TransSystemNum).WalkInNumMT(WalkInNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Medium Temperature Refrigeration Walk In Cooler," + General::RoundSigDigits(WalkInID) + ',' + WalkIn(WalkInID).Name + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignRatedCap, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).Temperature, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).CoilFanPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).CircFanPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).NumZones);
-                    for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
+                    for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
@@ -13208,15 +13147,15 @@ namespace RefrigeratedCase {
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValueGlassDr(ZoneID), 4);
                     } // Num zones for each walk in on system
                 }     // NumWalkInsMT on system
-                for (WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsLT; ++WalkInNum) {
-                    WalkInID = TransSystem(TransSystemNum).WalkInNumLT(WalkInNum);
+                for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsLT; ++WalkInNum) {
+                    int WalkInID = TransSystem(TransSystemNum).WalkInNumLT(WalkInNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Low Temperature Refrigeration Walk In Cooler," + General::RoundSigDigits(WalkInID) + ',' + WalkIn(WalkInID).Name + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignRatedCap, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).Temperature, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).CoilFanPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).CircFanPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).NumZones);
-                    for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
+                    for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_102) << "   Walk-In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
@@ -13229,19 +13168,19 @@ namespace RefrigeratedCase {
                     } // Num zones for each walk in on system
                 }     // NumWalkInsLT on system
 
-                for (CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsHP; ++CompressorNum) {
-                    CompID = TransSystem(TransSystemNum).CompressorNumHP(CompressorNum);
+                for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsHP; ++CompressorNum) {
+                    int CompID = TransSystem(TransSystemNum).CompressorNumHP(CompressorNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " High Pressure Refrigeration Compressor," + General::RoundSigDigits(CompID) + ',' +
                                                                    Compressor(CompID).Name + ',' + General::RoundSigDigits(Compressor(CompID).NomCap, 0);
                 } // NumCompressorsHP
-                for (CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsLP; ++CompressorNum) {
-                    CompID = TransSystem(TransSystemNum).CompressorNumLP(CompressorNum);
+                for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsLP; ++CompressorNum) {
+                    int CompID = TransSystem(TransSystemNum).CompressorNumLP(CompressorNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103) << " Low Pressure Refrigeration Compressor," + General::RoundSigDigits(CompID) + ',' +
                                                                    Compressor(CompID).Name + ',' + General::RoundSigDigits(Compressor(CompID).NomCap, 0);
                 } // NumCompressorsLP
 
                 if (TransSystem(TransSystemNum).NumGasCoolers >= 1) {
-                    GasCoolerID = TransSystem(TransSystemNum).GasCoolerNum(1);
+                    int GasCoolerID = TransSystem(TransSystemNum).GasCoolerNum(1);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Refrigeration GasCooler:Air-Cooled," + General::RoundSigDigits(GasCoolerID) + ',' + GasCooler(GasCoolerID).Name + ',' +
                                General::RoundSigDigits(GasCooler(GasCoolerID).RatedOutletP, 1) + ',' + General::RoundSigDigits(GasCooler(GasCoolerID).RatedOutletT, 1) +
@@ -13255,7 +13194,7 @@ namespace RefrigeratedCase {
 
         if (NumSimulationSecondarySystems > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101) << "#Secondary Refrigeration Systems," + General::RoundSigDigits(NumSimulationSecondarySystems);
-            for (SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
+            for (int SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
                 {
                     auto const SELECT_CASE_var(Secondary(SecondaryID).FluidType);
                     if (SELECT_CASE_var == SecFluidTypeAlwaysLiquid) {
@@ -13279,8 +13218,8 @@ namespace RefrigeratedCase {
                                    General::RoundSigDigits(Secondary(SecondaryID).PumpTotRatedPower, 3);
                     }
                 }
-                for (CaseNum = 1; CaseNum <= Secondary(SecondaryID).NumCases; ++CaseNum) {
-                    CaseID = Secondary(SecondaryID).CaseNum(CaseNum);
+                for (int CaseNum = 1; CaseNum <= Secondary(SecondaryID).NumCases; ++CaseNum) {
+                    int CaseID = Secondary(SecondaryID).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                             << "Refrigeration Case," + General::RoundSigDigits(CaseID) + ',' + RefrigCase(CaseID).Name + ',' + RefrigCase(CaseID).ZoneName +
@@ -13293,15 +13232,15 @@ namespace RefrigeratedCase {
                     }
                 } // NumCases on secondary on secondary system
 
-                for (WalkInNum = 1; WalkInNum <= Secondary(SecondaryID).NumWalkIns; ++WalkInNum) {
-                    WalkInID = Secondary(SecondaryID).WalkInNum(WalkInNum);
+                for (int WalkInNum = 1; WalkInNum <= Secondary(SecondaryID).NumWalkIns; ++WalkInNum) {
+                    int WalkInID = Secondary(SecondaryID).WalkInNum(WalkInNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << "Walk In," + General::RoundSigDigits(WalkInID) + ',' + WalkIn(WalkInID).Name + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignRatedCap, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).Temperature, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).CoilFanPower, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).CircFanPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DesignLighting, 1) + ',' + General::RoundSigDigits(WalkIn(WalkInID).HeaterPower, 1) + ',' +
                                General::RoundSigDigits(WalkIn(WalkInID).DefrostCapacity, 1);
-                    for (ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
+                    for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_102) << "Walk In Surfaces Facing Zone," + WalkIn(WalkInID).ZoneName(ZoneID) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).SurfaceArea(ZoneID), 1) + ',' +
                                                                        General::RoundSigDigits(WalkIn(WalkInID).UValue(ZoneID), 4) + ',' +
@@ -13314,8 +13253,8 @@ namespace RefrigeratedCase {
                     } // zones for walk ins on secondary
                 }     // walk ins on secondary
 
-                for (CoilNum = 1; CoilNum <= Secondary(SecondaryID).NumCoils; ++CoilNum) {
-                    CoilID = Secondary(SecondaryID).CoilNum(CoilNum);
+                for (int CoilNum = 1; CoilNum <= Secondary(SecondaryID).NumCoils; ++CoilNum) {
+                    int CoilID = Secondary(SecondaryID).CoilNum(CoilNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Air Chiller Load," + WarehouseCoil(CoilID).Name + ',' + General::RoundSigDigits(CoilID) + ',' + WarehouseCoil(CoilID).ZoneName;
                 } // numairchillers
@@ -13324,13 +13263,13 @@ namespace RefrigeratedCase {
 
         if (DataHeatBalance::NumRefrigChillerSets > 0) {
             ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101) << "#ZoneHVAC/Refrigeration Air Chiller Sets," + General::RoundSigDigits(DataHeatBalance::NumRefrigChillerSets);
-            for (ChillerSetNum = 1; ChillerSetNum <= DataHeatBalance::NumRefrigChillerSets; ++ChillerSetNum) {
+            for (int ChillerSetNum = 1; ChillerSetNum <= DataHeatBalance::NumRefrigChillerSets; ++ChillerSetNum) {
                 ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_101)
                     << "ZoneHVAC/Refrigeration Air Chiller Set," + AirChillerSet(ChillerSetNum).Name + ',' + General::RoundSigDigits(ChillerSetNum) + ',' +
                            General::RoundSigDigits(AirChillerSet(ChillerSetNum).NumCoils) + ',' + AirChillerSet(ChillerSetNum).ZoneName;
 
-                for (CoilNum = 1; CoilNum <= AirChillerSet(ChillerSetNum).NumCoils; ++CoilNum) {
-                    CoilID = AirChillerSet(ChillerSetNum).CoilNum(CoilNum);
+                for (int CoilNum = 1; CoilNum <= AirChillerSet(ChillerSetNum).NumCoils; ++CoilNum) {
+                    int CoilID = AirChillerSet(ChillerSetNum).CoilNum(CoilNum);
                     ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_103)
                         << " Refrigeration Air Chiller," + General::RoundSigDigits(CoilID) + ',' + WarehouseCoil(CoilID).Name + ',' +
                                WarehouseCoil(CoilID).ZoneName + ',' + General::RoundSigDigits(WarehouseCoil(CoilID).ZoneNodeNum) + ',' +
