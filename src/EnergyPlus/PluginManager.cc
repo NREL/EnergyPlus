@@ -535,6 +535,10 @@ namespace PluginManagement {
         // because of that, escaped backslashes actually need double escaping
         // plus, the string cannot end with a backslash
         // sanitize the path to remove any trailing backslash
+        if (path.empty()) {
+            // this is really only likely to occur during unit testing, just return the original blank path
+            return path;
+        }
         if (path.substr(path.length() - 1, path.length()) == "\\") {
             path = path.substr(0, path.length() - 1);
         }
@@ -884,6 +888,10 @@ namespace PluginManagement {
 
     Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
         return trends[handle].values[timeIndex];
+    }
+
+    size_t PluginManager::getTrendVariableHistorySize(int handle) {
+        return trends[handle].values.size();
     }
 
     void PluginManager::updatePluginValues() {
