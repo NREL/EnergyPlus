@@ -153,6 +153,7 @@ void resetActuator(int handle) {
 
 const char * listAllAPIStuff() {
     std::string output;
+    output.append("**ACTUATORS**\n");
     for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
         if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
             break;
@@ -162,6 +163,7 @@ const char * listAllAPIStuff() {
         output.append(availActuator.UniqueIDName).append(",");
         output.append(availActuator.ControlTypeName).append(";\n");
     }
+    output.append("**INTERNAL_VARIABLES**\n");
     for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) {
         if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
             break;
@@ -169,6 +171,33 @@ const char * listAllAPIStuff() {
         output.append("InternalVariable,");
         output.append(availVariable.DataTypeName).append(",");
         output.append(availVariable.UniqueIDName).append("\n");
+    }
+    output.append("**PLUGIN_GLOBAL_VARIABLES**\n");
+    for (auto const & gVarName : EnergyPlus::PluginManagement::globalVariableNames) {
+        output.append("PluginGlobalVariable,");
+        output.append(gVarName).append("\n");
+    }
+    output.append("**TRENDS**\n");
+    for (auto const & trend : EnergyPlus::PluginManagement::trends) {
+        output.append("PluginTrendVariable,");
+        output.append(trend.name).append("\n");
+    }
+    output.append("**METERS**\n");
+    for (auto const & meter : EnergyPlus::OutputProcessor::EnergyMeters) {
+        if (meter.Name.empty()) {
+            break;
+        }
+        output.append("OutputMeter,");
+        output.append(meter.Name).append("\n");
+    }
+    output.append("**VARIABLES**\n");
+    for (auto const & variable : EnergyPlus::OutputProcessor::RVariableTypes) {
+        if (variable.VarNameOnly.empty() && variable.KeyNameOnlyUC.empty()) {
+            break;
+        }
+        output.append("OutputVariable,");
+        output.append(variable.VarNameOnly).append(",");
+        output.append(variable.KeyNameOnlyUC).append("\n");
     }
     // add output vars and meters
     return output.c_str();

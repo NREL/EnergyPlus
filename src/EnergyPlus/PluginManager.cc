@@ -74,6 +74,8 @@ namespace PluginManagement {
     std::map<int, std::vector<void (*)()>> callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
+    std::vector<std::string> globalVariableNames;
+    std::vector<Real64> globalVariableValues;
 
     void registerNewCallback(int iCalledFrom, void (*f)())
     {
@@ -150,11 +152,11 @@ namespace PluginManagement {
                 if (!isMetered) {
                     // regular output variable, ignore the meter/resource stuff and register the variable
                     if (thisUnit != OutputProcessor::Unit::customEMS) {
-                        SetupOutputVariable(sOutputVariable, thisUnit, this->globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                        SetupOutputVariable(sOutputVariable, thisUnit, PluginManagement::globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
                     } else {
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -332,7 +334,7 @@ namespace PluginManagement {
                     if (sEndUseSubcategory.empty()) { // no subcategory
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -344,7 +346,7 @@ namespace PluginManagement {
                     } else { // has subcategory
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -855,22 +857,22 @@ namespace PluginManagement {
 
     void PluginManager::addGlobalVariable(const std::string &name) {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        this->globalVariableNames.push_back(varNameUC);
-        this->globalVariableValues.push_back(Real64());
+        PluginManagement::globalVariableNames.push_back(varNameUC);
+        PluginManagement::globalVariableValues.push_back(Real64());
     }
 
     int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        auto const it = std::find(this->globalVariableNames.begin(), this->globalVariableNames.end(), varNameUC);
-        if (it != this->globalVariableNames.end()) {
-            return std::distance(this->globalVariableNames.begin(), it);
+        auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
+        if (it != PluginManagement::globalVariableNames.end()) {
+            return std::distance(PluginManagement::globalVariableNames.begin(), it);
         } else {
             if (suppress_warning) {
                 return -1;
             } else {
                 EnergyPlus::ShowSevereError("Tried to retrieve handle for a nonexistent plugin global variable");
                 EnergyPlus::ShowContinueError("Name looked up: \"" + varNameUC + "\", available names: ");
-                for (auto const &gvName : this->globalVariableNames) {
+                for (auto const &gvName : PluginManagement::globalVariableNames) {
                     EnergyPlus::ShowContinueError("    \"" + gvName + "\"");
                 }
                 EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
@@ -907,28 +909,28 @@ namespace PluginManagement {
     }
 
     Real64 PluginManager::getGlobalVariableValue(int handle) {
-        if (this->globalVariableValues.empty()) {
+        if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
         try {
-            return this->globalVariableValues[handle];
+            return PluginManagement::globalVariableValues[handle];
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to access plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
         return 0;
     }
 
     void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
-        if (this->globalVariableValues.empty()) {
+        if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
         try {
-            this->globalVariableValues[handle] = value;
+            PluginManagement::globalVariableValues[handle] = value;
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to set plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
     }

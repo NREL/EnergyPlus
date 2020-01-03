@@ -152,10 +152,10 @@ namespace PluginManagement {
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         void setupOutputVariables();
 
-        void addGlobalVariable(const std::string& name);
-        int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
-        Real64 getGlobalVariableValue(int handle);
-        void setGlobalVariableValue(int handle, Real64 value);
+        static void addGlobalVariable(const std::string& name);
+        static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
+        static Real64 getGlobalVariableValue(int handle);
+        static void setGlobalVariableValue(int handle, Real64 value);
 
         int getTrendVariableHandle(const std::string& name);
         Real64 getTrendVariableValue(int handle, int timeIndex);
@@ -164,8 +164,6 @@ namespace PluginManagement {
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(int index);
-        std::vector<std::string> globalVariableNames;
-        std::vector<Real64> globalVariableValues;
     };
 
     struct PluginTrendVariable {
@@ -185,6 +183,8 @@ namespace PluginManagement {
 
     extern std::unique_ptr<PluginManager> pluginManager;
     extern std::vector<PluginTrendVariable> trends;
+    extern std::vector<std::string> globalVariableNames;
+    extern std::vector<Real64> globalVariableValues;
 }
 }
 
