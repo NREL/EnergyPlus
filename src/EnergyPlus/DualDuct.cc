@@ -143,7 +143,7 @@ namespace DualDuct {
     bool GetDualDuctInputFlag(true); // Flag set to make sure you get input once
 
     // Object Data
-    Array1D<DamperDesignParams> Damper;
+    Array1D<DualDuctAirTerminal> Damper;
     std::unordered_map<std::string, std::string> UniqueDamperNames;
     Array1D<DamperFlowConditions> DamperInlet;
     Array1D<DamperFlowConditions> DamperHotAirInlet;
@@ -182,7 +182,7 @@ namespace DualDuct {
 
         // Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
         if (CompIndex == 0) {
-            DamperNum = UtilityRoutines::FindItemInList(CompName, Damper, &DamperDesignParams::DamperName);
+            DamperNum = UtilityRoutines::FindItemInList(CompName, Damper, &DualDuctAirTerminal::DamperName);
             if (DamperNum == 0) {
                 ShowFatalError("SimulateDualDuct: Damper not found=" + CompName);
             }
@@ -817,7 +817,7 @@ namespace DualDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void DamperDesignParams::InitDualDuct(int const DamperNum, bool const FirstHVACIteration)
+    void DualDuctAirTerminal::InitDualDuct(int const DamperNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1102,7 +1102,7 @@ namespace DualDuct {
         }
     }
 
-    void DamperDesignParams::SizeDualDuct(int const DamperNum)
+    void DualDuctAirTerminal::SizeDualDuct(int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1178,7 +1178,7 @@ namespace DualDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void DamperDesignParams::SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1312,7 +1312,7 @@ namespace DualDuct {
         }
     }
 
-    void DamperDesignParams::SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1532,7 +1532,7 @@ namespace DualDuct {
         }
     }
 
-    void DamperDesignParams::SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1801,7 +1801,7 @@ namespace DualDuct {
         DamperRecircAirInlet(DamperNum).AirMassFlowRateHist1 = DamperRecircAirInlet(DamperNum).AirMassFlowRate;
     }
 
-    void DamperDesignParams::CalcOAMassFlow(int const DamperNum,  // index to terminal unit
+    void DualDuctAirTerminal::CalcOAMassFlow(int const DamperNum,  // index to terminal unit
                         Real64 &SAMassFlow,   // outside air based on optional user input
                         Real64 &AirLoopOAFrac // outside air based on optional user input
     )
@@ -1855,7 +1855,7 @@ namespace DualDuct {
         }
     }
 
-    void DamperDesignParams::CalcOAOnlyMassFlow(int const DamperNum,          // index to terminal unit
+    void DualDuctAirTerminal::CalcOAOnlyMassFlow(int const DamperNum,          // index to terminal unit
                             Real64 &OAMassFlow,           // outside air flow from user input kg/s
                             Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
@@ -1938,7 +1938,7 @@ namespace DualDuct {
     // Beginning of Update subroutines for the Damper Module
     // *****************************************************************************
 
-    void DamperDesignParams::UpdateDualDuct(int const DamperNum)
+    void DualDuctAirTerminal::UpdateDualDuct(int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2075,7 +2075,7 @@ namespace DualDuct {
     // Beginning of Reporting subroutines for the Damper Module
     // *****************************************************************************
 
-    void DamperDesignParams::ReportDualDuct(int const EP_UNUSED(DamperNum)) // unused1208
+    void DualDuctAirTerminal::ReportDualDuct(int const EP_UNUSED(DamperNum)) // unused1208
     {
 
         // SUBROUTINE INFORMATION:

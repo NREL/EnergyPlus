@@ -106,7 +106,7 @@ namespace DualDuct {
 
     // Types
 
-    struct DamperDesignParams
+    struct DualDuctAirTerminal
     {
         // Members
         std::string DamperName; // Name of the Damper
@@ -143,7 +143,7 @@ namespace DualDuct {
         int AirLoopNum;                  // index to airloop that this terminal unit is connected to
 
         // Default Constructor
-        DamperDesignParams()
+        DualDuctAirTerminal()
             : DamperType(0), SchedPtr(0), MaxAirVolFlowRate(0.0), MaxAirMassFlowRate(0.0), HotAirInletNodeNum(0), ColdAirInletNodeNum(0),
               OutletNodeNum(0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
               RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
@@ -221,7 +221,7 @@ namespace DualDuct {
     };
 
     // Object Data
-    extern Array1D<DamperDesignParams> Damper;
+    extern Array1D<DualDuctAirTerminal> Damper;
     extern Array1D<DamperFlowConditions> DamperInlet;
     extern Array1D<DamperFlowConditions> DamperHotAirInlet;
     extern Array1D<DamperFlowConditions> DamperColdAirInlet;
