@@ -81,7 +81,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     Real64 AirLoopOAFrac;
     Real64 OAMassFlow;
 
-    int numOfDampers = 2;
+    int numOfdd_airterminals = 2;
 
     DataHeatBalance::Zone.allocate(1);
     DataSizing::OARequirements.allocate(1);
@@ -90,17 +90,17 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     DataHeatBalance::Zone(1).FloorArea = 10.0;
 
-    Damper.allocate(numOfDampers);
-    Damper(1).CtrlZoneNum = 1;
-    Damper(1).OARequirementsPtr = 1;
-    Damper(1).NoOAFlowInputFromUser = false;
-    Damper(1).ActualZoneNum = 1;
-    Damper(1).AirLoopNum = 1;
-    Damper(2).CtrlZoneNum = 1;
-    Damper(2).NoOAFlowInputFromUser = false;
-    Damper(2).OARequirementsPtr = 1;
-    Damper(2).ActualZoneNum = 1;
-    Damper(2).AirLoopNum = 1;
+    dd_airterminal.allocate(numOfdd_airterminals);
+    dd_airterminal(1).CtrlZoneNum = 1;
+    dd_airterminal(1).OARequirementsPtr = 1;
+    dd_airterminal(1).NoOAFlowInputFromUser = false;
+    dd_airterminal(1).ActualZoneNum = 1;
+    dd_airterminal(1).AirLoopNum = 1;
+    dd_airterminal(2).CtrlZoneNum = 1;
+    dd_airterminal(2).NoOAFlowInputFromUser = false;
+    dd_airterminal(2).OARequirementsPtr = 1;
+    dd_airterminal(2).ActualZoneNum = 1;
+    dd_airterminal(2).AirLoopNum = 1;
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
@@ -117,11 +117,11 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataEnvironment::StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
-    DualDuct::Damper(1).CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
+    DualDuct::dd_airterminal(1).CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
     EXPECT_NEAR(0.5, AirLoopOAFrac, 0.00001);
 
-    DualDuct::Damper(2).CalcOAOnlyMassFlow(2, OAMassFlow);
+    DualDuct::dd_airterminal(2).CalcOAOnlyMassFlow(2, OAMassFlow);
     EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
     // Cleanup
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataAirLoop::AirLoopControlInfo.deallocate();
     DataHeatBalance::ZoneIntGain.deallocate();
 
-    Damper.deallocate();
+    dd_airterminal.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
     DataAirLoop::AirLoopFlow.deallocate();
 }
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //			"    Zone DualDuctVAV Inlet Node,     !- Air Outlet Node Name",
 //			"    DualDuctVAV Hot Air Inlet Node,  !- Hot Air Inlet Node Name",
 //			"    DualDuctVAV Cold Air Inlet Node, !- Cold Air Inlet Node Name",
-//			"    Autosize,                        !- Maximum Damper Air Flow Rate {m3/s}",
+//			"    Autosize,                        !- Maximum dd_airterminal Air Flow Rate {m3/s}",
 //			"    0.3;                             !- Zone Minimum Air Flow Fraction",
 //
 //			"  ZoneHVAC:EquipmentList,",
@@ -295,13 +295,13 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 //		DualDuct::GetDualDuctInput();
 //
-//		EXPECT_EQ(3u, Damper.size());
-//		EXPECT_EQ( DualDuct::DualDuct_ConstantVolume, Damper( 1 ).DamperType );
-//		EXPECT_EQ( DualDuct::DualDuct_VariableVolume, Damper( 2 ).DamperType ); // AT SD VAV HeatCool Reheat Type
-//		EXPECT_EQ( DualDuct::DualDuct_OutdoorAir, Damper( 3 ).DamperType ); // AT SD VAV HeatCool Reheat Type
+//		EXPECT_EQ(3u, dd_airterminal.size());
+//		EXPECT_EQ( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType );
+//		EXPECT_EQ( DualDuct::DualDuct_VariableVolume, dd_airterminal( 2 ).dd_airterminalType ); // AT SD VAV HeatCool Reheat Type
+//		EXPECT_EQ( DualDuct::DualDuct_OutdoorAir, dd_airterminal( 3 ).dd_airterminalType ); // AT SD VAV HeatCool Reheat Type
 //
 //
-//		for (size_t i = 1; i <= DualDuct::Damper.size(); ++i) {
-//			EXPECT_GT(0, DualDuct::Damper(i).ADUNum);
+//		for (size_t i = 1; i <= DualDuct::dd_airterminal.size(); ++i) {
+//			EXPECT_GT(0, DualDuct::dd_airterminal(i).ADUNum);
 //		}
 //}

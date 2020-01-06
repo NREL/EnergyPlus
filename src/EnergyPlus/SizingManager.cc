@@ -986,53 +986,53 @@ namespace SizingManager {
                 }
 
                 // sum up heating and max flows for any dual duct air terminals
-                if (allocated(DualDuct::Damper) && DualDuct::NumDampers > 0) {
+                if (allocated(DualDuct::dd_airterminal) && DualDuct::NumDampers > 0) {
                     for (int dualDuctATUNum = 1; dualDuctATUNum <= DualDuct::NumDampers; ++dualDuctATUNum) {
-                        if (AirLoopNum == DualDuct::Damper(dualDuctATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(DualDuct::Damper(dualDuctATUNum).ADUNum).TermUnitSizingNum;
-                            airLoopMaxFlowRateSum += DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
+                        if (AirLoopNum == DualDuct::dd_airterminal(dualDuctATUNum).AirLoopNum) {
+                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
+                            airLoopMaxFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
+                                DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
 
-                            if (DualDuct::Damper(dualDuctATUNum).DamperType == DualDuct::DualDuct_ConstantVolume) {
-                                airLoopHeatingMaximumFlowRateSum += DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
-                                airLoopHeatingMinimumFlowRateSum += DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
+                            if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_ConstantVolume) {
+                                airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
+                                airLoopHeatingMinimumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex);
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) = DataSizing::VpzMinClgByZone(termUnitSizingIndex);
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
 
-                            } else if (DualDuct::Damper(dualDuctATUNum).DamperType == DualDuct::DualDuct_VariableVolume) {
-                                airLoopHeatingMaximumFlowRateSum += DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
+                            } else if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_VariableVolume) {
+                                airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMinimumFlowRateSum +=
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate * DualDuct::Damper(dualDuctATUNum).ZoneMinAirFrac;
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate * DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate *
-                                    DualDuct::Damper(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
+                                    DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate *
-                                    DualDuct::Damper(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
+                                    DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
+                                    DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex);
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) = DataSizing::VpzMinClgByZone(termUnitSizingIndex);
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
-                            } else if (DualDuct::Damper(dualDuctATUNum).DamperType == DualDuct::DualDuct_OutdoorAir) {
-                                airLoopHeatingMaximumFlowRateSum += DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
+                            } else if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_OutdoorAir) {
+                                airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 // Calculate the design OA flow rate for this zone
                                 bool UseOccSchFlag = false;
                                 bool UseMinOASchFlag = false;
                                 Real64 designOAductFlow(0.0);
                                 designOAductFlow =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(DualDuct::Damper(dualDuctATUNum).OARequirementsPtr,
-                                                                                         DualDuct::Damper(dualDuctATUNum).ActualZoneNum,
+                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
+                                                                                         DualDuct::dd_airterminal(dualDuctATUNum).ActualZoneNum,
                                                                                          UseOccSchFlag,
                                                                                          UseMinOASchFlag);
                                 airLoopHeatingMinimumFlowRateSum += designOAductFlow;
@@ -1041,7 +1041,7 @@ namespace SizingManager {
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) = designOAductFlow; // not sure about this
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) = designOAductFlow;    // no heating for this terminal
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) = designOAductFlow;
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) = DualDuct::Damper(dualDuctATUNum).MaxAirVolFlowRate;
+                                DataSizing::VdzClgByZone(termUnitSizingIndex) = DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) = designOAductFlow;
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) = designOAductFlow;
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = designOAductFlow;

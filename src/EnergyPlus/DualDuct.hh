@@ -221,7 +221,7 @@ namespace DualDuct {
     };
 
     // Object Data
-    extern Array1D<DualDuctAirTerminal> Damper;
+    extern Array1D<DualDuctAirTerminal> dd_airterminal;
     extern Array1D<DamperFlowConditions> DamperInlet;
     extern Array1D<DamperFlowConditions> DamperHotAirInlet;
     extern Array1D<DamperFlowConditions> DamperColdAirInlet;
