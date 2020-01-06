@@ -10311,15 +10311,6 @@ namespace RefrigeratedCase {
 
         InitRefrigerationPlantConnections();
 
-        Real64 MassFlowRateMax(0.0);
-        Real64 OutletTempMax(0.0);
-        Real64 VolFlowRate(0.0);
-        int FlowType(0);
-        int NoFlowWarnIndex(0);
-        int HighFlowWarnIndex(0);
-        int HighInletWarnIndex(0);
-        int HighTempWarnIndex(0);
-        std::string Name;
         std::string TypeName;
         std::string ErrIntro;
 
@@ -10331,17 +10322,9 @@ namespace RefrigeratedCase {
         PlantBranchIndex = this->PlantBranchNum;
         PlantCompIndex = this->PlantCompNum;
 
-        TotalCondenserHeat =
-                DataHeatBalance::HeatReclaimRefrigeratedRack(Num).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
-        FlowType = this->FlowType;
-        OutletTempMax = this->OutletTempMax;
-        Name = this->Name;
+        TotalCondenserHeat = DataHeatBalance::HeatReclaimRefrigeratedRack(Num).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
         TypeName = "Refrigeration:CompressorRack:";
         ErrIntro = "Condenser for refrigeration rack ";
-        NoFlowWarnIndex = this->NoFlowWarnIndex;
-        HighFlowWarnIndex = this->HighFlowWarnIndex;
-        HighTempWarnIndex = this->HighTempWarnIndex;
-        HighInletWarnIndex = this->HighInletWarnIndex;
 
         // Current condenser is water cooled
         // Make demand request on first HVAC iteration
@@ -10350,42 +10333,39 @@ namespace RefrigeratedCase {
         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-        // first determine desired flow
-        Real64 OutletTemp(0.0);
+        if (this->FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
+            this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(this->OutletTempSchedPtr);
 
-        if (FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
-            OutletTemp = ScheduleManager::GetCurrentScheduleValue(this->OutletTempSchedPtr);
+            if (this->OutletTemp == this->InletTemp) {
 
-            if (OutletTemp == this->InletTemp) {
-
-                if (HighInletWarnIndex == 0) {
-                    ShowSevereError(ErrIntro + ", \"" + Name + "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
+                if (this->HighInletWarnIndex == 0) {
+                    ShowSevereError(ErrIntro + ", \"" + this->Name + "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
                     ShowContinueError("cooling water is not cold enough to reach desired outlet temperature");
                 }
-                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + Name + "\" : has inlet water temp equal to desired outlet temp.... continues. ",
-                                               HighInletWarnIndex);
-                VolFlowRate = 9999.0;
-                this->MassFlowRate = VolFlowRate * rho;
+                ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + this->Name + "\" : has inlet water temp equal to desired outlet temp.... continues. ",
+                                               this->HighInletWarnIndex);
+                this->VolFlowRate = 9999.0;
+                this->MassFlowRate = this->VolFlowRate * rho;
             } else {
-                Real64 DeltaT = OutletTemp - this->InletTemp;
+                Real64 DeltaT = this->OutletTemp - this->InletTemp;
                 this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
                 // Check for maximum flow in the component
-                if (this->MassFlowRate > MassFlowRateMax) {
-                    if (HighFlowWarnIndex == 0) {
-                        ShowWarningMessage(TypeName + Name);
+                if (this->MassFlowRate > this->MassFlowRateMax) {
+                    if (this->HighFlowWarnIndex == 0) {
+                        ShowWarningMessage(TypeName + this->Name);
                         ShowContinueError("Requested condenser water mass flow rate greater than maximum allowed value. ");
                         ShowContinueError("Flow reset to maximum value.");
                     } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(ErrIntro + Name + " - Flow rate higher than maximum allowed ... continues", HighFlowWarnIndex);
+                    ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues", this->HighFlowWarnIndex);
                     // END IF
-                    this->MassFlowRate = MassFlowRateMax;
+                    this->MassFlowRate = this->MassFlowRateMax;
                 }
             } // compare outlet T to inlet T
 
-        } else if (FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
+        } else if (this->FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
             // this part for constant flow condition
-            VolFlowRate = this->DesVolFlowRate;
-            this->MassFlowRate = VolFlowRate * rho;
+            this->VolFlowRate = this->DesVolFlowRate;
+            this->MassFlowRate = this->VolFlowRate * rho;
 
         } else if (TotalCondenserHeat == 0.0) {
             this->MassFlowRate = 0.0;
@@ -10394,36 +10374,28 @@ namespace RefrigeratedCase {
         // check against plant, might get changed.
         PlantUtilities::SetComponentFlowRate(this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
 
-        VolFlowRate = this->MassFlowRate / rho;
+        this->VolFlowRate = this->MassFlowRate / rho;
 
         if (this->MassFlowRate > 0) {
-            OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+            this->OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
         } else {
-            OutletTemp = this->InletTemp;
+            this->OutletTemp = this->InletTemp;
             if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
                 ShowRecurringWarningErrorAtEnd(
-                        TypeName + Name + "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                        NoFlowWarnIndex);
+                        TypeName + this->Name + "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
+                        this->NoFlowWarnIndex);
             }
         }
         // Check outlet water temp for max value
-        if (OutletTemp > OutletTempMax) {
-            if (HighTempWarnIndex == 0) {
-                ShowWarningMessage(TypeName + Name);
+        if (this->OutletTemp > this->OutletTempMax) {
+            if (this->HighTempWarnIndex == 0) {
+                ShowWarningMessage(TypeName + this->Name);
                 ShowContinueError(
                         "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
             }
-            ShowRecurringWarningErrorAtEnd(ErrIntro + Name + " - Condenser outlet temp higher than maximum allowed ... continues", HighTempWarnIndex);
+            ShowRecurringWarningErrorAtEnd(ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", HighTempWarnIndex);
         }
-
-        // set up output variables
-        this->VolFlowRate = VolFlowRate;
-        this->OutletTemp = OutletTemp;
-        this->HighFlowWarnIndex = HighFlowWarnIndex;
-        this->HighTempWarnIndex = HighTempWarnIndex;
-        this->HighInletWarnIndex = HighInletWarnIndex;
-        this->NoFlowWarnIndex = NoFlowWarnIndex;
 
         this->UpdateCondenser();
     }
