@@ -199,7 +199,7 @@ namespace SingleDuct {
     // Reporting routines for module
 
     // Object Data
-    Array1D<SysDesignParams> Sys;
+    Array1D<SingleDuctAirTerminal> Sys;
     std::unordered_map<std::string, std::string> SysUniqueNames;
     Array1D<SysFlowConditions> SysInlet;
     Array1D<SysFlowConditions> SysOutlet;
@@ -264,7 +264,7 @@ namespace SingleDuct {
 
         // Find the correct SysNumber with the Component Name
         if (CompIndex == 0) {
-            SysNum = UtilityRoutines::FindItemInList(CompName, Sys, &SysDesignParams::SysName);
+            SysNum = UtilityRoutines::FindItemInList(CompName, Sys, &SingleDuctAirTerminal::SysName);
             if (SysNum == 0) {
                 ShowFatalError("SimulateSingleDuct: System not found=" + CompName);
             }
@@ -1958,7 +1958,7 @@ namespace SingleDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void SysDesignParams::InitSys(int const SysNum, bool const FirstHVACIteration)
+    void SingleDuctAirTerminal::InitSys(int const SysNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2310,7 +2310,7 @@ namespace SingleDuct {
         Sys(SysNum).CoolEnergy = 0.0;
     }
 
-    void SysDesignParams::SizeSys(int const SysNum)
+    void SingleDuctAirTerminal::SizeSys(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3133,7 +3133,7 @@ namespace SingleDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SysDesignParams::SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3635,7 +3635,7 @@ namespace SingleDuct {
         MassFlow1(SysNum) = MassFlow;
     }
 
-    void SysDesignParams::CalcOAMassFlow(int const SysNum,     // index to terminal unit
+    void SingleDuctAirTerminal::CalcOAMassFlow(int const SysNum,     // index to terminal unit
                         Real64 &SAMassFlow,   // outside air based on optional user input
                         Real64 &AirLoopOAFrac // outside air based on optional user input
     )
@@ -3704,7 +3704,7 @@ namespace SingleDuct {
         }
     }
 
-    void SysDesignParams::SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimCBVAV(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4078,7 +4078,7 @@ namespace SingleDuct {
         MassFlow1(SysNum) = MassFlow;
     }
 
-    void SysDesignParams::SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4497,7 +4497,7 @@ namespace SingleDuct {
         }
     }
 
-    void SysDesignParams::SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4704,7 +4704,7 @@ namespace SingleDuct {
         // 20 Format(1x,I3,3x, 5(2x, F9.4), 2(2x, F9.2))
     }
 
-    void SysDesignParams::SimConstVolNoReheat(int const SysNum,
+    void SingleDuctAirTerminal::SimConstVolNoReheat(int const SysNum,
                                               bool const EP_UNUSED(FirstHVACIteration),
                                               int const EP_UNUSED(ZoneNum),
                                               int const ZoneNodeNum)
@@ -4768,7 +4768,7 @@ namespace SingleDuct {
         Sys(SysNum).UpdateSys(SysNum);
     }
 
-    void SysDesignParams::CalcVAVVS(int const SysNum,               // Unit index
+    void SingleDuctAirTerminal::CalcVAVVS(int const SysNum,               // Unit index
                    bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
                    int const ZoneNode,             // zone node number
                    int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
@@ -4889,7 +4889,7 @@ namespace SingleDuct {
         LoadMet = AirMassFlow * CpAirZn * (Node(HCOutNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 SysDesignParams::VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -4961,7 +4961,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SysDesignParams::VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5052,7 +5052,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SysDesignParams::VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -5124,7 +5124,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SysDesignParams::VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
+    Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5208,7 +5208,7 @@ namespace SingleDuct {
     // Beginning of Update subroutines for the Sys Module
     // *****************************************************************************
 
-    void SysDesignParams::UpdateSys(int const SysNum)
+    void SingleDuctAirTerminal::UpdateSys(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5282,7 +5282,7 @@ namespace SingleDuct {
     // Beginning of Reporting subroutines for the Sys Module
     // *****************************************************************************
 
-    void SysDesignParams::ReportSys(int const EP_UNUSED(SysNum)) // unused1208
+    void SingleDuctAirTerminal::ReportSys(int const EP_UNUSED(SysNum)) // unused1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -5344,7 +5344,7 @@ namespace SingleDuct {
             GetInputFlag = false;
         }
 
-        SDSIndex = UtilityRoutines::FindItemInList(SDSName, Sys, &SysDesignParams::SysName);
+        SDSIndex = UtilityRoutines::FindItemInList(SDSName, Sys, &SingleDuctAirTerminal::SysName);
         if (SDSIndex == 0) {
             if (present(ThisObjectType)) {
                 ShowSevereError(ThisObjectType() + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName);

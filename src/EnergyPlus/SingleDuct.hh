@@ -122,7 +122,7 @@ namespace SingleDuct {
 
     // Types
 
-    struct SysDesignParams
+    struct SingleDuctAirTerminal
     {
         // Members
         std::string SysName;      // Name of the Sys
@@ -210,7 +210,7 @@ namespace SingleDuct {
         Real64 CoolEnergy;           // zone air terminal sensible cooling energy
 
         // Default Constructor
-        SysDesignParams()
+        SingleDuctAirTerminal()
             : SysType_Num(0), SchedPtr(0), ReheatComp_Num(0), ReheatComp_Index(0), ReheatComp_PlantType(0), Fan_Num(0), Fan_Index(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0),
               HeatAirMassFlowRateMax(0.0), ZoneMinAirFracMethod(ConstantMinFrac), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
@@ -334,7 +334,7 @@ namespace SingleDuct {
     };
 
     // Object Data
-    extern Array1D<SysDesignParams> Sys;
+    extern Array1D<SingleDuctAirTerminal> Sys;
     extern Array1D<SysFlowConditions> SysInlet;
     extern Array1D<SysFlowConditions> SysOutlet;
     extern Array1D<AirTerminalMixerData> SysATMixer;
