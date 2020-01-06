@@ -406,7 +406,7 @@ namespace RefrigeratedCase {
         int SuctionPipeActualZoneNum;    // ID number for zone where suction pipes gain heat
         int SuctionPipeZoneNodeNum;      // ID number for zone node where suction pipes gain heat
         Array1D<Real64> MechSCLoad;      // Mechanical subcooler load on system from other systems(W)
-        Real64 AverageCompressorCOP;     // Average COP for compressers on this system (W)
+        Real64 AverageCompressorCOP;     // Average COP for compressors on this system (W)
         Real64 CpSatLiqCond;             // Spec Heat of sat liquid at condensing pressure  (J/kg-C)
         Real64 CpSatVapEvap;             // Spec Heat of saturated vapor exiting evaporator (J/kg-C)
         Real64 FlowRatioIntercooler;     // Refrigerant mass flow ratio through coil-side of shell-and-coil intercooler
@@ -451,18 +451,18 @@ namespace RefrigeratedCase {
         Real64 TotalCoolingEnergy; // Total energy of all refrigerated cases and walkins served directly (J)
         Real64 TotalCoolingLoad;   // Total load of all refrigerated cases and walkins served directly (W)
         Real64 TotalSystemLoad;    // Includes cases, walk-ins, and transfer loads (cascade, second, subcooler), W
-        Real64 TotCompPower;       // Total power for compressers on this system (for single-stage systems) or
+        Real64 TotCompPower;       // Total power for compressors on this system (for single-stage systems) or
         // total power for low-stage compressors on this system (for two-stage systems) (W)
-        Real64 TotCompElecConsump; // Total Elec consump for compressers on this system (for single-stage systems) or
+        Real64 TotCompElecConsump; // Total Elec consump for compressors on this system (for single-stage systems) or
         // total elec consump for low-stage compressors on this system (for two-stage systems) (J)
-        Real64 TotCompCapacity; // Total design capacity for compressers on this system (for single-stage systems) or
+        Real64 TotCompCapacity; // Total design capacity for compressors on this system (for single-stage systems) or
         // total design capacity for low-stage compressors on this system (for two-stage systems) (W)
-        Real64 TotCompCoolingEnergy; // Total cooling energy from compressers on this system (for single-stage systems) or
+        Real64 TotCompCoolingEnergy; // Total cooling energy from compressors on this system (for single-stage systems) or
         // total cooling energy from low-stage compressors on this system (for two-stage systems) (J)
-        Real64 TotHiStageCompCapacity;      // Total design capacity for high-stage compressers on this system (two-stage systems only) (W)
-        Real64 TotHiStageCompCoolingEnergy; // Total cooling energy from high-stage compressers on this system (two-stage systems only) (J)
-        Real64 TotHiStageCompElecConsump;   // Total Elec consump for high-stage compressers on this system (two-stage systems only) (J)
-        Real64 TotHiStageCompPower;         // Total power for high-stage compressers on this system (two-stage systems only) (W)
+        Real64 TotHiStageCompCapacity;      // Total design capacity for high-stage compressors on this system (two-stage systems only) (W)
+        Real64 TotHiStageCompCoolingEnergy; // Total cooling energy from high-stage compressors on this system (two-stage systems only) (J)
+        Real64 TotHiStageCompElecConsump;   // Total Elec consump for high-stage compressors on this system (two-stage systems only) (J)
+        Real64 TotHiStageCompPower;         // Total power for high-stage compressors on this system (two-stage systems only) (W)
         Real64 TotCompElecConsumpTwoStage;  // Total Elec consump for the low- and high-stage compressors on this system (two-stage systems only) (J)
         Real64 TotRejectHeatRecovered;      // Total reject heat recovered for hot gas or hot brine defrost or
         //     desuperheater coils (W)
@@ -514,6 +514,10 @@ namespace RefrigeratedCase {
             TotCompCoolingEnergy = 0.0;
             TotHiStageCompCoolingEnergy = 0.0;
         }
+
+        void CalculateCompressors();
+
+        void CalculateSubcoolers();
     };
 
     struct TransRefrigSystemData
@@ -545,7 +549,7 @@ namespace RefrigeratedCase {
         int SuctionPipeActualZoneNumLT;   // ID number for zone where medium temperature suction pipes gain heat
         int SuctionPipeZoneNodeNumLT;     // ID number for zone node where medium temperature suction pipes gain heat
         int TransSysType;                 // Transcritical refrigeration system type: SingleStage = 1, TwoStage=2
-        Real64 AverageCompressorCOP;      // Average COP for compressers on this system (W)
+        Real64 AverageCompressorCOP;      // Average COP for compressors on this system (W)
         Real64 CpSatLiqCond;              // Spec Heat of sat liquid at condensing pressure  (J/kg-C)
         Real64 CpSatVapEvapMT;            // Spec Heat of saturated vapor exiting medium temperature evaporator (J/kg-C)
         Real64 CpSatVapEvapLT;            // Spec Heat of saturated vapor exiting low temperature evaporator (J/kg-C)
@@ -601,17 +605,17 @@ namespace RefrigeratedCase {
         Real64 TotalSystemLoad;           // Sum of MT and LT loads, W
         Real64 TotalSystemLoadMT;         // Includes medium temperature cases and walk-ins, W
         Real64 TotalSystemLoadLT;         // Includes low temperature cases and walk-ins, W
-        Real64 TotCompPowerHP;            // Total power for high pressure compressers on this system (W)
-        Real64 TotCompPowerLP;            // Total power for low pressure compressers on this system (W)
-        Real64 TotCompElecConsump;        // Total Elec consump for compressers on this system (J)
+        Real64 TotCompPowerHP;            // Total power for high pressure compressors on this system (W)
+        Real64 TotCompPowerLP;            // Total power for low pressure compressors on this system (W)
+        Real64 TotCompElecConsump;        // Total Elec consump for compressors on this system (J)
         Real64 TotCompElecConsumpHP;      // Total Elec consumption for high pressure compressors on this system (J)
         Real64 TotCompElecConsumpLP;      // Total Elec consumption for low pressure compressors on this system (J)
         Real64 TotCompCapacity;           // Sum of HP and LP compressor capacity (W)
-        Real64 TotCompCapacityHP;         // Total design capacity for high pressure compressers on this system (W)
-        Real64 TotCompCapacityLP;         // Total design capacity for low pressure compressers on this system (W)
-        Real64 TotCompCoolingEnergy;      // Total cooling energy from compressers on this system (J)
-        Real64 TotCompCoolingEnergyHP;    // Total cooling energy from high pressure compressers on this system (J)
-        Real64 TotCompCoolingEnergyLP;    // Total cooling energy from low pressure compressers on this system (J)
+        Real64 TotCompCapacityHP;         // Total design capacity for high pressure compressors on this system (W)
+        Real64 TotCompCapacityLP;         // Total design capacity for low pressure compressors on this system (W)
+        Real64 TotCompCoolingEnergy;      // Total cooling energy from compressors on this system (J)
+        Real64 TotCompCoolingEnergyHP;    // Total cooling energy from high pressure compressors on this system (J)
+        Real64 TotCompCoolingEnergyLP;    // Total cooling energy from low pressure compressors on this system (J)
         Real64 TotRejectHeatRecovered;    // Total reject heat recovered for hot gas or hot brine defrost (W)
         Real64 UnmetEnergy;               // Accumulative loads unmet by the LP and HP compressors on this system (J)
         Real64 UnmetEnergyMT;             // Accumulative loads unmet by total HP compressors on this system (J)
@@ -657,6 +661,8 @@ namespace RefrigeratedCase {
             TotCompPowerLP = 0.0;
             TotCompCoolingEnergy = 0.0;
         }
+
+        void CalculateTransCompressors();
     };
 
     struct CaseAndWalkInListDef // Derived Type for CaseAndWalkIn Lists
@@ -1510,12 +1516,6 @@ namespace RefrigeratedCase {
     void CalculateCondensers(int SysNum);
 
     void CalcGasCooler(int SysNum);
-
-    void CalculateCompressors(int SysNum);
-
-    void CalculateTransCompressors(int SysNum);
-
-    void CalculateSubcoolers(int SysNum);
 
     void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,
