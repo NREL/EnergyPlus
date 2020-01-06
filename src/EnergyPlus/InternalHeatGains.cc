@@ -306,12 +306,14 @@ namespace InternalHeatGains {
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_721("('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant "
-                                   "{m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other "
-                                   "Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard "
-                                   "Heat')");
+        static ObjexxFCL::gio::Fmt Format_721(
+            "('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant "
+            "{m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other "
+            "Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard "
+            "Heat')");
         static ObjexxFCL::gio::Fmt Format_722("(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_723("('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)");
+        static ObjexxFCL::gio::Fmt Format_723(
+            "('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)");
         static ObjexxFCL::gio::Fmt Format_724("(' ',A,', ',A)");
 
         // FLOW:
@@ -708,7 +710,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-                        
+
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -716,12 +718,17 @@ namespace InternalHeatGains {
                         int const NumFirstTCModel = 14;
                         if (NumAlpha < NumFirstTCModel) {
                             bool NoTCModelSelectedWithSchedules = false;
-                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
+                            NoTCModelSelectedWithSchedules =
+                                CheckThermalComfortSchedules(lAlphaFieldBlanks(9), lAlphaFieldBlanks(12), lAlphaFieldBlanks(13));
                             if (NoTCModelSelectedWithSchedules) {
-                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
-                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
-                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
-                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) +
+                                                 "\" has comfort related schedules but no thermal comfort model selected.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no "
+                                                  "thermal comfort");
+                                ShowContinueError(
+                                    "thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError(
+                                    "To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
                             }
                         }
 
@@ -4754,9 +4761,10 @@ namespace InternalHeatGains {
             };
             if (Loop == 1) {
                 if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
-                                                         "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
-                                                         "Calculation,KSU Calculation";
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                        << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
+                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
+                           "Calculation,KSU Calculation";
                 } else {
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
@@ -4950,10 +4958,11 @@ namespace InternalHeatGains {
         }
         for (Loop = 1; Loop <= TotLights; ++Loop) {
             if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Lights"
-                                                        << "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
-                                                           "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
-                                                           "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
+                    << "Lights"
+                    << "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
+                       "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
+                       "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
 
             ZoneNum = Lights(Loop).ZonePtr;
 
@@ -5549,14 +5558,16 @@ namespace InternalHeatGains {
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
             if (Loop == 1)
-                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Outdoor Controlled Baseboard Heat"
-                                                        << "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
-                                                           "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory";
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
+                    << "Outdoor Controlled Baseboard Heat"
+                    << "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
+                       "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory";
 
             ZoneNum = ZoneBBHeat(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Outdoor Controlled Baseboard Heat-Illegal Zone specified" << ZoneBBHeat(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724)
+                    << "Outdoor Controlled Baseboard Heat-Illegal Zone specified" << ZoneBBHeat(Loop).Name;
                 continue;
             }
 
@@ -6035,7 +6046,7 @@ namespace InternalHeatGains {
 
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             QL(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
@@ -6161,7 +6172,7 @@ namespace InternalHeatGains {
         Real64 OperSchedFrac;                             // Operating schedule fraction
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
-        Real64 TSupply(0.0);                                   // Supply air temperature [C]
+        Real64 TSupply(0.0);                              // Supply air temperature [C]
         Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
@@ -6187,8 +6198,8 @@ namespace InternalHeatGains {
         Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
-        
-	//int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+
+        // int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
 
         //  Zero out time step variables
         // Object report variables
@@ -6313,12 +6324,12 @@ namespace InternalHeatGains {
                 } else if (AirConnection == ITEInletRoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = MAT(NZ);
-		    TSupply = TAirIn;
+                    TSupply = TAirIn;
                     WAirIn = ZoneAirHumRat(NZ);
-                } else { 
-		    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-		    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
-		    TSupply = Node(ZoneAirInletNode).Temp;
+                } else {
+                    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
+                    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+                    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
                 }
@@ -6832,20 +6843,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-    
+
     bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
                                       bool const CloInsSch,  // Blank clothing insulation schedule = true
                                       bool const AirVeloSch) // Blank air velocity schedule = true
     {
         bool TCSchedsPresent = false;
-        
-        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
+
+        if (!WorkEffSch || !CloInsSch || !AirVeloSch) {
             TCSchedsPresent = true;
         }
-        
+
         return TCSchedsPresent;
     }
-    
+
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 
