@@ -919,11 +919,7 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_RefrigerationWaterCoolRack) {
-                SimRefrigWaterCoolRack(sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
-
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Refrigeration Type=" + sim_component.TypeOf);

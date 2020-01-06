@@ -10251,7 +10251,35 @@ namespace RefrigeratedCase {
         Condenser(Num).UpdateCondenser();
     }
 
-    void SimRefrigWaterCoolRack(std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip)
+    PlantComponent *RefrigRackData::factory(std::string const &objectName)
+    {
+        // Process the input data for boilers if it hasn't been done already
+        if (GetRefrigerationInputFlag) {
+            CheckRefrigerationInput();
+            GetRefrigerationInputFlag = false;
+        }
+        // Now look for this particular object in list
+        for (auto &obj : RefrigRack) {
+            if (obj.Name == objectName) {
+                return &obj;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalRefrigRackFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void RefrigRackData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        InitRefrigeration();
+        InitRefrigerationPlantConnections();
+    }
+
+    void RefrigRackData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                  bool const FirstHVACIteration,
+                                  Real64 &EP_UNUSED(CurLoad),
+                                  bool const EP_UNUSED(RunFlag))
     {
 
         // SUBROUTINE INFORMATION:
@@ -10281,43 +10309,8 @@ namespace RefrigeratedCase {
         int PlantCompIndex(0);
         int Num(0);
 
-        if (CompIndex == 0) {
-            Num = UtilityRoutines::FindItemInList(CompName, RefrigRack);
-
-            if (Num == 0) {
-                ShowFatalError("SimRefrigCondenser: Specified refrigeration condenser not Valid =" + CompName);
-            }
-
-            CompIndex = Num;
-
-        } else {
-
-            Num = CompIndex;
-
-            if (Num > DataHeatBalance::NumRefrigeratedRacks || Num < 1) {
-                ShowFatalError("SimRefrigCondenser: Invalid CompIndex passed=" + General::TrimSigDigits(Num) +
-                               ", Number of Units=" + General::TrimSigDigits(DataHeatBalance::NumRefrigeratedRacks) + ", Entered Unit name=" + CompName);
-            }
-            if (CheckEquipNameRackWaterCondenser(Num)) {
-                if (CompName != RefrigRack(Num).Name) {
-                    ShowFatalError("SimRefrigCondenser: Invalid CompIndex passed=" + General::TrimSigDigits(Num) + ", Entered Unit name=" + CompName +
-                                   ", stored Unit name for that index=" + RefrigRack(Num).Name);
-                }
-                CheckEquipNameRackWaterCondenser(Num) = false;
-            }
-        }
-
-        if (InitLoopEquip) {
-            InitRefrigeration();
-            InitRefrigerationPlantConnections();
-            return;
-        }
-
         InitRefrigerationPlantConnections();
 
-        Real64 InletTemp(0.0);
-        Real64 DesVolFlowRate(0.0);
-        Real64 MassFlowRate(0.0);
         Real64 MassFlowRateMax(0.0);
         Real64 OutletTempMax(0.0);
         Real64 VolFlowRate(0.0);
@@ -10331,42 +10324,39 @@ namespace RefrigeratedCase {
         std::string ErrIntro;
 
         // set variables depending upon system type
-        PlantInletNode = RefrigRack(Num).InletNode;
-        PlantOutletNode = RefrigRack(Num).OutletNode;
-        PlantLoopIndex = RefrigRack(Num).PlantLoopNum;
-        PlantLoopSideIndex = RefrigRack(Num).PlantLoopSideNum;
-        PlantBranchIndex = RefrigRack(Num).PlantBranchNum;
-        PlantCompIndex = RefrigRack(Num).PlantCompNum;
+        PlantInletNode = this->InletNode;
+        PlantOutletNode = this->OutletNode;
+        PlantLoopIndex = this->PlantLoopNum;
+        PlantLoopSideIndex = this->PlantLoopSideNum;
+        PlantBranchIndex = this->PlantBranchNum;
+        PlantCompIndex = this->PlantCompNum;
 
         TotalCondenserHeat =
-                DataHeatBalance::HeatReclaimRefrigeratedRack(Num).AvailCapacity - RefrigRack(Num).LaggedUsedWaterHeater - RefrigRack(Num).LaggedUsedHVACCoil;
-        FlowType = RefrigRack(Num).FlowType;
-        InletTemp = RefrigRack(Num).InletTemp;
-        DesVolFlowRate = RefrigRack(Num).DesVolFlowRate;
-        MassFlowRateMax = RefrigRack(Num).MassFlowRateMax;
-        OutletTempMax = RefrigRack(Num).OutletTempMax;
-        Name = RefrigRack(Num).Name;
+                DataHeatBalance::HeatReclaimRefrigeratedRack(Num).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
+        FlowType = this->FlowType;
+        OutletTempMax = this->OutletTempMax;
+        Name = this->Name;
         TypeName = "Refrigeration:CompressorRack:";
         ErrIntro = "Condenser for refrigeration rack ";
-        NoFlowWarnIndex = RefrigRack(Num).NoFlowWarnIndex;
-        HighFlowWarnIndex = RefrigRack(Num).HighFlowWarnIndex;
-        HighTempWarnIndex = RefrigRack(Num).HighTempWarnIndex;
-        HighInletWarnIndex = RefrigRack(Num).HighInletWarnIndex;
+        NoFlowWarnIndex = this->NoFlowWarnIndex;
+        HighFlowWarnIndex = this->HighFlowWarnIndex;
+        HighTempWarnIndex = this->HighTempWarnIndex;
+        HighInletWarnIndex = this->HighInletWarnIndex;
 
         // Current condenser is water cooled
         // Make demand request on first HVAC iteration
 
         // get cooling fluid properties
-        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
         // first determine desired flow
         Real64 OutletTemp(0.0);
 
         if (FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
-            OutletTemp = ScheduleManager::GetCurrentScheduleValue(RefrigRack(Num).OutletTempSchedPtr);
+            OutletTemp = ScheduleManager::GetCurrentScheduleValue(this->OutletTempSchedPtr);
 
-            if (OutletTemp == InletTemp) {
+            if (OutletTemp == this->InletTemp) {
 
                 if (HighInletWarnIndex == 0) {
                     ShowSevereError(ErrIntro + ", \"" + Name + "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
@@ -10375,12 +10365,12 @@ namespace RefrigeratedCase {
                 ShowRecurringWarningErrorAtEnd(ErrIntro + ", \"" + Name + "\" : has inlet water temp equal to desired outlet temp.... continues. ",
                                                HighInletWarnIndex);
                 VolFlowRate = 9999.0;
-                MassFlowRate = VolFlowRate * rho;
+                this->MassFlowRate = VolFlowRate * rho;
             } else {
-                Real64 DeltaT = OutletTemp - InletTemp;
-                MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
+                Real64 DeltaT = OutletTemp - this->InletTemp;
+                this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
                 // Check for maximum flow in the component
-                if (MassFlowRate > MassFlowRateMax) {
+                if (this->MassFlowRate > MassFlowRateMax) {
                     if (HighFlowWarnIndex == 0) {
                         ShowWarningMessage(TypeName + Name);
                         ShowContinueError("Requested condenser water mass flow rate greater than maximum allowed value. ");
@@ -10388,28 +10378,28 @@ namespace RefrigeratedCase {
                     } // HighFlowWarnIndex
                     ShowRecurringWarningErrorAtEnd(ErrIntro + Name + " - Flow rate higher than maximum allowed ... continues", HighFlowWarnIndex);
                     // END IF
-                    MassFlowRate = MassFlowRateMax;
+                    this->MassFlowRate = MassFlowRateMax;
                 }
             } // compare outlet T to inlet T
 
         } else if (FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
             // this part for constant flow condition
-            VolFlowRate = DesVolFlowRate;
-            MassFlowRate = VolFlowRate * rho;
+            VolFlowRate = this->DesVolFlowRate;
+            this->MassFlowRate = VolFlowRate * rho;
 
         } else if (TotalCondenserHeat == 0.0) {
-            MassFlowRate = 0.0;
+            this->MassFlowRate = 0.0;
 
         } // on flow type
         // check against plant, might get changed.
-        PlantUtilities::SetComponentFlowRate(MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+        PlantUtilities::SetComponentFlowRate(this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
 
-        VolFlowRate = MassFlowRate / rho;
+        VolFlowRate = this->MassFlowRate / rho;
 
-        if (MassFlowRate > 0) {
-            OutletTemp = TotalCondenserHeat / (MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+        if (this->MassFlowRate > 0) {
+            OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
         } else {
-            OutletTemp = InletTemp;
+            OutletTemp = this->InletTemp;
             if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
                 ShowRecurringWarningErrorAtEnd(
@@ -10428,15 +10418,14 @@ namespace RefrigeratedCase {
         }
 
         // set up output variables
-        RefrigRack(Num).MassFlowRate = MassFlowRate;
-        RefrigRack(Num).VolFlowRate = VolFlowRate;
-        RefrigRack(Num).OutletTemp = OutletTemp;
-        RefrigRack(Num).HighFlowWarnIndex = HighFlowWarnIndex;
-        RefrigRack(Num).HighTempWarnIndex = HighTempWarnIndex;
-        RefrigRack(Num).HighInletWarnIndex = HighInletWarnIndex;
-        RefrigRack(Num).NoFlowWarnIndex = NoFlowWarnIndex;
+        this->VolFlowRate = VolFlowRate;
+        this->OutletTemp = OutletTemp;
+        this->HighFlowWarnIndex = HighFlowWarnIndex;
+        this->HighTempWarnIndex = HighTempWarnIndex;
+        this->HighInletWarnIndex = HighInletWarnIndex;
+        this->NoFlowWarnIndex = NoFlowWarnIndex;
 
-        RefrigRack(Num).UpdateCondenser();
+        this->UpdateCondenser();
     }
 
     void RefrigCondenserData::UpdateCondenser()
@@ -11218,7 +11207,7 @@ namespace RefrigeratedCase {
         int NumIter(0);          // Iteration counter
         bool NotBalanced(true);     // Flag to indicate convergence, based on system balance
         Real64 MassFlowStart(0.5); // Initial refrigerant mass flow through receiver bypass
-        Real64 ErrorMassFlow; // Error in calculated refrigerant mass flow trhough receiver bypass
+        Real64 ErrorMassFlow; // Error in calculated refrigerant mass flow through receiver bypass
 
         while (NotBalanced) {
             ++NumIter;

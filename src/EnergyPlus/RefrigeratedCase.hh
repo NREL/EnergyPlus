@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -240,7 +241,7 @@ namespace RefrigeratedCase {
         void CalculateCase(); // Absolute pointer to refrigerated case
     };
 
-    struct RefrigRackData
+    struct RefrigRackData : PlantComponent
     {
         // Members
         bool CoilFlag;                 // Flag to show if coil type load on rack
@@ -363,6 +364,12 @@ namespace RefrigeratedCase {
         void CalcRackSystem();
 
         void ReportRackSystem(int RackNum);
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigSystemData
