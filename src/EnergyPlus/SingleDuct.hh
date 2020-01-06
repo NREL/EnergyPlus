@@ -334,7 +334,7 @@ namespace SingleDuct {
     };
 
     // Object Data
-    extern Array1D<SingleDuctAirTerminal> Sys;
+    extern Array1D<SingleDuctAirTerminal> sd_airterminal;
     extern Array1D<SysFlowConditions> SysInlet;
     extern Array1D<SysFlowConditions> SysOutlet;
     extern Array1D<AirTerminalMixerData> SysATMixer;

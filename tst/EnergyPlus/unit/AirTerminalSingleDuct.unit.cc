@@ -188,9 +188,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
     GetZoneAirLoopEquipment();
     GetSysInput();
 
-    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", Sys(1).SysType); // AT SD VAV Reheat Type
-    EXPECT_EQ("REHEAT ZONE 1", Sys(1).SysName);                                // AT SD VAV Reheat Name
-    EXPECT_GT(Sys(1).ReheatControlNode, 0);                                    // none zero integer node index is expected
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", sd_airterminal(1).SysType); // AT SD VAV Reheat Type
+    EXPECT_EQ("REHEAT ZONE 1", sd_airterminal(1).SysName);                                // AT SD VAV Reheat Name
+    EXPECT_GT(sd_airterminal(1).ReheatControlNode, 0);                                    // none zero integer node index is expected
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
@@ -407,10 +407,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
     GetZoneAirLoopEquipment();
     GetSysInput();
 
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", Sys(1).SysType); // AT SD VAV HeatCool Reheat Type
-    EXPECT_EQ("ZONE 1 VAV SYSTEM", Sys(1).SysName);                             // AT SD VAV HeatCool Reheat Name
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", Sys(1).ReheatComp);                      // Reheat Coil Type
-    EXPECT_EQ("REHEAT COIL ZONE 1", Sys(1).ReheatName);                         // Reheat Coil Name
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", sd_airterminal(1).SysType); // AT SD VAV HeatCool Reheat Type
+    EXPECT_EQ("ZONE 1 VAV SYSTEM", sd_airterminal(1).SysName);                             // AT SD VAV HeatCool Reheat Name
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", sd_airterminal(1).ReheatComp);                      // Reheat Coil Type
+    EXPECT_EQ("REHEAT COIL ZONE 1", sd_airterminal(1).ReheatName);                         // Reheat Coil Name
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest)
@@ -530,10 +530,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     GetZoneAirLoopEquipment();
     GetSysInput();
 
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", Sys(1).SysType); // AT SD VAV HeatCool Reheat Type
-    EXPECT_EQ("SPACE1-1 VAV REHEAT", Sys(1).SysName);                                // AT SD VAV HeatCool Reheat Name
-    EXPECT_EQ("COIL:HEATING:WATER", Sys(1).ReheatComp);                              // Reheat Coil Type
-    EXPECT_EQ("SPACE1-1 ZONE COIL", Sys(1).ReheatName);                              // Reheat Coil Name
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", sd_airterminal(1).SysType); // AT SD VAV HeatCool Reheat Type
+    EXPECT_EQ("SPACE1-1 VAV REHEAT", sd_airterminal(1).SysName);                                // AT SD VAV HeatCool Reheat Name
+    EXPECT_EQ("COIL:HEATING:WATER", sd_airterminal(1).ReheatComp);                              // Reheat Coil Type
+    EXPECT_EQ("SPACE1-1 ZONE COIL", sd_airterminal(1).ReheatName);                              // Reheat Coil Name
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
@@ -636,19 +636,19 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     DataEnvironment::OutBaroPress = 101325.0;
 
     int const SysNum(1);
-    int const InletNode = Sys(SysNum).InletNodeNum;
-    int const OutletNode = Sys(SysNum).OutletNodeNum;
-    int const ZonePtr = Sys(SysNum).ActualZoneNum;
+    int const InletNode = sd_airterminal(SysNum).InletNodeNum;
+    int const OutletNode = sd_airterminal(SysNum).OutletNodeNum;
+    int const ZonePtr = sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = thisZoneEquip.ZoneNode;
-    Schedule(Sys(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+    Schedule(sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = Sys(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
-    EXPECT_EQ(1.0, Sys(SysNum).MaxAirVolFlowRate);
+    Real64 MassFlowRateMaxAvail = sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    EXPECT_EQ(1.0, sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
-    EXPECT_EQ("COIL:HEATING:ELECTRIC", Sys(SysNum).ReheatComp);
-    EXPECT_EQ(Normal, Sys(SysNum).DamperHeatingAction);
-    EXPECT_EQ(0.2, Sys(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", sd_airterminal(SysNum).ReheatComp);
+    EXPECT_EQ(Normal, sd_airterminal(SysNum).DamperHeatingAction);
+    EXPECT_EQ(0.2, sd_airterminal(SysNum).ZoneMinAirFrac);
 
     // set air inlet node properties
     Node(InletNode).Temp = 15.0;
@@ -679,7 +679,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(expectedMassFlowAirReheatMin, SysOutlet(SysNum).AirMassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
-    EXPECT_EQ(1.0, Sys(SysNum).AirMassFlowRateMax);
+    EXPECT_EQ(1.0, sd_airterminal(SysNum).AirMassFlowRateMax);
 }
 
 } // namespace EnergyPlus
