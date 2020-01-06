@@ -314,7 +314,7 @@ namespace SingleDuct {
         void InitATMixer(bool const FirstHVACIteration);
     };
 
-    struct SysFlowConditions
+    struct SingleDuctAirTerminalFlowConditions
     {
         // Members
         Real64 AirMassFlowRate;         // MassFlow through the Sys being Simulated [kg/Sec]
@@ -326,7 +326,7 @@ namespace SingleDuct {
         Real64 AirPressure;
 
         // Default Constructor
-        SysFlowConditions()
+        SingleDuctAirTerminalFlowConditions()
             : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirTemp(0.0), AirHumRat(0.0), AirEnthalpy(0.0),
               AirPressure(0.0)
         {
@@ -335,8 +335,8 @@ namespace SingleDuct {
 
     // Object Data
     extern Array1D<SingleDuctAirTerminal> sd_airterminal;
-    extern Array1D<SysFlowConditions> SysInlet;
-    extern Array1D<SysFlowConditions> SysOutlet;
+    extern Array1D<SingleDuctAirTerminalFlowConditions> sd_airterminalInlet;
+    extern Array1D<SingleDuctAirTerminalFlowConditions> sd_airterminalOutlet;
     extern Array1D<AirTerminalMixerData> SysATMixer;
 
     // Functions

@@ -676,7 +676,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     // run SimulateSingleDuct() function
     SimulateSingleDuct(thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action
-    EXPECT_EQ(expectedMassFlowAirReheatMin, SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, sd_airterminalOutlet(SysNum).AirMassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
     EXPECT_EQ(1.0, sd_airterminal(SysNum).AirMassFlowRateMax);

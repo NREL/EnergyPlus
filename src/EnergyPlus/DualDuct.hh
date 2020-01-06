@@ -109,7 +109,7 @@ namespace DualDuct {
     struct DualDuctAirTerminal
     {
         // Members
-        std::string DamperName; // Name of the Damper
+        std::string Name; // Name of the Damper
         //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
@@ -197,7 +197,7 @@ namespace DualDuct {
 
     };
 
-    struct DamperFlowConditions
+    struct DualDuctAirTerminalFlowConditions
     {
         // Members
         Real64 AirMassFlowRate;         // MassFlow through the Damper being Simulated [kg/Sec]
@@ -213,7 +213,7 @@ namespace DualDuct {
         Real64 AirMassFlowDiffMag;   // flow difference scale, kg/s
 
         // Default Constructor
-        DamperFlowConditions()
+        DualDuctAirTerminalFlowConditions()
             : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
               AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
         {
@@ -222,12 +222,12 @@ namespace DualDuct {
 
     // Object Data
     extern Array1D<DualDuctAirTerminal> dd_airterminal;
-    extern Array1D<DamperFlowConditions> DamperInlet;
-    extern Array1D<DamperFlowConditions> DamperHotAirInlet;
-    extern Array1D<DamperFlowConditions> DamperColdAirInlet;
-    extern Array1D<DamperFlowConditions> DamperOutlet;
-    extern Array1D<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
-    extern Array1D<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalHotAirInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalColdAirInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOutlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
     // Functions
 

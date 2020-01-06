@@ -179,8 +179,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
@@ -192,8 +192,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Test with cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
@@ -209,8 +209,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
@@ -222,8 +222,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();
@@ -351,8 +351,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
@@ -364,8 +364,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Test with cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
@@ -381,8 +381,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(0.0, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(0.0, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Second test - AlwaysOn Schedule - expecting flow
     // Reset flows and switch to AlwaysOn Schedule
@@ -394,8 +394,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     FirstHVACIteration = false;
     SingleDuct::sd_airterminal(SysNum).InitSys(SysNum, FirstHVACIteration); // Run thru init a second time with FirstHVACIteration set to false
     SingleDuct::sd_airterminal(SysNum).SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMaxMassFlow, SingleDuct::SysOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMaxMassFlow, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();

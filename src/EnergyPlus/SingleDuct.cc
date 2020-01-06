@@ -201,8 +201,8 @@ namespace SingleDuct {
     // Object Data
     Array1D<SingleDuctAirTerminal> sd_airterminal;
     std::unordered_map<std::string, std::string> SysUniqueNames;
-    Array1D<SysFlowConditions> SysInlet;
-    Array1D<SysFlowConditions> SysOutlet;
+    Array1D<SingleDuctAirTerminalFlowConditions> sd_airterminalInlet;
+    Array1D<SingleDuctAirTerminalFlowConditions> sd_airterminalOutlet;
     Array1D<AirTerminalMixerData> SysATMixer;
     // Array1D< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
 
@@ -229,8 +229,8 @@ namespace SingleDuct {
         SysUniqueNames.clear();
         SysATMixer.deallocate();
         sd_airterminal.deallocate();
-        SysInlet.deallocate();
-        SysOutlet.deallocate();
+        sd_airterminalInlet.deallocate();
+        sd_airterminalOutlet.deallocate();
         InitATMixerFlag = true;
     }
 
@@ -413,8 +413,8 @@ namespace SingleDuct {
 
         sd_airterminal.allocate(NumSys);
         SysUniqueNames.reserve(static_cast<unsigned>(NumSys));
-        SysInlet.allocate(NumSys);
-        SysOutlet.allocate(NumSys);
+        sd_airterminalInlet.allocate(NumSys);
+        sd_airterminalOutlet.allocate(NumSys);
         CheckEquipName.dimension(NumSys, true);
 
         MassFlow1.allocate(NumSys);
@@ -2292,17 +2292,17 @@ namespace SingleDuct {
 
         // Do a check and make sure that the max and min available(control) flow is
         //  between the physical max and min while operating.
-        SysInlet(SysNum).AirMassFlowRateMaxAvail = min(sd_airterminal(SysNum).AirMassFlowRateMax, Node(InletNode).MassFlowRateMaxAvail);
-        SysInlet(SysNum).AirMassFlowRateMinAvail =
-            min(max(Node(OutletNode).MassFlowRateMin, Node(InletNode).MassFlowRateMinAvail), SysInlet(SysNum).AirMassFlowRateMaxAvail);
+        sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail = min(sd_airterminal(SysNum).AirMassFlowRateMax, Node(InletNode).MassFlowRateMaxAvail);
+        sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail =
+            min(max(Node(OutletNode).MassFlowRateMin, Node(InletNode).MassFlowRateMinAvail), sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
 
         // Do the following initializations (every time step): This should be the info from
         // the previous components outlets or the node data in this section.
         // Load the node data in this section for the component simulation
-        SysInlet(SysNum).AirMassFlowRate = Node(InletNode).MassFlowRate;
-        SysInlet(SysNum).AirTemp = Node(InletNode).Temp;
-        SysInlet(SysNum).AirHumRat = Node(InletNode).HumRat;
-        SysInlet(SysNum).AirEnthalpy = Node(InletNode).Enthalpy;
+        sd_airterminalInlet(SysNum).AirMassFlowRate = Node(InletNode).MassFlowRate;
+        sd_airterminalInlet(SysNum).AirTemp = Node(InletNode).Temp;
+        sd_airterminalInlet(SysNum).AirHumRat = Node(InletNode).HumRat;
+        sd_airterminalInlet(SysNum).AirEnthalpy = Node(InletNode).Enthalpy;
         // set to zero, now it is used for constant volume with no reheat air terminal
         sd_airterminal(SysNum).HeatRate = 0.0;
         sd_airterminal(SysNum).CoolRate = 0.0;
@@ -3226,7 +3226,7 @@ namespace SingleDuct {
         SysOutletNode = sd_airterminal(SysNum).ReheatAirOutletNode;
         SysInletNode = sd_airterminal(SysNum).InletNodeNum;
         CpAirAvg =
-            PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp + SysInlet(SysNum).AirTemp));
+            PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + sd_airterminalInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp + sd_airterminalInlet(SysNum).AirTemp));
         MinFlowFrac = sd_airterminal(SysNum).ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
         ZoneTemp = Node(ZoneNodeNum).Temp;
@@ -3236,19 +3236,19 @@ namespace SingleDuct {
         // the massflow rate for cooling is determined to meet the entire load.  Then
         // if the massflow is below the minimum or greater than the Max it is set to either the Min
         // or the Max as specified for the VAV model.
-        if ((QTotLoad < 0.0) && (SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) && (TempControlType(ZoneNum) != SingleHeatingSetPoint) &&
+        if ((QTotLoad < 0.0) && (sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) && (TempControlType(ZoneNum) != SingleHeatingSetPoint) &&
             (GetCurrentScheduleValue(sd_airterminal(SysNum).SchedPtr) > 0.0)) {
             // Calculate the flow required for cooling
-            DeltaTemp = CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp);
+            DeltaTemp = CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
             if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
-                DeltaTemp = CpAirAvg * (SysInlet(SysNum).AirTemp - DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE);
+                DeltaTemp = CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE);
             }
 
             // Need to check DeltaTemp and ensure that it is not zero
             if (DeltaTemp != 0.0) {
                 MassFlow = QTotLoad / DeltaTemp;
             } else {
-                MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+                MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
             }
 
             // Apply the zone maximum outdoor air fraction FOR VAV boxes - a TRACE feature
@@ -3262,13 +3262,13 @@ namespace SingleDuct {
 
             // used for normal acting damper
             MinMassAirFlow = max(MinMassAirFlow, MassFlowBasedOnOA);
-            MinMassAirFlow = max(MinMassAirFlow, SysInlet(SysNum).AirMassFlowRateMinAvail);
-            MinMassAirFlow = min(MinMassAirFlow, SysInlet(SysNum).AirMassFlowRateMaxAvail);
+            MinMassAirFlow = max(MinMassAirFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail);
+            MinMassAirFlow = min(MinMassAirFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
 
             // limit the OA based supply air flow rate based on optional user input
             // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
-            MassFlow = max(MassFlow, SysInlet(SysNum).AirMassFlowRateMinAvail);
-            MassFlow = min(MassFlow, SysInlet(SysNum).AirMassFlowRateMaxAvail);
+            MassFlow = max(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail);
+            MassFlow = min(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
 
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
                 AirflowNetwork::AirflowNetworkFanActivated && AirflowNetwork::VAVTerminalRatio > 0.0) {
@@ -3278,14 +3278,14 @@ namespace SingleDuct {
                 }
             }
 
-        } else if ((SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) && (QTotLoad >= 0.0 || TempControlType(ZoneNum) == SingleHeatingSetPoint) &&
+        } else if ((sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) && (QTotLoad >= 0.0 || TempControlType(ZoneNum) == SingleHeatingSetPoint) &&
                    (GetCurrentScheduleValue(sd_airterminal(SysNum).SchedPtr) > 0.0)) {
-            //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. SysInlet(SysNum)%AirMassFlowRateMinAvail <= SmallMassFlow) THEN
+            //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. sd_airterminalInlet(SysNum)%AirMassFlowRateMinAvail <= SmallMassFlow) THEN
             // special case for heating: reverse action and damper allowed to close - set the minimum flow rate to a small but nonzero value
-            //       MassFlow = 0.01d0*SysInlet(SysNum)%AirMassFlowRateMaxAvail
+            //       MassFlow = 0.01d0*sd_airterminalInlet(SysNum)%AirMassFlowRateMaxAvail
             //     ELSE
             // usual case for heating: set the air mass flow rate to the minimum
-            MassFlow = SysInlet(SysNum).AirMassFlowRateMinAvail;
+            MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
             //     END IF
 
             // Apply the zone maximum outdoor air fraction for VAV boxes - a TRACE feature
@@ -3298,10 +3298,10 @@ namespace SingleDuct {
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
 
             // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
-            if (MassFlow <= SysInlet(SysNum).AirMassFlowRateMinAvail) {
-                MassFlow = SysInlet(SysNum).AirMassFlowRateMinAvail;
-            } else if (MassFlow >= SysInlet(SysNum).AirMassFlowRateMaxAvail) {
-                MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+            if (MassFlow <= sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail) {
+                MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
+            } else if (MassFlow >= sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail) {
+                MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
             }
 
             // the AirflowNetwork model overrids the mass flow rate value
@@ -3327,19 +3327,19 @@ namespace SingleDuct {
         }
 
         // Move data to the damper outlet node
-        SysOutlet(SysNum).AirTemp = SysInlet(SysNum).AirTemp;
-        SysOutlet(SysNum).AirHumRat = SysInlet(SysNum).AirHumRat;
-        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
-        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
-        SysOutlet(SysNum).AirEnthalpy = SysInlet(SysNum).AirEnthalpy;
+        sd_airterminalOutlet(SysNum).AirTemp = sd_airterminalInlet(SysNum).AirTemp;
+        sd_airterminalOutlet(SysNum).AirHumRat = sd_airterminalInlet(SysNum).AirHumRat;
+        sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMinAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
+        sd_airterminalOutlet(SysNum).AirEnthalpy = sd_airterminalInlet(SysNum).AirEnthalpy;
 
         //   ! Calculate the Damper Position when there is a Max air flow specified.
         //  If (MassFlow == 0.0D0) THEN
         //    sd_airterminal(SysNum)%DamperPosition = 0.0D0
-        //  ELSE IF (SysInlet(SysNum)%AirMassFlowRateMaxAvail > SysInlet(SysNum)%AirMassFlowRateMinAvail) THEN
-        //    sd_airterminal(SysNum)%DamperPosition = ((MassFlow-SysInlet(SysNum)%AirMassFlowRateMinAvail) / &
-        //                                   (SysInlet(SysNum)%AirMassFlowRateMaxAvail-SysInlet(SysNum)%AirMassFlowRateMinAvail)) * &
+        //  ELSE IF (sd_airterminalInlet(SysNum)%AirMassFlowRateMaxAvail > sd_airterminalInlet(SysNum)%AirMassFlowRateMinAvail) THEN
+        //    sd_airterminal(SysNum)%DamperPosition = ((MassFlow-sd_airterminalInlet(SysNum)%AirMassFlowRateMinAvail) / &
+        //                                   (sd_airterminalInlet(SysNum)%AirMassFlowRateMaxAvail-sd_airterminalInlet(SysNum)%AirMassFlowRateMinAvail)) * &
         //                                  (1.0d0-MinFlowFrac) + MinFlowFrac
         //  ELSE
         //    sd_airterminal(SysNum)%DamperPosition = 1.0D0
@@ -3360,7 +3360,7 @@ namespace SingleDuct {
         sd_airterminal(SysNum).UpdateSys(SysNum);
 
         // At the current air mass flow rate, calculate heating coil load
-        QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
+        QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
 
         // do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
         // there's a heating requirement, and there's a thermostat with a heating setpoint
@@ -3404,8 +3404,8 @@ namespace SingleDuct {
             MassFlow = max(MassFlow, MassFlowReqToLimitLeavingTemp);
             MassFlow = min(MassFlow, MaxDeviceAirMassFlowReheat);
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
-            MassFlow = min(MassFlow, SysInlet(SysNum).AirMassFlowRateMaxAvail);
-            MassFlow = max(MassFlow, SysInlet(SysNum).AirMassFlowRateMinAvail);
+            MassFlow = min(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
+            MassFlow = max(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail);
 
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
                 AirflowNetwork::AirflowNetworkFanActivated && AirflowNetwork::VAVTerminalRatio > 0.0) {
@@ -3421,7 +3421,7 @@ namespace SingleDuct {
                 QZoneMax2 = min(QZoneMaxRHTempLimit, QToHeatSetPt);
             }
 
-            SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+            sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
 
             sd_airterminal(SysNum).UpdateSys(SysNum);
 
@@ -3481,13 +3481,13 @@ namespace SingleDuct {
                         if (Node(sd_airterminal(SysNum).ReheatControlNode).MassFlowRate == MaxFlowWater) {
                             // fill limits for air flow for controller
                             MinAirMassFlowRevAct = sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac;
-                            MinAirMassFlowRevAct = min(MinAirMassFlowRevAct, SysInlet(SysNum).AirMassFlowRateMaxAvail);
-                            MinAirMassFlowRevAct = max(MinAirMassFlowRevAct, SysInlet(SysNum).AirMassFlowRateMinAvail);
+                            MinAirMassFlowRevAct = min(MinAirMassFlowRevAct, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
+                            MinAirMassFlowRevAct = max(MinAirMassFlowRevAct, sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail);
 
                             MaxAirMassFlowRevAct = sd_airterminal(SysNum).AirMassFlowRateMax;
                             MaxAirMassFlowRevAct = min(MaxAirMassFlowRevAct, MaxDeviceAirMassFlowReheat);
                             MaxAirMassFlowRevAct = max(MaxAirMassFlowRevAct, MinAirMassFlowRevAct);
-                            MaxAirMassFlowRevAct = min(MaxAirMassFlowRevAct, SysInlet(SysNum).AirMassFlowRateMaxAvail);
+                            MaxAirMassFlowRevAct = min(MaxAirMassFlowRevAct, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
 
                             Node(sd_airterminal(SysNum).OutletNodeNum).MassFlowRateMaxAvail =
                                 MaxAirMassFlowRevAct; // suspect, check how/if used in ControlCompOutput
@@ -3506,7 +3506,7 @@ namespace SingleDuct {
                                               SysOutletNode); // why not QZnReq  ?
                             // air flow controller, not on plant, don't pass plant topology info
                             // reset terminal unit inlet air mass flow to new value.
-                            Node(sd_airterminal(SysNum).OutletNodeNum).MassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+                            Node(sd_airterminal(SysNum).OutletNodeNum).MassFlowRateMaxAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
                             MassFlow = Node(SysOutletNode).MassFlowRate;
 
                             //         ! look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
@@ -3515,7 +3515,7 @@ namespace SingleDuct {
                                  (std::abs(MassFlow - MassFlow3(SysNum)) < MassFlowDiff(SysNum))) &&
                                 (std::abs(MassFlow - MassFlow1(SysNum)) >= MassFlowDiff(SysNum))) {
                                 if (MassFlow > 0.0) MassFlow = MassFlow1(SysNum);
-                                SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+                                sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
                                 sd_airterminal(SysNum).UpdateSys(SysNum);
 
                                 // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
@@ -3542,7 +3542,7 @@ namespace SingleDuct {
                                                   sd_airterminal(SysNum).HWBranchIndex);
                             }
 
-                            SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+                            sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
                             // reset OA report variable
                             sd_airterminal(SysNum).UpdateSys(SysNum);
                         } // IF (Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate .EQ. MaxFlowWater) THEN
@@ -3562,21 +3562,21 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, QZnReq);
 
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(
@@ -3794,21 +3794,21 @@ namespace SingleDuct {
         // the massflow rate for cooling is determined to meet the entire load.  Then
         // if the massflow is below the minimum or greater than the Max it is set to either the Min
         // or the Max as specified for the VAV model.
-        if (SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) {
+        if (sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) {
             // Calculate the flow required for cooling
-            CpAirSysIn = PsyCpAirFnWTdb(SysInlet(SysNum).AirHumRat, SysInlet(SysNum).AirTemp);
-            DeltaTemp = CpAirSysIn * SysInlet(SysNum).AirTemp - CpAirZn * ZoneTemp;
+            CpAirSysIn = PsyCpAirFnWTdb(sd_airterminalInlet(SysNum).AirHumRat, sd_airterminalInlet(SysNum).AirTemp);
+            DeltaTemp = CpAirSysIn * sd_airterminalInlet(SysNum).AirTemp - CpAirZn * ZoneTemp;
 
             // Need to check DeltaTemp and ensure that it is not zero
             if (DeltaTemp != 0.0) {
                 MassFlow = QTotLoad / DeltaTemp;
             } else {
-                MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+                MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
             }
 
             // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
-            MassFlow = max(MassFlow, SysInlet(SysNum).AirMassFlowRateMinAvail);
-            MassFlow = min(MassFlow, SysInlet(SysNum).AirMassFlowRateMaxAvail);
+            MassFlow = max(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail);
+            MassFlow = min(MassFlow, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
         } else {
             // System is Off set massflow to 0.0
             MassFlow = 0.0;
@@ -3821,12 +3821,12 @@ namespace SingleDuct {
         }
 
         // Move data to the damper outlet node
-        SysOutlet(SysNum).AirTemp = SysInlet(SysNum).AirTemp;
-        SysOutlet(SysNum).AirHumRat = SysInlet(SysNum).AirHumRat;
-        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
-        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
-        SysOutlet(SysNum).AirEnthalpy = SysInlet(SysNum).AirEnthalpy;
+        sd_airterminalOutlet(SysNum).AirTemp = sd_airterminalInlet(SysNum).AirTemp;
+        sd_airterminalOutlet(SysNum).AirHumRat = sd_airterminalInlet(SysNum).AirHumRat;
+        sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMinAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
+        sd_airterminalOutlet(SysNum).AirEnthalpy = sd_airterminalInlet(SysNum).AirEnthalpy;
 
         // Calculate the Damper Position when there is a Max air flow specified.
         if (sd_airterminal(SysNum).AirMassFlowRateMax == 0.0) {
@@ -3838,11 +3838,11 @@ namespace SingleDuct {
         // Need to make sure that the damper outlets are passed to the coil inlet
         sd_airterminal(SysNum).UpdateSys(SysNum);
 
-        QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (SysInlet(SysNum).AirTemp - ZoneTemp);
+        QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
         if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
             //   VAVHeatandCool boxes operate at varying mass flow rates when reheating, VAV boxes operate at min flow
-            //      (MassFlow <= SysInlet(SysNum)%AirMassFlowRateMinAvail) .AND. &
+            //      (MassFlow <= sd_airterminalInlet(SysNum)%AirMassFlowRateMinAvail) .AND. &
             //   Per Fred Buhl, don't use DeadBandOrSetback to determine if heaters operate
             //      (.NOT. DeadBandOrSetback(ZoneNum))) Then
 
@@ -3890,7 +3890,7 @@ namespace SingleDuct {
 
             } // IF (sd_airterminal(SysNum)%MaxReheatTempSetByUser) THEN
 
-            SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+            sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
 
             sd_airterminal(SysNum).UpdateSys(SysNum);
 
@@ -3954,8 +3954,8 @@ namespace SingleDuct {
                                               FirstHVACIteration,
                                               QZoneMax2,
                                               sd_airterminal(SysNum).OutletNodeNum,
-                                              SysInlet(SysNum).AirMassFlowRateMaxAvail,
-                                              SysInlet(SysNum).AirMassFlowRateMinAvail,
+                                              sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail,
+                                              sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail,
                                               sd_airterminal(SysNum).ControllerOffset,
                                               sd_airterminal(SysNum).ControlCompTypeNum,
                                               sd_airterminal(SysNum).CompErrIndex,
@@ -3965,7 +3965,7 @@ namespace SingleDuct {
 
                             // reset terminal unit inlet air mass flow to new value.
                             MassFlow = Node(SysOutletNode).MassFlowRate;
-                            SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+                            sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
                             sd_airterminal(SysNum).UpdateSys(SysNum);
                         }
                         // look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
@@ -3974,7 +3974,7 @@ namespace SingleDuct {
                              (std::abs(MassFlow - MassFlow3(SysNum)) < MassFlowDiff(SysNum))) &&
                             (std::abs(MassFlow - MassFlow1(SysNum)) >= MassFlowDiff(SysNum))) {
                             MassFlow = MassFlow1(SysNum);
-                            SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+                            sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
                             sd_airterminal(SysNum).UpdateSys(SysNum);
                             ControlCompOutput(sd_airterminal(SysNum).ReheatName,
                                               sd_airterminal(SysNum).ReheatComp,
@@ -4005,7 +4005,7 @@ namespace SingleDuct {
                     }
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // ! COIL:STEAM:AIRHEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirZn * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QZoneMax2 - MassFlow * CpAirZn * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
                     // Simulate reheat coil for the VAV system
@@ -4013,7 +4013,7 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
-                    QSupplyAir = MassFlow * CpAirZn * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QSupplyAir = MassFlow * CpAirZn * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
                     QZnReq = QZoneMax2 - QSupplyAir;
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
@@ -4022,7 +4022,7 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QZoneMax2 - MassFlow * CpAirZn * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QZoneMax2 - MassFlow * CpAirZn * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
                     // Simulate reheat coil for the VAV system
@@ -4162,13 +4162,13 @@ namespace SingleDuct {
         CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
         HCType = sd_airterminal(SysNum).ReheatComp_Num;
         FanType = sd_airterminal(SysNum).Fan_Num;
-        MaxCoolMassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;
-        MaxHeatMassFlow = min(sd_airterminal(SysNum).HeatAirMassFlowRateMax, SysInlet(SysNum).AirMassFlowRateMaxAvail);
+        MaxCoolMassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
+        MaxHeatMassFlow = min(sd_airterminal(SysNum).HeatAirMassFlowRateMax, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);
         MinMassFlow = MaxCoolMassFlow * sd_airterminal(SysNum).ZoneMinAirFrac;
         UnitFlowToler = 0.001 * HVACFlowRateToler;
         QDelivered = 0.0;
         HWFlow = 0.0;
-        if (SysInlet(SysNum).AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
+        if (sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
             MassFlow = 0.0;
             FanOp = 0;
             CalcVAVVS(SysNum, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
@@ -4238,7 +4238,7 @@ namespace SingleDuct {
         }
 
         // Active cooling with fix for issue #5592
-        if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 &&
+        if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 &&
             !CurDeadBandOrSetback(ZoneNum)) {
             // check that it can meet the load
             FanOp = 1;
@@ -4289,8 +4289,8 @@ namespace SingleDuct {
 
             // no active heating or cooling
         } else if ((QTotLoad >= QCoolFanOnMin - SmallLoad && QTotLoad <= QNoHeatFanOff + SmallLoad &&
-                    SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) ||
-                   (SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 && CurDeadBandOrSetback(ZoneNum))) {
+                    sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0) ||
+                   (sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 && CurDeadBandOrSetback(ZoneNum))) {
             MassFlow = MinMassFlow;
             FanOp = 0;
             if (HCType == HCoilType_SteamAirHeating) {
@@ -4300,7 +4300,7 @@ namespace SingleDuct {
             }
 
             // active heating
-        } else if (QTotLoad > QNoHeatFanOff + SmallLoad && SysInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 && !CurDeadBandOrSetback(ZoneNum)) {
+        } else if (QTotLoad > QNoHeatFanOff + SmallLoad && sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail > 0.0 && !CurDeadBandOrSetback(ZoneNum)) {
             // hot water coil
             if (HCType == HCoilType_SimpleHeating) {
                 if (QTotLoad < QHeatFanOffMax - SmallLoad) {
@@ -4550,7 +4550,7 @@ namespace SingleDuct {
         Real64 DummyMdot; // local fluid mass flow rate
 
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
-        MassFlow = SysInlet(SysNum).AirMassFlowRateMaxAvail;                    // System massflow is set to the Available
+        MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;                    // System massflow is set to the Available
         QMax2 = QToHeatSetPt;
         ZoneTemp = Node(ZoneNodeNum).Temp;
         CpAir = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, ZoneTemp); // zone air specific heat
@@ -4560,8 +4560,8 @@ namespace SingleDuct {
             QMax2 = min(QToHeatSetPt, QMax);
         } // IF (sd_airterminal(SysNum)%MaxReheatTempSetByUser) THEN
 
-        if (((SysInlet(SysNum).AirMassFlowRateMaxAvail == 0.0) && (SysInlet(SysNum).AirMassFlowRateMinAvail == 0.0)) ||
-            (SysInlet(SysNum).AirMassFlowRate == 0.0)) {
+        if (((sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail == 0.0) && (sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail == 0.0)) ||
+            (sd_airterminalInlet(SysNum).AirMassFlowRate == 0.0)) {
             // System is Off set massflow to 0.0
             MassFlow = 0.0;
         }
@@ -4574,12 +4574,12 @@ namespace SingleDuct {
         }
 
         // make sure the inlet node flow rate is updated if the mass flow has been limited
-        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
-        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
+        sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMinAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
         sd_airterminal(SysNum).UpdateSys(SysNum);
 
-        QActualHeating = QToHeatSetPt - MassFlow * CpAir * (SysInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
+        QActualHeating = QToHeatSetPt - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp); // reheat needed
         // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
         // system scheduled OFF then not operational and shut the system down.
         if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
@@ -4634,20 +4634,20 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:STEAMAIRHEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QMax2 - MassFlow * CpAir * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QMax2 - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, QZnReq);
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QMax2 - MassFlow * CpAir * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QMax2 - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
-                    QZnReq = QMax2 - MassFlow * CpAir * (SysInlet(SysNum).AirTemp - ZoneTemp);
+                    QZnReq = QMax2 - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
                     SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
@@ -4694,8 +4694,8 @@ namespace SingleDuct {
         //      Write(OutputFileDebug,*)  'Day of Sim     Hour of Day    Time'
         //      Write(OutputFileDebug,*)  DayOfSim, HourOfDay, TimeStep*TimeStepZone
         //      Write(OutputFileDebug,10)
-        //      Write(OutputFileDebug,20)ZoneNum, SysInlet(SysNum)%AirMassFlowRate, &
-        //                             SysInlet(SysNum)%AirMassFlowRate, &
+        //      Write(OutputFileDebug,20)ZoneNum, sd_airterminalInlet(SysNum)%AirMassFlowRate, &
+        //                             sd_airterminalInlet(SysNum)%AirMassFlowRate, &
         //                              Temperature, Mat(ZoneNum), Node(ZoneNodeNum)%Temp, QTotLoad, &
         //                             Enthalpy
         // End If
@@ -4739,7 +4739,7 @@ namespace SingleDuct {
         Real64 MassFlow;           // [kg/sec]   mass flow rate at the inlet
         Real64 SensOutputProvided; // heating and cooling provided to the zone [W]
 
-        MassFlow = SysInlet(SysNum).AirMassFlowRate; // system air mass flow rate
+        MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRate; // system air mass flow rate
 
         if (GetCurrentScheduleValue(this->SchedPtr) > 0.0 && MassFlow > SmallMassFlow) {
             Real64 CpAir = PsyCpAirFnWTdb(0.5 * (Node(this->OutletNodeNum).HumRat + Node(ZoneNodeNum).HumRat),
@@ -4751,12 +4751,12 @@ namespace SingleDuct {
         }
 
         // set the outlet node air conditions to that of the inlet
-        SysOutlet(SysNum).AirTemp = SysInlet(SysNum).AirTemp;
-        SysOutlet(SysNum).AirHumRat = SysInlet(SysNum).AirHumRat;
-        SysOutlet(SysNum).AirEnthalpy = SysInlet(SysNum).AirEnthalpy;
-        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
-        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
-        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
+        sd_airterminalOutlet(SysNum).AirTemp = sd_airterminalInlet(SysNum).AirTemp;
+        sd_airterminalOutlet(SysNum).AirHumRat = sd_airterminalInlet(SysNum).AirHumRat;
+        sd_airterminalOutlet(SysNum).AirEnthalpy = sd_airterminalInlet(SysNum).AirEnthalpy;
+        sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail;
+        sd_airterminalOutlet(SysNum).AirMassFlowRateMinAvail = sd_airterminalInlet(SysNum).AirMassFlowRateMinAvail;
 
         // air heat transfer rate and energy
         this->HeatRate = max(SensOutputProvided, 0.0);
@@ -5193,7 +5193,7 @@ namespace SingleDuct {
         FanOp = int(Par(7));
         HeatOut = HeatingFrac * MaxHeatOut;
         AirMassFlowRate =
-            max(HeatingFrac * sd_airterminal(UnitIndex).HeatAirMassFlowRateMax, SysInlet(UnitIndex).AirMassFlowRateMaxAvail * sd_airterminal(UnitIndex).ZoneMinAirFrac);
+            max(HeatingFrac * sd_airterminal(UnitIndex).HeatAirMassFlowRateMax, sd_airterminalInlet(UnitIndex).AirMassFlowRateMaxAvail * sd_airterminal(UnitIndex).ZoneMinAirFrac);
 
         sd_airterminal(UnitIndex).CalcVAVVS(UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
 
@@ -5252,10 +5252,10 @@ namespace SingleDuct {
             sd_airterminal(SysNum).SysType_Num == SingleDuctCBVAVNoReheat || sd_airterminal(SysNum).SysType_Num == SingleDuctVAVNoReheat ||
             sd_airterminal(SysNum).SysType_Num == SingleDuctConstVolNoReheat) {
             // Set the outlet air nodes of the Sys
-            Node(OutletNode).MassFlowRate = SysOutlet(SysNum).AirMassFlowRate;
-            Node(OutletNode).Temp = SysOutlet(SysNum).AirTemp;
-            Node(OutletNode).HumRat = SysOutlet(SysNum).AirHumRat;
-            Node(OutletNode).Enthalpy = SysOutlet(SysNum).AirEnthalpy;
+            Node(OutletNode).MassFlowRate = sd_airterminalOutlet(SysNum).AirMassFlowRate;
+            Node(OutletNode).Temp = sd_airterminalOutlet(SysNum).AirTemp;
+            Node(OutletNode).HumRat = sd_airterminalOutlet(SysNum).AirHumRat;
+            Node(OutletNode).Enthalpy = sd_airterminalOutlet(SysNum).AirEnthalpy;
             // Set the outlet nodes for properties that just pass through & not used
             Node(OutletNode).Quality = Node(InletNode).Quality;
             Node(OutletNode).Press = Node(InletNode).Press;
@@ -5263,9 +5263,9 @@ namespace SingleDuct {
 
         // After all of the Oulets are updated the mass flow information needs to be
         // passed back to the system inlet.
-        Node(InletNode).MassFlowRate = SysOutlet(SysNum).AirMassFlowRate;
-        Node(OutletNode).MassFlowRateMaxAvail = min(SysOutlet(SysNum).AirMassFlowRateMaxAvail, Node(OutletNode).MassFlowRateMax);
-        Node(OutletNode).MassFlowRateMinAvail = SysOutlet(SysNum).AirMassFlowRateMinAvail;
+        Node(InletNode).MassFlowRate = sd_airterminalOutlet(SysNum).AirMassFlowRate;
+        Node(OutletNode).MassFlowRateMaxAvail = min(sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail, Node(OutletNode).MassFlowRateMax);
+        Node(OutletNode).MassFlowRateMinAvail = sd_airterminalOutlet(SysNum).AirMassFlowRateMinAvail;
 
         if (Contaminant.CO2Simulation) {
             Node(OutletNode).CO2 = Node(InletNode).CO2;
