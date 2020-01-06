@@ -358,6 +358,8 @@ namespace RefrigeratedCase {
             ActualEvapPumpPower = 0.0;
         }
 
+        void UpdateRefrigCondenser(int Num, int SysType);
+
         void CalcRackSystem();
 
         void ReportRackSystem(int RackNum);
@@ -515,6 +517,10 @@ namespace RefrigeratedCase {
             TotHiStageCompCoolingEnergy = 0.0;
         }
 
+        void CalcDetailedSystem(int SysNum);
+
+        void CalculateCondensers(int SysNum);
+
         void CalculateCompressors();
 
         void CalculateSubcoolers();
@@ -661,6 +667,10 @@ namespace RefrigeratedCase {
             TotCompPowerLP = 0.0;
             TotCompCoolingEnergy = 0.0;
         }
+
+        void CalcDetailedTransSystem(int SysNum);
+
+        void CalcGasCooler(int SysNum);
 
         void CalculateTransCompressors();
     };
@@ -1503,19 +1513,9 @@ namespace RefrigeratedCase {
 
     void SimRefrigCondenser(int SysType, std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
 
-    void UpdateRefrigCondenser(int Num, int SysType);
-
     void SimulateDetailedRefrigerationSystems();
 
     void SimulateDetailedTransRefrigSystems();
-
-    void CalcDetailedSystem(int SysNum);
-
-    void CalcDetailedTransSystem(int SysNum);
-
-    void CalculateCondensers(int SysNum);
-
-    void CalcGasCooler(int SysNum);
 
     void GetRefrigeratedRackIndex(std::string const &Name,
                                   int &IndexPtr,

@@ -10352,10 +10352,10 @@ namespace RefrigeratedCase {
             }
         }
 
-        UpdateRefrigCondenser(Num, SysType);
+        RefrigRack(Num).UpdateRefrigCondenser(Num, SysType);
     }
 
-    void UpdateRefrigCondenser(int const Num, int const SysType)
+    void RefrigRackData::UpdateRefrigCondenser(int const Num, int const SysType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10367,30 +10367,30 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        int InletNode(0);
-        int OutletNode(0);
+        int inletNode(0);
+        int outletNode(0);
 
         {
             auto const SELECT_CASE_var(SysType);
             if (SELECT_CASE_var == DataPlant::TypeOf_RefrigerationWaterCoolRack) {
-                InletNode = RefrigRack(Num).InletNode;
-                OutletNode = RefrigRack(Num).OutletNode;
+                inletNode = this->InletNode;
+                outletNode = this->OutletNode;
             } else if (SELECT_CASE_var == DataPlant::TypeOf_RefrigSystemWaterCondenser) {
-                InletNode = Condenser(Num).InletNode;
-                OutletNode = Condenser(Num).OutletNode;
+                inletNode = Condenser(Num).InletNode;
+                outletNode = Condenser(Num).OutletNode;
             }
         }
 
         // Pass all variables from inlet to outlet node
-        PlantUtilities::SafeCopyPlantNode(InletNode, OutletNode); //  DataLoopNode::Node(OutletNode) = DataLoopNode::Node(InletNode)
+        PlantUtilities::SafeCopyPlantNode(inletNode, outletNode); //  DataLoopNode::Node(OutletNode) = DataLoopNode::Node(InletNode)
 
         // Set outlet node variables that are possibly changed
         {
             auto const SELECT_CASE_var(SysType);
             if (SELECT_CASE_var == DataPlant::TypeOf_RefrigerationWaterCoolRack) {
-                DataLoopNode::Node(OutletNode).Temp = RefrigRack(Num).OutletTemp;
+                DataLoopNode::Node(outletNode).Temp = this->OutletTemp;
             } else if (SELECT_CASE_var == DataPlant::TypeOf_RefrigSystemWaterCondenser) {
-                DataLoopNode::Node(OutletNode).Temp = Condenser(Num).OutletTemp;
+                DataLoopNode::Node(outletNode).Temp = Condenser(Num).OutletTemp;
             }
         }
     }
@@ -10679,7 +10679,7 @@ namespace RefrigeratedCase {
                             System(SysNum).RefMassFlowHiStageComps = System(SysNum).RefMassFlowComps / 0.65;
                         }
 
-                        CalcDetailedSystem(SysNum);
+                        System(SysNum).CalcDetailedSystem(SysNum);
 
                         bool DeRate = false;                        // If true, need to derate aircoils because load can't be met by system
 
@@ -10984,7 +10984,7 @@ namespace RefrigeratedCase {
                         TransSystem(SysNum).TotalSystemLoadMT / (TransSystem(SysNum).HCaseOutMT - TransSystem(SysNum).HCaseInMT);
                     TransSystem(SysNum).RefMassFlowCompsHP = TransSystem(SysNum).RefMassFlowtoLTLoads + TransSystem(SysNum).RefMassFlowtoMTLoads;
 
-                    CalcDetailedTransSystem(SysNum);
+                    TransSystem(SysNum).CalcDetailedTransSystem(SysNum);
                     //       TransCritSysFlag = .FALSE.
 
                 } // TransSystem(SysNum)%TotalSystemLoad > 0
@@ -11034,7 +11034,7 @@ namespace RefrigeratedCase {
         SumZoneImpacts();
     }
 
-    void CalcDetailedSystem(int const SysNum)
+    void RefrigSystemData::CalcDetailedSystem(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11071,49 +11071,48 @@ namespace RefrigeratedCase {
 
         bool NotBalanced = true;
         int  NumIter = 0;
-        Real64 ErrorMassFlowComps(0.0);        // Error in calculated (low stage) compressor mass flow (single- or two-stage systems)
+        Real64 ErrorMassFlowComps(0.0);        // Error in calculated low stage compressor mass flow (single- or two-stage systems)
         Real64 ErrorMassFlowHiStageComps(0.0); // Error in calculated high-stage compressor mass flow (two-stage systems only)
 
         // Balance This Refrigeration System using calculated refrigerant flow
         Real64 MassFlowHiStageCompsStart(0.0); // Mass flow through high-stage compressors (two-stage systems only)
-
-        auto &refrig_system(System(SysNum));
+        
         while (NotBalanced) {
             // Set values for iteration convergence tolerance check
             ++NumIter;
             // Mass flow through (low-stage) compressors (single- or two-stage systems)
-            Real64 MassFlowCompsStart = refrig_system.RefMassFlowComps;
+            Real64 MassFlowCompsStart = this->RefMassFlowComps;
 
-            if (refrig_system.NumStages == 2) { // Two-stage systems
-                MassFlowHiStageCompsStart = refrig_system.RefMassFlowHiStageComps;
+            if (this->NumStages == 2) { // Two-stage systems
+                MassFlowHiStageCompsStart = this->RefMassFlowHiStageComps;
             }
 
-            if (refrig_system.NumSubcoolers > 0) System(SysNum).CalculateSubcoolers();
-            refrig_system.CalculateCompressors();
-            CalculateCondensers(SysNum);
-            refrig_system.RefMassFlowtoLoads = refrig_system.TotalSystemLoad / (refrig_system.HCaseOut - refrig_system.HCaseIn);
+            if (this->NumSubcoolers > 0) this->CalculateSubcoolers();
+            this->CalculateCompressors();
+            this->CalculateCondensers(SysNum);
+            this->RefMassFlowtoLoads = this->TotalSystemLoad / (this->HCaseOut - this->HCaseIn);
             if (NumIter < 2) continue;
             // Previously did error check on calculated Tcondense, but not sensitive enough
-            if ((refrig_system.RefMassFlowtoLoads == 0.0) || (MassFlowCompsStart == 0.0)) { //.OR. (MassFlowCasesStart == 0.0)
-                ShowWarningError("Refrigeration:System: " + refrig_system.Name + " showing zero refrigeration flow.");
+            if ((this->RefMassFlowtoLoads == 0.0) || (MassFlowCompsStart == 0.0)) { //.OR. (MassFlowCasesStart == 0.0)
+                ShowWarningError("Refrigeration:System: " + this->Name + " showing zero refrigeration flow.");
             } else {
-                ErrorMassFlowComps = std::abs(MassFlowCompsStart - refrig_system.RefMassFlowComps) / MassFlowCompsStart;
-                if (refrig_system.NumStages == 2) { // Two-stage systems
-                    ErrorMassFlowHiStageComps = std::abs(MassFlowHiStageCompsStart - refrig_system.RefMassFlowHiStageComps) / MassFlowCompsStart;
+                ErrorMassFlowComps = std::abs(MassFlowCompsStart - this->RefMassFlowComps) / MassFlowCompsStart;
+                if (this->NumStages == 2) { // Two-stage systems
+                    ErrorMassFlowHiStageComps = std::abs(MassFlowHiStageCompsStart - this->RefMassFlowHiStageComps) / MassFlowCompsStart;
                 }
             } // denominator zero check
             if (NumIter > 20) break;
             if (ErrorMassFlowComps < ErrorTol) {
-                if (refrig_system.NumStages == 1) {
+                if (this->NumStages == 1) {
                     NotBalanced = false;
-                } else if (refrig_system.NumStages == 2 && ErrorMassFlowHiStageComps < ErrorTol) {
+                } else if (this->NumStages == 2 && ErrorMassFlowHiStageComps < ErrorTol) {
                     NotBalanced = false;
                 }
             }
         } // error check
     }
 
-    void CalcDetailedTransSystem(int const SysNum)
+    void TransRefrigSystemData::CalcDetailedTransSystem(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11145,24 +11144,24 @@ namespace RefrigeratedCase {
         while (NotBalanced) {
             ++NumIter;
 
-            if (TransSystem(SysNum).NumGasCoolers >= 1) CalcGasCooler(SysNum);
-            TransSystem(SysNum).CalculateTransCompressors();
+            if (this->NumGasCoolers >= 1) this->CalcGasCooler(SysNum);
+            this->CalculateTransCompressors();
             if (NumIter < 2) continue;
-            if ((TransSystem(SysNum).RefMassFlowReceiverBypass == 0.0) || (MassFlowStart == 0.0)) {
-                ShowSevereError("Refrigeration:TranscriticalSystem: " + TransSystem(SysNum).Name +
+            if ((this->RefMassFlowReceiverBypass == 0.0) || (MassFlowStart == 0.0)) {
+                ShowSevereError("Refrigeration:TranscriticalSystem: " + this->Name +
                                 " showing zero refrigerant flow through receiver bypass.");
-                ShowContinueError("Receiver Bypass Flow = " + General::RoundSigDigits(TransSystem(SysNum).RefMassFlowReceiverBypass, 6));
+                ShowContinueError("Receiver Bypass Flow = " + General::RoundSigDigits(this->RefMassFlowReceiverBypass, 6));
                 ShowContinueError("Check input file to ensure that refrigeration loads on this system are not zero.");
             } else {
-                ErrorMassFlow = std::abs(MassFlowStart - TransSystem(SysNum).RefMassFlowReceiverBypass) / MassFlowStart;
-                MassFlowStart = TransSystem(SysNum).RefMassFlowReceiverBypass;
+                ErrorMassFlow = std::abs(MassFlowStart - this->RefMassFlowReceiverBypass) / MassFlowStart;
+                MassFlowStart = this->RefMassFlowReceiverBypass;
             } // denominator zero check
             if (NumIter > 20) break;
             if (ErrorMassFlow < ErrorTol) NotBalanced = false;
         } // error check
     }
 
-    void CalculateCondensers(int const SysNum)
+    void RefrigSystemData::CalculateCondensers(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11232,12 +11231,12 @@ namespace RefrigeratedCase {
         Real64 HumRatOut;              // Humidity ratio of outlet air from condenser (assumed saturated) [kg/kg]
         Real64 OutWbTemp(0.0);         // Outdoor wet bulb temp at condenser air inlet node [C]
         Real64 OutDbTemp;              // Outdoor dry bulb temp at condenser air inlet node [C]
-        Real64 PurgeRate;              // Rate of water blow-down/bleed/purge in evap condenseer (m3/s)
+        Real64 PurgeRate;              // Rate of water blow-down/bleed/purge in evap condenser (m3/s)
         Real64 RatedFanPower;          // local variable equal to input condenser value
         Real64 RatedAirFlowRate;       // local variable equal to input condenser value
         Real64 SinkTemp;               // Heat sink temperature used to derate fan power at reduced loads [C]
         Real64 TCondCalc;              // Calculated Condensing temperature
-        Real64 TotalCondDefrostCredit; // total cond credit from hot gas/brine defr for cases etc. served
+        Real64 TotalCondDefrostCreditLocal; // total cond credit from hot gas/brine defr for cases etc. served
         //     directly by all systems served by this condenser [W]
         Real64 TotalCondDefCredfromSysID;    // cond credit for single system [W]
         Real64 TotalLoadFromThisSystem(0.0); // total heat rejection load from the detailed system id'd in subroutine call [W]
@@ -11252,10 +11251,10 @@ namespace RefrigeratedCase {
         TotalCondenserHeat = 0.0;
         TotalEvapWaterUseRate = 0.0;
         ActualFanPower = 0.0;
-        TotalCondDefrostCredit = 0.0;
+        TotalCondDefrostCreditLocal = 0.0;
         TotalLoadFromSystems = 0.0;
         EvapAvail = true;
-        CondID = System(SysNum).CondenserNum(1);
+        CondID = this->CondenserNum(1);
         auto &condenser(Condenser(CondID));
         RatedFanPower = condenser.RatedFanPower;
         RatedAirFlowRate = condenser.RatedAirFlowRate;
@@ -11275,7 +11274,7 @@ namespace RefrigeratedCase {
         for (Sysloop = 1; Sysloop <= condenser.NumSysAttach; ++Sysloop) {
             SystemID = condenser.SysNum(Sysloop);
             TotalCondDefCredfromSysID = System(SystemID).TotalCondDefrostCredit + System(SystemID).SumCascadeCondCredit;
-            TotalCondDefrostCredit += TotalCondDefCredfromSysID;
+            TotalCondDefrostCreditLocal += TotalCondDefCredfromSysID;
             // total heat rejection load from a single detailed system [W]
             Real64 TotalLoadFromSysID = System(SystemID).TotalSystemLoad + System(SystemID).TotCompPower + System(SystemID).TotHiStageCompPower +
                                  System(SystemID).PipeHeatLoad;
@@ -11284,22 +11283,22 @@ namespace RefrigeratedCase {
         } // Sysloop over every system connected to this condenser
 
         // for cascade condensers, condenser defrost credit gets passed on to the primary system condenser
-        if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeCascade) TotalCondDefrostCredit = 0.0;
+        if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeCascade) TotalCondDefrostCreditLocal = 0.0;
 
         // Calculate Total Heat rejection needed.  Assume hermetic compressors - conservative assumption
         // Note that heat rejection load carried by desuperheater hvac coils or water heaters is the
         // lagged variable from the previous time step because these are calculated after the refrigeration
         // system is solved.
         condenser.ExternalHeatRecoveredLoad = condenser.LaggedUsedWaterHeater + condenser.LaggedUsedHVACCoil;
-        condenser.InternalHeatRecoveredLoad = TotalCondDefrostCredit;
-        condenser.TotalHeatRecoveredLoad = condenser.ExternalHeatRecoveredLoad + TotalCondDefrostCredit;
+        condenser.InternalHeatRecoveredLoad = TotalCondDefrostCreditLocal;
+        condenser.TotalHeatRecoveredLoad = condenser.ExternalHeatRecoveredLoad + TotalCondDefrostCreditLocal;
 
-        TotalCondenserHeat = TotalLoadFromSystems - TotalCondDefrostCredit - condenser.ExternalHeatRecoveredLoad;
+        TotalCondenserHeat = TotalLoadFromSystems - TotalCondDefrostCreditLocal - condenser.ExternalHeatRecoveredLoad;
         if (TotalCondenserHeat < 0.0) {
 
             TotalCondenserHeat = 0.0;
             if (!DataGlobals::WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + System(SysNum).Name +
+                ShowRecurringWarningErrorAtEnd("Refrigeration:System: " + this->Name +
                                                    ":heat reclaimed(defrost,other purposes) >current condenser load. ",
                                                CondCreditWarnIndex1);
                 ShowRecurringContinueErrorAtEnd("For heat recovered for defrost: ASHRAE rule of thumb: <= 25% of the load on a rack ",
@@ -11326,8 +11325,8 @@ namespace RefrigeratedCase {
             // Obtain water-cooled condenser inlet/outlet temps
             condenser.InletTemp = DataLoopNode::Node(condenser.InletNode).Temp;
             TCondCalc = DataLoopNode::Node(condenser.InletNode).Temp + condenser.RatedApproachT;
-            if ((condenser.InletTemp < condenser.InletTempMin) || (TCondCalc < System(SysNum).TCondenseMin)) {
-                System(SysNum).TCondense = System(SysNum).TCondenseMin;
+            if ((condenser.InletTemp < condenser.InletTempMin) || (TCondCalc < this->TCondenseMin)) {
+                this->TCondense = this->TCondenseMin;
                 // condenser.LowTempWarn += 1;
                 if (condenser.LowTempWarnIndex == 0) {
                     ShowWarningMessage("Refrigeration:Condenser:WaterCooled " + condenser.Name);
@@ -11339,7 +11338,7 @@ namespace RefrigeratedCase {
                                                condenser.LowTempWarnIndex);
                 // END IF
             } else {
-                System(SysNum).TCondense = TCondCalc;
+                this->TCondense = TCondCalc;
             }
 
         } else if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) || (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap)) {
@@ -11409,25 +11408,25 @@ namespace RefrigeratedCase {
 
             // Fan energy calculations apply to both air- and evap-cooled condensers
             // Compare calculated condensing temps to minimum allowed to determine fan power/operating mode
-            if (TCondCalc >= System(SysNum).TCondenseMin) {
-                System(SysNum).TCondense = TCondCalc;
+            if (TCondCalc >= this->TCondenseMin) {
+                this->TCondense = TCondCalc;
                 ActualFanPower = RatedFanPower;
                 AirVolRatio = 1.0;
 
             } else { // need to reduce fan speed to reduce air flow and keep Tcond at or above Tcond min
-                System(SysNum).TCondense = System(SysNum).TCondenseMin;
-                TCondCalc = System(SysNum).TCondenseMin;
+                this->TCondense = this->TCondenseMin;
+                TCondCalc = this->TCondenseMin;
                 // recalculate CapFac at current delta T
                 if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
                     // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
-                    Real64 CurMaxCapacity = CurveManager::CurveValue(condenser.CapCurvePtr, (System(SysNum).TCondenseMin - OutDbTemp));
+                    Real64 CurMaxCapacity = CurveManager::CurveValue(condenser.CapCurvePtr, (this->TCondenseMin - OutDbTemp));
                     CapFac = TotalCondenserHeat / CurMaxCapacity;
                     AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry)); // Fans limited by minimum air flow ratio
                     AirVolRatio = min(AirVolRatio, 1.0);
                 } else { // condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap
                     HRCFFullFlow = HRCF;
                     // if evap condenser need to back calculate the operating capacity using HRCF relationship, given known Tcond
-                    Real64 QuadBterm = condenser.EvapCoeff1 - (System(SysNum).TCondense - SinkTemp) + condenser.EvapCoeff4 * SinkTemp;
+                    Real64 QuadBterm = condenser.EvapCoeff1 - (this->TCondense - SinkTemp) + condenser.EvapCoeff4 * SinkTemp;
                     Real64 Sqrtterm = pow_2(QuadBterm) - 4.0 * condenser.EvapCoeff2 * condenser.EvapCoeff3;
                     if (Sqrtterm < 0.0) { // only happens for very high wet bulb temps
                         HRCF = condenser.EvapElevFact * condenser.MaxCapFacEvap;
@@ -11514,12 +11513,12 @@ namespace RefrigeratedCase {
             //    or floats to meet other loads on that system
             // therese ** future - here and for new phase change heat exchanger - need to handle unmet loads!
 
-            System(SysNum).TCondense = condenser.RatedTCondense;
+            this->TCondense = condenser.RatedTCondense;
 
-            if ((System(SysNum).NumNonCascadeLoads > 0) && (condenser.CascadeTempControl == CascadeTempFloat)) {
-                System(SysNum).TCondense = System(condenser.CascadeSinkSystemID).TEvapNeeded + condenser.RatedApproachT;
-                if (System(SysNum).TCondense < System(SysNum).TCondenseMin) {
-                    System(SysNum).TCondense = System(SysNum).TCondenseMin;
+            if ((this->NumNonCascadeLoads > 0) && (condenser.CascadeTempControl == CascadeTempFloat)) {
+                this->TCondense = System(condenser.CascadeSinkSystemID).TEvapNeeded + condenser.RatedApproachT;
+                if (this->TCondense < this->TCondenseMin) {
+                    this->TCondense = this->TCondenseMin;
                     ShowRecurringWarningErrorAtEnd("Refrigeration Condenser " + condenser.Name +
                                                        " - Cascade condenser floating condensing temperature less than specified minimum condensing "
                                                        "temperature. Minimum specified temperature used for system below cascade condenser. No "
@@ -11549,8 +11548,8 @@ namespace RefrigeratedCase {
         condenser.ExternalEnergyRecovered = condenser.ExternalHeatRecoveredLoad * LocalTimeStep * DataGlobals::SecInHour;
         condenser.InternalEnergyRecovered = condenser.InternalHeatRecoveredLoad * LocalTimeStep * DataGlobals::SecInHour;
         condenser.TotalHeatRecoveredEnergy = condenser.TotalHeatRecoveredLoad * LocalTimeStep * DataGlobals::SecInHour;
-        System(SysNum).NetHeatRejectLoad = TotalCondenserHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
-        System(SysNum).NetHeatRejectEnergy = System(SysNum).NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
+        this->NetHeatRejectLoad = TotalCondenserHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
+        this->NetHeatRejectEnergy = this->NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
 
         // set water system demand request (if needed)
         if (condenser.EvapWaterSupplyMode == WaterSupplyFromTank) {
@@ -11561,7 +11560,7 @@ namespace RefrigeratedCase {
     //***************************************************************************************************
     //***************************************************************************************************
 
-    void CalcGasCooler(int const SysNum)
+    void TransRefrigSystemData::CalcGasCooler(int const SysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11605,7 +11604,7 @@ namespace RefrigeratedCase {
         Real64 OutDbTemp;                 // Outdoor dry bulb temperature at gas cooler air inlet node [C]
         Real64 RatedFanPower;             // Rated fan power for this gas cooler [W]
         Real64 TotalCondDefCredfromSysID; // Gas cooler defrost credit for single system [W]
-        Real64 TotalCondDefrostCredit;    // Total gas cooler credit from hot gas/brine defrost for cases etc. served
+        Real64 TotalCondDefrostCreditLocal;    // Total gas cooler credit from hot gas/brine defrost for cases etc. served
         //     directly by all systems served by this gas cooler [W]
         Real64 TotalGasCoolerHeat;           // Total gas cooler heat from system [W]
         Real64 TotalLoadFromSysID;           // Total heat rejection load from a single detailed system [W]
@@ -11618,9 +11617,9 @@ namespace RefrigeratedCase {
         //! Initialize this gas cooler for this time step
         AirVolRatio = 1.0;
         ActualFanPower = 0.0;
-        TotalCondDefrostCredit = 0.0;
+        TotalCondDefrostCreditLocal = 0.0;
         TotalLoadFromSystems = 0.0;
-        int GasCoolerID = TransSystem(SysNum).GasCoolerNum(1);
+        int GasCoolerID = this->GasCoolerNum(1);
         RatedFanPower = GasCooler(GasCoolerID).RatedFanPower;
         FanMinAirFlowRatio = GasCooler(GasCoolerID).FanMinAirFlowRatio;
         GasCoolerCreditWarnIndex = GasCooler(GasCoolerID).GasCoolerCreditWarnIndex;
@@ -11628,7 +11627,7 @@ namespace RefrigeratedCase {
         for (int Sysloop = 1; Sysloop <= GasCooler(GasCoolerID).NumSysAttach; ++Sysloop) {
             int SystemID = GasCooler(GasCoolerID).SysNum(Sysloop);
             TotalCondDefCredfromSysID = TransSystem(SystemID).TotalCondDefrostCredit;
-            TotalCondDefrostCredit += TotalCondDefCredfromSysID;
+            TotalCondDefrostCreditLocal += TotalCondDefCredfromSysID;
             TotalLoadFromSysID = TransSystem(SystemID).TotalSystemLoadLT + TransSystem(SystemID).TotalSystemLoadMT +
                                  TransSystem(SystemID).TotCompPowerLP + TransSystem(SystemID).TotCompPowerHP + TransSystem(SystemID).PipeHeatLoadLT +
                                  TransSystem(SystemID).PipeHeatLoadMT;
@@ -11637,14 +11636,14 @@ namespace RefrigeratedCase {
         } // Sysloop over every system connected to this gas cooler
 
         // Calculate Total Heat rejection needed.
-        GasCooler(GasCoolerID).InternalHeatRecoveredLoad = TotalCondDefrostCredit;
-        GasCooler(GasCoolerID).TotalHeatRecoveredLoad = TotalCondDefrostCredit;
-        TotalGasCoolerHeat = TotalLoadFromSystems - TotalCondDefrostCredit;
+        GasCooler(GasCoolerID).InternalHeatRecoveredLoad = TotalCondDefrostCreditLocal;
+        GasCooler(GasCoolerID).TotalHeatRecoveredLoad = TotalCondDefrostCreditLocal;
+        TotalGasCoolerHeat = TotalLoadFromSystems - TotalCondDefrostCreditLocal;
 
         if (TotalGasCoolerHeat < 0.0) {
             TotalGasCoolerHeat = 0.0;
             if (!DataGlobals::WarmupFlag)
-                ShowRecurringWarningErrorAtEnd("Refrigeration:TranscriticalSystem: " + TransSystem(SysNum).Name +
+                ShowRecurringWarningErrorAtEnd("Refrigeration:TranscriticalSystem: " + this->Name +
                                                    ":heat reclaimed (defrost,other purposes) is greater than current gas cooler load. ASHRAE rule of "
                                                    "thumb: <= 25% of the load on a system should be in defrost at the same time. Consider "
                                                    "diversifying defrost schedules.",
@@ -11671,10 +11670,10 @@ namespace RefrigeratedCase {
             if (GasCooler(GasCoolerID).PGasCoolerOut < 7.5e6) { // Ensure gas cooler pressure is at least 7.5 MPa for transcritical operation
                 GasCooler(GasCoolerID).PGasCoolerOut = 7.5e6;
             }
-            GasCooler(GasCoolerID).HGasCoolerOut = FluidProperties::GetSupHeatEnthalpyRefrig(TransSystem(SysNum).RefrigerantName,
+            GasCooler(GasCoolerID).HGasCoolerOut = FluidProperties::GetSupHeatEnthalpyRefrig(this->RefrigerantName,
                                                                             GasCooler(GasCoolerID).TGasCoolerOut,
                                                                             GasCooler(GasCoolerID).PGasCoolerOut,
-                                                                            TransSystem(SysNum).RefIndex,
+                                                                            this->RefIndex,
                                                                             RoutineName);
             GasCooler(GasCoolerID).TransOpFlag = true;
         } else { // Gas cooler in subcritical operation
@@ -11682,24 +11681,24 @@ namespace RefrigeratedCase {
             if (GasCooler(GasCoolerID).TGasCoolerOut > 30.978) { //  Gas temperature should be less than critical temperature
                 GasCooler(GasCoolerID).PGasCoolerOut = 7.2e6;    //  Fix the pressure to be subcritical
                 GasCooler(GasCoolerID).TGasCoolerOut = FluidProperties::GetSatTemperatureRefrig(
-                    TransSystem(SysNum).RefrigerantName, GasCooler(GasCoolerID).PGasCoolerOut, TransSystem(SysNum).RefIndex, RoutineName);
+                    this->RefrigerantName, GasCooler(GasCoolerID).PGasCoolerOut, this->RefIndex, RoutineName);
             } else if (GasCooler(GasCoolerID).TGasCoolerOut >
                        GasCooler(GasCoolerID).MinCondTemp) { //  Allow condensing temperature to float above the minimum
                 GasCooler(GasCoolerID).PGasCoolerOut = FluidProperties::GetSatPressureRefrig(
-                    TransSystem(SysNum).RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, TransSystem(SysNum).RefIndex, RoutineName);
+                    this->RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, this->RefIndex, RoutineName);
             } else { //  Don't allow condensing temperature to drop below minimum
                 GasCooler(GasCoolerID).TGasCoolerOut = GasCooler(GasCoolerID).MinCondTemp;
                 GasCooler(GasCoolerID).PGasCoolerOut = FluidProperties::GetSatPressureRefrig(
-                    TransSystem(SysNum).RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, TransSystem(SysNum).RefIndex, RoutineName);
+                    this->RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, this->RefIndex, RoutineName);
             }
             GasCooler(GasCoolerID).HGasCoolerOut = FluidProperties::GetSatEnthalpyRefrig(
-                TransSystem(SysNum).RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, 0.0, TransSystem(SysNum).RefIndex, RoutineName);
+                this->RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, 0.0, this->RefIndex, RoutineName);
             GasCooler(GasCoolerID).TransOpFlag = false;
         } // (OutDbTemp > TransitionTemperature)
 
         if (GasCooler(GasCoolerID).TGasCoolerOut < 30.978) {
             GasCooler(GasCoolerID).CpGasCoolerOut = FluidProperties::GetSatSpecificHeatRefrig(
-                TransSystem(SysNum).RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, 0.0, TransSystem(SysNum).RefIndex, RoutineName);
+                this->RefrigerantName, GasCooler(GasCoolerID).TGasCoolerOut, 0.0, this->RefIndex, RoutineName);
         } else {
             GasCooler(GasCoolerID).CpGasCoolerOut = 0.0;
         }
@@ -11733,8 +11732,8 @@ namespace RefrigeratedCase {
         GasCooler(GasCoolerID).GasCoolerCreditWarnIndex = GasCoolerCreditWarnIndex;
         GasCooler(GasCoolerID).InternalEnergyRecovered = GasCooler(GasCoolerID).InternalHeatRecoveredLoad * LocalTimeStep * DataGlobals::SecInHour;
         GasCooler(GasCoolerID).TotalHeatRecoveredEnergy = GasCooler(GasCoolerID).TotalHeatRecoveredLoad * LocalTimeStep * DataGlobals::SecInHour;
-        TransSystem(SysNum).NetHeatRejectLoad = TotalGasCoolerHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
-        TransSystem(SysNum).NetHeatRejectEnergy = TransSystem(SysNum).NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
+        this->NetHeatRejectLoad = TotalGasCoolerHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
+        this->NetHeatRejectEnergy = this->NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
     }
 
     //***************************************************************************************************
@@ -12058,7 +12057,7 @@ namespace RefrigeratedCase {
             DataHeatBalance::HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowComps * (this->HCompOut - HSatVapCondense);
         } else { // Two-stage systems
             DataHeatBalance::HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowHiStageComps * (this->HCompOut - HSatVapCondense);
-        } // this->NumStages
+        } // NumStages
 
         // No function available to get Tout as f(Pout, Hout), so use estimate based on constant cp in superheat range...
         //  Use average of Tcondense and Tout of condenser as check for whether heat reclaim is reasonable.
@@ -12118,8 +12117,7 @@ namespace RefrigeratedCase {
         // For the same pressure drop, CO2 has a corresponding temperature penalty 5 to 10 times smaller than
         // ammonia and R-134a (ASHRAE Handbook of Refrigeration, 2010, p. 3.7).  Ignore pressure drop for CO2 calculations.
         // NOTE, these DelT...Pipes reflect the decrease in Pressure in the pipes, NOT thermal transfer through the pipe walls.
-        // REAL(r64), PARAMETER ::DelTSuctPipes  = 1.0d0 ! Tsat drop corresponding to P drop in suction pipes, ASHRAE 2006 p 2.4 (C)
-        // REAL(r64), PARAMETER ::DelTDischPipes = 0.5d0 ! Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
+
         Real64 const ErrorTol(0.001); // Iterative solution tolerance
 
         static std::string const RoutineName("RefrigeratedCase:CalculateTransCompressors");
@@ -12137,7 +12135,6 @@ namespace RefrigeratedCase {
         Real64 HCompInRatedLP;              // Enthalpy entering low pressure compressor at rated superheat, J/kg
         Real64 HGCOutlet;                   // Enthalpy at gas cooler outlet, J/kg
         Real64 HIdeal;                      // Ideal enthalpy at subcooler (for 100% effectiveness)
-        Real64 Hnew;                        // Calucalted enthalpy, J/kg
         Real64 HsatLiqforTevapNeededMT;     // Enthalpy of saturated liquid at MT evaporator, J/kg
         Real64 HsatVaporforTevapneededMT;   // Enthlapy of saturated vapor at MT evaporator (transcritical cycle), J/kg
         Real64 HsatVaporforTevapneededLT;   // Enthlapy of saturated vapor at LT evaporator (transcritical cycle), J/kg
@@ -12319,7 +12316,7 @@ namespace RefrigeratedCase {
             this->HSatLiqReceiver) {
             for (Iter = 1; Iter <= 15; ++Iter) { // Maximum of 15 iterations to find receiver quality
                 QualityReceiver = (Xu + Xl) / 2.0;
-                Hnew = FluidProperties::GetSatEnthalpyRefrig(
+                Real64 Hnew = FluidProperties::GetSatEnthalpyRefrig(
                     this->RefrigerantName, this->TReceiver, QualityReceiver, this->RefIndex, RoutineName);
 
                 // estimated QualityReceiver is too high
@@ -12349,7 +12346,7 @@ namespace RefrigeratedCase {
         Xu = Xl + 50.0;
         for (Iter = 1; Iter <= 15; ++Iter) { // Maximum of 15 iterations
             Xnew = (Xu + Xl) / 2.0;
-            Hnew = FluidProperties::GetSupHeatEnthalpyRefrig(this->RefrigerantName, Xnew, PSuctionMT, this->RefIndex, RoutineName);
+            Real64 Hnew = FluidProperties::GetSupHeatEnthalpyRefrig(this->RefrigerantName, Xnew, PSuctionMT, this->RefIndex, RoutineName);
             if (Hnew > this->HCompInHP) { // xnew is too high
                 Xu = Xnew;
             } else { // xnew is too low
@@ -12380,7 +12377,7 @@ namespace RefrigeratedCase {
         Xu = Xl + 50.0;
         for (Iter = 1; Iter <= 15; ++Iter) { // Maximum of 15 iterations
             Xnew = (Xu + Xl) / 2.0;
-            Hnew = FluidProperties::GetSupHeatEnthalpyRefrig(this->RefrigerantName, Xnew, PSuctionMT, this->RefIndex, RoutineName);
+            Real64 Hnew = FluidProperties::GetSupHeatEnthalpyRefrig(this->RefrigerantName, Xnew, PSuctionMT, this->RefIndex, RoutineName);
             if (Hnew > this->HCompInHP) { // xnew is too high
                 Xu = Xnew;
             } else { // xnew is too low
