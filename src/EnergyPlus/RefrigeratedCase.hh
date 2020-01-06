@@ -712,7 +712,7 @@ namespace RefrigeratedCase {
         }
     };
 
-    struct RefrigCondenserData
+    struct RefrigCondenserData : PlantComponent
     {
         // Members
         std::string Name;               // Name of condenser
@@ -858,6 +858,12 @@ namespace RefrigeratedCase {
         }
 
         void UpdateCondenser();
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigGasCoolerData
@@ -1518,10 +1524,6 @@ namespace RefrigeratedCase {
     void InitRefrigeration();
 
     void InitRefrigerationPlantConnections();
-
-    void SimRefrigWaterCondenser(std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
-
-    void SimRefrigWaterCoolRack(std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
 
     void SimulateDetailedRefrigerationSystems();
 
