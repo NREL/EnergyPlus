@@ -570,8 +570,6 @@ namespace RefrigeratedCase {
         if (HaveDetailedTransRefrig) SimulateDetailedTransRefrigSystems();
     }
 
-    //***************************************************************************************************
-
     void GetRefrigerationInput()
     {
 
@@ -3707,9 +3705,7 @@ namespace RefrigeratedCase {
                     }
 
                     // Get fan control type
-                    if (UtilityRoutines::SameString(Alphas(3), "Fixed")) {
-                        GasCooler(GCNum).FanSpeedControlType = FanConstantSpeed;
-                    } else if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
+                    if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
                         GasCooler(GCNum).FanSpeedControlType = FanConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(3), "VariableSpeed")) {
                         GasCooler(GCNum).FanSpeedControlType = FanVariableSpeed;
@@ -4733,7 +4729,7 @@ namespace RefrigeratedCase {
                 Real64 NominalTotalCoilCap = 0.0;
                 Real64 NominalTotalWalkInCap = 0.0;
                 Real64 NominalTotalSecondaryCap = 0.0;
-                Real64 NominalTotalCoolingCap = 0.0;
+                Real64 NominalTotalCoolingCap;
                 Real64 NominalTotalCascadeLoad = 0.0;
                 System(RefrigSysNum).RefInventory = 0.0;
 
@@ -5573,7 +5569,7 @@ namespace RefrigeratedCase {
                 Real64 NominalTotalCaseCapLT = 0.0;
                 Real64 NominalTotalWalkInCapMT = 0.0;
                 Real64 NominalTotalWalkInCapLT = 0.0;
-                Real64 NominalTotalCoolingCap = 0.0;
+                Real64 NominalTotalCoolingCap;
                 TransSystem(TransRefrigSysNum).RefInventory = 0.0;
 
                 //   Check for Medium Temperature Case or Walk-In or CaseAndWalkInList names
@@ -5872,13 +5868,13 @@ namespace RefrigeratedCase {
                 if ((lAlphaBlanks(AlphaNum)) && (TransSystem(TransRefrigSysNum).TransSysType == 2)) {
                     // TwoStage system type is specified but low pressure compressor input is blank
                     ShowSevereError(RoutineName + CurrentModuleObject + ", The transcritical refrigeration system, \"" +
-                                    TransSystem(TransRefrigSysNum).Name + "\", is specified to be \"TwoStage\", however, the \"" +
+                                    TransSystem(TransRefrigSysNum).Name + R"(", is specified to be "TwoStage", however, the ")" +
                                     cAlphaFieldNames(AlphaNum) + "\" is not given.");
                     ErrorsFound = true;
                 } else if ((!(lAlphaBlanks(AlphaNum))) && (TransSystem(TransRefrigSysNum).TransSysType == 1)) {
                     // SingleStage system type with low pressure compressors specified. Ignore low pressure compressors
                     ShowWarningError(RoutineName + CurrentModuleObject + ", The transcritical refrigeration system, \"" +
-                                     TransSystem(TransRefrigSysNum).Name + "\", is specified to be \"SingleStage\", however, a\"" +
+                                     TransSystem(TransRefrigSysNum).Name + R"(", is specified to be \"SingleStage", however, a")" +
                                      cAlphaFieldNames(AlphaNum) +
                                      "\" was found.  The low pressure compressors will be ignored and will not simulated.");
                 } else if ((!(lAlphaBlanks(AlphaNum))) && (TransSystem(TransRefrigSysNum).TransSysType == 2)) {
@@ -8824,9 +8820,6 @@ namespace RefrigeratedCase {
         }     // (NumSimulationGasCooler >0)
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void InitRefrigeration()
     {
         // SUBROUTINE INFORMATION:
@@ -10089,9 +10082,6 @@ namespace RefrigeratedCase {
         }
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void SimRefrigCondenser(int const SysType, std::string const &CompName, int &CompIndex, bool const FirstHVACIteration, bool const InitLoopEquip)
     {
 
@@ -10278,7 +10268,6 @@ namespace RefrigeratedCase {
                 MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
                 // Check for maximum flow in the component
                 if (MassFlowRate > MassFlowRateMax) {
-                    // HighFlowWarn = HighFlowWarn +1
                     if (HighFlowWarnIndex == 0) {
                         ShowWarningMessage(TypeName + Name);
                         ShowContinueError("Requested condenser water mass flow rate greater than maximum allowed value. ");
@@ -10317,7 +10306,6 @@ namespace RefrigeratedCase {
         }
         // Check outlet water temp for max value
         if (OutletTemp > OutletTempMax) {
-            // HighTempWarn = HighTempWarn +1
             if (HighTempWarnIndex == 0) {
                 ShowWarningMessage(TypeName + Name);
                 ShowContinueError(
@@ -10330,8 +10318,6 @@ namespace RefrigeratedCase {
         {
             auto const SELECT_CASE_var(SysType);
             if (SELECT_CASE_var == DataPlant::TypeOf_RefrigerationWaterCoolRack) {
-                // RefrigRack(Num)%HighFlowWarn = HighFlowWarn
-                // RefrigRack(Num)%HighTempWarn = HighTempWarn
                 RefrigRack(Num).MassFlowRate = MassFlowRate;
                 RefrigRack(Num).VolFlowRate = VolFlowRate;
                 RefrigRack(Num).OutletTemp = OutletTemp;
@@ -10340,8 +10326,6 @@ namespace RefrigeratedCase {
                 RefrigRack(Num).HighInletWarnIndex = HighInletWarnIndex;
                 RefrigRack(Num).NoFlowWarnIndex = NoFlowWarnIndex;
             } else if (SELECT_CASE_var == DataPlant::TypeOf_RefrigSystemWaterCondenser) {
-                // Condenser(Num)%HighFlowWarn = HighFlowWarn
-                // Condenser(Num)%HighTempWarn = HighTempWarn
                 Condenser(Num).MassFlowRate = MassFlowRate;
                 Condenser(Num).VolFlowRate = VolFlowRate;
                 Condenser(Num).OutletTemp = OutletTemp;
@@ -10809,9 +10793,6 @@ namespace RefrigeratedCase {
 
         SumZoneImpacts();
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SimulateDetailedTransRefrigSystems()
     {
@@ -11557,9 +11538,6 @@ namespace RefrigeratedCase {
         }
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void TransRefrigSystemData::CalcGasCooler(int const SysNum)
     {
 
@@ -11735,9 +11713,6 @@ namespace RefrigeratedCase {
         this->NetHeatRejectLoad = TotalGasCoolerHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
         this->NetHeatRejectEnergy = this->NetHeatRejectLoad * LocalTimeStep * DataGlobals::SecInHour;
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void RefrigSystemData::CalculateCompressors()
     {
@@ -12073,9 +12048,6 @@ namespace RefrigeratedCase {
         this->TotCompCoolingEnergy = this->TotCompCapacity * LocalTimeStepSec;
         this->TotHiStageCompCoolingEnergy = this->TotHiStageCompCapacity * LocalTimeStepSec;
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void TransRefrigSystemData::CalculateTransCompressors()
     {
@@ -13233,9 +13205,6 @@ namespace RefrigeratedCase {
         }         // DataHeatBalance::NumRefrigChillerSets
     }
 
-    //***************************************************************************************************
-    //***************************************************************************************************
-
     void WalkInData::CalculateWalkIn() // Absolute pointer to  Walk In
     {
 
@@ -13641,9 +13610,6 @@ namespace RefrigeratedCase {
             }
         }
     }
-
-    //***************************************************************************************************
-    //***************************************************************************************************
 
     void SecondaryLoopData::CalculateSecondary(int const SecondaryNum)
     {
@@ -14088,8 +14054,6 @@ namespace RefrigeratedCase {
         SysOutputProvided = CoilSysCredit(ZoneNum).SenCreditToZoneRate;
     }
 
-    //***************************************************************************************************
-
     void AirChillerSetData::CalculateAirChillerSets()
     {
 
@@ -14132,8 +14096,6 @@ namespace RefrigeratedCase {
             if (RemainQZNReqSens > 0.0) RemainQZNReqSens = 0.0;
         } // CoilIndex
     }
-
-    //***************************************************************************************************
 
     void FinalRateCoils(bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
                         int const SystemSourceType,     // Secondarysystem or DetailedSystem
@@ -14488,7 +14450,6 @@ namespace RefrigeratedCase {
             }
 
         } else { // NOT (AirVolumeFlowMax > 0.0d0)
-            CoilCapTotEstimate = 0.0;
             WaterRemovRate = 0.0;
             latLoadServed = 0.0;
             FrostChangekg = 0.0;
@@ -14627,8 +14588,6 @@ namespace RefrigeratedCase {
             }
         }
     }
-
-    //***************************************************************************************************
 
     void FigureRefrigerationZoneGains()
     {
