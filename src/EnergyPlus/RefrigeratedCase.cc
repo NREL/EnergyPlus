@@ -339,7 +339,7 @@ namespace RefrigeratedCase {
     int NumSimulationTransferLoadLists(0);  // Number of Secondary Lists in simulation
     int NumUnusedRefrigCases(0);            // Number of refrigerated cases not connected to a rack or system
     int NumUnusedCoils(0);                  // Number of refrigeration air coils not connected to a rack or system
-    int NumUnusedCondensers(0);             // Number of refrigeration condensors not connected to a system
+    int NumUnusedCondensers(0);             // Number of refrigeration condensers not connected to a system
     int NumUnusedGasCoolers(0);             // Number of refrigeration gas coolers not connected to a system
     int NumUnusedCompressors(0);            // Number of refrigeration compressors not connected to a system
     int NumUnusedSecondarys(0);             // Number of refrigeration secondarys not connected to a system
@@ -1577,9 +1577,7 @@ namespace RefrigeratedCase {
 
                 // Input walk-in cooler defrost information
                 AlphaNum = 5;
-                if (lAlphaBlanks(AlphaNum)) {
-                    WalkIn(WalkInID).DefrostType = WalkInDefrostElec;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
                     WalkIn(WalkInID).DefrostType = WalkInDefrostElec;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "HotFluid")) {
                     WalkIn(WalkInID).DefrostType = WalkInDefrostFluid;
@@ -1594,9 +1592,7 @@ namespace RefrigeratedCase {
                 }
 
                 AlphaNum = 6;
-                if (lAlphaBlanks(AlphaNum)) {
-                    WalkIn(WalkInID).DefrostControlType = DefrostControlSched;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
                     WalkIn(WalkInID).DefrostControlType = DefrostControlSched;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TemperatureTermination")) {
                     WalkIn(WalkInID).DefrostControlType = DefrostContTempTerm;
@@ -1859,13 +1855,11 @@ namespace RefrigeratedCase {
                             }     // have schedule pointer
                         }         // blank on door opening schedule (AStart + 2)
 
-                        if (lAlphaBlanks(AStart + 3)) {
+                        if (lAlphaBlanks(AStart + 3) || UtilityRoutines::SameString(Alphas(AStart + 3), "AirCurtain")) {
                             // default air curtain
                             WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorAirCurtain;
                         } else if (UtilityRoutines::SameString(Alphas(AStart + 3), "None")) {
                             WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorNone;
-                        } else if (UtilityRoutines::SameString(Alphas(AStart + 3), "AirCurtain")) {
-                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorAirCurtain;
                         } else if (UtilityRoutines::SameString(Alphas(AStart + 3), "StripCurtain")) {
                             WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorStripCurtain;
                         } else {
@@ -2304,9 +2298,7 @@ namespace RefrigeratedCase {
 
                 // Input fan control type
                 ++AlphaNum; // A7
-                if (lAlphaBlanks(AlphaNum)) {
-                    WarehouseCoil(CoilID).FanType = FanConstantSpeed;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Fixed")) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Fixed")) {
                     WarehouseCoil(CoilID).FanType = FanConstantSpeed;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "FixedLinear")) {
                     WarehouseCoil(CoilID).FanType = FanConstantSpeedLinear;
@@ -2343,9 +2335,7 @@ namespace RefrigeratedCase {
 
                 // Input defrost type
                 ++AlphaNum; // A8
-                if (lAlphaBlanks(AlphaNum)) {
-                    WarehouseCoil(CoilID).DefrostType = DefrostElec;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
                     WarehouseCoil(CoilID).DefrostType = DefrostElec;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "HotFluid")) {
                     WarehouseCoil(CoilID).DefrostType = DefrostFluid;
@@ -2360,9 +2350,7 @@ namespace RefrigeratedCase {
                 } // defrost type
 
                 ++AlphaNum; // A9
-                if (lAlphaBlanks(AlphaNum)) {
-                    WarehouseCoil(CoilID).DefrostControlType = DefrostControlSched;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
                     WarehouseCoil(CoilID).DefrostControlType = DefrostControlSched;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TemperatureTermination")) {
                     WarehouseCoil(CoilID).DefrostControlType = DefrostContTempTerm;
@@ -2439,12 +2427,10 @@ namespace RefrigeratedCase {
                 }         // defrost type
 
                 ++AlphaNum; // A12
-                if (lAlphaBlanks(AlphaNum)) {
+                if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Middle")) {
                     WarehouseCoil(CoilID).VerticalLocation = Middle; // default position
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Ceiling")) {
                     WarehouseCoil(CoilID).VerticalLocation = Ceiling;
-                } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Middle")) {
-                    WarehouseCoil(CoilID).VerticalLocation = Middle;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Floor")) {
                     WarehouseCoil(CoilID).VerticalLocation = Floor;
                 } else {
@@ -3127,9 +3113,7 @@ namespace RefrigeratedCase {
                     if (!lNumericBlanks(1)) Condenser(CondNum).RatedSubcool = Numbers(1);
 
                     // Get fan control type
-                    if (UtilityRoutines::SameString(Alphas(3), "Fixed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeed;
-                    } else if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
+                    if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
                         Condenser(CondNum).FanSpeedControlType = FanConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(3), "VariableSpeed")) {
                         Condenser(CondNum).FanSpeedControlType = FanVariableSpeed;
@@ -3239,9 +3223,7 @@ namespace RefrigeratedCase {
                     if ((!lNumericBlanks(2)) && (Numbers(2) > 0.0)) Condenser(CondNum).RatedSubcool = Numbers(2);
 
                     // Get fan control type
-                    if (UtilityRoutines::SameString(Alphas(2), "Fixed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeed;
-                    } else if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
+                    if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
                         Condenser(CondNum).FanSpeedControlType = FanConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(2), "VariableSpeed")) {
                         Condenser(CondNum).FanSpeedControlType = FanVariableSpeed;
@@ -10781,7 +10763,7 @@ namespace RefrigeratedCase {
 
                         System(SysNum).CalcDetailedSystem(SysNum);
 
-                        bool DeRate = false;                        // If true, need to derate aircoils because load can't be met by system
+                        bool DeRate;                        // If true, need to derate aircoils because load can't be met by system
 
                         // With air chiller coils, don't use unmet energy, instead reduce capacity on coils to match avail compressor/cond capacity
                         // current loads on compressor, exclusive of unmet loads from prev time steps
@@ -11708,8 +11690,7 @@ namespace RefrigeratedCase {
         Real64 LocalTimeStep = DataGlobals::TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
-        //! Initialize this gas cooler for this time step
-        AirVolRatio = 1.0;
+        // Initialize this gas cooler for this time step
         ActualFanPower = 0.0;
         TotalCondDefrostCreditLocal = 0.0;
         TotalLoadFromSystems = 0.0;
@@ -12255,7 +12236,7 @@ namespace RefrigeratedCase {
 
         // Determine refrigerating capacity needed
         // Load due to previously unmet low temperature compressor loads (transcritical system)
-        Real64 AccumLoadLT = 0.0;
+        Real64 AccumLoadLT;
         NeededCapacityLT = 0.0;
         if (this->TransSysType == 2) {
             AccumLoadLT = max(0.0, (this->UnmetEnergyLT / LocalTimeStep / DataGlobals::SecInHour));
@@ -13795,7 +13776,6 @@ namespace RefrigeratedCase {
         } // Fluid type
 
         // Initialize this secondary for this time step
-        TotalLoad = 0.0;
         TotalPumpPower = 0.0;
         RefrigerationLoad = 0.0;
         TotalHotDefrostCondCredit = 0.0;
@@ -14568,7 +14548,6 @@ namespace RefrigeratedCase {
         } else { // NOT (AirVolumeFlowMax > 0.0d0)
             WaterRemovRate = 0.0;
             latLoadServed = 0.0;
-            FrostChangekg = 0.0;
             SensLoadGross = 0.0;
             FanPowerActual = 0.0;
         } //(AirVolumeFlowMax > 0.0d0)
