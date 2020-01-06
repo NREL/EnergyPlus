@@ -70,14 +70,12 @@ enum class OutputTypes
     BSON
 };
 
-template <typename T>
-void displayMessage(T t)
+template <typename T> void displayMessage(T t)
 {
     std::cout << t << EnergyPlus::DataStringGlobals::NL;
 }
 
-template<typename T, typename... Args>
-void displayMessage(T t, Args... args) // recursive variadic function
+template <typename T, typename... Args> void displayMessage(T t, Args... args) // recursive variadic function
 {
     std::cout << t;
     displayMessage(args...);
@@ -147,7 +145,8 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
+bool processInput(
+    std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string &outputTypeStr)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -497,11 +496,10 @@ int main(int argc, const char *argv[])
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none)                                                                                                                   \
-    shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
+#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
     {
 #pragma omp for
-        for (std::size_t i = 0; i < number_files; ++i) {
+        for (int i = 0; i < number_files; ++i) {
             bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
 #pragma omp atomic
             ++fileCount;
