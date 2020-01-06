@@ -358,7 +358,7 @@ namespace RefrigeratedCase {
             ActualEvapPumpPower = 0.0;
         }
 
-        void UpdateRefrigCondenser(int Num, int SysType);
+        void UpdateCondenser();
 
         void CalcRackSystem();
 
@@ -848,8 +848,9 @@ namespace RefrigeratedCase {
             InternalEnergyRecovered = 0.0;
             TotalHeatRecoveredLoad = 0.0;
             TotalHeatRecoveredEnergy = 0.0;
-            // LowTempWarn = 0
         }
+
+        void UpdateCondenser();
     };
 
     struct RefrigGasCoolerData
@@ -1511,7 +1512,9 @@ namespace RefrigeratedCase {
 
     void InitRefrigerationPlantConnections();
 
-    void SimRefrigCondenser(int SysType, std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
+    void SimRefrigWaterCondenser(std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
+
+    void SimRefrigWaterCoolRack(std::string const &CompName, int &CompIndex, bool FirstHVACIteration, bool InitLoopEquip);
 
     void SimulateDetailedRefrigerationSystems();
 

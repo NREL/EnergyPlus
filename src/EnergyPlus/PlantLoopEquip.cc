@@ -190,7 +190,8 @@ namespace PlantLoopEquip {
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
-        using RefrigeratedCase::SimRefrigCondenser;
+        using RefrigeratedCase::SimRefrigWaterCondenser;
+        using RefrigeratedCase::SimRefrigWaterCoolRack;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 
@@ -911,14 +912,14 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_Refrigeration) {
 
             if (EquipTypeNum == TypeOf_RefrigSystemWaterCondenser) {
-                SimRefrigCondenser(EquipTypeNum, sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
+                SimRefrigWaterCondenser(sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
                 }
 
             } else if (EquipTypeNum == TypeOf_RefrigerationWaterCoolRack) {
-                SimRefrigCondenser(EquipTypeNum, sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
+                SimRefrigWaterCoolRack(sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
 
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
