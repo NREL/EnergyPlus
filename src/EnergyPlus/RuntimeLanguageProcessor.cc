@@ -977,7 +977,7 @@ namespace RuntimeLanguageProcessor {
                     WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
-                    // evaluate expresssion at while, skip to past endwhile if not true
+                    // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
