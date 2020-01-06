@@ -891,8 +891,8 @@ namespace SizingManager {
                 Real64 airLoopHeatingMaximumFlowRateSum(0.0);
 
                 // sum up heating and max flows for any single duct systems, store 62.1 values by zone
-                if (allocated(SingleDuct::sd_airterminal) && SingleDuct::NumSys > 0) {
-                    for (int singleDuctATUNum = 1; singleDuctATUNum <= SingleDuct::NumSys; ++singleDuctATUNum) {
+                if (allocated(SingleDuct::sd_airterminal) && SingleDuct::NumSDAirTerminal > 0) {
+                    for (int singleDuctATUNum = 1; singleDuctATUNum <= SingleDuct::NumSDAirTerminal; ++singleDuctATUNum) {
                         if (AirLoopNum == SingleDuct::sd_airterminal(singleDuctATUNum).AirLoopNum) {
                             int termUnitSizingIndex = DataDefineEquip::AirDistUnit(SingleDuct::sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
@@ -986,8 +986,8 @@ namespace SizingManager {
                 }
 
                 // sum up heating and max flows for any dual duct air terminals
-                if (allocated(DualDuct::dd_airterminal) && DualDuct::NumDampers > 0) {
-                    for (int dualDuctATUNum = 1; dualDuctATUNum <= DualDuct::NumDampers; ++dualDuctATUNum) {
+                if (allocated(DualDuct::dd_airterminal) && DualDuct::NumDDAirTerminal > 0) {
+                    for (int dualDuctATUNum = 1; dualDuctATUNum <= DualDuct::NumDDAirTerminal; ++dualDuctATUNum) {
                         if (AirLoopNum == DualDuct::dd_airterminal(dualDuctATUNum).AirLoopNum) {
                             int termUnitSizingIndex = DataDefineEquip::AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;

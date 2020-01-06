@@ -105,7 +105,7 @@ namespace SingleDuct {
 
     // INTERFACE BLOCK SPECIFICATIONS
 
-    extern int NumSys; // The Number of Systems found in the Input
+    extern int NumSDAirTerminal; // The Number of single duct air terminals found in the Input
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

@@ -183,7 +183,7 @@ namespace SingleDuct {
 
     // INTERFACE BLOCK SPECIFICATIONS
 
-    int NumSys(0); // The Number of Systems found in the Input
+    int NumSDAirTerminal(0); // The Number of Systems found in the Input
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -271,9 +271,9 @@ namespace SingleDuct {
             CompIndex = SysNum;
         } else {
             SysNum = CompIndex;
-            if (SysNum > NumSys || SysNum < 1) {
+            if (SysNum > NumSDAirTerminal || SysNum < 1) {
                 ShowFatalError("SimulateSingleDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Systems=" + TrimSigDigits(NumSys) + ", System name=" + CompName);
+                               ", Number of Systems=" + TrimSigDigits(NumSDAirTerminal) + ", System name=" + CompName);
             }
             if (CheckEquipName(SysNum)) {
                 if (CompName != sd_airterminal(SysNum).SysName) {
@@ -409,18 +409,18 @@ namespace SingleDuct {
         NumVAVVS = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan");
         NumCBVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat");
         NumNoRHCBVAVSys = inputProcessor->getNumObjectsFound("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat");
-        NumSys = NumVAVSys + NumConstVolSys + NumCVNoReheatSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
+        NumSDAirTerminal = NumVAVSys + NumConstVolSys + NumCVNoReheatSys + NumNoRHVAVSys + NumVAVVS + NumCBVAVSys + NumNoRHCBVAVSys;
 
-        sd_airterminal.allocate(NumSys);
-        SysUniqueNames.reserve(static_cast<unsigned>(NumSys));
-        sd_airterminalInlet.allocate(NumSys);
-        sd_airterminalOutlet.allocate(NumSys);
-        CheckEquipName.dimension(NumSys, true);
+        sd_airterminal.allocate(NumSDAirTerminal);
+        SysUniqueNames.reserve(static_cast<unsigned>(NumSDAirTerminal));
+        sd_airterminalInlet.allocate(NumSDAirTerminal);
+        sd_airterminalOutlet.allocate(NumSDAirTerminal);
+        CheckEquipName.dimension(NumSDAirTerminal, true);
 
-        MassFlow1.allocate(NumSys);
-        MassFlow2.allocate(NumSys);
-        MassFlow3.allocate(NumSys);
-        MassFlowDiff.allocate(NumSys);
+        MassFlow1.allocate(NumSDAirTerminal);
+        MassFlow2.allocate(NumSDAirTerminal);
+        MassFlow3.allocate(NumSDAirTerminal);
+        MassFlowDiff.allocate(NumSDAirTerminal);
 
         MassFlow1 = 0.0;
         MassFlow2 = 0.0;
@@ -1922,7 +1922,7 @@ namespace SingleDuct {
 
         NumZoneSiz = inputProcessor->getNumObjectsFound("Sizing:Zone");
         if (NumZoneSiz > 0) {
-            for (SysIndex = 1; SysIndex <= NumSys; ++SysIndex) {
+            for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
                     if (DoZoneSizing) {
                         if (FinalZoneSizing(ZoneSizIndex).ActualZoneNum == sd_airterminal(SysIndex).ActualZoneNum) {
@@ -2010,10 +2010,10 @@ namespace SingleDuct {
         // Do the Begin Simulation initializations
         if (InitSysFlag) {
 
-            MyEnvrnFlag.allocate(NumSys);
-            MySizeFlag.allocate(NumSys);
-            PlantLoopScanFlag.allocate(NumSys);
-            GetGasElecHeatCoilCap.allocate(NumSys);
+            MyEnvrnFlag.allocate(NumSDAirTerminal);
+            MySizeFlag.allocate(NumSDAirTerminal);
+            PlantLoopScanFlag.allocate(NumSDAirTerminal);
+            GetGasElecHeatCoilCap.allocate(NumSDAirTerminal);
             MyEnvrnFlag = true;
             MySizeFlag = true;
             PlantLoopScanFlag = true;
@@ -2061,7 +2061,7 @@ namespace SingleDuct {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-            for (SysIndex = 1; SysIndex <= NumSys; ++SysIndex) {
+            for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 if (sd_airterminal(SysIndex).ADUNum == 0) continue;
                 if (CheckZoneEquipmentList("ZoneHVAC:AirDistributionUnit", AirDistUnit(sd_airterminal(SysIndex).ADUNum).Name)) continue;
                 ShowSevereError("InitSingleDuctSystems: ADU=[Air Distribution Unit," + AirDistUnit(sd_airterminal(SysIndex).ADUNum).Name +

@@ -135,7 +135,7 @@ namespace DualDuct {
     // MODULE VARIABLE DECLARATIONS:
     Array1D_bool CheckEquipName;
 
-    int NumDampers(0); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
+    int NumDDAirTerminal(0); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
     int NumDualDuctConstVolDampers;
     int NumDualDuctVarVolDampers;
     int NumDualDuctVarVolOA;
@@ -189,9 +189,9 @@ namespace DualDuct {
             CompIndex = DamperNum;
         } else {
             DamperNum = CompIndex;
-            if (DamperNum > NumDampers || DamperNum < 1) {
+            if (DamperNum > NumDDAirTerminal || DamperNum < 1) {
                 ShowFatalError("SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Dampers=" + TrimSigDigits(NumDampers) + ", Damper name=" + CompName);
+                               ", Number of Dampers=" + TrimSigDigits(NumDDAirTerminal) + ", Damper name=" + CompName);
             }
             if (CheckEquipName(DamperNum)) {
                 if (CompName != dd_airterminal(DamperNum).Name) {
@@ -293,18 +293,18 @@ namespace DualDuct {
         NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(cCMO_DDConstantVolume);
         NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(cCMO_DDVariableVolume);
         NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(cCMO_DDVarVolOA);
-        NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
-        dd_airterminal.allocate(NumDampers);
-        UniqueDualDuctAirTerminalNames.reserve(NumDampers);
-        CheckEquipName.dimension(NumDampers, true);
+        NumDDAirTerminal = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
+        dd_airterminal.allocate(NumDDAirTerminal);
+        UniqueDualDuctAirTerminalNames.reserve(NumDDAirTerminal);
+        CheckEquipName.dimension(NumDDAirTerminal, true);
 
-        dd_airterminalInlet.allocate(NumDampers);
-        dd_airterminalHotAirInlet.allocate(NumDampers);
-        dd_airterminalColdAirInlet.allocate(NumDampers);
-        dd_airterminalOutlet.allocate(NumDampers);
+        dd_airterminalInlet.allocate(NumDDAirTerminal);
+        dd_airterminalHotAirInlet.allocate(NumDDAirTerminal);
+        dd_airterminalColdAirInlet.allocate(NumDDAirTerminal);
+        dd_airterminalOutlet.allocate(NumDDAirTerminal);
 
-        dd_airterminalOAInlet.allocate(NumDampers);
-        dd_airterminalRecircAirInlet.allocate(NumDampers);
+        dd_airterminalOAInlet.allocate(NumDDAirTerminal);
+        dd_airterminalRecircAirInlet.allocate(NumDDAirTerminal);
 
         if (NumDualDuctConstVolDampers > 0) {
             for (DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex) {
@@ -860,9 +860,9 @@ namespace DualDuct {
         // Do the Begin Simulation initializations
         if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumDampers);
-            MySizeFlag.allocate(NumDampers);
-            MyAirLoopFlag.dimension(NumDampers, true);
+            MyEnvrnFlag.allocate(NumDDAirTerminal);
+            MySizeFlag.allocate(NumDDAirTerminal);
+            MyAirLoopFlag.dimension(NumDDAirTerminal, true);
             MyEnvrnFlag = true;
             MySizeFlag = true;
             MassFlowSetToler = HVACFlowRateToler * 0.00001;
@@ -873,7 +873,7 @@ namespace DualDuct {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-            for (Loop = 1; Loop <= NumDampers; ++Loop) {
+            for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
                 if (  dd_airterminal(Loop).ADUNum == 0) continue;
                 if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(  dd_airterminal(Loop).ADUNum).Name)) continue;
                 ShowSevereError("InitDualDuct: ADU=[Air Distribution Unit," + AirDistUnit(  dd_airterminal(Loop).ADUNum).Name +
@@ -2169,17 +2169,17 @@ namespace DualDuct {
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!allocated(dd_airterminal))
-            return; // Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDampers either set >0 or
+            return; // Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDDAirTerminal either set >0 or
                     // uninitialized
 
         // Report Dual Duct Dampers to BND File
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << "! ===============================================================";
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_100);
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumDampers * 2;
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumDDAirTerminal * 2;
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << " #Dual Duct Damper Connections," + stripped(ChrOut);
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_102);
 
-        for (Count1 = 1; Count1 <= NumDampers; ++Count1) {
+        for (Count1 = 1; Count1 <= NumDDAirTerminal; ++Count1) {
 
             // Determine if this damper is connected to a supply air path
             Found = 0;

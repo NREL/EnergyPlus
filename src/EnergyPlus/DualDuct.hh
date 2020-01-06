@@ -84,7 +84,7 @@ namespace DualDuct {
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D_bool CheckEquipName;
 
-    extern int NumDampers; // The Number of Dampers found in the Input
+    extern int NumDDAirTerminal; // The Number of dual duct air terminals found in the Input
     extern int NumDualDuctConstVolDampers;
     extern int NumDualDuctVarVolDampers;
     extern int NumDualDuctVarVolOA;
