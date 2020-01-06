@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,55 +55,56 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DesiccantDehumidifiers.hh>
-#include <EMSManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACControllers.hh>
-#include <HVACDXHeatPumpSystem.hh>
-#include <HVACDXSystem.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HeatRecovery.hh>
-#include <HeatingCoils.hh>
-#include <Humidifiers.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixedAir.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PhotovoltaicThermalCollectors.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SimAirServingZones.hh>
-#include <SteamCoils.hh>
-#include <TranspiredCollector.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -458,7 +459,7 @@ namespace MixedAir {
                                OACoolCoil,
                                OAHX);
             }
-            // now simulate again propogate current temps back through OA system
+            // now simulate again propigate current temps back through OA system
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
@@ -599,8 +600,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
@@ -831,7 +830,10 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    SimPVTcollectors(CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName);
+                    if (CompIndex == 0) {
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                    }
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
@@ -4593,7 +4595,8 @@ namespace MixedAir {
                 if (ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
-                    if (!this->ModifyDuringHighOAMoisture && Node(this->NodeNumofHumidistatZone).HumRat <= this->OAHumRat) {
+                    if (!this->ModifyDuringHighOAMoisture &&
+                        (Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
                         HighHumidityOperationFlag = false;
                     } else {
                         HighHumidityOperationFlag = true;

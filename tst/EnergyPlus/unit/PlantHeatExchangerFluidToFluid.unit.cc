@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,24 +51,24 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataLoopNode.hh>
-#include <NodeInputManager.hh>
-#include <PlantHeatExchangerFluidToFluid.hh>
-//#include <EMSManager.hh>
-#include <BranchInputManager.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <General.hh>
-#include <HeatBalanceManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SimulationManager.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
+//#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 

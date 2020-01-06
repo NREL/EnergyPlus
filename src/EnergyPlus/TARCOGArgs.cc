@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,15 +48,15 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 
-#include <DataGlobals.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <TARCOGArgs.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGGassesParams.hh>
-#include <TARCOGOutput.hh>
-#include <TARCOGParams.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/TARCOGArgs.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 

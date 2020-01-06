@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,18 +53,18 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataVectorTypes.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <PierceSurface.hh>
-#include <ScheduleManager.hh>
-#include <SolarReflectionManager.hh>
-#include <Vectors.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/PierceSurface.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarReflectionManager.hh>
+#include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
 
