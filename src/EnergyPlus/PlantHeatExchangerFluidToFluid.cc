@@ -512,77 +512,84 @@ namespace PlantHeatExchangerFluidToFluid {
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
         }
+    }
 
-        for (int CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop) {
+    void HeatExchangerStruct::setupOutputVars()
+    {
+        SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->HeatTransferRate,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                FluidHX(CompLoop).HeatTransferRate,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
+        SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->HeatTransferEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            this->HeatTransferMeteringEndUse,
+                            _,
+                            "Plant");
 
-            SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                FluidHX(CompLoop).HeatTransferEnergy,
-                                "System",
-                                "Sum",
-                                FluidHX(CompLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                FluidHX(CompLoop).HeatTransferMeteringEndUse,
-                                _,
-                                "Plant");
+        SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->SupplySideLoop.InletMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
 
-            SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                FluidHX(CompLoop).SupplySideLoop.InletMassFlowRate,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                FluidHX(CompLoop).SupplySideLoop.InletTemp,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                FluidHX(CompLoop).SupplySideLoop.OutletTemp,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                FluidHX(CompLoop).DemandSideLoop.InletMassFlowRate,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                FluidHX(CompLoop).DemandSideLoop.InletTemp,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                FluidHX(CompLoop).DemandSideLoop.OutletTemp,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Operation Status",
-                                OutputProcessor::Unit::None,
-                                FluidHX(CompLoop).OperationStatus,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-            SetupOutputVariable("Fluid Heat Exchanger Effectiveness",
-                                OutputProcessor::Unit::None,
-                                FluidHX(CompLoop).Effectiveness,
-                                "System",
-                                "Average",
-                                FluidHX(CompLoop).Name);
-        }
+        SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->SupplySideLoop.InletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Loop Supply Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->SupplySideLoop.OutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->DemandSideLoop.InletMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->DemandSideLoop.InletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Loop Demand Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->DemandSideLoop.OutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Operation Status",
+                            OutputProcessor::Unit::None,
+                            this->OperationStatus,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Fluid Heat Exchanger Effectiveness",
+                            OutputProcessor::Unit::None,
+                            this->Effectiveness,
+                            "System",
+                            "Average",
+                            this->Name);
     }
 
     void HeatExchangerStruct::initialize()
@@ -601,6 +608,7 @@ namespace PlantHeatExchangerFluidToFluid {
         static std::string const RoutineName("InitFluidHeatExchanger: ");
 
         if (this->MyOneTimeFlag) {
+            this->setupOutputVars();
             this->MyFlag = true;
             this->MyEnvrnFlag = true;
             this->MyOneTimeFlag = false;

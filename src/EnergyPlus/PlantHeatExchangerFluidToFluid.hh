@@ -146,6 +146,8 @@ namespace PlantHeatExchangerFluidToFluid {
         {
         }
 
+        void setupOutputVars();
+
         void initialize();
 
         void size();
@@ -163,8 +165,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
     // Object Data
     extern Array1D<HeatExchangerStruct> FluidHX;
-
-    // Functions
 
     void SimFluidHeatExchanger(int LoopNum,            // plant loop sim call originated from
                                int LoopSideNum,        // plant loop side sim call originated from
