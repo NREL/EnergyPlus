@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1265,8 +1265,7 @@ namespace MicroCHPElectricGenerator {
         if (NumMicroCHPs == 0) return;
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
-            for (auto &e : DataGenerators::FuelSupply)
-                e.QskinLoss = 0.0;
+            for (auto &e : DataGenerators::FuelSupply) e.QskinLoss = 0.0;
             for (auto &e : MicroCHP) {
                 e.A42Model.QdotSkin = 0.0;
                 e.A42Model.SkinLossConvect = 0.0;

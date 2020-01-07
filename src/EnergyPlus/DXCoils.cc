@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3937,9 +3937,9 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
             } else if (UtilityRoutines::SameString(Alphas(12), "Gasoline")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOil#1")) {
+            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo1")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOil#2")) {
+            } else if (UtilityRoutines::SameString(Alphas(12), "FuelOilNo2")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
             } else if (UtilityRoutines::SameString(Alphas(12), "OtherFuel1")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
@@ -3949,7 +3949,7 @@ namespace DXCoils {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
                 ShowContinueError(
-                    "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                    "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
             }
 
@@ -4430,9 +4430,9 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).FuelType = FuelTypeDiesel;
             } else if (UtilityRoutines::SameString(Alphas(9), "Gasoline")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeGasoline;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOil#1")) {
+            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo1")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil1;
-            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOil#2")) {
+            } else if (UtilityRoutines::SameString(Alphas(9), "FuelOilNo2")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeFuelOil2;
             } else if (UtilityRoutines::SameString(Alphas(9), "OtherFuel1")) {
                 DXCoil(DXCoilNum).FuelType = FuelTypeOtherFuel1;
@@ -4442,7 +4442,7 @@ namespace DXCoils {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                 ShowContinueError(",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));
                 ShowContinueError(
-                    "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                    "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
             }
 

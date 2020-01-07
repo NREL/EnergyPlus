@@ -55,6 +55,7 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
@@ -169,6 +170,7 @@
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
@@ -211,6 +213,7 @@
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -241,6 +244,7 @@ void EnergyPlus::clearAllStates()
     BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
+    ChillerAbsorption::clear_state();
     ChillerElectricEIR::clear_state();
     ChillerExhaustAbsorption::clear_state();
     ChillerGasAbsorption::clear_state();
@@ -349,6 +353,7 @@ void EnergyPlus::clearAllStates()
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
+    PhotovoltaicThermalCollectors::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
@@ -391,6 +396,7 @@ void EnergyPlus::clearAllStates()
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
+    UserDefinedComponents::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3046,7 +3046,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -8226,7 +8226,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.2;",
+        {"Version,9.3;",
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -8949,7 +8949,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.2;",
+        {"Version,9.3;",
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -12996,7 +12996,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 {
     std::string const idf_objects = delimited_string(
-        { "Version,9.2;",
+        { "Version,9.3;",
         "SimulationControl,",
         "  No,                      !- Do Zone Sizing Calculation",
         "  No,                      !- Do System Sizing Calculation",
@@ -13439,7 +13439,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     int i;
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
