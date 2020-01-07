@@ -112,13 +112,6 @@ namespace HVACVariableRefrigerantFlow {
     // To encapsulate the data and algorithms required to
     // manage the VRF System Component
 
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
@@ -127,11 +120,6 @@ namespace HVACVariableRefrigerantFlow {
     using namespace Psychrometrics;
     using namespace DataPlant;
 
-    // Use statements for access to subroutines in other modules
-    // na
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Compressor operation
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
@@ -203,9 +191,6 @@ namespace HVACVariableRefrigerantFlow {
 
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     bool GetVRFInputFlag(true);             // Flag set to make sure you get input once
     bool MyOneTimeFlag(true);               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     bool MyOneTimeSizeFlag(true);           // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -255,14 +240,6 @@ namespace HVACVariableRefrigerantFlow {
     Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
     Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
-    // Utility routines for module
-    // na
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
     void SimulateVRF(std::string const &CompName,
                      int const ZoneNum,
                      bool const FirstHVACIteration,
@@ -284,12 +261,10 @@ namespace HVACVariableRefrigerantFlow {
         // Simulate all terminal units
         // Once all terminal units have been simulated, simulate VRF condenser
 
-        // Using/Aliasing
         using DXCoils::DXCoilTotalCooling;
         using DXCoils::DXCoilTotalHeating;
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int VRFTUNum;             // current VRF system terminal unit index
         int VRFCondenser;         // index to VRF AC system object - AirConditioner:VariableRefrigerantFlow
         int TUListNum;            // index to VRF AC system terminal unit list
@@ -361,9 +336,6 @@ namespace HVACVariableRefrigerantFlow {
             TerminalUnitList(TUListNum).TotalHeatLoad(IndexToTUInTUList) = 0.0;
         }
 
-        // Update the current VRF terminal unit to the outlet nodes
-        //  CALL UpdateVRF(VRFTUNum)
-
         // Report the current VRF terminal unit
         ReportVRFTerminalUnit(VRFTUNum);
 
@@ -406,7 +378,6 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages water-source VRF condenser
 
-        // Using/Aliasing
         using PlantUtilities::UpdateChillerComponentCondenserSide;
         using namespace DataEnvironment;
         using General::TrimSigDigits;
@@ -479,7 +450,6 @@ namespace HVACVariableRefrigerantFlow {
         // The terminal units are simulated first, and then the condenser is simulated.
         // If terminal units require more capacity than can be delivered by condenser, a limit is set.
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
@@ -495,10 +465,8 @@ namespace HVACVariableRefrigerantFlow {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("VRFCondenser");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumTU;         // loop counter
         int TUIndex;       // Index to terminal unit
         int CoolCoilIndex; // index to cooling coil in terminal unit
@@ -1354,9 +1322,6 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetVRFInput()
     {
 
@@ -1399,7 +1364,6 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for VRF systems and stores it in data structures
 
-        // Using/Aliasing
         using namespace DataLoopNode;
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
@@ -1441,10 +1405,8 @@ namespace HVACVariableRefrigerantFlow {
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetVRFInput: "); // include trailing blank space
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumVRFCTU; // The number of VRF constant volume TUs (anticipating different types of TU's)
         int VRFTUNum;  // Loop index to the total number of VRF terminal units
         int VRFNum;    // Loop index to the total number of VRF terminal units
@@ -2301,8 +2263,6 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
-            //  REAL(r64)    :: MinOATHeatRecovery         =0.0d0 ! Minimum outdoor air temperature for heat recovery operation (C)
-            //  REAL(r64)    :: MaxOATHeatRecovery         =0.0d0 ! Maximum outdoor air temperature for heat recovery operation (C)
             if (VRF(VRFNum).HeatRecoveryUsed) {
                 if (lNumericFieldBlanks(29)) {
                     VRF(VRFNum).MinOATHeatRecovery = max(VRF(VRFNum).MinOATCooling, VRF(VRFNum).MinOATHeating);
@@ -2337,10 +2297,6 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 }
 
-                //  INTEGER      :: HRCAPFTCool                =0   ! Index to cool capacity as a function of temperature curve for heat recovery
-                //  REAL(r64)    :: HRInitialCoolCapFrac       =0.0d0 ! Fractional cooling degradation at the start of heat recovery from cooling mode
-                //  REAL(r64)    :: HRCoolCapTC                =0.0d0 ! Time constant used to recover from initial degradation in cooling heat
-                //  recovery
                 VRF(VRFNum).HRCAPFTCool = GetCurveIndex(cAlphaArgs(40));
                 if (VRF(VRFNum).HRCAPFTCool > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -2355,11 +2311,6 @@ namespace HVACVariableRefrigerantFlow {
                     VRF(VRFNum).HRInitialCoolCapFrac = rNumericArgs(31);
                 }
                 VRF(VRFNum).HRCoolCapTC = rNumericArgs(32);
-
-                //  INTEGER      :: HREIRFTCool                =0   ! Index to cool EIR as a function of temperature curve for heat recovery
-                //  REAL(r64)    :: HRInitialCoolEIRFrac       =0.0d0 ! Fractional EIR degradation at the start of heat recovery from cooling mode
-                //  REAL(r64)    :: HRCoolEIRTC                =0.0d0 ! Time constant used to recover from initial degradation in cooling heat
-                //  recovery
                 VRF(VRFNum).HREIRFTCool = GetCurveIndex(cAlphaArgs(41));
                 if (VRF(VRFNum).HREIRFTCool > 0) {
                     // Verify Curve Object, only legal type is bi-quadratic or linear, quadratic, or cubic
@@ -5092,12 +5043,6 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
     void InitVRF(int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
     {
 
@@ -5113,7 +5058,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::TempControlType;
@@ -5134,13 +5078,8 @@ namespace HVACVariableRefrigerantFlow {
         using ScheduleManager::GetCurrentScheduleValue;
         using SingleDuct::SimATMixer;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitVRF");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;                       // TU inlet node
         int OutNode;                      // TU outlet node
         int OutsideAirNode;               // TU mixer outside air inlet node
@@ -5166,7 +5105,6 @@ namespace HVACVariableRefrigerantFlow {
         bool errFlag;                     // local error flag
         Real64 SuppHeatCoilLoad;          // additional heating required by supplemental heater (W)
         Real64 SuppHeatCoilCapacity;      // supplemental heating coil size (W)
-        // FLOW:
 
         // ALLOCATE and Initialize subroutine variables
         if (MyOneTimeFlag) {
@@ -6305,7 +6243,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Initializes flow rates for a specific terminal unit.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool CurrentMode;      // - specifies whether current or previous operating mode is used
         int IndexToTUInTUList; // - index to TU in specific list for this VRF system
         int TUListIndex;       // index to TU list for this VRF system
@@ -6398,7 +6335,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone or system sizing arrays.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using CurveManager::CurveValue;
         auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
@@ -6413,11 +6349,8 @@ namespace HVACVariableRefrigerantFlow {
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         static std::string const RoutineName("SizeVRF: "); // include trailing blank space
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool CheckVRFCombinationRatio;
         bool FoundAll;                      // temporary variable used to check all terminal units
         bool errFlag;                       // temporary variable used for error checking
@@ -7457,7 +7390,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Set water-cooled plant flow rates.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -7466,11 +7398,8 @@ namespace HVACVariableRefrigerantFlow {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeVRFCondenser");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizCondNum;         // Plant Sizing index for condenser loop
         Real64 rho;                // local fluid density [kg/m3]
         Real64 Cp;                 // local fluid specific heat [J/kg-k]
@@ -7535,12 +7464,6 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void SimVRF(int const VRFTUNum,
                 bool const FirstHVACIteration,
                 Real64 &OnOffAirFlowRatio,
@@ -7561,12 +7484,11 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Simulate terminal unit to meet zone load.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadRatio(1.0);
         Real64 SuppHeatCoilLoad(0.0); // supplemental heating coil load (W)
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                 VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
@@ -7611,23 +7533,17 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
-        // Using/Aliasing
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;      // unit full output when compressor is operating [W]
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;    // output when no active compressor [W]
@@ -7662,7 +7578,6 @@ namespace HVACVariableRefrigerantFlow {
         // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
         // do nothing else if TU is scheduled off
-        //!!LKL Discrepancy < 0
         if (GetCurrentScheduleValue(this->SchedPtr) == 0.0) return;
 
         // do nothing if TU has no load (TU will be modeled using PLR=0)
@@ -7910,13 +7825,11 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // Using/Aliasing
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
-        //  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
         using DataAirLoop::LoopDXCoilRTF;
         using DataZoneEquipment::ZoneEquipConfig;
         using SingleDuct::SimATMixer;
@@ -7933,7 +7846,6 @@ namespace HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
         static int ATMixOutNode(0); // terminal unit mixer outlet node
         int ZoneNode;               // Zone node of VRFTU is serving
-        // FLOW
 
         VRFCond = this->VRFSysNum;
         TUListIndex = VRF(VRFCond).ZoneTUListPtr;
@@ -8077,12 +7989,6 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines
-    // *****************************************************************************
-
     void ReportVRFTerminalUnit(int const VRFTUNum) // index to VRF terminal unit
     {
 
@@ -8095,12 +8001,10 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the VRF Terminal Units.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DXCoils::DXCoilTotalCooling;
         using DXCoils::DXCoilTotalHeating;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoolingCoilIndex;      // - index to DX cooling coil
         int DXHeatingCoilIndex;      // - index to DX heating coil
         Real64 TotalConditioning;    // - sum of sensible and latent rates
@@ -8265,7 +8169,6 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the VRF Condenser.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant; // - conversion constant for energy
 
         ReportingConstant = TimeStepSys * SecInHour;
@@ -8296,7 +8199,6 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the node data for the VRF Condenser.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondenserOutletNode; // - outlet node for VRF water-cooled condenser
 
         CondenserOutletNode = VRF(VRFCond).CondenserOutletNodeNum;
@@ -8331,18 +8233,8 @@ namespace HVACVariableRefrigerantFlow {
         //  Calls CalcVRF to get ActualOutput at the given part load ratio
         //  and calculates the residual as defined above
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 PLRResidual;
 
-        // Argument array dimensioning
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // par(2) = Not used
         // par(3) = FirstHVACIteration
@@ -8350,16 +8242,6 @@ namespace HVACVariableRefrigerantFlow {
         // par(5) = QZnReq
         // par(6) = OnOffAirFlowRatio
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int VRFTUNum;             // TU index
         bool FirstHVACIteration;  // FirstHVACIteration flag
         int OpMode;               // Compressor operating mode
@@ -8380,7 +8262,7 @@ namespace HVACVariableRefrigerantFlow {
         SuppHeatCoilLoad = 0.0;
 
         if (VRF(VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
         } else {
             // Algorithm Type: VRF model based on system curve
@@ -8408,29 +8290,9 @@ namespace HVACVariableRefrigerantFlow {
         // Set the average air mass flow rates using the part load fraction of the heat pump for this time step
         // Set OnOffAirFlowRatio to be used by DX coils
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataZoneEquipment::VRFTerminalUnit_Num;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;                   // inlet node number
         int OutsideAirNode;              // outside air node number
         int AirRelNode;                  // relief air node number
@@ -8506,13 +8368,6 @@ namespace HVACVariableRefrigerantFlow {
         // Scans each zone coil and determines the load based on control
         // Moved from Init to clean up and localize code segments
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -8520,18 +8375,6 @@ namespace HVACVariableRefrigerantFlow {
         using MixedAir::SimOAMixer;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneDeltaT;       // zone temperature difference from setpoint
         Real64 SPTempHi;         // thermostat setpoint high
         Real64 SPTempLo;         // thermostat setpoint low
@@ -8879,27 +8722,6 @@ namespace HVACVariableRefrigerantFlow {
         // If the global flag SimZoneEquipment could be set for 1 additional iteration, these variables would
         // converge more closely (setting this global flag is not yet implemented).
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // these variables hold information on coil in opposite operating mode (i.e., heat recovery)
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RemainingCapacity; // decrement capacity counter to find limiting TU capacity [W]
 
         // limit TU coil capacity to be equal to the condenser capacity (piping losses already accounted for)
@@ -8956,26 +8778,6 @@ namespace HVACVariableRefrigerantFlow {
         // If the global flag SimZoneEquipment could be set for 1 additional iteration, these variables would
         // converge more closely (setting this global flag is not yet implemented).
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumTU;                                   // loop counter
         int TempTUIndex;                             // temp variable used to find max terminal unit limit
         int MinOutputIndex;                          // index to TU with lowest load
@@ -9179,10 +8981,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //       A new physics based VRF model appliable for Fluid Temperature Control.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
         using namespace DataZoneEnergyDemands;
         using DataEnvironment::OutBaroPress;
         using DXCoils::DXCoil;
@@ -9192,19 +8990,6 @@ namespace HVACVariableRefrigerantFlow {
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolCoilNum;             // index to the VRF Cooling DX coil to be simulated
         int HeatCoilNum;             // index to the VRF Heating DX coil to be simulated
         int IndexToTUInTUList;       // index to TU in specific list for the VRF system
@@ -9321,12 +9106,8 @@ namespace HVACVariableRefrigerantFlow {
         //       The indoor terminal units are simulated first, and then the outdoor unit is simulated.
 
         // METHODOLOGY EMPLOYED:
-        //       A new physics based VRF model appliable for Fluid Temperature Control.
+        //       A new physics based VRF model applicable for Fluid Temperature Control.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
@@ -9353,19 +9134,8 @@ namespace HVACVariableRefrigerantFlow {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcVRFCondenser_FluidTCtrl");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int VRFCond;            // index to VRF condenser
         int TUListNum;          // index to TU List
         int NumTUInList;        // number of terminal units is list
@@ -10673,10 +10443,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -10684,22 +10450,11 @@ namespace HVACVariableRefrigerantFlow {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);        // maximum number of iterations
         Real64 const MinPLF(0.0);     // minimum part load factor allowed
         Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;      // unit full output when compressor is operating [W]
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;    // output when no active compressor [W]
@@ -10912,33 +10667,15 @@ namespace HVACVariableRefrigerantFlow {
 
         // METHODOLOGY EMPLOYED:
         //		A new physics based VRF model appliable for Fluid Temperature Control.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
-        //  USE WaterToAirHeatPumpSimple,  ONLY: SimWatertoAirHPSimple
         using DataAirLoop::LoopDXCoilRTF;
         using DataZoneEquipment::ZoneEquipConfig;
         using SingleDuct::SimATMixer;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int VRFTUOutletNodeNum;     // TU air outlet node
         int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
@@ -11126,29 +10863,12 @@ namespace HVACVariableRefrigerantFlow {
         //  coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
         //  OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
         using DataEnvironment::OutDryBulbTemp;
         using DXCoils::DXCoil;
         using General::SolveRoot;
 
-        // Return value
         Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 
-        // Argument array dimensioning
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> Par(7);      // Parameters passed to RegulaFalsi
         int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int const MaxIte(500);       // maximum number of iterations
@@ -11244,10 +10964,6 @@ namespace HVACVariableRefrigerantFlow {
         // 		coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
         // 		OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DXCoils::ControlVRFIUCoil;
         using DXCoils::DXCoil;
         using Fans::Fan;
@@ -11257,18 +10973,8 @@ namespace HVACVariableRefrigerantFlow {
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 AirFlowRateResidual;
 
-        // Argument array dimensioning
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // 	Par( 1 ) = FirstHVACIteration;
         // 	Par( 2 ) = VRFTUNum;
@@ -11278,16 +10984,6 @@ namespace HVACVariableRefrigerantFlow {
         // 	Par( 6 ) = PartLoadRatio;
         // 	Par( 7 ) = OACompOnMassFlow;
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
         int OAMixNode;           // index to the mix node of OA mixer
@@ -11310,8 +11006,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Hout;             // coil outlet air enthalpy
         Real64 SHact;            // coil actual SH
         Real64 SCact;            // coil actual SC
-
-        // FLOW
 
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
         FirstHVACIteration = (Par(1) == 1.0);
@@ -11387,7 +11081,6 @@ namespace HVACVariableRefrigerantFlow {
         // 		Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
         // 		conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
 
-        // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutHumRat;
@@ -11395,8 +11088,6 @@ namespace HVACVariableRefrigerantFlow {
         // Return value
         Real64 TeResidual;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         int VRFCond = int(Par(1));        // Index to VRF outdoor unit
         Real64 CompSpdActual = Par(2);    // Actual compressor running speed [rps]
         Real64 Tdischarge = Par(3);       // VRF Compressor discharge refrigerant temperature [C]
@@ -11439,12 +11130,6 @@ namespace HVACVariableRefrigerantFlow {
         // PURPOSE OF THIS FUNCTION:
         //  	 Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
         //
-        // METHODOLOGY EMPLOYED:
-        //
-        // REFERENCES:
-        // na
-        //
-        // USE STATEMENTS:
         using CurveManager::CurveValue;
 
         Real64 T_dis;    // Compressor discharge temperature Tc' [C]
@@ -11490,10 +11175,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
         //
-        // REFERENCES:
-        //        na
-        //
-        // USE STATEMENTS:
         using General::TrimSigDigits;
 
         Real64 BF;              // VRF OU bypass  [-]
@@ -11575,11 +11256,7 @@ namespace HVACVariableRefrigerantFlow {
         //
         // METHODOLOGY EMPLOYED:
         //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
-        //
-        // REFERENCES:
-        //        na
-        //
-        // USE STATEMENTS:
+
         using DataEnvironment::OutBaroPress;
         using General::TrimSigDigits;
 
@@ -11663,11 +11340,7 @@ namespace HVACVariableRefrigerantFlow {
         //
         // METHODOLOGY EMPLOYED:
         //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
-        //
-        // REFERENCES:
-        //        na
-        //
-        // USE STATEMENTS:
+
         using DataEnvironment::OutBaroPress;
         using General::TrimSigDigits;
 
@@ -11745,11 +11418,7 @@ namespace HVACVariableRefrigerantFlow {
         //
         // METHODOLOGY EMPLOYED:
         //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
-        //
-        // REFERENCES:
-        //        na
-        //
-        // USE STATEMENTS:
+
         using DataEnvironment::OutBaroPress;
         using General::TrimSigDigits;
 
@@ -11846,20 +11515,12 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatTemperatureRefrig;
         using FluidProperties::GetSupHeatDensityRefrig;
         using FluidProperties::GetSupHeatEnthalpyRefrig;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int RefrigerantIndex;   // Index of the refrigerant [-]
         Real64 C_cap_density;   // Compressor capacity modification algorithm_modified flow rate [-]
         Real64 C_cap_enthalpy;  // Compressor capacity modification algorithm_modified enthalpy difference [-]
@@ -11869,14 +11530,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 h_evap_in_rate;  // enthalpy of refrigerant at the evaporator inlet at rated conditions [kJ/kg]
         Real64 density_rate;    // density of refrigerant at rated conditions [kg/m3]
         Real64 density_real;    // density of refrigerant at rated conditions [kg/m3]
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         static std::string const RoutineName("VRFOU_CapModFactor");
 
@@ -11937,10 +11590,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatPressureRefrig;
@@ -11948,10 +11597,6 @@ namespace HVACVariableRefrigerantFlow {
         using FluidProperties::GetSupHeatEnthalpyRefrig;
         using FluidProperties::RefrigData;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int CoolCoilIndex;      // index to cooling coil in terminal unit
         int NumTUInList;        // number of terminal units is list
         int NumTeIte;           // counter for Te calculation iterations [-]
@@ -11972,13 +11617,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Tfs;             // Temperature of the air at the coil surface [C]]
         Real64 Tsuction;        // VRF compressor suction refrigerant temperature [Pa]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("VRFOU_TeModification");
 
         // variable initializations
@@ -12087,10 +11725,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //        This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        //        na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatPressureRefrig;
@@ -12119,13 +11753,6 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("VRFOU_CompSpd");
 
         // variable initializations: component index
@@ -12251,20 +11878,12 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //       This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        //       na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatPressureRefrig;
         using FluidProperties::GetSupHeatTempRefrig;
         using FluidProperties::RefrigData;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int CounterCompSpdTemp;                // Index for the compressor speed level[-]
         int CompSpdLB;                         // index for Compressor speed low bound [-]
         int CompSpdUB;                         // index for Compressor speed up bound [-]
@@ -12282,13 +11901,6 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("VRFOU_CompCap");
 
         // variable initializations: component index
@@ -12382,10 +11994,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
@@ -12400,10 +12008,6 @@ namespace HVACVariableRefrigerantFlow {
         using FluidProperties::RefrigData;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int CounterCompSpdTemp;                // Index for the compressor speed level[-]
         int CompSpdLB;                         // index for Compressor speed low bound [-]
         int CompSpdUB;                         // index for Compressor speed up bound [-]
@@ -12450,13 +12054,6 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
         Array1D<Real64> Par(3);                // Array for the parameters [-]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("VRFOU_CalcCompC");
 
         // variable initializations
@@ -12743,10 +12340,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // This is part of the VRF-FluidTCtrl Model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
@@ -12761,10 +12354,6 @@ namespace HVACVariableRefrigerantFlow {
         using FluidProperties::RefrigData;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int CounterCompSpdTemp;                // Index for the compressor speed level[-]
         int CompSpdLB;                         // index for Compressor speed low bound [-]
         int CompSpdUB;                         // index for Compressor speed up bound [-]
@@ -12793,13 +12382,6 @@ namespace HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
         Array1D<Real64> Par(3);                // Array for the parameters [-]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("VRFOU_CalcCompH");
 
         // variable initializations
@@ -12962,11 +12544,7 @@ namespace HVACVariableRefrigerantFlow {
         //
         // METHODOLOGY EMPLOYED:
         //        This is part of the physics based VRF model appliable for Fluid Temperature Control.
-        //
-        // REFERENCES:
-        //        na
-        //
-        // USE STATEMENTS:
+
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutHumRat;
@@ -13362,21 +12940,12 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSupHeatDensityRefrig;
         using FluidProperties::RefrigData;
         using General::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         int TUListNum;        // index to TU List
         int TUIndex;          // Index to terminal unit
@@ -13402,17 +12971,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Ref_Coe_v3;            // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
         Real64 RefPipInsH;            // Heat transfer coefficient for calculating piping loss [W/m2K]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static std::string const RoutineName("VRFOU_PipeLossC");
-
-        // variable initializations
 
         TUListNum = this->ZoneTUListPtr;
         NumTUInList = TerminalUnitList(TUListNum).NumTUInList;
@@ -13525,10 +13084,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Use a physics based piping loss model.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::Pi;
         using DXCoils::DXCoil;
         using FluidProperties::FindRefrigerant;
@@ -13538,11 +13093,6 @@ namespace HVACVariableRefrigerantFlow {
         using FluidProperties::GetSupHeatTempRefrig;
         using FluidProperties::RefrigData;
         using General::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         int TUListNum;        // index to TU List
         int TUIndex;          // Index to terminal unit
@@ -13569,17 +13119,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Ref_Coe_v3;            // Piping Loss Algorithm Parameter: coefficient to calculate Pipe_viscosity_ref [-]
         Real64 RefPipInsH;            // Heat transfer coefficient for calculating piping loss [W/m2K]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static std::string const RoutineName("VRFOU_PipeLossH");
-
-        // variable initializations
 
         TUListNum = this->ZoneTUListPtr;
         NumTUInList = TerminalUnitList(TUListNum).NumTUInList;
@@ -13882,9 +13422,6 @@ namespace HVACVariableRefrigerantFlow {
         MyVRFCondFlag.deallocate();
         MyZoneEqFlag.deallocate();
     }
-
-    // End of Utility subroutines for the Module
-    // *****************************************************************************
 
 } // namespace HVACVariableRefrigerantFlow
 

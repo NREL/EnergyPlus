@@ -62,10 +62,6 @@ namespace EnergyPlus {
 
 namespace HVACVariableRefrigerantFlow {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Compressor operation
     extern int const On;  // normal compressor operation
     extern int const Off; // signal DXCoil that compressor shouldn't run
@@ -118,9 +114,6 @@ namespace HVACVariableRefrigerantFlow {
     extern int const FuelTypeOtherFuel1; // Fuel type for other fuel #1
     extern int const FuelTypeOtherFuel2; // Fuel type for other fuel #2
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern bool GetVRFInputFlag;                 // Flag set to make sure you get input once
     extern bool MyOneTimeFlag;                   // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     extern bool MyOneTimeSizeFlag;               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -134,7 +127,6 @@ namespace HVACVariableRefrigerantFlow {
     extern Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
     extern int NumVRFCond;                       // total number of VRF condensers (All VRF Algorithm Types)
     extern int NumVRFCond_SysCurve;              // total number of VRF condensers with VRF Algorithm Type 1
-    extern int NumVRFCond_FluidTCtrl;            // total number of VRF condensers with VRF Algorithm Type 2
     extern int NumVRFTU;                         // total number of VRF terminal units
     extern int NumVRFTULists;                    // The number of VRF TU lists
     extern Real64 CompOnMassFlow;                // Supply air mass flow rate w/ compressor ON
@@ -444,9 +436,9 @@ namespace HVACVariableRefrigerantFlow {
         {
         }
 
-    public:
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
+
         void CalcVRFCondenser_FluidTCtrl();
 
         void CalcVRFIUTeTc_FluidTCtrl();
@@ -729,6 +721,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
         int fanOutletNode;               // fan outlet node index
         bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
+
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
@@ -753,7 +746,6 @@ namespace HVACVariableRefrigerantFlow {
         {
         }
 
-    public:
         // Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
         // Note: the argument VRFTUNum should be removed later in the deeper OO re-factor. Now this argument may be used by other functions that are
@@ -866,19 +858,10 @@ namespace HVACVariableRefrigerantFlow {
                           bool const FirstHVACIteration // flag for first time through HVAC system simulation
     );
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetVRFInput();
 
     void GetVRFInputData(bool &ErrorsFound // flag for errors in GetInput
     );
-
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitVRF(int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
@@ -887,12 +870,6 @@ namespace HVACVariableRefrigerantFlow {
     void SizeVRF(int const VRFTUNum);
 
     void SizeVRFCondenser(int const VRFCond);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
 
     void SimVRF(int const VRFTUNum,
                 bool const FirstHVACIteration,
@@ -946,15 +923,8 @@ namespace HVACVariableRefrigerantFlow {
                            Real64 &MaxLimit                // Maximum terminal unit capacity for coils in same operating mode [W]
     );
 
-    // Clears the global data in CurveManager.
-    // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    // End of Utility subroutines for the Module
-    // *****************************************************************************
-
-    // Begin of Methods for New VRF Model: Fluid Temperature Control
-    //******************************************************************************
     Real64 VRFTUAirFlowResidual_FluidTCtrl(Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1<Real64> const &Par // par(1) = VRFTUNum
     );
@@ -966,9 +936,6 @@ namespace HVACVariableRefrigerantFlow {
     Real64 CompResidual_FluidTCtrl(Real64 const T_suc,       // Compressor suction temperature Te' [C]
                                    Array1<Real64> const &Par // parameters
     );
-
-    // End of Methods for New VRF Model: Fluid Temperature Control
-    //******************************************************************************
 
 } // namespace HVACVariableRefrigerantFlow
 
