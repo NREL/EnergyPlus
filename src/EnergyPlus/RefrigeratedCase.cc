@@ -2650,6 +2650,7 @@ namespace RefrigeratedCase {
                 UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 RefrigRack(RackNum).Name = Alphas(1);
+                RefrigRack(RackNum).MyIdx = RackNum;
                 DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name = Alphas(1);
                 DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).SourceType = CurrentModuleObject;
                 if (UtilityRoutines::SameString(Alphas(2), "Outdoors")) {
@@ -10268,7 +10269,6 @@ namespace RefrigeratedCase {
         int PlantLoopSideIndex(0);
         int PlantBranchIndex(0);
         int PlantCompIndex(0);
-        int Num(0);
 
         InitRefrigerationPlantConnections();
 
@@ -10283,7 +10283,7 @@ namespace RefrigeratedCase {
         PlantBranchIndex = this->PlantBranchNum;
         PlantCompIndex = this->PlantCompNum;
 
-        TotalCondenserHeat = DataHeatBalance::HeatReclaimRefrigeratedRack(Num).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
+        TotalCondenserHeat = DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
         TypeName = "Refrigeration:CompressorRack:";
         ErrIntro = "Condenser for refrigeration rack ";
 

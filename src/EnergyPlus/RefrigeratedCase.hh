@@ -244,6 +244,7 @@ namespace RefrigeratedCase {
     struct RefrigRackData : PlantComponent
     {
         // Members
+        int MyIdx;                     // Index number
         bool CoilFlag;                 // Flag to show if coil type load on rack
         std::string Name;              // Name of Refrigeration Compressor rack
         std::string SupplyTankName;    // Evap water supply tank name
@@ -325,7 +326,7 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigRackData()
-            : CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(0), CondenserType(0), LaggedUsedWaterHeater(0.0),
+            : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(0), CondenserType(0), LaggedUsedWaterHeater(0.0),
               LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0),
               EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0),
               EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0),
