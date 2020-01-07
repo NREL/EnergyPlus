@@ -60,38 +60,10 @@ namespace EnergyPlus {
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    extern int const CrossFlowBothUnMixed;
-    extern int const CrossFlowBothMixed;
-    extern int const CrossFlowSupplyLoopMixedDemandLoopUnMixed;
-    extern int const CrossFlowSupplyLoopUnMixedDemandLoopMixed;
-    extern int const CounterFlow;
-    extern int const ParallelFlow;
-    extern int const Ideal;
-
-    extern int const UncontrolledOn;
-    extern int const OperationSchemeModulated;
-    extern int const OperationSchemeOnOff;
-    extern int const HeatingSetPointModulated;
-    extern int const HeatingSetPointOnOff;
-    extern int const CoolingSetPointModulated;
-    extern int const CoolingSetPointOnOff;
-    extern int const DualDeadBandSetPointModulated;
-    extern int const DualDeadBandSetPointOnOff;
     extern int const CoolingDifferentialOnOff;
     extern int const CoolingSetPointOnOffWithComponentOverride;
-    extern int const TrackComponentOnOff;
-
-    extern int const WetBulbTemperature;
     extern int const DryBulbTemperature;
-    extern int const LoopTemperature;
-
-    extern int const HeatingSupplySideLoop;
-    extern int const CoolingSupplySideLoop;
-
-    extern std::string ComponentClassName;
     extern int NumberOfPlantFluidHXs;
-    extern bool GetInput;
-    extern Array1D_bool CheckFluidHXs;
 
     struct PlantConnectionStruct : PlantLocation
     {
