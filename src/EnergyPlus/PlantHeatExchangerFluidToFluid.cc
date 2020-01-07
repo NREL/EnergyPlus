@@ -124,18 +124,49 @@ namespace PlantHeatExchangerFluidToFluid {
 
     Array1D<HeatExchangerStruct> FluidHX;
 
-    void SimFluidHeatExchanger(int const LoopNum,                       // plant loop sim call originated from
-                               int const EP_UNUSED(LoopSideNum),        // plant loop side sim call originated from
-                               std::string const &EP_UNUSED(EquipType), // type of equipment, 'PlantComponent:UserDefined'
-                               std::string const &EquipName,            // user name for component
-                               int &CompIndex,
-                               bool &InitLoopEquip,
-                               Real64 const MyLoad,
-                               Real64 &MaxCap,
-                               Real64 &MinCap,
-                               Real64 &OptCap,
-                               bool const FirstHVACIteration)
+    PlantComponent *HeatExchangerStruct::factory(std::string const &objectName)
     {
+        // Process the input data for heat exchangers if it hasn't been done already
+        if (GetInput) {
+            GetFluidHeatExchangerInput();
+            GetInput = false;
+        }
+        // Now look for this particular object
+        for (auto &obj : FluidHX) {
+            if (obj.Name == objectName) {
+                return &obj;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalPlantFluidHXFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void HeatExchangerStruct::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->initialize();
+    }
+
+    void HeatExchangerStruct::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        if (calledFromLocation.loopNum == this->DemandSideLoop.loopNum) {
+            MinLoad = 0.0;
+            MaxLoad = this->DemandSideLoop.MaxLoad;
+            OptLoad = this->DemandSideLoop.MaxLoad * 0.9;
+        } else if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
+            this->size(); // only call sizing from the loop that sizes are based on
+            MinLoad = 0.0;
+            MaxLoad = this->SupplySideLoop.MaxLoad;
+            OptLoad = this->SupplySideLoop.MaxLoad * 0.9;
+        }
+    }
+
+    void HeatExchangerStruct::simulate(const PlantLocation &calledFromLocation,
+                                       bool const FirstHVACIteration,
+                                       Real64 &CurLoad,
+                                       bool const EP_UNUSED(RunFlag))
+        {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -145,63 +176,20 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Main entry point and simulation manager for heat exchanger
-        
-        int CompNum;
 
-        if (GetInput) {
-            GetFluidHeatExchangerInput();
-            GetInput = false;
-        }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(EquipName, FluidHX);
-            if (CompNum == 0) {
-                ShowFatalError("SimFluidHeatExchanger: HeatExchanger:FluidToFluid not found");
-            }
-            CompIndex = CompNum;
-        } else {
-            CompNum = CompIndex;
-            if (CompNum < 1 || CompNum > NumberOfPlantFluidHXs) {
-                ShowFatalError("SimFluidHeatExchanger: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) + ", Number of heat exchangers =" +
-                               General::TrimSigDigits(NumberOfPlantFluidHXs) + ", Entered heat exchanger name = " + EquipName);
-            }
-            if (CheckFluidHXs(CompNum)) {
-                if (EquipName != FluidHX(CompNum).Name) {
-                    ShowFatalError("SimFluidHeatExchanger: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", heat exchanger name=" + EquipName + ", stored name for that index=" + FluidHX(CompNum).Name);
-                }
-                CheckFluidHXs(CompNum) = false;
-            }
-        }
-
-        if (InitLoopEquip) {
-            FluidHX(CompNum).initialize();
-            if (LoopNum == FluidHX(CompNum).DemandSideLoop.loopNum) {
-                MinCap = 0.0;
-                MaxCap = FluidHX(CompNum).DemandSideLoop.MaxLoad;
-                OptCap = FluidHX(CompNum).DemandSideLoop.MaxLoad * 0.9;
-            } else if (LoopNum == FluidHX(CompNum).SupplySideLoop.loopNum) {
-                FluidHX(CompNum).size(); // only call sizing from the loop that sizes are based on
-                MinCap = 0.0;
-                MaxCap = FluidHX(CompNum).SupplySideLoop.MaxLoad;
-                OptCap = FluidHX(CompNum).SupplySideLoop.MaxLoad * 0.9;
-            }
-        }
-
-        FluidHX(CompNum).initialize();
+        this->initialize();
 
         // for op scheme led HXs, only call controls if called from Loop Supply Side
-        if ((FluidHX(CompNum).ControlMode == OperationSchemeModulated) || (FluidHX(CompNum).ControlMode == OperationSchemeOnOff)) {
-            if (LoopNum == FluidHX(CompNum).SupplySideLoop.loopNum) {
-                FluidHX(CompNum).control(CompNum, LoopNum, MyLoad, FirstHVACIteration);
+        if ((this->ControlMode == OperationSchemeModulated) || (this->ControlMode == OperationSchemeOnOff)) {
+            if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
+                this->control(calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
             }
         } else {
-            FluidHX(CompNum).control(CompNum, LoopNum, MyLoad, FirstHVACIteration);
+            this->control(calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
         }
 
-        FluidHX(CompNum).calculate(DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).MassFlowRate,
-                               DataLoopNode::Node(FluidHX(CompNum).DemandSideLoop.inletNodeNum).MassFlowRate);
+        this->calculate(DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).MassFlowRate,
+                               DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).MassFlowRate);
     }
 
     void GetFluidHeatExchangerInput()
@@ -1016,7 +1004,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::control(int const CompNum, int const EP_UNUSED(LoopNum), Real64 const MyLoad, bool FirstHVACIteration)
+    void HeatExchangerStruct::control(int const EP_UNUSED(LoopNum), Real64 const MyLoad, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1109,7 +1097,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                RoutineName);
                                     Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp - std::abs(MyLoad) / (cp * mdotSupSide);
 
-                                    this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
+                                    this->findDemandSideLoopFlow(TargetLeavingTemp, CoolingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
                                     mdotDmdSide = 0.0;
                                     PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -1163,7 +1151,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                                                RoutineName);
                                     Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotSupSide);
 
-                                    this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
+                                    this->findDemandSideLoopFlow(TargetLeavingTemp, HeatingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
                                     mdotDmdSide = 0.0;
                                     PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -1355,7 +1343,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
 
                             Real64 TargetLeavingTemp = SetPointTemp;
-                            this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
+                            this->findDemandSideLoopFlow(TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -1458,7 +1446,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                             Real64 TargetLeavingTemp = SetPointTemp;
-                            this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
+                            this->findDemandSideLoopFlow(TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -1564,7 +1552,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                             Real64 TargetLeavingTemp = SetPointTempHi;
-                            this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
+                            this->findDemandSideLoopFlow(TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -1587,7 +1575,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                             Real64 TargetLeavingTemp = SetPointTempLo;
-                            this->findDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
+                            this->findDemandSideLoopFlow(TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(mdotDmdSide,
@@ -2069,7 +2057,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::findDemandSideLoopFlow(int const CompNum, Real64 const TargetSupplySideLoopLeavingTemp, int const HXActionMode)
+    void HeatExchangerStruct::findDemandSideLoopFlow(Real64 const TargetSupplySideLoopLeavingTemp, int const HXActionMode)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2111,9 +2099,7 @@ namespace PlantHeatExchangerFluidToFluid {
             if (SELECT_CASE_var == HeatingSupplySideLoop) {
                 if ((LeavingTempFullFlow > TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp > LeavingTempMinFlow)) {
                     // need to solve
-                    Par(1) = double(CompNum); // HX index
                     Par(2) = TargetSupplySideLoopLeavingTemp;
-
                     auto f = std::bind(&HeatExchangerStruct::demandSideFlowResidual, this, std::placeholders::_1, std::placeholders::_2);
 
                     General::SolveRoot(Acc,
@@ -2192,9 +2178,7 @@ namespace PlantHeatExchangerFluidToFluid {
             } else if (SELECT_CASE_var == CoolingSupplySideLoop) {
                 if ((LeavingTempFullFlow < TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp < LeavingTempMinFlow)) {
                     // need to solve
-                    Par(1) = double(CompNum); // HX index
                     Par(2) = TargetSupplySideLoopLeavingTemp;
-
                     auto f = std::bind(&HeatExchangerStruct::demandSideFlowResidual, this, std::placeholders::_1, std::placeholders::_2);
 
                     General::SolveRoot(Acc,

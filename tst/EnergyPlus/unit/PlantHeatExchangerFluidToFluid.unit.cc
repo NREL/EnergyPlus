@@ -2346,13 +2346,13 @@ TEST_F(PlantHXFixture, PlantHXControlWithFirstHVACIteration)
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
@@ -2477,16 +2477,6 @@ TEST_F(PlantHXFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
     PlantHeatExchangerFluidToFluid::FluidHX(1).initialize();
-
-//    EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 9.5, 0.001);
-//
-//    // Force Effectiveness = 1 when -NTU < EXP_LowerLimit #6516
-//    PlantHeatExchangerFluidToFluid::FluidHX(1).HeatExchangeModelType = PlantHeatExchangerFluidToFluid::CrossFlowBothMixed;
-//    PlantHeatExchangerFluidToFluid::FluidHX(1).UA = 9000.0;
-//
-//    PlantHeatExchangerFluidToFluid::CalcFluidHeatExchanger(1, 0.1, 0.1);
-//    EXPECT_NEAR(PlantHeatExchangerFluidToFluid::FluidHX(1).Effectiveness, 1.0, 0.001);
-
 }
 
 } // namespace EnergyPlus

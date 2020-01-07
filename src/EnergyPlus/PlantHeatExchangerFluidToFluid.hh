@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -102,7 +103,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     };
 
-    struct HeatExchangerStruct
+    struct HeatExchangerStruct : PlantComponent
     {
         // Members
         std::string Name;
@@ -146,6 +147,14 @@ namespace PlantHeatExchangerFluidToFluid {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
         void setupOutputVars();
 
         void initialize();
@@ -154,9 +163,9 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void calculate(Real64 SupSideMdot, Real64 DmdSideMdot);
 
-        void control(int CompNum, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
+        void control(int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(int CompNum, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
+        void findDemandSideLoopFlow(Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
         Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
                                             Array1<Real64> const &Par // Par(1) = HX index number
@@ -165,18 +174,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
     // Object Data
     extern Array1D<HeatExchangerStruct> FluidHX;
-
-    void SimFluidHeatExchanger(int LoopNum,            // plant loop sim call originated from
-                               int LoopSideNum,        // plant loop side sim call originated from
-                               std::string const &EquipType, // type of equipment, 'PlantComponent:UserDefined'
-                               std::string const &EquipName, // user name for component
-                               int &CompIndex,
-                               bool &InitLoopEquip,
-                               Real64 MyLoad,
-                               Real64 &MaxCap,
-                               Real64 &MinCap,
-                               Real64 &OptCap,
-                               bool FirstHVACIteration);
 
     void GetFluidHeatExchangerInput();
 

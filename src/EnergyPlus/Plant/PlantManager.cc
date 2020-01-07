@@ -96,6 +96,7 @@
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -1267,6 +1268,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
