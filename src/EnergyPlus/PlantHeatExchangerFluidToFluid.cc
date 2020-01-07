@@ -117,12 +117,20 @@ namespace PlantHeatExchangerFluidToFluid {
     int const HeatingSupplySideLoop(501);
     int const CoolingSupplySideLoop(502);
 
-    std::string ComponentClassName("HeatExchanger:FluidToFluid");
+    std::string const ComponentClassName("HeatExchanger:FluidToFluid");
+
     int NumberOfPlantFluidHXs(0);
     bool GetInput(true);
+    Array1D<HeatExchangerStruct> FluidHX;
     Array1D_bool CheckFluidHXs;
 
-    Array1D<HeatExchangerStruct> FluidHX;
+    void clear_state()
+    {
+        NumberOfPlantFluidHXs = 0;
+        GetInput = true;
+        FluidHX.deallocate();
+        CheckFluidHXs.deallocate();
+    }
 
     PlantComponent *HeatExchangerStruct::factory(std::string const &objectName)
     {

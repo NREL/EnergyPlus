@@ -64,6 +64,7 @@ namespace PlantHeatExchangerFluidToFluid {
     extern int const CoolingDifferentialOnOff;
     extern int const CoolingSetPointOnOffWithComponentOverride;
     extern int const DryBulbTemperature;
+
     extern int NumberOfPlantFluidHXs;
 
     struct PlantConnectionStruct : PlantLocation
@@ -176,6 +177,8 @@ namespace PlantHeatExchangerFluidToFluid {
     extern Array1D<HeatExchangerStruct> FluidHX;
 
     void GetFluidHeatExchangerInput();
+
+    void clear_state();
 
 } // namespace PlantHeatExchangerFluidToFluid
 
