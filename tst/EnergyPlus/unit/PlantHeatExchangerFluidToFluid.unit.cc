@@ -74,7 +74,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 {
     // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
     // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks
-    // that the HX will attempt to meet setpoint of 19 when the conditioniong fluid is 20 and cannot really make it to 19.  The HX still cools to down
+    // that the HX will attempt to meet setpoint of 19 when the conditioning fluid is 20 and cannot really make it to 19.  The HX still cools to down
     // to 20.
 
     std::string const idf_objects = delimited_string({
@@ -2346,13 +2346,13 @@ TEST_F(PlantHXFixture, PlantHXControlWithFirstHVACIteration)
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, 1, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, 1, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
@@ -2469,14 +2469,14 @@ TEST_F(PlantHXFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
-    PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger(1, 1);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize();
 
     // check value in FreeCoolCntrlMinCntrlTemp
     EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
-    PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger(1, 1);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize();
 
 //    EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 9.5, 0.001);
 //

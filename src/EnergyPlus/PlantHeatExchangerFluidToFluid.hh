@@ -145,6 +145,20 @@ namespace PlantHeatExchangerFluidToFluid {
               MyFlag(true), MyEnvrnFlag(true)
         {
         }
+
+        void initialize();
+
+        void size();
+
+        void calculate(Real64 SupSideMdot, Real64 DmdSideMdot);
+
+        void control(int CompNum, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
+
+        void findDemandSideLoopFlow(int CompNum, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
+
+        Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
+                                            Array1<Real64> const &Par // Par(1) = HX index number
+        );
     };
 
     // Object Data
@@ -165,27 +179,6 @@ namespace PlantHeatExchangerFluidToFluid {
                                bool FirstHVACIteration);
 
     void GetFluidHeatExchangerInput();
-
-    void InitFluidHeatExchanger(int CompNum, int LoopNum);
-
-    void SizeFluidHeatExchanger(int CompNum);
-
-    void ControlFluidHeatExchanger(int CompNum, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
-
-    void CalcFluidHeatExchanger(int CompNum,
-                                Real64 SupSideMdot, // mass flow rate of fluid entering from supply side loop
-                                Real64 DmdSideMdot  // mass flow rate of fluid entering from demand side loop
-    );
-
-    void FindHXDemandSideLoopFlow(int CompNum, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
-
-    Real64 HXDemandSideLoopFlowResidual(Real64 DmdSideMassFlowRate,
-                                        Array1<Real64> const &Par // Par(1) = HX index number
-    );
-
-    void UpdateFluidHeatExchanger(int CompNum);
-
-    void ReportFluidHeatExchanger(int CompNum);
 
 } // namespace PlantHeatExchangerFluidToFluid
 
