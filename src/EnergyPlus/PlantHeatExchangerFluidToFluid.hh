@@ -85,9 +85,9 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         PlantConnectionStruct()
-            : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0),
-              DesignVolumeFlowRate(0.0), DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0),
-              InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
+            : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0),
+              DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletTemp(0.0), InletMassFlowRate(0.0),
+              OutletTemp(0.0)
         {
         }
     };
@@ -120,7 +120,7 @@ namespace PlantHeatExchangerFluidToFluid {
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
         PlantConnectionStruct SupplySideLoop;
         std::string HeatTransferMeteringEndUse;
-        std::string ComponentUserName;  // user name for control-associated  component
+        std::string ComponentUserName; // user name for control-associated  component
         int ComponentTypeOfNum;
         PlantLocatorStruct OtherCompSupplySideLoop;
         PlantLocatorStruct OtherCompDemandSideLoop;
@@ -142,8 +142,8 @@ namespace PlantHeatExchangerFluidToFluid {
             : AvailSchedNum(0), HeatExchangeModelType(0), UA(0.0), UAWasAutoSized(false), ControlMode(0), SetPointNodeNum(0), TempControlTol(0.0),
               ControlSignalTemp(0), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0),
               HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
-              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true),
-              MyFlag(true), MyEnvrnFlag(true)
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -168,7 +168,7 @@ namespace PlantHeatExchangerFluidToFluid {
         void findDemandSideLoopFlow(Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
         Real64 demandSideFlowResidual(Real64 DmdSideMassFlowRate,
-                                            Array1<Real64> const &Par // Par(1) = HX index number
+                                      Array1<Real64> const &Par // Par(1) = HX index number
         );
     };
 
