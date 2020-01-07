@@ -479,11 +479,11 @@ For multi-cell towers, the following inputs are assumed to be for the entire tow
   BASIN HEATER (we assume that there is a common basin)
 \end{itemize}
 
-\textbf{\emph{Field: Name}}
+\subsubsection{Inputs}\label{inputs-1-006}
+
+\paragraph{Field: Name}\label{ct-twospeed-field-name}
 
 This alpha field contains the identifying name for the cooling tower.
-
-\subsubsection{Inputs}\label{inputs-1-006}
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-1}
 
@@ -598,6 +598,26 @@ This numeric input field contains the ``nominal'' heat rejection capacity of the
 \paragraph{Field: Free Convection Nominal Capacity Sizing Factor}\label{field-free-convection-nominal-capacity-sizing-factor-1}
 
 This numeric field contains the sizing factor to use when calculating the Free Convection Capacity. The default is 0.1.
+
+\paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature-1}
+
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is \SI{35.0}{\celsius}.
+
+\paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature-1}
+
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
+
+\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature-1}
+
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
+The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{3.9}{\celsius}.
+
+\paragraph{Field: Design Temperature Range}\label{field-design-temperature-range-1}
+
+This numeric field specifies the design temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.
+The design range  should be the inlet water temperature minus the outlet water temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{5.5}{\celsius}.
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-1}
 
@@ -1050,6 +1070,26 @@ This alpha field contains the name of a curve or table object that describes how
 \paragraph{Field: U-Factor Times Area Modifier Function of Water Flow Ratio Curve Name}\label{field-u-factor-times-area-modifier-function-of-water-flow-ratio-curve-name}
 
 This alpha field contains the name of a curve or table object that describes how the UA value varies as a function of the current water flow rate ratio (water flow rate/design water flow rate). The result of this curve is multiplied by the design UA value to adjust for water flow rates that differ from design level, along with the other two modifiers discussed above. The curve or table object must be for one independent variable and should be normalized to 1.0 at a water flow ratio of 1.0.~ This field is required
+
+\paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature-2}
+
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is \SI{35.0}{\celsius}.
+
+\paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature-2}
+
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
+
+\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature-2}
+
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
+The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{3.9}{\celsius}.
+
+\paragraph{Field: Design Temperature Range}\label{field-design-temperature-range-2}
+
+This numeric field specifies the design temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.
+The design range  should be the inlet water temperature minus the outlet water temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{5.5}{\celsius}.
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-2}
 
