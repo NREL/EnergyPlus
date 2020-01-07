@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -92,15 +93,11 @@ namespace PlantHeatExchangerFluidToFluid {
     extern bool GetInput;
     extern Array1D_bool CheckFluidHXs;
 
-    struct PlantConnectionStruct
+    struct PlantConnectionStruct : PlantLocation
     {
         // Members
-        int LoopNum;                           // plant loop connection index
-        int LoopSideNum;                       // plant loop side connection index
-        int BranchNum;                         // plant loop branch connection index
-        int CompNum;                           // plant loop component connection index
-        int InletNodeNum;                      // plant loop inlet node index
-        int OutletNodeNum;                     // plant loop outlet node index
+        int inletNodeNum;                      // plant loop inlet node index
+        int outletNodeNum;                     // plant loop outlet node index
         Real64 MassFlowRateMin;                // minimum (hardware) flow rate for component [kg/s]
         Real64 MassFlowRateMax;                // maximum (hardware) flow rate for component [kg/s]
         Real64 DesignVolumeFlowRate;           // design flow rate [m3/s]
@@ -111,28 +108,24 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 OptLoad;                        // reports back size for load dispatch [W]
         Real64 InletTemp;                      // current inlet fluid temperature [C]
         Real64 InletMassFlowRate;              // current inlet mass flow rate [kg/s]
-        Real64 OutletTemp;                     // componenent outlet temperature [C]
+        Real64 OutletTemp;                     // component outlet temperature [C]
 
         // Default Constructor
         PlantConnectionStruct()
-            : LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0), OutletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0),
+            : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0),
               DesignVolumeFlowRate(0.0), DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0),
               InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {
         }
     };
 
-    struct PlantLocatorStruct
+    struct PlantLocatorStruct : PlantLocation
     {
         // Members
-        int LoopNum;      // plant loop connection index
-        int LoopSideNum;  // plant loop side connection index
-        int BranchNum;    // plant loop branch connection index
-        int CompNum;      // plant loop component connection index
-        int InletNodeNum; // plant loop inlet node index
+        int inletNodeNum; // plant loop inlet node index
 
         // Default Constructor
-        PlantLocatorStruct() : LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0)
+        PlantLocatorStruct() : inletNodeNum(0)
         {
         }
     };
