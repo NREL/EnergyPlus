@@ -89,22 +89,10 @@ namespace PlantHeatExchangerFluidToFluid {
     // PURPOSE OF THIS MODULE:
     // Simulate a generic plant heat exchanger with a variety of control options
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataPlant;
     using namespace DataLoopNode;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     int const CrossFlowBothUnMixed(1);
     int const CrossFlowBothMixed(2);
     int const CrossFlowSupplyLoopMixedDemandLoopUnMixed(3);
@@ -133,20 +121,12 @@ namespace PlantHeatExchangerFluidToFluid {
     int const HeatingSupplySideLoop(501);
     int const CoolingSupplySideLoop(502);
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     std::string ComponentClassName("HeatExchanger:FluidToFluid");
     int NumberOfPlantFluidHXs(0);
     bool GetInput(true);
     Array1D_bool CheckFluidHXs;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Object Data
     Array1D<HeatExchangerStruct> FluidHX;
-
-    // Functions
 
     void SimFluidHeatExchanger(int const LoopNum,                       // plant loop sim call originated from
                                int const EP_UNUSED(LoopSideNum),        // plant loop side sim call originated from
@@ -170,10 +150,8 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // Main entry point and simulation manager for heat exchanger
 
-        // Using/Aliasing
         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
 
         if (GetInput) {
@@ -249,7 +227,6 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // get input for heat exchanger model
 
-        // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::ScheduleAlwaysOn;
@@ -262,10 +239,8 @@ namespace PlantHeatExchangerFluidToFluid {
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetFluidHeatExchangerInput: ");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
@@ -647,17 +622,14 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize heat exchanger model
 
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::InterConnectTwoPlantLoopSides;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineNameNoColon("InitFluidHeatExchanger");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag; // environment flag
         static Array1D_bool MyFlag;
@@ -889,7 +861,6 @@ namespace PlantHeatExchangerFluidToFluid {
         // the UA is sized for an effectiveness of 1.0 using sizing temps
         // the capacity uses the full HX model
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::SmallWaterVolFlow;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -902,10 +873,8 @@ namespace PlantHeatExchangerFluidToFluid {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeFluidHeatExchanger");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNumSupSide; // Plant Sizing index for Loop Supply Side
         int PltSizNumDmdSide; // plant sizing index for Loop Demand Side
         Real64 tmpSupSideDesignVolFlowRate;
@@ -1140,10 +1109,6 @@ namespace PlantHeatExchangerFluidToFluid {
         // METHODOLOGY EMPLOYED:
         // long CASE statement for different control options
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutWetBulbTemp;
@@ -1152,19 +1117,8 @@ namespace PlantHeatExchangerFluidToFluid {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ControlFluidHeatExchanger");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AvailSchedValue;
         bool ScheduledOff;
         bool LimitTrippedOff;
@@ -2010,27 +1964,13 @@ namespace PlantHeatExchangerFluidToFluid {
         // METHODOLOGY EMPLOYED:
         // apply heat transfer model depending on type of HX used
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const CmaxMixedCminUnmixed(40);
         int const CmaxUnMixedCminMixed(41);
         static std::string const RoutineName("CalcFluidHeatExchanger");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SupSideLoopInletTemp;
         Real64 DmdSideLoopInletTemp;
         Real64 SupSideLoopInletCp; // specific heat of fluid entering from supply side loop at inlet temp
@@ -2253,29 +2193,14 @@ namespace PlantHeatExchangerFluidToFluid {
         // METHODOLOGY EMPLOYED:
         // uses E+'s Regula Falsi numercial method
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);   // Maximum number of iterations for solver
         Real64 const Acc(1.e-3); // Accuracy of solver result
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(2); // Parameter array passed to solver
 
@@ -2473,34 +2398,10 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS FUNCTION:
         // calculate residual value for regula falsi solver
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SetComponentFlowRate;
 
-        // Return value
         Real64 Residuum; // Residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // Par(2) = desired supply side loop outlet temperature [C]
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CompNum;
         Real64 SupSideLoopOutletTemp;
         Real64 MdotTrial;
@@ -2531,30 +2432,6 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // update calculate results
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         Node(FluidHX(CompNum).DemandSideLoop.OutletNodeNum).Temp = FluidHX(CompNum).DemandSideLoop.OutletTemp;
         Node(FluidHX(CompNum).SupplySideLoop.OutletNodeNum).Temp = FluidHX(CompNum).SupplySideLoop.OutletTemp;
     }
@@ -2571,31 +2448,9 @@ namespace PlantHeatExchangerFluidToFluid {
         // PURPOSE OF THIS SUBROUTINE:
         // update heat exchanger report variables
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         FluidHX(CompNum).HeatTransferEnergy = FluidHX(CompNum).HeatTransferRate * TimeStepSys * SecInHour;
 

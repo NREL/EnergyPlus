@@ -59,10 +59,6 @@ namespace EnergyPlus {
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     extern int const CrossFlowBothUnMixed;
     extern int const CrossFlowBothMixed;
     extern int const CrossFlowSupplyLoopMixedDemandLoopUnMixed;
@@ -91,17 +87,10 @@ namespace PlantHeatExchangerFluidToFluid {
     extern int const HeatingSupplySideLoop;
     extern int const CoolingSupplySideLoop;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern std::string ComponentClassName;
     extern int NumberOfPlantFluidHXs;
     extern bool GetInput;
     extern Array1D_bool CheckFluidHXs;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
 
     struct PlantConnectionStruct
     {
