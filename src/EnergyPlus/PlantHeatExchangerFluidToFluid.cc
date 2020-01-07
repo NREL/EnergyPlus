@@ -223,13 +223,13 @@ namespace PlantHeatExchangerFluidToFluid {
 
         static std::string const RoutineName("GetFluidHeatExchangerInput: ");
 
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int NumAlphas;               // Number of elements in the alpha array
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
-        static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
+        int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -606,9 +606,6 @@ namespace PlantHeatExchangerFluidToFluid {
         
         static std::string const RoutineNameNoColon("InitFluidHeatExchanger");
 
-        static bool MyOneTimeFlag(true); // one time flag
-        static Array1D_bool MyEnvrnFlag; // environment flag
-        static Array1D_bool MyFlag;
         bool errFlag;
         static std::string const RoutineName("InitFluidHeatExchanger: ");
         Real64 rho;
@@ -617,15 +614,13 @@ namespace PlantHeatExchangerFluidToFluid {
         int BranchNum;
         int LoopCompNum;
 
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumberOfPlantFluidHXs);
-            MyEnvrnFlag.allocate(NumberOfPlantFluidHXs);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
+        if (FluidHX(CompNum).MyOneTimeFlag) {
+            FluidHX(CompNum).MyFlag = true;
+            FluidHX(CompNum).MyEnvrnFlag = true;
+            FluidHX(CompNum).MyOneTimeFlag = false;
         }
 
-        if (MyFlag(CompNum)) {
+        if (FluidHX(CompNum).MyFlag) {
             // locate the main two connections to the plant loops
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(FluidHX(CompNum).Name,
@@ -766,10 +761,10 @@ namespace PlantHeatExchangerFluidToFluid {
             if (errFlag) {
                 ShowFatalError(RoutineName + "Program terminated due to previous condition(s).");
             }
-            MyFlag(CompNum) = false;
+            FluidHX(CompNum).MyFlag = false;
         } // plant setup
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(CompNum) && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (DataGlobals::BeginEnvrnFlag && FluidHX(CompNum).MyEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
@@ -798,10 +793,10 @@ namespace PlantHeatExchangerFluidToFluid {
                                FluidHX(CompNum).SupplySideLoop.LoopSideNum,
                                FluidHX(CompNum).SupplySideLoop.BranchNum,
                                FluidHX(CompNum).SupplySideLoop.CompNum);
-            MyEnvrnFlag(CompNum) = false;
+            FluidHX(CompNum).MyEnvrnFlag = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(CompNum) = true;
+            FluidHX(CompNum).MyEnvrnFlag = true;
         }
 
         FluidHX(CompNum).DemandSideLoop.InletTemp = DataLoopNode::Node(FluidHX(CompNum).DemandSideLoop.InletNodeNum).Temp;

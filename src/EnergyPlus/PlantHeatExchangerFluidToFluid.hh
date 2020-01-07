@@ -167,13 +167,17 @@ namespace PlantHeatExchangerFluidToFluid {
         int DmdSideModulatSolvNoConvergeErrorIndex;
         int DmdSideModulatSolvFailErrorCount;
         int DmdSideModulatSolvFailErrorIndex;
+        bool MyOneTimeFlag;
+        bool MyFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         HeatExchangerStruct()
             : AvailSchedNum(0), HeatExchangeModelType(0), UA(0.0), UAWasAutoSized(false), ControlMode(0), SetPointNodeNum(0), TempControlTol(0.0),
               ControlSignalTemp(0), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0),
               HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
-              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0)
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true),
+              MyFlag(true), MyEnvrnFlag(true)
         {
         }
     };
