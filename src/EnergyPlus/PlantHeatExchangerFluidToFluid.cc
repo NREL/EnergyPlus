@@ -672,7 +672,7 @@ namespace PlantHeatExchangerFluidToFluid {
             if (FluidHX(CompNum).SupplySideLoop.LoopNum == FluidHX(CompNum).DemandSideLoop.LoopNum) { // user is being too tricky, don't allow
                 ShowSevereError(RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) + " name = \"" +
                                 FluidHX(CompNum).Name + "\"");
-                ShowContinueError("The \"Loop Supply Side\" and \"Loop Demand Side\" need to be on different loops.");
+                ShowContinueError(R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
                 errFlag = true;
             } else {
 
@@ -846,7 +846,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 tmpUA;
         Real64 tmpDeltaTSupLoop;
         Real64 tmpDeltaTloopToLoop(0.0);
-        bool ErrorsFound;
         Real64 Cp;
         Real64 rho;
         Real64 tmpDesCap;
@@ -854,7 +853,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 DmdSideMdot;
 
         // first deal with Loop Supply Side
-        ErrorsFound = false;
         PltSizNumSupSide = DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.LoopNum).PlantSizNum;
         PltSizNumDmdSide = DataPlant::PlantLoop(FluidHX(CompNum).DemandSideLoop.LoopNum).PlantSizNum;
         tmpSupSideDesignVolFlowRate = FluidHX(CompNum).SupplySideLoop.DesignVolumeFlowRate;
@@ -883,7 +881,6 @@ namespace PlantHeatExchangerFluidToFluid {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     ShowSevereError("SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object");
                     ShowContinueError("Occurs in heat exchanger object=" + FluidHX(CompNum).Name);
-                    ErrorsFound = true;
                 }
             }
         }
@@ -915,7 +912,6 @@ namespace PlantHeatExchangerFluidToFluid {
         PlantUtilities::RegisterPlantCompDesignFlow(FluidHX(CompNum).DemandSideLoop.InletNodeNum, tmpDmdSideDesignVolFlowRate);
 
         // size UA if needed
-        tmpUA = FluidHX(CompNum).UA;
         if (FluidHX(CompNum).UAWasAutoSized) {
             // get nominal delta T between two loops
             if (PltSizNumSupSide > 0 && PltSizNumDmdSide > 0) {
@@ -923,17 +919,11 @@ namespace PlantHeatExchangerFluidToFluid {
                 {
                     auto const SELECT_CASE_var(DataSizing::PlantSizData(PltSizNumSupSide).LoopType);
 
-                    if (SELECT_CASE_var == DataSizing::HeatingLoop) {
+                    if ((SELECT_CASE_var == DataSizing::HeatingLoop) || (SELECT_CASE_var == DataSizing::SteamLoop)) {
                         tmpDeltaTloopToLoop = std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
                                                        DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
-                    } else if (SELECT_CASE_var == DataSizing::CoolingLoop) {
+                    } else if ((SELECT_CASE_var == DataSizing::CoolingLoop) || (SELECT_CASE_var == DataSizing::CondenserLoop)) {
                         tmpDeltaTloopToLoop = std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
-                                                       DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
-                    } else if (SELECT_CASE_var == DataSizing::CondenserLoop) {
-                        tmpDeltaTloopToLoop = std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
-                                                       DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
-                    } else if (SELECT_CASE_var == DataSizing::SteamLoop) {
-                        tmpDeltaTloopToLoop = std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
                                                        DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
                     } else {
                         assert(false);
@@ -983,7 +973,6 @@ namespace PlantHeatExchangerFluidToFluid {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     ShowSevereError("SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops");
                     ShowContinueError("Occurs in heat exchanger object=" + FluidHX(CompNum).Name);
-                    ErrorsFound = true;
                 }
             }
         }
@@ -994,18 +983,12 @@ namespace PlantHeatExchangerFluidToFluid {
             if (PltSizNumSupSide > 0) {
                 {
                     auto const SELECT_CASE_var(DataSizing::PlantSizData(PltSizNumSupSide).LoopType);
-                    if (SELECT_CASE_var == DataSizing::HeatingLoop) {
+                    if ((SELECT_CASE_var == DataSizing::HeatingLoop) || (SELECT_CASE_var == DataSizing::SteamLoop)) {
                         DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.InletNodeNum).Temp =
                             (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
-                    } else if (SELECT_CASE_var == DataSizing::CoolingLoop) {
+                    } else if ((SELECT_CASE_var == DataSizing::CoolingLoop) || (SELECT_CASE_var == DataSizing::CondenserLoop)) {
                         DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.InletNodeNum).Temp =
                             (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
-                    } else if (SELECT_CASE_var == DataSizing::CondenserLoop) {
-                        DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.InletNodeNum).Temp =
-                            (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
-                    } else if (SELECT_CASE_var == DataSizing::SteamLoop) {
-                        DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.InletNodeNum).Temp =
-                            (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
                     }
                 }
 
@@ -1082,10 +1065,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 mdotDmdSide;
         Real64 DeltaTCooling;
         Real64 DeltaTHeating;
-        Real64 DeltaTCoolSetPointDemand;
-        Real64 DeltaTCoolSetPointSupply;
-        Real64 DeltaTHeatSetPointDemand;
-        Real64 DeltaTHeatSetPointSupply;
         Real64 cp;                // specific heat of fluid
         Real64 TargetLeavingTemp; // target temperature deg. C
         Real64 SetPointTemp;      // temperature setpoint for single setpoint
@@ -1606,11 +1585,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     SetPointTempLo = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointLo;
                     SetPointTempHi = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointHi;
                     DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
-                    DeltaTCoolSetPointDemand = SetPointTempHi - FluidHX(CompNum).DemandSideLoop.InletTemp;
-                    DeltaTCoolSetPointSupply = SetPointTempHi - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
-                    DeltaTHeatSetPointDemand = SetPointTempLo - FluidHX(CompNum).DemandSideLoop.InletTemp;
-                    DeltaTHeatSetPointSupply = SetPointTempLo - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     if ((DeltaTCooling > FluidHX(CompNum).TempControlTol) && (SetPointTempHi < FluidHX(CompNum).SupplySideLoop.InletTemp)) {
 
                         // can and want to cool

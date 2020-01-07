@@ -155,7 +155,6 @@ namespace PlantHeatExchangerFluidToFluid {
         PlantConnectionStruct SupplySideLoop;
         std::string HeatTransferMeteringEndUse;
         std::string ComponentUserName;  // user name for control-associated  component
-        std::string ComponentClassName; // object class name for control-associated component
         int ComponentTypeOfNum;
         PlantLocatorStruct OtherCompSupplySideLoop;
         PlantLocatorStruct OtherCompDemandSideLoop;
@@ -184,40 +183,40 @@ namespace PlantHeatExchangerFluidToFluid {
 
     // Functions
 
-    void SimFluidHeatExchanger(int const LoopNum,            // plant loop sim call originated from
-                               int const LoopSideNum,        // plant loop side sim call originated from
+    void SimFluidHeatExchanger(int LoopNum,            // plant loop sim call originated from
+                               int LoopSideNum,        // plant loop side sim call originated from
                                std::string const &EquipType, // type of equipment, 'PlantComponent:UserDefined'
                                std::string const &EquipName, // user name for component
                                int &CompIndex,
                                bool &InitLoopEquip,
-                               Real64 const MyLoad,
+                               Real64 MyLoad,
                                Real64 &MaxCap,
                                Real64 &MinCap,
                                Real64 &OptCap,
-                               bool const FirstHVACIteration);
+                               bool FirstHVACIteration);
 
     void GetFluidHeatExchangerInput();
 
-    void InitFluidHeatExchanger(int const CompNum, int const LoopNum);
+    void InitFluidHeatExchanger(int CompNum, int LoopNum);
 
-    void SizeFluidHeatExchanger(int const CompNum);
+    void SizeFluidHeatExchanger(int CompNum);
 
-    void ControlFluidHeatExchanger(int const CompNum, int const LoopNum, Real64 const MyLoad, bool const FirstHVACIteration);
+    void ControlFluidHeatExchanger(int CompNum, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-    void CalcFluidHeatExchanger(int const CompNum,
-                                Real64 const SupSideMdot, // mass flow rate of fluid entering from supply side loop
-                                Real64 const DmdSideMdot  // mass flow rate of fluid entering from demand side loop
+    void CalcFluidHeatExchanger(int CompNum,
+                                Real64 SupSideMdot, // mass flow rate of fluid entering from supply side loop
+                                Real64 DmdSideMdot  // mass flow rate of fluid entering from demand side loop
     );
 
-    void FindHXDemandSideLoopFlow(int const CompNum, Real64 const TargetSupplySideLoopLeavingTemp, int const HXActionMode);
+    void FindHXDemandSideLoopFlow(int CompNum, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
 
-    Real64 HXDemandSideLoopFlowResidual(Real64 const DmdSideMassFlowRate,
+    Real64 HXDemandSideLoopFlowResidual(Real64 DmdSideMassFlowRate,
                                         Array1<Real64> const &Par // Par(1) = HX index number
     );
 
-    void UpdateFluidHeatExchanger(int const CompNum);
+    void UpdateFluidHeatExchanger(int CompNum);
 
-    void ReportFluidHeatExchanger(int const CompNum);
+    void ReportFluidHeatExchanger(int CompNum);
 
 } // namespace PlantHeatExchangerFluidToFluid
 
