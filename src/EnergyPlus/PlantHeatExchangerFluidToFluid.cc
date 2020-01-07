@@ -237,8 +237,6 @@ namespace PlantHeatExchangerFluidToFluid {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        int CompLoop;
-        bool NodeEMSSetPointMissing;
 
         cCurrentModuleObject = "HeatExchanger:FluidToFluid";
 
@@ -259,7 +257,7 @@ namespace PlantHeatExchangerFluidToFluid {
         if (NumberOfPlantFluidHXs > 0) {
             FluidHX.allocate(NumberOfPlantFluidHXs);
             CheckFluidHXs.dimension(NumberOfPlantFluidHXs, true);
-            for (CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop) {
+            for (int CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               CompLoop,
                                               cAlphaArgs,
@@ -391,7 +389,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ErrorsFound = true;
                             } else {
                                 // need call to EMS to check node
-                                NodeEMSSetPointMissing = false;
+                                bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
@@ -412,7 +410,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ErrorsFound = true;
                             } else {
                                 // need call to EMS to check node
-                                NodeEMSSetPointMissing = false;
+                                bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
@@ -520,7 +518,7 @@ namespace PlantHeatExchangerFluidToFluid {
             ShowFatalError(RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
-        for (CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop) {
+        for (int CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop) {
 
             SetupOutputVariable("Fluid Heat Exchanger Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
@@ -1053,23 +1051,13 @@ namespace PlantHeatExchangerFluidToFluid {
         
         static std::string const RoutineName("ControlFluidHeatExchanger");
 
-        Real64 AvailSchedValue;
-        bool ScheduledOff;
-        bool LimitTrippedOff;
         Real64 mdotSupSide;
         Real64 mdotDmdSide;
-        Real64 DeltaTCooling;
-        Real64 DeltaTHeating;
-        Real64 cp;                // specific heat of fluid
-        Real64 TargetLeavingTemp; // target temperature deg. C
-        Real64 SetPointTemp;      // temperature setpoint for single setpoint
-        Real64 SetPointTempLo;    // low setpoint for dual deadband temperature setpoints
-        Real64 SetPointTempHi;    // High setpoint for dual deadband temperature setpoints
         Real64 ControlSignalValue(0.0);
-        bool ChillerShutDown;
 
         // check if available by schedule
-        AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(FluidHX(CompNum).AvailSchedNum);
+        bool ScheduledOff;
+        Real64 AvailSchedValue = ScheduleManager::GetCurrentScheduleValue(FluidHX(CompNum).AvailSchedNum);
         if (AvailSchedValue <= 0) {
             ScheduledOff = true;
         } else {
@@ -1077,7 +1065,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
 
         // check if operational limits trip off unit
-        LimitTrippedOff = false;
+        bool LimitTrippedOff = false;
         if ((DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).Temp < FluidHX(CompNum).MinOperationTemp) ||
             (DataLoopNode::Node(FluidHX(CompNum).DemandSideLoop.inletNodeNum).Temp < FluidHX(CompNum).MinOperationTemp)) {
             LimitTrippedOff = true;
@@ -1121,7 +1109,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                     if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
                         if (MyLoad < -1.0 * DataHVACGlobals::SmallLoad) { // requesting cooling
-                            DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                            Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
                             if (DeltaTCooling > FluidHX(CompNum).TempControlTol) { // can do cooling so turn on
                                 mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
                                 PlantUtilities::SetComponentFlowRate(mdotSupSide,
@@ -1133,11 +1121,11 @@ namespace PlantHeatExchangerFluidToFluid {
                                                      FluidHX(CompNum).SupplySideLoop.compNum);
                                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                                     // if supply side loop has massflow, request demand side flow
-                                    cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
+                                    Real64 cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
                                                                FluidHX(CompNum).SupplySideLoop.InletTemp,
                                                                DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidIndex,
                                                                RoutineName);
-                                    TargetLeavingTemp = FluidHX(CompNum).SupplySideLoop.InletTemp - std::abs(MyLoad) / (cp * mdotSupSide);
+                                    Real64 TargetLeavingTemp = FluidHX(CompNum).SupplySideLoop.InletTemp - std::abs(MyLoad) / (cp * mdotSupSide);
 
                                     FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
@@ -1176,7 +1164,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             }
 
                         } else { // requesting heating
-                            DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                            Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                             if (DeltaTHeating > FluidHX(CompNum).TempControlTol) { // can do heating so turn on
                                 mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
                                 PlantUtilities::SetComponentFlowRate(mdotSupSide,
@@ -1187,11 +1175,11 @@ namespace PlantHeatExchangerFluidToFluid {
                                                      FluidHX(CompNum).SupplySideLoop.branchNum,
                                                      FluidHX(CompNum).SupplySideLoop.compNum);
                                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
-                                    cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
+                                    Real64 cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
                                                                FluidHX(CompNum).SupplySideLoop.InletTemp,
                                                                DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidIndex,
                                                                RoutineName);
-                                    TargetLeavingTemp = FluidHX(CompNum).SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotSupSide);
+                                    Real64 TargetLeavingTemp = FluidHX(CompNum).SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotSupSide);
 
                                     FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
                                 } else { // no flow on supply side so do not request flow on demand side
@@ -1252,7 +1240,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if (SELECT_CASE_var == OperationSchemeOnOff) {
                     if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
                         if (MyLoad < DataHVACGlobals::SmallLoad) { // requesting cooling
-                            DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                            Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
                             if (DeltaTCooling > FluidHX(CompNum).TempControlTol) { // can do cooling so turn on
                                 mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
                                 PlantUtilities::SetComponentFlowRate(mdotSupSide,
@@ -1301,7 +1289,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             }
 
                         } else { // requesting heating
-                            DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                            Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                             if (DeltaTHeating > FluidHX(CompNum).TempControlTol) { // can do heating so turn on
                                 mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
                                 PlantUtilities::SetComponentFlowRate(mdotSupSide,
@@ -1370,8 +1358,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == HeatingSetPointModulated) {
 
-                    SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
-                    DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                    Real64 SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
+                    Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     if ((DeltaTHeating > FluidHX(CompNum).TempControlTol) && (SetPointTemp > FluidHX(CompNum).SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1384,7 +1372,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              FluidHX(CompNum).SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
 
-                            TargetLeavingTemp = SetPointTemp;
+                            Real64 TargetLeavingTemp = SetPointTemp;
                             FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
@@ -1423,8 +1411,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == HeatingSetPointOnOff) {
 
-                    SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
-                    DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                    Real64 SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
+                    Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     if ((DeltaTHeating > FluidHX(CompNum).TempControlTol) && (SetPointTemp > FluidHX(CompNum).SupplySideLoop.InletTemp)) {
                         // can and want to heat
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1474,8 +1462,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == CoolingSetPointModulated) {
 
-                    SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
-                    DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                    Real64 SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
+                    Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
                     if ((DeltaTCooling > FluidHX(CompNum).TempControlTol) && (SetPointTemp < FluidHX(CompNum).SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1487,7 +1475,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              FluidHX(CompNum).SupplySideLoop.branchNum,
                                              FluidHX(CompNum).SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
-                            TargetLeavingTemp = SetPointTemp;
+                            Real64 TargetLeavingTemp = SetPointTemp;
                             FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
@@ -1526,8 +1514,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == CoolingSetPointOnOff) {
 
-                    SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
-                    DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                    Real64 SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
+                    Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
                     if ((DeltaTCooling > FluidHX(CompNum).TempControlTol) && (SetPointTemp < FluidHX(CompNum).SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1577,10 +1565,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == DualDeadBandSetPointModulated) {
 
-                    SetPointTempLo = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointLo;
-                    SetPointTempHi = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointHi;
-                    DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
-                    DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                    Real64 SetPointTempLo = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointLo;
+                    Real64 SetPointTempHi = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointHi;
+                    Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                    Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     if ((DeltaTCooling > FluidHX(CompNum).TempControlTol) && (SetPointTempHi < FluidHX(CompNum).SupplySideLoop.InletTemp)) {
 
                         // can and want to cool
@@ -1593,7 +1581,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              FluidHX(CompNum).SupplySideLoop.branchNum,
                                              FluidHX(CompNum).SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
-                            TargetLeavingTemp = SetPointTempHi;
+                            Real64 TargetLeavingTemp = SetPointTempHi;
                             FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, CoolingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
@@ -1616,7 +1604,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                              FluidHX(CompNum).SupplySideLoop.branchNum,
                                              FluidHX(CompNum).SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
-                            TargetLeavingTemp = SetPointTempLo;
+                            Real64 TargetLeavingTemp = SetPointTempLo;
                             FindHXDemandSideLoopFlow(CompNum, TargetLeavingTemp, HeatingSupplySideLoop);
                         } else {
                             mdotDmdSide = 0.0;
@@ -1655,10 +1643,10 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == DualDeadBandSetPointOnOff) {
 
-                    SetPointTempLo = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointLo;
-                    SetPointTempHi = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointHi;
-                    DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
-                    DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
+                    Real64 SetPointTempLo = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointLo;
+                    Real64 SetPointTempHi = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPointHi;
+                    Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                    Real64 DeltaTHeating = FluidHX(CompNum).DemandSideLoop.InletTemp - FluidHX(CompNum).SupplySideLoop.InletTemp;
                     if ((DeltaTCooling > FluidHX(CompNum).TempControlTol) && (SetPointTempHi < FluidHX(CompNum).SupplySideLoop.InletTemp)) {
                         // can and want to cool
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1730,7 +1718,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
                 } else if (SELECT_CASE_var == CoolingDifferentialOnOff) {
 
-                    DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
+                    Real64 DeltaTCooling = FluidHX(CompNum).SupplySideLoop.InletTemp - FluidHX(CompNum).DemandSideLoop.InletTemp;
                     if (DeltaTCooling > FluidHX(CompNum).TempControlTol) {
                         //  want to cool
                         mdotSupSide = FluidHX(CompNum).SupplySideLoop.MassFlowRateMax;
@@ -1794,10 +1782,10 @@ namespace PlantHeatExchangerFluidToFluid {
                         }
                     }
 
-                    SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
-                    DeltaTCooling = SetPointTemp - ControlSignalValue;
+                    Real64 SetPointTemp = DataLoopNode::Node(FluidHX(CompNum).SetPointNodeNum).TempSetPoint;
+                    Real64 DeltaTCooling = SetPointTemp - ControlSignalValue;
                     // obtain shut down state
-                    ChillerShutDown = DataPlant::PlantLoop(FluidHX(CompNum).OtherCompSupplySideLoop.loopNum)
+                    bool ChillerShutDown = DataPlant::PlantLoop(FluidHX(CompNum).OtherCompSupplySideLoop.loopNum)
                                           .LoopSide(FluidHX(CompNum).OtherCompSupplySideLoop.loopSideNum)
                                           .Branch(FluidHX(CompNum).OtherCompSupplySideLoop.branchNum)
                                           .Comp(FluidHX(CompNum).OtherCompSupplySideLoop.compNum)
@@ -1889,43 +1877,33 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // METHODOLOGY EMPLOYED:
         // apply heat transfer model depending on type of HX used
-        
-        int const CmaxMixedCminUnmixed(40);
-        int const CmaxUnMixedCminMixed(41);
+
         static std::string const RoutineName("CalcFluidHeatExchanger");
 
-        Real64 SupSideLoopInletTemp;
-        Real64 DmdSideLoopInletTemp;
-        Real64 SupSideLoopInletCp; // specific heat of fluid entering from supply side loop at inlet temp
-        Real64 DmdSideLoopInletCp; // specific heat of fluid entering from demand side loop at inlet temp
-        Real64 SupSideCapRate;     // product of specific heat and mass flow for supply side loop at inlet temp
-        Real64 DmdSideCapRate;     // product of specific heat and mass flow for demand side loop at inlet temp
-        Real64 MinCapRate;         // minimum capacity flow rate
-        Real64 MaxCapRate;         // maximum capacity flow rate
-        Real64 NTU;                // number of transfer units for heat exchanger performance model
-        Real64 CapRatio;
-        Real64 ExpCheckValue1;
-        Real64 ExpCheckValue2;
+        int const CmaxMixedCminUnmixed(40);
+        int const CmaxUnMixedCminMixed(41);
+
         Real64 Effectiveness(0.0);
-        Real64 HeatTransferRate;
-        int CrossFlowEquation;
 
-        SupSideLoopInletTemp = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).Temp;
-        DmdSideLoopInletTemp = DataLoopNode::Node(FluidHX(CompNum).DemandSideLoop.inletNodeNum).Temp;
+        Real64 SupSideLoopInletTemp = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).Temp;
+        Real64 DmdSideLoopInletTemp = DataLoopNode::Node(FluidHX(CompNum).DemandSideLoop.inletNodeNum).Temp;
 
-        SupSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
+        // specific heat of fluid entering from supply side loop at inlet temp
+        Real64 SupSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidName,
                                                    SupSideLoopInletTemp,
                                                    DataPlant::PlantLoop(FluidHX(CompNum).SupplySideLoop.loopNum).FluidIndex,
                                                    RoutineName);
-        DmdSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).DemandSideLoop.loopNum).FluidName,
+
+        // specific heat of fluid entering from demand side loop at inlet temp
+        Real64 DmdSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(FluidHX(CompNum).DemandSideLoop.loopNum).FluidName,
                                                    DmdSideLoopInletTemp,
                                                    DataPlant::PlantLoop(FluidHX(CompNum).DemandSideLoop.loopNum).FluidIndex,
                                                    RoutineName);
 
-        SupSideCapRate = SupSideMdot * SupSideLoopInletCp;
-        DmdSideCapRate = DmdSideMdot * DmdSideLoopInletCp;
-        MinCapRate = min(SupSideCapRate, DmdSideCapRate);
-        MaxCapRate = max(SupSideCapRate, DmdSideCapRate);
+        Real64 SupSideCapRate = SupSideMdot * SupSideLoopInletCp;
+        Real64 DmdSideCapRate = DmdSideMdot * DmdSideLoopInletCp;
+        Real64 MinCapRate = min(SupSideCapRate, DmdSideCapRate);
+        Real64 MaxCapRate = max(SupSideCapRate, DmdSideCapRate);
 
         if (MinCapRate > 0.0) {
 
@@ -1933,10 +1911,10 @@ namespace PlantHeatExchangerFluidToFluid {
                 auto const SELECT_CASE_var(FluidHX(CompNum).HeatExchangeModelType);
 
                 if (SELECT_CASE_var == CrossFlowBothUnMixed) {
-                    NTU = FluidHX(CompNum).UA / MinCapRate;
-                    CapRatio = MinCapRate / MaxCapRate;
-                    ExpCheckValue1 = std::pow(NTU, 0.22) / CapRatio;
-                    ExpCheckValue2 = -CapRatio * std::pow(NTU, 0.78);
+                    Real64 NTU = FluidHX(CompNum).UA / MinCapRate;
+                    Real64 CapRatio = MinCapRate / MaxCapRate;
+                    Real64 ExpCheckValue1 = std::pow(NTU, 0.22) / CapRatio;
+                    Real64 ExpCheckValue2 = -CapRatio * std::pow(NTU, 0.78);
                     if ((ExpCheckValue1 > DataPrecisionGlobals::EXP_UpperLimit) || (ExpCheckValue2 > DataPrecisionGlobals::EXP_UpperLimit)) {
                         if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
                             Effectiveness = 1.0 - std::exp(-NTU);
@@ -1950,10 +1928,10 @@ namespace PlantHeatExchangerFluidToFluid {
                     }
 
                 } else if (SELECT_CASE_var == CrossFlowBothMixed) {
-                    NTU = FluidHX(CompNum).UA / MinCapRate;
-                    CapRatio = MinCapRate / MaxCapRate;
-                    ExpCheckValue1 = -CapRatio * NTU;
-                    ExpCheckValue2 = -NTU;
+                    Real64 NTU = FluidHX(CompNum).UA / MinCapRate;
+                    Real64 CapRatio = MinCapRate / MaxCapRate;
+                    Real64 ExpCheckValue1 = -CapRatio * NTU;
+                    Real64 ExpCheckValue2 = -NTU;
                     if (ExpCheckValue1 < DataPrecisionGlobals::EXP_LowerLimit) {
                         if (ExpCheckValue2 >= DataPrecisionGlobals::EXP_LowerLimit) {
                             Effectiveness = 1.0 - std::exp(-NTU);
@@ -1974,6 +1952,7 @@ namespace PlantHeatExchangerFluidToFluid {
                 } else if ((SELECT_CASE_var == CrossFlowSupplyLoopMixedDemandLoopUnMixed) ||
                            (SELECT_CASE_var == CrossFlowSupplyLoopUnMixedDemandLoopMixed)) {
 
+                    int CrossFlowEquation;
                     if (SupSideCapRate == MaxCapRate && FluidHX(CompNum).HeatExchangeModelType == CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
                         CrossFlowEquation = CmaxMixedCminUnmixed;
                     } else if (SupSideCapRate == MinCapRate && FluidHX(CompNum).HeatExchangeModelType == CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
@@ -1986,10 +1965,10 @@ namespace PlantHeatExchangerFluidToFluid {
                         CrossFlowEquation = CmaxMixedCminUnmixed;
                     }
 
-                    NTU = FluidHX(CompNum).UA / MinCapRate;
-                    CapRatio = MinCapRate / MaxCapRate;
+                    Real64 NTU = FluidHX(CompNum).UA / MinCapRate;
+                    Real64 CapRatio = MinCapRate / MaxCapRate;
                     if (CrossFlowEquation == CmaxMixedCminUnmixed) {
-                        ExpCheckValue1 = -NTU;
+                        Real64 ExpCheckValue1 = -NTU;
                         if (CapRatio == 0.0) { // protect div by zero
                             if (ExpCheckValue1 >= DataPrecisionGlobals::EXP_LowerLimit) {
                                 Effectiveness = 1.0 - std::exp(-NTU);
@@ -2005,7 +1984,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             Effectiveness = min(1.0, Effectiveness);
                         }
                     } else if (CrossFlowEquation == CmaxUnMixedCminMixed) {
-                        ExpCheckValue1 = -CapRatio * NTU;
+                        Real64 ExpCheckValue1 = -CapRatio * NTU;
                         if (CapRatio == 0.0) {
                             if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
                                 Effectiveness = 1.0 - std::exp(-NTU);
@@ -2015,7 +1994,7 @@ namespace PlantHeatExchangerFluidToFluid {
                             }
                         } else {
                             if (ExpCheckValue1 >= DataPrecisionGlobals::EXP_LowerLimit) {
-                                ExpCheckValue2 = -(1.0 / CapRatio) * (1.0 - std::exp(-CapRatio * NTU));
+                                Real64 ExpCheckValue2 = -(1.0 / CapRatio) * (1.0 - std::exp(-CapRatio * NTU));
                                 if (ExpCheckValue2 < DataPrecisionGlobals::EXP_LowerLimit) {
                                     Effectiveness = 1.0;
                                 } else {
@@ -2031,9 +2010,9 @@ namespace PlantHeatExchangerFluidToFluid {
                     }
 
                 } else if (SELECT_CASE_var == CounterFlow) {
-                    NTU = FluidHX(CompNum).UA / MinCapRate;
-                    CapRatio = MinCapRate / MaxCapRate;
-                    ExpCheckValue1 = -NTU * (1.0 - CapRatio);
+                    Real64 NTU = FluidHX(CompNum).UA / MinCapRate;
+                    Real64 CapRatio = MinCapRate / MaxCapRate;
+                    Real64 ExpCheckValue1 = -NTU * (1.0 - CapRatio);
                     if (ExpCheckValue1 > DataPrecisionGlobals::EXP_UpperLimit) {
                         if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
                             Effectiveness = 1.0 - std::exp(-NTU);
@@ -2054,9 +2033,9 @@ namespace PlantHeatExchangerFluidToFluid {
                     }
 
                 } else if (SELECT_CASE_var == ParallelFlow) {
-                    NTU = FluidHX(CompNum).UA / MinCapRate;
-                    CapRatio = MinCapRate / MaxCapRate;
-                    ExpCheckValue1 = -NTU * (1.0 + CapRatio);
+                    Real64 NTU = FluidHX(CompNum).UA / MinCapRate;
+                    Real64 CapRatio = MinCapRate / MaxCapRate;
+                    Real64 ExpCheckValue1 = -NTU * (1.0 + CapRatio);
                     if (ExpCheckValue1 > DataPrecisionGlobals::EXP_UpperLimit) {
                         if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
                             Effectiveness = 1.0 - std::exp(-NTU);
@@ -2080,7 +2059,7 @@ namespace PlantHeatExchangerFluidToFluid {
             Effectiveness = 0.0;
         }
 
-        HeatTransferRate = Effectiveness * MinCapRate * (SupSideLoopInletTemp - DmdSideLoopInletTemp); // + means supply side is cooled
+        Real64 HeatTransferRate = Effectiveness * MinCapRate * (SupSideLoopInletTemp - DmdSideLoopInletTemp); // + means supply side is cooled
 
         if (SupSideMdot > 0.0) {
             FluidHX(CompNum).SupplySideLoop.OutletTemp = SupSideLoopInletTemp - HeatTransferRate / (SupSideLoopInletCp * SupSideMdot);
@@ -2122,22 +2101,20 @@ namespace PlantHeatExchangerFluidToFluid {
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(2); // Parameter array passed to solver
 
-        Real64 LeavingTempMinFlow;
-        Real64 LeavingTempFullFlow;
-        Real64 SupSideMdot; // mass flow rate of fluid entering from supply side loop
-        Real64 DmdSideMdot; // mass flow rate of fluid entering from demand side loop
-
-        SupSideMdot = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).MassFlowRate;
+        // mass flow rate of fluid entering from supply side loop
+        Real64 SupSideMdot = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).MassFlowRate;
         // first see if root is bracketed
         // min demand flow
-        DmdSideMdot = FluidHX(CompNum).DemandSideLoop.MassFlowRateMin;
+
+        // mass flow rate of fluid entering from demand side loop
+        Real64 DmdSideMdot = FluidHX(CompNum).DemandSideLoop.MassFlowRateMin;
         CalcFluidHeatExchanger(CompNum, SupSideMdot, DmdSideMdot);
-        LeavingTempMinFlow = FluidHX(CompNum).SupplySideLoop.OutletTemp;
+        Real64 LeavingTempMinFlow = FluidHX(CompNum).SupplySideLoop.OutletTemp;
 
         // full demand flow
         DmdSideMdot = FluidHX(CompNum).DemandSideLoop.MassFlowRateMax;
         CalcFluidHeatExchanger(CompNum, SupSideMdot, DmdSideMdot);
-        LeavingTempFullFlow = FluidHX(CompNum).SupplySideLoop.OutletTemp;
+        Real64 LeavingTempFullFlow = FluidHX(CompNum).SupplySideLoop.OutletTemp;
 
         {
             auto const SELECT_CASE_var(HXActionMode);
@@ -2318,18 +2295,13 @@ namespace PlantHeatExchangerFluidToFluid {
         
         Real64 Residuum; // Residual to be minimized to zero
 
-        int CompNum;
-        Real64 SupSideLoopOutletTemp;
-        Real64 MdotTrial;
-        Real64 SupSideMdot; // mass flow rate of fluid entering from supply side loop
-
-        MdotTrial = DmdSideMassFlowRate;
-        CompNum = int(Par(1));
-        SupSideMdot = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).MassFlowRate;
+        Real64 MdotTrial = DmdSideMassFlowRate;
+        int CompNum = int(Par(1));
+        Real64 SupSideMdot = DataLoopNode::Node(FluidHX(CompNum).SupplySideLoop.inletNodeNum).MassFlowRate;
 
         CalcFluidHeatExchanger(CompNum, SupSideMdot, MdotTrial);
 
-        SupSideLoopOutletTemp = FluidHX(CompNum).SupplySideLoop.OutletTemp;
+        Real64 SupSideLoopOutletTemp = FluidHX(CompNum).SupplySideLoop.OutletTemp;
 
         Residuum = Par(2) - SupSideLoopOutletTemp;
 
