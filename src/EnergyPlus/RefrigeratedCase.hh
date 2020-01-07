@@ -68,7 +68,7 @@ namespace RefrigeratedCase {
     struct RefrigCaseData
     {
         // Members
-        std::string Name; // Name of refrigerated display case
+        std::string Name;            // Name of refrigerated display case
         std::string ZoneName;        // Zone or Location of Display Case
         int NumSysAttach;            // Number of systems attached to case, error if /=1
         int SchedPtr;                // Index to the correct availability schedule
@@ -253,8 +253,8 @@ namespace RefrigeratedCase {
         Array1D_int CaseNum;
         Array1D_int CoilNum;
         Array1D_int WalkInNum;
-        int HeatRejectionLocation; // Refrigeration Compressor Rack heat rejection location
-        int CondenserType; // Specifies cooling mode for outdoor condenser
+        int HeatRejectionLocation;        // Refrigeration Compressor Rack heat rejection location
+        int CondenserType;                // Specifies cooling mode for outdoor condenser
         Real64 LaggedUsedWaterHeater;     // Heat reclaim used to heat water in previous zone/load time step(W)
         Real64 LaggedUsedHVACCoil;        // Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
         Real64 EvapEffect;                // Effectiveness of evaporative condenser
@@ -327,18 +327,18 @@ namespace RefrigeratedCase {
         // Default Constructor
         RefrigRackData()
             : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(0), CondenserType(0), LaggedUsedWaterHeater(0.0),
-              LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0),
-              EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0),
-              EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0),
-              RatedCOP(0.0), COPFTempPtr(0), NumCases(0), NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupplyFromMains),
-              EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), OutsideAirNodeNum(0), HeatRejectionZoneNum(0), HeatRejectionZoneNodeNum(0),
-              TotalRackLoad(0.0), RackCompressorCOP(0.0), RackCompressorPower(0.0), RackElecConsumption(0.0), RackCapacity(0.0),
-              RackCoolingEnergy(0.0), CondenserFanPower(0.0), TotCondFTempPtr(0), ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0),
-              SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0), SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0),
-              NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0),
-              InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
-              OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0),
-              FlowType(1), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
+              LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
+              EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0),
+              BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), RatedCOP(0.0), COPFTempPtr(0), NumCases(0),
+              NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              OutsideAirNodeNum(0), HeatRejectionZoneNum(0), HeatRejectionZoneNodeNum(0), TotalRackLoad(0.0), RackCompressorCOP(0.0),
+              RackCompressorPower(0.0), RackElecConsumption(0.0), RackCapacity(0.0), RackCoolingEnergy(0.0), CondenserFanPower(0.0),
+              TotCondFTempPtr(0), ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
+              SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
+              LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
+              PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
+              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(1), VolFlowRateMax(0.0), MassFlowRateMax(0.0),
+              InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
 
@@ -376,8 +376,8 @@ namespace RefrigeratedCase {
     struct RefrigSystemData
     {
         // Members
-        std::string Name;            // Name of refrigeration system
-        std::string RefrigerantName; // Name of refrigerant, must match name in FluidName
+        std::string Name;                 // Name of refrigeration system
+        std::string RefrigerantName;      // Name of refrigerant, must match name in FluidName
         std::string EndUseSubcategory;    // Used for reporting purposes
         bool SystemRejectHeatToZone;      // Flag to show air-cooled condenser located inside zone
         bool CoilFlag;                    // Flag to show if coil type load on system (even if below in a secondary)
@@ -392,13 +392,13 @@ namespace RefrigeratedCase {
         Array1D_int SubcoolerNum;         // Absolute Index of subcoolers (allocated NumSubcoolers)
         Array1D_int WalkInNum;            // absolute Index of walk ins (allocated NumWalkIns)
         int CompSuctControl;              // Index to suction control
-        int HiStageWarnIndex1; // Recurring warning index when hi stage compressors unable to meet coil loads
-        int HiStageWarnIndex2; // Recurring warning index when hi stage compressors unable to meet coil loads
-        int InsuffCapWarn;     // Recurring warning index when refrigeration system unable to meet coil loads
-        int IntercoolerType;   // Intercooler type (0=none, 1=flash intercooler, 2=shell-and-coil intercooler)
-        int NumCases;          // Number of cases on this system
-        int NumCoils;          // Number of cases on this system
-        int NumCompressors;    // Number of compressors on this system for single-stage systems
+        int HiStageWarnIndex1;            // Recurring warning index when hi stage compressors unable to meet coil loads
+        int HiStageWarnIndex2;            // Recurring warning index when hi stage compressors unable to meet coil loads
+        int InsuffCapWarn;                // Recurring warning index when refrigeration system unable to meet coil loads
+        int IntercoolerType;              // Intercooler type (0=none, 1=flash intercooler, 2=shell-and-coil intercooler)
+        int NumCases;                     // Number of cases on this system
+        int NumCoils;                     // Number of cases on this system
+        int NumCompressors;               // Number of compressors on this system for single-stage systems
         // or number of low-stage compressors on this system for two-stage systems
         int NumCondensers;         // Number of condensers on this system
         int NumGasCoolers;         // Number of gas coolers on this system
@@ -1038,9 +1038,9 @@ namespace RefrigeratedCase {
         int ReceiverZoneNum;           // ID number for zone where receiver gains heat
         int ReceiverZoneNodeNum;       // ID number for zone node where receiver gains heat
         Real64 ReceiverZoneHeatGain;   // sensible heat gain rate to zone with receiver
-        int VarSpeedCurvePtr;  // Pointer for variable speed pump power curve
-        Real64 AvailLoadCoils; // Used to determine amount of avail heat for warehouse coils
-        Real64 CpBrineRated;   // Specific heat of secondary loop fluid at rated average
+        int VarSpeedCurvePtr;          // Pointer for variable speed pump power curve
+        Real64 AvailLoadCoils;         // Used to determine amount of avail heat for warehouse coils
+        Real64 CpBrineRated;           // Specific heat of secondary loop fluid at rated average
         //    brine temperature (J/kg-C)
         Real64 ChillerRefInventory; // Refrigerant inventory on cold side of loop heat exchanger
         Real64 CircRate;            // For PhaseChange loop = mass flow at pump/mass gas out load (dimensionless)
@@ -1304,23 +1304,23 @@ namespace RefrigeratedCase {
         int DefrostType;             // Coil defrost type, Hot-gas,Electric, Hot-brine
         int FanType;                 // Index to coil fan type (fixed, two-speed, etc.)
         int HeaterSchedPtr;          // Index to the correct availability schedule
-        int NumSysAttach;          // Number of refrigerating systems cooling this coil (error check purpose)
-        int RatingType;            // Indicates which type of manufacturer's rating is used
-        int SchedPtr;              // Index to the correct availability schedule
-        int SCIndex;               // IDs which of European standard conditions is used for rating
-        int SecServeID;            // Index to the refrigeration system serving this coil
-        int SHRCorrectionType;     // Index to type of correction for sensible heat ratio
-        int SHRCorrectionCurvePtr; // Index to Sensible heat ratio correction curve
-        int SysServeID;            // Index to the secondary system serving this coil
-        int VerticalLocation;      // Index to coil location, floor, ceiling, or middle
-        int ZoneNodeNum;           // Index to the zone node for the zone served by this coil
-        int ZoneNum;               // Index to the zone served by this coil
-        Real64 CorrMaterial;       // Correction factor from manufacturer's rating for coil material, default 1.0
-        Real64 CorrRefrigerant;    // Correction factor from manufacturer's rating for refrigerant, default 1.0
-        Real64 DefrostCapacity;    // Design defrost Coil capacity [W]
-        Real64 DefrostPower;       // Defrost power for electric defrost (W)
-        Real64 DeltaFreezeKgFrost; // Used to reverse accumulation if the zone/load time step is repeated (kg)
-        Real64 DefEnergyFraction;  // Portion of defrost energy available to melt ice,
+        int NumSysAttach;            // Number of refrigerating systems cooling this coil (error check purpose)
+        int RatingType;              // Indicates which type of manufacturer's rating is used
+        int SchedPtr;                // Index to the correct availability schedule
+        int SCIndex;                 // IDs which of European standard conditions is used for rating
+        int SecServeID;              // Index to the refrigeration system serving this coil
+        int SHRCorrectionType;       // Index to type of correction for sensible heat ratio
+        int SHRCorrectionCurvePtr;   // Index to Sensible heat ratio correction curve
+        int SysServeID;              // Index to the secondary system serving this coil
+        int VerticalLocation;        // Index to coil location, floor, ceiling, or middle
+        int ZoneNodeNum;             // Index to the zone node for the zone served by this coil
+        int ZoneNum;                 // Index to the zone served by this coil
+        Real64 CorrMaterial;         // Correction factor from manufacturer's rating for coil material, default 1.0
+        Real64 CorrRefrigerant;      // Correction factor from manufacturer's rating for refrigerant, default 1.0
+        Real64 DefrostCapacity;      // Design defrost Coil capacity [W]
+        Real64 DefrostPower;         // Defrost power for electric defrost (W)
+        Real64 DeltaFreezeKgFrost;   // Used to reverse accumulation if the zone/load time step is repeated (kg)
+        Real64 DefEnergyFraction;    // Portion of defrost energy available to melt ice,
         //    used with fluid defrost with temp termination (dimensionless)
         Real64 DesignRefrigInventory; // Design refrigerant inventory [kg]
         Real64 FanMinAirFlowRatio;    // Minimum air flow ratio set to preserve fan motor, dimensionless
@@ -1368,24 +1368,25 @@ namespace RefrigeratedCase {
         Real64 TotalCoolingLoad;            // Gross total cooling rate (W)
         Real64 TotalCoolingEnergy;          // Gross total cooling energy (J)
         Real64 TotalElecPower;              // Coil total electric
-        Real64 TotalElecConsumption; // Coil total electric energy (J)
+        Real64 TotalElecConsumption;        // Coil total electric energy (J)
         bool ShowCoilFrostWarning;
 
         // Default Constructor
         WarehouseCoilData()
             : SecStatusFirst(false), SecStatusLast(false), SysStatusFirst(false), SysStatusLast(false), CoilFanSchedPtr(0),
               DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(0), DefrostType(0), FanType(0), HeaterSchedPtr(0), NumSysAttach(0),
-              RatingType(0), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0), VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0),
-              CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0), DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0),
-              DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0), HeaterPower(0.0), HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0),
-              KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0), RatedAirVolumeFlow(0.0), RatedCapTotal(0.0), RatedFanPower(0.0), RatedRH(0.0),
-              RatedSensibleCap(0.0), RatedTemperatureDif(0.0), ReqLoad(0.0), SensHeatRatio(0.0), SHRCorrection60(0.0), Temperature(0.0),
-              TEvapDesign(0.0), ThermalDefrostPower(0.0), UnitLoadFactorSens(0.0), ElecHeaterPower(0.0), ElecHeaterConsumption(0.0),
-              ElecFanPower(0.0), ElecFanConsumption(0.0), ElecDefrostPower(0.0), ElecDefrostConsumption(0.0), LatCreditRate(0.0), LatLoadServed(0.0),
-              LatKgPerS_ToZone(0.0), LatCreditEnergy(0.0), ReportSensCoolCreditRate(0.0), ReportHeatingCreditRate(0.0),
-              ReportSensCoolCreditEnergy(0.0), ReportHeatingCreditEnergy(0.0), ReportTotalCoolCreditRate(0.0), ReportTotalCoolCreditEnergy(0.0),
-              SensCreditRate(0.0), SensCreditEnergy(0.0), SensCoolingEnergyRate(0.0), SensCoolingEnergy(0.0), TotalCoolingLoad(0.0),
-              TotalCoolingEnergy(0.0), TotalElecPower(0.0), TotalElecConsumption(0.0), ShowCoilFrostWarning(true)
+              RatingType(0), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0),
+              VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0),
+              DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0), DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0), HeaterPower(0.0),
+              HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0), KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0),
+              RatedAirVolumeFlow(0.0), RatedCapTotal(0.0), RatedFanPower(0.0), RatedRH(0.0), RatedSensibleCap(0.0), RatedTemperatureDif(0.0),
+              ReqLoad(0.0), SensHeatRatio(0.0), SHRCorrection60(0.0), Temperature(0.0), TEvapDesign(0.0), ThermalDefrostPower(0.0),
+              UnitLoadFactorSens(0.0), ElecHeaterPower(0.0), ElecHeaterConsumption(0.0), ElecFanPower(0.0), ElecFanConsumption(0.0),
+              ElecDefrostPower(0.0), ElecDefrostConsumption(0.0), LatCreditRate(0.0), LatLoadServed(0.0), LatKgPerS_ToZone(0.0), LatCreditEnergy(0.0),
+              ReportSensCoolCreditRate(0.0), ReportHeatingCreditRate(0.0), ReportSensCoolCreditEnergy(0.0), ReportHeatingCreditEnergy(0.0),
+              ReportTotalCoolCreditRate(0.0), ReportTotalCoolCreditEnergy(0.0), SensCreditRate(0.0), SensCreditEnergy(0.0),
+              SensCoolingEnergyRate(0.0), SensCoolingEnergy(0.0), TotalCoolingLoad(0.0), TotalCoolingEnergy(0.0), TotalElecPower(0.0),
+              TotalElecConsumption(0.0), ShowCoilFrostWarning(true)
         {
         }
 
@@ -1535,7 +1536,7 @@ namespace RefrigeratedCase {
                                   int SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
-                                  const Optional_bool_const& SuppressWarning = _);
+                                  const Optional_bool_const &SuppressWarning = _);
 
     void ReportRefrigerationComponents();
 
