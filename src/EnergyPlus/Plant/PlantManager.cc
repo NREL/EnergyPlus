@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,6 +89,7 @@
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
@@ -108,6 +109,7 @@
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -1341,6 +1343,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
                                 this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
@@ -1438,6 +1441,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
