@@ -634,7 +634,7 @@ The input for the Outside Air System consists of a system name, a controller lis
 
 The equipment inlet/outlet must be sequential with no loops - the simulation can only handle a straight-through air path, both on the primary air side and on the secondary air side, if any. Heat exchanger secondary air inlets need to be independent of the primary air stream -- usually relief air is used.
 
-The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) can also be defined as a subsystem of an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}. When this subsystem is referred in AirLoopHVAC:DedicatedOutdoorAirSystem, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} can not be listed in the \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, because the outdoor air flow rate will not be determined by Controller:OutdoorAir. Instead, the outdoor air flow rate will be specified by \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}.  In addition, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} as a component, because no mix is needed due to 100\% outdoor incoming airflow determined by AirLoopHVAC:DedicatedOutdoorAirSystem.     
+The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) can also be defined as a subsystem of an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}. When this subsystem is referred in AirLoopHVAC:DedicatedOutdoorAirSystem, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} can not be listed in the \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, because the outdoor air flow rate will not be determined by Controller:OutdoorAir. Instead, the outdoor air flow rate will be specified by \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}.  In addition, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} as a component, because no mix is needed due to 100\% outdoor incoming airflow determined by AirLoopHVAC:DedicatedOutdoorAirSystem.
 
 \subsubsection{Inputs}\label{inputs-3-001}
 
@@ -715,12 +715,12 @@ The impact of using outside air/mechanical ventilation is described in the secti
 
 Used to specify the components in the outdoor air system. The components will be simulated in the order in which they occur in the list.
 
-The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix shows which coils and fans are allowed with which equipment models.
+The following HVAC equipment types are allowed as outdoor air system equipment. The component matrix (Figure~\ref{fig:outdoor-air-system-component-matrix}) shows which coils and fans are allowed with which equipment models.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/OASysComponentMatrix.png}
-\caption{Component Matrix: which coils and fans are allowed with which outdoor air equipment models}
+\caption{Outdoor Air System Component Matrix \protect \label{fig:outdoor-air-system-component-matrix}}
 \end{figure}
 
 \subsubsection{Inputs}\label{inputs-4-001}
