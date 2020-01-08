@@ -1950,6 +1950,19 @@ namespace SingleDuct {
                 ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
             }
 
+            if (lAlphaBlanks(9)) {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = 1.0;
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = false;
+            } else {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(Alphas(9));
+                if (sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr == 0) {
+                    ShowSevereError(cAlphaFields(9) + " = " + Alphas(9) + " not found.");
+                    ShowContinueError("Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
+                    ErrorsFound = true;
+                }
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = true;
+            }
+
             // Add reheat coil to component sets array
             SetUpCompSets(sd_airterminal(SysNum).SysType,
                           sd_airterminal(SysNum).SysName,
@@ -2913,7 +2926,7 @@ namespace SingleDuct {
                 if (sd_airterminal(SysNum).SysType_Num == SingleDuctVAVReheatVSFan) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = max(UserInputMaxHeatAirVolFlowRate,
                                                                           TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
-                                                                          sd_airterminal(SysNum).MaxAirVolFlowRate * sd_airterminal(SysNum).ZoneMinAirFracDes);
+                                                                          sd_airterminal(SysNum).MaxAirVolFlowRate * sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
                 } else {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                                                                           sd_airterminal(SysNum).MaxAirVolFlowRate * sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
@@ -2921,7 +2934,7 @@ namespace SingleDuct {
             } else {
                 if (sd_airterminal(SysNum).SysType_Num == SingleDuctVAVReheatVSFan) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
-                        max(sd_airterminal(SysNum).MaxHeatAirVolFlowRate, sd_airterminal(SysNum).MaxAirVolFlowRate * sd_airterminal(SysNum).ZoneMinAirFracDes);
+                        max(sd_airterminal(SysNum).MaxHeatAirVolFlowRate, sd_airterminal(SysNum).MaxAirVolFlowRate * sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
                 } else if (sd_airterminal(SysNum).SysType_Num == SingleDuctConstVolReheat || sd_airterminal(SysNum).SysType_Num == SingleDuctConstVolNoReheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = sd_airterminal(SysNum).MaxAirVolFlowRate;
                 } else {
