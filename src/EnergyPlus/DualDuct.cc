@@ -369,7 +369,7 @@ namespace DualDuct {
                                                                           cAlphaFields(5));
 
                  dd_airterminal(DamperNum).MaxAirVolFlowRate = NumArray(1);
-                 dd_airterminal(DamperNum).ZoneMinAirFrac = 0.0;
+                 dd_airterminal(DamperNum).ZoneMinAirFracDes = 0.0;
 
                 // Register component set data - one for heat and one for cool
                 TestCompSet(CurrentModuleObject + ":HEAT",  dd_airterminal(DamperNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
@@ -508,7 +508,7 @@ namespace DualDuct {
                                                                           cAlphaFields(5));
 
                  dd_airterminal(DamperNum).MaxAirVolFlowRate = NumArray(1);
-                 dd_airterminal(DamperNum).ZoneMinAirFrac = NumArray(2);
+                 dd_airterminal(DamperNum).ZoneMinAirFracDes = NumArray(2);
 
                 // Register component set data - one for heat and one for cool
                 TestCompSet(CurrentModuleObject + ":HEAT",  dd_airterminal(DamperNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
@@ -568,6 +568,19 @@ namespace DualDuct {
                     } else {
                          dd_airterminal(DamperNum).NoOAFlowInputFromUser = false;
                     }
+                }
+
+                if (lAlphaBlanks(7)) {
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = 1.0;
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchExist = false;
+                } else {
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(AlphArray(7));
+                    if (dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr == 0) {
+                        ShowSevereError(cAlphaFields(7) + " = " + AlphArray(7) + " not found.");
+                        ShowContinueError("Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DamperNum).Name);
+                        ErrorsFound = true;
+                    }
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchExist = true;
                 }
 
                 // Setup the Average damper Position output variable
@@ -908,7 +921,13 @@ namespace DualDuct {
                 if (  dd_airterminal(DamperNum).DamperType == DualDuct_ConstantVolume) {
                     Node(OutNode).MassFlowRateMin = 0.0;
                 } else if (  dd_airterminal(DamperNum).DamperType == DualDuct_VariableVolume) {
-                    Node(OutNode).MassFlowRateMin = Node(OutNode).MassFlowRateMax *  dd_airterminal(DamperNum).ZoneMinAirFrac;
+                    // get dual duct air terminal box turndown minimum flow fraction
+                    if (dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchExist) {
+                        dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = ScheduleManager::GetCurrentScheduleValue(dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr);
+                    } else {
+                        dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = 1.0;
+                    }
+                    Node(OutNode).MassFlowRateMin = Node(OutNode).MassFlowRateMax *  dd_airterminal(DamperNum).ZoneMinAirFracDes * dd_airterminal(DamperNum).ZoneTurndownMinAirFrac;
                 } else {
                     Node(OutNode).MassFlowRateMin = 0.0;
                 }
@@ -1007,14 +1026,22 @@ namespace DualDuct {
                 } else {
                     Node(ColdInNode).MassFlowRateMaxAvail = 0.0;
                 }
+                // get current time step air terminal box turndown minimum flow fraction
+                if (dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchExist) {
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = ScheduleManager::GetCurrentScheduleValue(dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr);
+                } else {
+                    dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = 1.0;
+                }
+                // update to the current dual duct minimum air flow fraction
+                dd_airterminal(DamperNum).ZoneMinAirFrac = dd_airterminal(DamperNum).ZoneMinAirFracDes * dd_airterminal(DamperNum).ZoneTurndownMinAirFrac;
                 // The last item is to take care of the Min Avail Flow Rates
                 if ((Node(HotInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue( dd_airterminal(DamperNum).SchedPtr) > 0.0)) {
-                    Node(HotInNode).MassFlowRateMinAvail = dd_airterminalHotAirInlet(DamperNum).AirMassFlowRateMax *  dd_airterminal(DamperNum).ZoneMinAirFrac;
+                    Node(HotInNode).MassFlowRateMinAvail = dd_airterminalHotAirInlet(DamperNum).AirMassFlowRateMax * dd_airterminal(DamperNum).ZoneMinAirFrac;
                 } else {
                     Node(HotInNode).MassFlowRateMinAvail = 0.0;
                 }
                 if ((Node(ColdInNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(  dd_airterminal(DamperNum).SchedPtr) > 0.0)) {
-                    Node(ColdInNode).MassFlowRateMinAvail = dd_airterminalColdAirInlet(DamperNum).AirMassFlowRateMax *  dd_airterminal(DamperNum).ZoneMinAirFrac;
+                    Node(ColdInNode).MassFlowRateMinAvail = dd_airterminalColdAirInlet(DamperNum).AirMassFlowRateMax * dd_airterminal(DamperNum).ZoneMinAirFrac;
                 } else {
                     Node(ColdInNode).MassFlowRateMinAvail = 0.0;
                 }

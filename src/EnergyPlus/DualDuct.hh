@@ -119,7 +119,8 @@ namespace DualDuct {
         int HotAirInletNodeNum;
         int ColdAirInletNodeNum;
         int OutletNodeNum;
-        Real64 ZoneMinAirFrac;
+        Real64 ZoneMinAirFracDes;        // Fraction of supply air used as design minimum flow
+        Real64 ZoneMinAirFrac;           // Fraction of supply air used as current minimum flow
         Real64 ColdAirDamperPosition;
         Real64 HotAirDamperPosition;
         int OAInletNodeNum;              // Alternate Node for VAV:OutdoorAir for Outdoor Air
@@ -141,15 +142,18 @@ namespace DualDuct {
         int OAPerPersonMode;             // mode for how per person rates are determined, DCV or design.
         Real64 OAPerPersonByDesignLevel; // store sum of people and per person rate, constant, m3/s
         int AirLoopNum;                  // index to airloop that this terminal unit is connected to
+        int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
 
         // Default Constructor
         DualDuctAirTerminal()
             : DamperType(0), SchedPtr(0), MaxAirVolFlowRate(0.0), MaxAirMassFlowRate(0.0), HotAirInletNodeNum(0), ColdAirInletNodeNum(0),
-              OutletNodeNum(0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
+              OutletNodeNum(0), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
               RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
               RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
               ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), OAPerPersonMode(PerPersonModeNotSet),
-              OAPerPersonByDesignLevel(0.0), AirLoopNum(0)
+              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false)
         {
         }
 
