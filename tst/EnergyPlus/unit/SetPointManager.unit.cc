@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,16 +57,16 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <CurveManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DirectAirManager.hh>
@@ -78,12 +78,12 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <HeatBalanceManager.hh>
-#include <NodeInputManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SimAirServingZones.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 using namespace EnergyPlus;
 
@@ -1183,7 +1183,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1241,7 +1241,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",

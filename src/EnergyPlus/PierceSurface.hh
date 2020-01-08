@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,9 +69,9 @@
 //   Don't make changes here without validating the performance impact
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <EnergyPlus.hh>
-#include <Platform.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Platform.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector2.hh>

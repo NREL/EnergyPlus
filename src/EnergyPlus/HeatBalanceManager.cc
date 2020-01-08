@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,56 +58,56 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <ConductionTransferFunctionCalc.hh>
-#include <CurveManager.hh>
-#include <DataBSDFWindow.hh>
-#include <DataComplexFenestration.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDaylighting.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataRoomAirModel.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DaylightingDevices.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <EconomicTariff.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <HVACSizingSimulationManager.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <MatrixDataManager.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportTabular.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>
-#include <SurfaceGeometry.hh>
-#include <SurfaceOctree.hh>
-#include <UtilityRoutines.hh>
-#include <WindowComplexManager.hh>
-#include <WindowEquivalentLayer.hh>
-#include <WindowManager.hh>
-#include <WindowModel.hh>
+#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MatrixDataManager.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -1118,7 +1118,7 @@ namespace HeatBalanceManager {
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
-                    if ((SELECT_CASE_var == "3RDORDERBACKWARDDIFFERENCE") || (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE")) {
+                    if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
                         ZoneAirSolutionAlgo = Use3rdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                     } else if (SELECT_CASE_var == "ANALYTICALSOLUTION") {
@@ -1362,7 +1362,7 @@ namespace HeatBalanceManager {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
-                    } else if (SELECT_CASE_var == "BiSECTION") {
+                    } else if (SELECT_CASE_var == "BISECTION") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
@@ -4176,7 +4176,6 @@ namespace HeatBalanceManager {
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
         bool EOFonW5File; // True if EOF encountered reading Window5 data file
-        static bool NoRegularMaterialsUsed(true);
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -5108,7 +5107,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOWITT") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = MoWiTTHcOutside;
 
-                } else if ((SELECT_CASE_var == "DOE2") || (SELECT_CASE_var == "DOE-2")) {
+                } else if (SELECT_CASE_var == "DOE-2") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = DOE2HcOutside;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
@@ -7557,12 +7556,15 @@ namespace HeatBalanceManager {
                 if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    thisConstruct.TransDiff = 1.0;
-                    thisConstruct.TransDiffVis = 1.0;
-                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    thisConstruct.TransSolBeamCoef = 1.0;
-                    thisConstruct.ReflectSolDiffBack = 0.0;
+                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
+                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                    //thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    //thisConstruct.TransDiff = 1.0;
+                    //thisConstruct.TransDiffVis = 1.0;
+                    //thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    //thisConstruct.TransSolBeamCoef = 1.0;
+                    //thisConstruct.ReflectSolDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method

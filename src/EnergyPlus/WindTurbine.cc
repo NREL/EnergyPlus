@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,20 +56,20 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataGenerators.hh>
-#include <DataGlobalConstants.hh>
-#include <DataHVACGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WindTurbine.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGenerators.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindTurbine.hh>
 
 namespace EnergyPlus {
 
@@ -318,10 +318,9 @@ namespace WindTurbine {
             // Select rotor type
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
-                if ((SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE") || (SELECT_CASE_var == "HAWT") || (SELECT_CASE_var == "NONE") ||
-                    (SELECT_CASE_var == "")) {
+                if ((SELECT_CASE_var == "HORIZONTALAXISWINDTURBINE") || (SELECT_CASE_var == "")) {
                     WindTurbineSys(WindTurbineNum).RotorType = HAWT;
-                } else if ((SELECT_CASE_var == "VERTICALAXISWINDTURBINE") || (SELECT_CASE_var == "VAWT")) {
+                } else if (SELECT_CASE_var == "VERTICALAXISWINDTURBINE") {
                     WindTurbineSys(WindTurbineNum).RotorType = VAWT;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -332,14 +331,13 @@ namespace WindTurbine {
             // Select control type
             {
                 auto const SELECT_CASE_var(cAlphaArgs(4));
-                if ((SELECT_CASE_var == "FIXEDSPEEDFIXEDPITCH") || (SELECT_CASE_var == "FSFP")) {
+                if (SELECT_CASE_var == "FIXEDSPEEDFIXEDPITCH") {
                     WindTurbineSys(WindTurbineNum).ControlType = FSFP;
-                } else if ((SELECT_CASE_var == "FIXEDSPEEDVARIABLEPITCH") || (SELECT_CASE_var == "FSVP")) {
+                } else if (SELECT_CASE_var == "FIXEDSPEEDVARIABLEPITCH") {
                     WindTurbineSys(WindTurbineNum).ControlType = FSVP;
-                } else if ((SELECT_CASE_var == "VARIABLESPEEDFIXEDPITCH") || (SELECT_CASE_var == "VSFP")) {
+                } else if (SELECT_CASE_var == "VARIABLESPEEDFIXEDPITCH") {
                     WindTurbineSys(WindTurbineNum).ControlType = VSFP;
-                } else if ((SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH") || (SELECT_CASE_var == "VSVP") || (SELECT_CASE_var == "NONE") ||
-                           (SELECT_CASE_var == "")) {
+                } else if ((SELECT_CASE_var == "VARIABLESPEEDVARIABLEPITCH") || (SELECT_CASE_var == "")) {
                     WindTurbineSys(WindTurbineNum).ControlType = VSVP;
                 } else {
                     ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" + cAlphaArgs(4) + "\".");

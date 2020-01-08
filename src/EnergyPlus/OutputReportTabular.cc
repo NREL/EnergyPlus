@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,69 +64,69 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetworkBalanceManager.hh>
-#include <Boilers.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerReformulatedEIR.hh>
-#include <CommandLineInterface.hh>
-#include <CondenserLoopTowers.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataCostEstimate.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataOutputs.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataShadowingCombinations.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataWater.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <EconomicLifeCycleCost.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <EvaporativeFluidCoolers.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FluidCoolers.hh>
-#include <General.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HeatingCoils.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <MixedAir.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <PackagedThermalStorageCoil.hh>
-#include <PlantChillers.hh>
-#include <PollutionModule.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ReportCoilSelection.hh>
-#include <ResultsSchema.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <VariableSpeedCoils.hh>
-#include <VentilatedSlab.hh>
-#include <WaterThermalTanks.hh>
-#include <WeatherManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataCostEstimate.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/PackagedThermalStorageCoil.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2005,15 +2005,7 @@ namespace OutputReportTabular {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
                     ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "BEPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2025,23 +2017,11 @@ namespace OutputReportTabular {
                     displayTabularVeriSum = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "IVRS")) {
-                    displayTabularVeriSum = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
                     displayComponentSizing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CSS")) {
-                    displayComponentSizing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
-                    displaySurfaceShadowing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "SHAD")) {
                     displaySurfaceShadowing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2091,10 +2071,6 @@ namespace OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "EIO")) {
-                    WriteTabularFiles = true;
-                    displayEioSummary = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
                     WriteTabularFiles = true;
@@ -3348,7 +3324,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("ResidualOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3361,7 +3337,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("DistillateOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;
@@ -4840,7 +4816,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
@@ -4909,7 +4885,7 @@ namespace OutputReportTabular {
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+                    SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto & cooler : SimpleFluidCooler) {
             SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -154,6 +154,8 @@ namespace HeatBalanceSurfaceManager {
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+
+    Real64 GetQdotConvOutRepPerArea(int const SurfNum);
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
