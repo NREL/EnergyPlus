@@ -3809,7 +3809,8 @@ namespace OutputReportTabular {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Initialization_Summary, Entire_Facility) << "\">Initialization Summary</a>\n";
                 }
                 if (displayHeatEmissionsSummary) {
-                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility) << "\">Annual Heat Emissions Summary</a>\n";
+                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility)
+                               << "\">Annual Heat Emissions Summary</a>\n";
                 }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
@@ -3963,8 +3964,10 @@ namespace OutputReportTabular {
             if (gatherThisTime) {
                 for (jTable = 1; jTable <= curNumTables; ++jTable) {
                     repIndex = curResIndex + (jTable - 1);
-                    if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
-                        ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
+                    if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
+                         (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                        ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
+                         (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                         // put actual value from OutputProcesser arrays
                         curValue = GetInternalVariableValue(curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
                         // per MJW when a summed variable is used divide it by the length of the time step
@@ -4124,8 +4127,10 @@ namespace OutputReportTabular {
                 curCol = jColumn + curFirstColumn - 1;
                 curTypeOfVar = MonthlyColumnsTypeOfVar(curCol);
                 curStepType = MonthlyColumnsStepType(curCol);
-                if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
-                    ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
+                if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
+                     (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                    ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
+                     (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                     //  the above condition used to include the following prior to new scan method
                     //  (MonthlyColumns(curCol)%aggType .EQ. aggTypeValueWhenMaxMin)
                     curVarNum = MonthlyColumnsVarNum(curCol);
@@ -4142,8 +4147,8 @@ namespace OutputReportTabular {
                     // the current timestamp
                     minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                    //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated + SysTimeElapsed * 60
-                    //      minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
+                    //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
+                    //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
@@ -4838,8 +4843,8 @@ namespace OutputReportTabular {
         using PlantChillers::NumElectricChillers;
         using PlantChillers::NumEngineDrivenChillers;
         using PlantChillers::NumGTChillers;
-        using RefrigeratedCase::RefrigRack;
         using RefrigeratedCase::Condenser;
+        using RefrigeratedCase::RefrigRack;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
         using WaterThermalTanks::AmbientTempOutsideAir;
@@ -4880,14 +4885,13 @@ namespace OutputReportTabular {
 
         // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += towers(iCooler).Qactual * TimeStepSysSec + towers(iCooler).FanEnergy +
-                                          towers(iCooler).BasinHeaterConsumption;
+            SysTotalHVACRejectHeatLoss +=
+                towers(iCooler).Qactual * TimeStepSysSec + towers(iCooler).FanEnergy + towers(iCooler).BasinHeaterConsumption;
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss +=
-                    SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+            SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
-        for (auto & cooler : SimpleFluidCooler) {
+        for (auto &cooler : SimpleFluidCooler) {
             SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
         }
 
@@ -4925,8 +4929,7 @@ namespace OutputReportTabular {
 
         // Water / steam boiler
         for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss +=
-                Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
+            SysTotalHVACRejectHeatLoss += Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
@@ -7645,6 +7648,9 @@ namespace OutputReportTabular {
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = gatherEndUseBEPS(1, jEndUse); // electricity
+
+                Real64 tmpGathCollapseEndUse = gatherEndUseBEPS(1, jEndUse); // temporary
+                
                 collapsedEndUse(2, jEndUse) = gatherEndUseBEPS(2, jEndUse); // natural gas
                 collapsedEndUse(3, jEndUse) = gatherEndUseBEPS(6, jEndUse) + gatherEndUseBEPS(8, jEndUse) + gatherEndUseBEPS(9, jEndUse) +
                                               gatherEndUseBEPS(10, jEndUse) + gatherEndUseBEPS(11, jEndUse) + gatherEndUseBEPS(12, jEndUse) +
@@ -7668,8 +7674,16 @@ namespace OutputReportTabular {
             collapsedTotal(6) = gatherTotalsBEPS(7);                       // water
 
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
+
+                Array1D<Real64> tmpGathEndUseSub; // temporary
+                tmpGathEndUseSub.allocate(EndUseCategory(jEndUse).NumSubcategories);  // temporary
+
+
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1); // electricity
+
+                    tmpGathEndUseSub(kEndUseSub) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1); // temporary
+
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2); // natural gas
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) =
                         gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6) + gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8) +
@@ -8428,9 +8442,13 @@ namespace OutputReportTabular {
                     if (EndUseCategory(jEndUse).NumSubcategories > 0) {
                         // set the value to the total for the end use
                         endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
+                        Real64 tmpEndUseSubOther = collapsedEndUse(iResource, jEndUse); // temporary
+                        Array1D<Real64> tmpEndUseSub; // temporary
+                        tmpEndUseSub.allocate(EndUseCategory(jEndUse).NumSubcategories);  // temporary
                         // subtract off each sub end use category value
                         for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
+                            tmpEndUseSub(kEndUseSub) = collapsedEndUseSub(kEndUseSub, jEndUse, iResource); // temporary
                         }
                         // if just a small value remains set it to zero
                         if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
@@ -9289,7 +9307,6 @@ namespace OutputReportTabular {
                                                                                         "Source Energy End Use Components Summary");
             }
 
-
             // Normalized by Area tables
 
             {
@@ -9343,12 +9360,13 @@ namespace OutputReportTabular {
                                                            "Source Energy End Use Component Per Conditioned Floor Area");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Source Energy End Use Components Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Source Energy End Use Component Per Conditioned Floor Area");
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        tableBody,
+                        rowHead,
+                        columnHead,
+                        "Source Energy End Use Components Summary",
+                        "Entire Facility",
+                        "Source Energy End Use Component Per Conditioned Floor Area");
                 }
             } // End of Normalized by Conditioned Area
 
@@ -10573,8 +10591,9 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 if (DetailedWWR) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Wall," + RoundSigDigits(curArea * mult, 1) + ',' +
-                                                                             RoundSigDigits(Surface(iSurf).Tilt, 1);
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Wall," +
+                                                                                        RoundSigDigits(curArea * mult, 1) + ',' +
+                                                                                        RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
@@ -10595,8 +10614,9 @@ namespace OutputReportTabular {
                                     curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                 zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
                                 if (DetailedWWR) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Window," + RoundSigDigits(curArea * mult, 1) + ',' +
-                                                                             RoundSigDigits(Surface(iSurf).Tilt, 1);
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Window," +
+                                                                                        RoundSigDigits(curArea * mult, 1) + ',' +
+                                                                                        RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             }
                         }
@@ -10608,15 +10628,17 @@ namespace OutputReportTabular {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Roof," + RoundSigDigits(curArea * mult, 1) + ',' +
-                                                                             RoundSigDigits(Surface(iSurf).Tilt, 1);
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Roof," +
+                                                                                        RoundSigDigits(curArea * mult, 1) + ',' +
+                                                                                        RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass_Window) || (SELECT_CASE_var == SurfaceClass_TDD_Dome)) {
                                 mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Skylight," + RoundSigDigits(curArea * mult, 1) +
-                                                                             ',' + RoundSigDigits(Surface(iSurf).Tilt, 1);
+                                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << Surface(iSurf).Name + ",Skylight," +
+                                                                                        RoundSigDigits(curArea * mult, 1) + ',' +
+                                                                                        RoundSigDigits(Surface(iSurf).Tilt, 1);
                                 }
                             }
                         }
@@ -10634,11 +10656,11 @@ namespace OutputReportTabular {
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWallArea, 2) + ',' + RoundSigDigits(wallAreaN, 2) + ',' +
-                                                         RoundSigDigits(wallAreaS, 2) + ',' + RoundSigDigits(wallAreaE, 2) + ',' +
-                                                         RoundSigDigits(wallAreaW, 2);
+                                                                    RoundSigDigits(wallAreaS, 2) + ',' + RoundSigDigits(wallAreaE, 2) + ',' +
+                                                                    RoundSigDigits(wallAreaW, 2);
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << RoundSigDigits(TotalWindowArea, 2) + ',' + RoundSigDigits(windowAreaN, 2) + ',' +
-                                                         RoundSigDigits(windowAreaS, 2) + ',' + RoundSigDigits(windowAreaE, 2) + ',' +
-                                                         RoundSigDigits(windowAreaW, 2);
+                                                                    RoundSigDigits(windowAreaS, 2) + ',' + RoundSigDigits(windowAreaE, 2) + ',' +
+                                                                    RoundSigDigits(windowAreaW, 2);
             }
 
             tableBody = "";
@@ -12280,10 +12302,12 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
+                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
@@ -12796,7 +12820,6 @@ namespace OutputReportTabular {
                     // We delay the potential application of SI to IP conversion and actual output until after both the AirLoopComponentLoadSummary
                     // and FacilityComponentLoadSummary have been processed because below we try to retrieve the info directly when the timestamp
                     // would match (cf #7356), and if we converted right now, we would apply the conversion twice
-
                 }
             }
         }
@@ -13071,7 +13094,6 @@ namespace OutputReportTabular {
 
             OutputCompLoadSummary(facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
         }
-
 
         // ZoneComponentLoadSummary: Now we convert and Display
         if (displayZoneComponentLoadSummary) {
@@ -15607,18 +15629,18 @@ namespace OutputReportTabular {
 
         // FUNCTION PARAMETER DEFINITIONS:
         static Array1D<ObjexxFCL::gio::Fmt> formDigits({0, 9},
-                                            {"(F12.0)",
-                                             "(F12.1)",
-                                             "(F12.2)",
-                                             "(F12.3)",
-                                             "(F12.4)",
-                                             "(F12.5)",
-                                             "(F12.6)",
-                                             "(F12.7)",
-                                             "(F12.8)",
-                                             "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
-                                                          // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
-                                                          // formDigits(8) | formDigits(9)
+                                                       {"(F12.0)",
+                                                        "(F12.1)",
+                                                        "(F12.2)",
+                                                        "(F12.3)",
+                                                        "(F12.4)",
+                                                        "(F12.5)",
+                                                        "(F12.6)",
+                                                        "(F12.7)",
+                                                        "(F12.8)",
+                                                        "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
+                                                                     // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
+                                                                     // formDigits(8) | formDigits(9)
         static Array1D<Real64> const maxvalDigits({0, 9},
                                                   {9999999999.0,
                                                    999999999.0,
