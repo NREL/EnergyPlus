@@ -192,6 +192,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -444,6 +445,7 @@ void EnergyPlusFixture::clear_all_states()
     Pumps::clear_state();
     PurchasedAirManager::clear_state();
     PVWatts::clear_state();
+    RefrigeratedCase::clear_state();
     ResultsFramework::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
