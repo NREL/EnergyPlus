@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5452,7 +5452,7 @@ namespace SingleDuct {
         NumATMixers = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         SysATMixer.allocate(NumATMixers);
 
-        // Need air disribution units first
+        // Need air distribution units first
         ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
