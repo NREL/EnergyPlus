@@ -965,6 +965,19 @@ namespace SingleDuct {
                 ErrorsFound = true;
             }
 
+            if (lAlphaBlanks(8)) {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = 1.0;
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = false;
+            } else {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(Alphas(8));
+                if (sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr == 0) {
+                    ShowSevereError(cAlphaFields(8) + " = " + Alphas(8) + " not found.");
+                    ShowContinueError("Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
+                    ErrorsFound = true;
+                }
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = true;
+            }
+
             // Add reheat coil to component sets array
             SetUpCompSets(sd_airterminal(SysNum).SysType, sd_airterminal(SysNum).SysName, Alphas(5), Alphas(6), Alphas(3), Alphas(7));
 
@@ -1658,6 +1671,20 @@ namespace SingleDuct {
                     }
                 }
             }
+
+            if (lAlphaBlanks(5)) {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = 1.0;
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = false;
+            } else {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = GetScheduleIndex(Alphas(5));
+                if (sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr == 0) {
+                    ShowSevereError(cAlphaFields(5) + " = " + Alphas(5) + " not found.");
+                    ShowContinueError("Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
+                    ErrorsFound = true;
+                }
+                sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist = true;
+            }
+
             // Setup the Average damper Position output variable
             SetupOutputVariable("Zone Air Terminal VAV Damper Position",
                                 OutputProcessor::Unit::None,
