@@ -146,7 +146,8 @@ namespace SingleDuct {
         Real64 MaxHeatAirVolFlowRate;     // Max specified volume flow rate of unit at max heating [m3/s]
         Real64 HeatAirMassFlowRateMax;    // Max Specified Mass Flow Rate of unit at max heating [kg/sec]
         int ZoneMinAirFracMethod;         // parameter for what method is used for min flow fraction
-        Real64 ZoneMinAirFrac;            // Fraction of supply air used as minimum flow
+        Real64 ZoneMinAirFracDes;         // Fraction of supply air used as design minimum flow
+        Real64 ZoneMinAirFrac;            // Fraction of supply air used as current minimum flow
         Real64 ZoneMinAirFracReport;      // Fraction of supply air used as minimum flow for reporting (zero if terminal unit flow is zero)
         Real64 ZoneFixedMinAir;           // Absolute minimum supply air flow
         int ZoneMinAirFracSchPtr;         // pointer to the schedule for min flow fraction
@@ -208,12 +209,15 @@ namespace SingleDuct {
         Real64 CoolRate;             // zone air terminal sensible cooling rate
         Real64 HeatEnergy;           // zone air terminal sensible heating energy
         Real64 CoolEnergy;           // zone air terminal sensible cooling energy
+        int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
 
         // Default Constructor
         SingleDuctAirTerminal()
             : SysType_Num(0), SchedPtr(0), ReheatComp_Num(0), ReheatComp_Index(0), ReheatComp_PlantType(0), Fan_Num(0), Fan_Index(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0),
-              HeatAirMassFlowRateMax(0.0), ZoneMinAirFracMethod(ConstantMinFrac), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
+              HeatAirMassFlowRateMax(0.0), ZoneMinAirFracMethod(ConstantMinFrac), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
               ZoneFixedMinAir(0.0), ZoneMinAirFracSchPtr(0), ConstantMinAirFracSetByUser(false), FixedMinAirSetByUser(false), DesignMinAirFrac(0.0),
               DesignFixedMinAir(0.0), InletNodeNum(0), OutletNodeNum(0), ReheatControlNode(0), ReheatCoilOutletNode(0), ReheatCoilMaxCapacity(0.0),
               ReheatAirOutletNode(0), MaxReheatWaterVolFlow(0.0), MaxReheatSteamVolFlow(0.0), MaxReheatWaterFlow(0.0), MaxReheatSteamFlow(0.0),
@@ -223,7 +227,8 @@ namespace SingleDuct {
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0), OAPerPersonMode(0), EMSOverrideAirFlow(false),
-              EMSMassFlowRateValue(0.0), HeatRate(0.0), CoolRate(0.0), HeatEnergy(0.0), CoolEnergy(0.0)
+              EMSMassFlowRateValue(0.0), HeatRate(0.0), CoolRate(0.0), HeatEnergy(0.0), CoolEnergy(0.0), ZoneTurndownMinAirFracSchPtr(0), 
+              ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false)
         {
         }
 

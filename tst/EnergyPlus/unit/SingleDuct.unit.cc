@@ -2708,16 +2708,16 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     CurTermUnitSizingNum = 1;
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
     SingleDuct::sd_airterminal(SysNum).SizeSys(SysNum);
-    EXPECT_EQ(0.5, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(0.5, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // Second test -  design min flow > max flow
     ZoneSizingRunDone = true;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
-    SingleDuct::sd_airterminal(SysNum).ZoneMinAirFrac = AutoSize; // need to reset this so it sizes again
+    SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
     SingleDuct::sd_airterminal(SysNum).SizeSys(SysNum);
-    EXPECT_EQ(1.0, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(1.0, SingleDuct::sd_airterminal(SysNum).ZoneMinAirFracDes);
 }
 TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 {

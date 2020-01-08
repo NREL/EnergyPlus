@@ -286,7 +286,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(1);
-    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFrac, 0.22);
+    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.22);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001);
 
     Node.deallocate();
@@ -466,7 +466,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(1);
-    EXPECT_NEAR(sd_airterminal(CurZoneEqNum).ZoneMinAirFrac, 0.348739, 0.000001);
+    EXPECT_NEAR(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).DesHeatVolFlowMax, 0.11);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     sd_airterminal(1).SizeSys(1);
-    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFrac, 0.22);
+    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.22);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.092756, 0.000001);
 
     Node.deallocate();
@@ -795,7 +795,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     Zone(1).FloorArea = 96.48;
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     sd_airterminal(1).SizeSys(1);
-    EXPECT_NEAR(sd_airterminal(CurZoneEqNum).ZoneMinAirFrac, 0.348739, 0.000001);
+    EXPECT_NEAR(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
     EXPECT_NEAR(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
@@ -976,7 +976,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     UpdateTermUnitFinalZoneSizing(); // Fills the TermUnitFinalZoneSizing array
     sd_airterminal(1).SizeSys(1);
-    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFrac, 0.07351776 / 0.21081);
+    EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).ZoneMinAirFracDes, 0.07351776 / 0.21081);
     EXPECT_DOUBLE_EQ(sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.08);
 
     Node.deallocate();

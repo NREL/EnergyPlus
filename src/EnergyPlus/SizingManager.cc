@@ -919,7 +919,7 @@ namespace SizingManager {
                                     SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     SingleDuct::sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                    SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;                // store std 62.1 values
+                                    SingleDuct::sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                 if (SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate > 0.0) { // VS fan ATU has this non zero, so use it
                                     airLoopHeatingMaximumFlowRateSum += SingleDuct::sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate;
                                     DataSizing::VpzHtgByZone(termUnitSizingIndex) =

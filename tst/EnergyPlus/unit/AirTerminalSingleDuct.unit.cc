@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", sd_airterminal(SysNum).ReheatComp);
     EXPECT_EQ(Normal, sd_airterminal(SysNum).DamperHeatingAction);
-    EXPECT_EQ(0.2, sd_airterminal(SysNum).ZoneMinAirFrac);
+    EXPECT_EQ(0.2, sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // set air inlet node properties
     Node(InletNode).Temp = 15.0;
