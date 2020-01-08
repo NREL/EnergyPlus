@@ -61,6 +61,72 @@ namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
 
+    static Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
+    {
+        //  Sigmoid smoothing function
+        //
+        //  https://en.wikipedia.org/wiki/Sigmoid_function
+        //
+        //  @param x: independent variable
+        //  @param a: fitting parameter 1
+        //  @param b: fitting parameter 2
+        //  @return float between 0-1
+
+        return 1 / (1 + std::exp(-(x - a) / b));
+    }
+
+    static Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
+    {
+        //  Simple linear interpolation
+        //
+        //  @param x: independent input variable
+        //  @param x_l: low independent interval bound
+        //  @param x_h: high independent interval bound
+        //  @param y_l: low dependent interval bound
+        //  @param y_h: high dependent interval bound
+        //  @return interpolated value
+
+        return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
+    }
+
+    static std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
+    {
+        // Tri-diagonal matrix solver
+
+        // This solver expects the ghost points at a(0) and c(n) to be present
+
+        // a(0) = 0
+        // c(n) = 0
+
+        // len(a) = len(b) = len(c) = len(d)
+
+        // Adapted from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C++
+
+        // param a: west diagonal vector from coefficient matrix
+        // param b: center diagonal vector from coefficient matrix
+        // param c: east diagonal vector from coefficient matrix
+        // param d: column vector
+        // returns solution vector
+
+        u_int n = d.size() - 1;
+
+        c[0] /= b[0];
+        d[0] /= b[0];
+
+        for (u_int i = 1; i < n; ++i) {
+            c[i] /= b[i] - a[i] * c[i - 1];
+            d[i] = (d[i] - a[i] * d[i - 1]) / (b[i] - a[i] * c[i - 1]);
+        }
+
+        d[n] = (d[n] - a[n] * d[n - 1]) / (b[n] - a[n] * c[n - 1]);
+
+        for (int i = n; i-- > 0;) {
+            d[i] -= c[i] * d[i + 1];
+        }
+
+        return d;
+    }
+
     Real64 FluidWorker::get_cp(Real64 &temperature, const std::string &routineName)
     {
         return FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
@@ -152,9 +218,6 @@ namespace GroundHeatExchangers {
             auto dt_u = calc_times(this->dts);
 
             // find lower bin edge referenced from current simulation time
-//            auto dt_l =
-
-            Real64 delteme = 0;
 
         }
     };
@@ -334,7 +397,7 @@ namespace GroundHeatExchangers {
 
         static std::string const routineName("Pipe::calcTransitTime");
         Real64 mu = this->fluid.get_mu(temperature, routineName);
-        return 4 * flowRate / (mu * Pi * this->innerDia);
+        return 4 * flowRate / (mu * DataGlobals::Pi * this->innerDia);
     }
 
     Real64 Pipe::calcFrictionFactor(Real64 Re)
@@ -368,7 +431,7 @@ namespace GroundHeatExchangers {
 
         // @returns conduction resistance, K/(W/m)
 
-        return std::log(this->outDia / this->innerDia) / (2 * Pi * this->k);
+        return std::log(this->outDia / this->innerDia) / (2 * DataGlobals::Pi * this->k);
     }
 
     Real64 Pipe::turbulentNusselt(Real64 Re, Real64 temperature)
