@@ -84,7 +84,7 @@
 ! Utility Tariffs:
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -363,7 +363,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    WorldCoordinateSystem;   !- Coordinate System
+    World;                   !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER and SURFACE:HEATTRANSFER:SUB ===========
 !-   Heat transfer objects listed as order in Figure.

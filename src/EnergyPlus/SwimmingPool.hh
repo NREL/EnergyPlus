@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,33 +54,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace SwimmingPool {
 
-    // Using/Aliasing
+    extern int NumSwimmingPools; // Number of swimming pools
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
-    extern int NumSwimmingPools;                 // Number of swimming pools
-    extern Array1D<int> SurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
-    extern Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular pool
-    extern Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QPoolSrcAvg locally
-    extern Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-
-    // Types
-
-    struct SwimmingPoolData
+    struct SwimmingPoolData : PlantComponent
     {
         // Members
         // Input data
@@ -150,6 +132,18 @@ namespace SwimmingPool {
         Real64 RadConvertToConvectRep;  // LW and SW radiation converted to convective gain by pool cover (reporting) in W
         Real64 EvapHeatLossRate;        // Heat lost due to evaporation of pool water as a rate in Watts
         Real64 EvapEnergyLoss;          // Energy lost due to evaporation in Joules
+        bool MyOneTimeFlag;
+        bool MyEnvrnFlagGeneral;
+        bool MyPlantScanFlagPool;
+        Array1D_int SurfaceToPoolIndex;
+        Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
+        Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
+        Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+        // Record keeping variables used to calculate QRadSysSrcAvg locally
+        Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         SwimmingPoolData()
@@ -161,50 +155,46 @@ namespace SwimmingPool {
               PeopleSchedPtr(0), PeopleHeatGainSchedPtr(0), PeopleHeatGain(0.0), GlycolIndex(0), WaterMass(0.0), SatPressPoolWaterTemp(0.0),
               PartPressZoneAirTemp(0.0), PoolWaterTemp(23.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterMassFlowRate(0.0),
               MakeUpWaterMassFlowRate(0.0), MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0), MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0),
-              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0)
+              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0), MyOneTimeFlag(true),
+              MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
+        );
+
+        void setupOutputVars();
+
+        void initSwimmingPoolPlantLoopIndex();
+
+        void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        );
+
+        void calculate();
+
+        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+                                  int SurfNum,      // Surface index
+                                  Real64 MAT,       // mean air temperature
+                                  Real64 HumRat     // zone air humidity ratio
+        );
+
+        void update();
     };
 
     // Object Data
     extern Array1D<SwimmingPoolData> Pool;
 
-    // Functions
-
     void clear_state();
-
-    void SimSwimmingPool(bool const FirstHVACIteration);
 
     void GetSwimmingPool();
 
-    void InitSwimmingPool(bool const FirstHVACIteration, // true during the first HVAC iteration
-                          int const PoolNum              // Index of the swimming pool under consideration within the derived types
-    );
-
-    void InitSwimmingPoolPlantLoopIndex(int const PoolNum,        // number of the swimming pool
-                                        bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    );
-
-    void InitSwimmingPoolPlantNodeFlow(int const PoolNum,             // number of the swimming pool
-                                       bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    );
-    
-    void CalcSwimmingPool(int const PoolNum // Index of the swimming pool under consideration within the derived types
-    );
-
-    void CalcSwimmingPoolEvap(Real64 &EvapRate,   // Evaporation rate
-                              int const PoolNum,  // Pool index
-                              int const SurfNum,  // Surface index
-                              Real64 const MAT,   // mean air temperature
-                              Real64 const HumRat // zone air humidity ratio
-    );
-
-    void UpdateSwimmingPool(int const PoolNum // Index of the swimming pool under consideration within the derived types
-    );
+    void SimSwimmingPool(bool FirstHVACIteration);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(int ZoneNum); // Zone number
 
     void ReportSwimmingPool();
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -802,7 +802,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.2;",
+        delimited_string({"  Version,9.3;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1303,7 +1303,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1337,7 +1337,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1369,7 +1369,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -2019,5 +2019,38 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     EXPECT_NEAR(FenLaySurfTempBack(1,3),ZeroResult,0.0001);
 
 }
-    
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisectionInputTest)
+{
+    // Test eio output for HVACSystemRootFindingAlgorithm 
+
+    std::string const idf_objects = delimited_string({
+        "Version,9.2;",
+        "Building,",
+        "My Building, !- Name",
+        "30., !- North Axis{ deg }",
+        "City, !- Terrain",
+        "0.04, !- Loads Convergence Tolerance Value",
+        "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+        "FullExterior, !- Solar Distribution",
+        "25, !- Maximum Number of Warmup Days",
+        "6;                       !- Minimum Number of Warmup Days",
+        "ZoneAirMassFlowConservation,",
+        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Infiltration Balancing Method",
+        ";                !- Infiltration Balancing Zones",
+        " HVACSystemRootFindingAlgorithm,",
+        " Bisection;!- Algorithm",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false); // If errors detected in input
+    ErrorsFound = false;
+    GetProjectControlData(ErrorsFound); // returns ErrorsFound false
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
+}
+
 } // namespace EnergyPlus
