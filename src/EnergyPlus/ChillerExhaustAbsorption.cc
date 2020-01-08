@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,6 @@ namespace ChillerExhaustAbsorption {
     using DataHVACGlobals::SmallWaterVolFlow;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
-    using MicroturbineElectricGenerator::SimMTGenerator;
     using Psychrometrics::CPCW;
     using Psychrometrics::CPHW;
     using Psychrometrics::RhoH2O;
@@ -329,7 +328,6 @@ namespace ChillerExhaustAbsorption {
         using CurveManager::GetCurveCheck;
         using DataSizing::AutoSize;
         using GlobalNames::VerifyUniqueChillerName;
-        using MicroturbineElectricGenerator::GetMTGeneratorExhaustNode;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
@@ -338,7 +336,6 @@ namespace ChillerExhaustAbsorption {
         int NumAlphas;        // Number of elements in the alpha array
         int NumNums;          // Number of elements in the numeric array
         int IOStat;           // IO Status when calling get input subroutine
-        int MTExhaustNodeNum; // Exhaust node number passed from MicroTurbine
         std::string ChillerName;
         bool Okay;
 
@@ -520,9 +517,8 @@ namespace ChillerExhaustAbsorption {
                 ExhaustAbsorber(AbsorberNum).CompType_Num = iGeneratorMicroturbine;
                 ExhaustAbsorber(AbsorberNum).ExhuastSourceName = cAlphaArgs(18);
 
-                GetMTGeneratorExhaustNode(
-                    ExhaustAbsorber(AbsorberNum).CompType_Num, ExhaustAbsorber(AbsorberNum).ExhuastSourceName, MTExhaustNodeNum);
-                ExhaustAbsorber(AbsorberNum).ExhaustAirInletNodeNum = MTExhaustNodeNum;
+                auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(ExhaustAbsorber(AbsorberNum).ExhuastSourceName);
+                ExhaustAbsorber(AbsorberNum).ExhaustAirInletNodeNum =dynamic_cast<MicroturbineElectricGenerator::MTGeneratorSpecs*> (thisMTG)->CombustionAirOutletNodeNum;
             }
         }
 
@@ -1515,7 +1511,6 @@ namespace ChillerExhaustAbsorption {
         using DataPlant::SingleSetPoint;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using MicroturbineElectricGenerator::SimMTGenerator;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnWTdb;
 
@@ -2004,7 +1999,6 @@ namespace ChillerExhaustAbsorption {
         using DataPlant::SingleSetPoint;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using MicroturbineElectricGenerator::SimMTGenerator;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnWTdb;
 
