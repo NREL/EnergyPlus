@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -169,7 +170,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput();
+    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 
@@ -177,7 +178,7 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcAirflowNetworkAirBalance();
 
-    void CalcWindPressureCoeffs();
+    void CalcWindPressureCoeffs(OutputFiles &outputFiles);
 
     Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
                                     Real64 const mdot, // Mass flow rate
