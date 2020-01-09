@@ -55,27 +55,14 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
 
 
 namespace EnergyPlus {
 
-namespace GroundHeatExchangers {
+namespace GroundHeatExchangerNew {
 
-    static Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
-    {
-        //  Sigmoid smoothing function
-        //
-        //  https://en.wikipedia.org/wiki/Sigmoid_function
-        //
-        //  @param x: independent variable
-        //  @param a: fitting parameter 1
-        //  @param b: fitting parameter 2
-        //  @return float between 0-1
-
-        return 1 / (1 + std::exp(-(x - a) / b));
-    }
-
-    static Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
+    Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
     {
         //  Simple linear interpolation
         //
@@ -220,28 +207,28 @@ namespace GroundHeatExchangers {
             // find lower bin edge referenced from current simulation time
 
         }
-    };
+    }
 
     Real64 SubHourAgg::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": calculate temporal superpostion not implemented.");
         return 0;
-    };
+    }
 
     Real64 SubHourAgg::get_g_value(Real64 &EP_UNUSED(time)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get g value is not implemented.");
         return 0;
-    };
+    }
 
     Real64 SubHourAgg::get_q_prev() {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get previous q value is not implemented.");
         return 0;
-    };
+    }
 
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
@@ -415,7 +402,7 @@ namespace GroundHeatExchangers {
         } else if (lowRe <= Re && Re < highRe) {
             Real64 fLow = laminarFrictionFactor(Re);
             Real64 fHigh = turbulentFrictionFactor(Re);
-            Real64 sigma = smoothingFunc(Re, 3000, 450);
+            Real64 sigma = GroundHeatExchangers::smoothingFunc(Re, 3000, 450);
             this->friction = (1 - sigma) * fLow + sigma * fHigh;
         } else
             this->friction = turbulentFrictionFactor(Re);
@@ -480,7 +467,7 @@ namespace GroundHeatExchangers {
         } else if (lowRe <= Re && Re < highRe) {
             Real64 NuLow = laminarNusselt();
             Real64 NuHigh = turbulentNusselt(Re, temperature);
-            Real64 sigma = smoothingFunc(Re, 3000, 150);
+            Real64 sigma = GroundHeatExchangers::smoothingFunc(Re, 3000, 150);
             Nu = (1 - sigma) * NuLow + sigma * NuHigh;
         } else
             Nu = turbulentNusselt(Re, temperature);

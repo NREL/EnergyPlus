@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GroundHeatExchangers_hh_INCLUDED
-#define GroundHeatExchangers_hh_INCLUDED
+#ifndef GroundHeatExchangerNew_hh_INCLUDED
+#define GroundHeatExchangerNew_hh_INCLUDED
 
 // C++ headers
 #include <iostream>
@@ -64,7 +64,7 @@ using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-namespace GroundHeatExchangers {
+namespace GroundHeatExchangerNew {
 
     struct BaseProps
     {
@@ -335,8 +335,9 @@ namespace GroundHeatExchangers {
         Real64 get_q_prev() override;
     };
 
+    Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h);
 
-} // namespace GroundHeatExchangers
+} // namespace GroundHeatExchangerNew
 
 } // namespace EnergyPlus
 

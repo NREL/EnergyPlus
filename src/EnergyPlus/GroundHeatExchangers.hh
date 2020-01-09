@@ -81,9 +81,6 @@ namespace EnergyPlus {
         // Types
 
         struct thermoPhysicialPropsStruct {
-            // Destructor
-            virtual ~thermoPhysicialPropsStruct() {
-            }
 
             Real64 k;           // Thermal conductivity [W/m-K]
             Real64 rho;         // Density [kg/m3]
@@ -96,9 +93,6 @@ namespace EnergyPlus {
         };
 
         struct pipePropsStruct : thermoPhysicialPropsStruct {
-            // Destructor
-            ~pipePropsStruct() {
-            }
 
             // Members
             Real64 outDia;      // Outer diameter of the pipe [m]
@@ -112,9 +106,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEVertPropsStruct {
-            // Destructor
-            ~GLHEVertPropsStruct() {
-            }
 
             // Members
             std::string name;                 // Name
@@ -130,9 +121,6 @@ namespace EnergyPlus {
         };
 
         struct MyCartesian {
-            // Destructor
-            ~MyCartesian() {
-            }
 
             Real64 x;
             Real64 y;
@@ -143,9 +131,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEVertSingleStruct {
-            // Destructor
-            ~GLHEVertSingleStruct() {
-            }
 
             // Members
             std::string name;                           // Name
@@ -166,9 +151,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEVertArrayStruct {
-            // Destructor
-            ~GLHEVertArrayStruct() {
-            }
 
             // Members
             std::string name;                           // Name
@@ -182,9 +164,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEResponseFactorsStruct {
-            // Destructor
-            ~GLHEResponseFactorsStruct() {
-            }
 
             // Members
             std::string name;                                              // Name
@@ -203,9 +182,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEBase : PlantComponent {
-            // Destructor
-            virtual ~GLHEBase() {
-            }
 
             // Members
             bool available;   // need an array of logicals--load identifiers of available equipment
@@ -261,7 +237,7 @@ namespace EnergyPlus {
                       designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0),
                       massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
                       aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false),
-                      lastQnSubHr(0.0), HXResistance(0.0),
+                      lastQnSubHr(0.0), HXResistance(0.0), totalTubeLength(0.0),
                       timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
                       updateCurSimTime(true), triggerDesignDayReset(false) {
             }
@@ -274,7 +250,7 @@ namespace EnergyPlus {
 
             void calcGroundHeatExchanger();
 
-            inline bool isEven(int const val);
+            inline bool isEven(int val);
 
             Real64 interpGFunc(Real64);
 
@@ -284,12 +260,11 @@ namespace EnergyPlus {
 
             virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
 
-            void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+            void onInitLoopEquip(PlantLocation const &calledFromLocation) override;
 
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
-                          bool const RunFlag) override;
+            void simulate(PlantLocation const &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-            static PlantComponent *factory(int const objectType, std::string objectName);
+            static PlantComponent *factory(int objectType, std::string objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
@@ -301,9 +276,6 @@ namespace EnergyPlus {
         };
 
         struct GLHEVert : GLHEBase {
-            // Destructor
-            ~GLHEVert() {
-            }
 
             // Members
             Real64 bhDiameter;  // Diameter of borehole {m}
@@ -341,19 +313,19 @@ namespace EnergyPlus {
 
             void calcLongTimestepGFunctions();
 
-            void calcGFunctions();
+            void calcGFunctions() override;
 
-            Real64 calcHXResistance();
+            Real64 calcHXResistance() override;
 
-            void initGLHESimVars();
+            void initGLHESimVars() override;
 
-            void getAnnualTimeConstant();
+            void getAnnualTimeConstant() override;
 
-            Real64 getGFunc(Real64 const time);
+            Real64 getGFunc(Real64 time) override;
 
-            void makeThisGLHECacheStruct();
+            void makeThisGLHECacheStruct() override;
 
-            void readCacheFileAndCompareWithThisGLHECache();
+            void readCacheFileAndCompareWithThisGLHECache() override;
 
             void writeGLHECacheToFile();
 
@@ -367,7 +339,7 @@ namespace EnergyPlus {
 
             Real64 calcPipeConvectionResistance();
 
-            Real64 frictionFactor(Real64 const reynoldsNum);
+            Real64 frictionFactor(Real64 reynoldsNum);
 
             Real64 calcPipeResistance();
 
@@ -375,10 +347,6 @@ namespace EnergyPlus {
         };
 
         struct GLHESlinky : GLHEBase {
-
-            // Destructor
-            ~GLHESlinky() {
-            }
 
             // Members
             bool verticalConfig;  // HX Configuration Flag
@@ -399,44 +367,42 @@ namespace EnergyPlus {
 
             GLHESlinky()
                     : verticalConfig(false), coilDiameter(0.0), coilPitch(0.0), coilDepth(0.0), trenchDepth(0.0),
-                      trenchLength(0.0), numTrenches(0),
-                      trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0), maxSimYears(0.0), minSurfTemp(0.0) {
+                      trenchLength(0.0), numTrenches(0), trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0),
+                      maxSimYears(0.0), minSurfTemp(0.0), Z0(0.0) {
             }
 
-            Real64 calcHXResistance();
+            Real64 calcHXResistance() override;
 
-            void calcGFunctions();
+            void calcGFunctions() override;
 
-            void initGLHESimVars();
+            void initGLHESimVars() override;
 
-            void getAnnualTimeConstant();
+            void getAnnualTimeConstant() override;
 
-            Real64 doubleIntegral(int const m, int const n, int const m1, int const n1, Real64 const t, int const I0,
-                                  int const J0);
+            Real64 doubleIntegral(int m, int n, int m1, int n1, Real64 t, int I0, int J0);
 
-            Real64 integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta,
-                            Real64 const J0);
+            Real64 integral(int m, int n, int m1, int n1, Real64 t, Real64 eta, Real64 J0);
 
-            Real64 distance(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta);
+            Real64 distance(int m, int n, int m1, int n1, Real64 eta, Real64 theta);
 
-            Real64 distanceToFictRing(int const m, int const n, int const m1, int const n1, Real64 const eta,
-                                      Real64 const theta);
+            Real64 distanceToFictRing(int m, int n, int m1, int n1, Real64 eta, Real64 theta);
 
-            Real64 distToCenter(int const m, int const n, int const m1, int const n1);
+            Real64 distToCenter(int m, int n, int m1, int n1);
 
-            Real64 nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta,
-                                             Real64 const theta, Real64 const t);
+            Real64 nearFieldResponseFunction(int m, int n, int m1, int n1, Real64 eta, Real64 theta, Real64 t);
 
-            Real64 midFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const t);
+            Real64 midFieldResponseFunction(int m, int n, int m1, int n1, Real64 t);
 
-            Real64 getGFunc(Real64 const time);
+            Real64 getGFunc(Real64 time) override;
 
-            void makeThisGLHECacheStruct();
+            void makeThisGLHECacheStruct() override;
 
-            void readCacheFileAndCompareWithThisGLHECache();
+            void readCacheFileAndCompareWithThisGLHECache() override;
         };
 
         void clear_state();
+
+        Real64 smoothingFunc(Real64 x, Real64 a, Real64 b);
 
         void GetGroundHeatExchangerInput();
 

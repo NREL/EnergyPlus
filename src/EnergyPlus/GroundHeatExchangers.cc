@@ -193,6 +193,20 @@ namespace GroundHeatExchangers {
         singleBoreholesVector.clear();
     }
 
+    Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
+    {
+        //  Sigmoid smoothing function
+        //
+        //  https://en.wikipedia.org/wiki/Sigmoid_function
+        //
+        //  @param x: independent variable
+        //  @param a: fitting parameter 1
+        //  @param b: fitting parameter 2
+        //  @return float between 0-1
+
+        return 1 / (1 + std::exp(-(x - a) / b));
+    }
+
     //******************************************************************************
 
     std::shared_ptr<GLHEVertPropsStruct> GetVertProps(std::string const &objectName)
@@ -1570,11 +1584,7 @@ namespace GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // Determines if an integer is even
 
-        if (val % 2 == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return val % 2 == 0;
     }
 
     //******************************************************************************
@@ -1662,7 +1672,7 @@ namespace GroundHeatExchangers {
 
             if (i == 1 || i == I0) {
                 g(i) = g(i);
-            } else if (isEven(i)) {
+            } else if (this->isEven(i)) {
                 g(i) = 4 * g(i);
             } else {
                 g(i) = 2 * g(i);
@@ -1749,7 +1759,6 @@ namespace GroundHeatExchangers {
         static std::string const RoutineName("CalcGroundHeatExchanger");
 
         // LOCAL PARAMETERS
-        Real64 fluidDensity;
         Real64 kGroundFactor;
         Real64 cpFluid;
         Real64 gFuncVal; // Interpolated G function value at a sub-hour
@@ -1789,7 +1798,6 @@ namespace GroundHeatExchangers {
         inletTemp = Node(inletNodeNum).Temp;
 
         cpFluid = GetSpecificHeatGlycol(PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = GetDensityGlycol(PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
 
         kGroundFactor = 2.0 * Pi * soil.k;
 
@@ -2966,15 +2974,15 @@ namespace GroundHeatExchangers {
 
         Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * Pi * pipe.innerDia);
 
-        Real64 nusseltNum = 0.0;
+        Real64 nusseltNum;
         if (reynoldsNum < lower_limit) {
             nusseltNum = 4.01; // laminar mean(4.36, 3.66)
         } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
-            Real64 const nu_low = 4.01;                   // laminar
-            Real64 const f = frictionFactor(reynoldsNum); // turbulent
-            Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
-            Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
-            Real64 const sigma = 1 / (1 + std::exp(-(reynoldsNum - 3000) / 150.0)); // smoothing function
+            Real64 nu_low = 4.01;                   // laminar
+            Real64 f = frictionFactor(reynoldsNum); // turbulent
+            Real64 prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
+            Real64 nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
+            Real64 sigma = 1 / (1 + std::exp(-(reynoldsNum - 3000) / 150.0)); // smoothing function
             nusseltNum = (1 - sigma) * nu_low + sigma * nu_high;
         } else {
             Real64 const f = frictionFactor(reynoldsNum);
