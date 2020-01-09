@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,6 +93,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -459,7 +460,7 @@ namespace MixedAir {
                                OACoolCoil,
                                OAHX);
             }
-            // now simulate again propogate current temps back through OA system
+            // now simulate again propigate current temps back through OA system
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
@@ -600,8 +601,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
@@ -843,7 +842,10 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    SimPVTcollectors(CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName);
+                    if (CompIndex == 0) {
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                    }
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
@@ -4605,7 +4607,8 @@ namespace MixedAir {
                 if (ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
-                    if (!this->ModifyDuringHighOAMoisture && Node(this->NodeNumofHumidistatZone).HumRat <= this->OAHumRat) {
+                    if (!this->ModifyDuringHighOAMoisture &&
+                        (Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
                         HighHumidityOperationFlag = false;
                     } else {
                         HighHumidityOperationFlag = true;

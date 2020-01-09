@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -14922,7 +14922,7 @@ namespace DXCoils {
                     (SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl)) {
                     CapFTCurveIndex = DXCoil(CoilIndex).CCapFTemp(1);
                 } else if ((SELECT_CASE_var == CoilDX_MultiSpeedCooling) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
-                    CapFTCurveIndex = DXCoil(CoilIndex).MSCCapFTemp(1);
+                    CapFTCurveIndex = DXCoil(CoilIndex).MSCCapFTemp(DXCoil(CoilIndex).NumOfSpeeds);
                 } else if (SELECT_CASE_var == CoilVRF_Heating) {
                     CapFTCurveIndex = DXCoil(CoilIndex).CCapFTemp(1);
                 } else {

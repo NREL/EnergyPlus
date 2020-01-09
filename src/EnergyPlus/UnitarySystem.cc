@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4217,9 +4217,6 @@ namespace UnitarySystems {
                         thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
                     } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                         thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-                        if (DataGlobals::DoCoilDirectSolutions) {
-                            DXCoils::DisableLatentDegradation(thisSys.m_CoolingCoilIndex);
-                        }
                     } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
                         thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
                     } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:UserDefined")) {
@@ -4247,6 +4244,9 @@ namespace UnitarySystems {
                             if (isNotOK) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
+                            }
+                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                                DXCoils::DisableLatentDegradation(thisSys.m_CoolingCoilIndex);
                             }
 
                             thisSys.m_CoolingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
