@@ -115,7 +115,7 @@
 !    Split_TS2_ERV_power = 68.6212775
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2790,7 +2790,7 @@
 
   GlobalGeometryRules,
     LowerLeftCorner,         !- Starting Vertex Position
-    CW,                      !- Vertex Entry Direction
+    ClockWise,               !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========

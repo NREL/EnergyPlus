@@ -75,7 +75,7 @@
 !
 !
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Exercise 1B,             !- Name
@@ -282,7 +282,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    WorldCoordinateSystem;   !- Coordinate System
+    World;                   !- Coordinate System
 
   BuildingSurface:Detailed,
     SURFACE NORTH,           !- Name
