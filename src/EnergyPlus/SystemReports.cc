@@ -4016,9 +4016,9 @@ namespace SystemReports {
             {"ZONEHVAC:AIRDISTRIBUTIONUNIT", ZONEHVAC_AIRDISTRIBUTIONUNIT},
             {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",ZONEHVAC_TERMINALUNIT_VRF},
             {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",COIL_COOLING_VRF},
-            {"COIL:HEATING:DX:VARAIBLEREFRIGERANTFLOW",COIL_HEATING_VRF},
+            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",COIL_HEATING_VRF},
             {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_COOLING_VRF_FTC},
-            {"COIL:HEATING:DX:VARAIBLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_HEATING_VRF_FTC}};
+            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_HEATING_VRF_FTC}};
         assert(component_map.size() == n_ComponentTypes);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -4102,6 +4102,8 @@ namespace SystemReports {
         case COIL_COOLING_WATER_DETAILEDGEOMETRY:
         case COIL_COOLING_WATER:
         case COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE:
+        case COIL_COOLING_VRF:
+        case COIL_COOLING_VRF_FTC:
         case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
             if (CompLoadFlag) SysCCCompCLNG(AirLoopNum) += std::abs(CompLoad);
@@ -4173,6 +4175,8 @@ namespace SystemReports {
 
             // DX Systems
             break;
+        case COIL_HEATING_VRF:
+        case COIL_HEATING_VRF_FTC:
         case AIRLOOPHVAC_UNITARYSYSTEM:
             // All energy transfers accounted for in subcomponent models
             break;
@@ -4205,9 +4209,11 @@ namespace SystemReports {
             break;
         case AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED:
             // All energy transfers accounted for in subcomponent models
-
-            // Humidifier Types for the air system simulation
             break;
+        case ZONEHVAC_TERMINALUNIT_VRF:
+            // All energy transfers accounted for in subcomponent models
+            break;
+            // Humidifier Types for the air system simulation
         case HUMIDIFIER_STEAM_GAS:
         case HUMIDIFIER_STEAM_ELECTRIC:
             if (CompLoadFlag) SysHumidHTNG(AirLoopNum) += std::abs(CompLoad);

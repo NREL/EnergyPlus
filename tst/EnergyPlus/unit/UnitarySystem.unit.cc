@@ -466,7 +466,6 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     bool CoolingActive = false;
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
-    bool ZoneEquipFlag = true;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
     DataGlobals::SysSizingCalc = false; // permits unitary system sizing
@@ -10572,6 +10571,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     mySys.getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     mySys = UnitarySystems::unitarySys[0];
 
+    EXPECT_NE(nullptr, thisSys);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, mySys.ATMixerType);
@@ -10719,6 +10719,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     mySys.getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     mySys = UnitarySystems::unitarySys[0];
+    EXPECT_TRUE(thisSys);
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, mySys.ATMixerType);

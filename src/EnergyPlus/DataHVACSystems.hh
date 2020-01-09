@@ -56,35 +56,33 @@
 
 namespace EnergyPlus {
 
-// base class for all HVAC systems
-class HVACSystemData
-{
+    // base class for all HVAC systems
+    class HVACSystemData {
 
-public:
+    public:
 
-    // Default Constructor
-    HVACSystemData()
-    {
-    }
+        // Default Constructor
+        HVACSystemData() {
+        }
 
-    virtual void simulate(std::string const &Name,
-        bool const firstHVACIteration,
-        int const &AirLoopNum,
-        int &CompIndex,
-        bool &HeatActive,
-        bool &CoolActive,
-        int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-        Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-        bool const ZoneEquipment,    // TRUE if called as zone equipment
-        Real64 &sysOutputProvided,   // sensible output at supply air node
-        Real64 &latOutputProvided    // latent output at supply air node
-    ) = 0;
+        virtual void simulate(std::string const &Name,
+            bool const firstHVACIteration,
+            int const &AirLoopNum,
+            int &CompIndex,
+            bool &HeatActive,
+            bool &CoolActive,
+            int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+            Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+            bool const ZoneEquipment,    // TRUE if called as zone equipment
+            Real64 &sysOutputProvided,   // sensible output at supply air node
+            Real64 &latOutputProvided    // latent output at supply air node
+        ) = 0;
 
-    virtual void sizeSystem(bool const FirstHVACIteration, int const AirLoopNum) = 0;
-    virtual int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
-    virtual int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual void sizeSystem(bool const FirstHVACIteration, int const AirLoopNum) = 0;
+        virtual int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
 
-};
+    };
 
 } // namespace EnergyPlus
 

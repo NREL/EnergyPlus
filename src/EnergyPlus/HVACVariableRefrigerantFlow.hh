@@ -802,6 +802,14 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
+        void ControlVRFToLoad(int const VRFTUNum,            // Index to VRF terminal unit
+                              Real64 const QZnReq,           // Index to zone number
+                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                              Real64 &PartLoadRatio,         // unit part load ratio
+                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
+        );
+
         void CalcVRF(int const VRFTUNum,                    // Unit index in VRF terminal unit array
                      bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
                      Real64 const PartLoadRatio,            // compressor part load fraction

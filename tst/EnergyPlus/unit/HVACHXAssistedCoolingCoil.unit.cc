@@ -395,8 +395,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
-    UnitarySystems::UnitarySys thisSys;
-    HVACSystemData *mySys;
     int AirLoopNum = 0;
     int CompIndex = 0;
     bool HeatingActive = false;
@@ -407,10 +405,10 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     bool zoneEquipment = true;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
-    mySys = thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *mySys = UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
+    UnitarySystems::UnitarySys &thisSys(*mySys);
     thisSys.getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    thisSys = UnitarySystems::unitarySys[0];
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 

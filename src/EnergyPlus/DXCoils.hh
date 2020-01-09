@@ -806,6 +806,14 @@ namespace DXCoils {
                           bool &ErrorsFound            // set to true if problem
     );
 
+    int getCoilInNodeIndex(int const &CoilIndex,       // coil index
+                           bool &ErrorsFound           // set to true if problem
+    );
+
+    int getCoilOutNodeIndex(int const &CoilIndex,      // coil index
+                            bool &ErrorsFound          // set to true if problem
+    );
+
     int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
