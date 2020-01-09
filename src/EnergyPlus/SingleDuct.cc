@@ -3174,7 +3174,7 @@ namespace SingleDuct {
         }
 
         if (CurTermUnitSizingNum > 0) {
-            TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = sd_airterminal(SysNum).ZoneMinAirFracDes;
+            TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac;
             TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = sd_airterminal(SysNum).MaxReheatWaterVolFlow;
             TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = sd_airterminal(SysNum).MaxReheatSteamVolFlow;
             TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // Coil Summary report
@@ -3206,8 +3206,6 @@ namespace SingleDuct {
                 sd_airterminal(SysNum).MaxAirVolFlowRateDuringReheat = (sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).MaxAirVolFlowRate);
             }
         }
-        // set to the design minimum flow fraction value will be updated during init as well
-        //sd_airterminal( SysNum ).ZoneMinAirFrac = sd_airterminal( SysNum ).ZoneMinAirFracDes;
 
         if (ErrorsFound) {
             ShowFatalError("Preceding sizing errors cause program termination");
