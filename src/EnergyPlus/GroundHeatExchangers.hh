@@ -64,15 +64,7 @@ namespace EnergyPlus {
 
     namespace GroundHeatExchangers {
 
-        // Using/Aliasing
-        using namespace GroundTemperatureManager;
-
-        // Data
-        // DERIVED TYPE DEFINITIONS
-
-        // MODULE PARAMETER DEFINITIONS
-        extern Real64 const hrsPerDay;   // Number of hours in a day
-        extern Real64 const hrsPerMonth; // Number of hours in month
+        extern Real64 const avgHrsPerMonth; // Number of hours in month
         extern int const maxTSinHr;      // Max number of time step in a hour
 
         // MODULE VARIABLE DECLARATIONS:
@@ -242,6 +234,9 @@ namespace EnergyPlus {
                       updateCurSimTime(true), triggerDesignDayReset(false) {
             }
 
+            // Destructor
+            ~GLHEBase() = default;
+
             virtual void calcGFunctions() = 0;
 
             void calcAggregateLoad();
@@ -250,7 +245,7 @@ namespace EnergyPlus {
 
             void calcGroundHeatExchanger();
 
-            inline bool isEven(int val);
+            static bool isEven(int val);
 
             Real64 interpGFunc(Real64);
 
@@ -264,7 +259,7 @@ namespace EnergyPlus {
 
             void simulate(PlantLocation const &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-            static PlantComponent *factory(int objectType, std::string objectName);
+            static PlantComponent *factory(int objectType, std::string const &objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
@@ -273,6 +268,7 @@ namespace EnergyPlus {
             virtual Real64 calcHXResistance() = 0;
 
             virtual void getAnnualTimeConstant() = 0;
+
         };
 
         struct GLHEVert : GLHEBase {
@@ -294,11 +290,15 @@ namespace EnergyPlus {
             std::vector<Real64> GFNC_shortTimestep;
             std::vector<Real64> LNTTS_shortTimestep;
 
+            // Default constructor
             GLHEVert() : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), theta_1(0.0), theta_2(0.0),
                          theta_3(0.0), sigma(0.0) {
             }
 
-            std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
+            // Default Destructor
+            ~GLHEVert() = default;
+
+            static std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
 
             Real64 calcResponse(std::vector<Real64> const &dists, Real64 const &currTime);
 
@@ -339,7 +339,7 @@ namespace EnergyPlus {
 
             Real64 calcPipeConvectionResistance();
 
-            Real64 frictionFactor(Real64 reynoldsNum);
+            static Real64 frictionFactor(Real64 reynoldsNum);
 
             Real64 calcPipeResistance();
 
@@ -365,11 +365,15 @@ namespace EnergyPlus {
             Array1D<Real64> Y0;
             Real64 Z0;
 
+            // Default constructor
             GLHESlinky()
                     : verticalConfig(false), coilDiameter(0.0), coilPitch(0.0), coilDepth(0.0), trenchDepth(0.0),
                       trenchLength(0.0), numTrenches(0), trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0),
                       maxSimYears(0.0), minSurfTemp(0.0), Z0(0.0) {
             }
+
+            // Default destructor
+            ~GLHESlinky() = default;
 
             Real64 calcHXResistance() override;
 

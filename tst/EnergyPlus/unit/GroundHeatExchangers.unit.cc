@@ -599,9 +599,9 @@ TEST_F(GHEFixture, SubHourAgg_aggregate)
     subHr.aggregate(time, energy);
     EXPECT_NEAR(subHr.subHrEnergy, 0.0, tol);
 
-    Real64 dt_huge = 3600;
-    Real64 dt_lrg = 3150;
-    Real64 dt_med = 1800;
+//    Real64 dt_huge = 3600;
+//    Real64 dt_lrg = 3150;
+//    Real64 dt_med = 1800;
     Real64 dt_sml = 900;
 
     // no shift
@@ -1431,7 +1431,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Check)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects =
         delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -1721,7 +1720,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
                           "	Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1783,7 +1782,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_resistance)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects =
         delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -1827,7 +1825,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_resistanc
                           "	,					!- Response Factors Object Name",
                           "	GHE-Array;          !- GHE Array Object Name"});
 
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1933,7 +1931,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_friction_factor)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistance)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects =
         delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -2202,7 +2199,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistanc
                           "	Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2224,20 +2221,22 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistanc
     Real64 const tol = 1E-5;
 
     // Turbulent
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.004453, tol);
+    Real64 resistTurb = thisGLHE.calcPipeConvectionResistance();
+    EXPECT_NEAR(resistTurb, 0.004453, tol);
 
     // Transitional
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 4;
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.05, tol);
+    Real64 resitTrans = thisGLHE.calcPipeConvectionResistance();
+    EXPECT_NEAR(resitTrans, 0.019185, tol);
 
     // Laminar
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 10;
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.135556, tol);
+    Real64 resisLam = thisGLHE.calcPipeConvectionResistance();
+    EXPECT_NEAR(resisLam, 0.135556, tol);
 }
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects =
         delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -2506,7 +2505,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
                           "	Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2532,7 +2531,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects = delimited_string({
 
@@ -2802,7 +2800,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2830,7 +2828,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
 {
-    using namespace DataSystemVariables;
+
 
     std::string const idf_objects = delimited_string({
 
@@ -3100,7 +3098,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3128,7 +3126,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects = delimited_string({
 
@@ -3398,7 +3395,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3426,7 +3423,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_1)
 {
-    using namespace DataSystemVariables;
+
 
     std::string const idf_objects = delimited_string({
 
@@ -3696,7 +3693,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3724,7 +3721,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_2)
 {
-    using namespace DataSystemVariables;
+
 
     std::string const idf_objects = delimited_string({
 
@@ -3994,7 +3991,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -4022,7 +4019,6 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
 
 TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_3)
 {
-    using namespace DataSystemVariables;
 
     std::string const idf_objects = delimited_string({
 
@@ -4292,7 +4288,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
         "	GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    DataSystemVariables::DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -4318,304 +4314,304 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
     EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.31582, tol);
 }
 
-TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Test_ExFT)
-{
-    using namespace DataSystemVariables;
-    std::string const idf_objects = delimited_string({
-
-        "Branch,",
-        "	Main Floor Cooling Condenser Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type",
-        "	Main Floor WAHP Cooling Coil,  !- Component 1 Name",
-        "	Main Floor WAHP Cooling Water Inlet Node,  !- Component 1 Inlet Node Name",
-        "	Main Floor WAHP Cooling Water Outlet Node;  !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Main Floor Heating Condenser Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type",
-        "	Main Floor WAHP Heating Coil,  !- Component 1 Name",
-        "	Main Floor WAHP Heating Water Inlet Node,  !- Component 1 Inlet Node Name",
-        "	Main Floor WAHP Heating Water Outlet Node;  !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	GHE-Vert Branch,         !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	GroundHeatExchanger:System,  !- Component 1 Object Type",
-        "	Vertical GHE 1x4 Std,    !- Component 1 Name",
-        "	GHLE Inlet,         !- Component 1 Inlet Node Name",
-        "	GHLE Outlet;        !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Ground Loop Supply Inlet Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Pump:ConstantSpeed,      !- Component 1 Object Type",
-        "	Ground Loop Supply Pump, !- Component 1 Name",
-        "	Ground Loop Supply Inlet,!- Component 1 Inlet Node Name",
-        "	Ground Loop Pump Outlet; !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Ground Loop Supply Outlet Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Pipe:Adiabatic,          !- Component 1 Object Type",
-        "	Ground Loop Supply Outlet Pipe,  !- Component 1 Name",
-        "	Ground Loop Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-        "	Ground Loop Supply Outlet;  !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Ground Loop Demand Inlet Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Pipe:Adiabatic,          !- Component 1 Object Type",
-        "	Ground Loop Demand Inlet Pipe,  !- Component 1 Name",
-        "	Ground Loop Demand Inlet,!- Component 1 Inlet Node Name",
-        "	Ground Loop Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Ground Loop Demand Bypass Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Pipe:Adiabatic,          !- Component 1 Object Type",
-        "	Ground Loop Demand Side Bypass Pipe,  !- Component 1 Name",
-        "	Ground Loop Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
-        "	Ground Loop Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
-
-        "Branch,",
-        "	Ground Loop Demand Outlet Branch,  !- Name",
-        "	,                        !- Pressure Drop Curve Name",
-        "	Pipe:Adiabatic,          !- Component 1 Object Type",
-        "	Ground Loop Demand Outlet Pipe,  !- Component 1 Name",
-        "	Ground Loop Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
-        "	Ground Loop Demand Outlet;  !- Component 1 Outlet Node Name",
-
-        "BranchList,",
-        "	Ground Loop Supply Side Branches,  !- Name",
-        "	Ground Loop Supply Inlet Branch,  !- Branch 1 Name",
-        "	GHE-Vert Branch,         !- Branch 2 Name",
-        "	Ground Loop Supply Outlet Branch;  !- Branch 3 Name",
-
-        "BranchList,",
-        "	Ground Loop Demand Side Branches,  !- Name",
-        "	Ground Loop Demand Inlet Branch,  !- Branch 1 Name",
-        "	Main Floor Cooling Condenser Branch,  !- Branch 2 Name",
-        "	Main Floor Heating Condenser Branch,  !- Branch 3 Name",
-        "	Ground Loop Demand Bypass Branch,  !- Branch 4 Name",
-        "	Ground Loop Demand Outlet Branch;  !- Branch 5 Name",
-
-        "Connector:Splitter,",
-        "	Ground Loop Supply Splitter,  !- Name",
-        "	Ground Loop Supply Inlet Branch,  !- Inlet Branch Name",
-        "	GHE-Vert Branch;         !- Outlet Branch 1 Name",
-
-        "Connector:Splitter,",
-        "	Ground Loop Demand Splitter,  !- Name",
-        "	Ground Loop Demand Inlet Branch,  !- Inlet Branch Name",
-        "	Ground Loop Demand Bypass Branch,  !- Outlet Branch 1 Name",
-        "	Main Floor Cooling Condenser Branch,  !- Outlet Branch 2 Name",
-        "	Main Floor Heating Condenser Branch;  !- Outlet Branch 3 Name",
-
-        "Connector:Mixer,",
-        "	Ground Loop Supply Mixer,!- Name",
-        "	Ground Loop Supply Outlet Branch,  !- Outlet Branch Name",
-        "	GHE-Vert Branch;         !- Inlet Branch 1 Name",
-
-        "Connector:Mixer,",
-        "	Ground Loop Demand Mixer,!- Name",
-        "	Ground Loop Demand Outlet Branch,  !- Outlet Branch Name",
-        "	Ground Loop Demand Bypass Branch,  !- Inlet Branch 1 Name",
-        "	Main Floor Cooling Condenser Branch,  !- Inlet Branch 2 Name",
-        "	Main Floor Heating Condenser Branch;  !- Inlet Branch 3 Name",
-
-        "ConnectorList,",
-        "	Ground Loop Supply Side Connectors,  !- Name",
-        "	Connector:Splitter,      !- Connector 1 Object Type",
-        "	Ground Loop Supply Splitter,  !- Connector 1 Name",
-        "	Connector:Mixer,         !- Connector 2 Object Type",
-        "	Ground Loop Supply Mixer;!- Connector 2 Name",
-
-        "ConnectorList,",
-        "	Ground Loop Demand Side Connectors,  !- Name",
-        "	Connector:Splitter,      !- Connector 1 Object Type",
-        "	Ground Loop Demand Splitter,  !- Connector 1 Name",
-        "	Connector:Mixer,         !- Connector 2 Object Type",
-        "	Ground Loop Demand Mixer;!- Connector 2 Name",
-
-        "NodeList,",
-        "	Ground Loop Supply Setpoint Nodes,  !- Name",
-        "	GHLE Outlet,                        !- Node 1 Name",
-        "	Ground Loop Supply Outlet;  !- Node 2 Name",
-
-        "OutdoorAir:Node,",
-        "	Main Floor WAHP Outside Air Inlet,  !- Name",
-        "	-1;                      !- Height Above Ground {m}",
-
-        "Pipe:Adiabatic,",
-        "	Ground Loop Supply Outlet Pipe,  !- Name",
-        "	Ground Loop Supply Outlet Pipe Inlet,  !- Inlet Node Name",
-        "	Ground Loop Supply Outlet;  !- Outlet Node Name",
-
-        "Pipe:Adiabatic,",
-        "	Ground Loop Demand Inlet Pipe,  !- Name",
-        "	Ground Loop Demand Inlet,!- Inlet Node Name",
-        "	Ground Loop Demand Inlet Pipe Outlet;  !- Outlet Node Name",
-
-        "Pipe:Adiabatic,",
-        "	Ground Loop Demand Side Bypass Pipe,  !- Name",
-        "	Ground Loop Demand Bypass Inlet,  !- Inlet Node Name",
-        "	Ground Loop Demand Bypass Outlet;  !- Outlet Node Name",
-
-        "Pipe:Adiabatic,",
-        "	Ground Loop Demand Outlet Pipe,  !- Name",
-        "	Ground Loop Demand Outlet Pipe Inlet,  !- Inlet Node Name",
-        "	Ground Loop Demand Outlet;  !- Outlet Node Name",
-
-        "Pump:ConstantSpeed,",
-        "	Ground Loop Supply Pump, !- Name",
-        "	Ground Loop Supply Inlet,!- Inlet Node Name",
-        "	Ground Loop Pump Outlet, !- Outlet Node Name",
-        "	autosize,                !- Design Flow Rate {m3/s}",
-        "	179352,                  !- Design Pump Head {Pa}",
-        "	autosize,                !- Design Power Consumption {W}",
-        "	0.9,                     !- Motor Efficiency",
-        "	0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
-        "	Intermittent;            !- Pump Control Type",
-
-        "PlantLoop,",
-        "	Ground Loop Water Loop,  !- Name",
-        "	Water,                      !- Fluid Type",
-        "	,                           !- User Defined Fluid Type",
-        "	Only Water Loop Operation,  !- Plant Equipment Operation Scheme Name",
-        "	Ground Loop Supply Outlet,  !- Loop Temperature Setpoint Node Name",
-        "	100,                     !- Maximum Loop Temperature {C}",
-        "	10,                      !- Minimum Loop Temperature {C}",
-        "	autosize,                !- Maximum Loop Flow Rate {m3/s}",
-        "	0,                       !- Minimum Loop Flow Rate {m3/s}",
-        "	autosize,                !- Plant Loop Volume {m3}",
-        "	Ground Loop Supply Inlet,!- Plant Side Inlet Node Name",
-        "	Ground Loop Supply Outlet,  !- Plant Side Outlet Node Name",
-        "	Ground Loop Supply Side Branches,  !- Plant Side Branch List Name",
-        "	Ground Loop Supply Side Connectors,  !- Plant Side Connector List Name",
-        "	Ground Loop Demand Inlet,!- Demand Side Inlet Node Name",
-        "	Ground Loop Demand Outlet,  !- Demand Side Outlet Node Name",
-        "	Ground Loop Demand Side Branches,  !- Demand Side Branch List Name",
-        "	Ground Loop Demand Side Connectors,  !- Demand Side Connector List Name",
-        "	SequentialLoad,          !- Load Distribution Scheme",
-        "	,                        !- Availability Manager List Name",
-        "	DualSetPointDeadband;    !- Plant Loop Demand Calculation Scheme",
-
-        "PlantEquipmentList,",
-        "	Only Water Loop All Cooling Equipment,  !- Name",
-        "	GroundHeatExchanger:System,  !- Equipment 1 Object Type",
-        "	Vertical GHE 1x4 Std;    !- Equipment 1 Name",
-
-        "PlantEquipmentOperation:CoolingLoad,",
-        "	Only Water Loop Cool Operation All Hours,  !- Name",
-        "	0,                       !- Load Range 1 Lower Limit {W}",
-        "	1000000000000000,        !- Load Range 1 Upper Limit {W}",
-        "	Only Water Loop All Cooling Equipment;  !- Range 1 Equipment List Name",
-
-        "PlantEquipmentOperationSchemes,",
-        "	Only Water Loop Operation,  !- Name",
-        "	PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
-        "	Only Water Loop Cool Operation All Hours,  !- Control Scheme 1 Name",
-        "	HVACTemplate-Always 1;   !- Control Scheme 1 Schedule Name",
-
-        "SetpointManager:Scheduled:DualSetpoint,",
-        "	Ground Loop Temp Manager,!- Name",
-        "	Temperature,             !- Control Variable",
-        "	HVACTemplate-Always 34,  !- High Setpoint Schedule Name",
-        "	HVACTemplate-Always 20,  !- Low Setpoint Schedule Name",
-        "	Ground Loop Supply Setpoint Nodes;  !- Setpoint Node or NodeList Name",
-
-        "Schedule:Compact,",
-        "	HVACTemplate-Always 4,   !- Name",
-        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
-        "	Through: 12/31,          !- Field 1",
-        "	For: AllDays,            !- Field 2",
-        "	Until: 24:00,4;          !- Field 3",
-
-        "Schedule:Compact,",
-        "	HVACTemplate-Always 34,  !- Name",
-        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
-        "	Through: 12/31,          !- Field 1",
-        "	For: AllDays,            !- Field 2",
-        "	Until: 24:00,34;         !- Field 3",
-
-        "Schedule:Compact,",
-        "	HVACTemplate-Always 20,  !- Name",
-        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
-        "	Through: 12/31,          !- Field 1",
-        "	For: AllDays,            !- Field 2",
-        "	Until: 24:00,20;         !- Field 3",
-
-        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-        "	KATemps,                 !- Name",
-        "	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
-        "	920,                     !- Soil Density {kg/m3}",
-        "	2200,                    !- Soil Specific Heat {J/kg-K}",
-        "	15.5,                    !- Average Soil Surface Temperature {C}",
-        "	3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
-        "	8;                       !- Phase Shift of Minimum Surface Temperature {days}",
-
-        "GroundHeatExchanger:Vertical:Properties,",
-        "	GHE-1 Props,        !- Name",
-        "	1,                  !- Depth of Top of Borehole {m}",
-        "	76.2,               !- Borehole Length {m}",
-        "	0.288,              !- Borehole Diameter {m}",
-        "	3.0,                !- Grout Thermal Conductivity {W/m-K}",
-        "	1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
-        "	0.389,              !- Pipe Thermal Conductivity {W/m-K}",
-        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
-        "	0.032,              !- Pipe Outer Diameter {m}",
-        "	0.0016279,          !- Pipe Thickness {m}",
-        "	0.1066667;          !- U-Tube Distance {m}",
-
-        "GroundHeatExchanger:Vertical:Array,",
-        "	GHE-Array,          !- Name",
-        "	GHE-1 Props,        !- GHE Properties",
-        "	2,                  !- Number of Boreholes in X Direction",
-        "	2,                  !- Number of Boreholes in Y Direction",
-        "	2;                  !- Borehole Spacing {m}",
-
-        "GroundHeatExchanger:System,",
-        "	Vertical GHE 1x4 Std,  !- Name",
-        "	GHLE Inlet,         !- Inlet Node Name",
-        "	GHLE Outlet,        !- Outlet Node Name",
-        "	0.1,                !- Design Flow Rate {m3/s}",
-        "	Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
-        "	KATemps,            !- Undisturbed Ground Temperature Model Name",
-        "	1.0,                !- Ground Thermal Conductivity {W/m-K}",
-        "	2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
-        "	,					!- Response Factors Object Name",
-        "	GHE-Array;          !- GHE Array Object Name"});
-
-    // Envr variable
-    DisableGLHECaching = true;
-
-    // Setup
-    ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
-    ScheduleInputProcessed = true;
-    GetPlantLoopData();
-    GetPlantInput();
-    SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes();
-
-    auto &thisGLHE(verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
-    Node(thisGLHE.inletNodeNum).Temp = 20.0;
-
-    thisGLHE.initGLHESimVars();
-    thisGLHE.calcAggregateLoad();
-    thisGLHE.massFlowRate = 1;
-    DayOfSim = 1;
-    HourOfDay = 1;
-    TimeStep = 1;
-    TimeStepZone = 0.15;
-    DataHVACGlobals::SysTimeElapsed = 0;
-    thisGLHE.calcGroundHeatExchanger();
-    DataHVACGlobals::SysTimeElapsed = 0.25;
-    thisGLHE.massFlowRate = 1;
-    thisGLHE.calcGroundHeatExchanger();
-
-    EXPECT_GT(thisGLHE.outletTemp, thisGLHE.tempGround);
-}
+//TEST_F(GHEFixture, GroundHeatExchangerTest_System_Test_ExFT)
+//{
+//
+//    std::string const idf_objects = delimited_string({
+//
+//        "Branch,",
+//        "	Main Floor Cooling Condenser Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type",
+//        "	Main Floor WAHP Cooling Coil,  !- Component 1 Name",
+//        "	Main Floor WAHP Cooling Water Inlet Node,  !- Component 1 Inlet Node Name",
+//        "	Main Floor WAHP Cooling Water Outlet Node;  !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Main Floor Heating Condenser Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Component 1 Object Type",
+//        "	Main Floor WAHP Heating Coil,  !- Component 1 Name",
+//        "	Main Floor WAHP Heating Water Inlet Node,  !- Component 1 Inlet Node Name",
+//        "	Main Floor WAHP Heating Water Outlet Node;  !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	GHE-Vert Branch,         !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	GroundHeatExchanger:System,  !- Component 1 Object Type",
+//        "	Vertical GHE 1x4 Std,    !- Component 1 Name",
+//        "	GHLE Inlet,         !- Component 1 Inlet Node Name",
+//        "	GHLE Outlet;        !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Ground Loop Supply Inlet Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Pump:ConstantSpeed,      !- Component 1 Object Type",
+//        "	Ground Loop Supply Pump, !- Component 1 Name",
+//        "	Ground Loop Supply Inlet,!- Component 1 Inlet Node Name",
+//        "	Ground Loop Pump Outlet; !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Ground Loop Supply Outlet Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Pipe:Adiabatic,          !- Component 1 Object Type",
+//        "	Ground Loop Supply Outlet Pipe,  !- Component 1 Name",
+//        "	Ground Loop Supply Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+//        "	Ground Loop Supply Outlet;  !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Ground Loop Demand Inlet Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Pipe:Adiabatic,          !- Component 1 Object Type",
+//        "	Ground Loop Demand Inlet Pipe,  !- Component 1 Name",
+//        "	Ground Loop Demand Inlet,!- Component 1 Inlet Node Name",
+//        "	Ground Loop Demand Inlet Pipe Outlet;  !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Ground Loop Demand Bypass Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Pipe:Adiabatic,          !- Component 1 Object Type",
+//        "	Ground Loop Demand Side Bypass Pipe,  !- Component 1 Name",
+//        "	Ground Loop Demand Bypass Inlet,  !- Component 1 Inlet Node Name",
+//        "	Ground Loop Demand Bypass Outlet;  !- Component 1 Outlet Node Name",
+//
+//        "Branch,",
+//        "	Ground Loop Demand Outlet Branch,  !- Name",
+//        "	,                        !- Pressure Drop Curve Name",
+//        "	Pipe:Adiabatic,          !- Component 1 Object Type",
+//        "	Ground Loop Demand Outlet Pipe,  !- Component 1 Name",
+//        "	Ground Loop Demand Outlet Pipe Inlet,  !- Component 1 Inlet Node Name",
+//        "	Ground Loop Demand Outlet;  !- Component 1 Outlet Node Name",
+//
+//        "BranchList,",
+//        "	Ground Loop Supply Side Branches,  !- Name",
+//        "	Ground Loop Supply Inlet Branch,  !- Branch 1 Name",
+//        "	GHE-Vert Branch,         !- Branch 2 Name",
+//        "	Ground Loop Supply Outlet Branch;  !- Branch 3 Name",
+//
+//        "BranchList,",
+//        "	Ground Loop Demand Side Branches,  !- Name",
+//        "	Ground Loop Demand Inlet Branch,  !- Branch 1 Name",
+//        "	Main Floor Cooling Condenser Branch,  !- Branch 2 Name",
+//        "	Main Floor Heating Condenser Branch,  !- Branch 3 Name",
+//        "	Ground Loop Demand Bypass Branch,  !- Branch 4 Name",
+//        "	Ground Loop Demand Outlet Branch;  !- Branch 5 Name",
+//
+//        "Connector:Splitter,",
+//        "	Ground Loop Supply Splitter,  !- Name",
+//        "	Ground Loop Supply Inlet Branch,  !- Inlet Branch Name",
+//        "	GHE-Vert Branch;         !- Outlet Branch 1 Name",
+//
+//        "Connector:Splitter,",
+//        "	Ground Loop Demand Splitter,  !- Name",
+//        "	Ground Loop Demand Inlet Branch,  !- Inlet Branch Name",
+//        "	Ground Loop Demand Bypass Branch,  !- Outlet Branch 1 Name",
+//        "	Main Floor Cooling Condenser Branch,  !- Outlet Branch 2 Name",
+//        "	Main Floor Heating Condenser Branch;  !- Outlet Branch 3 Name",
+//
+//        "Connector:Mixer,",
+//        "	Ground Loop Supply Mixer,!- Name",
+//        "	Ground Loop Supply Outlet Branch,  !- Outlet Branch Name",
+//        "	GHE-Vert Branch;         !- Inlet Branch 1 Name",
+//
+//        "Connector:Mixer,",
+//        "	Ground Loop Demand Mixer,!- Name",
+//        "	Ground Loop Demand Outlet Branch,  !- Outlet Branch Name",
+//        "	Ground Loop Demand Bypass Branch,  !- Inlet Branch 1 Name",
+//        "	Main Floor Cooling Condenser Branch,  !- Inlet Branch 2 Name",
+//        "	Main Floor Heating Condenser Branch;  !- Inlet Branch 3 Name",
+//
+//        "ConnectorList,",
+//        "	Ground Loop Supply Side Connectors,  !- Name",
+//        "	Connector:Splitter,      !- Connector 1 Object Type",
+//        "	Ground Loop Supply Splitter,  !- Connector 1 Name",
+//        "	Connector:Mixer,         !- Connector 2 Object Type",
+//        "	Ground Loop Supply Mixer;!- Connector 2 Name",
+//
+//        "ConnectorList,",
+//        "	Ground Loop Demand Side Connectors,  !- Name",
+//        "	Connector:Splitter,      !- Connector 1 Object Type",
+//        "	Ground Loop Demand Splitter,  !- Connector 1 Name",
+//        "	Connector:Mixer,         !- Connector 2 Object Type",
+//        "	Ground Loop Demand Mixer;!- Connector 2 Name",
+//
+//        "NodeList,",
+//        "	Ground Loop Supply Setpoint Nodes,  !- Name",
+//        "	GHLE Outlet,                        !- Node 1 Name",
+//        "	Ground Loop Supply Outlet;  !- Node 2 Name",
+//
+//        "OutdoorAir:Node,",
+//        "	Main Floor WAHP Outside Air Inlet,  !- Name",
+//        "	-1;                      !- Height Above Ground {m}",
+//
+//        "Pipe:Adiabatic,",
+//        "	Ground Loop Supply Outlet Pipe,  !- Name",
+//        "	Ground Loop Supply Outlet Pipe Inlet,  !- Inlet Node Name",
+//        "	Ground Loop Supply Outlet;  !- Outlet Node Name",
+//
+//        "Pipe:Adiabatic,",
+//        "	Ground Loop Demand Inlet Pipe,  !- Name",
+//        "	Ground Loop Demand Inlet,!- Inlet Node Name",
+//        "	Ground Loop Demand Inlet Pipe Outlet;  !- Outlet Node Name",
+//
+//        "Pipe:Adiabatic,",
+//        "	Ground Loop Demand Side Bypass Pipe,  !- Name",
+//        "	Ground Loop Demand Bypass Inlet,  !- Inlet Node Name",
+//        "	Ground Loop Demand Bypass Outlet;  !- Outlet Node Name",
+//
+//        "Pipe:Adiabatic,",
+//        "	Ground Loop Demand Outlet Pipe,  !- Name",
+//        "	Ground Loop Demand Outlet Pipe Inlet,  !- Inlet Node Name",
+//        "	Ground Loop Demand Outlet;  !- Outlet Node Name",
+//
+//        "Pump:ConstantSpeed,",
+//        "	Ground Loop Supply Pump, !- Name",
+//        "	Ground Loop Supply Inlet,!- Inlet Node Name",
+//        "	Ground Loop Pump Outlet, !- Outlet Node Name",
+//        "	autosize,                !- Design Flow Rate {m3/s}",
+//        "	179352,                  !- Design Pump Head {Pa}",
+//        "	autosize,                !- Design Power Consumption {W}",
+//        "	0.9,                     !- Motor Efficiency",
+//        "	0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+//        "	Intermittent;            !- Pump Control Type",
+//
+//        "PlantLoop,",
+//        "	Ground Loop Water Loop,  !- Name",
+//        "	Water,                      !- Fluid Type",
+//        "	,                           !- User Defined Fluid Type",
+//        "	Only Water Loop Operation,  !- Plant Equipment Operation Scheme Name",
+//        "	Ground Loop Supply Outlet,  !- Loop Temperature Setpoint Node Name",
+//        "	100,                     !- Maximum Loop Temperature {C}",
+//        "	10,                      !- Minimum Loop Temperature {C}",
+//        "	autosize,                !- Maximum Loop Flow Rate {m3/s}",
+//        "	0,                       !- Minimum Loop Flow Rate {m3/s}",
+//        "	autosize,                !- Plant Loop Volume {m3}",
+//        "	Ground Loop Supply Inlet,!- Plant Side Inlet Node Name",
+//        "	Ground Loop Supply Outlet,  !- Plant Side Outlet Node Name",
+//        "	Ground Loop Supply Side Branches,  !- Plant Side Branch List Name",
+//        "	Ground Loop Supply Side Connectors,  !- Plant Side Connector List Name",
+//        "	Ground Loop Demand Inlet,!- Demand Side Inlet Node Name",
+//        "	Ground Loop Demand Outlet,  !- Demand Side Outlet Node Name",
+//        "	Ground Loop Demand Side Branches,  !- Demand Side Branch List Name",
+//        "	Ground Loop Demand Side Connectors,  !- Demand Side Connector List Name",
+//        "	SequentialLoad,          !- Load Distribution Scheme",
+//        "	,                        !- Availability Manager List Name",
+//        "	DualSetPointDeadband;    !- Plant Loop Demand Calculation Scheme",
+//
+//        "PlantEquipmentList,",
+//        "	Only Water Loop All Cooling Equipment,  !- Name",
+//        "	GroundHeatExchanger:System,  !- Equipment 1 Object Type",
+//        "	Vertical GHE 1x4 Std;    !- Equipment 1 Name",
+//
+//        "PlantEquipmentOperation:CoolingLoad,",
+//        "	Only Water Loop Cool Operation All Hours,  !- Name",
+//        "	0,                       !- Load Range 1 Lower Limit {W}",
+//        "	1000000000000000,        !- Load Range 1 Upper Limit {W}",
+//        "	Only Water Loop All Cooling Equipment;  !- Range 1 Equipment List Name",
+//
+//        "PlantEquipmentOperationSchemes,",
+//        "	Only Water Loop Operation,  !- Name",
+//        "	PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
+//        "	Only Water Loop Cool Operation All Hours,  !- Control Scheme 1 Name",
+//        "	HVACTemplate-Always 1;   !- Control Scheme 1 Schedule Name",
+//
+//        "SetpointManager:Scheduled:DualSetpoint,",
+//        "	Ground Loop Temp Manager,!- Name",
+//        "	Temperature,             !- Control Variable",
+//        "	HVACTemplate-Always 34,  !- High Setpoint Schedule Name",
+//        "	HVACTemplate-Always 20,  !- Low Setpoint Schedule Name",
+//        "	Ground Loop Supply Setpoint Nodes;  !- Setpoint Node or NodeList Name",
+//
+//        "Schedule:Compact,",
+//        "	HVACTemplate-Always 4,   !- Name",
+//        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
+//        "	Through: 12/31,          !- Field 1",
+//        "	For: AllDays,            !- Field 2",
+//        "	Until: 24:00,4;          !- Field 3",
+//
+//        "Schedule:Compact,",
+//        "	HVACTemplate-Always 34,  !- Name",
+//        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
+//        "	Through: 12/31,          !- Field 1",
+//        "	For: AllDays,            !- Field 2",
+//        "	Until: 24:00,34;         !- Field 3",
+//
+//        "Schedule:Compact,",
+//        "	HVACTemplate-Always 20,  !- Name",
+//        "	HVACTemplate Any Number, !- Schedule Type Limits Name",
+//        "	Through: 12/31,          !- Field 1",
+//        "	For: AllDays,            !- Field 2",
+//        "	Until: 24:00,20;         !- Field 3",
+//
+//        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+//        "	KATemps,                 !- Name",
+//        "	1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+//        "	920,                     !- Soil Density {kg/m3}",
+//        "	2200,                    !- Soil Specific Heat {J/kg-K}",
+//        "	15.5,                    !- Average Soil Surface Temperature {C}",
+//        "	3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+//        "	8;                       !- Phase Shift of Minimum Surface Temperature {days}",
+//
+//        "GroundHeatExchanger:Vertical:Properties,",
+//        "	GHE-1 Props,        !- Name",
+//        "	1,                  !- Depth of Top of Borehole {m}",
+//        "	76.2,               !- Borehole Length {m}",
+//        "	0.288,              !- Borehole Diameter {m}",
+//        "	3.0,                !- Grout Thermal Conductivity {W/m-K}",
+//        "	1.0E+06,            !- Grout Thermal Heat Capacity {J/m3-K}",
+//        "	0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+//        "   8E+05,              !- Pipe Thermal Heat Capacity {J/m3-K}",
+//        "	0.032,              !- Pipe Outer Diameter {m}",
+//        "	0.0016279,          !- Pipe Thickness {m}",
+//        "	0.1066667;          !- U-Tube Distance {m}",
+//
+//        "GroundHeatExchanger:Vertical:Array,",
+//        "	GHE-Array,          !- Name",
+//        "	GHE-1 Props,        !- GHE Properties",
+//        "	2,                  !- Number of Boreholes in X Direction",
+//        "	2,                  !- Number of Boreholes in Y Direction",
+//        "	2;                  !- Borehole Spacing {m}",
+//
+//        "GroundHeatExchanger:System,",
+//        "	Vertical GHE 1x4 Std,  !- Name",
+//        "	GHLE Inlet,         !- Inlet Node Name",
+//        "	GHLE Outlet,        !- Outlet Node Name",
+//        "	0.1,                !- Design Flow Rate {m3/s}",
+//        "	Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+//        "	KATemps,            !- Undisturbed Ground Temperature Model Name",
+//        "	1.0,                !- Ground Thermal Conductivity {W/m-K}",
+//        "	2.4957E+06,         !- Ground Thermal Heat Capacity {J/m3-K}",
+//        "	,					!- Response Factors Object Name",
+//        "	GHE-Array;          !- GHE Array Object Name"});
+//
+//    // Envr variable
+//    DataSystemVariables::DisableGLHECaching = true;
+//
+//    // Setup
+//    ASSERT_TRUE(process_idf(idf_objects));
+//    ProcessScheduleInput();
+//    ScheduleInputProcessed = true;
+//    GetPlantLoopData();
+//    GetPlantInput();
+//    SetupInitialPlantCallingOrder();
+//    SetupBranchControlTypes();
+//
+//    auto &thisGLHE(verticalGLHE[0]);
+//    thisGLHE.loopNum = 1;
+//    Node(thisGLHE.inletNodeNum).Temp = 20.0;
+//
+//    thisGLHE.initGLHESimVars();
+//    thisGLHE.calcAggregateLoad();
+//    thisGLHE.massFlowRate = 1;
+//    DayOfSim = 1;
+//    HourOfDay = 1;
+//    TimeStep = 1;
+//    TimeStepZone = 0.15;
+//    DataHVACGlobals::SysTimeElapsed = 0;
+//    thisGLHE.calcGroundHeatExchanger();
+//    DataHVACGlobals::SysTimeElapsed = 0.25;
+//    thisGLHE.massFlowRate = 1;
+//    thisGLHE.calcGroundHeatExchanger();
+//
+//    EXPECT_GT(thisGLHE.outletTemp, thisGLHE.tempGround);
+//}
