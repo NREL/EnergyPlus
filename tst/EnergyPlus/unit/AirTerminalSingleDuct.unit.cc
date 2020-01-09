@@ -681,5 +681,246 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
     EXPECT_EQ(1.0, sd_airterminal(SysNum).AirMassFlowRateMax);
 }
+TEST_F(EnergyPlusFixture, SingleDuctVAVAirTerminals_GetInputs)
+{
+    std::string const idf_objects = delimited_string({
+
+        "    ZoneHVAC:AirDistributionUnit,",
+        "      ADU VAV Reheat AT,       !- Name",
+        "      Node 5,                  !- Air Distribution Unit Outlet Node Name",
+        "      AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type",
+        "      VAV Reheat AT;           !- Air Terminal Name",
+
+        "    AirTerminal:SingleDuct:VAV:Reheat,",
+        "      VAV Reheat AT,           !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      VAV Reheat AT OutletNode,!- Damper Air Outlet Node Name",
+        "      Node 24,                 !- Air Inlet Node Name",
+        "      Autosize,                !- Maximum Air Flow Rate {m3/s}",
+        "      Constant,                !- Zone Minimum Air Flow Input Method",
+        "      0.3,                     !- Constant Minimum Air Flow Fraction",
+        "      ,                        !- Fixed Minimum Air Flow Rate {m3/s}",
+        "      ,                        !- Minimum Air Flow Fraction Schedule Name",
+        "      Coil:Heating:Water,      !- Reheat Coil Object Type",
+        "      VAV Reheat Coil,         !- Reheat Coil Name",
+        "      Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "      0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "      Node 5,                  !- Air Outlet Node Name",
+        "      0.001,                   !- Convergence Tolerance",
+        "      Normal,                  !- Damper Heating Action",
+        "      Autocalculate,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}",
+        "      Autocalculate,           !- Maximum Flow Fraction During Reheat",
+        "      35,                      !- Maximum Reheat Air Temperature {C}",
+        "      ,                        !- Design Specification Outdoor Air Object Name",
+        "      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name",
+
+        "    Coil:Heating:Water,",
+        "      VAV Reheat Coil,         !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      Autosize,                !- U-Factor Times Area Value {W/K}",
+        "      Autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "      Node 25,                 !- Water Inlet Node Name",
+        "      Node 26,                 !- Water Outlet Node Name",
+        "      Thermal Zone one VAV Reheat AT Damper Outlet,  !- Air Inlet Node Name",
+        "      Node 5,                  !- Air Outlet Node Name",
+        "      UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "      Autosize,                !- Rated Capacity {W}",
+        "      82.2,                    !- Rated Inlet Water Temperature {C}",
+        "      16.6,                    !- Rated Inlet Air Temperature {C}",
+        "      71.1,                    !- Rated Outlet Water Temperature {C}",
+        "      32.2,                    !- Rated Outlet Air Temperature {C}",
+        "      0.5;                     !- Rated Ratio for Air and Water Convection",
+
+        "    ZoneHVAC:AirDistributionUnit,",
+        "      ADU VAV CBP Gas Reheat AT,  !- Name",
+        "      Node 8,                  !- Air Distribution Unit Outlet Node Name",
+        "      AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,  !- Air Terminal Object Type",
+        "      VAV CBP Gas Reheat AT;   !- Air Terminal Name",
+
+        "    AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,",
+        "      VAV CBP Gas Reheat AT,   !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      CBP Rht Outlet Node,     !- Damper Air Outlet Node Name",
+        "      Node 7,                  !- Air Inlet Node Name",
+        "      AutoSize,                !- Maximum Air Flow Rate {m3/s}",
+        "      0.20,                    !- Zone Minimum Air Flow Fraction",
+        "      Coil:Heating:Fuel,       !- Reheat Coil Object Type",
+        "      CBP Gas Reheat Coil,     !- Reheat Coil Name",
+        "      AutoSize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "      0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "      Node 8,                  !- Air Outlet Node Name",
+        "      0.001,                   !- Convergence Tolerance",
+        "      1000,                    !- Maximum Reheat Air Temperature {C}",
+        "      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name",
+
+        "    Coil:Heating:Fuel,",
+        "      CBP Gas Reheat Coil,     !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      NaturalGas,              !- Fuel Type",
+        "      0.8,                     !- Burner Efficiency",
+        "      AutoSize,                !- Nominal Capacity {W}",
+        "      CBP Rht Outlet Node,     !- Air Inlet Node Name",
+        "      Node 8,                  !- Air Outlet Node Name",
+        "      ,                        !- Temperature Setpoint Node Name",
+        "      0,                       !- Parasitic Electric Load {W}",
+        "      ,                        !- Part Load Fraction Correlation Curve Name",
+        "      0;                       !- Parasitic Fuel Load {W}",
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU VAV No Rht,                         !- Name",
+        "     Node 6,                                 !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:VAV:NoReheat,    !- Air Terminal Object Type",
+        "     VAV No Reheat AT;                       !- Air Terminal Name",
+
+        "   AirTerminal:SingleDuct:VAV:NoReheat,",
+        "     VAV No Reheat AT,         !- Name",
+        "     ,                         !- Availability Schedule Name",
+        "     Node 6,                   !- Air Outlet Node Name",
+        "     Node 9,                   !- Air Inlet Node Name",
+        "     Autosize,                 !- Maximum Air Flow Rate {m3/s}",
+        "     Constant,                 !- Zone Minimum Air Flow Input Method",
+        "     0.25,                     !- Constant Minimum Air Flow Fraction",
+        "     Autosize,                 !- Fixed Minimum Air Flow Rate {m3/s}",
+        "     ,                         !- Minimum Air Flow Fraction Schedule Name",
+        "     ,                         !- Design Specification Outdoor Air Object Name",
+        "     TurndownMinAirFlowSch;    !- Minimum Air Flow Turndown Schedule Name",
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU VAV CBP NoReheat AT, !- Name",
+        "     CBP NoRht Outlet Node,   !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,  !- Air Terminal Object Type",
+        "     VAV CBP NoReheat AT;     !- Air Terminal Name",
+
+        "   AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,",
+        "     VAV CBP NoReheat AT,     !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     CBP NoRht Outlet Node,   !- Damper Air Outlet Node Name",
+        "     Node 14,                 !- Air Inlet Node Name",
+        "     AutoSize,                !- Maximum Air Flow Rate {m3/s}",
+        "     0.15,                    !- Zone Minimum Air Flow Fraction",
+        "     TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name",
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU VAV Reheat VS Fan,   !- Name",
+        "     SPACE1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,  !- Air Terminal Object Type",
+        "     VAV Reheat VS Fan;       !- Air Terminal Name",
+
+        "   AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,",
+        "     VAV Reheat VS Fan,       !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     autosize,                !- Maximum Cooling Air Flow Rate {m3/s}",
+        "     autosize,                !- Maximum Heating Air Flow Rate {m3/s}",
+        "     0.10,                    !- Zone Minimum Air Flow Fraction",
+        "     SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "     SPACE1-1 In Node,        !- Air Outlet Node Name",
+        "     Fan:SystemModel,         !- Fan Object Type",
+        "     SPACE1-1 Zone Fan,       !- Fan Name",
+        "     Coil:Heating:Electric,   !- Heating Coil Object Type",
+        "     SPACE1-1 Zone Rht Coil,  !- Heating Coil Name",
+        "     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "     0.001,                   !- Heating Convergence Tolerance",
+        "     TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name",
+
+        "   Coil:Heating:Electric,",
+        "     SPACE1-1 Zone Rht Coil,  !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     1.0,                     !- Efficiency",
+        "     autosize,                !- Nominal Capacity {W}",
+        "     Reheat Air Inlet Node,   !- Air Inlet Node Name",
+        "     SPACE1-1 In Node;        !- Air Outlet Node Name",
+
+        "   Fan:SystemModel,",
+        "     SPACE1-1 Zone Fan,       !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "     Reheat Air Inlet Node,   !- Air Outlet Node Name",
+        "     AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}",
+        "     Continuous,              !- Speed Control Method",
+        "     0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "     125.0,                   !- Design Pressure Rise {Pa}",
+        "     0.9,                     !- Motor Efficiency",
+        "     1.0,                     !- Motor In Air Stream Fraction",
+        "     AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "     TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "     ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "     0.7,                     !- Fan Total Efficiency",
+        "     VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name",
+        "     ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "     ,                        !- Night Ventilation Mode Flow Fraction",
+        "     ,                        !- Motor Loss Zone Name",
+        "     ,                        !- Motor Loss Radiative Fraction",
+        "     ATU Fan Energy;          !- End-Use Subcategory",
+
+        "   Curve:Quartic,",
+        "     VAV Fan Curve,           !- Name",
+        "     0.00153028,              !- Coefficient1 Constant",
+        "     0.00520806,              !- Coefficient2 x",
+        "     1.1086242,               !- Coefficient3 x**2",
+        "     -.11635563,              !- Coefficient4 x**3",
+        "     0.0,                     !- Coefficient5 x**4",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0,                     !- Maximum Value of x",
+        "     0.0,                     !- Minimum Curve Output",
+        "     1.0,                     !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Schedule:Compact,",
+        "     TurndownMinAirFlowSch,   !- Name",
+        "     Fraction,                !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: Weekdays,           !- Field 2",
+        "     Until: 7:00,0.50,        !- Field 3",
+        "     Until: 17:00,0.75,       !- Field 4",
+        "     Until: 24:00,0.50,       !- Field 5",
+        "     For: SummerDesignDay WinterDesignDay, !- Field 6",
+        "     Until: 24:00,1.0,        !- Field 7",
+        "     For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8",
+        "     Until: 24:00,0.25;       !- Field 9",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetZoneAirLoopEquipment();
+    SingleDuct::GetSysInput();
+
+    // VAV Reheat get input test
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat", sd_airterminal(1).SysType); // VAV Reheat Type
+    EXPECT_EQ("VAV REHEAT AT", sd_airterminal(1).SysName);                   // VAV Reheat Name
+    EXPECT_TRUE(sd_airterminal(1).ZoneTurndownMinAirFracSchExist);           // turndown schdule exists
+    EXPECT_EQ(sd_airterminal(1).ZoneTurndownMinAirFrac, 1.0);                // initialized to 1.0
+    EXPECT_EQ(sd_airterminal(1).ZoneMinAirFracDes, 0.3);                     // design minimum flow fraction
+
+    // VAV change over bypass reheat get input test
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", sd_airterminal(2).SysType); // VAV HeatCool Reheat Type
+    EXPECT_EQ("VAV CBP GAS REHEAT AT", sd_airterminal(2).SysName);           // VAV HeatCool Reheat Name
+    EXPECT_TRUE(sd_airterminal(2).ZoneTurndownMinAirFracSchExist);           // turndown schdule exists
+    EXPECT_EQ(sd_airterminal(2).ZoneTurndownMinAirFrac, 1.0);                // initialized to 1.0
+    EXPECT_EQ(sd_airterminal(2).ZoneMinAirFracDes, 0.20);                    // design minimum flow fraction
+
+    // VAV No reheat get input test
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:NoReheat", sd_airterminal(3).SysType); // VAV No Reheat Type
+    EXPECT_EQ("VAV NO REHEAT AT", sd_airterminal(3).SysName);                // VAV No Reheat Name
+    EXPECT_TRUE(sd_airterminal(3).ZoneTurndownMinAirFracSchExist);           // turndown schdule exists
+    EXPECT_EQ(sd_airterminal(3).ZoneTurndownMinAirFrac, 1.0);                // initialized to 1.0
+    EXPECT_EQ(sd_airterminal(3).ZoneMinAirFracDes, 0.25);                    // design minimum flow fraction
+
+    // VAV change over bypass no reheat get input test
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", sd_airterminal(4).SysType); // VAV HeatCool NoReheat Type
+    EXPECT_EQ("VAV CBP NOREHEAT AT", sd_airterminal(4).SysName);           // VAV HeatCool NoReheat Name
+    EXPECT_TRUE(sd_airterminal(4).ZoneTurndownMinAirFracSchExist);           // turndown schdule exists
+    EXPECT_EQ(sd_airterminal(4).ZoneTurndownMinAirFrac, 1.0);                // initialized to 1.0
+    EXPECT_EQ(sd_airterminal(4).ZoneMinAirFracDes, 0.15);                    // design minimum flow fraction
+
+    // VAV reheat variable speed fan get input test
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", sd_airterminal(5).SysType); // VAV Reheat VSFan Type
+    EXPECT_EQ("VAV REHEAT VS FAN", sd_airterminal(5).SysName);           // VAV Reheat VSFan Name
+    EXPECT_TRUE(sd_airterminal(5).ZoneTurndownMinAirFracSchExist);           // turndown schdule exists
+    EXPECT_EQ(sd_airterminal(5).ZoneTurndownMinAirFrac, 1.0);                // initialized to 1.0
+    EXPECT_EQ(sd_airterminal(5).ZoneMinAirFracDes, 0.10);                    // design minimum flow fraction
+}
 
 } // namespace EnergyPlus
