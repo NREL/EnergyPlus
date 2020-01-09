@@ -116,7 +116,7 @@ namespace GroundHeatExchangers {
 
     // CONSTANTS
     Real64 const avgHrsPerMonth(730.0); // Number of hours in month
-    int const maxTSinHr(60);         // Max number of time step in a hour
+    int const maxTSinHr(60);            // Max number of time step in a hour
 
     // MODULE VARIABLE DECLARATIONS:
     int numVerticalGLHEs(0);
@@ -186,8 +186,6 @@ namespace GroundHeatExchangers {
         return 1 / (1 + std::exp(-(x - a) / b));
     }
 
-    //******************************************************************************
-
     std::shared_ptr<GLHEVertPropsStruct> GetVertProps(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
@@ -200,8 +198,6 @@ namespace GroundHeatExchangers {
 
         return nullptr;
     }
-
-    //******************************************************************************
 
     std::shared_ptr<GLHEVertSingleStruct> GetSingleBH(std::string const &objectName)
     {
@@ -216,8 +212,6 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    //******************************************************************************
-
     std::shared_ptr<GLHEVertArrayStruct> GetVertArray(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
@@ -231,8 +225,6 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    //******************************************************************************
-
     std::shared_ptr<GLHEResponseFactorsStruct> GetResponseFactor(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
@@ -245,8 +237,6 @@ namespace GroundHeatExchangers {
 
         return nullptr;
     }
-
-    //******************************************************************************
 
     std::shared_ptr<GLHEResponseFactorsStruct> BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr)
     {
@@ -280,8 +270,6 @@ namespace GroundHeatExchangers {
         responseFactorsVector.push_back(thisRF);
         return thisRF;
     }
-
-    //******************************************************************************
 
     std::shared_ptr<GLHEResponseFactorsStruct>
     BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingleStruct>> const &singleBHsForRFVect)
@@ -356,8 +344,6 @@ namespace GroundHeatExchangers {
         return thisRF;
     }
 
-    //******************************************************************************
-
     void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactorsStruct> &thisRF)
     {
         for (auto &thisBH : thisRF->myBorholes) {
@@ -398,14 +384,10 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     void GLHEBase::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initGLHESimVars();
     }
-
-    //******************************************************************************
 
     void GLHEBase::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                             bool const EP_UNUSED(FirstHVACIteration),
@@ -421,8 +403,6 @@ namespace GroundHeatExchangers {
             this->updateGHX();
         }
     }
-
-    //******************************************************************************
 
     PlantComponent *GLHEBase::factory(int const objectType, std::string const &objectName)
     {
@@ -449,8 +429,6 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    //******************************************************************************
-
     std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian const &point_j)
     {
         std::vector<Real64> sumVals;
@@ -476,8 +454,6 @@ namespace GroundHeatExchangers {
         return retVals;
     }
 
-    //******************************************************************************
-
     Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
     {
         Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(soil.diffusivity * currTime))) / dists[0];
@@ -485,8 +461,6 @@ namespace GroundHeatExchangers {
 
         return pointToPointResponse - pointToReflectedResponse;
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingleStruct> const &bh_j, Real64 const &currTime)
     {
@@ -518,8 +492,6 @@ namespace GroundHeatExchangers {
 
         return (bh_j->dl_j / 3.0) * sum_f;
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingleStruct> const &bh_i,
                                     std::shared_ptr<GLHEVertSingleStruct> const &bh_j,
@@ -576,8 +548,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     void GLHEVert::calcGFunctions()
     {
 
@@ -594,8 +564,6 @@ namespace GroundHeatExchangers {
             writeGLHECacheToFile();
         }
     }
-
-    //******************************************************************************
 
     void GLHEVert::calcLongTimestepGFunctions()
     {
@@ -655,8 +623,6 @@ namespace GroundHeatExchangers {
             DisplayString("...progress: " + ss.str() + "%");
         }
     }
-
-    //******************************************************************************
 
     void GLHEVert::calcShortTimestepGFunctions()
     {
@@ -730,8 +696,10 @@ namespace GroundHeatExchangers {
         Real64 bh_equivalent_resistance_convection = bhResistance - bh_equivalent_resistance_tube_grout;
 
         Real64 initial_temperature = inletTemp;
-        Real64 cpFluid_init = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, initial_temperature, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 fluidDensity_init = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, initial_temperature, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 cpFluid_init = FluidProperties::GetSpecificHeatGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, initial_temperature, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 fluidDensity_init = FluidProperties::GetDensityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, initial_temperature, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // initialize the fluid cells
         for (int i = 0; i < num_fluid_cells; ++i) {
@@ -918,13 +886,11 @@ namespace GroundHeatExchangers {
         } // end timestep loop
     }
 
-    //******************************************************************************
-
     std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
     {
         // from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C.2B.2B
 
-        int n = static_cast<int> (d.size()) - 1;
+        int n = static_cast<int>(d.size()) - 1;
 
         c[0] /= b[0];
         d[0] /= b[0];
@@ -942,8 +908,6 @@ namespace GroundHeatExchangers {
 
         return d;
     }
-
-    //******************************************************************************
 
     void GLHEVert::combineShortAndLongTimestepGFunctions()
     {
@@ -989,8 +953,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     void GLHEVert::makeThisGLHECacheStruct()
     {
         // For convenience
@@ -1019,8 +981,6 @@ namespace GroundHeatExchangers {
             d_bh["Y-Location"] = thisBH->yLoc;
         }
     }
-
-    //******************************************************************************
 
     void GLHEVert::readCacheFileAndCompareWithThisGLHECache()
     {
@@ -1070,7 +1030,7 @@ namespace GroundHeatExchangers {
                 // Populate the time array
                 int index = 1;
                 auto &j_time = myCacheData["Response Factors"]["time"];
-                for (auto & it : j_time) {
+                for (auto &it : j_time) {
                     myRespFactors->time(index) = it;
                     ++index;
                 }
@@ -1078,7 +1038,7 @@ namespace GroundHeatExchangers {
                 // Populate the lntts array
                 index = 1;
                 auto &j_lntts = myCacheData["Response Factors"]["LNTTS"];
-                for (auto & j_lntt : j_lntts) {
+                for (auto &j_lntt : j_lntts) {
                     myRespFactors->LNTTS(index) = j_lntt;
                     ++index;
                 }
@@ -1086,15 +1046,13 @@ namespace GroundHeatExchangers {
                 // Populate the g-function array
                 index = 1;
                 auto &j_gfnc = myCacheData["Response Factors"]["GFNC"];
-                for (auto & it : j_gfnc) {
+                for (auto &it : j_gfnc) {
                     myRespFactors->GFNC(index) = it;
                     ++index;
                 }
             }
         }
     }
-
-    //******************************************************************************
 
     void GLHEVert::writeGLHECacheToFile()
     {
@@ -1166,8 +1124,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     void GLHESlinky::calcGFunctions()
     {
         // SUBROUTINE INFORMATION:
@@ -1182,7 +1138,7 @@ namespace GroundHeatExchangers {
         Real64 const tLg_min(-2);
         Real64 const tLg_grid(0.25);
         Real64 const ts(3600);
-        Real64 const convertYearsToSeconds(356 * 24 * 60 * 60);  // TODO: fix this 356 -> 365
+        Real64 const convertYearsToSeconds(356 * 24 * 60 * 60); // TODO: fix this 356 -> 365
         Array2D<Real64> valStored({0, numTrenches}, {0, numCoils}, -1.0);
 
         DisplayString("Initializing GroundHeatExchanger:Slinky: " + name);
@@ -1337,19 +1293,13 @@ namespace GroundHeatExchangers {
         } // NT time
     }
 
-    //******************************************************************************
-
     void GLHESlinky::makeThisGLHECacheStruct()
     {
     }
 
-    //******************************************************************************
-
     void GLHESlinky::readCacheFileAndCompareWithThisGLHECache()
     {
     }
-
-    //******************************************************************************
 
     Real64
     GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta, Real64 const t)
@@ -1384,8 +1334,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     Real64 GLHESlinky::midFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const t)
     {
         // SUBROUTINE INFORMATION:
@@ -1407,8 +1355,6 @@ namespace GroundHeatExchangers {
 
         return 4 * pow_2(DataGlobals::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
     }
-
-    //******************************************************************************
 
     Real64 GLHESlinky::distance(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta)
     {
@@ -1453,8 +1399,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     Real64 GLHESlinky::distanceToFictRing(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta)
     {
         // SUBROUTINE INFORMATION:
@@ -1489,8 +1433,6 @@ namespace GroundHeatExchangers {
                0.5 * std::sqrt(pow_2(x - xOut) + pow_2(Y0(m1) - Y0(m)) + pow_2(z - zOut));
     }
 
-    //******************************************************************************
-
     Real64 GLHESlinky::distToCenter(int const m, int const n, int const m1, int const n1)
     {
         // SUBROUTINE INFORMATION:
@@ -1505,8 +1447,6 @@ namespace GroundHeatExchangers {
         return std::sqrt(pow_2(X0(n) - X0(n1)) + pow_2(Y0(m) - Y0(m1)));
     }
 
-    //******************************************************************************
-
     bool GLHEBase::isEven(int const val)
     {
         // SUBROUTINE INFORMATION:
@@ -1520,8 +1460,6 @@ namespace GroundHeatExchangers {
 
         return val % 2 == 0;
     }
-
-    //******************************************************************************
 
     Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1, Real64 const t, Real64 const eta, Real64 const J0)
     {
@@ -1566,8 +1504,6 @@ namespace GroundHeatExchangers {
         return (h / 3) * sumIntF;
     }
 
-    //******************************************************************************
-
     Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int const n1, Real64 const t, int const I0, int const J0)
     {
         // SUBROUTINE INFORMATION:
@@ -1611,8 +1547,6 @@ namespace GroundHeatExchangers {
         return (h / 3) * sumIntF;
     }
 
-    //******************************************************************************
-
     void GLHEVert::getAnnualTimeConstant()
     {
         // SUBROUTINE INFORMATION:
@@ -1628,8 +1562,6 @@ namespace GroundHeatExchangers {
         timeSSFactor = timeSS * 8760.0;
     }
 
-    //******************************************************************************
-
     void GLHESlinky::getAnnualTimeConstant()
     {
         // SUBROUTINE INFORMATION:
@@ -1643,8 +1575,6 @@ namespace GroundHeatExchangers {
 
         timeSSFactor = 1.0;
     }
-
-    //******************************************************************************
 
     void GLHEBase::calcGroundHeatExchanger()
     {
@@ -1691,15 +1621,15 @@ namespace GroundHeatExchangers {
         Real64 RQHour;
         Real64 RQSubHr;
         int I;
-        Real64 tmpQnSubHourly;              // current Qn sub-hourly value
-        int hourlyLimit;                    // number of hours to be taken into account in superposition
-        int subHourlyLimit;                 // number of sub-hourly to be taken into account in sub-hourly superposition
-        Real64 sumTotal(0.0);               // sum of all the Qn (load) blocks
-        Real64 C0;                          // **Intermediate constants used
-        Real64 C1;                          // **Intermediate constants used
-        Real64 C2;                          // **in explicit  calculation of the
-        Real64 C3;                          // **temperature at the U tube outlet.
-        int IndexN;                         // Used to index the LastHourN array
+        Real64 tmpQnSubHourly; // current Qn sub-hourly value
+        int hourlyLimit;       // number of hours to be taken into account in superposition
+        int subHourlyLimit;    // number of sub-hourly to be taken into account in sub-hourly superposition
+        Real64 sumTotal(0.0);  // sum of all the Qn (load) blocks
+        Real64 C0;             // **Intermediate constants used
+        Real64 C1;             // **Intermediate constants used
+        Real64 C2;             // **in explicit  calculation of the
+        Real64 C3;             // **temperature at the U tube outlet.
+        int IndexN;            // Used to index the LastHourN array
 
         // Calculate G-Functions
         if (this->firstTime) {
@@ -1715,7 +1645,8 @@ namespace GroundHeatExchangers {
 
         inletTemp = DataLoopNode::Node(inletNodeNum).Temp;
 
-        cpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = FluidProperties::GetSpecificHeatGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
 
         kGroundFactor = 2.0 * DataGlobals::Pi * soil.k;
 
@@ -1735,7 +1666,8 @@ namespace GroundHeatExchangers {
             triggerDesignDayReset = false;
         }
 
-        currentSimTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed; //+ TimeStepsys
+        currentSimTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+                         DataHVACGlobals::SysTimeElapsed; //+ TimeStepsys
         locHourOfDay = mod(currentSimTime, DataGlobals::HoursInDay) + 1;
         locDayOfSim = currentSimTime / 24 + 1;
 
@@ -1858,7 +1790,7 @@ namespace GroundHeatExchangers {
 
                 numOfMonths = (currentSimTime + 1) / avgHrsPerMonth;
 
-                if (currentSimTime < ((numOfMonths) * avgHrsPerMonth) + AGG + SubAGG) {
+                if (currentSimTime < ((numOfMonths)*avgHrsPerMonth) + AGG + SubAGG) {
                     currentMonth = numOfMonths - 1;
                 } else {
                     currentMonth = numOfMonths;
@@ -1940,8 +1872,6 @@ namespace GroundHeatExchangers {
         aveFluidTemp = fluidAveTemp;
     }
 
-    //******************************************************************************
-
     void GLHEBase::updateGHX()
     {
         // SUBROUTINE INFORMATION:
@@ -1964,12 +1894,14 @@ namespace GroundHeatExchangers {
 
         DataLoopNode::Node(outletNodeNum).Temp = outletTemp;
         DataLoopNode::Node(outletNodeNum).Enthalpy =
-            outletTemp * FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, outletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+            outletTemp * FluidProperties::GetSpecificHeatGlycol(
+                             DataPlant::PlantLoop(loopNum).FluidName, outletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
 
         GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
         if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !DataGlobals::WarmupFlag) {
-            fluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = FluidProperties::GetDensityGlycol(
+                DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             ShowWarningError("Check GLHE design inputs & g-functions for consistency");
             ShowContinueError("For GroundHeatExchanger: " + name + "GLHE delta Temp > 100C.");
@@ -1980,8 +1912,6 @@ namespace GroundHeatExchangers {
             ++this->numErrorCalls;
         }
     }
-
-    //******************************************************************************
 
     void GLHEBase::calcAggregateLoad()
     {
@@ -2052,8 +1982,6 @@ namespace GroundHeatExchangers {
             prevHour = locHourOfDay;
         }
     }
-
-    //******************************************************************************
 
     void GetGroundHeatExchangerInput()
     {
@@ -2372,31 +2300,31 @@ namespace GroundHeatExchangers {
 
                 // get inlet node num
                 thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
-                                                          errorsFound,
-                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                          DataLoopNode::NodeType_Water,
-                                                          DataLoopNode::NodeConnectionType_Inlet,
-                                                          1,
-                                                          DataLoopNode::ObjectIsNotParent);
+                                                                            errorsFound,
+                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                            DataLoopNode::NodeType_Water,
+                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            1,
+                                                                            DataLoopNode::ObjectIsNotParent);
 
                 // get outlet node num
                 thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
-                                                           errorsFound,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                           DataLoopNode::NodeType_Water,
-                                                           DataLoopNode::NodeConnectionType_Outlet,
-                                                           1,
-                                                           DataLoopNode::ObjectIsNotParent);
+                                                                             errorsFound,
+                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             DataLoopNode::NodeType_Water,
+                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             1,
+                                                                             DataLoopNode::ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
                 BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
-                            DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3),
-                            "Condenser Water Nodes");
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   "Condenser Water Nodes");
 
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
                 PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
@@ -2501,7 +2429,8 @@ namespace GroundHeatExchangers {
                 prevTimeSteps = 0.0;
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GroundTemperatureManager::GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
+                thisGLHE.groundTempModel =
+                    GroundTemperatureManager::GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }
@@ -2593,31 +2522,31 @@ namespace GroundHeatExchangers {
 
                 // get inlet node num
                 thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
-                                                          errorsFound,
-                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                          DataLoopNode::NodeType_Water,
-                                                          DataLoopNode::NodeConnectionType_Inlet,
-                                                          1,
-                                                          DataLoopNode::ObjectIsNotParent);
+                                                                            errorsFound,
+                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                            DataLoopNode::NodeType_Water,
+                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            1,
+                                                                            DataLoopNode::ObjectIsNotParent);
 
                 // get outlet node num
                 thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
-                                                           errorsFound,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                           DataLoopNode::NodeType_Water,
-                                                           DataLoopNode::NodeConnectionType_Outlet,
-                                                           1,
-                                                           DataLoopNode::ObjectIsNotParent);
+                                                                             errorsFound,
+                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             DataLoopNode::NodeType_Water,
+                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             1,
+                                                                             DataLoopNode::ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
                 BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
-                            DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3),
-                            "Condenser Water Nodes");
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   "Condenser Water Nodes");
 
                 // load data
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
@@ -2655,7 +2584,8 @@ namespace GroundHeatExchangers {
                 thisGLHE.numCoils = int(thisGLHE.trenchLength / thisGLHE.coilPitch);
 
                 // Total tube length
-                thisGLHE.totalTubeLength = DataGlobals::Pi * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
+                thisGLHE.totalTubeLength =
+                    DataGlobals::Pi * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
 
                 // Get g function data
                 thisGLHE.SubAGG = 15;
@@ -2667,8 +2597,10 @@ namespace GroundHeatExchangers {
                     if (thisGLHE.trenchDepth - thisGLHE.coilDiameter < 0.0) {
                         // Error: part of the coil is above ground
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(13) + "=[" + General::RoundSigDigits(thisGLHE.trenchDepth, 3) + "].");
-                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + General::RoundSigDigits(thisGLHE.coilDepth, 3) + "].");
+                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(13) + "=[" + General::RoundSigDigits(thisGLHE.trenchDepth, 3) +
+                                          "].");
+                        ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + General::RoundSigDigits(thisGLHE.coilDepth, 3) +
+                                          "].");
                         ShowContinueError("...Average coil depth will be <=0.");
                         errorsFound = true;
 
@@ -2690,14 +2622,17 @@ namespace GroundHeatExchangers {
 
                 if (thisGLHE.pipe.thickness >= thisGLHE.pipe.outDia / 2.0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(12) + "=[" + General::RoundSigDigits(thisGLHE.pipe.thickness, 3) + "].");
-                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + General::RoundSigDigits(thisGLHE.pipe.outDia, 3) + "].");
+                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(12) + "=[" + General::RoundSigDigits(thisGLHE.pipe.thickness, 3) +
+                                      "].");
+                    ShowContinueError("..." + DataIPShortCuts::cNumericFieldNames(10) + "=[" + General::RoundSigDigits(thisGLHE.pipe.outDia, 3) +
+                                      "].");
                     ShowContinueError("...Radius will be <=0.");
                     errorsFound = true;
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GroundTemperatureManager::GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
+                thisGLHE.groundTempModel =
+                    GroundTemperatureManager::GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
                 if (thisGLHE.groundTempModel) {
                     errorsFound = thisGLHE.groundTempModel->errorsFound;
                 }
@@ -2737,8 +2672,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     Real64 GLHEVert::calcBHAverageResistance()
     {
         // Calculates the average thermal resistance of the borehole using the first-order multipole method.
@@ -2759,8 +2692,6 @@ namespace GroundHeatExchangers {
 
         return (1 / (4 * DataGlobals::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::calcBHTotalInternalResistance()
     {
@@ -2784,8 +2715,6 @@ namespace GroundHeatExchangers {
         return (1 / (DataGlobals::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
 
-    //******************************************************************************
-
     Real64 GLHEVert::calcBHGroutResistance()
     {
         // Calculates grout resistance. Use for validation.
@@ -2797,8 +2726,6 @@ namespace GroundHeatExchangers {
 
         return calcBHAverageResistance() - calcPipeResistance() / 2.0;
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::calcHXResistance()
     {
@@ -2814,12 +2741,11 @@ namespace GroundHeatExchangers {
         if (massFlowRate <= 0.0) {
             return 0;
         } else {
-            Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+            Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(
+                DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
             return calcBHAverageResistance() + 1 / (3 * calcBHTotalInternalResistance()) * pow_2(bhLength / (massFlowRate * cpFluid));
         }
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::calcPipeConductionResistance()
     {
@@ -2830,8 +2756,6 @@ namespace GroundHeatExchangers {
 
         return log(pipe.outDia / pipe.innerDia) / (2 * DataGlobals::Pi * pipe.k);
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::calcPipeConvectionResistance()
     {
@@ -2845,9 +2769,12 @@ namespace GroundHeatExchangers {
         // Get fluid props
         inletTemp = DataLoopNode::Node(inletNodeNum).Temp;
 
-        Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const kFluid = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const fluidViscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const kFluid = FluidProperties::GetConductivityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const fluidViscosity = FluidProperties::GetViscosityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // Smoothing fit limits
         Real64 const lower_limit = 2000;
@@ -2878,8 +2805,6 @@ namespace GroundHeatExchangers {
         return 1 / (h * DataGlobals::Pi * pipe.innerDia);
     }
 
-    //******************************************************************************
-
     Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
     {
         // Calculates the friction factor in smooth tubes
@@ -2905,8 +2830,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     Real64 GLHEVert::calcPipeResistance()
     {
         // Calculates the combined conduction and convection pipe resistance
@@ -2918,8 +2841,6 @@ namespace GroundHeatExchangers {
 
         return calcPipeConductionResistance() + calcPipeConvectionResistance();
     }
-
-    //******************************************************************************
 
     Real64 GLHESlinky::calcHXResistance()
     {
@@ -2956,10 +2877,14 @@ namespace GroundHeatExchangers {
         Real64 laminarNusseltNo(4.364);
         Real64 turbulentNusseltNo;
 
-        cpFluid = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        kFluid = FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidViscosity = FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = FluidProperties::GetSpecificHeatGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        kFluid = FluidProperties::GetConductivityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidDensity = FluidProperties::GetDensityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidViscosity = FluidProperties::GetViscosityGlycol(
+            DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // calculate mass flow rate
         singleSlinkyMassFlowRate = massFlowRate / numTrenches;
@@ -2972,7 +2897,8 @@ namespace GroundHeatExchangers {
             Rconv = 0.0;
         } else {
             // Re=Rho*V*D/Mu
-            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobals::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
+            reynoldsNum =
+                fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobals::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
             prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
             //   Convection Resistance
             if (reynoldsNum <= 2300) {
@@ -2993,8 +2919,6 @@ namespace GroundHeatExchangers {
 
         return Rcond + Rconv;
     }
-
-    //******************************************************************************
 
     Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
     )
@@ -3108,8 +3032,6 @@ namespace GroundHeatExchangers {
         }
     }
 
-    //******************************************************************************
-
     Real64 GLHESlinky::getGFunc(Real64 const time)
     {
         // SUBROUTINE INFORMATION:
@@ -3129,8 +3051,6 @@ namespace GroundHeatExchangers {
 
         return interpGFunc(LNTTS);
     }
-
-    //******************************************************************************
 
     Real64 GLHEVert::getGFunc(Real64 const time)
     {
@@ -3162,8 +3082,6 @@ namespace GroundHeatExchangers {
         return gFuncVal;
     }
 
-    //******************************************************************************
-
     void GLHEVert::initGLHESimVars()
     {
         // SUBROUTINE INFORMATION:
@@ -3178,13 +3096,16 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed) * DataGlobals::SecInHour;
+        Real64 currTime = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+                           DataHVACGlobals::SysTimeElapsed) *
+                          DataGlobals::SecInHour;
 
         // Init more variables
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(name, DataPlant::TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                name, DataPlant::TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3195,7 +3116,8 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, 20.0, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = FluidProperties::GetDensityGlycol(
+                DataPlant::PlantLoop(loopNum).FluidName, 20.0, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             PlantUtilities::InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3241,8 +3163,6 @@ namespace GroundHeatExchangers {
         if (!DataGlobals::BeginEnvrnFlag) myEnvrnFlag = true;
     }
 
-    //******************************************************************************
-
     void GLHESlinky::initGLHESimVars()
     {
         // SUBROUTINE INFORMATION:
@@ -3257,13 +3177,16 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed) * DataGlobals::SecInHour;
+        CurTime = ((DataGlobals::DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+                   DataHVACGlobals::SysTimeElapsed) *
+                  DataGlobals::SecInHour;
 
         // Init more variables
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(name, DataPlant::TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                name, DataPlant::TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3274,7 +3197,8 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName, 20.0, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = FluidProperties::GetDensityGlycol(
+                DataPlant::PlantLoop(loopNum).FluidName, 20.0, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             PlantUtilities::InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3302,8 +3226,6 @@ namespace GroundHeatExchangers {
         // Reset local environment init flag
         if (!DataGlobals::BeginEnvrnFlag) myEnvrnFlag = true;
     }
-
-    //******************************************************************************
 
 } // namespace GroundHeatExchangers
 
