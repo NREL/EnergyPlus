@@ -25,6 +25,8 @@ set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
+string( TIMESTAMP CMAKE_YEAR "%Y")
+
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
 
@@ -74,8 +76,8 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
-find_package(PythonInterp 2.7 REQUIRED)
+# we are making python a required dependency, so find it here
+find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )

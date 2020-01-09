@@ -8366,7 +8366,6 @@ namespace WeatherManager {
         Real64 Lag;                           // Value used in correlation
         Real64 Offset;                        // Value used in correlation
         Real64 CurrentWaterMainsTemp;         // calculated water main temp (F)
-        Real64 WaterMainsTempFromCorrelation; // calculated water main temp (C)
 
         // FLOW:
         Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
@@ -8377,17 +8376,17 @@ namespace WeatherManager {
         Offset = 6.0;
         int latitude_sign;
         if (Latitude >= 0) {
-            latitude_sign = -1;
-        } else {
             latitude_sign = 1;
+        } else {
+            latitude_sign = -1;
         }
 
-        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::cos((0.986 * (DayOfYear - 15.0 - Lag)) * DegToRadians);
+        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DayOfYear - 15.0 - Lag) - 90) * DegToRadians);
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
         // Convert F to C
-        return WaterMainsTempFromCorrelation = (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
+        return (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
     }
     void GetWeatherStation(bool &ErrorsFound)
     {
