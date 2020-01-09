@@ -48,6 +48,11 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
+
+#include "DataGlobals.hh"
+#include <ObjexxFCL/gio.hh>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <ostream>
 
 namespace EnergyPlus {
@@ -61,6 +66,22 @@ struct OutputFiles
 private:
     OutputFiles();
 };
+
+void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args);
+
+// Defines a custom formatting type `r` which chooses between `e` and `g` depending
+// on the value being printed.
+template <typename... Args>
+void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
+{
+    if (sizeof...(Args) == 0) {
+        // assume 0 args is intentional and just print the string
+        os.write(format_str.data(), format_str.size());
+    } else {
+        EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...));
+    }
+}
+
 } // namespace EnergyPlus
 
 #endif

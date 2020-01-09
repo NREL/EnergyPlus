@@ -45,11 +45,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "DataGlobals.hh"
 #include "OutputFiles.hh"
+#include "DataGlobals.hh"
 
 #include <ObjexxFCL/gio.hh>
-
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 namespace EnergyPlus {
 OutputFiles OutputFiles::makeOutputFiles()
@@ -62,9 +63,49 @@ OutputFiles::OutputFiles() : eio{*ObjexxFCL::gio::out_stream(EnergyPlus::DataGlo
 {
 }
 
-OutputFiles &OutputFiles::getSingleton() {
+OutputFiles &OutputFiles::getSingleton()
+{
     static OutputFiles ofs{makeOutputFiles()};
     return ofs;
 }
 
+using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
+
+// A custom argument formatter that formats negative integers as unsigned
+
+// with the ``x`` format specifier.
+
+class custom_arg_formatter : public arg_formatter
+{
+public:
+    explicit custom_arg_formatter(fmt::format_context &ctx, fmt::format_parse_context *parse_ctx = nullptr, fmt::format_specs *spec = nullptr)
+        : arg_formatter(ctx, parse_ctx, spec)
+    {
+    }
+
+    using arg_formatter::operator();
+
+    iterator operator()(Real64 value)
+    {
+        if (specs() && specs()->type == 'R') {
+            if (value >= 0.1 || value <= -0.1) {
+                specs()->type = 'F';
+            } else {
+                specs()->type = 'E';
+            }
+            return (*this)(value);
+        }
+        return arg_formatter::operator()(value);
+    }
+};
+
+void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args)
+{
+    fmt::memory_buffer buffer;
+    // Pass custom argument formatter as a template arg to vformat_to.
+    fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
+    os.write(buffer.data(), buffer.size());
+}
+
 } // namespace EnergyPlus
+

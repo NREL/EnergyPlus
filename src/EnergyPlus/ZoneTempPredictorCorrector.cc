@@ -49,11 +49,6 @@
 #include <cmath>
 #include <string>
 
-// lib {fmt}
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -1889,8 +1884,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        outputFiles.eio << Header;
-        fmt::print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
+        print(outputFiles.eio, Header);
+        print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
