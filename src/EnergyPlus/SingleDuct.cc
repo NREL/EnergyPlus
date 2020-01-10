@@ -2200,6 +2200,13 @@ namespace SingleDuct {
                 sd_airterminal(SysNum).MinReheatSteamFlow = SteamDensity * sd_airterminal(SysNum).MinReheatSteamVolFlow;
             }
 
+            // get current environment air terminal box turndown minimum flow fraction
+            if (sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist) {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr);
+            } else {
+                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = 1.0;
+            }
+
             if ((sd_airterminal(SysNum).SysType_Num == SingleDuctVAVReheat || sd_airterminal(SysNum).SysType_Num == SingleDuctCBVAVReheat) ||
                 (sd_airterminal(SysNum).SysType_Num == SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
