@@ -2352,6 +2352,13 @@ namespace DualDuct {
     void clear_state()
     {
         UniqueDualDuctAirTerminalNames.clear();
+        dd_airterminal.deallocate();
+        dd_airterminalInlet.deallocate();
+        dd_airterminalHotAirInlet.deallocate();
+        dd_airterminalColdAirInlet.deallocate();
+        dd_airterminalOutlet.deallocate();
+        dd_airterminalOAInlet.deallocate();
+        dd_airterminalRecircAirInlet.deallocate();
     }
 
 } // namespace DualDuct

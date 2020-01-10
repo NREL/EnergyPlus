@@ -305,3 +305,51 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //			EXPECT_GT(0, DualDuct::dd_airterminal(i).ADUNum);
 //		}
 //}
+
+TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
+{
+    std::string const idf_objects = delimited_string({
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU Dual Duct AT,        !- Name",
+        "     DualDuct Outlet,         !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:DualDuct:VAV,!- Air Terminal Object Type",
+        "     VAV Dual Duct AT;        !- Air Terminal Name",
+
+        "   AirTerminal:DualDuct:VAV,",
+        "     VAV Dual Duct AT,        !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     DualDuct Outlet,         !- Air Outlet Node Name",
+        "     DualDuct Hot Inlet,      !- Hot Air Inlet Node Name",
+        "     DualDuct Cold Inlet,     !- Cold Air Inlet Node Name",
+        "     0.47,                    !- Maximum Damper Air Flow Rate {m3/s}",
+        "     0.3,                     !- Zone Minimum Air Flow Fraction",
+        "     ,                        !- Design Specification Outdoor Air Object Name",
+        "     TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name",
+
+        "   Schedule:Compact,",
+        "     TurndownMinAirFlowSch,   !- Name",
+        "     Fraction,                !- Schedule Type Limits Name",
+        "     Through: 12/31,          !- Field 1",
+        "     For: Weekdays,           !- Field 2",
+        "     Until: 7:00,0.50,        !- Field 3",
+        "     Until: 17:00,0.75,       !- Field 4",
+        "     Until: 24:00,0.50,       !- Field 5",
+        "     For: SummerDesignDay WinterDesignDay, !- Field 6",
+        "     Until: 24:00,1.0,        !- Field 7",
+        "     For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8",
+        "     Until: 24:00,0.25;       !- Field 9",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DualDuct::GetDualDuctInput();
+
+    //dual duct  VAV air terminal get input test
+    EXPECT_EQ(dd_airterminal(1).DamperType, DualDuct_VariableVolume); // dual duct VAV Type
+    EXPECT_EQ(dd_airterminal(1).Name, "VAV DUAL DUCT AT");            // dual duct VAV Name
+    EXPECT_TRUE(dd_airterminal(1).ZoneTurndownMinAirFracSchExist);    // turndown schdule exists
+    EXPECT_EQ(dd_airterminal(1).ZoneTurndownMinAirFrac, 1.0);         // turndown fraction initialized to 1.0
+    EXPECT_EQ(dd_airterminal(1).ZoneMinAirFracDes, 0.3);              // design minimum flow fraction
+}
