@@ -210,6 +210,7 @@ namespace DataGlobals {
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
+    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
     extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
     extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step

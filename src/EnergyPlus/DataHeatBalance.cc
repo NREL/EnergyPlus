@@ -207,7 +207,7 @@ namespace DataHeatBalance {
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(6);  // Default minimum number of warmup days allowed
+    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
@@ -500,7 +500,7 @@ namespace DataHeatBalance {
     bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
 
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
+    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
 
@@ -872,7 +872,7 @@ namespace DataHeatBalance {
         AnyAirBoundary = false;
         AnyAirBoundaryGroupedSolar = false;
         MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 6;
+        MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;
