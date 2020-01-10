@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -861,17 +861,7 @@ namespace HeatBalanceManager {
                                  RoundSigDigits(MinNumberOfWarmupDays) + " will be used.");
                 MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
             }
-            if (MinNumberOfWarmupDays < 6) {
-                ShowWarningError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(5) +
-                                 " potentially invalid. Experience has shown that most files will converge within " +
-                                 RoundSigDigits(DefaultMaxNumberOfWarmupDays) + " warmup days. ");
-                ShowContinueError("...Choosing less than " + RoundSigDigits(DefaultMinNumberOfWarmupDays) +
-                                  " warmup days may have adverse effects on the simulation results, particularly design day simulations. ");
-                ShowContinueError("...Users should only alter this default if they are certain that less than " +
-                                  RoundSigDigits(DefaultMinNumberOfWarmupDays) + " warmup days is appropriate for a particular file. ");
-                ShowContinueError(
-                    "...Verify that convergence to desired results are achieved. You can report values during warmup days to ascertain convergence.");
-            }
+
         } else {
             ShowSevereError(RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
             ErrorsFound = true;
@@ -1828,7 +1818,7 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-            
+
             // Load data for other properties that need defaults
             Material(MaterNum).ROnly = true;
             Material(MaterNum).Resistance = 0.01;
@@ -2099,11 +2089,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(5));           // Field Name
+                                                                    {2},                                         // Valid dimensions
+                                                                    RoutineName,                                 // Routine name
+                                                                    CurrentModuleObject,                         // Object Type
+                                                                    Material(MaterNum).Name,                     // Object Name
+                                                                    cAlphaFieldNames(5));                        // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2148,11 +2138,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(6));           // Field Name
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(6));                         // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2197,11 +2187,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(7));           // Field Name
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(7));                         // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -4175,7 +4165,7 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File; // True if EOF encountered reading Window5 data file
+        bool EOFonW5File;       // True if EOF encountered reading Window5 data file
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -5607,10 +5597,9 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
-        
+
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
         UpdateWindowFaceTempsNonBSDFWin();
-        
     }
 
     void CheckWarmupConvergence()
@@ -5886,21 +5875,21 @@ namespace HeatBalanceManager {
 
     void UpdateWindowFaceTempsNonBSDFWin()
     {
-        
+
         int SurfNum;
-        
+
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!Construct(thisConstruct).WindowTypeBSDF) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
             }
         }
     }
-    
+
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
@@ -7559,12 +7548,12 @@ namespace HeatBalanceManager {
                     ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
                     ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
                     thisConstruct.TypeIsAirBoundarySolar = true;
-                    //thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    //thisConstruct.TransDiff = 1.0;
-                    //thisConstruct.TransDiffVis = 1.0;
-                    //thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    //thisConstruct.TransSolBeamCoef = 1.0;
-                    //thisConstruct.ReflectSolDiffBack = 0.0;
+                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    // thisConstruct.TransDiff = 1.0;
+                    // thisConstruct.TransDiffVis = 1.0;
+                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    // thisConstruct.TransSolBeamCoef = 1.0;
+                    // thisConstruct.ReflectSolDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method
