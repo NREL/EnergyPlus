@@ -144,10 +144,10 @@ namespace GroundHeatExchangers {
     // Object Data
     std::vector<GLHEVert> verticalGLHE;
     std::vector<GLHESlinky> slinkyGLHE;
-    std::vector<std::shared_ptr<GLHEVertArrayStruct>> vertArraysVector;
-    std::vector<std::shared_ptr<GLHEVertPropsStruct>> vertPropsVector;
-    std::vector<std::shared_ptr<GLHEResponseFactorsStruct>> responseFactorsVector;
-    std::vector<std::shared_ptr<GLHEVertSingleStruct>> singleBoreholesVector;
+    std::vector<std::shared_ptr<GLHEVertArray>> vertArrays;
+    std::vector<std::shared_ptr<GLHEVertProps>> vertProps;
+    std::vector<std::shared_ptr<GLHEResponseFactors>> responseFactors;
+    std::vector<std::shared_ptr<GLHEVertSingle>> singleBoreholes;
 
     void clear_state()
     {
@@ -166,10 +166,10 @@ namespace GroundHeatExchangers {
         prevTimeSteps.deallocate();
         verticalGLHE.clear();
         slinkyGLHE.clear();
-        vertArraysVector.clear();
-        vertPropsVector.clear();
-        responseFactorsVector.clear();
-        singleBoreholesVector.clear();
+        vertArrays.clear();
+        vertProps.clear();
+        responseFactors.clear();
+        singleBoreholes.clear();
     }
 
     Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
@@ -314,7 +314,7 @@ namespace GroundHeatExchangers {
         return it2->second + (it->second - it2->second)*(x - it2->first)/(it->first - it2->first);
     }
 
-    void SubHourAgg::aggregate(Real64 &time, Real64 &energy) {
+    void SubHourAggData::aggregate(Real64 &time, Real64 &energy) {
 
         Real64 const small_value = 1E-3;
 
@@ -338,21 +338,21 @@ namespace GroundHeatExchangers {
         }
     }
 
-    Real64 SubHourAgg::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
+    Real64 SubHourAggData::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": calculate temporal superpostion not implemented.");
         return 0;
     }
 
-    Real64 SubHourAgg::get_g_value(Real64 &EP_UNUSED(time)) {
+    Real64 SubHourAggData::get_g_value(Real64 &EP_UNUSED(time)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get g value is not implemented.");
         return 0;
     }
 
-    Real64 SubHourAgg::get_q_prev() {
+    Real64 SubHourAggData::get_q_prev() {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get previous q value is not implemented.");
@@ -683,10 +683,10 @@ namespace GroundHeatExchangers {
         return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
     }
 
-    std::shared_ptr<GLHEVertPropsStruct> GetVertProps(std::string const &objectName)
+    std::shared_ptr<GLHEVertProps> GetVertProps(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
-        for (auto &thisProp : vertPropsVector) {
+        for (auto &thisProp : vertProps) {
             // Check if the type and name match
             if (objectName == thisProp->name) {
                 return thisProp;
@@ -696,10 +696,10 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    std::shared_ptr<GLHEVertSingleStruct> GetSingleBH(std::string const &objectName)
+    std::shared_ptr<GLHEVertSingle> GetSingleBH(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
-        for (auto &thisBH : singleBoreholesVector) {
+        for (auto &thisBH : singleBoreholes) {
             // Check if the type and name match
             if (objectName == thisBH->name) {
                 return thisBH;
@@ -709,10 +709,10 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    std::shared_ptr<GLHEVertArrayStruct> GetVertArray(std::string const &objectName)
+    std::shared_ptr<GLHEVertArray> GetVertArray(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
-        for (auto &thisProp : vertArraysVector) {
+        for (auto &thisProp : vertArrays) {
             // Check if the type and name match
             if (objectName == thisProp->name) {
                 return thisProp;
@@ -722,10 +722,10 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    std::shared_ptr<GLHEResponseFactorsStruct> GetResponseFactor(std::string const &objectName)
+    std::shared_ptr<GLHEResponseFactors> GetResponseFactor(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
-        for (auto &thisRF : responseFactorsVector) {
+        for (auto &thisRF : responseFactors) {
             // Check if the type and name match
             if (objectName == thisRF->name) {
                 return thisRF;
@@ -735,10 +735,10 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    std::shared_ptr<GLHEResponseFactorsStruct> BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr)
+    std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArray> const &arrayObjectPtr)
     {
         // Make new response factor object and store it for later use
-        std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+        std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
         thisRF->name = arrayObjectPtr->name;
         thisRF->props = arrayObjectPtr->props;
 
@@ -749,14 +749,14 @@ namespace GroundHeatExchangers {
             int yLoc = 0;
             for (int yBH = 1; yBH <= arrayObjectPtr->numBHinYDirection; ++yBH) {
                 bhCounter += 1;
-                std::shared_ptr<GLHEVertSingleStruct> thisBH(new GLHEVertSingleStruct);
+                std::shared_ptr<GLHEVertSingle> thisBH(new GLHEVertSingle);
                 thisBH->name =
                     thisRF->name + " BH " + std::to_string(bhCounter) + " loc: (" + std::to_string(xLoc) + ", " + std::to_string(yLoc) + ")";
                 thisBH->props = GetVertProps(arrayObjectPtr->props->name);
                 thisBH->xLoc = xLoc;
                 thisBH->yLoc = yLoc;
                 thisRF->myBorholes.push_back(thisBH);
-                singleBoreholesVector.push_back(thisBH);
+                singleBoreholes.push_back(thisBH);
                 yLoc += arrayObjectPtr->bhSpacing;
                 thisRF->numBoreholes += 1;
             }
@@ -764,22 +764,22 @@ namespace GroundHeatExchangers {
         }
 
         SetupBHPointsForResponseFactorsObject(thisRF);
-        responseFactorsVector.push_back(thisRF);
+        responseFactors.push_back(thisRF);
         return thisRF;
     }
 
-    std::shared_ptr<GLHEResponseFactorsStruct>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingleStruct>> const &singleBHsForRFVect)
+    std::shared_ptr<GLHEResponseFactors>
+    BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
     {
         // Make new response factor object and store it for later use
-        std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+        std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
         thisRF->name = "Response Factor Object Auto Generated No: " + std::to_string(numAutoGeneratedResponseFactors + 1);
 
         // Make new props object which has the mean values of the other props objects referenced by the individual BH objects
-        std::shared_ptr<GLHEVertPropsStruct> thisProps(new GLHEVertPropsStruct);
+        std::shared_ptr<GLHEVertProps> thisProps(new GLHEVertProps);
         thisProps->name = "Response Factor Auto Generated Mean Props No: " + std::to_string(numAutoGeneratedResponseFactors + 1);
         int numBH = singleBHsForRFVect.size();
-        for (auto &thisBH : singleBoreholesVector) {
+        for (auto &thisBH : singleBoreholes) {
             thisProps->bhDiameter += thisBH->props->bhDiameter;
             thisProps->bhLength += thisBH->props->bhLength;
             thisProps->bhTopDepth += thisBH->props->bhTopDepth;
@@ -830,18 +830,18 @@ namespace GroundHeatExchangers {
 
         thisRF->props = thisProps;
         thisRF->numBoreholes = thisRF->myBorholes.size();
-        vertPropsVector.push_back(thisProps);
+        vertProps.push_back(thisProps);
 
         SetupBHPointsForResponseFactorsObject(thisRF);
 
-        responseFactorsVector.push_back(thisRF);
+        responseFactors.push_back(thisRF);
 
         numAutoGeneratedResponseFactors += 1;
 
         return thisRF;
     }
 
-    void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactorsStruct> &thisRF)
+    void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF)
     {
         for (auto &thisBH : thisRF->myBorholes) {
 
@@ -959,7 +959,7 @@ namespace GroundHeatExchangers {
         return pointToPointResponse - pointToReflectedResponse;
     }
 
-    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingleStruct> const &bh_j, Real64 const &currTime)
+    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
     {
 
         // This code could be optimized in a number of ways.
@@ -990,8 +990,8 @@ namespace GroundHeatExchangers {
         return (bh_j->dl_j / 3.0) * sum_f;
     }
 
-    Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingleStruct> const &bh_i,
-                                    std::shared_ptr<GLHEVertSingleStruct> const &bh_j,
+    Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i,
+                                    std::shared_ptr<GLHEVertSingle> const &bh_j,
                                     Real64 const &currTime)
     {
 
@@ -2511,7 +2511,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVertProp : vertPropsVector) {
+                for (auto &existingVertProp : vertProps) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
                         ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVertProp->name);
@@ -2519,7 +2519,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertPropsStruct> thisProp(new GLHEVertPropsStruct);
+                std::shared_ptr<GLHEVertProps> thisProp(new GLHEVertProps);
                 thisProp->name = DataIPShortCuts::cAlphaArgs(1);
                 thisProp->bhTopDepth = DataIPShortCuts::rNumericArgs(1);
                 thisProp->bhLength = DataIPShortCuts::rNumericArgs(2);
@@ -2543,7 +2543,7 @@ namespace GroundHeatExchangers {
                 thisProp->pipe.outRadius = thisProp->pipe.outDia / 2;
                 thisProp->pipe.innerRadius = thisProp->pipe.innerDia / 2;
 
-                vertPropsVector.push_back(thisProp);
+                vertProps.push_back(thisProp);
             }
         }
 
@@ -2579,7 +2579,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVertProp : vertPropsVector) {
+                for (auto &existingVertProp : vertProps) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
                         ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVertProp->name);
@@ -2587,7 +2587,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
                 thisRF->name = DataIPShortCuts::cAlphaArgs(1);
                 thisRF->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
                 thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
@@ -2623,7 +2623,7 @@ namespace GroundHeatExchangers {
                     indexNum += 2;
                 }
 
-                responseFactorsVector.push_back(thisRF);
+                responseFactors.push_back(thisRF);
             }
         }
 
@@ -2659,7 +2659,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVerticalArray : vertArraysVector) {
+                for (auto &existingVerticalArray : vertArrays) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingVerticalArray->name) {
                         ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingVerticalArray->name);
@@ -2667,13 +2667,13 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertArrayStruct> thisArray(new GLHEVertArrayStruct);
+                std::shared_ptr<GLHEVertArray> thisArray(new GLHEVertArray);
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
                 thisArray->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
                 thisArray->numBHinXDirection = DataIPShortCuts::rNumericArgs(1);
                 thisArray->numBHinYDirection = DataIPShortCuts::rNumericArgs(2);
                 thisArray->bhSpacing = DataIPShortCuts::rNumericArgs(3);
-                vertArraysVector.push_back(thisArray);
+                vertArrays.push_back(thisArray);
             }
         }
 
@@ -2709,7 +2709,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingSingleBH : singleBoreholesVector) {
+                for (auto &existingSingleBH : singleBoreholes) {
                     if (DataIPShortCuts::cAlphaArgs(1) == existingSingleBH->name) {
                         ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                        " object: Duplicate name found: " + existingSingleBH->name);
@@ -2717,13 +2717,13 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertSingleStruct> thisArray(new GLHEVertSingleStruct);
+                std::shared_ptr<GLHEVertSingle> thisArray(new GLHEVertSingle);
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
                 thisArray->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
                 thisArray->xLoc = DataIPShortCuts::rNumericArgs(1);
                 thisArray->yLoc = DataIPShortCuts::rNumericArgs(2);
 
-                singleBoreholesVector.push_back(thisArray);
+                singleBoreholes.push_back(thisArray);
             }
         }
 
@@ -2829,11 +2829,11 @@ namespace GroundHeatExchangers {
                     }
 
                     // Calculate response factors from individual boreholes
-                    std::vector<std::shared_ptr<GLHEVertSingleStruct>> tempVectOfBHObjects;
+                    std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
 
                     for (int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index) {
                         if (!DataIPShortCuts::lAlphaFieldBlanks(index)) {
-                            std::shared_ptr<GLHEVertSingleStruct> tempBHptr = GetSingleBH(DataIPShortCuts::cAlphaArgs(index));
+                            std::shared_ptr<GLHEVertSingle> tempBHptr = GetSingleBH(DataIPShortCuts::cAlphaArgs(index));
                             if (tempBHptr) {
                                 tempVectOfBHObjects.push_back(tempBHptr);
                             } else {
@@ -3047,10 +3047,10 @@ namespace GroundHeatExchangers {
                 thisGLHE.maxSimYears = DataIPShortCuts::rNumericArgs(16);
 
                 // Need to add a response factor object for the slinky model
-                std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
                 thisRF->name = "Response Factor Object Auto Generated No: " + std::to_string(numAutoGeneratedResponseFactors + 1);
                 thisGLHE.myRespFactors = thisRF;
-                responseFactorsVector.push_back(thisRF);
+                responseFactors.push_back(thisRF);
 
                 // Number of coils
                 thisGLHE.numCoils = int(thisGLHE.trenchLength / thisGLHE.coilPitch);

@@ -702,7 +702,7 @@ TEST_F(GHEFixture, SubHourAgg_aggregate)
 
     nlohmann::json j = {{"time-scale", 5E9}, {"g-function-data", {{"lntts", {-14, -13, -12}}, {"g", {0, 1, 2}}}}};
 
-    GroundHeatExchangers::SubHourAgg subHr(j);
+    GroundHeatExchangers::SubHourAggData subHr(j);
 
     Real64 tol = 1E-6;
 
@@ -739,7 +739,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 
     int NPairs = 2;
 
-    std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+    std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
     thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
@@ -776,7 +776,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_Slinky_GetGFunc)
 
     int NPairs = 2;
 
-    std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+    std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
     thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
@@ -804,7 +804,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_GetGFunc)
 
     int NPairs = 2;
 
-    std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+    std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
     thisGLHE.myRespFactors->LNTTS.allocate(NPairs);
@@ -871,7 +871,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger)
     // Initializations
     GLHESlinky thisGLHE;
 
-    std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+    std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
     thisGLHE.myRespFactors = thisRF;
 
     thisGLHE.numCoils = 100;
@@ -915,9 +915,9 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(1u, vertPropsVector.size());
+    EXPECT_EQ(1u, vertProps.size());
 
-    auto &thisProp(vertPropsVector[0]);
+    auto &thisProp(vertProps[0]);
 
     EXPECT_EQ("GHE-1 PROPS", thisProp->name);
     EXPECT_EQ(1, thisProp->bhTopDepth);
@@ -1109,9 +1109,9 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(1u, responseFactorsVector.size());
+    EXPECT_EQ(1u, responseFactors.size());
 
-    auto &thisRF(responseFactorsVector[0]);
+    auto &thisRF(responseFactors[0]);
 
     EXPECT_EQ("GHE-1 G-FUNCTIONS", thisRF->name);
     EXPECT_EQ("GHE-1 PROPS", thisRF->props->name);
@@ -1152,9 +1152,9 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check)
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(1u, vertArraysVector.size());
+    EXPECT_EQ(1u, vertArrays.size());
 
-    auto &thisArray(vertArraysVector[0]);
+    auto &thisArray(vertArrays[0]);
 
     EXPECT_EQ("GHE-ARRAY", thisArray->name);
     EXPECT_EQ("GHE-1 PROPS", thisArray->props->name);
@@ -1361,11 +1361,11 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Response_Factors_IDF_Che
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(1u, vertPropsVector.size());
-    EXPECT_EQ(1u, responseFactorsVector.size());
+    EXPECT_EQ(1u, vertProps.size());
+    EXPECT_EQ(1u, responseFactors.size());
     EXPECT_EQ(1u, verticalGLHE.size());
 
-    auto &thisRF(responseFactorsVector[0]);
+    auto &thisRF(responseFactors[0]);
     auto &thisGLHE(verticalGLHE[0]);
 
     EXPECT_EQ("VERTICAL GHE 1X4 STD", thisGLHE.name);
@@ -1431,11 +1431,11 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(1u, vertPropsVector.size());
-    EXPECT_EQ(1u, vertArraysVector.size());
+    EXPECT_EQ(1u, vertProps.size());
+    EXPECT_EQ(1u, vertArrays.size());
     EXPECT_EQ(1u, verticalGLHE.size());
 
-    auto &thisArray(vertArraysVector[0]);
+    auto &thisArray(vertArrays[0]);
     auto &thisGLHE(verticalGLHE[0]);
 
     EXPECT_EQ("VERTICAL GHE 1X4 STD", thisGLHE.name);
@@ -1522,8 +1522,8 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Check)
 
     GetGroundHeatExchangerInput();
 
-    EXPECT_EQ(2u, vertPropsVector.size());
-    EXPECT_EQ(4u, singleBoreholesVector.size());
+    EXPECT_EQ(2u, vertProps.size());
+    EXPECT_EQ(4u, singleBoreholes.size());
     EXPECT_EQ(1u, verticalGLHE.size());
 
     auto &thisGLHE(verticalGLHE[0]);
