@@ -5643,7 +5643,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
-                EndUseSub = "";
+                EndUseSub = "General";
             }
             if (present(GroupKey)) {
                 Group = GroupKey;
