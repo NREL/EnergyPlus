@@ -183,12 +183,25 @@ TEST_F(GHEFixture, BaseProps_Init)
 {
     nlohmann::json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
-    GroundHeatExchangers::BaseProps props(j);
-    EXPECT_EQ(props.k, 0.4);
-    EXPECT_EQ(props.rho, 950);
-    EXPECT_EQ(props.cp, 1900);
-    EXPECT_EQ(props.rhoCp, 950 * 1900);
-    EXPECT_EQ(props.diffusivity, 0.4 / (950 * 1900));
+    // test default constructor and setup
+    GroundHeatExchangers::BaseProps p1;
+    p1.k = j["conductivity"];
+    p1.rho = j["density"];
+    p1.cp = j["specific-heat"];
+    p1.setup();
+    EXPECT_EQ(p1.k, 0.4);
+    EXPECT_EQ(p1.rho, 950);
+    EXPECT_EQ(p1.cp, 1900);
+    EXPECT_EQ(p1.rhoCp, 950 * 1900);
+    EXPECT_EQ(p1.diffusivity, 0.4 / (950 * 1900));
+
+    // test member constructor
+    GroundHeatExchangers::BaseProps p2(j["conductivity"], j["density"], j["specific-heat"]);
+    EXPECT_EQ(p2.k, 0.4);
+    EXPECT_EQ(p2.rho, 950);
+    EXPECT_EQ(p2.cp, 1900);
+    EXPECT_EQ(p2.rhoCp, 950 * 1900);
+    EXPECT_EQ(p2.diffusivity, 0.4 / (950 * 1900));
 }
 
 TEST_F(GHEFixture, Pipe_Init)
@@ -208,16 +221,24 @@ TEST_F(GHEFixture, Pipe_Init)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 tol = 1E-4;
 
     // properties
-    EXPECT_EQ(pipe.k, 0.4);
-    EXPECT_EQ(pipe.rho, 950);
-    EXPECT_EQ(pipe.cp, 1900);
-    EXPECT_EQ(pipe.rhoCp, 950 * 1900);
-    EXPECT_EQ(pipe.diffusivity, 0.4 / (950 * 1900));
+    EXPECT_EQ(pipe.props.k, 0.4);
+    EXPECT_EQ(pipe.props.rho, 950);
+    EXPECT_EQ(pipe.props.cp, 1900);
+    EXPECT_EQ(pipe.props.rhoCp, 950 * 1900);
+    EXPECT_EQ(pipe.props.diffusivity, 0.4 / (950 * 1900));
 
     // geometry
     EXPECT_EQ(pipe.outDia, 0.0334);
@@ -258,7 +279,15 @@ TEST_F(GHEFixture, Pipe_CalcTransitTime)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 tol = 0.1;
 
@@ -281,7 +310,15 @@ TEST_F(GHEFixture, Pipe_mdotToRePipe)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 tol = 0.1;
 
@@ -304,7 +341,15 @@ TEST_F(GHEFixture, Pipe_calcFrictionFactor)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 tol = 1E-3;
 
@@ -355,7 +400,15 @@ TEST_F(GHEFixture, Pipe_calcConductionResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     std::cout << pipe.inletTemps.size() << std::endl;
     std::cout << pipe.inletTempTimes.size() << std::endl;
@@ -380,7 +433,15 @@ TEST_F(GHEFixture, Pipe_calcConvectionResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -405,7 +466,15 @@ TEST_F(GHEFixture, Pipe_laminarNusselt)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 tol = 1E-2;
     EXPECT_NEAR(pipe.laminarNusselt(), 4.01, tol);
@@ -427,7 +496,15 @@ TEST_F(GHEFixture, Pipe_turbulentNusselt)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-2;
@@ -451,7 +528,15 @@ TEST_F(GHEFixture, Pipe_calcResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -477,7 +562,15 @@ TEST_F(GHEFixture, Pipe_logInletTemps)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
 
     EXPECT_EQ(pipe.inletTemps.size(), 1u);
     EXPECT_EQ(pipe.inletTempTimes.size(), 1u);
@@ -511,7 +604,16 @@ TEST_F(GHEFixture, Pipe_plugFlowOutletTemp)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
+
     Real64 tol = 1E-4;
 
     EXPECT_NEAR(pipe.plugFlowOutletTemp(0), 10.0, tol);
@@ -538,7 +640,16 @@ TEST_F(GHEFixture, Pipe_simulate)
               {"initial-temperature", 20},
               {"loop-num", 1}};
 
-    GroundHeatExchangers::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe;
+    pipe.props.k = j["conductivity"];
+    pipe.props.rho = j["density"];
+    pipe.props.cp = j["specific-heat"];
+    pipe.outDia = j["outer-diameter"];
+    pipe.innerDia = j["inner-diameter"];
+    pipe.length = j["length"];
+    pipe.fluid.loopNum = j["loop-num"];
+    pipe.setup(j["initial-temperature"]);
+
     Real64 tol = 1E-2;
 
     Real64 time = 0;

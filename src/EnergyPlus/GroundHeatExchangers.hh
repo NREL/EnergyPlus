@@ -63,6 +63,7 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -70,132 +71,98 @@ namespace GroundHeatExchangers {
 
     struct BaseProps
     {
-        // member variables
-        Real64 k = 0.0;           // Thermal conductivity [W/m-K]
-        Real64 rho = 0.0;         // Density [kg/m3]
-        Real64 cp = 0.0;          // Specific heat [J/kg-K]
-        Real64 rhoCp = 0.0;       // Heat capacity [J/m3-K]
-        Real64 diffusivity = 0.0; // Thermal diffusivity [m2/s]
-
-        // constructor
-        explicit BaseProps(const nlohmann::json &j)
-        {
-            this->k = j["conductivity"];
-            this->rho = j["density"];
-            this->cp = j["specific-heat"];
-            this->rhoCp = rho * cp;
-            this->diffusivity = k / this->rhoCp;
-        }
+        // members
+        Real64 k;           // Thermal conductivity [W/m-K]
+        Real64 rho;         // Density [kg/m3]
+        Real64 cp;          // Specific heat [J/kg-K]
+        Real64 rhoCp;       // Heat capacity [J/m3-K]
+        Real64 diffusivity; // Thermal diffusivity [m2/s]
 
         // default constructor
-        BaseProps() = default;
+        BaseProps() : k(0.0), rho(0.0), cp(0.0), rhoCp(0.0), diffusivity(0.0) {
+        }
 
-        // destructor
+        // member constructor
+        BaseProps(Real64 const k, Real64 const rho, Real64 const cp)
+            : k(k), rho(rho), cp(cp)
+        {
+            this->setup();
+        }
+
+        // default destructor
         ~BaseProps() = default;
+
+        // member methods
+        void setup();
     };
 
     struct FluidWorker
     {
-        // E+ member variables
-        int loopNum = 0;
-
-        // constructor
-        explicit FluidWorker(const nlohmann::json &j) {
-            this->loopNum = j["loop-num"];
-        }
+        // members
+        int loopNum;
 
         // default constructor
-        FluidWorker() = default;
+        FluidWorker() : loopNum(0) {
+        }
 
-        // destructor
+        // member constructor
+        FluidWorker(int const loopNum) : loopNum(loopNum)
+        {
+        }
+
+        // default destructor
         ~FluidWorker() = default;
 
-        // member functions
-        Real64 get_cp(Real64 &temperature, const std::string &routineName);
-        Real64 get_k(Real64 &temperature, const std::string &routineName);
-        Real64 get_mu(Real64 &temperature, const std::string &routineName);
-        Real64 get_rho(Real64 &temperature, const std::string &routineName);
-        Real64 get_Pr(Real64 &temperature, const std::string &routineName);
+        // member methods
+        Real64 get_cp(Real64 const &temperature, const std::string &routineName);
+        Real64 get_k(Real64 const &temperature, const std::string &routineName);
+        Real64 get_mu(Real64 const &temperature, const std::string &routineName);
+        Real64 get_rho(Real64 const &temperature, const std::string &routineName);
+        Real64 get_Pr(Real64 const &temperature, const std::string &routineName);
     };
 
-    struct Pipe : public BaseProps, FluidWorker
+    struct Pipe
     {
-        // E+ member variables
-        int loopNum = 0;
-
-        // parent classes
+        // members
+        BaseProps props;
         FluidWorker fluid;
-
-        // model member variables
-        Real64 outDia = 0.0;        // Outer diameter [m]
-        Real64 innerDia = 0.0;      // Inner diameter [m]
-        Real64 length = 0.0;        // Length [m]
-        Real64 outRadius = 0.0;     // Outer radius [m]
-        Real64 innerRadius = 0.0;   // Inner radius [m]
-        Real64 wallThickness = 0.0; // Pipe wall thickness [m]
-        Real64 areaCrOuter = 0.0;   // Outer cross-sectional area [m2]
-        Real64 areaCrInner = 0.0;   // Inner cross-sectional area [m2]
-        Real64 areaCrPipe = 0.0;    // Pipe wall cross-sectional area [m2]
-        Real64 areaSurfOuter = 0.0; // Pipe outer surface area [m2]
-        Real64 areaSurfInner = 0.0; // Pipe inner surface area [m2]
-        Real64 volTotal = 0.0;      // Total pipe volume [m3]
-        Real64 volFluid = 0.0;      // Fluid volume [m3]
-        Real64 volPipeWall = 0.0;   // Pipe wall volume [m3]
-        Real64 friction = 0.0;      // Friction factor [-]
-        Real64 resistPipe = 0.0;    // Total pipe resistance [K/(W/m)]
-        Real64 resistConv = 0.0;    // Pipe convection resistance [K/(W/m)]
+        Real64 outDia;        // Outer diameter [m]
+        Real64 innerDia;      // Inner diameter [m]
+        Real64 length;        // Length [m]
+        Real64 outRadius;     // Outer radius [m]
+        Real64 innerRadius;   // Inner radius [m]
+        Real64 wallThickness; // Pipe wall thickness [m]
+        Real64 areaCrOuter;   // Outer cross-sectional area [m2]
+        Real64 areaCrInner;   // Inner cross-sectional area [m2]
+        Real64 areaCrPipe;    // Pipe wall cross-sectional area [m2]
+        Real64 areaSurfOuter; // Pipe outer surface area [m2]
+        Real64 areaSurfInner; // Pipe inner surface area [m2]
+        Real64 volTotal;      // Total pipe volume [m3]
+        Real64 volFluid;      // Fluid volume [m3]
+        Real64 volPipeWall;   // Pipe wall volume [m3]
+        Real64 friction;      // Friction factor [-]
+        Real64 resistPipe;    // Total pipe resistance [K/(W/m)]
+        Real64 resistConv;    // Pipe convection resistance [K/(W/m)]
         int const numCells = 16;    // Number of pipe elements
-        std::vector<Real64> cellTemps = {
-                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
-        std::deque<Real64> inletTemps = {0.0};                                              // Inlet temperature history [C]
-        std::deque<Real64> inletTempTimes = {0.0};                                           // Times for respective inlet temperatures [s]
-        Real64 outletTemp = 0.0;                                                             // Pipe outlet temperature [C]
-        bool applyTransitDelay = true;
-
-        // constructor
-        explicit Pipe(const nlohmann::json &j)
-        {
-            // properties
-            BaseProps tmpProps(j);
-            this->fluid = FluidWorker(j);
-            this->k = tmpProps.k;
-            this->rho = tmpProps.rho;
-            this->cp = tmpProps.cp;
-            this->rhoCp = tmpProps.rhoCp;
-            this->diffusivity = tmpProps.diffusivity;
-
-            // geometry
-            this->outDia = j["outer-diameter"];
-            this->innerDia = j["inner-diameter"];
-            this->length = j["length"];
-            this->outRadius = this->outDia / 2;
-            this->innerRadius = this->innerDia / 2;
-            this->wallThickness = this->outRadius - this->innerRadius;
-
-            // areas
-            this->areaCrOuter = (DataGlobals::Pi / 4) * std::pow(this->outDia, 2);
-            this->areaCrInner = (DataGlobals::Pi / 4) * std::pow(this->innerDia, 2);
-            this->areaCrPipe = this->areaCrOuter - this->areaCrInner;
-            this->areaSurfOuter = DataGlobals::Pi * this->outDia * this->length;
-            this->areaSurfInner = DataGlobals::Pi * this->innerDia * this->length;
-
-            // volumes
-            this->volTotal = this->areaCrOuter * this->length;
-            this->volFluid = this->areaCrInner * this->length;
-            this->volPipeWall = this->volTotal - this->volFluid;
-
-            Real64 initTemp = j["initial-temperature"];
-            std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
-            std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
-        }
+        std::vector<Real64> cellTemps; // Pipe temperature for each node
+        std::deque<Real64> inletTemps;                                              // Inlet temperature history [C]
+        std::deque<Real64> inletTempTimes;                                           // Times for respective inlet temperatures [s]
+        Real64 outletTemp;                                                             // Pipe outlet temperature [C]
+        bool applyTransitDelay;
 
         // default constructor
-        Pipe() = default;
+        Pipe() : outDia(0.0), innerDia(0.0), length(0.0), outRadius(0.0), innerRadius(0.0), wallThickness(0.0),
+        areaCrOuter(0.0), areaCrInner(0.0), areaCrPipe(0.0), areaSurfOuter(0.0), areaSurfInner(0.0), volTotal(0.0),
+        volFluid(0.0), volPipeWall(0.0), friction(0.0), resistPipe(0.0), resistConv(0.0), cellTemps(numCells, 0.0),
+        inletTemps({0.0}), inletTempTimes({0.0}), outletTemp(0.0), applyTransitDelay(true)
+        {
+        }
 
-        // destructor
+        // default destructor
         ~Pipe() = default;
 
-        // members functions
+        // members methods
+        void setup(Real64 const &initTemp);
         Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
         void simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 inletTemp);
         Real64 plugFlowOutletTemp(Real64 time);
@@ -206,36 +173,9 @@ namespace GroundHeatExchangers {
         Real64 calcConvectionResistance(Real64 flowRate, Real64 temperature);
         Real64 calcResistance(Real64 flowRate, Real64 temperature);
         Real64 turbulentNusselt(Real64 Re, Real64 temperature);
-
-        static Real64 laminarNusselt()
-        {
-            // laminar Nusselt number for smooth pipes
-            // mean(4.36, 3.66)
-
-            return 4.01;
-        }
-
-        static Real64 laminarFrictionFactor(Real64 Re)
-        {
-            // laminar friction factor
-
-            // @param Re: Reynolds number
-
-            return 64 / Re;
-        }
-
-        static Real64 turbulentFrictionFactor(Real64 Re)
-        {
-            // turbulent friction factor
-
-            // Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, chapter Heat transfer and
-            // friction in turbulent pipe flow with variable physical properties, pages 503–564.
-            // Academic Press, Inc., New York, NY.
-
-            // @param Re: Reynolds number
-
-            return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
-        }
+        static Real64 laminarNusselt();
+        static Real64 laminarFrictionFactor(Real64 Re);
+        static Real64 turbulentFrictionFactor(Real64 Re);
     };
 
     struct Interp1D
@@ -385,7 +325,7 @@ namespace GroundHeatExchangers {
         Real64 bhDiameter;                // Diameter of borehole {m}
         thermoPhysicialPropsStruct grout; // Grout properties
         pipePropsStruct pipe;             // Pipe properties
-        Real64 bhUTubeDist;               // U-tube, shank-to-shank spacking {m}
+        Real64 bhUTubeDist;               // U-tube, shank-to-shank spaceing {m}
 
         // Default constructor
         GLHEVertPropsStruct() : bhTopDepth(0.0), bhLength(0.0), bhDiameter(0.0), bhUTubeDist(0.0)
@@ -482,17 +422,13 @@ namespace GroundHeatExchangers {
         ~GLHEResponseFactorsStruct() = default;
     };
 
-    struct GLHEBase : PlantComponent
+    struct GLHEBase : PlantComponent, PlantLocation
     {
 
         // Members
         bool available;   // need an array of logicals--load identifiers of available equipment
         bool on;          // simulate the machine at it's operating part load ratio
         std::string name; // user identifier
-        int loopNum;
-        int loopSideNum;
-        int branchNum;
-        int compNum;
         int inletNodeNum;  // Node number on the inlet side of the plant
         int outletNodeNum; // Node number on the outlet side of the plant
         thermoPhysicialPropsStruct soil;
@@ -533,8 +469,9 @@ namespace GroundHeatExchangers {
         bool updateCurSimTime; // Used to reset the CurSimTime to reset after WarmupFlag
         bool triggerDesignDayReset;
 
+        // Default constructor
         GLHEBase()
-            : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
+            : available(false), on(false), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
               aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
               totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
@@ -542,7 +479,7 @@ namespace GroundHeatExchangers {
         {
         }
 
-        // Destructor
+        // Default destructor
         ~GLHEBase() = default;
 
         virtual void calcGFunctions() = 0;

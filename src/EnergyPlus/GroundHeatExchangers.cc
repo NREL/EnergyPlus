@@ -178,9 +178,9 @@ namespace GroundHeatExchangers {
         //
         //  https://en.wikipedia.org/wiki/Sigmoid_function
         //
-        //  @param x: independent variable
-        //  @param a: fitting parameter 1
-        //  @param b: fitting parameter 2
+        //  param x: independent variable
+        //  param a: fitting parameter 1
+        //  param b: fitting parameter 2
         //  @return float between 0-1
 
         return 1 / (1 + std::exp(-(x - a) / b));
@@ -190,11 +190,11 @@ namespace GroundHeatExchangers {
     {
         //  Simple linear interpolation
         //
-        //  @param x: independent input variable
-        //  @param x_l: low independent interval bound
-        //  @param x_h: high independent interval bound
-        //  @param y_l: low dependent interval bound
-        //  @param y_h: high dependent interval bound
+        //  param x: independent input variable
+        //  param x_l: low independent interval bound
+        //  param x_h: high independent interval bound
+        //  param y_l: low dependent interval bound
+        //  param y_h: high dependent interval bound
         //  @return interpolated value
 
         return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
@@ -238,36 +238,41 @@ namespace GroundHeatExchangers {
         return d;
     }
 
-    Real64 FluidWorker::get_cp(Real64 &temperature, const std::string &routineName)
+    void BaseProps::setup() {
+        this->rhoCp = this->rho * this->cp;
+        this->diffusivity = this->k / this->rhoCp;
+    }
+
+    Real64 FluidWorker::get_cp(Real64 const &temperature, const std::string &routineName)
     {
         return FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
                                                       temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
     }
 
-    Real64 FluidWorker::get_k(Real64 &temperature, const std::string &routineName)
+    Real64 FluidWorker::get_k(Real64 const &temperature, const std::string &routineName)
     {
         return FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
                                                       temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
     }
 
-    Real64 FluidWorker::get_mu(Real64 &temperature, const std::string &routineName) {
+    Real64 FluidWorker::get_mu(Real64 const &temperature, const std::string &routineName) {
         return FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
                                                    temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
     }
 
-    Real64 FluidWorker::get_rho(Real64 &temperature, const std::string &routineName)
+    Real64 FluidWorker::get_rho(Real64 const &temperature, const std::string &routineName)
     {
         return FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
                                                  temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
     }
 
-    Real64 FluidWorker::get_Pr(Real64 &temperature, const std::string &routineName)
+    Real64 FluidWorker::get_Pr(Real64 const &temperature, const std::string &routineName)
     {
         // worker to get the Prandtl number
 
-        // @param temperature: fluid temperature, C
-        // @param routineName: caller routine name, str
-        // @returns Prandtl number
+        // param temperature: fluid temperature, C
+        // param routineName: caller routine name, str
+        // returns: Prandtl number
 
         Real64 cp = this->get_cp(temperature, routineName);
         Real64 mu = this->get_mu(temperature, routineName);
@@ -354,13 +359,39 @@ namespace GroundHeatExchangers {
         return 0;
     }
 
+    void Pipe::setup(Real64 const &initTemp) {
+
+        // props
+        this->props.setup();
+
+        // radii
+        this->outRadius = this->outDia / 2;
+        this->innerRadius = this->innerDia / 2;
+        this->wallThickness = this->outRadius - this->innerRadius;
+
+        // areas
+        this->areaCrOuter = (DataGlobals::Pi / 4) * std::pow(this->outDia, 2);
+        this->areaCrInner = (DataGlobals::Pi / 4) * std::pow(this->innerDia, 2);
+        this->areaCrPipe = this->areaCrOuter - this->areaCrInner;
+        this->areaSurfOuter = DataGlobals::Pi * this->outDia * this->length;
+        this->areaSurfInner = DataGlobals::Pi * this->innerDia * this->length;
+
+        // volumes
+        this->volTotal = this->areaCrOuter * this->length;
+        this->volFluid = this->areaCrInner * this->length;
+        this->volPipeWall = this->volTotal - this->volFluid;
+
+        std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
+        std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
+    }
+
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
         // Compute the fluid transit time
 
-        // @param flowRate: mass flow rate, kg/s
-        // @param temperature: temperature, C
-        // @returns pipe transit time
+        // param flowRate: mass flow rate, kg/s
+        // param temperature: temperature, C
+        // returns: pipe transit time
 
         static std::string const routineName("Pipe::calcTransitTime");
 
@@ -383,10 +414,10 @@ namespace GroundHeatExchangers {
         //  Bischoff, K.B., and O. Levenspiel. 1962. 'Fluid dispersion--generalization and comparision
         //  of mathematical models--II; Comparison of models.' Chem. Eng. Sci.. 17: 257-264.
 
-        // @param time: simulation time, s
-        // @param timeStep: simulation time step, s
-        // @param flowRate: mass flow rate, kg/s
-        // @param inletTemp: fluid inlet temperature, C
+        // param time: simulation time, s
+        // param timeStep: simulation time step, s
+        // param flowRate: mass flow rate, kg/s
+        // param inletTemp: fluid inlet temperature, C
 
         static std::string const routineName("Pipe::simulate");
 
@@ -459,8 +490,8 @@ namespace GroundHeatExchangers {
     {
         // computes the plug-flow outlet temperature
 
-        // @param time: simulation time, s
-        // @returns outlet temperature for respective time, C
+        // param time: simulation time, s
+        // returns: outlet temperature for respective time, C
 
         if (time <= 0) {
             return this->inletTemps[0];
@@ -501,10 +532,10 @@ namespace GroundHeatExchangers {
     {
         // convert mass flow rate to Reynolds number
 
-        // @param flowRate: mass flow rate, kg/s
-        // @param temperature: temperature, C
+        // param flowRate: mass flow rate, kg/s
+        // param temperature: temperature, C
 
-        // @returns Reynolds number
+        // returns: Reynolds number
 
         static std::string const routineName("Pipe::calcTransitTime");
         Real64 mu = this->fluid.get_mu(temperature, routineName);
@@ -515,8 +546,8 @@ namespace GroundHeatExchangers {
     {
         // smooth pipe friction factor
 
-        // @param Re: Reynolds number
-        // @returns friction factor
+        // param Re: Reynolds number
+        // returns: friction factor
 
         Real64 lowRe = 1500;
         Real64 highRe = 5000;
@@ -540,9 +571,9 @@ namespace GroundHeatExchangers {
         // Javed, S. and Spitler, J.D. 2017. 'Accuracy of borehole thermal resistance calculation methods
         // for grouted single U-tube ground heat exchangers.' Applied Energy. 187: 790-806.
 
-        // @returns conduction resistance, K/(W/m)
+        // returns: conduction resistance, K/(W/m)
 
-        return std::log(this->outDia / this->innerDia) / (2 * DataGlobals::Pi * this->k);
+        return std::log(this->outDia / this->innerDia) / (2 * DataGlobals::Pi * this->props.k);
     }
 
     Real64 Pipe::turbulentNusselt(Real64 Re, Real64 temperature)
@@ -552,9 +583,9 @@ namespace GroundHeatExchangers {
         // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         // International Chemical Engineering 16(1976), pp. 359-368.
 
-        // @param Re: Reynolds number
-        // @param temperature: temperature, C
-        // @returns Nusselt number
+        // param Re: Reynolds number
+        // param temperature: temperature, C
+        // returns: Nusselt number
 
         static std::string const routineName("Pipe::turbulentNusselt");
 
@@ -574,9 +605,9 @@ namespace GroundHeatExchangers {
         // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         // International Chemical Engineering 16(1976), pp. 359-368.
 
-        // @param flow_rate: mass flow rate, kg/s
-        // @param temperature: temperature, C
-        // @returns convection resistance, K/(W/m)
+        // param flow_rate: mass flow rate, kg/s
+        // param temperature: temperature, C
+        // returns: convection resistance, K/(W/m)
 
         static std::string const routineName("Pipe::calcConvectionResistance");
 
@@ -609,13 +640,47 @@ namespace GroundHeatExchangers {
 
         // Equation 3
 
-        // @param flowRate: mass flow rate, kg/s
-        // @param temperature: temperature, C
-        // @returns pipe resistance, K/(W/m)
+        // param flowRate: mass flow rate, kg/s
+        // param temperature: temperature, C
+        // returns: pipe resistance, K/(W/m)
 
         this->resistPipe = this->calcConvectionResistance(flowRate, temperature) + this->calcConductionResistance();
         return this->resistPipe;
 
+    }
+
+    Real64 Pipe::laminarNusselt()
+    {
+        // laminar Nusselt number for smooth pipes
+        // mean(4.36, 3.66)
+
+        // returns Nusselt number
+
+        return 4.01;
+    }
+
+    Real64 Pipe::laminarFrictionFactor(Real64 Re)
+    {
+        // laminar friction factor
+
+        // param Re: Reynolds number
+        // returns: friction factor
+
+        return 64 / Re;
+    }
+
+    Real64 Pipe::turbulentFrictionFactor(Real64 Re)
+    {
+        // turbulent friction factor
+
+        // Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, chapter Heat transfer and
+        // friction in turbulent pipe flow with variable physical properties, pages 503–564.
+        // Academic Press, Inc., New York, NY.
+
+        // param Re: Reynolds number
+        // returns: friction factor
+
+        return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
     }
 
     std::shared_ptr<GLHEVertPropsStruct> GetVertProps(std::string const &objectName)
