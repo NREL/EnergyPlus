@@ -1547,7 +1547,7 @@ namespace GroundHeatExchangers {
         Real64 const tLg_min(-2);
         Real64 const tLg_grid(0.25);
         Real64 const ts(3600);
-        Real64 const convertYearsToSeconds(356 * 24 * 60 * 60); // TODO: fix this 356 -> 365
+        Real64 const convertYearsToSeconds(365 * 24 * 60 * 60);
         Array2D<Real64> valStored({0, numTrenches}, {0, numCoils}, -1.0);
 
         DisplayString("Initializing GroundHeatExchanger:Slinky: " + name);
