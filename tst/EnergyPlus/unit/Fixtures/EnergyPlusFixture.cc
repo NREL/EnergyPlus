@@ -181,6 +181,7 @@
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
@@ -192,6 +193,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>

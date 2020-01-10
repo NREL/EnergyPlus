@@ -178,6 +178,7 @@
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
@@ -189,6 +190,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -359,6 +361,7 @@ void EnergyPlus::clearAllStates()
     PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
     PlantCondLoopOperation::clear_state();
+    PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();
@@ -375,6 +378,7 @@ void EnergyPlus::clearAllStates()
     PurchasedAirManager::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
+    RefrigeratedCase::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelManager::clear_state();

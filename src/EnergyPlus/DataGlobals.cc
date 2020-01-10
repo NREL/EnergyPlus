@@ -178,6 +178,7 @@ namespace DataGlobals {
 
     bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
     bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ
+    bool beginEnvrnWarmStartFlag(false); // Sizing Speed Up
     bool BeginHourFlag(false);          // True at the start of each hour, False after first time step in hour
     bool BeginSimFlag(false);           // True until any actual simulation (full or sizing) has begun, False after first time step
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
