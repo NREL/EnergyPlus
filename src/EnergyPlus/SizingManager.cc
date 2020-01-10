@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -356,6 +356,14 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
+                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                        // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
+                        // more easily converge fewer warmup days are allowed
+                        DisplayString("Suppressing Initialization of New Environment Parameters");
+                        DataGlobals::beginEnvrnWarmStartFlag = true;
+                    } else {
+                        DataGlobals::beginEnvrnWarmStartFlag = false;
+                    }
                     EndEnvrnFlag = false;
                     EndMonthFlag = false;
                     WarmupFlag = true;
@@ -571,6 +579,14 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
+                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                    // easily converge fewer warmup days are allowed
+                    DisplayString("Suppressing Initialization of New Environment Parameters");
+                    DataGlobals::beginEnvrnWarmStartFlag = true;
+                } else {
+                    DataGlobals::beginEnvrnWarmStartFlag = false;
+                }
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;

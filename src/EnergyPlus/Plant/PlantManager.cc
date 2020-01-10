@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,8 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -87,23 +89,29 @@
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
@@ -1113,6 +1121,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1121,6 +1130,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
@@ -1259,6 +1269,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1335,10 +1346,11 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
                                 this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-
+                                this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(CompNames(CompNum));
                                 // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:RadiantConvective:Water")) {
@@ -1424,14 +1436,17 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:CompressorRack")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
@@ -1815,7 +1830,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp.TypeOf,
                                                                    "PlantComponent:TemperatureSource")) {
                                 GeneralEquipType = GenEquipTypes_HeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CENTRALHEATPUMPSYSTEM")) {
+                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CentralHeatPumpSystem")) {
                                 GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
                             } else {
                                 ShowSevereError("GetPlantInput: PlantLoop=\"" + PlantLoop(LoopNum).Name +
@@ -3935,8 +3950,7 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                     this_component.HowLoadServed = HowMet_ByNominalCap;
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Absorption) { //                =  3  ! older BLAST absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Absorption) {  // = 3 ! older BLAST absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -3945,10 +3959,8 @@ namespace EnergyPlus {
                                         this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                         this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
                                     }
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Indirect_Absorption) { //       =  4  ! revised absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption) { // = 4 ! revised absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
-
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                         this_component.HowLoadServed = HowMet_NoneDemand;
