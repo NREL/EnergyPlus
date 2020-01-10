@@ -314,7 +314,37 @@ namespace GroundHeatExchangers {
         return it2->second + (it->second - it2->second)*(x - it2->first)/(it->first - it2->first);
     }
 
-    void SubHourAggData::aggregate(Real64 &time, Real64 &energy) {
+    Real64 SingleUtubeBHPassThroughSegment::getOutletTemp2() {
+        return this->temperature;
+    }
+
+    void SingleUtubeBHPassThroughSegment::simulate(const Real64 &temp) {
+        this->temperature = temp;
+    }
+
+    void SingleUtubeBHSegment::setup(Real64 const &initTemp) {
+        this->pipe.setup(initTemp);
+        this->soil.setup();
+        this->grout.setup();
+        this->groutVolume = this->calcGroutVolume();
+    }
+
+    Real64 SingleUtubeBHSegment::calcGroutVolume() {
+        return this->calcSegVolume() - this->calcTotalPipeVolume();
+    }
+
+    Real64 SingleUtubeBHSegment::calcTotalPipeVolume() {
+        return this->pipe.volTotal * this->numPipes;
+    }
+
+    Real64 SingleUtubeBHSegment::calcSegVolume() {
+        return DataGlobals::PiOvr4 * std::pow(this->diameter, 2.0) * this->length;
+    }
+
+    void SingleUtubeBHSegment::simulate() {
+    }
+
+    void SubHourAgg::aggregate(Real64 &time, Real64 &energy) {
 
         Real64 const small_value = 1E-3;
 
@@ -338,21 +368,21 @@ namespace GroundHeatExchangers {
         }
     }
 
-    Real64 SubHourAggData::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
+    Real64 SubHourAgg::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": calculate temporal superpostion not implemented.");
         return 0;
     }
 
-    Real64 SubHourAggData::get_g_value(Real64 &EP_UNUSED(time)) {
+    Real64 SubHourAgg::get_g_value(Real64 &EP_UNUSED(time)) {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get g value is not implemented.");
         return 0;
     }
 
-    Real64 SubHourAggData::get_q_prev() {
+    Real64 SubHourAgg::get_q_prev() {
         // not currently used
         // fatal if called
         ShowFatalError(this->routineName + ": get previous q value is not implemented.");
@@ -768,8 +798,7 @@ namespace GroundHeatExchangers {
         return thisRF;
     }
 
-    std::shared_ptr<GLHEResponseFactors>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
+    std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
     {
         // Make new response factor object and store it for later use
         std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
@@ -1775,8 +1804,7 @@ namespace GroundHeatExchangers {
     {
     }
 
-    Real64
-    GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta, Real64 const t)
+    Real64 GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, int const n1, Real64 const eta, Real64 const theta, Real64 const t)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -3392,8 +3420,7 @@ namespace GroundHeatExchangers {
         return Rcond + Rconv;
     }
 
-    Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-    )
+    Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chris L. Marshall, Jeffrey D. Spitler

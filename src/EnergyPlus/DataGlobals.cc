@@ -115,6 +115,7 @@ namespace DataGlobals {
     Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
     Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
     Real64 const PiOvr2(Pi / 2.0);        // Pi/2
+    Real64 const PiOvr4(Pi / 4.0);        // Pi/4
     Real64 const TwoPi(2.0 * Pi);         // 2*Pi 6.2831853071795864769252868
     Real64 const GravityConstant(9.807);
     Real64 const DegToRadians(Pi / 180.0);           // Conversion for Degrees to Radians

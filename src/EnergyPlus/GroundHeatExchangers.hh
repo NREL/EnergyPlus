@@ -178,6 +178,51 @@ namespace GroundHeatExchangers {
         static Real64 turbulentFrictionFactor(Real64 Re);
     };
 
+    struct SingleUtubeBHPassThroughSegment
+    {
+        // members
+        Real64 temperature;
+
+        // default constructor
+        SingleUtubeBHPassThroughSegment() : temperature(0.0)
+        {
+        }
+
+        // default destructor
+        ~SingleUtubeBHPassThroughSegment() = default;
+
+        Real64 getOutletTemp2();
+
+        void simulate(Real64 const &temp);
+    };
+
+    struct SingleUtubeBHSegment {
+
+        // members
+        int const numPipes = 2;
+        Pipe pipe;
+        BaseProps soil;
+        BaseProps grout;
+        Real64 diameter;
+        Real64 length;
+        Real64 groutVolume;
+
+        // default constructor
+        SingleUtubeBHSegment() : diameter(0.0), length(0.0), groutVolume(0.0)
+        {
+        }
+
+        // default destructor
+        ~SingleUtubeBHSegment() = default;
+
+        // member methods
+        void setup(Real64 const &initTemp);
+        Real64 calcGroutVolume();
+        Real64 calcTotalPipeVolume();
+        Real64 calcSegVolume();
+        void simulate();
+    };
+
     struct Interp1D
     {
         std::vector<Real64> x_data;
@@ -251,13 +296,13 @@ namespace GroundHeatExchangers {
 
     };
 
-    struct SubHourAggData : BaseAgg
+    struct SubHourAgg : BaseAgg
     {
         std::string routineName = "Subhourly Aggregation";
         Real64 subHrEnergy = 0.0;
 
         // constructor
-        explicit SubHourAggData(const nlohmann::json &j)
+        explicit SubHourAgg(const nlohmann::json &j)
         {
             this->energy.emplace_back(0.0);
             this->dts.emplace_back(DataGlobals::SecInHour);
@@ -268,7 +313,7 @@ namespace GroundHeatExchangers {
         };
 
         // destructor
-        ~SubHourAggData() = default;
+        ~SubHourAgg() = default;
 
         // member functions
         void aggregate(Real64 &time, Real64 &energy) override;

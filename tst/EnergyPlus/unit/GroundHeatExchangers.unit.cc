@@ -697,12 +697,63 @@ TEST_F(GHEFixture, Pipe_simulate)
     EXPECT_NEAR(outlet_temp, 24.87, tol);
 }
 
+TEST_F(GHEFixture, SingleUtubeBHPassThroughSegment){
+    GroundHeatExchangers::SingleUtubeBHPassThroughSegment s;
+    s.simulate(10.0);
+    EXPECT_EQ(s.temperature, 10.0);
+    EXPECT_EQ(s.getOutletTemp2(), 10.0);
+}
+
+TEST_F(GHEFixture, SingleUtubeBHSegment_calcPipeVolume) {
+    GroundHeatExchangers::SingleUtubeBHSegment s;
+    nlohmann::json j = {{"grout-conductivity", 0.744},
+                        {"grout-density", 1500},
+                        {"grout-specific-heat", 800},
+                        {"soil-conductivity", 2.7},
+                        {"soil-density", 2500},
+                        {"soil-specific-heat", 880},
+                        {"pipe-outer-diameter", 0.0334},
+                        {"pipe-inner-diameter", 0.0269},
+                        {"pipe-conductivity", 0.389},
+                        {"pipe-density", 950},
+                        {"pipe-specific-heat", 1900},
+                        {"diameter", 0.114},
+                        {"length", 7.62}};
+
+
+    s.soil.k = j["soil-conductivity"];
+    s.soil.rho = j["soil-density"];
+    s.soil.cp = j["soil-specific-heat"];
+
+    s.grout.k = j["grout-conductivity"];
+    s.grout.rho = j["grout-conductivity"];
+    s.grout.cp = j["grout-specific-heat"];
+
+    s.pipe.outDia = j["pipe-outer-diameter"];
+    s.pipe.innerDia = j["pipe-inner-diameter"];
+    s.pipe.length = j["length"];
+    s.pipe.props.k = j["pipe-conductivity"];
+    s.pipe.props.rho = j["pipe-conductivity"];
+    s.pipe.props.cp = j["pipe-specific-heat"];
+
+    s.diameter = j["diameter"];
+    s.length = j["length"];
+
+    s.setup(10.0);
+
+    Real64 tol = 1E-4;
+
+    EXPECT_NEAR(s.calcGroutVolume(), 0.064424943, tol);
+    EXPECT_NEAR(s.calcSegVolume(), 0.077777603, tol);
+    EXPECT_NEAR(s.calcTotalPipeVolume(), 0.01335266, tol);
+}
+
 TEST_F(GHEFixture, SubHourAgg_aggregate)
 {
 
     nlohmann::json j = {{"time-scale", 5E9}, {"g-function-data", {{"lntts", {-14, -13, -12}}, {"g", {0, 1, 2}}}}};
 
-    GroundHeatExchangers::SubHourAggData subHr(j);
+    GroundHeatExchangers::SubHourAgg subHr(j);
 
     Real64 tol = 1E-6;
 
