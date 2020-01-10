@@ -48,21 +48,294 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
+// C++ Headers
+#include <deque>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // JSON Headers
-#include <nlohmann/json.hpp>
+#include <../third_party/nlohmann/json.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace GroundHeatExchangers {
+
+    struct BaseProps
+    {
+        // member variables
+        Real64 k = 0.0;           // Thermal conductivity [W/m-K]
+        Real64 rho = 0.0;         // Density [kg/m3]
+        Real64 cp = 0.0;          // Specific heat [J/kg-K]
+        Real64 rhoCp = 0.0;       // Heat capacity [J/m3-K]
+        Real64 diffusivity = 0.0; // Thermal diffusivity [m2/s]
+
+        // constructor
+        explicit BaseProps(const nlohmann::json &j)
+        {
+            this->k = j["conductivity"];
+            this->rho = j["density"];
+            this->cp = j["specific-heat"];
+            this->rhoCp = rho * cp;
+            this->diffusivity = k / this->rhoCp;
+        }
+
+        // default constructor
+        BaseProps() = default;
+
+        // destructor
+        ~BaseProps() = default;
+    };
+
+    struct FluidWorker
+    {
+        // E+ member variables
+        int loopNum = 0;
+
+        // constructor
+        explicit FluidWorker(const nlohmann::json &j) {
+            this->loopNum = j["loop-num"];
+        }
+
+        // default constructor
+        FluidWorker() = default;
+
+        // destructor
+        ~FluidWorker() = default;
+
+        // member functions
+        Real64 get_cp(Real64 &temperature, const std::string &routineName);
+        Real64 get_k(Real64 &temperature, const std::string &routineName);
+        Real64 get_mu(Real64 &temperature, const std::string &routineName);
+        Real64 get_rho(Real64 &temperature, const std::string &routineName);
+        Real64 get_Pr(Real64 &temperature, const std::string &routineName);
+    };
+
+    struct Pipe : public BaseProps, FluidWorker
+    {
+        // E+ member variables
+        int loopNum = 0;
+
+        // parent classes
+        FluidWorker fluid;
+
+        // model member variables
+        Real64 outDia = 0.0;        // Outer diameter [m]
+        Real64 innerDia = 0.0;      // Inner diameter [m]
+        Real64 length = 0.0;        // Length [m]
+        Real64 outRadius = 0.0;     // Outer radius [m]
+        Real64 innerRadius = 0.0;   // Inner radius [m]
+        Real64 wallThickness = 0.0; // Pipe wall thickness [m]
+        Real64 areaCrOuter = 0.0;   // Outer cross-sectional area [m2]
+        Real64 areaCrInner = 0.0;   // Inner cross-sectional area [m2]
+        Real64 areaCrPipe = 0.0;    // Pipe wall cross-sectional area [m2]
+        Real64 areaSurfOuter = 0.0; // Pipe outer surface area [m2]
+        Real64 areaSurfInner = 0.0; // Pipe inner surface area [m2]
+        Real64 volTotal = 0.0;      // Total pipe volume [m3]
+        Real64 volFluid = 0.0;      // Fluid volume [m3]
+        Real64 volPipeWall = 0.0;   // Pipe wall volume [m3]
+        Real64 friction = 0.0;      // Friction factor [-]
+        Real64 resistPipe = 0.0;    // Total pipe resistance [K/(W/m)]
+        Real64 resistConv = 0.0;    // Pipe convection resistance [K/(W/m)]
+        int const numCells = 16;    // Number of pipe elements
+        std::vector<Real64> cellTemps = {
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
+        std::deque<Real64> inletTemps = {0.0};                                              // Inlet temperature history [C]
+        std::deque<Real64> inletTempTimes = {0.0};                                           // Times for respective inlet temperatures [s]
+        Real64 outletTemp = 0.0;                                                             // Pipe outlet temperature [C]
+        bool applyTransitDelay = true;
+
+        // constructor
+        explicit Pipe(const nlohmann::json &j)
+        {
+            // properties
+            BaseProps tmpProps(j);
+            this->fluid = FluidWorker(j);
+            this->k = tmpProps.k;
+            this->rho = tmpProps.rho;
+            this->cp = tmpProps.cp;
+            this->rhoCp = tmpProps.rhoCp;
+            this->diffusivity = tmpProps.diffusivity;
+
+            // geometry
+            this->outDia = j["outer-diameter"];
+            this->innerDia = j["inner-diameter"];
+            this->length = j["length"];
+            this->outRadius = this->outDia / 2;
+            this->innerRadius = this->innerDia / 2;
+            this->wallThickness = this->outRadius - this->innerRadius;
+
+            // areas
+            this->areaCrOuter = (DataGlobals::Pi / 4) * std::pow(this->outDia, 2);
+            this->areaCrInner = (DataGlobals::Pi / 4) * std::pow(this->innerDia, 2);
+            this->areaCrPipe = this->areaCrOuter - this->areaCrInner;
+            this->areaSurfOuter = DataGlobals::Pi * this->outDia * this->length;
+            this->areaSurfInner = DataGlobals::Pi * this->innerDia * this->length;
+
+            // volumes
+            this->volTotal = this->areaCrOuter * this->length;
+            this->volFluid = this->areaCrInner * this->length;
+            this->volPipeWall = this->volTotal - this->volFluid;
+
+            Real64 initTemp = j["initial-temperature"];
+            std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
+            std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
+        }
+
+        // default constructor
+        Pipe() = default;
+
+        // destructor
+        ~Pipe() = default;
+
+        // members functions
+        Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
+        void simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 inletTemp);
+        Real64 plugFlowOutletTemp(Real64 time);
+        void logInletTemps(Real64 inletTemp, Real64 time);
+        Real64 mdotToRe(Real64 flowRate, Real64 temperature);
+        Real64 calcFrictionFactor(Real64 Re);
+        Real64 calcConductionResistance();
+        Real64 calcConvectionResistance(Real64 flowRate, Real64 temperature);
+        Real64 calcResistance(Real64 flowRate, Real64 temperature);
+        Real64 turbulentNusselt(Real64 Re, Real64 temperature);
+
+        static Real64 laminarNusselt()
+        {
+            // laminar Nusselt number for smooth pipes
+            // mean(4.36, 3.66)
+
+            return 4.01;
+        }
+
+        static Real64 laminarFrictionFactor(Real64 Re)
+        {
+            // laminar friction factor
+
+            // @param Re: Reynolds number
+
+            return 64 / Re;
+        }
+
+        static Real64 turbulentFrictionFactor(Real64 Re)
+        {
+            // turbulent friction factor
+
+            // Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, chapter Heat transfer and
+            // friction in turbulent pipe flow with variable physical properties, pages 503–564.
+            // Academic Press, Inc., New York, NY.
+
+            // @param Re: Reynolds number
+
+            return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
+        }
+    };
+
+    struct Interp1D
+    {
+        std::vector<Real64> x_data;
+        std::vector<Real64> y_data;
+        std::string routineName;
+        std::vector<std::pair<Real64, Real64> > table;
+        bool extrapolate = false;
+
+        // constructor
+        Interp1D(std::vector<Real64> &x_data, std::vector<Real64> &y_data,
+                 std::string &routineName, bool extrapolate = false) {
+
+            this->x_data = x_data;
+            this->y_data = y_data;
+            this->routineName = routineName;
+            this->extrapolate = extrapolate;
+
+            if (this->x_data.size() == this->y_data.size()) {
+                for (std::size_t i = 0; i != this->x_data.size(); ++i) {
+                    this->table.emplace_back(std::pair<Real64, Real64> {this->x_data[i], this->y_data[i]});
+                }
+            } else {
+                ShowFatalError(routineName + ": Number of X and Y data must be equal.");
+            }
+            // add option later to ask if the data needs to be sorted
+            // std::sort(table.begin(), table.end());
+        }
+
+        // default constructor
+        Interp1D() = default;
+
+        // destructor
+        ~Interp1D() = default;
+
+        // member functions
+        Real64 interpolate(Real64 &x);
+    };
+
+    struct BaseAgg
+    {
+        // member variables
+        Real64 ts;  // GHE time scale
+        Interp1D g_data;  // g-function data
+        std::vector<Real64> energy;  // energy history
+        std::vector<Real64> dts;  // time steps
+        Real64 prev_update_time;  // previous update time
+
+        // constructor
+        BaseAgg() : ts(0.0), prev_update_time(0.0)
+        {};
+
+        // destructor
+        ~BaseAgg() = default;
+
+        // member functions
+        static std::vector<Real64> calc_times(std::vector<Real64> &times)
+        {
+            std::vector<Real64> v = times;
+            std::reverse(std::begin(v), std::end(v));
+            std::vector<Real64> sums (v.size());
+            std::partial_sum(std::begin(v), std::end(v), sums.begin());
+            std::reverse(std::begin(sums), std::end(sums));
+            return sums;
+        }
+
+        // virtual functions
+        virtual void aggregate(Real64 &time, Real64 &energy) = 0;
+        virtual Real64 calc_temporal_superposition(Real64 &timeStep, Real64 & flowRate) = 0;
+        virtual Real64 get_g_value(Real64 &time) = 0;
+        virtual Real64 get_q_prev() = 0;
+
+    };
+
+    struct SubHourAgg : BaseAgg
+    {
+        std::string routineName = "Subhourly Aggregation";
+        Real64 subHrEnergy = 0.0;
+
+        // constructor
+        explicit SubHourAgg(const nlohmann::json &j)
+        {
+            this->energy.emplace_back(0.0);
+            this->dts.emplace_back(DataGlobals::SecInHour);
+            this->ts = j["time-scale"];
+            std::vector<Real64> lntts = j["g-function-data"]["lntts"];
+            std::vector<Real64> g = j["g-function-data"]["g"];
+            this->g_data = Interp1D(lntts, g, routineName, true);
+        };
+
+        // destructor
+        ~SubHourAgg() = default;
+
+        // member functions
+        void aggregate(Real64 &time, Real64 &energy) override;
+        Real64 calc_temporal_superposition(Real64 &timeStep, Real64 & flowRate) override;
+        Real64 get_g_value(Real64 &time) override;
+        Real64 get_q_prev() override;
+    };
 
     struct thermoPhysicialPropsStruct
     {
@@ -442,12 +715,13 @@ namespace GroundHeatExchangers {
 
     Real64 smoothingFunc(Real64 x, Real64 a, Real64 b);
 
+    Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h);
+
     void GetGroundHeatExchangerInput();
 
     std::shared_ptr<GLHEResponseFactorsStruct> BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);
 
-    std::shared_ptr<GLHEResponseFactorsStruct>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingleStruct>> const &singleBHsForRFVect);
+    std::shared_ptr<GLHEResponseFactorsStruct> BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingleStruct>> const &singleBHsForRFVect);
 
     void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactorsStruct> &thisRF);
 

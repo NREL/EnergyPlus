@@ -237,8 +237,6 @@ SET( SRC
   GlobalNames.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
-  GroundHeatExchangerNew.cc
-  GroundHeatExchangerNew.hh
   GroundTemperatureModeling/BaseGroundTemperatureModel.hh
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.cc
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh

@@ -53,12 +53,14 @@
 // C++ Headers
 #include <vector>
 
+// JSON Headers
+#include <../../third_party/nlohmann/json.hpp>
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/GroundHeatExchangerNew.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -81,9 +83,9 @@ class GHEFixture : public EnergyPlusFixture
 TEST_F(GHEFixture, linInterp)
 {
     Real64 tol = 1E-6;
-    EXPECT_NEAR(GroundHeatExchangerNew::linInterp(0.25, 0, 1, 0, 1), 0.25, tol);
-    EXPECT_NEAR(GroundHeatExchangerNew::linInterp(0.50, 0, 1, 0, 1), 0.50, tol);
-    EXPECT_NEAR(GroundHeatExchangerNew::linInterp(0.75, 0, 1, 0, 1), 0.75, tol);
+    EXPECT_NEAR(GroundHeatExchangers::linInterp(0.25, 0, 1, 0, 1), 0.25, tol);
+    EXPECT_NEAR(GroundHeatExchangers::linInterp(0.50, 0, 1, 0, 1), 0.50, tol);
+    EXPECT_NEAR(GroundHeatExchangers::linInterp(0.75, 0, 1, 0, 1), 0.75, tol);
 }
 
 TEST_F(GHEFixture, smoothingFunc)
@@ -114,7 +116,7 @@ TEST_F(GHEFixture, Interp1D)
     std::vector<Real64> yData{0, 1, 2, 3};
     std::string routineName = "GHE Interp1D Test";
 
-    auto tst = GroundHeatExchangerNew::Interp1D(xData, yData, routineName);
+    auto tst = GroundHeatExchangers::Interp1D(xData, yData, routineName);
 
     Real64 tol = 1E-6;
 
@@ -146,7 +148,7 @@ TEST_F(GHEFixture, Interp1D)
     test_val = -1.0;
     EXPECT_THROW(tst.interpolate(test_val), std::runtime_error);
 
-    auto tst2 = GroundHeatExchangerNew::Interp1D(xData, yData, routineName, true);
+    auto tst2 = GroundHeatExchangers::Interp1D(xData, yData, routineName, true);
 
     // extrapolate = true
     test_val = 0.0;
@@ -179,9 +181,9 @@ TEST_F(GHEFixture, Interp1D)
 
 TEST_F(GHEFixture, BaseProps_Init)
 {
-    json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
+    nlohmann::json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
-    GroundHeatExchangerNew::BaseProps props(j);
+    GroundHeatExchangers::BaseProps props(j);
     EXPECT_EQ(props.k, 0.4);
     EXPECT_EQ(props.rho, 950);
     EXPECT_EQ(props.cp, 1900);
@@ -197,7 +199,7 @@ TEST_F(GHEFixture, Pipe_Init)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -206,7 +208,7 @@ TEST_F(GHEFixture, Pipe_Init)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 tol = 1E-4;
 
@@ -247,7 +249,7 @@ TEST_F(GHEFixture, Pipe_CalcTransitTime)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -256,7 +258,7 @@ TEST_F(GHEFixture, Pipe_CalcTransitTime)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 tol = 0.1;
 
@@ -270,7 +272,7 @@ TEST_F(GHEFixture, Pipe_mdotToRePipe)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -279,7 +281,7 @@ TEST_F(GHEFixture, Pipe_mdotToRePipe)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 tol = 0.1;
 
@@ -293,7 +295,7 @@ TEST_F(GHEFixture, Pipe_calcFrictionFactor)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -302,7 +304,7 @@ TEST_F(GHEFixture, Pipe_calcFrictionFactor)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 tol = 1E-3;
 
@@ -344,7 +346,7 @@ TEST_F(GHEFixture, Pipe_calcConductionResistance)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -353,7 +355,7 @@ TEST_F(GHEFixture, Pipe_calcConductionResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     std::cout << pipe.inletTemps.size() << std::endl;
     std::cout << pipe.inletTempTimes.size() << std::endl;
@@ -369,7 +371,7 @@ TEST_F(GHEFixture, Pipe_calcConvectionResistance)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -378,7 +380,7 @@ TEST_F(GHEFixture, Pipe_calcConvectionResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -394,7 +396,7 @@ TEST_F(GHEFixture, Pipe_laminarNusselt)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -403,7 +405,7 @@ TEST_F(GHEFixture, Pipe_laminarNusselt)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 tol = 1E-2;
     EXPECT_NEAR(pipe.laminarNusselt(), 4.01, tol);
@@ -416,7 +418,7 @@ TEST_F(GHEFixture, Pipe_turbulentNusselt)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -425,7 +427,7 @@ TEST_F(GHEFixture, Pipe_turbulentNusselt)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 temp = 20;
     Real64 tol = 1E-2;
@@ -440,7 +442,7 @@ TEST_F(GHEFixture, Pipe_calcResistance)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -449,7 +451,7 @@ TEST_F(GHEFixture, Pipe_calcResistance)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -466,7 +468,7 @@ TEST_F(GHEFixture, Pipe_logInletTemps)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -475,7 +477,7 @@ TEST_F(GHEFixture, Pipe_logInletTemps)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
 
     EXPECT_EQ(pipe.inletTemps.size(), 1u);
     EXPECT_EQ(pipe.inletTempTimes.size(), 1u);
@@ -500,7 +502,7 @@ TEST_F(GHEFixture, Pipe_plugFlowOutletTemp)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -509,7 +511,7 @@ TEST_F(GHEFixture, Pipe_plugFlowOutletTemp)
               {"initial-temperature", 10},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
     Real64 tol = 1E-4;
 
     EXPECT_NEAR(pipe.plugFlowOutletTemp(0), 10.0, tol);
@@ -527,7 +529,7 @@ TEST_F(GHEFixture, Pipe_simulate)
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
 
-    json j = {{"conductivity", 0.4},
+    nlohmann::json j = {{"conductivity", 0.4},
               {"density", 950},
               {"specific-heat", 1900},
               {"outer-diameter", 0.0334},
@@ -536,7 +538,7 @@ TEST_F(GHEFixture, Pipe_simulate)
               {"initial-temperature", 20},
               {"loop-num", 1}};
 
-    GroundHeatExchangerNew::Pipe pipe(j);
+    GroundHeatExchangers::Pipe pipe(j);
     Real64 tol = 1E-2;
 
     Real64 time = 0;
@@ -587,9 +589,9 @@ TEST_F(GHEFixture, Pipe_simulate)
 TEST_F(GHEFixture, SubHourAgg_aggregate)
 {
 
-    json j = {{"time-scale", 5E9}, {"g-function-data", {{"lntts", {-14, -13, -12}}, {"g", {0, 1, 2}}}}};
+    nlohmann::json j = {{"time-scale", 5E9}, {"g-function-data", {{"lntts", {-14, -13, -12}}, {"g", {0, 1, 2}}}}};
 
-    GroundHeatExchangerNew::SubHourAgg subHr(j);
+    GroundHeatExchangers::SubHourAgg subHr(j);
 
     Real64 tol = 1E-6;
 
