@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -7652,4 +7653,169 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     }
 
     EnergyPlus::sqlite->sqliteCommit();
+}
+
+TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    OutputReportTabular::displayTabularBEPS = true;
+    OutputReportTabular::displayDemandEndUse = true;
+    OutputReportTabular::displayLEEDSummary = true;
+
+    OutputReportTabular::WriteTabularFiles = true;
+
+    SetupUnitConversions();
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleJtoKWH;
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject();
+
+    SetPredefinedTables();
+
+    Real64 extLitUse = 1e8;
+
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "AnotherEndUseSubCat");
+    SetupOutputVariable("Exterior Lights Electric Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    DataGlobals::DoWeathSim = true;
+    DataGlobals::TimeStepZone = 1.0;
+    displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers("Zone", timeStep);
+    SetupTimePointers("HVAC", timeStep);
+
+    TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+
+    GetInputOutputTableSummaryReports();
+
+    DataEnvironment::Month = 12;
+
+    UpdateMeterReporting();
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 1, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+
+    UpdateMeterReporting();
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+
+    UpdateMeterReporting();
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::endUseExteriorLights), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
+
+    OutputReportTabular::WriteBEPSTable();
+    OutputReportTabular::WriteDemandEndUseSummary();
+
+    EnergyPlus::sqlite->sqliteCommit();
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General", "AnotherEndUseSubCat"};
+
+    std::string endUseName = "Exterior Lighting";
+    std::string endUseSubCategoryName = "AnotherEndUseSubCat";
+    std::string rowName = endUseName + ":" + endUseSubCategoryName;
+    std::string columnName = "Electricity";
+
+    for (auto& endUseSubCategoryName: endUseSubCategoryNames) {
+        for (auto& reportName: testReportNames) {
+
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE TableName = 'End Uses By Subcategory'"
+                              "  AND ColumnName = 'Electricity'"
+                              "  AND ReportName = '" + reportName + "'"
+                              "  AND RowName = '" + endUseName + ":" + endUseSubCategoryName + "'"); // Now Like 'Exterior Lighting:General'
+
+            auto result = queryResult(query, "TabularDataWithStrings");
+
+            ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+        }
+    }
+
+
+    // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
+    // and make sure it's the right number that's returned
+    std::string query("SELECT Value From TabularDataWithStrings"
+                  "  WHERE TableName = 'End Uses By Subcategory'"
+                  "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                  "  AND ColumnName = 'Electricity'"
+                  "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+    Real64 return_val = execAndReturnFirstDouble(query);
+
+    EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+
+
+    // Get all Interior Lighting End Uses (all subcats) for Electricity
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                "  WHERE TableName = 'End Uses By Subcategory'"
+                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "  AND ColumnName = 'Electricity'"
+                "  AND RowName LIKE 'Exterior Lighting:%'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(2u, result.size()) << "Failed for query: " << query;
+    }
+
+    // Get all subcat usage for all fuels (6)
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                "  WHERE TableName = 'End Uses By Subcategory'"
+                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(6u, result.size()) << "Failed for query: " << query;
+    }
 }

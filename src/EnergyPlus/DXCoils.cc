@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -92,6 +91,7 @@
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 
@@ -6503,7 +6503,7 @@ namespace DXCoils {
 
                 // call for standard ratings for two-speeed DX coil
                 if (DXCoil(DXCoilNum).CondenserType(1) == AirCooled) {
-                    CalcTwoSpeedDXCoilStandardRating(DXCoilNum);
+                    CalcTwoSpeedDXCoilStandardRating(OutputFiles::getSingleton(), DXCoilNum);
                 }
             }
 
@@ -13424,7 +13424,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum)
+    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
@@ -13524,16 +13524,11 @@ namespace DXCoils {
         int index;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_890(
-            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
-            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
-            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
-            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
-            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-        static ObjexxFCL::gio::Fmt Format_891(
-            "(' VAV DX Cooling Coil Standard Rating Information, "
-            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-            ",',A)");
+        static constexpr auto Header(
+            "! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, COP 100% Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, EER 100% Capacity {Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, Supply Air Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}\n");
+
+        static constexpr auto Format_891{
+            " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R},\n"};
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
@@ -13814,7 +13809,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_890);
+            print(outputFiles.eio, Header);
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -13856,25 +13851,22 @@ namespace DXCoils {
             }
         }
 
-        if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_891)
-                << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "Fan:VariableVolume" << DXCoil(DXCoilNum).SupplyFanName
-                << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << RoundSigDigits(IEER, 2)
-                << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2) << RoundSigDigits(EER_TestPoint_SI(3), 2)
-                << RoundSigDigits(EER_TestPoint_SI(4), 2) << RoundSigDigits(EER_TestPoint_IP(1), 2) << RoundSigDigits(EER_TestPoint_IP(2), 2)
-                << RoundSigDigits(EER_TestPoint_IP(3), 2) << RoundSigDigits(EER_TestPoint_IP(4), 2) << RoundSigDigits(SupAirMdot_TestPoint(1), 4)
-                << RoundSigDigits(SupAirMdot_TestPoint(2), 4) << RoundSigDigits(SupAirMdot_TestPoint(3), 4)
-                << RoundSigDigits(SupAirMdot_TestPoint(4), 4);
-        } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_891)
-                << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "N/A"
-                << "N/A" << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
-                << RoundSigDigits(IEER, 2) << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2)
-                << RoundSigDigits(EER_TestPoint_SI(3), 2) << RoundSigDigits(EER_TestPoint_SI(4), 2) << RoundSigDigits(EER_TestPoint_IP(1), 2)
-                << RoundSigDigits(EER_TestPoint_IP(2), 2) << RoundSigDigits(EER_TestPoint_IP(3), 2) << RoundSigDigits(EER_TestPoint_IP(4), 2)
-                << RoundSigDigits(SupAirMdot_TestPoint(1), 4) << RoundSigDigits(SupAirMdot_TestPoint(2), 4)
-                << RoundSigDigits(SupAirMdot_TestPoint(3), 4) << RoundSigDigits(SupAirMdot_TestPoint(4), 4);
-        }
+        const auto &fan_type_name = [&]() -> std::pair<const char *, std::string> {
+          if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
+            return {"Fan:VariableVolume", DXCoil(DXCoilNum).SupplyFanName};
+          } else {
+            return {"N/A", "N/A"};
+          }
+        }();
+
+        print(outputFiles.eio, Format_891
+            , "Coil:Cooling:DX:TwoSpeed" , DXCoil(DXCoilNum).Name , fan_type_name.first, fan_type_name.second
+            , NetCoolingCapRated , (NetCoolingCapRated * ConvFromSIToIP) , IEER
+            , EER_TestPoint_SI(1) , EER_TestPoint_SI(2) , EER_TestPoint_SI(3)
+            , EER_TestPoint_SI(4) , EER_TestPoint_IP(1) , EER_TestPoint_IP(2)
+            , EER_TestPoint_IP(3) , EER_TestPoint_IP(4) , SupAirMdot_TestPoint(1)
+            , SupAirMdot_TestPoint(2) , SupAirMdot_TestPoint(3)
+            , SupAirMdot_TestPoint(4));
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
         // W to tons
@@ -14876,7 +14868,7 @@ namespace DXCoils {
                     (SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl)) {
                     CapFTCurveIndex = DXCoil(CoilIndex).CCapFTemp(1);
                 } else if ((SELECT_CASE_var == CoilDX_MultiSpeedCooling) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
-                    CapFTCurveIndex = DXCoil(CoilIndex).MSCCapFTemp(1);
+                    CapFTCurveIndex = DXCoil(CoilIndex).MSCCapFTemp(DXCoil(CoilIndex).NumOfSpeeds);
                 } else if (SELECT_CASE_var == CoilVRF_Heating) {
                     CapFTCurveIndex = DXCoil(CoilIndex).CCapFTemp(1);
                 } else {
