@@ -206,9 +206,19 @@ namespace GroundHeatExchangers {
         Real64 diameter;
         Real64 length;
         Real64 groutVolume;
+        int const numEquations = 5;
+        std::vector<Real64> temps;
+        Real64 const groutFrac = 0.5;
+        Real64 bhResist;
+        Real64 dcResist;
+        Real64 boundaryTemp;
+        Real64 heatRate;
+        Real64 outletTemp1;
+        Real64 outletTemp2;
 
         // default constructor
-        SingleUtubeBHSegment() : diameter(0.0), length(0.0), groutVolume(0.0)
+        SingleUtubeBHSegment() : diameter(0.0), length(0.0), groutVolume(0.0), temps(numEquations, 0.0),
+        bhResist(0.0), dcResist(0.0), boundaryTemp(0.0), heatRate(0.0), outletTemp1(0.0), outletTemp2(0.0)
         {
         }
 
@@ -220,7 +230,25 @@ namespace GroundHeatExchangers {
         Real64 calcGroutVolume();
         Real64 calcTotalPipeVolume();
         Real64 calcSegVolume();
-        void simulate();
+        Real64 getOutletTemp1();
+        Real64 getOutletTemp2();
+        Real64 getHeatRate();
+        std::vector<Real64> rhs(Real64 const &inletTemp1,
+                                Real64 const &inletTemp2,
+                                Real64 const &flowRate,
+                                Real64 const &fluidCp,
+                                Real64 const &fluidRhoCp,
+                                std::vector<Real64> const &y);
+        std::vector<Real64> rk4(Real64 const &inletTemp1,
+                                Real64 const &inletTemp2,
+                                Real64 const &flowRate,
+                                Real64 const &fluidCp,
+                                Real64 const &fluidRhoCp,
+                                std::vector<Real64> const &y,
+                                Real64 const &h);
+        void simulate(Real64 const &inletTemp1,
+                      Real64 const &inletTemp2,
+                      Real64 const &flowRate);
     };
 
     struct Interp1D

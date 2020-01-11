@@ -748,6 +748,62 @@ TEST_F(GHEFixture, SingleUtubeBHSegment_calcPipeVolume) {
     EXPECT_NEAR(s.calcTotalPipeVolume(), 0.01335266, tol);
 }
 
+TEST_F(GHEFixture, SingleUtubeBHSegment_simulate) {
+    GroundHeatExchangers::SingleUtubeBHSegment s;
+    nlohmann::json j = {{"grout-conductivity", 0.744},
+                        {"grout-density", 1500},
+                        {"grout-specific-heat", 800},
+                        {"soil-conductivity", 2.7},
+                        {"soil-density", 2500},
+                        {"soil-specific-heat", 880},
+                        {"pipe-outer-diameter", 0.0334},
+                        {"pipe-inner-diameter", 0.0269},
+                        {"pipe-conductivity", 0.389},
+                        {"pipe-density", 950},
+                        {"pipe-specific-heat", 1900},
+                        {"diameter", 0.114},
+                        {"length", 7.62}};
+
+
+    s.soil.k = j["soil-conductivity"];
+    s.soil.rho = j["soil-density"];
+    s.soil.cp = j["soil-specific-heat"];
+
+    s.grout.k = j["grout-conductivity"];
+    s.grout.rho = j["grout-density"];
+    s.grout.cp = j["grout-specific-heat"];
+
+    s.pipe.outDia = j["pipe-outer-diameter"];
+    s.pipe.innerDia = j["pipe-inner-diameter"];
+    s.pipe.length = j["length"];
+    s.pipe.props.k = j["pipe-conductivity"];
+    s.pipe.props.rho = j["pipe-density"];
+    s.pipe.props.cp = j["pipe-specific-heat"];
+
+    s.diameter = j["diameter"];
+    s.length = j["length"];
+
+    s.setup(20.0);
+
+    s.boundaryTemp = 20;
+    s.bhResist = 0.16;
+    s.dcResist = 2.28;
+
+    Real64 inletTemp1 = 30.0;
+    Real64 inletTemp2 = 25.0;
+    Real64 flowRate = 0.2;
+
+    s.simulate(inletTemp1, inletTemp2, flowRate);
+
+    Real64 tol = 1E-4;
+
+    EXPECT_NEAR(s.temps[0], 20.4525, tol);
+    EXPECT_NEAR(s.temps[1], 20.2262, tol);
+    EXPECT_NEAR(s.temps[2], 20.0000, tol);
+    EXPECT_NEAR(s.temps[3], 20.0005, tol);
+
+}
+
 TEST_F(GHEFixture, SubHourAgg_aggregate)
 {
 

@@ -49,6 +49,7 @@
 #include <cmath>
 #include <fstream>
 #include <vector>
+#include <functional>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -327,6 +328,7 @@ namespace GroundHeatExchangers {
         this->soil.setup();
         this->grout.setup();
         this->groutVolume = this->calcGroutVolume();
+        std::replace(this->temps.begin(), this->temps.end(), 0.0, initTemp);
     }
 
     Real64 SingleUtubeBHSegment::calcGroutVolume() {
@@ -341,7 +343,168 @@ namespace GroundHeatExchangers {
         return DataGlobals::PiOvr4 * std::pow(this->diameter, 2.0) * this->length;
     }
 
-    void SingleUtubeBHSegment::simulate() {
+    Real64 SingleUtubeBHSegment::getOutletTemp1() {
+        return this->temps[0];
+    }
+
+    Real64 SingleUtubeBHSegment::getOutletTemp2() {
+        return this->temps[1];
+    }
+
+    Real64 SingleUtubeBHSegment::getHeatRate() {
+        Real64 qTot = (this->temps[3] - this->boundaryTemp) / this->bhResist * this->length;
+        qTot += (this->temps[4] - this->boundaryTemp) / this->bhResist * this->length;
+        return qTot;
+    }
+
+    std::vector<Real64> SingleUtubeBHSegment::rhs(
+            Real64 const &inletTemp1,
+            Real64 const &inletTemp2,
+            Real64 const &flowRate,
+            Real64 const &fluidCp,
+            Real64 const &fluidRhoCp,
+            std::vector<Real64> const &y)
+    {
+        // setup results vector
+        std::vector<Real64> r(this->numEquations, 0.0);
+
+        // local parameters
+        Real64 dz = this->length;
+        Real64 tBnd = this->boundaryTemp;
+        Real64 tIn1 = inletTemp1;
+        Real64 tIn2 = inletTemp2;
+
+        // fluid resistance
+        Real64 rf = 1 / (flowRate * fluidCp);
+
+        // bh resistance
+        Real64 rb = this->bhResist;
+
+        // direct-coupling resistance
+        Real64 r12 = this->dcResist;
+
+        // fluid node capacitance
+        Real64 cf1 = fluidRhoCp * this->pipe.volFluid;
+        Real64 cf2 = cf1;
+
+        // direct-coupling grout node
+        Real64 f = this->groutFrac;
+        Real64 cg1 = f * this->grout.rhoCp * this->groutVolume;
+        cg1 += this->pipe.props.rhoCp * this->pipe.volPipeWall;
+
+        // node between leg 1 and wall
+        Real64 cg2 = (1 - f) * this->grout.rhoCp * this->groutVolume;
+        cg2 += this->pipe.props.rhoCp * this->pipe.volPipeWall;
+        cg2 /= 2.0;
+
+        // node between leg 2 and wall
+        Real64 cg3 = cg2;
+
+        // fluid node leg 1
+        r[0] = ((tIn1 - y[0]) / rf + (y[2] - y[0]) * dz / (r12 / 2.0) + (y[3] - y[0]) * dz / rb) / cf1;
+
+        // fluid node leg 2
+        r[1] = ((tIn2 - y[1]) / rf + (y[2] - y[1]) * dz / (r12 / 2.0) + (y[4] - y[1]) * dz / rb) / cf2;
+
+        // direct-coupling grout node
+        r[2] = ((y[0] - y[2]) * dz / (r12 / 2.0) + (y[1] - y[2]) * dz / (r12 / 2.0)) / cg1;
+
+        // leg 1 node
+        r[3] = ((y[0] - y[3]) * dz / rb + + (tBnd - y[3]) * dz / rb) / cg2;
+
+        // leg 2 node
+        r[4] = ((y[1] - y[4]) * dz / rb + + (tBnd - y[4]) * dz / rb) / cg3;
+
+        return r;
+    }
+
+    std::vector<Real64> SingleUtubeBHSegment::rk4(Real64 const &inletTemp1,
+                                                    Real64 const &inletTemp2,
+                                                    Real64 const &flowRate,
+                                                    Real64 const &fluidCp,
+                                                    Real64 const &fluidRhoCp,
+                                                    std::vector<Real64> const &y,
+                                                    Real64 const &h)
+    {
+
+        // y1 = y
+        std::vector<Real64> y1;
+        std::copy(y.begin(), y.end(), back_inserter(y1));
+
+        // k1 = rhs(y1)
+        std::vector<Real64> k1 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y1);
+
+        // k1 / 2
+        std::vector<Real64> k1Ovr2(y.size(), 0.0);
+        std::transform(k1.begin(), k1.end(), k1Ovr2.begin(), [](Real64 const &i) {return i / 2.0;});
+
+        // y2 = y + k1 / 2
+        std::vector<Real64> y2;
+        std::copy(y.begin(), y.end(), back_inserter(y2));
+        std::transform(y2.begin(), y2.end(), k1Ovr2.begin(), y2.begin(), std::plus<Real64>());
+
+        // k2 = rhs(y2)
+        std::vector<Real64> k2 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y2);
+
+        // k2 / 2
+        std::vector<Real64> k2Ovr2(y.size(), 0.0);
+        std::transform(k2.begin(), k2.end(), k2Ovr2.begin(), [](Real64 const &i) {return i / 2.0;});
+
+        // y3 = y + k2 / 2
+        std::vector<Real64> y3;
+        std::copy(y.begin(), y.end(), back_inserter(y3));
+        std::transform(y3.begin(), y3.end(), k2Ovr2.begin(), y3.begin(), std::plus<Real64>());
+
+        // k3 = rhs(y3)
+        std::vector<Real64> k3 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y3);
+
+        // y4 = y + k3
+        std::vector<Real64> y4;
+        std::copy(y.begin(), y.end(), back_inserter(y4));
+        std::transform(y4.begin(), y4.end(), k3.begin(), y4.begin(), std::plus<Real64>());
+
+        // k4 = rhs(y4)
+        std::vector<Real64> k4 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y4);
+
+        // twok23 = 2 * (k2 + k3)
+        std::vector<Real64> twok23;
+        std::copy(k2.begin(), k2.end(), back_inserter(twok23));
+        std::transform(twok23.begin(), twok23.end(), k3.begin(), twok23.begin(), std::plus<Real64>());
+        std::transform(twok23.begin(), twok23.end(), twok23.begin(), [](Real64 const &i) {return i * 2.0;});
+
+        // step = (k1 + 2 * (k2 + k3) + k4) / 6 * h
+        std::vector<Real64> step;
+        std::copy(twok23.begin(), twok23.end(), back_inserter(step));
+        std::transform(step.begin(), step.end(), k1.begin(), step.begin(), std::plus<Real64>());
+        std::transform(step.begin(), step.end(), k4.begin(), step.begin(), std::plus<Real64>());
+        std::transform(step.begin(), step.end(), step.begin(), [](Real64 const &i) {return i / 6.0;});
+        std::transform(step.begin(), step.end(), step.begin(), [&h](Real64 const &i) {return i * h;});
+
+        // r = y + (k1 + 2 * (k2 + k3) + k4) / 6 * h
+        std::vector<Real64> r;
+        std::copy(y.begin(), y.end(), back_inserter(r));
+        std::transform(r.begin(), r.end(), step.begin(), r.begin(), std::plus<Real64>());
+
+        return r;
+    }
+
+    void SingleUtubeBHSegment::simulate(Real64 const &inletTemp1,
+                                        Real64 const &inletTemp2,
+                                        Real64 const &flowRate)
+    {
+        Real64 cp = 4179.8;
+        Real64 rho = 995.6;
+        Real64 rhoCp = rho * cp;
+        std::vector<Real64> retTemps = this->rk4(
+                inletTemp1,
+                inletTemp2,
+                flowRate,
+                cp,
+                rhoCp,
+                this->temps,
+                1);
+
+        this->temps = retTemps;
     }
 
     void SubHourAgg::aggregate(Real64 &time, Real64 &energy) {
