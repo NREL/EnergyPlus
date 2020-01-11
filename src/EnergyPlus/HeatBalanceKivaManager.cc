@@ -71,6 +71,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
@@ -78,7 +79,6 @@
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
