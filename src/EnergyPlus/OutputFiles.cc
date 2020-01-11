@@ -88,7 +88,7 @@ public:
     iterator operator()(Real64 value)
     {
         if (specs() && specs()->type == 'R') {
-            if (value >= 0.1 || value <= -0.1) {
+            if ((value >= 0.1 || value <= -0.1) || (value == 0.0)) {
                 specs()->type = 'F';
             } else {
                 specs()->type = 'E';

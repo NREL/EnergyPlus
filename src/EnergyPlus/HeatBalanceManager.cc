@@ -1118,7 +1118,7 @@ namespace HeatBalanceManager {
         static constexpr auto Format_726(
             "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
         print(outputFiles.eio, Format_726);
-        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}");
+        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
         print(outputFiles.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
@@ -1401,7 +1401,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}");
+        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
         // FLOW:
         CurrentModuleObject = "Site:HeightVariation";
@@ -5820,7 +5820,7 @@ namespace HeatBalanceManager {
             "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
             "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
             "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
-            "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence");
+            "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
@@ -5857,7 +5857,7 @@ namespace HeatBalanceManager {
                 StdDevZoneTemp = std::sqrt(sum(TempZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
-                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}");
+                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
                 print(outputFiles.eio,
                       Format_731,
                       Zone(ZoneNum).Name,

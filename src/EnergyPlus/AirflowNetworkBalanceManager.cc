@@ -5,7 +5,6 @@
 // contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
-
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
 // granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
 // worldwide license in the Software to reproduce, distribute copies to the public, prepare
@@ -1644,7 +1643,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Formats
         static constexpr auto Format_110(
-            "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
+            "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
             "without Distribution/Multizone with Distribution only during Fan Operation\n");
         static constexpr auto Format_120("AirflowNetwork Model:Control,{}\n");
 
@@ -3146,7 +3145,7 @@ namespace AirflowNetworkBalanceManager {
         }
         print(outputFiles.eio, "{:.1R}\n", numWinDirs * angleDelta);
 
-        print(outputFiles.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)");
+        print(outputFiles.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
@@ -3159,7 +3158,7 @@ namespace AirflowNetworkBalanceManager {
             for (j = 0; j < numWinDirs; ++j) {
                 print(outputFiles.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
             }
-            print(outputFiles.eio, "{:.2R}", CurveManager::CurveValue(index, numWinDirs * angleDelta));
+            print(outputFiles.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
         }
 
         if (AirflowNetworkNumOfSingleSideZones > 0) {
