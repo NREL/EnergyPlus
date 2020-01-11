@@ -87,13 +87,42 @@ public:
 
     iterator operator()(Real64 value)
     {
-        if (specs() && specs()->type == 'R') {
-            if ((value >= 0.1 || value <= -0.1) || (value == 0.0)) {
-                specs()->type = 'F';
-            } else {
-                specs()->type = 'E';
+        if (specs()) {
+            if (specs()->type == 'R') {
+                if ((value >= 0.1 || value <= -0.1) || (value == 0.0)) {
+                    specs()->type = 'F';
+                    return (*this)(value);
+                } else {
+                    specs()->type = 'E';
+
+                    // write the `E` formatted float to a std::string
+                    std::string str;
+                    struct string_ref {
+                        std::reference_wrapper<std::string> ref;
+                        std::back_insert_iterator<std::string> begin() {
+                            return std::back_inserter(ref.get());
+                        }
+                        using value_type = std::string::value_type;
+                        using iterator = std::back_insert_iterator<std::string>;
+                    };
+
+                    fmt::internal::basic_writer<string_ref> bw(string_ref{str});
+                    bw.write(value, *specs());
+
+                    // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+                    if (str.size() > 3) {
+                        if (!std::isdigit(str[str.size()-3])) {
+                            // wants a 0 inserted
+                            str.insert(str.size()-2,"0");
+                        }
+                    }
+
+                    // write one character at a time to avoid any spec formatting from {fmt}
+                    // which may truncate our output otherwise
+                    std::for_each(begin(str), end(str), [&](const char c){ writer().write(c); });
+                    return this->out();
+                }
             }
-            return (*this)(value);
         }
         return arg_formatter::operator()(value);
     }
