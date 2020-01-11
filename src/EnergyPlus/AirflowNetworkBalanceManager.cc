@@ -6276,7 +6276,7 @@ namespace AirflowNetworkBalanceManager {
         NumOfExtNodes = AirflowNetworkNumOfExtSurfaces;
         for (ExtNum = 1; ExtNum <= NumOfExtNodes; ++ExtNum) {
             MultizoneExternalNodeData(ExtNum).ExtNum = AirflowNetworkNumOfZones + ExtNum;
-            fmt::print(outputFiles.eio, "ExtNode,{:>4}\n", ExtNum);
+            ObjexxFCL::gio::write(Name, "('ExtNode',I4)") << ExtNum;
             MultizoneExternalNodeData(ExtNum).Name = stripped(Name);
         }
 

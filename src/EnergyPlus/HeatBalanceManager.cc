@@ -3839,8 +3839,8 @@ namespace HeatBalanceManager {
             print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
-            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}");
-            static constexpr auto Format_702(" Material:Air,{},{:.2R}");
+            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
+            static constexpr auto Format_702(" Material:Air,{},{:.2R}\n");
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
