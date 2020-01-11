@@ -52,6 +52,10 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
+
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -69,6 +73,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -510,7 +515,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput();  // read schedules
 
-    GetZoneAirSetPoints();
+    GetZoneAirSetPoints(OutputFiles::getSingleton());
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);

@@ -78,6 +78,7 @@
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include "OutputFiles.hh"
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
@@ -652,7 +653,7 @@ namespace HeatBalanceKivaManager {
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 

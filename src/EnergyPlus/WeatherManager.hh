@@ -362,13 +362,16 @@ namespace WeatherManager {
         Real64 DailyWBRange;    // daily range of wetbulb (deltaC)
         bool PressureEntered;   // true if a pressure was entered in design day data
         bool DewPointNeedsSet;  // true if the Dewpoint humidicating value needs to be set (after location determined)
+        int maxWarmupDays;        // Maximum warmup days between sizing periods
+        bool suppressBegEnvReset; // true if this design day should be run without thermal history being reset at begin environment
 
         // Default Constructor
         DesignDayData()
             : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(0), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
               RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(0), DBTempRangeType(0), TempRangeSchPtr(0),
               HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
-              DewPointNeedsSet(false)
+              DewPointNeedsSet(false),                       //**Trane:BEG: Sizing Speed Up
+              maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up
         {
         }
     };
