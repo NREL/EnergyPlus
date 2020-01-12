@@ -3065,7 +3065,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            CalcWindPressureCoeffs(outputFiles);
+            CalcWindPressureCoeffs();
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
@@ -6178,7 +6178,7 @@ namespace AirflowNetworkBalanceManager {
         return CurveNum;
     }
 
-    void CalcWindPressureCoeffs(OutputFiles &outputFiles)
+    void CalcWindPressureCoeffs()
     {
 
         // SUBROUTINE INFORMATION:

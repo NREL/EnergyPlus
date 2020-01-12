@@ -178,7 +178,7 @@ namespace AirflowNetworkBalanceManager {
 
     void CalcAirflowNetworkAirBalance();
 
-    void CalcWindPressureCoeffs(OutputFiles &outputFiles);
+    void CalcWindPressureCoeffs();
 
     Real64 CalcDuctInsideConvResist(Real64 const Tair, // Average air temperature
                                     Real64 const mdot, // Mass flow rate
