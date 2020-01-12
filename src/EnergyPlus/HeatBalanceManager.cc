@@ -3840,7 +3840,7 @@ namespace HeatBalanceManager {
 
             // Formats
             static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
-            static constexpr auto Format_702(" Material:Air,{},{:.2R}\n");
+            static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 

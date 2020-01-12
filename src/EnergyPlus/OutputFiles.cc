@@ -90,8 +90,10 @@ public:
         if (specs()) {
             if (specs()->type == 'R') {
                 if ((value >= 0.1 || value <= -0.1) || (value == 0.0)) {
+                    const auto magnitude = std::pow(10, specs()->precision);
+                    const auto rounded = std::round(value * magnitude) / magnitude;
                     specs()->type = 'F';
-                    return (*this)(value);
+                    return (*this)(rounded);
                 } else {
                     specs()->type = 'E';
 
