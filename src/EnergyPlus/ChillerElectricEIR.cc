@@ -1067,8 +1067,8 @@ namespace ChillerElectricEIR {
         int EvapOutletNode;              // Node number for evaporator water outlet node
         int CondInletNode;               // Node number for condenser water inlet node
         int CondOutletNode;              // Node number for condenser water outlet node
-        int HeatRecInNode;               // Node number for heat recovery water inlet node
-        int HeatRecOutNode;              // Node number for heat recovery water outlet node
+        int HeatRecInNode(0);               // Node number for heat recovery water inlet node
+        int HeatRecOutNode(0);              // Node number for heat recovery water outlet node
         Real64 rho;                      // local fluid density
         Real64 mdot;                     // local fluid mass flow rate
         Real64 mdotCond;                 // local fluid mass flow rate for condenser
@@ -1441,13 +1441,12 @@ namespace ChillerElectricEIR {
             ChillerIPLVOneTimeFlag = false;
         }
 
-        PltSizNum = 0;
         PltSizCondNum = 0;
         ErrorsFound = false;
         Real64 tmpNomCap = ElectricEIRChiller(EIRChillNum).RefCap;
         Real64 tmpEvapVolFlowRate = ElectricEIRChiller(EIRChillNum).EvapVolFlowRate;
         Real64 tmpCondVolFlowRate = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
-        Real64 tempHeatRecVolFlowRate = ElectricEIRChiller(EIRChillNum).DesignHeatRecVolFlowRate;
+        Real64 tempHeatRecVolFlowRate;
         Real64 EvapVolFlowRateUser(0.0);
         Real64 RefCapUser(0.0);
         Real64 CondVolFlowRateUser(0.0);
@@ -1807,7 +1806,6 @@ namespace ChillerElectricEIR {
         Real64 MinPartLoadRat;              // Min allowed operating fraction of full load
         Real64 MinUnloadRat;                // Min allowed unloading fraction of full load
         Real64 MaxPartLoadRat;              // Max allowed operating fraction of full load
-        Real64 EvapInletTemp;               // Evaporator inlet temperature [C]
         Real64 CondInletTemp;               // Condenser inlet temperature [C]
         Real64 EvapOutletTempSetPoint(0.0); // Evaporator outlet temperature setpoint [C]
         Real64 AvailChillerCap;             // Chiller available capacity at current operating conditions [W]
@@ -1856,7 +1854,6 @@ namespace ChillerElectricEIR {
         LoopSideNum = ElectricEIRChiller(EIRChillNum).CWLoopSideNum;
         BranchNum = ElectricEIRChiller(EIRChillNum).CWBranchNum;
         CompNum = ElectricEIRChiller(EIRChillNum).CWCompNum;
-        EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
         FRAC = 1.0;
 
         // Set performance curve outputs to 0.0 when chiller is off
@@ -2316,7 +2313,6 @@ namespace ChillerElectricEIR {
             PartLoadRat = (AvailChillerCap > 0.0) ? (QEvaporator / AvailChillerCap) : 0.0;
             PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
             ChillerPartLoadRatio = PartLoadRat;
-            EvapDeltaTemp = DataLoopNode::Node(EvapInletNode).Temp - EvapOutletTemp;
         }
 
         // Checks QEvaporator on the basis of the machine limits.
@@ -2480,10 +2476,7 @@ namespace ChillerElectricEIR {
 
         static std::string const RoutineName("EIRChillerHeatRecovery");
 
-        int CondInletNode;            // Condenser inlet node number
-        int CondOutletNode;           // Condenser outlet node number
         int HeatRecInNode;            // Node number of heat recovery water inlet node
-        int HeatRecOutNode;           // Node number of heat recovery water outlet node
         Real64 QTotal;                // Total condenser heat [W]
         Real64 HeatRecInletTemp;      // Heat reclaim inlet temp [C]
         Real64 HeatRecMassFlowRate;   // Heat reclaim mass flow rate [m3/s]
@@ -2497,9 +2490,6 @@ namespace ChillerElectricEIR {
 
         // Begin routine
         HeatRecInNode = ElectricEIRChiller(EIRChillNum).HeatRecInletNodeNum;
-        HeatRecOutNode = ElectricEIRChiller(EIRChillNum).HeatRecOutletNodeNum;
-        CondInletNode = ElectricEIRChiller(EIRChillNum).CondInletNodeNum;
-        CondOutletNode = ElectricEIRChiller(EIRChillNum).CondOutletNodeNum;
 
         // Inlet node to the heat recovery heat exchanger
         HeatRecInletTemp = DataLoopNode::Node(HeatRecInNode).Temp;

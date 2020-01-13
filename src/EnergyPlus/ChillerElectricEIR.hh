@@ -62,55 +62,27 @@ namespace ChillerElectricEIR {
     // Chiller type parameters
     extern int const AirCooled;
     extern int const WaterCooled;
-    extern int const EvapCooled;
 
     // chiller flow modes
     extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumElectricEIRChillers;  // Number of electric EIR chillers specified in input
     extern Real64 CondMassFlowRate;     // Condenser mass flow rate [kg/s]
     extern Real64 EvapMassFlowRate;     // Evaporator mass flow rate [kg/s]
-    extern Real64 CondOutletTemp;       // Condenser outlet temperature [C]
-    extern Real64 CondOutletHumRat;     // Condenser outlet humidity ratio [kg/kg]
-    extern Real64 EvapOutletTemp;       // Evaporator outlet temperature [C]
-    extern Real64 Power;                // Rate of chiller electric energy use [W]
-    extern Real64 QEvaporator;          // Rate of heat transfer to the evaporator coil [W]
-    extern Real64 QCondenser;           // Rate of heat transfer to the condenser coil [W]
-    extern Real64 QHeatRecovered;       // Rate of heat transfer to the heat recovery coil [W]
-    extern Real64 HeatRecOutletTemp;    // Heat recovery outlet temperature [C]
-    extern Real64 CondenserFanPower;    // Condenser Fan Power (fan cycles with compressor) [W]
-    extern Real64 ChillerCapFT;         // Chiller capacity fraction (evaluated as a function of temperature)
-    extern Real64 ChillerEIRFT;         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-    extern Real64 ChillerEIRFPLR;       // Chiller EIR as a function of part-load ratio (PLR)
-    extern Real64 ChillerPartLoadRatio; // Chiller part-load ratio (PLR)
-    extern Real64 ChillerCyclingRatio;  // Chiller cycling ratio
-    extern Real64 BasinHeaterPower;     // Basin heater power (W)
-    extern Real64 ChillerFalseLoadRate; // Chiller false load over and above the water-side load [W]
-    extern Real64 AvgCondSinkTemp;      // condenser temperature value for use in curves [C]
-
-    extern Array1D_bool CheckEquipName;
 
     extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
-    extern bool ChillerIPLVOneTimeFlag;
-    extern Array1D_bool ChillerIPLVFlagArr; // TRUE in order to calculate IPLV
-    extern bool getInputAllocatedFlag;      // True when arrays are allocated
-    extern bool InitMyOneTimeFlag;          // Flag used to execute code only once
 
     struct ElectricEIRChillerSpecs
     {
         // Members
         std::string Name;                 // User identifier
         int TypeNum;                      // plant loop type identifier
-        std::string EIRFPLRName;          // EIRPLR curve name
         int CondenserType;                // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
         Real64 RefCap;                    // Reference capacity of chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        int FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
@@ -273,47 +245,47 @@ namespace ChillerElectricEIR {
 
     void SimElectricEIRChiller(std::string const &EIRChillerType, // Type of chiller
                                std::string const &EIRChillerName, // User specified name of chiller
-                               int const EquipFlowCtrl,           // Flow control mode for the equipment
+                               int EquipFlowCtrl,           // Flow control mode for the equipment
                                int &CompIndex,                    // Chiller number pointer
-                               int const LoopNum,                 // plant loop index pointer
-                               bool const RunFlag,                // Simulate chiller when TRUE
-                               bool const FirstIteration,         // Initialize variables when TRUE
+                               int LoopNum,                 // plant loop index pointer
+                               bool RunFlag,                // Simulate chiller when TRUE
+                               bool FirstIteration,         // Initialize variables when TRUE
                                bool &InitLoopEquip,               // If not zero, calculate the max load for operating conditions
                                Real64 &MyLoad,                    // Loop demand component will meet
                                Real64 &MaxCap,                    // Maximum operating capacity of chiller [W]
                                Real64 &MinCap,                    // Minimum operating capacity of chiller [W]
                                Real64 &OptCap,                    // Optimal operating capacity of chiller [W]
-                               bool const GetSizingFactor,        // TRUE when just the sizing factor is requested
+                               bool GetSizingFactor,        // TRUE when just the sizing factor is requested
                                Real64 &SizingFactor,              // sizing factor
                                Real64 &TempCondInDesign,
                                Real64 &TempEvapOutDesign);
 
     void GetElectricEIRChillerInput();
 
-    void InitElectricEIRChiller(int const EIRChillNum, // Number of the current electric EIR chiller being simulated
-                                bool const RunFlag,    // TRUE when chiller operating
-                                Real64 const MyLoad    // current load put on chiller
+    void InitElectricEIRChiller(int EIRChillNum, // Number of the current electric EIR chiller being simulated
+                                bool RunFlag,    // TRUE when chiller operating
+                                Real64 MyLoad    // current load put on chiller
     );
 
-    void SizeElectricEIRChiller(int const EIRChillNum);
+    void SizeElectricEIRChiller(int EIRChillNum);
 
     void CalcElectricEIRChillerModel(int &EIRChillNum,          // Chiller number
                                      Real64 &MyLoad,            // Operating load
-                                     bool const RunFlag,        // TRUE when chiller operating
-                                     bool const FirstIteration, // TRUE when first iteration of timestep
-                                     int const EquipFlowCtrl    // Flow control mode for the equipment
+                                     bool RunFlag,        // TRUE when chiller operating
+                                     bool FirstIteration, // TRUE when first iteration of timestep
+                                     int EquipFlowCtrl    // Flow control mode for the equipment
     );
 
-    void EIRChillerHeatRecovery(int const EIRChillNum,      // Number of the current electric EIR chiller being simulated
+    void EIRChillerHeatRecovery(int EIRChillNum,      // Number of the current electric EIR chiller being simulated
                                 Real64 &QCond,              // Current condenser load [W]
-                                Real64 const CondMassFlow,  // Current condenser mass flow [kg/s]
-                                Real64 const CondInletTemp, // Current condenser inlet temp [C]
+                                Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
+                                Real64 CondInletTemp, // Current condenser inlet temp [C]
                                 Real64 &QHeatRec            // Amount of heat recovered [W]
     );
 
-    void UpdateElectricEIRChillerRecords(Real64 const MyLoad, // Current load [W]
-                                         bool const RunFlag,  // TRUE if chiller operating
-                                         int const Num        // Chiller number
+    void UpdateElectricEIRChillerRecords(Real64 MyLoad, // Current load [W]
+                                         bool RunFlag,  // TRUE if chiller operating
+                                         int Num        // Chiller number
     );
 
 } // namespace ChillerElectricEIR
