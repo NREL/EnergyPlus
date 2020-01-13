@@ -309,6 +309,15 @@ ASHRAETau model Taub and Taud values are used from the 2009 ASHRAE HOF and ASHRA
 
 If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level. Values greater than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
 
+\paragraph{Field: Maximum Number Warmup Days}\label{field-max-num-warm-days}
+
+Optional integer number of days for an upper limit on the number of warmup days when running this sizing period.  This overrides the global maximum set in the Building object for this particular design day.
+
+\paragraph{Field: Begin Environment Reset Mode}\label{field-beg-env-reset-mode}
+
+Optional choice field to control if zone heat balance history terms should be reset when beginning to run this sizing period.  This can reduce the number of warmup days needed to reach zone convergence.  The options are \textbf{FullResetAtBeginEnvironment} or \textbf{SuppressThermalResetAtBeginEnvironment}.  \textbf{FullResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are set to 23 degrees C, which is the usual starting point for each environment.  \textbf{SuppressThermalResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are not reset and will just retain whatever thermal history results they had at the end of the previous design day.  The warmup days still proceed as usual but because the initial condition is closer it needs fewer warmup days to reach convergence.  This is available to reduce simulation run time when using many design days that are similiar to each other.
+
+
 IDF Examples:
 
 \begin{lstlisting}

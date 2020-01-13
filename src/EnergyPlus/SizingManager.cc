@@ -356,6 +356,14 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
+                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                        // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
+                        // more easily converge fewer warmup days are allowed
+                        DisplayString("Suppressing Initialization of New Environment Parameters");
+                        DataGlobals::beginEnvrnWarmStartFlag = true;
+                    } else {
+                        DataGlobals::beginEnvrnWarmStartFlag = false;
+                    }
                     EndEnvrnFlag = false;
                     EndMonthFlag = false;
                     WarmupFlag = true;
@@ -571,6 +579,14 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
+                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                    // easily converge fewer warmup days are allowed
+                    DisplayString("Suppressing Initialization of New Environment Parameters");
+                    DataGlobals::beginEnvrnWarmStartFlag = true;
+                } else {
+                    DataGlobals::beginEnvrnWarmStartFlag = false;
+                }
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
@@ -2852,7 +2868,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(5)) {
                         ZoneSizingInput(ZoneSizIndex).CoolDesHumRat = 0.0;
                     } else if (rNumericArgs(5) < 0.0) {
@@ -2866,7 +2882,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(6)) {
                         ZoneSizingInput(ZoneSizIndex).HeatDesHumRat = 0.0;
                     } else if (rNumericArgs(6) < 0.0) {

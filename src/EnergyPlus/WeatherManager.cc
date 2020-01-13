@@ -7112,6 +7112,23 @@ namespace WeatherManager {
             //   N14; \field Sky Clearness
             DesDayInput(EnvrnNum).SkyClear = rNumericArgs(14); // Sky Clearness (0 to 1)
 
+            //   N15, \field Maximum Warmup Days Between Sizing Periods
+            if (lNumericFieldBlanks(15)) {
+                // Default to -1 if not input
+                DesDayInput(EnvrnNum).maxWarmupDays = -1;
+            } else {
+                DesDayInput(EnvrnNum).maxWarmupDays = int(rNumericArgs(15));
+            }
+            //   A13, \field Begin Environment Reset Mode
+            if (lAlphaFieldBlanks(13)) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+            } else {
+                if (UtilityRoutines::SameString(cAlphaArgs(13), "FullResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = true;
+                }
+            }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;
@@ -8366,7 +8383,6 @@ namespace WeatherManager {
         Real64 Lag;                           // Value used in correlation
         Real64 Offset;                        // Value used in correlation
         Real64 CurrentWaterMainsTemp;         // calculated water main temp (F)
-        Real64 WaterMainsTempFromCorrelation; // calculated water main temp (C)
 
         // FLOW:
         Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
@@ -8377,17 +8393,17 @@ namespace WeatherManager {
         Offset = 6.0;
         int latitude_sign;
         if (Latitude >= 0) {
-            latitude_sign = -1;
-        } else {
             latitude_sign = 1;
+        } else {
+            latitude_sign = -1;
         }
 
-        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::cos((0.986 * (DayOfYear - 15.0 - Lag)) * DegToRadians);
+        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DayOfYear - 15.0 - Lag) - 90) * DegToRadians);
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
         // Convert F to C
-        return WaterMainsTempFromCorrelation = (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
+        return (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
     }
     void GetWeatherStation(bool &ErrorsFound)
     {

@@ -9899,9 +9899,9 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
     Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347046, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347040, 0.000001);
     Real64 Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
-    EXPECT_NEAR(Result_AirMassFlowRate, 0.347046, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRate, 0.347040, 0.000001);
     Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
     EXPECT_NEAR(Result_FanPower, 41.22, 0.001);
 

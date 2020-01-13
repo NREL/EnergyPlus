@@ -77,3 +77,65 @@ Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/k
 ```
 
 See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
+
+### End Use By Subcategory in SQL
+
+In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
+the tables `TableName = "End Uses by Subcategory"` have been refactored. `RowName` is now in the format `<End Use Category>:<End Use Subcategory>`.
+This will allow querying a specific End Use Subcategory in the SQL file more easily.
+
+Example SQL Queries:
+
+* Get the Value corresponding to a specific Fuel Type "Electricity", End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName = 'Interior Lighting:GeneralLights'
+```
+
+* Return all rows (one row per fuel type) for End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT ColumnName as FuelType, Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND RowName = 'Interior Lighting:GeneralLights'
+```
+
+| FuelType         | Value |
+|------------------|-------|
+| Electricity      | 83.33 |
+| Natural Gas      | 0.00  |
+| Additional Fuel  | 0.00  |
+| District Cooling | 0.00  |
+| District Heating | 0.00  |
+| Water            | 0.00  |
+
+* Get all rows related to Electricity usage by Interior Lighting:
+
+```sql
+SELECT RowName as "End Use&Subcategory", Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName LIKE 'Interior Lighting:%'
+```
+
+| End Use&Subcategory                   | Value  |
+|---------------------------------------|--------|
+| Interior Lighting:GeneralLights       | 166.67 |
+| Interior Lighting:AnotherEndUseSubCat | 83.33  |
+
+See [PR#7584](https://github.com/NREL/EnergyPlus/pull/7584).
+
+### Standardize units for humidity ratio and add where missing
+
+Units for humidity ratio standardized to "kgWater/kgDryAir" and "lbWater/lbDryAir".
+
+Impacts eio sizing output and table reports including Coil Sizing Summary and Details.
+
+See [7571](https://github.com/NREL/EnergyPlus/pull/7571)
+
