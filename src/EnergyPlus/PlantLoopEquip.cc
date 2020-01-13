@@ -186,11 +186,9 @@ namespace PlantLoopEquip {
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
-        using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
-        using RefrigeratedCase::SimRefrigCondenser;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 
@@ -647,23 +645,7 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_HeatExchanger) {
 
             if (EquipTypeNum == TypeOf_FluidToFluidPlantHtExchg) {
-                SimFluidHeatExchanger(LoopNum,
-                                      LoopSideNum,
-                                      sim_component.TypeOf,
-                                      sim_component.Name,
-                                      EquipNum,
-                                      InitLoopEquip,
-                                      CurLoad,
-                                      MaxLoad,
-                                      MinLoad,
-                                      OptLoad,
-                                      FirstHVACIteration);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Heat Exchanger Type=" + sim_component.TypeOf);
@@ -911,18 +893,10 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_Refrigeration) {
 
             if (EquipTypeNum == TypeOf_RefrigSystemWaterCondenser) {
-                SimRefrigCondenser(EquipTypeNum, sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
-
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_RefrigerationWaterCoolRack) {
-                SimRefrigCondenser(EquipTypeNum, sim_component.Name, EquipNum, FirstHVACIteration, InitLoopEquip);
-
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Refrigeration Type=" + sim_component.TypeOf);
