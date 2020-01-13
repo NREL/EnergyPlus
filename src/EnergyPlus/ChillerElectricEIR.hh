@@ -167,6 +167,10 @@ namespace ChillerElectricEIR {
         int FaultyChillerFoulingIndex;     // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
         std::string EndUseSubcategory;     // identifier use for the end use subcategory
+        Real64 TimeStepSysLast;
+        Real64 CurrentEndTimeLast;
+        bool MyFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -185,7 +189,7 @@ namespace ChillerElectricEIR {
               CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), BasinHeaterSchedulePtr(0), CondMassFlowIndex(0),
               MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), ErrCount1(0), PossibleSubcooling(false), FaultyChillerSWTFlag(false),
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
-              FaultyChillerFoulingFactor(1.0)
+              FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), MyFlag(true), MyEnvrnFlag(true)
         {
         }
     };

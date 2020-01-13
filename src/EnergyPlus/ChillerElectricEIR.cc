@@ -322,10 +322,8 @@ namespace ChillerElectricEIR {
         int NumAlphas;                     // Number of elements in the alpha array
         int NumNums;                       // Number of elements in the numeric array
         int IOStat;                        // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);    // True when input errors are found
+        bool ErrorsFound(false);    // True when input errors are found
         Real64 CurveVal;                   // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
-        static bool FoundNegValue(false);  // Used to evaluate PLFFPLR curve objects
-        static int CurveCheck(0);          // Used to evaluate PLFFPLR curve objects
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
         std::string StringVar;             // Used for EIRFPLR warning messages
@@ -715,8 +713,8 @@ namespace ChillerElectricEIR {
             }
 
             if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR > 0) {
-                FoundNegValue = false;
-                for (CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                bool FoundNegValue = false;
+                for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                     CurveValTmp = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
@@ -1061,8 +1059,6 @@ namespace ChillerElectricEIR {
 
         static std::string const RoutineName("InitElectricEIRChiller");
 
-        static Array1D_bool MyFlag;      // TRUE in order to set component location
-        static Array1D_bool MyEnvrnFlag; // TRUE when new environment is started
         int EvapInletNode;               // Node number for evaporator water inlet node
         int EvapOutletNode;              // Node number for evaporator water outlet node
         int CondInletNode;               // Node number for condenser water inlet node
@@ -1082,10 +1078,6 @@ namespace ChillerElectricEIR {
 
         // Do the one time initializations
         if (InitMyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumElectricEIRChillers);
-            MyFlag.allocate(NumElectricEIRChillers);
-            MyEnvrnFlag = true;
-            MyFlag = true;
             InitMyOneTimeFlag = false;
         }
 
@@ -1100,7 +1092,7 @@ namespace ChillerElectricEIR {
         }
 
         // Init more variables
-        if (MyFlag(EIRChillNum)) {
+        if (ElectricEIRChiller(EIRChillNum).MyFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ElectricEIRChiller(EIRChillNum).Name,
@@ -1222,10 +1214,10 @@ namespace ChillerElectricEIR {
                         DataLoopNode::Node(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            MyFlag(EIRChillNum) = false;
+            ElectricEIRChiller(EIRChillNum).MyFlag = false;
         }
 
-        if (MyEnvrnFlag(EIRChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (ElectricEIRChiller(EIRChillNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -1342,10 +1334,10 @@ namespace ChillerElectricEIR {
                 }         // IF(ElectricEIRChiller(EIRChillNum)%HeatRecSetPointNodeNum > 0)THEN
             }             // IF (ElectricEIRChiller(EIRChillNum)%HeatRecActive) THEN
 
-            MyEnvrnFlag(EIRChillNum) = false;
+            ElectricEIRChiller(EIRChillNum).MyEnvrnFlag = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(EIRChillNum) = true;
+            ElectricEIRChiller(EIRChillNum).MyEnvrnFlag = true;
         }
 
         if ((ElectricEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated) && ElectricEIRChiller(EIRChillNum).ModulatedFlowSetToLoop) {
@@ -1827,9 +1819,7 @@ namespace ChillerElectricEIR {
         int LoopSideNum;  // Plant loop side which contains the current chiller (usually supply side)
         int BranchNum;
         int CompNum;
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         static std::string OutputChar;         // character string for warning messages
         Real64 Cp;                             // local fluid specific heat
         Real64 RhoAir;                         // air density [kg/m3]
@@ -1868,7 +1858,7 @@ namespace ChillerElectricEIR {
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > ElectricEIRChiller(EIRChillNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= ElectricEIRChiller(EIRChillNum).TimeStepSysLast) {
             if (ElectricEIRChiller(EIRChillNum).PrintMessage) {
                 ++ElectricEIRChiller(EIRChillNum).MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -1888,8 +1878,8 @@ namespace ChillerElectricEIR {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        ElectricEIRChiller(EIRChillNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        ElectricEIRChiller(EIRChillNum).CurrentEndTimeLast = CurrentEndTime;
 
         // If no loop demand or chiller OFF, return
         // If Chiller load is 0 or chiller is not running then leave the subroutine.Before leaving
