@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,69 +64,69 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetworkBalanceManager.hh>
-#include <Boilers.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerReformulatedEIR.hh>
-#include <CommandLineInterface.hh>
-#include <CondenserLoopTowers.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataCostEstimate.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataOutputs.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataShadowingCombinations.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataWater.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <EconomicLifeCycleCost.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <EvaporativeFluidCoolers.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FluidCoolers.hh>
-#include <General.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HeatingCoils.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <MixedAir.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <PackagedThermalStorageCoil.hh>
-#include <PlantChillers.hh>
-#include <PollutionModule.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ReportCoilSelection.hh>
-#include <ResultsSchema.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <VariableSpeedCoils.hh>
-#include <VentilatedSlab.hh>
-#include <WaterThermalTanks.hh>
-#include <WeatherManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataCostEstimate.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/PackagedThermalStorageCoil.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2005,15 +2005,7 @@ namespace OutputReportTabular {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
                     ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "BEPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2025,23 +2017,11 @@ namespace OutputReportTabular {
                     displayTabularVeriSum = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "IVRS")) {
-                    displayTabularVeriSum = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
                     displayComponentSizing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CSS")) {
-                    displayComponentSizing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
-                    displaySurfaceShadowing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "SHAD")) {
                     displaySurfaceShadowing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2091,10 +2071,6 @@ namespace OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "EIO")) {
-                    WriteTabularFiles = true;
-                    displayEioSummary = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
                     WriteTabularFiles = true;
@@ -3348,7 +3324,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("ResidualOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3361,7 +3337,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("DistillateOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;
@@ -4840,7 +4816,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
@@ -4909,7 +4885,7 @@ namespace OutputReportTabular {
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+                    SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto & cooler : SimpleFluidCooler) {
             SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -8488,8 +8464,7 @@ namespace OutputReportTabular {
             columnHead.allocate(7);
             columnWidth.allocate(7);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(7, numRows);
-
+            tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
 
@@ -8565,14 +8540,31 @@ namespace OutputReportTabular {
             if (displayTabularBEPS) {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
+
+                Array1D_string rowHeadTemp(rowHead);
+                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // for better sql queries
+                FillRowHead(rowHeadTemp);
+
+                for (int i = 1; i <= numRows; ++i) {
+                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                }
+
+                // Erase the SubCategory (first column), using slicing
+                Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
                 }
+                rowHeadTemp.deallocate();
+                tableBodyTemp.deallocate();
+                columnHeadTemp.deallocate();
             }
 
             // EAp2-4/5. Performance Rating Method Compliance
@@ -9893,14 +9885,31 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+
+            Array1D_string rowHeadTemp(rowHead);
+            // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+            // for better sql queries
+            FillRowHead(rowHeadTemp);
+
+            for (int i = 1; i <= numRows; ++i) {
+                rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+            }
+
+            // Erase the SubCategory (first column), using slicing
+            Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+            Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
+            rowHeadTemp.deallocate();
+            tableBodyTemp.deallocate();
+            columnHeadTemp.deallocate();
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 6; ++iResource) {
@@ -14096,10 +14105,10 @@ namespace OutputReportTabular {
                     rowHead(1) = "Time of Peak Load";
                     rowHead(2) = "Outside Dry Bulb Temperature [C]";
                     rowHead(3) = "Outside Wet Bulb Temperature [C]";
-                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [C]";
                     rowHead(6) = "Zone Relative Humidity [%]";
-                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
 
                     rowHead(8) = "Supply Air Temperature [C]";
                     rowHead(9) = "Mixed Air Temperature [C]";
@@ -15151,6 +15160,21 @@ namespace OutputReportTabular {
         }
     }
 
+    void FillRowHead(Array1D_string & rowHead)
+    {
+        // Forward fill the blanks in rowHead (eg End use column)
+        std::string currentEndUseName;
+        for (size_t i = 1; i <= rowHead.size(); ++i) {
+            std::string thisEndUseName = rowHead(i);
+            if (thisEndUseName.empty()) {
+                rowHead(i) = currentEndUseName;
+            } else {
+                currentEndUseName = thisEndUseName;
+            }
+        }
+    }
+
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -15917,7 +15941,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 117;
+        UnitConvSize = 115;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15944,14 +15968,14 @@ namespace OutputReportTabular {
         UnitConv(23).siName = "J";
         UnitConv(24).siName = "J";
         UnitConv(25).siName = "J/KG";
-        UnitConv(26).siName = "J/KG H2O";
+        UnitConv(26).siName = "J/KGWATER";
         UnitConv(27).siName = "J/M2";
         UnitConv(28).siName = "K/M";
         UnitConv(29).siName = "KG";
         UnitConv(30).siName = "KG/KG";
         UnitConv(31).siName = "KG/M3";
         UnitConv(32).siName = "KG/S";
-        UnitConv(33).siName = "KGWATER/KGAIR";
+        UnitConv(33).siName = "KGWATER/KGDRYAIR";
         UnitConv(34).siName = "KGWATER/SEC";
         UnitConv(35).siName = "KMOL/S";
         UnitConv(36).siName = "KMOL/SEC";
@@ -15990,7 +16014,7 @@ namespace OutputReportTabular {
         UnitConv(69).siName = "W";
         UnitConv(70).siName = "W";
         UnitConv(71).siName = "W/KG";
-        UnitConv(72).siName = "W/KG H2O";
+        UnitConv(72).siName = "W/KG H2O";   // TODO: replace with W/kgWater? or rather just remove
         UnitConv(73).siName = "W/K";
         UnitConv(74).siName = "W/M2";
         UnitConv(75).siName = "W/M2";
@@ -16023,19 +16047,17 @@ namespace OutputReportTabular {
         UnitConv(102).siName = "$";
         UnitConv(103).siName = "$/UNIT ENERGY";
         UnitConv(104).siName = "KW";
-        UnitConv(105).siName = "KGWATER/KGDRYAIR";
-        UnitConv(106).siName = " ";
-        UnitConv(107).siName = "AH";
-        UnitConv(108).siName = "CLO";
-        UnitConv(109).siName = "J/KG-K";
-        UnitConv(110).siName = "J/KGWATER";
-        UnitConv(111).siName = "KGWATER/S";
-        UnitConv(112).siName = "PPM";
-        UnitConv(113).siName = "RAD";
-        UnitConv(114).siName = "REV/MIN";
-        UnitConv(115).siName = "NM";
-        UnitConv(116).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(117).siName = "PERSON/M2";
+        UnitConv(105).siName = " ";
+        UnitConv(106).siName = "AH";
+        UnitConv(107).siName = "CLO";
+        UnitConv(108).siName = "J/KG-K";
+        UnitConv(109).siName = "KGWATER/S";
+        UnitConv(110).siName = "PPM";
+        UnitConv(111).siName = "RAD";
+        UnitConv(112).siName = "REV/MIN";
+        UnitConv(113).siName = "NM";
+        UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(115).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -16069,7 +16091,7 @@ namespace OutputReportTabular {
         UnitConv(30).ipName = "lb/lb";
         UnitConv(31).ipName = "lb/ft3";
         UnitConv(32).ipName = "lb/s";
-        UnitConv(33).ipName = "lbWater/lbAir";
+        UnitConv(33).ipName = "lbWater/lbDryAir";
         UnitConv(34).ipName = "lbWater/s";
         UnitConv(35).ipName = "kmol/s";
         UnitConv(36).ipName = "kmol/sec";
@@ -16141,19 +16163,17 @@ namespace OutputReportTabular {
         UnitConv(102).ipName = "$";
         UnitConv(103).ipName = "$/unit energy";
         UnitConv(104).ipName = "kW";
-        UnitConv(105).ipName = "lbWater/lbDryAir";
-        UnitConv(106).ipName = " ";
-        UnitConv(107).ipName = "Ah";
-        UnitConv(108).ipName = "clo";
-        UnitConv(109).ipName = "Btu/lbm-R";
-        UnitConv(110).ipName = "Btu/lbWater";
-        UnitConv(111).ipName = "lbWater/s";
-        UnitConv(112).ipName = "ppm";
-        UnitConv(113).ipName = "rad";
-        UnitConv(114).ipName = "rev/min";
-        UnitConv(115).ipName = "lbf-ft";
-        UnitConv(116).ipName = "Btu/W-h";
-        UnitConv(117).ipName = "person/ft2";
+        UnitConv(105).ipName = " ";
+        UnitConv(106).ipName = "Ah";
+        UnitConv(107).ipName = "clo";
+        UnitConv(108).ipName = "Btu/lbm-R";
+        UnitConv(109).ipName = "lbWater/s";
+        UnitConv(110).ipName = "ppm";
+        UnitConv(111).ipName = "rad";
+        UnitConv(112).ipName = "rev/min";
+        UnitConv(113).ipName = "lbf-ft";
+        UnitConv(114).ipName = "Btu/W-h";
+        UnitConv(115).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -16262,16 +16282,14 @@ namespace OutputReportTabular {
         UnitConv(105).mult = 1.0;
         UnitConv(106).mult = 1.0;
         UnitConv(107).mult = 1.0;
-        UnitConv(108).mult = 1.0;
-        UnitConv(109).mult = 0.000238845896627;
-        UnitConv(110).mult = 0.0000004302105;
-        UnitConv(111).mult = 2.2046;
+        UnitConv(108).mult = 0.000238845896627;
+        UnitConv(109).mult = 2.2046;
+        UnitConv(110).mult = 1.0;
+        UnitConv(111).mult = 1.0;
         UnitConv(112).mult = 1.0;
-        UnitConv(113).mult = 1.0;
+        UnitConv(113).mult = 0.737562149277;
         UnitConv(114).mult = 1.0;
-        UnitConv(115).mult = 0.737562149277;
-        UnitConv(116).mult = 1.0;
-        UnitConv(117).mult = 0.09290304;
+        UnitConv(115).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;

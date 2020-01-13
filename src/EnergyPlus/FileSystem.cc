@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,15 +66,12 @@
 #endif
 
 // EnergyPlus Headers
-#include <DataStringGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <FileSystem.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
 namespace FileSystem {
-
-    using namespace DataStringGlobals;
 
 #ifdef _WIN32
     std::string const exeExtension(".exe");
@@ -84,25 +81,25 @@ namespace FileSystem {
 
     void makeNativePath(std::string &path)
     {
-        std::replace(path.begin(), path.end(), altpathChar, pathChar);
+        std::replace(path.begin(), path.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
     }
 
     std::string getFileName(std::string const &filePath)
     {
-        int pathCharPosition = filePath.find_last_of(pathChar);
+        int pathCharPosition = filePath.find_last_of(DataStringGlobals::pathChar);
         return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
     }
 
     std::string getParentDirectoryPath(std::string const &path)
     {
         std::string tempPath = path;
-        if (path.at(path.size() - 1) == pathChar) tempPath = path.substr(0, path.size() - 1);
+        if (path.at(path.size() - 1) == DataStringGlobals::pathChar) tempPath = path.substr(0, path.size() - 1);
 
-        int pathCharPosition = tempPath.find_last_of(pathChar);
+        int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
         // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.', pathChar};
+        if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
 
         return tempPath;
     }
@@ -134,10 +131,10 @@ namespace FileSystem {
             if (pathTail.size() == 0)
                 return absoluteParentPath;
             else
-                return absoluteParentPath + pathChar + pathTail;
+                return absoluteParentPath + DataStringGlobals::pathChar + pathTail;
 
         } else {
-            DisplayString("ERROR: Could not resolve path for " + path + ".");
+            std::cout << "ERROR: Could not resolve path for " + path + "." << std::endl;
             std::exit(EXIT_FAILURE);
         }
 #endif
@@ -153,7 +150,7 @@ namespace FileSystem {
 #elif __linux__
         ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath) - 1);
         if (len == -1) {
-            DisplayString("ERROR: Unable to locate executable.");
+            std::cout << "ERROR: Unable to locate executable." << std::endl;
             std::exit(EXIT_FAILURE);
         } else {
             executableRelativePath[len] = '\0';
@@ -182,13 +179,13 @@ namespace FileSystem {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
+                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
             std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
             if (!pathExists(parentDirectoryPath)) {
-                DisplayString("ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory.");
+                std::cout << "ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
 #ifdef _WIN32

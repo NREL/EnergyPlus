@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,38 +54,38 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataWater.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <EMSManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
 
@@ -1739,8 +1739,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).RecircPumpPower;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapCond(EvapCoolNum).EvapWaterConsumpRate =
@@ -1897,9 +1897,9 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(TDBSec);
             RhoAir =
@@ -2054,8 +2054,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-            //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+            //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+            //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
             //******************
             //***** FIRST calculate the heat exchange on the primary air side**********
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -2397,8 +2397,8 @@ namespace EvaporativeCoolers {
 
                 EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
                 //******************
-                //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-                //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+                //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+                //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
                 //******************
                 //***** FIRST calculate the heat exchange on the primary air side**********
                 RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -3116,7 +3116,7 @@ namespace EvaporativeCoolers {
         // latent heat transfer only.  For dry operation the humdity ratio remains constant.
 
         // REFERENCES:
-        // CalculateWaterUseage routine of cooling towers for wet operation mode
+        // CalculateWaterUsage routine of cooling towers for wet operation mode
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
@@ -3373,8 +3373,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower = EvapCond(EvapCoolNum).RecircPumpPower * PumpPowerModCurveValue;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapVdot = (EvapCond(EvapCoolNum).OutletHumRat - EvapCond(EvapCoolNum).InletHumRat) * EvapCond(EvapCoolNum).InletMassFlowRate / RhoWater;

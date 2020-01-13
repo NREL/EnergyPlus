@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,70 +57,70 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <BaseboardElectric.hh>
-#include <BaseboardRadiator.hh>
-#include <ChilledCeilingPanelSimple.hh>
-#include <CoolTower.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataConvergParams.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <EarthTube.hh>
-#include <ElectricBaseboardRadiator.hh>
-#include <EvaporativeCoolers.hh>
-#include <FanCoilUnits.hh>
-#include <Fans.hh>
-#include <General.hh>
-#include <HVACInterfaceManager.hh>
-#include <HVACStandAloneERV.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HWBaseboardRadiator.hh>
-#include <HeatRecovery.hh>
-#include <HighTempRadiantSystem.hh>
-#include <HybridUnitaryAirConditioners.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <OutdoorAirUnit.hh>
-#include <PackagedTerminalHeatPump.hh>
-#include <Psychrometrics.hh>
-#include <PurchasedAirManager.hh>
-#include <RefrigeratedCase.hh>
-#include <ReturnAirPathManager.hh>
-#include <ScheduleManager.hh>
-#include <SizingManager.hh>
-#include <SplitterComponent.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <SwimmingPool.hh>
-#include <SystemAvailabilityManager.hh>
-#include <ThermalChimney.hh>
-#include <UnitHeater.hh>
-#include <UnitVentilator.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <VentilatedSlab.hh>
-#include <WaterThermalTanks.hh>
-#include <WindowAC.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
-#include <ZoneDehumidifier.hh>
-#include <ZoneEquipmentManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EarthTube.hh>
+#include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -618,7 +618,7 @@ namespace ZoneEquipmentManager {
         Real64 RetTemp;                       // zone return temperature [C]
         Real64 DOASMassFlowRate(0.0);         // DOAS air mass flow rate for sizing [kg/s]
         Real64 DOASSupplyTemp(0.0);           // DOAS supply air temperature [C]
-        Real64 DOASSupplyHumRat(0.0);         // DOAS supply air humidity ratio [kg H2O / kg dry air]
+        Real64 DOASSupplyHumRat(0.0);         // DOAS supply air humidity ratio [kgWater/kgDryAir]
         Real64 DOASCpAir(0.0);                // heat capacity of DOAS air [J/kg-C]
         Real64 DOASSysOutputProvided(0.0);    // heating / cooling provided by DOAS system [W]
         Real64 TotDOASSysOutputProvided(0.0); // total DOAS load on the zone [W]
@@ -1924,7 +1924,7 @@ namespace ZoneEquipmentManager {
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
 
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesDay = ""; // name of a cooling design day
@@ -1984,7 +1984,7 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
             }
         }
@@ -2106,7 +2106,7 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
             FinalZoneSizing(CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
             FinalZoneSizing(CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-            FinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+            FinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
             FinalZoneSizing(CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
 
             CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay = ""; // name of a cooling design day
@@ -2166,7 +2166,7 @@ namespace ZoneEquipmentManager {
             CalcFinalZoneSizing(CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
             CalcFinalZoneSizing(CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
             CalcFinalZoneSizing(CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-            CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+            CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
             CalcFinalZoneSizing(CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
         }
     }

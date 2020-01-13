@@ -16,12 +16,16 @@ endif()
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 9 )
-set( CMAKE_VERSION_MINOR 2 )
+set( CMAKE_VERSION_MINOR 3 )
 set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "08d2e30" )
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
+set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
+
+string( TIMESTAMP CMAKE_YEAR "%Y")
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -72,8 +76,8 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
-find_package(PythonInterp 2.7 REQUIRED)
+# we are making python a required dependency, so find it here
+find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -151,7 +155,6 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Sing
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
 
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
@@ -180,6 +183,7 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
@@ -229,6 +233,8 @@ if( BUILD_TESTING )
     ADD_SUBDIRECTORY(performance_tests)
   endif()
 endif()
+
+ADD_SUBDIRECTORY(src/ConvertInputFormat)
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)

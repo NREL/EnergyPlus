@@ -1536,7 +1536,7 @@ This alpha field contains the identifying name for the generator's heat recovery
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type}
 
-This alpha field determines the type of fuel that the generator uses. The default is Diesel. Valid values are: \textbf{NaturalGas}, \textbf{PropaneGas}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2, OtherFuel1,} and \textbf{OtherFuel2}.
+This alpha field determines the type of fuel that the generator uses. The default is Diesel. Valid values are: \textbf{NaturalGas}, \textbf{Propane}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOilNo1}, \textbf{FuelOilNo2, OtherFuel1,} and \textbf{OtherFuel2}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature}
 
@@ -1714,9 +1714,9 @@ If the fuel type is Propane, then Propane is shown as the fuel type. They are th
 
 If the fuel type is Gasoline, then Gasoline is shown as the fuel type. They are the gasoline fuel input to the electric generator. Consumption is metered on Cogeneration:Gasoline, Gasoline:Plant, and Gasoline:Facility.
 
-If the fuel type is FuelOil\#1, then FuelOil\#1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#1, FuelOil\#1:Plant, and FuelOil\#1:Facility.
+If the fuel type is FuelOilNo1, then FuelOil\#1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#1, FuelOil\#1:Plant, and FuelOil\#1:Facility.
 
-If the fuel type is FuelOil\#2, then FuelOil\#2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#2, FuelOil\#2:Plant, and FuelOil\#2:Facility.
+If the fuel type is FuelOilNo2, then FuelOil\#2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#2, FuelOil\#2:Plant, and FuelOil\#2:Facility.
 
 If the fuel type is OtherFuel1, then OtherFuel1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:OtherFuel1, OtherFuel1:Plant, and OtherFuel1:Facility.
 
@@ -1840,7 +1840,7 @@ This alpha field contains the identifying name for the combustion turbine genera
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-1}
 
-This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
+This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature-1}
 
@@ -2040,7 +2040,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2}
 
-This choice field specifies the type of fuel used by the generator. Valid fueld types are PropaneGas and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
+This choice field specifies the type of fuel used by the generator. Valid fueld types are Propane and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
 
 \paragraph{Field: Fuel Higher Heating Value}\label{field-fuel-higher-heating-value-2}
 
@@ -2322,7 +2322,7 @@ This output variable is the average electric efficiency of the generator (lower 
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} HHV Basis Rate {[}W{]}}\label{generator-fuel-type-hhv-basis-rate-w}
 
-This output variable is the average fuel-specific energy consumption rate of the electric generator in Watts (higher heating value basis) for the timestep being reported. \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or PropaneGas ( = \textgreater{} Propane ).
+This output variable is the average fuel-specific energy consumption rate of the electric generator in Watts (higher heating value basis) for the timestep being reported. \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or Propane.
 
 \paragraph{Generator Fuel HHV Basis Rate {[}W{]}}\label{generator-fuel-hhv-basis-rate-w-1}
 
@@ -2330,7 +2330,7 @@ This output variable is the average fuel energy consumption rate of the electric
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} HHV Basis Energy {[}J{]}}\label{generator-fuel-type-hhv-basis-energy-j}
 
-This output variable is the fuel-specific energy consumption of the electric generator in Joules (higher heating value basis) for the timestep being reported. This output is also added to a meter with Resource Type = \textless{}Fuel Type\textgreater{}, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or PropaneGas ( = \textgreater{} Propane ).
+This output variable is the fuel-specific energy consumption of the electric generator in Joules (higher heating value basis) for the timestep being reported. This output is also added to a meter with Resource Type = \textless{}Fuel Type\textgreater{}, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or Propane.
 
 \paragraph{Generator Fuel HHV Basis Energy {[}J{]}}\label{generator-fuel-hhv-basis-energy-j-1}
 

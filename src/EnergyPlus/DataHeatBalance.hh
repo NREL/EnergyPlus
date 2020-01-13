@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,14 +57,14 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataComplexFenestration.hh>
-#include <DataGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <EnergyPlus.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 

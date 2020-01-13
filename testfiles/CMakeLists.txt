@@ -437,6 +437,7 @@ ADD_SIMULATION_TEST(IDF_FILE RefBldgLargeOfficeNew2004_Chicago.idf EPW_FILE USA_
 ADD_SIMULATION_TEST(IDF_FILE RefBldgLargeOfficeNew2004_Chicago-ReturnReset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RefBldgMediumOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RefBldgMediumOfficeNew2004_Chicago_JSON_Outputs.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE RefBldgMediumOfficeNew2004_Chicago_epJSON.epJSON EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RefBldgMidriseApartmentNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RefBldgOutPatientNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RefBldgPrimarySchoolNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
