@@ -64,7 +64,9 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::DataLoopNode;
 
-TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
+class ChillerElecEIRFixture : public EnergyPlusFixture {};
+
+TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
 
     int Num = 1;
@@ -96,7 +98,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
     ElectricEIRChillerReport.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
+TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
     ChillerElectricEIR::ElectricEIRChiller.allocate(1);
@@ -140,7 +142,7 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
+TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_AirCooledChiller)
 {
 
     bool RunFlag(true);
