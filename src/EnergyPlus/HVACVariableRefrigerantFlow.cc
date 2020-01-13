@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1255,8 +1255,8 @@ namespace HVACVariableRefrigerantFlow {
             if (CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
                 //******************
                 // WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-                // H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-                //                    /RhoWater [kg H2O/m3 H2O]
+                // H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+                //                    /RhoWater [kgWater/m3]
                 //******************
                 RhoWater = RhoH2O(OutdoorDryBulb);
                 VRF(VRFCond).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater * VRF(VRFCond).VRFCondPLR;
@@ -8043,7 +8043,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        Real64 LatentLoadMet = 0.0; // latent load deleivered [kgH2O/s]
+        Real64 LatentLoadMet = 0.0; // latent load deleivered [kgWater/s]
         Real64 TempOut = 0.0;
         Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
@@ -8070,7 +8070,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
@@ -11099,7 +11099,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;

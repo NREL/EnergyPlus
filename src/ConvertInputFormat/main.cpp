@@ -489,7 +489,7 @@ int main(int argc, const char *argv[])
     auto const embeddedEpJSONSchema = EnergyPlus::EmbeddedEpJSONSchema::embeddedEpJSONSchema();
     auto schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
 
-    auto number_files = files.size();
+    int number_files = static_cast<int>(files.size());
     std::size_t fileCount = 0;
 
 #ifdef _OPENMP
@@ -501,7 +501,7 @@ int main(int argc, const char *argv[])
     shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
     {
 #pragma omp for
-        for (std::size_t i = 0; i < number_files; ++i) {
+        for (int i = 0; i < number_files; ++i) {
             bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
 #pragma omp atomic
             ++fileCount;

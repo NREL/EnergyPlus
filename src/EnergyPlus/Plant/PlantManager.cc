@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,12 +96,14 @@
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
@@ -1267,6 +1269,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1433,10 +1436,12 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:CompressorRack")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
