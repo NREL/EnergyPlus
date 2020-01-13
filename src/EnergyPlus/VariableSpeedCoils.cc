@@ -5542,8 +5542,8 @@ namespace VariableSpeedCoils {
             if (VarSpeedCoil(DXCoilNum).CondenserType == EvapCooled) {
                 //******************
                 //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-                //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-                //                                /RhoWater [kg H2O/m3 H2O]
+                //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+                //                                /RhoWater [kgWater/m3]
                 //******************
                 RhoEvapCondWater = RhoH2O(OutdoorDryBulb);
                 VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoEvapCondWater * RuntimeFrac;
