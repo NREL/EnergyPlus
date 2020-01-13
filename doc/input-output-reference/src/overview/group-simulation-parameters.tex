@@ -198,6 +198,11 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
+\textbf{Diffuse Radiation}
+
+Diffuse solar transmitted through exterior and interior windows is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.
+The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly (based on area and solar absorptance) to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights. Refer to the section ``Solar Distribution'' in the Engineering Reference Guide for more information including equations.
+
 \textbf{Reflection calculations}
 
 Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics},DoNotMirrorDetachedShading; in many cases to get past a fatal error.
