@@ -2201,20 +2201,18 @@ namespace SingleDuct {
             }
 
             // get current environment air terminal box turndown minimum flow fraction
+            Real64 CurrentEnvZoneTurndownMinAirFrac = 1.0;
             if (sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist) {
-                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr);
-            } else {
-                sd_airterminal(SysNum).ZoneTurndownMinAirFrac = 1.0;
-            }
-
+                CurrentEnvZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr);
+            } 
             if ((sd_airterminal(SysNum).SysType_Num == SingleDuctVAVReheat || sd_airterminal(SysNum).SysType_Num == SingleDuctCBVAVReheat) ||
                 (sd_airterminal(SysNum).SysType_Num == SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
                 if (sd_airterminal(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac) {
                     sd_airterminal(SysNum).ZoneMinAirFracDes = GetScheduleMinValue(sd_airterminal(SysNum).ZoneMinAirFracSchPtr);
                 }
-                Node(OutletNode).MassFlowRateMin = Node(OutletNode).MassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac;
-                Node(InletNode).MassFlowRateMin = Node(InletNode).MassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac;
+                Node(OutletNode).MassFlowRateMin = Node(OutletNode).MassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
+                Node(InletNode).MassFlowRateMin = Node(InletNode).MassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes * CurrentEnvZoneTurndownMinAirFrac;
             } else {
                 Node(OutletNode).MassFlowRateMin = 0.0;
                 Node(InletNode).MassFlowRateMin = 0.0;
@@ -2391,7 +2389,7 @@ namespace SingleDuct {
         sd_airterminal(SysNum).CoolEnergy = 0.0;
         
         // update to the current minimum air flow fraction
-        sd_airterminal( SysNum ).ZoneMinAirFrac = sd_airterminal( SysNum ).ZoneMinAirFracDes * sd_airterminal( SysNum ).ZoneTurndownMinAirFrac;
+        sd_airterminal(SysNum).ZoneMinAirFrac = sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac;
 
     }
 
