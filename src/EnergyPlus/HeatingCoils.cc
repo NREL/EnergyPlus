@@ -3238,24 +3238,6 @@ namespace HeatingCoils {
         SuppressWarning = true;
         CoilFound = 0;
 
-        // This function only used for dessicant regeneration and refrigeration desuperheat not a valid source
-        // IF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeRack, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. COMPRESSORRACK_REFRIGERATEDCASE .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeDetailed, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. CONDENSER_REFRIGERATION .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF
         // note should eventually get rid of this string comparison
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||

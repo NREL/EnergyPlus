@@ -19,9 +19,13 @@ set( CMAKE_VERSION_MAJOR 9 )
 set( CMAKE_VERSION_MINOR 3 )
 set( CMAKE_VERSION_PATCH 0 )
 
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
 set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
+
+string( TIMESTAMP CMAKE_YEAR "%Y")
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -179,6 +183,7 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
