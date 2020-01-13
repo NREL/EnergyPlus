@@ -355,6 +355,14 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
+    static PlantComponent *factory(std::string const &objectName) {}
+
+    void VRFCondenserEquipment::onInitLoopEquip(const PlantLocation &calledFromLocation) {}
+
+    void VRFCondenserEquipment::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) {}
+
+    void VRFCondenserEquipment::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) {}
+
     void SimVRFCondenserPlant(std::string const &VRFType,     // Type of VRF
                               int const VRFTypeNum,           // Type of VRF in Plant equipment
                               std::string const &VRFName,     // User Specified Name of VRF
@@ -374,10 +382,6 @@ namespace HVACVariableRefrigerantFlow {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages water-source VRF condenser
-
-        using PlantUtilities::UpdateChillerComponentCondenserSide;
-        using namespace DataEnvironment;
-        using General::TrimSigDigits;
 
         // Get input from VRF
         if (GetVRFInputFlag) { // First time subroutine has been entered
@@ -399,7 +403,7 @@ namespace HVACVariableRefrigerantFlow {
                         ShowFatalError("SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType);
                     }
                 }
-                SizeVRFCondenser(VRFNum);
+                VRF(VRFNum).SizeVRFCondenser();
                 return;
             }
         }
@@ -410,7 +414,7 @@ namespace HVACVariableRefrigerantFlow {
             if (SELECT_CASE_var == TypeOf_HeatPumpVRF) {
                 if (VRFNum != 0) {
                     if (LoopNum == VRF(VRFNum).SourceLoopNum) { // condenser loop
-                        UpdateChillerComponentCondenserSide(VRF(VRFNum).SourceLoopNum,
+                        PlantUtilities::UpdateChillerComponentCondenserSide(VRF(VRFNum).SourceLoopNum,
                                                             VRF(VRFNum).SourceLoopSideNum,
                                                             TypeOf_HeatPumpVRF,
                                                             VRF(VRFNum).CondenserNodeNum,
@@ -7370,7 +7374,7 @@ namespace HVACVariableRefrigerantFlow {
         DataScalableCapSizingON = false;
     }
 
-    void SizeVRFCondenser(int const VRFCond)
+    void VRFCondenserEquipment::SizeVRFCondenser()
     {
 
         // SUBROUTINE INFORMATION:
@@ -7385,14 +7389,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Set water-cooled plant flow rates.
 
-        using namespace DataSizing;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
-        using ReportSizingManager::ReportSizingOutput;
-
         static std::string const RoutineName("SizeVRFCondenser");
 
         int PltSizCondNum;         // Plant Sizing index for condenser loop
@@ -7402,50 +7398,50 @@ namespace HVACVariableRefrigerantFlow {
         bool ErrorsFound;          // indicates problem with sizing
 
         // save the design water flow rate for use by the water loop sizing algorithms
-        if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
+        if (this->CondenserType == DataHVACGlobals::WaterCooled) {
 
             ErrorsFound = false;
             PltSizCondNum = 0;
 
-            if (VRF(VRFCond).WaterCondVolFlowRate == AutoSize) {
-                if (VRF(VRFCond).SourceLoopNum > 0) PltSizCondNum = PlantLoop(VRF(VRFCond).SourceLoopNum).PlantSizNum;
+            if (this->WaterCondVolFlowRate == DataSizing::AutoSize) {
+                if (this->SourceLoopNum > 0) PltSizCondNum = PlantLoop(this->SourceLoopNum).PlantSizNum;
                 if (PltSizCondNum > 0) {
-                    rho = GetDensityGlycol(PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName,
-                                           PlantSizData(PltSizCondNum).ExitTemp,
-                                           PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex,
+                    rho = FluidProperties::GetDensityGlycol(PlantLoop(this->SourceLoopNum).FluidName,
+                                           DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                           PlantLoop(this->SourceLoopNum).FluidIndex,
                                            RoutineName);
 
-                    Cp = GetSpecificHeatGlycol(PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName,
-                                               PlantSizData(PltSizCondNum).ExitTemp,
-                                               PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex,
+                    Cp = FluidProperties::GetSpecificHeatGlycol(PlantLoop(this->SourceLoopNum).FluidName,
+                                               DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
+                                               PlantLoop(this->SourceLoopNum).FluidIndex,
                                                RoutineName);
                     tmpCondVolFlowRate =
-                        max(VRF(VRFCond).CoolingCapacity, VRF(VRFCond).HeatingCapacity) / (PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
-                    if (VRF(VRFCond).HeatingCapacity != AutoSize && VRF(VRFCond).CoolingCapacity != AutoSize) {
-                        VRF(VRFCond).WaterCondVolFlowRate = tmpCondVolFlowRate;
-                        ReportSizingOutput("AirConditioner:VariableRefrigerantFlow",
-                                           VRF(VRFCond).Name,
+                        max(this->CoolingCapacity, this->HeatingCapacity) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                    if (this->HeatingCapacity != DataSizing::AutoSize && this->CoolingCapacity != DataSizing::AutoSize) {
+                        this->WaterCondVolFlowRate = tmpCondVolFlowRate;
+                        ReportSizingManager::ReportSizingOutput("AirConditioner:VariableRefrigerantFlow",
+                                           this->Name,
                                            "Design Condenser Water Flow Rate [m3/s]",
-                                           VRF(VRFCond).WaterCondVolFlowRate);
+                                           this->WaterCondVolFlowRate);
                     }
 
-                    rho = GetDensityGlycol(PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName,
+                    rho = FluidProperties::GetDensityGlycol(PlantLoop(this->SourceLoopNum).FluidName,
                                            CWInitConvTemp,
-                                           PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex,
+                                           PlantLoop(this->SourceLoopNum).FluidIndex,
                                            RoutineName);
-                    VRF(VRFCond).WaterCondenserDesignMassFlow = VRF(VRFCond).WaterCondVolFlowRate * rho;
-                    InitComponentNodes(0.0,
-                                       VRF(VRFCond).WaterCondenserDesignMassFlow,
-                                       VRF(VRFCond).CondenserNodeNum,
-                                       VRF(VRFCond).CondenserOutletNodeNum,
-                                       VRF(VRFCond).SourceLoopNum,
-                                       VRF(VRFCond).SourceLoopSideNum,
-                                       VRF(VRFCond).SourceBranchNum,
-                                       VRF(VRFCond).SourceCompNum);
+                    this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
+                    PlantUtilities::InitComponentNodes(0.0,
+                                       this->WaterCondenserDesignMassFlow,
+                                       this->CondenserNodeNum,
+                                       this->CondenserOutletNodeNum,
+                                       this->SourceLoopNum,
+                                       this->SourceLoopSideNum,
+                                       this->SourceBranchNum,
+                                       this->SourceCompNum);
 
                 } else {
                     ShowSevereError("Autosizing of condenser water flow rate requires a condenser loop Sizing:Plant object");
-                    ShowContinueError("... occurs in AirConditioner:VariableRefrigerantFlow object=" + VRF(VRFCond).Name);
+                    ShowContinueError("... occurs in AirConditioner:VariableRefrigerantFlow object=" + this->Name);
                     ShowContinueError("... plant loop name must be referenced in Sizing:Plant object");
                     ErrorsFound = true;
                 }
@@ -7455,7 +7451,7 @@ namespace HVACVariableRefrigerantFlow {
                 ShowFatalError("Preceding sizing errors cause program termination");
             }
 
-            RegisterPlantCompDesignFlow(VRF(VRFCond).CondenserNodeNum, VRF(VRFCond).WaterCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(this->CondenserNodeNum, this->WaterCondVolFlowRate);
         }
     }
 

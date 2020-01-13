@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -63,14 +62,11 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -83,7 +79,6 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -96,12 +91,9 @@ using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::CurveManager;
-using namespace EnergyPlus::DataAirLoop;
-using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataGlobals;
-using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -117,7 +109,6 @@ using namespace EnergyPlus::HVACFan;
 using namespace EnergyPlus::HVACVariableRefrigerantFlow;
 using namespace EnergyPlus::HeatingCoils;
 using namespace EnergyPlus::GlobalNames;
-using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PlantManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
