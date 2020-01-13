@@ -921,9 +921,9 @@ namespace DualDuct {
                 if (  dd_airterminal(DamperNum).DamperType == DualDuct_ConstantVolume) {
                     Node(OutNode).MassFlowRateMin = 0.0;
                 } else if (  dd_airterminal(DamperNum).DamperType == DualDuct_VariableVolume) {
-                    // get dual duct air terminal box turndown minimum flow fraction
+                    // get dual duct air terminal box minimum flow fraction value
                     if (dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchExist) {
-                        dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = ScheduleManager::GetCurrentScheduleValue(dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr);
+                        dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = ScheduleManager::GetScheduleMinValue(dd_airterminal(DamperNum).ZoneTurndownMinAirFracSchPtr);
                     } else {
                         dd_airterminal(DamperNum).ZoneTurndownMinAirFrac = 1.0;
                     }

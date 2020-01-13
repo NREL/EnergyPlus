@@ -56,14 +56,18 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DualDuct.hh>
-
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
@@ -352,4 +356,164 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
     EXPECT_TRUE(dd_airterminal(1).ZoneTurndownMinAirFracSchExist);    // turndown schdule exists
     EXPECT_EQ(dd_airterminal(1).ZoneTurndownMinAirFrac, 1.0);         // turndown fraction initialized to 1.0
     EXPECT_EQ(dd_airterminal(1).ZoneMinAirFracDes, 0.3);              // design minimum flow fraction
+}
+
+TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
+{
+    std::string const idf_objects = delimited_string({
+        "   Zone,",
+        "    Thermal Zone;               !- Name",
+
+        "   ZoneHVAC:EquipmentConnections,",
+        "     Thermal Zone,              !- Zone Name",
+        "     Thermal Zone Equipment,    !- Zone Conditioning Equipment List Name",
+        "     DualDuct Outlet,           !- Zone Air Inlet Node or NodeList Name",
+        "     ,                          !- Zone Air Exhaust Node or NodeList Name",
+        "     Zone 1 Air Node,           !- Zone Air Node Name",
+        "     Zone 1 Return Node;        !- Zone Return Air Node Name",
+
+        "   ZoneHVAC:EquipmentList,",
+        "     Thermal Zone Equipment,    !- Name",
+        "     SequentialLoad,            !- Load Distribution Scheme",
+        "     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "     ADU Dual Duct AT,          !- Zone Equipment 1 Name",
+        "     1,                         !- Zone Equipment 1 Cooling Sequence",
+        "     1;                         !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU Dual Duct AT,        !- Name",
+        "     DualDuct Outlet,         !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:DualDuct:VAV,!- Air Terminal Object Type",
+        "     VAV Dual Duct AT;        !- Air Terminal Name",
+
+        "   AirTerminal:DualDuct:VAV,",
+        "     VAV Dual Duct AT,        !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     DualDuct Outlet,         !- Air Outlet Node Name",
+        "     DualDuct Hot Inlet,      !- Hot Air Inlet Node Name",
+        "     DualDuct Cold Inlet,     !- Cold Air Inlet Node Name",
+        "     1.0,                     !- Maximum Damper Air Flow Rate {m3/s}",
+        "     0.3,                     !- Zone Minimum Air Flow Fraction",
+        "     ,                        !- Design Specification Outdoor Air Object Name",
+        "     TurndownMinAirFlowSch1;  !- Minimum Air Flow Turndown Schedule Name",
+
+        "   Schedule:Compact,",
+        "     TurndownMinAirFlowSch1,     !- Name",
+        "     Fraction,                   !- Schedule Type Limits Name",
+        "     Through: 12/31,             !- Field 1",
+        "     For: AllDays,               !- Field 2",
+        "     Until: 24:00, 1.0;          !- Field 3",
+
+        "   Schedule:Compact,",
+        "     TurndownMinAirFlowSch2,     !- Name",
+        "     Fraction,                   !- Schedule Type Limits Name",
+        "     Through: 12/31,             !- Field 1",
+        "     For: AllDays,               !- Field 2",
+        "     Until: 24:00, 0.5;          !- Field 3",
+
+        "   ScheduleTypeLimits,",
+        "     Fraction,                   !- Name",
+        "     0,                          !- Lower Limit Value",
+        "     1,                          !- Upper Limit Value",
+        "     CONTINUOUS;                 !- Numeric Type",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+
+    // setup variables for dual duct VAV air terminal
+    int DDNum = 1;
+    int ZoneNum = 1;
+    int ZoneNodeNum = 1;
+    bool ErrorsFound = false;
+    bool FirstHVACIteration = true;
+
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ScheduleInputProcessed = true;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    ScheduleManager::UpdateScheduleValues();
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    DataHeatBalFanSys::TempControlType.allocate(1);
+    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    DataZoneEquipment::GetZoneEquipmentData1();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    DualDuct::GetDualDuctInput();
+
+    //dual duct  VAV air terminal get input test
+    EXPECT_EQ(dd_airterminal(DDNum).DamperType, DualDuct_VariableVolume); // dual duct VAV Type
+    EXPECT_EQ(dd_airterminal(DDNum).Name, "VAV DUAL DUCT AT");            // dual duct VAV Name
+    EXPECT_TRUE(dd_airterminal(DDNum).ZoneTurndownMinAirFracSchExist);    // turndown schdule exists
+    EXPECT_EQ(dd_airterminal(DDNum).ZoneTurndownMinAirFrac, 1.0);         // turndown fraction initialized to 1.0
+    EXPECT_EQ(dd_airterminal(DDNum).ZoneMinAirFracDes, 0.3);              // design minimum flow fraction
+
+    int OutNode =  dd_airterminal(DDNum).OutletNodeNum;
+    int HotInNode =  dd_airterminal(DDNum).HotAirInletNodeNum;
+    int ColdInNode =  dd_airterminal(DDNum).ColdAirInletNodeNum;
+
+    // calculate mass flow rates
+    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
+    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;              // inputs from dual duct VAV AT
+
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 2000.0;
+    DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
+    DataLoopNode::Node(HotInNode).Temp = 35.0;
+    DataLoopNode::Node(HotInNode).HumRat = 0.0075;
+    DataLoopNode::Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(HotInNode).Temp, DataLoopNode::Node(HotInNode).HumRat);
+
+    // test with heating load and turndown fraction schedule value set 1.0
+    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; // 
+    DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    DataGlobals::BeginEnvrnFlag = true;
+    FirstHVACIteration = true;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DataGlobals::BeginEnvrnFlag = false;
+    FirstHVACIteration = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DualDuct::dd_airterminal(DDNum).SimDualDuctVarVol(DDNum, ZoneNum, ZoneNodeNum);
+    // check inputs and calculated values for turndown fraction set to 1.0
+    EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFracDes);
+    EXPECT_EQ(1.0, dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRate);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRateMinAvail);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+
+    // test with heating load and turndown fraction schedule value set 0.5
+    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 2;
+    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
+    DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    DataGlobals::BeginEnvrnFlag = true;
+    FirstHVACIteration = true;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DataGlobals::BeginEnvrnFlag = false;
+    FirstHVACIteration = false;
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DualDuct::dd_airterminal(DDNum).SimDualDuctVarVol(DDNum, ZoneNum, ZoneNodeNum);
+    // check inputs and calculated values for turndown fraction set to 0.5
+    EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFracDes);
+    EXPECT_EQ(0.5, dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.15, dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(0.15, dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRate);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRateMinAvail);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
 }
