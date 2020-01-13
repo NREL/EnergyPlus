@@ -130,3 +130,12 @@ SELECT RowName as "End Use&Subcategory", Value FROM TabularDataWithStrings
 | Interior Lighting:AnotherEndUseSubCat | 83.33  |
 
 See [PR#7584](https://github.com/NREL/EnergyPlus/pull/7584).
+
+### Standardize units for humidity ratio and add where missing
+
+Units for humidity ratio standardized to "kgWater/kgDryAir" and "lbWater/lbDryAir".
+
+Impacts eio sizing output and table reports including Coil Sizing Summary and Details.
+
+See [7571](https://github.com/NREL/EnergyPlus/pull/7571)
+

@@ -135,7 +135,7 @@ namespace SystemReports {
     extern Array1D<Real64> SysHCCompHTNG;
     extern Array1D<Real64> SysHCCompGas;
     extern Array1D<Real64> SysHCCompSteam;
-    extern Array1D<Real64> SysDomesticH20;
+    extern Array1D<Real64> SysDomesticH2O;
 
     extern Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
     extern Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
