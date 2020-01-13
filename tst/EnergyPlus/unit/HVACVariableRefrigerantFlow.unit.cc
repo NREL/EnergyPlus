@@ -79,6 +79,7 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -4112,11 +4113,6 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     int ZoneInletAirNode(0);       // zone inlet node number
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
-    Real64 CurLoad(0.0);
-    Real64 MaxLoad(0.0);
-    Real64 MinLoad(0.0);
-    Real64 OptLoad(0.0);
-    int LoopNum(0);
     Real64 rho(0.0);
     Real64 Cp(0.0);
     Real64 CondVolFlowRate(0.0);
@@ -4987,20 +4983,13 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     PlantManager::SizePlantLoop(1, true);
     PlantManager::InitLoopEquip = true;
     // call air-side VRF
-    SimulateVRF(
-        VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+    SimulateVRF(VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+
     // call plant-side VRF
-    SimVRFCondenserPlant(SimPlantEquipTypes(VRF(VRFCond).VRFPlantTypeOfNum),
-                         VRF(VRFCond).VRFPlantTypeOfNum,
-                         VRF(VRFCond).Name,
-                         VRFCond,
-                         FirstHVACIteration,
-                         InitLoopEquip,
-                         CurLoad,
-                         MaxLoad,
-                         MinLoad,
-                         OptLoad,
-                         LoopNum);
+    auto vrfCondPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(VRF(VRFCond).Name);
+    PlantLocation dummyLoc;
+    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment*> (vrfCondPtr)->SourceLoopNum;
+    vrfCondPtr->onInitLoopEquip(dummyLoc);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -1000.0;

@@ -187,7 +187,6 @@ namespace PlantLoopEquip {
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
-        using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
@@ -492,24 +491,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HeatPumpVRF) {
-
-                SimVRFCondenserPlant(sim_component.TypeOf,
-                                     EquipTypeNum,
-                                     sim_component.Name,
-                                     EquipNum,
-                                     FirstHVACIteration,
-                                     InitLoopEquip,
-                                     CurLoad,
-                                     MaxLoad,
-                                     MinLoad,
-                                     OptLoad,
-                                     LoopNum); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Heat Pump Type=" + sim_component.TypeOf);

@@ -163,11 +163,11 @@ namespace HVACVariableRefrigerantFlow {
         int VRFSystemTypeNum;                // integer equivalent of system type
         int VRFAlgorithmTypeNum;             // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
         int VRFPlantTypeOfNum;               // integer equivalent of index to DataPlant type
-        int SourceLoopNum;                   // plant data for water-coole only
-        int SourceLoopSideNum;               // plant data for water-coole only
-        int SourceBranchNum;                 // plant data for water-coole only
-        int SourceCompNum;                   // plant data for water-coole only
-        Real64 WaterCondenserDesignMassFlow; // plant data for water-coole only
+        int SourceLoopNum;                   // plant data for water-cooled only
+        int SourceLoopSideNum;               // plant data for water-cooled only
+        int SourceBranchNum;                 // plant data for water-cooled only
+        int SourceCompNum;                   // plant data for water-cooled only
+        Real64 WaterCondenserDesignMassFlow; // plant data for water-cooled only
         Real64 WaterCondenserMassFlow;       // Water condenser flow rate (kg/s)
         Real64 QCondenser;                   // Water condenser heat rejection/absorption (W)
         Real64 QCondEnergy;                  // Water condenser heat rejection/aborption energy (J)
@@ -393,6 +393,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 SHHigh;                    // VRF outdoor unit superheating degrees uppler limit [C]
         Real64 SCHigh;                    // VRF outdoor unit subcooling degrees uppler limit [C]
         Real64 VRFOperationSimPath;       // simulation path indicating the VRF operation mode [--]
+        bool checkPlantCondTypeOneTime;
 
         // Default Constructor
         VRFCondenserEquipment()
@@ -433,20 +434,20 @@ namespace HVACVariableRefrigerantFlow {
               RatedEvapCapacity(40000.0), RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0),
               RatedOUFanPowerPerCapcity(0.0), RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0),
               RefPipEquLen(0.0), RefPipHei(0.0), RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0),
-              SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0)
+              SHHigh(0.0), SCHigh(0.0), VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
         {
         }
 
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
 
-        static PlantComponent *factory(std::string const &objectName);
-
         void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        static PlantComponent *factory(std::string const &objectName);
 
         void SizeVRFCondenser();
 
@@ -741,7 +742,7 @@ namespace HVACVariableRefrigerantFlow {
               MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
               CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
               SuppHeatCoilFluidMaxFlow(0.0), DesignSuppHeatingCapacity(0.0), MaxSATFromSuppHeatCoil(0.0), MaxOATSuppHeatingCoil(0.0),
-              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), FanOpModeSchedPtr(0), FanAvailSchedPtr(0), FanIndex(0), FanPower(0.0), OpMode(0),
+              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(0), FanIndex(0), FanPower(0.0), OpMode(0),
               FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0), HeatCoilIndex(0), SuppHeatCoilIndex(0),
               DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0), ParasiticOffElec(0.0),
               HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0), ParasiticHeatElecPower(0.0),
@@ -751,8 +752,8 @@ namespace HVACVariableRefrigerantFlow {
               TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0), LatentCoolingEnergy(0.0),
               LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0),
               ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), firstPass(true),
-              SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
+              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
+              firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
               fanOutletNode(0), MySuppCoilPlantScanFlag(true)
         {
         }
@@ -832,9 +833,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_string FieldNames;
 
         // Default Constructor
-        VRFTUNumericFieldData()
-        {
-        }
+        VRFTUNumericFieldData() = default;
     };
 
     // Object Data
@@ -851,19 +850,6 @@ namespace HVACVariableRefrigerantFlow {
                      Real64 &SysOutputProvided,
                      Real64 &LatOutputProvided,
                      int &CompIndex);
-
-    void SimVRFCondenserPlant(std::string const &VRFType,    // Type of VRF
-                              int VRFTypeNum,          // Type of VRF in Plant equipment
-                              std::string const &VRFName,    // User Specified Name of VRF
-                              int &VRFNum,                   // Index of Equipment
-                              bool FirstHVACIteration, // Flag for first time through HVAC simulation
-                              bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                              Real64 MyLoad,           // Loop demand component will meet
-                              Real64 &MaxCap,                // Maximum operating capacity of GSHP [W]
-                              Real64 &MinCap,                // Minimum operating capacity of GSHP [W]
-                              Real64 &OptCap,                // Optimal operating capacity of GSHP [W]
-                              int LoopNum              // The calling loop number
-    );
 
     void CalcVRFCondenser(int VRFCond,            // index to VRF condenser
                           bool FirstHVACIteration // flag for first time through HVAC system simulation
