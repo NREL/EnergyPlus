@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -413,7 +413,7 @@ namespace FuelCellElectricGenerator {
         Real64 HXenergy;           // energy from gas stream to water [J]
         Real64 THXexh;             // temperature of exhaust gases leaving heat exchanger.
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream
-        // relative to water vapor entering HX  (NdotH20/Ndoaux-mix)
+        // relative to water vapor entering HX  (NdotH2O/Ndoaux-mix)
         Real64 CondensateRate;     // water condensation rate [kmol/s]
         int SeqSubstIterations;    // number of iterations in SOFC loop
         int RegulaFalsiIterations; // number of iterations in Tproduct gas solving

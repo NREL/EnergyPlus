@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1010,7 +1010,7 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool UnitOn;        // unit on flag
-        Real64 HumRatSatIn; // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatIn; // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
 
         UnitOn = true;
         if (HumRatSet <= 0.0) UnitOn = false;
@@ -1068,8 +1068,8 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kg H2O / kg dry air]
-        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kgWater/kgDryAir]
+        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
         Real64 WaterAddNeededMax; // moisture addition rate set by controller, limited by humidifier capacity
         Real64 WaterInEnthalpy;   // enthalpy of the inlet steam [J/kg]
         Real64 HumRatSatApp;      // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions
@@ -1174,8 +1174,8 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kg H2O / kg dry air]
-        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kgWater/kgDryAir]
+        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
         Real64 WaterAddNeededMax; // moisture addition rate set by controller, limited by humidifier capacity
         Real64 WaterInEnthalpy;   // enthalpy of the inlet steam [J/kg]
         Real64 HumRatSatApp;      // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions

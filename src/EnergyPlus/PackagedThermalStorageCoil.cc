@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4420,7 +4420,7 @@ namespace PackagedThermalStorageCoil {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet hum rat [kg_h20/kg_dryair]
+        // par(2) = desired air outlet hum rat [kgWater/kgDryAir]
         // par(3) = TES coil operating mode
         // par(4) = outlet node number
         // par(5) = supply air fan operating mode (ContFanCycCoil)
@@ -4436,7 +4436,7 @@ namespace PackagedThermalStorageCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;          // index of this coil
-        Real64 OutletAirHumRat; // outlet air humidity ratio [kg_H20/Kg_dryair]
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kgWater/kgDryAir]
         int FanOpMode;          // Supply air fan operating mode
         int TESOpMode;
         int OutletNodeNum;
