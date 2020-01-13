@@ -95,14 +95,14 @@ TEST_F(GHEFixture, smoothingFunc)
     EXPECT_NEAR(GroundHeatExchangers::smoothingFunc(8, 0, 1), 1.0, tol);
 }
 
-TEST_F(GHEFixture, TDMA)
+TEST_F(GHEFixture, solveTDM)
 {
     Real64 tol = 1E-6;
     std::vector<Real64> a = {0, 3, 1, 3};
     std::vector<Real64> b = {10, 10, 7, 4};
     std::vector<Real64> c = {2, 4, 5, 0};
     std::vector<Real64> d = {3, 4, 5, 6};
-    std::vector<Real64> result = TDMA(a, b, c, d);
+    std::vector<Real64> result = solveTDM(a, b, c, d);
 
     EXPECT_NEAR(result[0], 0.148776, tol);
     EXPECT_NEAR(result[1], 0.756120, tol);

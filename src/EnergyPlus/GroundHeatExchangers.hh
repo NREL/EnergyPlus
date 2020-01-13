@@ -50,6 +50,7 @@
 
 // C++ Headers
 #include <deque>
+#include <stdarg.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -233,19 +234,25 @@ namespace GroundHeatExchangers {
         Real64 getOutletTemp1();
         Real64 getOutletTemp2();
         Real64 getHeatRate();
-        std::vector<Real64> rhs(Real64 const &inletTemp1,
+        std::vector<Real64> rhs(std::vector<Real64> const &y,
+                                Real64 const &inletTemp1,
                                 Real64 const &inletTemp2,
                                 Real64 const &flowRate,
                                 Real64 const &fluidCp,
-                                Real64 const &fluidRhoCp,
-                                std::vector<Real64> const &y);
-        std::vector<Real64> rk4(Real64 const &inletTemp1,
+                                Real64 const &fluidRhoCp);
+
+//        std::vector<Real64> rhs(std::vector<Real64> const &y, ...);
+
+        std::vector<Real64> rk4(std::vector<Real64> const &y,
+                                Real64 const &h,
+                                Real64 const &inletTemp1,
                                 Real64 const &inletTemp2,
                                 Real64 const &flowRate,
                                 Real64 const &fluidCp,
-                                Real64 const &fluidRhoCp,
-                                std::vector<Real64> const &y,
-                                Real64 const &h);
+                                Real64 const &fluidRhoCp);
+
+//        std::vector<Real64> rk4(std::vector<Real64> const &y, Real64 const &h, ...);
+
         void simulate(Real64 const &inletTemp1,
                       Real64 const &inletTemp2,
                       Real64 const &flowRate);
@@ -724,7 +731,7 @@ namespace GroundHeatExchangers {
 
     std::shared_ptr<GLHEVertArray> GetVertArray(std::string const &objectName);
 
-    std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d);
+    std::vector<Real64> solveTDM(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d);
 
     // Object Data
     extern std::vector<GLHEVert> verticalGLHE;                                            // Vertical GLHEs

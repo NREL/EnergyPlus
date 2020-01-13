@@ -50,6 +50,7 @@
 #include <fstream>
 #include <vector>
 #include <functional>
+#include <stdarg.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -201,7 +202,7 @@ namespace GroundHeatExchangers {
         return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
     }
 
-    std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
+    std::vector<Real64> solveTDM(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
     {
         // Tri-diagonal matrix solver
 
@@ -357,14 +358,44 @@ namespace GroundHeatExchangers {
         return qTot;
     }
 
-    std::vector<Real64> SingleUtubeBHSegment::rhs(
-            Real64 const &inletTemp1,
-            Real64 const &inletTemp2,
-            Real64 const &flowRate,
-            Real64 const &fluidCp,
-            Real64 const &fluidRhoCp,
-            std::vector<Real64> const &y)
+    std::vector<Real64> SingleUtubeBHSegment::rhs(std::vector<Real64> const &y,
+                                                  Real64 const &inletTemp1,
+                                                  Real64 const &inletTemp2,
+                                                  Real64 const &flowRate,
+                                                  Real64 const &fluidCp,
+                                                  Real64 const &fluidRhoCp)
     {
+        // for variadic function
+
+//        // https://stackoverflow.com/a/3530807/5965685
+//
+//        va_list args;
+//
+//        va_start(args,  y);
+//
+//        int numArgs = 5;
+//        Real64 inletTemp1(0.0);
+//        Real64 inletTemp2(0.0);
+//        Real64 flowRate(0.0);
+//        Real64 fluidCp(0.0);
+//        Real64 fluidRhoCp(0.0);
+//
+//        for (int i = 0; i < numArgs; ++i) {
+//            if (i == 0) {
+//                inletTemp1 = va_arg(args, Real64);
+//            } else if (i == 1) {
+//                inletTemp2 = va_arg(args, Real64);
+//            } else if (i == 2) {
+//                flowRate = va_arg(args, Real64);
+//            } else if (i == 3) {
+//                fluidCp = va_arg(args, Real64);
+//            } else if (i == 4) {
+//                fluidRhoCp = va_arg(args, Real64);
+//            } else {
+//                assert(false);
+//            }
+//        }
+
         // setup results vector
         std::vector<Real64> r(this->numEquations, 0.0);
 
@@ -415,24 +446,30 @@ namespace GroundHeatExchangers {
         // leg 2 node
         r[4] = ((y[1] - y[4]) * dz / rb + + (tBnd - y[4]) * dz / rb) / cg3;
 
+//        va_end(args);
+
         return r;
     }
 
-    std::vector<Real64> SingleUtubeBHSegment::rk4(Real64 const &inletTemp1,
-                                                    Real64 const &inletTemp2,
-                                                    Real64 const &flowRate,
-                                                    Real64 const &fluidCp,
-                                                    Real64 const &fluidRhoCp,
-                                                    std::vector<Real64> const &y,
-                                                    Real64 const &h)
+    std::vector<Real64> SingleUtubeBHSegment::rk4(std::vector<Real64> const &y,
+                                                  Real64 const &h,
+                                                  Real64 const &inletTemp1,
+                                                  Real64 const &inletTemp2,
+                                                  Real64 const &flowRate,
+                                                  Real64 const &fluidCp,
+                                                  Real64 const &fluidRhoCp)
     {
+        // for variadic functions
+//        va_list args;
+//        va_start(args, h);
 
         // y1 = y
         std::vector<Real64> y1;
         std::copy(y.begin(), y.end(), back_inserter(y1));
 
         // k1 = rhs(y1)
-        std::vector<Real64> k1 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y1);
+        std::vector<Real64> k1 = this->rhs(y1, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
+//        std::vector<Real64> k1 = this->rhs(y1, args);
 
         // k1 / 2
         std::vector<Real64> k1Ovr2(y.size(), 0.0);
@@ -444,7 +481,8 @@ namespace GroundHeatExchangers {
         std::transform(y2.begin(), y2.end(), k1Ovr2.begin(), y2.begin(), std::plus<Real64>());
 
         // k2 = rhs(y2)
-        std::vector<Real64> k2 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y2);
+        std::vector<Real64> k2 = this->rhs(y2, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
+//        std::vector<Real64> k2 = this->rhs(y2, args);
 
         // k2 / 2
         std::vector<Real64> k2Ovr2(y.size(), 0.0);
@@ -456,7 +494,8 @@ namespace GroundHeatExchangers {
         std::transform(y3.begin(), y3.end(), k2Ovr2.begin(), y3.begin(), std::plus<Real64>());
 
         // k3 = rhs(y3)
-        std::vector<Real64> k3 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y3);
+        std::vector<Real64> k3 = this->rhs(y3, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
+//        std::vector<Real64> k3 = this->rhs(y3, args);
 
         // y4 = y + k3
         std::vector<Real64> y4;
@@ -464,7 +503,8 @@ namespace GroundHeatExchangers {
         std::transform(y4.begin(), y4.end(), k3.begin(), y4.begin(), std::plus<Real64>());
 
         // k4 = rhs(y4)
-        std::vector<Real64> k4 = this->rhs(inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp, y4);
+        std::vector<Real64> k4 = this->rhs(y4, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
+//        std::vector<Real64> k4 = this->rhs(y4, args);
 
         // twok23 = 2 * (k2 + k3)
         std::vector<Real64> twok23;
@@ -485,6 +525,8 @@ namespace GroundHeatExchangers {
         std::copy(y.begin(), y.end(), back_inserter(r));
         std::transform(r.begin(), r.end(), step.begin(), r.begin(), std::plus<Real64>());
 
+//        va_end(args);
+
         return r;
     }
 
@@ -495,14 +537,22 @@ namespace GroundHeatExchangers {
         Real64 cp = 4179.8;
         Real64 rho = 995.6;
         Real64 rhoCp = rho * cp;
-        std::vector<Real64> retTemps = this->rk4(
-                inletTemp1,
-                inletTemp2,
-                flowRate,
-                cp,
-                rhoCp,
-                this->temps,
-                1);
+        Real64 timestep = 1;
+
+        std::vector<Real64> retTemps = this->rk4(this->temps,
+                                                 timestep,
+                                                 inletTemp1,
+                                                 inletTemp2,
+                                                 flowRate,
+                                                 cp,
+                                                 rhoCp);
+
+        // for variadic function
+//        va_list args = {inletTemp1, inletTemp2, flowRate, cp, rhoCp};
+//
+//        std::vector<Real64> retTemps = this->rk4(this->temps,
+//                                                 1,
+//                                                 args);
 
         this->temps = retTemps;
     }
@@ -670,7 +720,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // solve for cell temps
-                this->cellTemps = TDMA(a, b, c, d);
+                this->cellTemps = solveTDM(a, b, c, d);
 
                 // update time
                 t_sub += dt_sub;
@@ -1544,7 +1594,7 @@ namespace GroundHeatExchangers {
             } // end tdma setup
 
             // solve for new temperatures
-            std::vector<Real64> new_temps = TDMA(a, b, c, d);
+            std::vector<Real64> new_temps = solveTDM(a, b, c, d);
 
             for (int cell_index = 0; cell_index < num_cells; ++cell_index) {
                 Cells[cell_index].temperature = new_temps[cell_index];
