@@ -114,7 +114,6 @@ namespace ChillerElectricEIR {
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using DataGlobals::DisplayExtraWarnings;
@@ -125,8 +124,6 @@ namespace ChillerElectricEIR {
     using General::RoundSigDigits;
     using General::TrimSigDigits;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Chiller type parameters
     int const AirCooled(1);
     int const WaterCooled(2);
@@ -170,17 +167,10 @@ namespace ChillerElectricEIR {
     Array1D_bool ChillerIPLVFlagArr;
     bool getInputAllocatedFlag(false);
     bool InitMyOneTimeFlag(true);
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
-    // PUBLIC     SimEIRChillerHeatRecovery
 
     // Object Data
     Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
     Array1D<ReportEIRVars> ElectricEIRChillerReport;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Electric EIR Chiller Module Driver Subroutine
-    //*************************************************************************
 
     // Functions
     void clear_state()
@@ -244,12 +234,10 @@ namespace ChillerElectricEIR {
         //  model, initializes simulation variables, calls the appropriate model and sets
         //  up reporting variables.
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using PlantUtilities::UpdateChillerComponentCondenserSide;
         using PlantUtilities::UpdateComponentHeatRecoverySide;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EIRChillNum; // Chiller number pointer
         int LoopSide;
 
@@ -334,9 +322,6 @@ namespace ChillerElectricEIR {
         }
     }
 
-    // End Electric EIR Chiller Module Driver Subroutine
-    //******************************************************************************
-
     void GetElectricEIRChillerInput()
     {
         // SUBROUTINE INFORMATION:
@@ -346,7 +331,6 @@ namespace ChillerElectricEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Electric EIR Chiller model.
 
-        // Using/Aliasing
         using DataGlobals::MaxNameLength;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
@@ -363,11 +347,8 @@ namespace ChillerElectricEIR {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetScheduleIndex;
 
-        // Locals
-        // PARAMETERS
         static std::string const RoutineName("GetElectricEIRChillerInput: "); // include trailing blank space
 
-        // LOCAL VARIABLES
         int EIRChillerNum;                 // Chiller counter
         int NumAlphas;                     // Number of elements in the alpha array
         int NumNums;                       // Number of elements in the numeric array
@@ -385,8 +366,6 @@ namespace ChillerElectricEIR {
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
-
-        // FLOW
 
         if (getInputAllocatedFlag) return;
         cCurrentModuleObject = "Chiller:Electric:EIR";
@@ -1111,7 +1090,6 @@ namespace ChillerElectricEIR {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::DualSetPointDeadBand;
@@ -1127,7 +1105,6 @@ namespace ChillerElectricEIR {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitElectricEIRChiller");
 
         static Array1D_bool MyFlag;      // TRUE in order to set component location
@@ -1148,7 +1125,6 @@ namespace ChillerElectricEIR {
         int CompIndex;
         bool FatalError;
         bool errFlag;
-        // FLOW:
 
         // Do the one time initializations
         if (InitMyOneTimeFlag) {
@@ -1490,7 +1466,6 @@ namespace ChillerElectricEIR {
         //  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         //  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -1501,10 +1476,8 @@ namespace ChillerElectricEIR {
         using namespace OutputReportPredefined;
         using StandardRatings::CalcChillerIPLV;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricEIRChiller");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // Plant Sizing index corresponding to CurLoopNum
         int PltSizCondNum; // Plant Sizing index for condenser loop
         bool ErrorsFound;  // If errors detected in input
@@ -1883,7 +1856,6 @@ namespace ChillerElectricEIR {
         // REFERENCES:
         // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -1912,13 +1884,9 @@ namespace ChillerElectricEIR {
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyWFnTdbTwbPb;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricEIRChillerModel");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FRAC;                        // Chiller cycling ratio
         Real64 MinPartLoadRat;              // Min allowed operating fraction of full load
         Real64 MinUnloadRat;                // Min allowed unloading fraction of full load
@@ -2596,28 +2564,13 @@ namespace ChillerElectricEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from the chiller condenser
 
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
         using DataPlant::SingleSetPoint;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("EIRChillerHeatRecovery");
 
-        // DERIVED TYPE DEFINITIONS:
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode;            // Condenser inlet node number
         int CondOutletNode;           // Condenser outlet node number
         int HeatRecInNode;            // Node number of heat recovery water inlet node
@@ -2716,7 +2669,6 @@ namespace ChillerElectricEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Reporting
 
-        // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;

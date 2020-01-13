@@ -59,10 +59,6 @@ namespace EnergyPlus {
 
 namespace ChillerElectricEIR {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Chiller type parameters
     extern int const AirCooled;
     extern int const WaterCooled;
@@ -103,11 +99,6 @@ namespace ChillerElectricEIR {
     extern Array1D_bool ChillerIPLVFlagArr; // TRUE in order to calculate IPLV
     extern bool getInputAllocatedFlag;      // True when arrays are allocated
     extern bool InitMyOneTimeFlag;          // Flag used to execute code only once
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
-    // PUBLIC     SimEIRChillerHeatRecovery
-
-    // Types
 
     struct ElectricEIRChillerSpecs
     {
@@ -296,9 +287,6 @@ namespace ChillerElectricEIR {
                                Real64 &SizingFactor,              // sizing factor
                                Real64 &TempCondInDesign,
                                Real64 &TempEvapOutDesign);
-
-    // End Electric EIR Chiller Module Driver Subroutine
-    //******************************************************************************
 
     void GetElectricEIRChillerInput();
 
