@@ -245,30 +245,33 @@ namespace GroundHeatExchangers {
         this->diffusivity = this->k / this->rhoCp;
     }
 
-    Real64 FluidWorker::get_cp(Real64 const &temperature, const std::string &routineName)
+    void FluidWorker::setup(int const _loopNum)
     {
-        return FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
-                                                      temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
+        this->loopNum = _loopNum;
+        this->fluidName = DataPlant::PlantLoop(_loopNum).FluidName;
+        this->fluidIdx = DataPlant::PlantLoop(_loopNum).FluidIndex;
     }
 
-    Real64 FluidWorker::get_k(Real64 const &temperature, const std::string &routineName)
+    Real64 FluidWorker::getSpHt(Real64 const &temperature, const std::string &routineName)
     {
-        return FluidProperties::GetConductivityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
-                                                      temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
+        return FluidProperties::GetSpecificHeatGlycol(this->fluidName, temperature, this->fluidIdx, routineName);
     }
 
-    Real64 FluidWorker::get_mu(Real64 const &temperature, const std::string &routineName) {
-        return FluidProperties::GetViscosityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
-                                                   temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
-    }
-
-    Real64 FluidWorker::get_rho(Real64 const &temperature, const std::string &routineName)
+    Real64 FluidWorker::getCond(Real64 const &temperature, const std::string &routineName)
     {
-        return FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loopNum).FluidName,
-                                                 temperature, DataPlant::PlantLoop(this->loopNum).FluidIndex, routineName);
+        return FluidProperties::GetConductivityGlycol(this->fluidName, temperature, this->fluidIdx, routineName);
     }
 
-    Real64 FluidWorker::get_Pr(Real64 const &temperature, const std::string &routineName)
+    Real64 FluidWorker::getVisc(Real64 const &temperature, const std::string &routineName) {
+        return FluidProperties::GetViscosityGlycol(this->fluidName, temperature, this->fluidIdx, routineName);
+    }
+
+    Real64 FluidWorker::getDens(Real64 const &temperature, const std::string &routineName)
+    {
+        return FluidProperties::GetDensityGlycol(this->fluidName, temperature, this->fluidIdx, routineName);
+    }
+
+    Real64 FluidWorker::getPrtl(Real64 const &temperature, const std::string &routineName)
     {
         // worker to get the Prandtl number
 
@@ -276,9 +279,9 @@ namespace GroundHeatExchangers {
         // param routineName: caller routine name, str
         // returns: Prandtl number
 
-        Real64 cp = this->get_cp(temperature, routineName);
-        Real64 mu = this->get_mu(temperature, routineName);
-        Real64 k = this->get_k(temperature, routineName);
+        Real64 cp = this->getSpHt(temperature, routineName);
+        Real64 mu = this->getVisc(temperature, routineName);
+        Real64 k = this->getCond(temperature, routineName);
 
         return cp * mu / k;
     }
@@ -358,55 +361,19 @@ namespace GroundHeatExchangers {
         return qTot;
     }
 
-    std::vector<Real64> SingleUtubeBHSegment::rhs(std::vector<Real64> const &y,
-                                                  Real64 const &inletTemp1,
-                                                  Real64 const &inletTemp2,
-                                                  Real64 const &flowRate,
-                                                  Real64 const &fluidCp,
-                                                  Real64 const &fluidRhoCp)
+    std::vector<Real64> SingleUtubeBHSegment::rhs(std::vector<Real64> const &y, std::vector<Real64> const &params)
     {
-        // for variadic function
-
-//        // https://stackoverflow.com/a/3530807/5965685
-//
-//        va_list args;
-//
-//        va_start(args,  y);
-//
-//        int numArgs = 5;
-//        Real64 inletTemp1(0.0);
-//        Real64 inletTemp2(0.0);
-//        Real64 flowRate(0.0);
-//        Real64 fluidCp(0.0);
-//        Real64 fluidRhoCp(0.0);
-//
-//        for (int i = 0; i < numArgs; ++i) {
-//            if (i == 0) {
-//                inletTemp1 = va_arg(args, Real64);
-//            } else if (i == 1) {
-//                inletTemp2 = va_arg(args, Real64);
-//            } else if (i == 2) {
-//                flowRate = va_arg(args, Real64);
-//            } else if (i == 3) {
-//                fluidCp = va_arg(args, Real64);
-//            } else if (i == 4) {
-//                fluidRhoCp = va_arg(args, Real64);
-//            } else {
-//                assert(false);
-//            }
-//        }
-
         // setup results vector
         std::vector<Real64> r(this->numEquations, 0.0);
 
         // local parameters
         Real64 dz = this->length;
         Real64 tBnd = this->boundaryTemp;
-        Real64 tIn1 = inletTemp1;
-        Real64 tIn2 = inletTemp2;
+        Real64 tIn1 = params[0];
+        Real64 tIn2 = params[1];
 
         // fluid resistance
-        Real64 rf = 1 / (flowRate * fluidCp);
+        Real64 rf = 1 / (params[2] * params[3]);
 
         // bh resistance
         Real64 rb = this->bhResist;
@@ -415,7 +382,7 @@ namespace GroundHeatExchangers {
         Real64 r12 = this->dcResist;
 
         // fluid node capacitance
-        Real64 cf1 = fluidRhoCp * this->pipe.volFluid;
+        Real64 cf1 = params[4] * this->pipe.volFluid;
         Real64 cf2 = cf1;
 
         // direct-coupling grout node
@@ -446,30 +413,19 @@ namespace GroundHeatExchangers {
         // leg 2 node
         r[4] = ((y[1] - y[4]) * dz / rb + + (tBnd - y[4]) * dz / rb) / cg3;
 
-//        va_end(args);
-
         return r;
     }
 
     std::vector<Real64> SingleUtubeBHSegment::rk4(std::vector<Real64> const &y,
                                                   Real64 const &h,
-                                                  Real64 const &inletTemp1,
-                                                  Real64 const &inletTemp2,
-                                                  Real64 const &flowRate,
-                                                  Real64 const &fluidCp,
-                                                  Real64 const &fluidRhoCp)
+                                                  std::vector<Real64> const &params)
     {
-        // for variadic functions
-//        va_list args;
-//        va_start(args, h);
-
         // y1 = y
         std::vector<Real64> y1;
         std::copy(y.begin(), y.end(), back_inserter(y1));
 
         // k1 = rhs(y1)
-        std::vector<Real64> k1 = this->rhs(y1, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
-//        std::vector<Real64> k1 = this->rhs(y1, args);
+        std::vector<Real64> k1 = this->rhs(y1, params);
 
         // k1 / 2
         std::vector<Real64> k1Ovr2(y.size(), 0.0);
@@ -481,8 +437,7 @@ namespace GroundHeatExchangers {
         std::transform(y2.begin(), y2.end(), k1Ovr2.begin(), y2.begin(), std::plus<Real64>());
 
         // k2 = rhs(y2)
-        std::vector<Real64> k2 = this->rhs(y2, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
-//        std::vector<Real64> k2 = this->rhs(y2, args);
+        std::vector<Real64> k2 = this->rhs(y2, params);
 
         // k2 / 2
         std::vector<Real64> k2Ovr2(y.size(), 0.0);
@@ -494,8 +449,7 @@ namespace GroundHeatExchangers {
         std::transform(y3.begin(), y3.end(), k2Ovr2.begin(), y3.begin(), std::plus<Real64>());
 
         // k3 = rhs(y3)
-        std::vector<Real64> k3 = this->rhs(y3, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
-//        std::vector<Real64> k3 = this->rhs(y3, args);
+        std::vector<Real64> k3 = this->rhs(y3, params);
 
         // y4 = y + k3
         std::vector<Real64> y4;
@@ -503,8 +457,7 @@ namespace GroundHeatExchangers {
         std::transform(y4.begin(), y4.end(), k3.begin(), y4.begin(), std::plus<Real64>());
 
         // k4 = rhs(y4)
-        std::vector<Real64> k4 = this->rhs(y4, inletTemp1, inletTemp2, flowRate, fluidCp, fluidRhoCp);
-//        std::vector<Real64> k4 = this->rhs(y4, args);
+        std::vector<Real64> k4 = this->rhs(y4, params);
 
         // twok23 = 2 * (k2 + k3)
         std::vector<Real64> twok23;
@@ -525,8 +478,6 @@ namespace GroundHeatExchangers {
         std::copy(y.begin(), y.end(), back_inserter(r));
         std::transform(r.begin(), r.end(), step.begin(), r.begin(), std::plus<Real64>());
 
-//        va_end(args);
-
         return r;
     }
 
@@ -539,20 +490,8 @@ namespace GroundHeatExchangers {
         Real64 rhoCp = rho * cp;
         Real64 timestep = 1;
 
-        std::vector<Real64> retTemps = this->rk4(this->temps,
-                                                 timestep,
-                                                 inletTemp1,
-                                                 inletTemp2,
-                                                 flowRate,
-                                                 cp,
-                                                 rhoCp);
-
-        // for variadic function
-//        va_list args = {inletTemp1, inletTemp2, flowRate, cp, rhoCp};
-//
-//        std::vector<Real64> retTemps = this->rk4(this->temps,
-//                                                 1,
-//                                                 args);
+        std::vector<Real64> params = {inletTemp1, inletTemp2, flowRate, cp, rhoCp};
+        std::vector<Real64> retTemps = rk4(this->temps, timestep, params);
 
         this->temps = retTemps;
     }
@@ -638,7 +577,7 @@ namespace GroundHeatExchangers {
 
         static std::string const routineName("Pipe::calcTransitTime");
 
-        Real64 rho = this->fluid.get_rho(temperature, routineName);
+        Real64 rho = this->fluid.getDens(temperature, routineName);
         Real64 vdot = flowRate / rho;
         return this->volFluid / vdot;
     }
@@ -683,7 +622,7 @@ namespace GroundHeatExchangers {
             Real64 tau_0 = tau - this->numCells * tau_n;
 
             // volume flow rate
-            Real64 rho = this->fluid.get_rho(inletTemp, routineName);
+            Real64 rho = this->fluid.getDens(inletTemp, routineName);
             Real64 v_dot = flowRate / rho;
 
             // volume for ideal-mixed cells
@@ -781,7 +720,7 @@ namespace GroundHeatExchangers {
         // returns: Reynolds number
 
         static std::string const routineName("Pipe::calcTransitTime");
-        Real64 mu = this->fluid.get_mu(temperature, routineName);
+        Real64 mu = this->fluid.getVisc(temperature, routineName);
         return 4 * flowRate / (mu * DataGlobals::Pi * this->innerDia);
     }
 
@@ -836,7 +775,7 @@ namespace GroundHeatExchangers {
         Real64 f = this->calcFrictionFactor(Re);
 
         // Prandtl number
-        Real64 Pr = this->fluid.get_Pr(temperature, routineName);
+        Real64 Pr = this->fluid.getPrtl(temperature, routineName);
 
         return (f / 8) * (Re - 1000) * Pr / (1 + 12.7 * std::pow(f / 8, 0.5) * (std::pow(Pr, 2.0 / 3.0) - 1));
     }
@@ -870,7 +809,7 @@ namespace GroundHeatExchangers {
         } else
             Nu = turbulentNusselt(Re, temperature);
 
-        Real64 k = this->fluid.get_k(temperature, routineName);
+        Real64 k = this->fluid.getCond(temperature, routineName);
         this->resistConv = 1 / (Nu * DataGlobals::Pi * k);
         return this->resistConv;
     }

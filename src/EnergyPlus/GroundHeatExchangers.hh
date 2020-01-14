@@ -63,6 +63,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
@@ -101,13 +102,17 @@ namespace GroundHeatExchangers {
     {
         // members
         int loopNum;
+        std::string fluidName;
+        int fluidIdx;
 
         // default constructor
-        FluidWorker() : loopNum(0) {
+        FluidWorker() : loopNum(0), fluidIdx(0)
+        {
         }
 
         // member constructor
-        FluidWorker(int const loopNum) : loopNum(loopNum)
+        FluidWorker(int const loopNum) : loopNum(loopNum), fluidName(DataPlant::PlantLoop(loopNum).FluidName),
+        fluidIdx(DataPlant::PlantLoop(loopNum).FluidIndex)
         {
         }
 
@@ -115,11 +120,12 @@ namespace GroundHeatExchangers {
         ~FluidWorker() = default;
 
         // member methods
-        Real64 get_cp(Real64 const &temperature, const std::string &routineName);
-        Real64 get_k(Real64 const &temperature, const std::string &routineName);
-        Real64 get_mu(Real64 const &temperature, const std::string &routineName);
-        Real64 get_rho(Real64 const &temperature, const std::string &routineName);
-        Real64 get_Pr(Real64 const &temperature, const std::string &routineName);
+        void setup(int const loopNum);
+        Real64 getSpHt(Real64 const &temperature, const std::string &routineName);
+        Real64 getCond(Real64 const &temperature, const std::string &routineName);
+        Real64 getVisc(Real64 const &temperature, const std::string &routineName);
+        Real64 getDens(Real64 const &temperature, const std::string &routineName);
+        Real64 getPrtl(Real64 const &temperature, const std::string &routineName);
     };
 
     struct Pipe
@@ -234,25 +240,8 @@ namespace GroundHeatExchangers {
         Real64 getOutletTemp1();
         Real64 getOutletTemp2();
         Real64 getHeatRate();
-        std::vector<Real64> rhs(std::vector<Real64> const &y,
-                                Real64 const &inletTemp1,
-                                Real64 const &inletTemp2,
-                                Real64 const &flowRate,
-                                Real64 const &fluidCp,
-                                Real64 const &fluidRhoCp);
-
-//        std::vector<Real64> rhs(std::vector<Real64> const &y, ...);
-
-        std::vector<Real64> rk4(std::vector<Real64> const &y,
-                                Real64 const &h,
-                                Real64 const &inletTemp1,
-                                Real64 const &inletTemp2,
-                                Real64 const &flowRate,
-                                Real64 const &fluidCp,
-                                Real64 const &fluidRhoCp);
-
-//        std::vector<Real64> rk4(std::vector<Real64> const &y, Real64 const &h, ...);
-
+        std::vector<Real64> rhs(std::vector<Real64> const &y, std::vector<Real64> const &params);
+        std::vector<Real64> rk4(std::vector<Real64> const &y, Real64 const &h, std::vector<Real64> const &params);
         void simulate(Real64 const &inletTemp1,
                       Real64 const &inletTemp2,
                       Real64 const &flowRate);
