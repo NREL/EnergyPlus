@@ -1218,7 +1218,7 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Heating")) {
+                                                                   "HeatPump:PlantLoop:EIR:Heating")) {
                                 this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
@@ -1229,7 +1229,7 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Cooling")) {
+                                                                   "HeatPump:PlantLoop:EIR:Cooling")) {
                                 this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
