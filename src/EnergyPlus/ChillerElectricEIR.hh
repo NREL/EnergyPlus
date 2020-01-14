@@ -184,6 +184,8 @@ namespace ChillerElectricEIR {
         Real64 ChillerCapFT;         // Chiller capacity fraction (evaluated as a function of temperature)
         Real64 ChillerEIRFT;         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
         Real64 ChillerEIRFPLR;       // Chiller EIR as a function of part-load ratio (PLR)
+        Real64 ChillerPartLoadRatio; // Chiller part-load ratio (PLR)
+        Real64 ChillerCyclingRatio;  // Chiller cycling ratio
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -205,7 +207,8 @@ namespace ChillerElectricEIR {
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), MyFlag(true), MyEnvrnFlag(true),
               EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0),
-              HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0)
+              HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
+              ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0)
         {
         }
     };
@@ -213,8 +216,6 @@ namespace ChillerElectricEIR {
     struct ReportEIRVars
     {
         // Members
-        Real64 ChillerPartLoadRatio;          // reporting: Chiller PLR (Load/Capacity)
-        Real64 ChillerCyclingRatio;           // reporting: Chiller cycling ratio (time on/time step)
         Real64 ChillerFalseLoadRate;          // reporting: Chiller false load over and above water side load [J]
         Real64 ChillerFalseLoad;              // reporting: Chiller false load over and above water side load [W]
         Real64 Energy;                        // reporting: Chiller electric consumption [J]
@@ -233,7 +234,7 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ReportEIRVars()
-            : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
+            : ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
               Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
               ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0),

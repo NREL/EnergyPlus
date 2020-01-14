@@ -128,8 +128,6 @@ namespace ChillerElectricEIR {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumElectricEIRChillers(0);    // Number of electric EIR chillers specified in input
-    Real64 ChillerPartLoadRatio(0.0); // Chiller part-load ratio (PLR)
-    Real64 ChillerCyclingRatio(0.0);  // Chiller cycling ratio
     Real64 BasinHeaterPower(0.0);     // Basin heater power (W)
     Real64 ChillerFalseLoadRate(0.0); // Chiller false load over and above the water-side load [W]
     Real64 AvgCondSinkTemp(0.0);      // condenser temperature value for use in curves [C]
@@ -150,8 +148,6 @@ namespace ChillerElectricEIR {
     void clear_state()
     {
         NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
-        ChillerPartLoadRatio = 0.0; // Chiller part-load ratio (PLR)
-        ChillerCyclingRatio = 0.0;  // Chiller cycling ratio
         BasinHeaterPower = 0.0;     // Basin heater power (W)
         ChillerFalseLoadRate = 0.0; // Chiller false load over and above the water-side load [W]
         AvgCondSinkTemp = 0.0;      // condenser temperature value for use in curves [C]
@@ -747,13 +743,13 @@ namespace ChillerElectricEIR {
         for (EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum) {
             SetupOutputVariable("Chiller Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerPartLoadRatio,
+                                ElectricEIRChiller(EIRChillerNum).ChillerPartLoadRatio,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Cycling Ratio",
                                 OutputProcessor::Unit::None,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerCyclingRatio,
+                                ElectricEIRChiller(EIRChillerNum).ChillerCyclingRatio,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
@@ -1795,8 +1791,6 @@ namespace ChillerElectricEIR {
         Real64 RhoAir;                         // air density [kg/m3]
 
         // Set module level inlet and outlet nodes and initialize other local variables
-        ChillerPartLoadRatio = 0.0;
-        ChillerCyclingRatio = 0.0;
         ChillerFalseLoadRate = 0.0;
         EvapInletNode = ElectricEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum;
@@ -2173,7 +2167,7 @@ namespace ChillerElectricEIR {
                 ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(EvapInletNode).Temp;
                 ElectricEIRChiller(EIRChillNum).QEvaporator = 0.0;
                 PartLoadRat = 0.0;
-                ChillerPartLoadRatio = PartLoadRat;
+                ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
 
                 // DSU? so what if the delta T is zero?  On FlowLock==0, the inlet temp could = setpoint, right?
                 if (ElectricEIRChiller(EIRChillNum).DeltaTErrCount < 1 && !DataGlobals::WarmupFlag) {
@@ -2264,7 +2258,7 @@ namespace ChillerElectricEIR {
             // update corresponding variables at faulty case
             PartLoadRat = (AvailChillerCap > 0.0) ? (ElectricEIRChiller(EIRChillNum).QEvaporator / AvailChillerCap) : 0.0;
             PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
-            ChillerPartLoadRatio = PartLoadRat;
+            ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
         }
 
         // Checks QEvaporator on the basis of the machine limits.
@@ -2290,7 +2284,7 @@ namespace ChillerElectricEIR {
         if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
 
         // set the module level variable used for reporting FRAC
-        ChillerCyclingRatio = FRAC;
+        ElectricEIRChiller(EIRChillNum).ChillerCyclingRatio = FRAC;
 
         // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
         if (AvailChillerCap > 0.0) {
@@ -2300,7 +2294,7 @@ namespace ChillerElectricEIR {
         }
 
         // set the module level variable used for reporting PLR
-        ChillerPartLoadRatio = PartLoadRat;
+        ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
 
         // calculate the load due to false loading on chiller over and above water side load
         ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - ElectricEIRChiller(EIRChillNum).QEvaporator;
@@ -2548,8 +2542,8 @@ namespace ChillerElectricEIR {
                 DataLoopNode::Node(CondOutletNode).MassFlowRate = 0.0;
             }
 
-            ElectricEIRChillerReport(Num).ChillerPartLoadRatio = 0.0;
-            ElectricEIRChillerReport(Num).ChillerCyclingRatio = 0.0;
+            ElectricEIRChiller(Num).ChillerPartLoadRatio = 0.0;
+            ElectricEIRChiller(Num).ChillerCyclingRatio = 0.0;
             ElectricEIRChillerReport(Num).ChillerFalseLoadRate = 0.0;
             ElectricEIRChillerReport(Num).ChillerFalseLoad = 0.0;
             ElectricEIRChiller(Num).Power = 0.0;
@@ -2606,8 +2600,6 @@ namespace ChillerElectricEIR {
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            ElectricEIRChillerReport(Num).ChillerPartLoadRatio = ChillerPartLoadRatio;
-            ElectricEIRChillerReport(Num).ChillerCyclingRatio = ChillerCyclingRatio;
             ElectricEIRChillerReport(Num).ChillerFalseLoadRate = ChillerFalseLoadRate;
             ElectricEIRChillerReport(Num).ChillerFalseLoad = ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             ElectricEIRChillerReport(Num).Energy = ElectricEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
