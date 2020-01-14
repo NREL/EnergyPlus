@@ -806,7 +806,7 @@ TEST_F(EvapCoolersFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode
                                                             thisEvapCooler.SecInletWetBulbTemp,
                                                             thisEvapCooler.SecInletHumRat);
     // test outlet temperature in full wet operating mode
-    EXPECT_NEAR(22.035628057558771, thisEvapCooler.OutletTemp, 0.001);
+    EXPECT_NEAR(22.036, thisEvapCooler.OutletTemp, 0.001);
 }
 
 TEST_F(EvapCoolersFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
