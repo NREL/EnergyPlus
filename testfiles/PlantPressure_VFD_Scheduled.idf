@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -256,7 +256,7 @@
     BGSeries60,              !- Pump Curve Name
     0.1778,                  !- Impeller Diameter {m}
     ManualControl,           !- VFD Control Type
-    RPMSchedule;             !- Pump rpm Schedule Name
+    RPMSchedule;             !- Pump RPM Schedule Name
 
   Schedule:Compact,
     RPMSchedule,             !- Name

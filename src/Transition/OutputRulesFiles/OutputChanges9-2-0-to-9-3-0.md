@@ -15,38 +15,127 @@ See [7397](https://github.com/NREL/EnergyPlus/pull/7397)
 
 ### Name re-ordering in the sizing labels and modified variable names for MulitSpeed DX Cooling and Heating Coils
 
-The change impacts rated capacity, rated flow rate, rated sensible heat ratio, etc, see sample changes below 
+The change impacts rated capacity, rated flow rate, rated sensible heat ratio, etc, see sample changes below
 
+
+*Before:*
 ```
-Before: 
 'Speed X' Design Size Design Size Rated Total Cooling Capacity
 'Speed X' Design Size Gross Rated Heating Capacity
-'Speed X' Design Size Rated Air Flow Rate 
-'Speed X' Design Size Rated Sensible Heat Ratio 
+'Speed X' Design Size Rated Air Flow Rate
+'Speed X' Design Size Rated Sensible Heat Ratio
 'Speed X' Design Size Evaporative Condenser Air Flow Rate
 'Speed X' Design Size Rated Evaporative Condenser Pump Power Consumption
-          
+
 'Speed X' User-Specified User-Specified Total Cooling Capacity
 'Speed X' User-Specified Gross Rated Heating Capacity
-'Speed X' User-Specified Rated Air Flow Rate 
-'Speed X' User-Specified Rated Sensible Heat Ratio 
+'Speed X' User-Specified Rated Air Flow Rate
+'Speed X' User-Specified Rated Sensible Heat Ratio
 'Speed X' User-Specified Evaporative Condenser Air Flow Rate
 'Speed X' User-Specified Rated Evaporative Condenser Pump Power Consumption
+```
 
-After:
+*After:*
+```
 Design Size 'Speed X' Gross Rated Total Cooling Capacity
 Design Size 'Speed X' Gross Rated Heating Capacity
-Design Size 'Speed X' Rated Air Flow Rate 
-Design Size 'Speed X' Rated Sensible Heat Ratio 
+Design Size 'Speed X' Rated Air Flow Rate
+Design Size 'Speed X' Rated Sensible Heat Ratio
 Design Size 'Speed X' Evaporative Condenser Air Flow Rate
 Design Size 'Speed X' Rated Evaporative Condenser Pump Power Consumption
 
 User-Specified 'Speed X' Gross Rated Total Cooling Capacity
 User-Specified 'Speed X' Gross Rated Heating Capacity
-User-Specified 'Speed X' Rated Air Flow Rate 
-User-Specified 'Speed X' Rated Sensible Heat Ratio 
+User-Specified 'Speed X' Rated Air Flow Rate
+User-Specified 'Speed X' Rated Sensible Heat Ratio
 User-Specified 'Speed X' Evaporative Condenser Air Flow Rate
 User-Specified 'Speed X' Rated Evaporative Condenser Pump Power Consumption
+```
 
+### EIO output for SizingPeriod:DesignDay
+
+In the eio and table output related to `SizingPeriod:DesignDay`, the Humidity Indicating Type and Value are now correctly reported. Example:
+
+*Before:*
+```
+! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow
+Environment:Design Day Data,33.00,6.60,DefaultMultipliers,100511,220,3.2,0.00,No,No
+```
+
+If we realign to the header, we see that two values related to Humidity Indicating Value were missing.
 
 ```
+# Realign to header
+Environment:Design Day Data,33.00,6.60,DefaultMultipliers,<MISSING>,<MISSING>,100511,220,3.2,0.00,No,No
+```
+
+*v9.3.0:* The `Hum Ind Type` and `Hum Ind Value at Max Temp` are swapped and actually output to the EIO, and the `Hum Ind Units` is added:
+
+```
+! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow
+Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No
+```
+
+See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
+
+### End Use By Subcategory in SQL
+
+In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
+the tables `TableName = "End Uses by Subcategory"` have been refactored. `RowName` is now in the format `<End Use Category>:<End Use Subcategory>`.
+This will allow querying a specific End Use Subcategory in the SQL file more easily.
+
+Example SQL Queries:
+
+* Get the Value corresponding to a specific Fuel Type "Electricity", End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName = 'Interior Lighting:GeneralLights'
+```
+
+* Return all rows (one row per fuel type) for End Use "Interior Lighting", Subcategory "GeneralLights":
+
+```sql
+SELECT ColumnName as FuelType, Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND RowName = 'Interior Lighting:GeneralLights'
+```
+
+| FuelType         | Value |
+|------------------|-------|
+| Electricity      | 83.33 |
+| Natural Gas      | 0.00  |
+| Additional Fuel  | 0.00  |
+| District Cooling | 0.00  |
+| District Heating | 0.00  |
+| Water            | 0.00  |
+
+* Get all rows related to Electricity usage by Interior Lighting:
+
+```sql
+SELECT RowName as "End Use&Subcategory", Value FROM TabularDataWithStrings
+  WHERE TableName = 'End Uses By Subcategory'
+  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+  AND ColumnName = 'Electricity'
+  AND RowName LIKE 'Interior Lighting:%'
+```
+
+| End Use&Subcategory                   | Value  |
+|---------------------------------------|--------|
+| Interior Lighting:GeneralLights       | 166.67 |
+| Interior Lighting:AnotherEndUseSubCat | 83.33  |
+
+See [PR#7584](https://github.com/NREL/EnergyPlus/pull/7584).
+
+### Standardize units for humidity ratio and add where missing
+
+Units for humidity ratio standardized to "kgWater/kgDryAir" and "lbWater/lbDryAir".
+
+Impacts eio sizing output and table reports including Coil Sizing Summary and Details.
+
+See [7571](https://github.com/NREL/EnergyPlus/pull/7571)
+
