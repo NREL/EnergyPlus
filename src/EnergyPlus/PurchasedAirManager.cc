@@ -1982,8 +1982,8 @@ namespace PurchasedAirManager {
         Real64 SupplyMassFlowRateForDehum; // System supply air mass flow rate required to meet dehumidification load [kg/s]
         Real64 SupplyMassFlowRateForCool;  // System supply air mass flow rate required to meet sensible cooling load[kg/s]
         Real64 SupplyMassFlowRateForHeat;  // System supply air mass flow rate required to meet sensible heating load[kg/s]
-        Real64 SupplyHumRatForHumid;       // Supply air humidity ratio require to meet the humidification load [kgH2O/kgAir]
-        Real64 SupplyHumRatForDehum;       // Supply air humidity ratio require to meet the dehumidification load [kgH2O/kgAir]
+        Real64 SupplyHumRatForHumid;       // Supply air humidity ratio require to meet the humidification load [kgWater/kgDryAir]
+        Real64 SupplyHumRatForDehum;       // Supply air humidity ratio require to meet the dehumidification load [kgWater/kgDryAir]
         Real64 OAMassFlowRate;             // Outdoor air mass flow rate [kg/s]
         Real64 OAVolFlowRate;              // Outdoor air volume flow rate at standard density [m3/s]
         Real64 MinOASensOutput;            // Minimum Outdoor air sensible output [W], <0 means OA is cooler than zone air
@@ -1998,19 +1998,19 @@ namespace PurchasedAirManager {
         Real64 DeltaHumRat;                // Delta humidity ratio - reused in multiple places
         Real64 QZnHeatSP;                  // Load required to meet heating setpoint [W] (>0 is a heating load)
         Real64 QZnCoolSP;                  // Load required to meet cooling setpoint [W] (<0 is a cooling load)
-        Real64 MdotZnHumidSP;              // Load required to meet humidifying setpoint [kg H2O/s] (>0 = a humidify load)
-        Real64 MdotZnDehumidSP;            // Load required to meet dehumidifying setpoint [kg H2O/s] (<0 = a dehumidify load)
+        Real64 MdotZnHumidSP;              // Load required to meet humidifying setpoint [kgWater/s] (>0 = a humidify load)
+        Real64 MdotZnDehumidSP;            // Load required to meet dehumidifying setpoint [kgWater/s] (<0 = a dehumidify load)
         bool UnitOn;
         bool HeatOn;             // Flag for heating and humidification availbility schedule, true if heating is on
         bool CoolOn;             // Flag for cooling and dehumidification availbility schedule, true if cooling is on
         bool EconoOn;            // Flag for economizer operation, true if economizer is on
         Real64 SupplyTemp;       // Supply inlet to zone dry bulb temperature [C]
-        Real64 SupplyHumRat;     // Supply inlet to zone humidity ratio [kg H2O/kg Air]
-        Real64 SupplyHumRatOrig; // Supply inlet to zone humidity ratio before saturation check [kg H2O/kg Air]
-        Real64 SupplyHumRatSat;  // Supply inlet to zone humidity ratio saturation at SupplyTemp [kg H2O/kg Air]
+        Real64 SupplyHumRat;     // Supply inlet to zone humidity ratio [kgWater/kgDryAir]
+        Real64 SupplyHumRatOrig; // Supply inlet to zone humidity ratio before saturation check [kgWater/kgDryAir]
+        Real64 SupplyHumRatSat;  // Supply inlet to zone humidity ratio saturation at SupplyTemp [kgWater/kgDryAir]
         Real64 SupplyEnthalpy;   // Supply inlet to zone enthalpy [J/kg]
         Real64 MixedAirTemp;     // Mixed air dry bulb temperature [C]
-        Real64 MixedAirHumRat;   // Mixed air humidity ratio [kg H2O/kg Air]
+        Real64 MixedAirHumRat;   // Mixed air humidity ratio [kgWater/kgDryAir]
         Real64 MixedAirEnthalpy; // Mixed air enthalpy [J/kg]
         Real64 CpAir;            // Specific heat [J/kg-C] reused in multiple places
         //         REAL(r64) :: SpecHumOut   ! Specific humidity ratio of outlet air (kg moisture / kg moist air)
@@ -2810,7 +2810,7 @@ namespace PurchasedAirManager {
                               Real64 const OAMassFlowRate,     // outside air mass flow rate [kg/s]
                               Real64 const SupplyMassFlowRate, // supply air mass flow rate [kg/s]
                               Real64 &MixedAirTemp,            // Mixed air dry bulb temperature [C]
-                              Real64 &MixedAirHumRat,          // Mixed air humidity ratio [kg H2O/kg Air]
+                              Real64 &MixedAirHumRat,          // Mixed air humidity ratio [kgWater/kgDryAir]
                               Real64 &MixedAirEnthalpy,        // Mixed air enthalpy [J/kg]
                               int const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     )
@@ -2849,14 +2849,14 @@ namespace PurchasedAirManager {
         int RecircNodeNum;           // Zone return air node
         int OANodeNum;               // Outdoor air inlet node
         Real64 RecircTemp;           // Recirculated air from zone dry bulb temperature [C]
-        Real64 RecircHumRat;         // Recirculated air from zone humidity ratio [kg H2O/kg Air]
+        Real64 RecircHumRat;         // Recirculated air from zone humidity ratio [kgWater/kgDryAir]
         Real64 RecircEnthalpy;       // Recirculated air from zone enthalpy [J/kg]
         Real64 RecircMassFlowRate;   // Recirculated air mass flow rate [kg/s]
         Real64 OAInletTemp;          // Outdoor air inlet dry bulb temperature [C]
-        Real64 OAInletHumRat;        // Outdoor air inlet humidity ratio [kg H2O/kg Air]
+        Real64 OAInletHumRat;        // Outdoor air inlet humidity ratio [kgWater/kgDryAir]
         Real64 OAInletEnthalpy;      // Outdoor air inlet enthalpy [J/kg]
         Real64 OAAfterHtRecTemp;     // Outdoor air after heat recovery to mixing box dry bulb temperature [C]
-        Real64 OAAfterHtRecHumRat;   // Outdoor air after heat recovery to mixing box humidity ratio [kg H2O/kg Air]
+        Real64 OAAfterHtRecHumRat;   // Outdoor air after heat recovery to mixing box humidity ratio [kgWater/kgDryAir]
         Real64 OAAfterHtRecEnthalpy; // Outdoor air after heat recovery to mixing box enthalpy [J/kg]
         bool HeatRecOn;
         Real64 CpAir; // Specific heat [J/kg-C] reused in multiple places
