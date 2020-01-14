@@ -128,9 +128,6 @@ namespace ChillerElectricEIR {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumElectricEIRChillers(0);    // Number of electric EIR chillers specified in input
-    Real64 ChillerCapFT(0.0);         // Chiller capacity fraction (evaluated as a function of temperature)
-    Real64 ChillerEIRFT(0.0);         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-    Real64 ChillerEIRFPLR(0.0);       // Chiller EIR as a function of part-load ratio (PLR)
     Real64 ChillerPartLoadRatio(0.0); // Chiller part-load ratio (PLR)
     Real64 ChillerCyclingRatio(0.0);  // Chiller cycling ratio
     Real64 BasinHeaterPower(0.0);     // Basin heater power (W)
@@ -153,9 +150,6 @@ namespace ChillerElectricEIR {
     void clear_state()
     {
         NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
-        ChillerCapFT = 0.0;         // Chiller capacity fraction (evaluated as a function of temperature)
-        ChillerEIRFT = 0.0;         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-        ChillerEIRFPLR = 0.0;       // Chiller EIR as a function of part-load ratio (PLR)
         ChillerPartLoadRatio = 0.0; // Chiller part-load ratio (PLR)
         ChillerCyclingRatio = 0.0;  // Chiller cycling ratio
         BasinHeaterPower = 0.0;     // Basin heater power (W)
@@ -346,22 +340,22 @@ namespace ChillerElectricEIR {
             ElectricEIRChiller(EIRChillerNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves
-            ElectricEIRChiller(EIRChillerNum).ChillerCapFT = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFT == 0) {
+            ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
+            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + " \"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).ChillerEIRFT = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFT == 0) {
+            ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
+            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
-            ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR == 0) {
+            ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
                 ErrorsFound = true;
@@ -653,8 +647,8 @@ namespace ChillerElectricEIR {
             }
 
             //   Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
-            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFT > 0) {
-                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerCapFT,
+            if (ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex > 0) {
+                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerCapFTIndex,
                                       ElectricEIRChiller(EIRChillerNum).TempRefEvapOut,
                                       ElectricEIRChiller(EIRChillerNum).TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -665,8 +659,8 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFT > 0) {
-                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFT,
+            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex > 0) {
+                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFTIndex,
                                       ElectricEIRChiller(EIRChillerNum).TempRefEvapOut,
                                       ElectricEIRChiller(EIRChillerNum).TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -677,8 +671,8 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR > 0) {
-                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR, 1.0);
+            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex > 0) {
+                CurveVal = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -688,10 +682,10 @@ namespace ChillerElectricEIR {
                 }
             }
 
-            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR > 0) {
+            if (ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex > 0) {
                 bool FoundNegValue = false;
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                    CurveValTmp = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR, double(CurveCheck / 10.0));
+                    CurveValTmp = CurveManager::CurveValue(ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -855,19 +849,19 @@ namespace ChillerElectricEIR {
 
             SetupOutputVariable("Chiller Capacity Temperature Modifier Multiplier",
                                 OutputProcessor::Unit::None,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerCapFT,
+                                ElectricEIRChiller(EIRChillerNum).ChillerCapFT,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller EIR Temperature Modifier Multiplier",
                                 OutputProcessor::Unit::None,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerEIRFT,
+                                ElectricEIRChiller(EIRChillerNum).ChillerEIRFT,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller EIR Part Load Modifier Multiplier",
                                 OutputProcessor::Unit::None,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerEIRFPLR,
+                                ElectricEIRChiller(EIRChillerNum).ChillerEIRFPLR,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
@@ -1724,9 +1718,9 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillNum).RefCap,
                                 ElectricEIRChiller(EIRChillNum).RefCOP,
                                 ElectricEIRChiller(EIRChillNum).CondenserType,
-                                ElectricEIRChiller(EIRChillNum).ChillerCapFT,
-                                ElectricEIRChiller(EIRChillNum).ChillerEIRFT,
-                                ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR,
+                                ElectricEIRChiller(EIRChillNum).ChillerCapFTIndex,
+                                ElectricEIRChiller(EIRChillNum).ChillerEIRFTIndex,
+                                ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRIndex,
                                 ElectricEIRChiller(EIRChillNum).MinUnloadRat,
                                 IPLV);
                 ChillerIPLVFlagArr(EIRChillNum) = false;
@@ -1815,9 +1809,9 @@ namespace ChillerElectricEIR {
         FRAC = 1.0;
 
         // Set performance curve outputs to 0.0 when chiller is off
-        ChillerCapFT = 0.0;
-        ChillerEIRFT = 0.0;
-        ChillerEIRFPLR = 0.0;
+        ElectricEIRChiller(EIRChillNum).ChillerCapFT = 0.0;
+        ElectricEIRChiller(EIRChillNum).ChillerEIRFT = 0.0;
+        ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = 0.0;
 
         // calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -2033,13 +2027,13 @@ namespace ChillerElectricEIR {
         }
 
         // Get capacity curve info with respect to CW setpoint and entering condenser water temps
-        ChillerCapFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerCapFT, EvapOutletTempSetPoint, AvgCondSinkTemp);
+        ElectricEIRChiller(EIRChillNum).ChillerCapFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
-        if (ChillerCapFT < 0) {
+        if (ElectricEIRChiller(EIRChillNum).ChillerCapFT < 0) {
             if (ElectricEIRChiller(EIRChillNum).ChillerCapFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++ElectricEIRChiller(EIRChillNum).ChillerCapFTError;
                 ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller Capacity as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ChillerCapFT, 3) +
+                ShowContinueError(" Chiller Capacity as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerCapFT, 3) +
                                   ").");
                 ShowContinueError(" Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(EvapOutletTempSetPoint, 1) +
                                   " and a Condenser Inlet Temp of " + General::RoundSigDigits(CondInletTemp, 1) + '.');
@@ -2049,14 +2043,14 @@ namespace ChillerElectricEIR {
                 ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
                                                    "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
                                                ElectricEIRChiller(EIRChillNum).ChillerCapFTErrorIndex,
-                                               ChillerCapFT,
-                                               ChillerCapFT);
+                                               ElectricEIRChiller(EIRChillNum).ChillerCapFT,
+                                               ElectricEIRChiller(EIRChillNum).ChillerCapFT);
             }
-            ChillerCapFT = 0.0;
+            ElectricEIRChiller(EIRChillNum).ChillerCapFT = 0.0;
         }
 
         // Available chiller capacity as a function of temperature
-        AvailChillerCap = ChillerRefCap * ChillerCapFT;
+        AvailChillerCap = ChillerRefCap * ElectricEIRChiller(EIRChillNum).ChillerCapFT;
 
         // Only perform this check for temperature setpoint control
         if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
@@ -2105,7 +2099,7 @@ namespace ChillerElectricEIR {
         // Set evaporator heat transfer rate
         ElectricEIRChiller(EIRChillNum).QEvaporator = AvailChillerCap * PartLoadRat;
 
-        // Either set the flow to the Constant value or caluclate the flow for the variable volume
+        // Either set the flow to the Constant value or calculate the flow for the variable volume
         if ((ElectricEIRChiller(EIRChillNum).FlowMode == ConstantFlow) || (ElectricEIRChiller(EIRChillNum).FlowMode == NotModulated)) {
             // Set the evaporator mass flow rate to design
             // Start by assuming max (design) flow
@@ -2320,12 +2314,12 @@ namespace ChillerElectricEIR {
                                  BasinHeaterPower);
         }
 
-        ChillerEIRFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFT, ElectricEIRChiller(EIRChillNum).EvapOutletTemp, AvgCondSinkTemp);
-        if (ChillerEIRFT < 0.0) {
+        ElectricEIRChiller(EIRChillNum).ChillerEIRFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFTIndex, ElectricEIRChiller(EIRChillNum).EvapOutletTemp, AvgCondSinkTemp);
+        if (ElectricEIRChiller(EIRChillNum).ChillerEIRFT < 0.0) {
             if (ElectricEIRChiller(EIRChillNum).ChillerEIRFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++ElectricEIRChiller(EIRChillNum).ChillerEIRFTError;
                 ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller EIR as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ChillerEIRFT, 3) + ").");
+                ShowContinueError(" Chiller EIR as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerEIRFT, 3) + ").");
                 ShowContinueError(" Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).EvapOutletTemp, 1) +
                                   " and a Condenser Inlet Temp of " + General::RoundSigDigits(CondInletTemp, 1) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
@@ -2334,19 +2328,19 @@ namespace ChillerElectricEIR {
                 ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
                                                    "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
                                                ElectricEIRChiller(EIRChillNum).ChillerEIRFTErrorIndex,
-                                               ChillerEIRFT,
-                                               ChillerEIRFT);
+                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFT,
+                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFT);
             }
-            ChillerEIRFT = 0.0;
+            ElectricEIRChiller(EIRChillNum).ChillerEIRFT = 0.0;
         }
 
-        ChillerEIRFPLR = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR, PartLoadRat);
-        if (ChillerEIRFPLR < 0.0) {
+        ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRIndex, PartLoadRat);
+        if (ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR < 0.0) {
             if (ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {
                 ++ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRError;
                 ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller EIR as a function of PLR curve output is negative (" + General::RoundSigDigits(ChillerEIRFPLR, 3) + ").");
+                ShowContinueError(" Chiller EIR as a function of PLR curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR, 3) + ").");
                 ShowContinueError(" Negative value occurs using a part-load ratio of " + General::RoundSigDigits(PartLoadRat, 3) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
@@ -2354,13 +2348,13 @@ namespace ChillerElectricEIR {
                 ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
                                                    "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
                                                ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRErrorIndex,
-                                               ChillerEIRFPLR,
-                                               ChillerEIRFPLR);
+                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR,
+                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR);
             }
-            ChillerEIRFPLR = 0.0;
+            ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = 0.0;
         }
 
-        ElectricEIRChiller(EIRChillNum).Power = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+        ElectricEIRChiller(EIRChillNum).Power = (AvailChillerCap / ReferenceCOP) * ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR * ElectricEIRChiller(EIRChillNum).ChillerEIRFT * FRAC;
 
         ElectricEIRChiller(EIRChillNum).QCondenser = ElectricEIRChiller(EIRChillNum).Power * ElectricEIRChiller(EIRChillNum).CompPowerToCondenserFrac + ElectricEIRChiller(EIRChillNum).QEvaporator + ChillerFalseLoadRate;
 
@@ -2410,7 +2404,7 @@ namespace ChillerElectricEIR {
         }
 
         // Calculate condenser fan power
-        if (ChillerCapFT > 0.0) {
+        if (ElectricEIRChiller(EIRChillNum).ChillerCapFT > 0.0) {
             ElectricEIRChiller(EIRChillNum).CondenserFanPower = ChillerRefCap * ElectricEIRChiller(EIRChillNum).CondenserFanPowerRatio * FRAC;
         } else {
             ElectricEIRChiller(EIRChillNum).CondenserFanPower = 0.0;
@@ -2644,10 +2638,6 @@ namespace ChillerElectricEIR {
                 ElectricEIRChillerReport(Num).HeatRecMassFlow = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
             }
         }
-
-        ElectricEIRChillerReport(Num).ChillerCapFT = ChillerCapFT;
-        ElectricEIRChillerReport(Num).ChillerEIRFT = ChillerEIRFT;
-        ElectricEIRChillerReport(Num).ChillerEIRFPLR = ChillerEIRFPLR;
     }
 
 } // namespace ChillerElectricEIR

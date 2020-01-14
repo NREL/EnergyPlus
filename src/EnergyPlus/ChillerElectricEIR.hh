@@ -123,13 +123,13 @@ namespace ChillerElectricEIR {
         Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
         int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
         int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
-        int ChillerCapFT;                          // Index for the total cooling capacity modifier curve
+        int ChillerCapFTIndex;                          // Index for the total cooling capacity modifier curve
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
-        int ChillerEIRFT; // Index for the energy input ratio modifier curve
+        int ChillerEIRFTIndex; // Index for the energy input ratio modifier curve
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
-        int ChillerEIRFPLR; // Index for the EIR vs part-load ratio curve
+        int ChillerEIRFPLRIndex; // Index for the EIR vs part-load ratio curve
         int ChillerCapFTError;        // Used for negative capacity as a function of temp warnings
         int ChillerCapFTErrorIndex;   // Used for negative capacity as a function of temp warnings
         int ChillerEIRFTError;        // Used for negative EIR as a function of temp warnings
@@ -181,7 +181,9 @@ namespace ChillerElectricEIR {
         Real64 QHeatRecovered;       // Rate of heat transfer to the heat recovery coil [W]
         Real64 HeatRecOutletTemp;    // Heat recovery outlet temperature [C]
         Real64 CondenserFanPower;    // Condenser Fan Power (fan cycles with compressor) [W]
-        Real64 ChillerCapFT(0.0);         // Chiller capacity fraction (evaluated as a function of temperature)
+        Real64 ChillerCapFT;         // Chiller capacity fraction (evaluated as a function of temperature)
+        Real64 ChillerEIRFT;         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+        Real64 ChillerEIRFPLR;       // Chiller EIR as a function of part-load ratio (PLR)
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -194,8 +196,8 @@ namespace ChillerElectricEIR {
               TempRefCondIn(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0),
-              HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0), HeatRecInletLimitSchedNum(0), ChillerCapFT(0), ChillerEIRFT(0),
-              ChillerEIRFPLR(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0),
+              HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0), HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0),
+              ChillerEIRFPLRIndex(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0),
               ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerEIRFPLRMin(0.0), ChillerEIRFPLRMax(0.0), DeltaTErrCount(0),
               DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0),
               CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), BasinHeaterSchedulePtr(0), CondMassFlowIndex(0),
@@ -203,7 +205,7 @@ namespace ChillerElectricEIR {
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), MyFlag(true), MyEnvrnFlag(true),
               EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0),
-              HeatRecOutletTemp(0.0), CondenserFanPower(0.0)
+              HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0)
         {
         }
     };
@@ -225,9 +227,6 @@ namespace ChillerElectricEIR {
         Real64 HeatRecInletTemp;              // reporting: Heat reclaim inlet temperature [C]
         Real64 HeatRecMassFlow;               // reporting: Heat reclaim mass flow rate [kg/s]
         Real64 ChillerCondAvgTemp;            // reporting: average condenser temp for curves with Heat recovery [C]
-        Real64 ChillerCapFT;                  // reporting: Chiller capacity curve output value
-        Real64 ChillerEIRFT;                  // reporting: Chiller EIRFT curve output value
-        Real64 ChillerEIRFPLR;                // reporting: Chiller EIRFPLR curve output value
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterPower;              // Basin heater power (W)
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
@@ -237,7 +236,7 @@ namespace ChillerElectricEIR {
             : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
               Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
               ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
+              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0),
               CondenserFanEnergyConsumption(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
         {
         }
