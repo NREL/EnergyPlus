@@ -96,8 +96,11 @@ namespace ChillerElectricEIR {
         Real64 CompPowerToCondenserFrac;  // Fraction of compressor electric power rejected by condenser [0 to 1]
         int EvapInletNodeNum;             // Node number on the inlet side of the plant (evaporator side)
         int EvapOutletNodeNum;            // Node number on the outlet side of the plant (evaporator side)
+        Real64 EvapOutletTemp;       // Evaporator outlet temperature [C]
         int CondInletNodeNum;             // Node number on the inlet side of the condenser
         int CondOutletNodeNum;            // Node number on the outlet side of the condenser
+        Real64 CondOutletTemp;       // Condenser outlet temperature [C]
+        Real64 CondOutletHumRat;     // Condenser outlet humidity ratio [kg/kg]
         Real64 MinPartLoadRat;            // Minimum allowed operating fraction of full load
         Real64 MaxPartLoadRat;            // Maximum allowed operating fraction of full load
         Real64 OptPartLoadRat;            // Optimal operating fraction of full load
@@ -127,7 +130,6 @@ namespace ChillerElectricEIR {
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
         int ChillerEIRFPLR; // Index for the EIR vs part-load ratio curve
-        //  INTEGER           :: CondFanPowerFCap          = 0   ! Condenser fan capacity as a function of chiller capacity
         int ChillerCapFTError;        // Used for negative capacity as a function of temp warnings
         int ChillerCapFTErrorIndex;   // Used for negative capacity as a function of temp warnings
         int ChillerEIRFTError;        // Used for negative EIR as a function of temp warnings
@@ -178,8 +180,8 @@ namespace ChillerElectricEIR {
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0),
-              CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
-              CondInletNodeNum(0), CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
+              CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), EvapOutletTemp(0.0),
+              CondInletNodeNum(0), CondOutletNodeNum(0), CondOutletTemp(0.0), CondOutletHumRat(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
               TempRefCondIn(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0),
@@ -210,8 +212,6 @@ namespace ChillerElectricEIR {
         Real64 CondEnergy;                    // reporting: Condenser heat transfer energy [J]
         Real64 CondInletTemp;                 // reporting: Condenser inlet temperature [C]
         Real64 EvapInletTemp;                 // reporting: Evaporator inlet temperature [C]
-        Real64 CondOutletTemp;                // reporting: Condenser outlet temperature [C]
-        Real64 EvapOutletTemp;                // reporting: Evaporator outlet temperature [C]
         Real64 ActualCOP;                     // reporting: Coefficient of performance
         Real64 QHeatRecovery;                 // reporting: Heat recovered from water-cooled condenser [W]
         Real64 EnergyHeatRecovery;            // reporting: Energy recovered from water-cooled condenser [J]
@@ -231,8 +231,8 @@ namespace ChillerElectricEIR {
         // Default Constructor
         ReportEIRVars()
             : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Power(0.0), QEvap(0.0),
-              QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0),
-              EvapOutletTemp(0.0), ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+              QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
+              ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
               CondenserFanPowerUse(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), EvapWaterConsump(0.0)
         {

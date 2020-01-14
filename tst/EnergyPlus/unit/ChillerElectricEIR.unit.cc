@@ -87,8 +87,8 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
 
     UpdateElectricEIRChillerRecords(-2000, true, 1);
 
-    EXPECT_EQ(18, ElectricEIRChillerReport(Num).EvapOutletTemp);
-    EXPECT_EQ(35, ElectricEIRChillerReport(Num).CondOutletTemp);
+    EXPECT_EQ(18, ElectricEIRChiller(Num).EvapOutletTemp);
+    EXPECT_EQ(35, ElectricEIRChiller(Num).CondOutletTemp);
 
     Node.deallocate();
     ElectricEIRChiller.deallocate();
