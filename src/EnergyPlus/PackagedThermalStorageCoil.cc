@@ -4535,8 +4535,7 @@ namespace PackagedThermalStorageCoil {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using WaterThermalTanks::CalcTankTemp;
-        using WaterThermalTanks::CalcTempIntegral;
+        using WaterThermalTanks::WaterThermalTankData;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4599,7 +4598,7 @@ namespace PackagedThermalStorageCoil {
         LossCoeff = TESCoil(TESCoilNum).StorageUA;
         QdotTES = TESCoil(TESCoilNum).QdotTES;
 
-        NewTankTemp = CalcTankTemp(TankTemp,
+        NewTankTemp = WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp,
                                    AmbientTemp,
                                    UseInletTemp,
                                    SourceInletTemp,
@@ -4632,7 +4631,7 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).TESPlantOutletNodeNum).Temp = NewOutletTemp;
         }
 
-        deltaTsum = CalcTempIntegral(TankTemp,
+        deltaTsum = WaterThermalTankData::CalcTempIntegral(TankTemp,
                                      NewTankTemp,
                                      AmbientTemp,
                                      UseInletTemp,
