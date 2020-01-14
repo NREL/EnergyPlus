@@ -176,6 +176,9 @@ namespace ChillerElectricEIR {
         Real64 EvapWaterConsump;              // Evap cooler water consumption (m3)
         Real64 EvapWaterConsumpRate; // Evap condenser water consumption rate [m3/s]
         Real64 Power;                // Rate of chiller electric energy use [W]
+        Real64 QEvaporator;          // Rate of heat transfer to the evaporator coil [W]
+        Real64 QCondenser;           // Rate of heat transfer to the condenser coil [W]
+        Real64 QHeatRecovered;       // Rate of heat transfer to the heat recovery coil [W]
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -196,7 +199,7 @@ namespace ChillerElectricEIR {
               MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), ErrCount1(0), PossibleSubcooling(false), FaultyChillerSWTFlag(false),
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), MyFlag(true), MyEnvrnFlag(true),
-              EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0)
+              EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0)
         {
         }
     };
@@ -208,15 +211,12 @@ namespace ChillerElectricEIR {
         Real64 ChillerCyclingRatio;           // reporting: Chiller cycling ratio (time on/time step)
         Real64 ChillerFalseLoadRate;          // reporting: Chiller false load over and above water side load [J]
         Real64 ChillerFalseLoad;              // reporting: Chiller false load over and above water side load [W]
-        Real64 QEvap;                         // reporting: Evaporator heat transfer rate [W]
-        Real64 QCond;                         // reporting: Condenser heat transfer rate [W]
         Real64 Energy;                        // reporting: Chiller electric consumption [J]
         Real64 EvapEnergy;                    // reporting: Evaporator heat transfer energy [J]
         Real64 CondEnergy;                    // reporting: Condenser heat transfer energy [J]
         Real64 CondInletTemp;                 // reporting: Condenser inlet temperature [C]
         Real64 EvapInletTemp;                 // reporting: Evaporator inlet temperature [C]
         Real64 ActualCOP;                     // reporting: Coefficient of performance
-        Real64 QHeatRecovery;                 // reporting: Heat recovered from water-cooled condenser [W]
         Real64 EnergyHeatRecovery;            // reporting: Energy recovered from water-cooled condenser [J]
         Real64 HeatRecInletTemp;              // reporting: Heat reclaim inlet temperature [C]
         Real64 HeatRecOutletTemp;             // reporting: Heat reclaim outlet temperature [C]
@@ -232,9 +232,9 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ReportEIRVars()
-            : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), QEvap(0.0),
-              QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+            : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
+              Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
+              ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
               CondenserFanPowerUse(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0)
         {
