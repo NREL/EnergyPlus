@@ -41,6 +41,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataGlobalConstants.unit.cc
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc

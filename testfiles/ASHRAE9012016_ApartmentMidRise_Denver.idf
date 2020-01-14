@@ -2790,7 +2790,7 @@
 
   GlobalGeometryRules,
     LowerLeftCorner,         !- Starting Vertex Position
-    CW,                      !- Vertex Entry Direction
+    ClockWise,               !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========

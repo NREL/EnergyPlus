@@ -2780,7 +2780,7 @@
     0,                       !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-    Electric,                !- Fuel Type
+    Electricity,             !- Fuel Type
     ;                        !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
 
   ZoneTerminalUnitList,

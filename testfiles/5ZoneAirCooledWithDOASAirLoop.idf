@@ -3615,7 +3615,7 @@
   Coil:Heating:Fuel,
     DOAS Heating Coil,       !- Name
     ,                        !- Availability Schedule Name
-    Gas,                     !- Fuel Type
+    NaturalGas,              !- Fuel Type
     0.8,                     !- Burner Efficiency
     autosize,                !- Nominal Capacity {W}
     DOAS Cooling Coil Outlet,!- Air Inlet Node Name
