@@ -128,9 +128,6 @@ namespace ChillerElectricEIR {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumElectricEIRChillers(0);    // Number of electric EIR chillers specified in input
-    Real64 BasinHeaterPower(0.0);     // Basin heater power (W)
-    Real64 ChillerFalseLoadRate(0.0); // Chiller false load over and above the water-side load [W]
-    Real64 AvgCondSinkTemp(0.0);      // condenser temperature value for use in curves [C]
 
     Array1D_bool CheckEquipName;
 
@@ -148,9 +145,6 @@ namespace ChillerElectricEIR {
     void clear_state()
     {
         NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
-        BasinHeaterPower = 0.0;     // Basin heater power (W)
-        ChillerFalseLoadRate = 0.0; // Chiller false load over and above the water-side load [W]
-        AvgCondSinkTemp = 0.0;      // condenser temperature value for use in curves [C]
         CheckEquipName.deallocate();
         GetInputEIR = true;
         ChillerIPLVOneTimeFlag = true;
@@ -790,7 +784,7 @@ namespace ChillerElectricEIR {
                                 "Plant");
             SetupOutputVariable("Chiller False Load Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerFalseLoadRate,
+                                ElectricEIRChiller(EIRChillerNum).ChillerFalseLoadRate,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
@@ -980,7 +974,7 @@ namespace ChillerElectricEIR {
                     if (ElectricEIRChiller(EIRChillerNum).BasinHeaterPowerFTempDiff > 0.0) {
                         SetupOutputVariable("Chiller Basin Heater Electric Power",
                                             OutputProcessor::Unit::W,
-                                            ElectricEIRChillerReport(EIRChillerNum).BasinHeaterPower,
+                                            ElectricEIRChiller(EIRChillerNum).BasinHeaterPower,
                                             "System",
                                             "Average",
                                             ElectricEIRChiller(EIRChillerNum).Name);
@@ -1356,7 +1350,7 @@ namespace ChillerElectricEIR {
         }
 
         if (ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
-            BasinHeaterPower = 0.0;
+            ElectricEIRChiller(EIRChillNum).BasinHeaterPower = 0.0;
         }
     }
 
@@ -1791,7 +1785,6 @@ namespace ChillerElectricEIR {
         Real64 RhoAir;                         // air density [kg/m3]
 
         // Set module level inlet and outlet nodes and initialize other local variables
-        ChillerFalseLoadRate = 0.0;
         EvapInletNode = ElectricEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum;
         CondInletNode = ElectricEIRChiller(EIRChillNum).CondInletNodeNum;
@@ -1858,7 +1851,7 @@ namespace ChillerElectricEIR {
                 CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
                                      ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
                                      ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                     BasinHeaterPower);
+                                     ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
             }
             ElectricEIRChiller(EIRChillNum).PrintMessage = false;
             return;
@@ -2008,6 +2001,7 @@ namespace ChillerElectricEIR {
 
         // correct temperature if using heat recovery
         // use report values for latest valid calculation, lagged somewhat
+        Real64 AvgCondSinkTemp;
         if (ElectricEIRChiller(EIRChillNum).HeatRecActive) {
             if ((ElectricEIRChiller(EIRChillNum).QHeatRecovered + ElectricEIRChiller(EIRChillNum).QCondenser) > 0.0) { // protect div by zero
                 AvgCondSinkTemp = (ElectricEIRChiller(EIRChillNum).QHeatRecovered * ElectricEIRChillerReport(EIRChillNum).HeatRecInletTemp +
@@ -2191,7 +2185,7 @@ namespace ChillerElectricEIR {
                 CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
                                      ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
                                      ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                     BasinHeaterPower);
+                                     ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
             }
             ElectricEIRChiller(EIRChillNum).PrintMessage = false;
             return;
@@ -2297,15 +2291,15 @@ namespace ChillerElectricEIR {
         ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
 
         // calculate the load due to false loading on chiller over and above water side load
-        ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - ElectricEIRChiller(EIRChillNum).QEvaporator;
-        if (ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
-            ChillerFalseLoadRate = 0.0;
+        ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - ElectricEIRChiller(EIRChillNum).QEvaporator;
+        if (ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
+            ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate = 0.0;
         }
         if (ElectricEIRChiller(EIRChillNum).QEvaporator == 0.0 && ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
             CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
                                  ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
                                  ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                 BasinHeaterPower);
+                                 ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
         }
 
         ElectricEIRChiller(EIRChillNum).ChillerEIRFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFTIndex, ElectricEIRChiller(EIRChillNum).EvapOutletTemp, AvgCondSinkTemp);
@@ -2350,7 +2344,7 @@ namespace ChillerElectricEIR {
 
         ElectricEIRChiller(EIRChillNum).Power = (AvailChillerCap / ReferenceCOP) * ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR * ElectricEIRChiller(EIRChillNum).ChillerEIRFT * FRAC;
 
-        ElectricEIRChiller(EIRChillNum).QCondenser = ElectricEIRChiller(EIRChillNum).Power * ElectricEIRChiller(EIRChillNum).CompPowerToCondenserFrac + ElectricEIRChiller(EIRChillNum).QEvaporator + ChillerFalseLoadRate;
+        ElectricEIRChiller(EIRChillNum).QCondenser = ElectricEIRChiller(EIRChillNum).Power * ElectricEIRChiller(EIRChillNum).CompPowerToCondenserFrac + ElectricEIRChiller(EIRChillNum).QEvaporator + ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate;
 
         if (ElectricEIRChiller(EIRChillNum).CondenserType == WaterCooled) {
             if (ElectricEIRChiller(EIRChillNum).CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -2544,7 +2538,7 @@ namespace ChillerElectricEIR {
 
             ElectricEIRChiller(Num).ChillerPartLoadRatio = 0.0;
             ElectricEIRChiller(Num).ChillerCyclingRatio = 0.0;
-            ElectricEIRChillerReport(Num).ChillerFalseLoadRate = 0.0;
+            ElectricEIRChiller(Num).ChillerFalseLoadRate = 0.0;
             ElectricEIRChillerReport(Num).ChillerFalseLoad = 0.0;
             ElectricEIRChiller(Num).Power = 0.0;
             ElectricEIRChiller(Num).QEvaporator = 0.0;
@@ -2560,8 +2554,7 @@ namespace ChillerElectricEIR {
             ElectricEIRChiller(Num).CondenserFanPower = 0.0;
             ElectricEIRChillerReport(Num).CondenserFanEnergyConsumption = 0.0;
             if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
-                ElectricEIRChillerReport(Num).BasinHeaterPower = BasinHeaterPower;
-                ElectricEIRChillerReport(Num).BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;
+                ElectricEIRChillerReport(Num).BasinHeaterConsumption = ElectricEIRChiller(Num).BasinHeaterPower * ReportingConstant;
                 ElectricEIRChiller(Num).EvapWaterConsump = 0.0;
             }
 
@@ -2600,8 +2593,7 @@ namespace ChillerElectricEIR {
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            ElectricEIRChillerReport(Num).ChillerFalseLoadRate = ChillerFalseLoadRate;
-            ElectricEIRChillerReport(Num).ChillerFalseLoad = ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElectricEIRChillerReport(Num).ChillerFalseLoad = ElectricEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             ElectricEIRChillerReport(Num).Energy = ElectricEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             ElectricEIRChillerReport(Num).EvapEnergy = ElectricEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             ElectricEIRChillerReport(Num).CondEnergy = ElectricEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -2611,13 +2603,12 @@ namespace ChillerElectricEIR {
             ElectricEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
             ElectricEIRChillerReport(Num).CondenserFanEnergyConsumption = ElectricEIRChiller(Num).CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             if (ElectricEIRChiller(Num).Power != 0.0) {
-                ElectricEIRChillerReport(Num).ActualCOP = (ElectricEIRChiller(Num).QEvaporator + ChillerFalseLoadRate) / ElectricEIRChiller(Num).Power;
+                ElectricEIRChillerReport(Num).ActualCOP = (ElectricEIRChiller(Num).QEvaporator + ElectricEIRChiller(Num).ChillerFalseLoadRate) / ElectricEIRChiller(Num).Power;
             } else {
                 ElectricEIRChillerReport(Num).ActualCOP = 0.0;
             }
             if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
-                ElectricEIRChillerReport(Num).BasinHeaterPower = BasinHeaterPower;
-                ElectricEIRChillerReport(Num).BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;
+                ElectricEIRChillerReport(Num).BasinHeaterConsumption = ElectricEIRChiller(Num).BasinHeaterPower * ReportingConstant;
                 ElectricEIRChiller(Num).EvapWaterConsump = ElectricEIRChiller(Num).EvapWaterConsumpRate * ReportingConstant;
             }
 
