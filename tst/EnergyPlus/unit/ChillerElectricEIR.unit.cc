@@ -85,9 +85,6 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
     Node(ElectricEIRChiller(Num).EvapInletNodeNum).Temp = 18.0;
     Node(ElectricEIRChiller(Num).CondInletNodeNum).Temp = 35.0;
 
-    CondMassFlowRate = 0.0;
-    EvapMassFlowRate = 0.0;
-
     UpdateElectricEIRChillerRecords(-2000, true, 1);
 
     EXPECT_EQ(18, ElectricEIRChillerReport(Num).EvapOutletTemp);

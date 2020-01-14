@@ -68,8 +68,6 @@ namespace ChillerElectricEIR {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumElectricEIRChillers;  // Number of electric EIR chillers specified in input
-    extern Real64 CondMassFlowRate;     // Condenser mass flow rate [kg/s]
-    extern Real64 EvapMassFlowRate;     // Evaporator mass flow rate [kg/s]
 
     extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
 
@@ -88,9 +86,11 @@ namespace ChillerElectricEIR {
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
         Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
         bool EvapVolFlowRateWasAutoSized; // true if previous was autosize input
+        Real64 EvapMassFlowRate;
         Real64 EvapMassFlowRateMax;       // Reference water mass flow rate through evaporator [kg/s]
         Real64 CondVolFlowRate;           // Reference water volumetric flow rate through the condenser [m3/s]
         bool CondVolFlowRateWasAutoSized; // true if previous was set to autosize on input
+        Real64 CondMassFlowRate;     // Condenser mass flow rate [kg/s]
         Real64 CondMassFlowRateMax;       // Reference water mass flow rate through condenser [kg/s]
         Real64 CondenserFanPowerRatio;    // Reference power of condenser fan to capacity ratio, W/W
         Real64 CompPowerToCondenserFrac;  // Fraction of compressor electric power rejected by condenser [0 to 1]
@@ -176,7 +176,8 @@ namespace ChillerElectricEIR {
         ElectricEIRChillerSpecs()
             : TypeNum(0), CondenserType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false), EvapVolFlowRate(0.0),
-              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
+              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
+              CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0),
               CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
               CondInletNodeNum(0), CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
               TempRefCondIn(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
@@ -211,8 +212,6 @@ namespace ChillerElectricEIR {
         Real64 EvapInletTemp;                 // reporting: Evaporator inlet temperature [C]
         Real64 CondOutletTemp;                // reporting: Condenser outlet temperature [C]
         Real64 EvapOutletTemp;                // reporting: Evaporator outlet temperature [C]
-        Real64 Evapmdot;                      // reporting: Evaporator mass flow rate [kg/s]
-        Real64 Condmdot;                      // reporting: Condenser mass flow rate [kg/s]
         Real64 ActualCOP;                     // reporting: Coefficient of performance
         Real64 QHeatRecovery;                 // reporting: Heat recovered from water-cooled condenser [W]
         Real64 EnergyHeatRecovery;            // reporting: Energy recovered from water-cooled condenser [J]
@@ -233,7 +232,7 @@ namespace ChillerElectricEIR {
         ReportEIRVars()
             : ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Power(0.0), QEvap(0.0),
               QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0),
-              EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+              EvapOutletTemp(0.0), ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
               CondenserFanPowerUse(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), EvapWaterConsump(0.0)
         {
