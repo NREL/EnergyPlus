@@ -383,7 +383,7 @@ This alpha field specifies the name of a \hyperref[designspecificationoutdoorair
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction values. This field can be used with any of the three \textit{Zone Minimum Air Flow Input Method}. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
+This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1. 
 
 An IDF example:
 
@@ -565,9 +565,7 @@ The default is 0.001.
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the fan-off minimum flow rate by multiplying it using this scheduled fraction values. This field is used with \textit{Zone Minimum Air Flow Fraction}. Schedule values are fractions 0.0 to 1.0. 
-This field adjusts the minimum airflow turndown value below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction 
-value is set to 1 and the model uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
+This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
 	   
 An IDF example:
 
@@ -721,7 +719,7 @@ This is the upper limit on the temperature in degrees C of the air leaving the t
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction values. This field is used with the field \textit{Zone Minimum Air Flow Fraction}. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
+This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
 An IDF example is provided below:
 
@@ -812,7 +810,7 @@ This alpha field specifies the name of a \hyperref[designspecificationoutdoorair
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction values. This field can be used with any of the field \textit{Zone Minimum Air Flow Input Method}. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction value is set to 1.
+This field adjusts the \textit{Constant Minimum Air Flow Fraction}, \textit{Fixed Minimum Air Flow Rate}, or \textit{Minimum Air Flow Fraction Schedule} value by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1. 
 
 An IDF example:
 
@@ -922,7 +920,7 @@ This numeric field defines the minimum air volume flow rate to the zone while th
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction values. This field is used with the three \textit{Zone Minimum Air Flow Fraction}. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the terminal unit uses fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
+This field adjusts the \textit{Zone Minimum Air Flow Fraction} by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and uses the fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
 
 An IDF example is provided below:
 
@@ -2004,7 +2002,7 @@ This alpha field specifies the name of a \hyperref[designspecificationoutdoorair
 
 \paragraph{Field: Minimum Air Flow Turndown Schedule Name}\label{field-minimum-air-flow-turndown-schedule-name}
 
-This field adjusts the design minimum flow rate by multiplying it using this scheduled fraction values. This field is used with the field \textit{Zone Minimum Air Flow Fraction}. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown below the design minimum air flow and is intended for use with ASHRAE Standard 170. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses fixed fraction specified in the field \textit{Zone Minimum Air Flow Fraction}.
+This field adjusts \textit{Zone Minimum Air Flow Fraction} by multiplying it using this scheduled fraction values. Schedule values are fractions, 0.0 to 1.0. This field adjusts the minimum airflow turndown value below the zone design minimum air flow and is intended for use with ASHRAE Standard 170. This field can also be used to adjust the design minimum air flow sizing calculation by applying a desired fraction values to summer and winter design days turndown schedule. If this field is left blank, then the turndown minimum air flow fraction value is set to 1 and the VAV air terminal uses the fixed fraction specified in in the field \textit{Zone Minimum Air Flow Fraction}.
 
 
 An IDF example:
@@ -2019,8 +2017,9 @@ An IDF example:
       Zone 1 Dual Duct Cold Inlet,  !- Cold Air Inlet Node Name
       autosize,                !- Maximum Air Flow Rate {m3/s}
       0.1,                     !- Zone Minimum Air Flow Fraction
-      ZoneMinOARequirements;   !- Design Specification Outdoor Air Object Name
-
+      ZoneMinOARequirements,   !- Design Specification Outdoor Air Object Name
+      TurndownMinAirFlowSch;   !- Minimum Air Flow Turndown Schedule Name
+	  
   ! Outdoor air specification should be consistent with Sizing:Zone object inputs.
     DesignSpecification:OutdoorAir,
       ZoneMinOARequirements,    !- Name
@@ -2039,6 +2038,19 @@ An IDF example:
       Until: 24:00,1.0,          !- Field 7
       For: AllOtherDays,         !- Field 9
       Until: 24:00,0.25;         !- Field 10
+	  
+    Schedule:Compact,
+      TurndownMinAirFlowSch,   !- Name
+      Fraction,                !- Schedule Type Limits Name
+      Through: 12/31,          !- Field 1
+      For: Weekdays,           !- Field 2
+      Until: 7:00,0.50,        !- Field 3
+      Until: 17:00,0.75,       !- Field 4
+      Until: 24:00,0.50,       !- Field 5
+      For: SummerDesignDay WinterDesignDay, !- Field 6
+      Until: 24:00,1.0,        !- Field 7
+      For: Weekends Holidays CustomDay1 CustomDay2, !- Field 8
+      Until: 24:00,0.25;       !- Field 9	  
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-13}
