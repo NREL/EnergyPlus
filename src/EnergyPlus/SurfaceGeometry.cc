@@ -1754,6 +1754,14 @@ namespace SurfaceGeometry {
                 if (Surface(SurfNum).Zone == ZoneNum) {
                     if (Zone(ZoneNum).SurfaceFirst == 0) {
                         Zone(ZoneNum).SurfaceFirst = SurfNum;
+                        // Non window surfaces are grouped first within each zone
+                        Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
+                    }
+                    if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) ||
+                        (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
+                        // Window surfaces are grouped last within each zone
+                        Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
+                        Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
                         break;
                     }
                 }
@@ -1762,9 +1770,27 @@ namespace SurfaceGeometry {
         //  Surface First pointers are set, set last
         if (NumOfZones > 0) {
             Zone(NumOfZones).SurfaceLast = TotSurfaces;
+            if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_Window) ||
+                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
+                Zone(NumOfZones).WindowSurfaceLast = TotSurfaces;
+            } else {
+                // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
+                // execute
+                Zone(NumOfZones).WindowSurfaceLast = -1;
+                Zone(NumOfZones).NonWindowSurfaceLast = TotSurfaces;
+            }
         }
         for (int ZoneNum = 1; ZoneNum <= NumOfZones - 1; ++ZoneNum) {
             Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
+            if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_Window) ||
+                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
+                Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum + 1).SurfaceFirst - 1;
+            } else {
+                // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
+                // execute
+                Zone(ZoneNum).WindowSurfaceLast = -1;
+                Zone(ZoneNum).NonWindowSurfaceLast = Zone(ZoneNum).SurfaceLast;
+            }
         }
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {

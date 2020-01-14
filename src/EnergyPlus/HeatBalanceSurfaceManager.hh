@@ -165,10 +165,9 @@ namespace HeatBalanceSurfaceManager {
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
                                     Optional_int_const ZoneToResimulate = _);
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
-                                           const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
-                                           const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
-                                           const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
+    void CalcHeatBalanceInsideSurf2CTFOnly(const int FirstZone,             // First zone to simulate
+                                           const int LastZone,              // Last zone to simulate
+                                           const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
