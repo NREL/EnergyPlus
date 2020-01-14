@@ -226,7 +226,6 @@
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
@@ -372,7 +371,6 @@ void EnergyPlusFixture::clear_all_states()
     EarthTube::clear_state();
     EconomicLifeCycleCost::clear_state();
     EconomicTariff::clear_state();
-    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
     EMSManager::clear_state();
     EnergyPlus::inputProcessor->clear_state();
     EvaporativeCoolers::clear_state();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,13 +48,15 @@
 #ifndef ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH
 #define ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH
 
+// C++ headers
 #include <functional>
 #include <string>
 #include <vector>
 
-#include <Plant/PlantLocation.hh>
-#include <PlantComponent.hh>
-#include <WaterToWaterHeatPumps.hh>
+// EnergyPlus headers
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
 
