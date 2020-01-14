@@ -169,7 +169,7 @@ namespace GroundHeatExchangers {
         ~Pipe() = default;
 
         // members methods
-        void setup(Real64 const &initTemp);
+        void setup(Real64 const &initTemp, int const &loopNum);
         Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
         void simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 inletTemp);
         Real64 plugFlowOutletTemp(Real64 time);
@@ -233,7 +233,7 @@ namespace GroundHeatExchangers {
         ~SingleUtubeBHSegment() = default;
 
         // member methods
-        void setup(Real64 const &initTemp);
+        void setup(Real64 const &initTemp, int const &loopNum);
         Real64 calcGroutVolume();
         Real64 calcTotalPipeVolume();
         Real64 calcSegVolume();
@@ -700,9 +700,9 @@ namespace GroundHeatExchangers {
 
     void clear_state();
 
-    Real64 smoothingFunc(Real64 x, Real64 a, Real64 b);
+    Real64 smoothingFunc(Real64 const &x, Real64 const &a, Real64 const &b);
 
-    Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h);
+    Real64 linInterp(Real64 const &x, Real64 const &x_l, Real64 const &x_h, Real64 const &y_l, Real64 const &y_h);
 
     void GetGroundHeatExchangerInput();
 

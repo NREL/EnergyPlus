@@ -174,7 +174,7 @@ namespace GroundHeatExchangers {
         singleBoreholes.clear();
     }
 
-    Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
+    Real64 smoothingFunc(Real64 const &x, Real64 const &a, Real64 const &b)
     {
         //  Sigmoid smoothing function
         //
@@ -188,7 +188,7 @@ namespace GroundHeatExchangers {
         return 1 / (1 + std::exp(-(x - a) / b));
     }
 
-    Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
+    Real64 linInterp(Real64 const &x, Real64 const &x_l, Real64 const &x_h, Real64 const &y_l, Real64 const &y_h)
     {
         //  Simple linear interpolation
         //
@@ -327,8 +327,8 @@ namespace GroundHeatExchangers {
         this->temperature = temp;
     }
 
-    void SingleUtubeBHSegment::setup(Real64 const &initTemp) {
-        this->pipe.setup(initTemp);
+    void SingleUtubeBHSegment::setup(Real64 const &initTemp, int const &loopNum) {
+        this->pipe.setup(initTemp, loopNum);
         this->soil.setup();
         this->grout.setup();
         this->groutVolume = this->calcGroutVolume();
@@ -541,10 +541,13 @@ namespace GroundHeatExchangers {
         return 0;
     }
 
-    void Pipe::setup(Real64 const &initTemp) {
+    void Pipe::setup(Real64 const &initTemp, int const &loopNum) {
 
         // props
         this->props.setup();
+
+        // fluid
+        this->fluid.setup(loopNum);
 
         // radii
         this->outRadius = this->outDia / 2;

@@ -229,7 +229,7 @@ TEST_F(GHEFixture, Pipe_Init)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 1E-4;
 
@@ -287,11 +287,13 @@ TEST_F(GHEFixture, Pipe_CalcTransitTime)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 0.1;
+    Real64 flowRate = 0.1;
+    Real64 temp = 20;
 
-    EXPECT_NEAR(pipe.calcTransitTime(0.1, 20), 567.3, tol);
+    EXPECT_NEAR(pipe.calcTransitTime(flowRate, temp), 567.3, tol);
 }
 
 TEST_F(GHEFixture, Pipe_mdotToRePipe)
@@ -318,7 +320,7 @@ TEST_F(GHEFixture, Pipe_mdotToRePipe)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 0.1;
 
@@ -349,7 +351,7 @@ TEST_F(GHEFixture, Pipe_calcFrictionFactor)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 1E-3;
 
@@ -408,7 +410,7 @@ TEST_F(GHEFixture, Pipe_calcConductionResistance)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     std::cout << pipe.inletTemps.size() << std::endl;
     std::cout << pipe.inletTempTimes.size() << std::endl;
@@ -441,7 +443,7 @@ TEST_F(GHEFixture, Pipe_calcConvectionResistance)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -474,7 +476,7 @@ TEST_F(GHEFixture, Pipe_laminarNusselt)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 1E-2;
     EXPECT_NEAR(pipe.laminarNusselt(), 4.01, tol);
@@ -504,7 +506,7 @@ TEST_F(GHEFixture, Pipe_turbulentNusselt)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-2;
@@ -536,7 +538,7 @@ TEST_F(GHEFixture, Pipe_calcResistance)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 temp = 20;
     Real64 tol = 1E-5;
@@ -570,7 +572,7 @@ TEST_F(GHEFixture, Pipe_logInletTemps)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     EXPECT_EQ(pipe.inletTemps.size(), 1u);
     EXPECT_EQ(pipe.inletTempTimes.size(), 1u);
@@ -612,7 +614,7 @@ TEST_F(GHEFixture, Pipe_plugFlowOutletTemp)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 1E-4;
 
@@ -648,7 +650,7 @@ TEST_F(GHEFixture, Pipe_simulate)
     pipe.innerDia = j["inner-diameter"];
     pipe.length = j["length"];
     pipe.fluid.loopNum = j["loop-num"];
-    pipe.setup(j["initial-temperature"]);
+    pipe.setup(j["initial-temperature"], j["loop-num"]);
 
     Real64 tol = 1E-2;
 
@@ -739,7 +741,9 @@ TEST_F(GHEFixture, SingleUtubeBHSegment_calcPipeVolume) {
     s.diameter = j["diameter"];
     s.length = j["length"];
 
-    s.setup(10.0);
+    int loopNum = 1;
+
+    s.setup(10.0, loopNum);
 
     Real64 tol = 1E-4;
 
@@ -783,7 +787,9 @@ TEST_F(GHEFixture, SingleUtubeBHSegment_simulate) {
     s.diameter = j["diameter"];
     s.length = j["length"];
 
-    s.setup(20.0);
+    int loopNum = 1;
+
+    s.setup(20.0, loopNum);
 
     s.boundaryTemp = 20;
     s.bhResist = 0.16;
