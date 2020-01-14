@@ -66,52 +66,50 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
 
-class EIRPLHPFixture : public EnergyPlusFixture {};
+class EIRPLHPFixture : public EnergyPlusFixture
+{
+};
 
-TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp cooling side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp cooling side,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  2,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  2,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -141,25 +139,14 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource) {
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, PairingCompanionCoils) {
+TEST_F(EIRPLHPFixture, PairingCompanionCoils)
+{
     heatPumps.resize(2);
     EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
     EIRPlantLoopHeatPump *coil2 = &heatPumps[1];
@@ -204,37 +191,32 @@ TEST_F(EIRPLHPFixture, PairingCompanionCoils) {
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(), std::runtime_error);
     }
-
 }
 
-TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -255,44 +237,34 @@ TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -313,44 +285,34 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  ,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  ,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -366,37 +328,32 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults) {
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
     EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
-
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  ,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  ,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -417,71 +374,57 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource) {
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CatchErrorsOnBadCurves) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  ,",
-                            "  1,",
-                            "  dummyCurveA,",
-                            "  dummyCurveB,",
-                            "  dummyCurveC;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CatchErrorsOnBadCurves)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  ,",
+                                                      "  1,",
+                                                      "  dummyCurveA,",
+                                                      "  dummyCurveB,",
+                                                      "  dummyCurveC;"});
     ASSERT_TRUE(process_idf(idf_objects));
     // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, Initialization) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, Initialization)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -546,103 +489,58 @@ TEST_F(EIRPLHPFixture, Initialization) {
     Real64 const rho = 999.89; // easy to edit here if the expected density gets adjusted in E+
     Real64 const expectedLoadSideMassFlow = rho * thisCoolingPLHP->loadSideDesignVolFlowRate;
     Real64 const expectedSourceSideMassFlow = rho * thisCoolingPLHP->sourceSideDesignVolFlowRate;
-    EXPECT_NEAR(
-            expectedLoadSideMassFlow,
-            thisCoolingPLHP->loadSideDesignMassFlowRate,
-            flowTol
-    );
-    EXPECT_NEAR(
-            expectedSourceSideMassFlow,
-            thisCoolingPLHP->sourceSideDesignMassFlowRate,
-            flowTol
-    );
-    EXPECT_NEAR(
-            0.0,
-            DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMin,
-            flowTol
-    );
-    EXPECT_NEAR(
-            0.0,
-            DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail,
-            flowTol
-    );
-    EXPECT_NEAR(
-            expectedLoadSideMassFlow,
-            DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMax,
-            flowTol
-    );
-    EXPECT_NEAR(
-            expectedLoadSideMassFlow,
-            DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMaxAvail,
-            flowTol
-    );
-    EXPECT_NEAR(
-            0.0,
-            DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMin,
-            flowTol
-    );
-    EXPECT_NEAR(
-            0.0,
-            DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail,
-            flowTol
-    );
-    EXPECT_NEAR(
-            expectedSourceSideMassFlow,
-            DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMax,
-            flowTol
-    );
-    EXPECT_NEAR(
-            expectedSourceSideMassFlow,
-            DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail,
-            flowTol
-    );
-
+    EXPECT_NEAR(expectedLoadSideMassFlow, thisCoolingPLHP->loadSideDesignMassFlowRate, flowTol);
+    EXPECT_NEAR(expectedSourceSideMassFlow, thisCoolingPLHP->sourceSideDesignMassFlowRate, flowTol);
+    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMin, flowTol);
+    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail, flowTol);
+    EXPECT_NEAR(expectedLoadSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMax, flowTol);
+    EXPECT_NEAR(expectedLoadSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
+    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMin, flowTol);
+    EXPECT_NEAR(0.0, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail, flowTol);
+    EXPECT_NEAR(expectedSourceSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMax, flowTol);
+    EXPECT_NEAR(expectedSourceSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  WaterSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  hp cooling side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -790,50 +688,46 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  0.01,",
-                            "  0.02,",
-                            "  1200,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  WaterSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  hp cooling side,",
-                            "  0.01,",
-                            "  0.02,",
-                            "  1200,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  0.01,",
+                                                      "  0.02,",
+                                                      "  1200,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  0.01,",
+                                                      "  0.02,",
+                                                      "  1200,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -925,57 +819,52 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     // Call it again, but this time with PlantSizing on, it should come out the same again
     DataGlobals::DoPlantSizing = true;
     thisHeatingPLHP->sizeLoadSide();
-    thisHeatingPLHP->sizeSrcSideWSHP(); 
+    thisHeatingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(0.01, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.02, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
-
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  WaterSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  hp cooling side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -1065,34 +954,30 @@ TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     EXPECT_NEAR(1000.0, thisCoolingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  WaterSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  ,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -1156,37 +1041,32 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
 
     // with no plant sizing available and no companion coil to size from, it should throw a fatal
     EXPECT_THROW(thisHeatingPLHP->sizeLoadSide(), std::runtime_error);
-
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  WaterSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  ,",
-                            "  0.1,",
-                            "  0.1,",
-                            "  1000,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  ,",
+                                                      "  0.1,",
+                                                      "  0.1,",
+                                                      "  1000,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -1256,34 +1136,30 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     EXPECT_NEAR(1000, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -1325,65 +1201,44 @@ TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker) {
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
-    EXPECT_NEAR(
-            3.141,
-            thisCoolingPLHP->getLoadSideOutletSetPointTemp(),
-            0.001
-    );
+    EXPECT_NEAR(3.141, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
-    EXPECT_NEAR(
-            2.718,
-            thisCoolingPLHP->getLoadSideOutletSetPointTemp(),
-            0.001
-    );
+    EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
 
     // test for dual setpoint operation
     PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
-    EXPECT_NEAR(
-            6.282,
-            thisCoolingPLHP->getLoadSideOutletSetPointTemp(),
-            0.001
-    );
+    EXPECT_NEAR(6.282, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
-    EXPECT_NEAR(
-            5.436,
-            thisCoolingPLHP->getLoadSideOutletSetPointTemp(),
-            0.001
-    );
-
+    EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
 }
 
-TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, Initialization2_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -1432,32 +1287,16 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.1,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.2,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
@@ -1465,16 +1304,8 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.24,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
@@ -1483,16 +1314,8 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.2,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
@@ -1501,16 +1324,8 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.2,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on both sides
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
@@ -1519,16 +1334,8 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
@@ -1537,47 +1344,34 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesWSHP();
-    EXPECT_NEAR(
-            0.14,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.13,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
-
+    EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.13, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 }
 
-TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.0001,",
-                            "  0.0001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  0.95,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  0.0001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up a couple simple plant loops with one branch per loop-side and one component per branch
@@ -1669,37 +1463,32 @@ TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases) {
     extraPLHPPlantDemandSideComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
     // call for all initialization, it should abort because the coil load was found on a demand side
     EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
-
 }
 
-TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.0001,",
-                            "  0.0001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  0.95,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  0.0001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -1780,8 +1569,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -1800,8 +1588,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -1810,37 +1597,32 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
     }
-
 }
 
-TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  WaterSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.0001,",
-                            "  0.0001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  0.95,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  0.0001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -1892,7 +1674,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
     {
         bool firstHVAC = true;
         Real64 curLoad = -900;
-        bool runFlag = true;  // plant actually shouldn't do this but the component can be smart enough to handle it
+        bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
         Real64 const specifiedLoadSetpoint = 45;
         Real64 const loadInletTemp = 46;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
@@ -1912,8 +1694,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -1932,8 +1713,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -1942,10 +1722,10 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
     }
-
 }
 
-TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking) {
+TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking)
+{
     heatPumps.resize(4);
     EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
     EIRPlantLoopHeatPump *coil2 = &heatPumps[1];
@@ -1973,50 +1753,46 @@ TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking) {
     ASSERT_EQ(1, coil4->recurringConcurrentOperationWarningIndex);
 }
 
-TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp cooling side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp cooling side,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  2,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  0.001,",
+                                                      "  0.001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  2,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -2046,52 +1822,36 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource) {
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.0001,",
-                            "  1,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  0.95,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  1,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -2155,8 +1915,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -2175,8 +1934,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4183;
         Real64 const specifiedLoadSetpoint = 15;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -2185,37 +1943,32 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
         EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
     }
-
 }
 
-TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.0001,",
-                            "  1,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  0.95,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  1,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -2257,7 +2010,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
     {
         bool firstHVAC = true;
         Real64 curLoad = -900;
-        bool runFlag = true;  // plant actually shouldn't do this but the component can be smart enough to handle it
+        bool runFlag = true; // plant actually shouldn't do this but the component can be smart enough to handle it
         Real64 const specifiedLoadSetpoint = 45;
         Real64 const loadInletTemp = 46;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
@@ -2277,8 +2030,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -2297,8 +2049,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
         Real64 const expectedLoadMassFlowRate = 0.09999;
         Real64 const expectedCp = 4180;
         Real64 const specifiedLoadSetpoint = 45;
-        Real64 const calculatedLoadInletTemp =
-                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
         DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
         DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
@@ -2307,37 +2058,32 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
         EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
     }
-
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  ,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  ,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -2358,44 +2104,34 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource) {
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, ClearState) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  ,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, ClearState)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  ,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -2407,34 +2143,30 @@ TEST_F(EIRPLHPFixture, ClearState) {
     EXPECT_EQ(heatPumps.size(), 0u);
 }
 
-TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  ,",
-                            "  0.001,",
-                            "  1,",
-                            "  1000,",
-                            "  3.14,",
-                            "  ,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, Initialization2_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.001,",
+                                                      "  1,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -2473,158 +2205,97 @@ TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.1,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.24,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.2,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            1.29,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.1
-    );
+    EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
     // call with run flag ON, flow locked at zero on both sides
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            0.0,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.001
-    );
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
     DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP();
-    EXPECT_NEAR(
-            0.14,
-            thisCoolingPLHP->loadSideMassFlowRate,
-            0.001
-    );
-    EXPECT_NEAR(
-            1.29,
-            thisCoolingPLHP->sourceSideMassFlowRate,
-            0.1
-    );
-
+    EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
+    EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  AirSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  hp cooling side,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  AirSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
@@ -2749,50 +2420,46 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource) 
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  Autosize,",
-                            "  2.0,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 5,",
-                            "  node 6,",
-                            "  AirSource,",
-                            "  node 7,",
-                            "  node 8,",
-                            "  hp cooling side,",
-                            "  Autosize,",
-                            "  2.0,",
-                            "  Autosize,",
-                            "  1.0,",
-                            "  1,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
+TEST_F(EIRPLHPFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  Autosize,",
+                                                      "  2.0,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  AirSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  Autosize,",
+                                                      "  2.0,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
