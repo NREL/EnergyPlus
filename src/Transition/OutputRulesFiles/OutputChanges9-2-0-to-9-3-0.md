@@ -139,3 +139,40 @@ Impacts eio sizing output and table reports including Coil Sizing Summary and De
 
 See [7571](https://github.com/NREL/EnergyPlus/pull/7571)
 
+
+### Water to Water Air-Source EIR Heat Pump
+The HeatPump:WaterToWater:EIR:Heating and HeatPump:WaterToWater:EIR:Cooling objects have been renamed to HeatPump:PlantLoop:EIR:Heating and HeatPump:PlantLoop:EIR:Cooling, and the respective output variables have been renamed from: 
+
+*Before*
+```
+Water to Water Heat Pump Load Side Heat Transfer Rate
+Water to Water Heat Pump Load Side Heat Transfer Energy
+Water to Water Heat Pump Source Side Heat Transfer Rate
+Water to Water Heat Pump Source Side Heat Transfer Energy
+Water to Water Heat Pump Load Side Inlet Temperature
+Water to Water Heat Pump Load Side Outlet Temperature
+Water to Water Heat Pump Source Side Inlet Temperature
+Water to Water Heat Pump Source Side Outlet Temperature
+Water to Water Heat Pump Electric Power
+Water to Water Heat Pump Electric Energy
+Water to Water Heat Pump Load Side Mass Flow Rate
+Water to Water Heat Pump Source Side Mass Flow Rate
+```
+
+*9.3.0*
+```
+Heat Pump Load Side Heat Transfer Rate
+Heat Pump Load Side Heat Transfer Energy
+Heat Pump Source Side Heat Transfer Rate
+Heat Pump Source Side Heat Transfer Energy
+Heat Pump Load Side Inlet Temperature
+Heat Pump Load Side Outlet Temperature
+Heat Pump Source Side Inlet Temperature
+Heat Pump Source Side Outlet Temperature
+Heat Pump Electric Power
+Heat Pump Electric Energy
+Heat Pump Load Side Mass Flow Rate
+Heat Pump Source Side Mass Flow Rate
+```
+
+See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)
