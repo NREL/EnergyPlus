@@ -128,7 +128,7 @@ TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    ChillerElectricEIR::SizeElectricEIRChiller(1);
+    ChillerElectricEIR::ElectricEIRChiller(1).size();
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(ChillerElectricEIR::ElectricEIRChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -229,12 +229,12 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    InitElectricEIRChiller(1, RunFlag, MyLoad);
-    SizeElectricEIRChiller(1);
+    ElectricEIRChiller(1).initialize(RunFlag, MyLoad);
+    ElectricEIRChiller(1).size();
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    InitElectricEIRChiller(1, RunFlag, MyLoad);
+    ElectricEIRChiller(1).initialize(RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(ElectricEIRChiller(1).EvapMassFlowRateMax, 0.999898, 0.0000001);
