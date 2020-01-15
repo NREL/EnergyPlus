@@ -150,6 +150,7 @@ namespace ChillerReformulatedEIR {
     Real64 ChillerCyclingRatio(0.0);  // Chiller cycling ratio
     Real64 ChillerFalseLoadRate(0.0); // Chiller false load over and above the water-side load [W]
     Real64 AvgCondSinkTemp(0.0);      // condenser temperature value for use in curves [C]
+    bool AllocatedFlag(false); // True when arrays are allocated
 
     bool GetInputREIR(true); // When TRUE, calls subroutine to read input file
 
@@ -281,8 +282,7 @@ namespace ChillerReformulatedEIR {
         int NumAlphas;                    // Number of elements in the alpha array
         int NumNums;                      // Number of elements in the numeric array
         int IOStat;                       // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);   // True when input errors found
-        static bool AllocatedFlag(false); // True when arrays are allocated
+        bool ErrorsFound(false);   // True when input errors found
         std::string PartLoadCurveType;    // Part load curve type
 
         if (AllocatedFlag) return;
@@ -819,9 +819,6 @@ namespace ChillerReformulatedEIR {
         //  Uses the status flags to trigger initializations.
 
         static std::string const RoutineName("InitElecReformEIRChiller");
-        static bool MyOneTimeFlag(true); // One time logic flag for allocating MyEnvrnFlag array
-        static Array1D_bool MyFlag;
-        static Array1D_bool MyEnvrnFlag; // Logical array to initialize when appropriate
         int EvapInletNode;               // Node number for evaporator water inlet node
         int EvapOutletNode;              // Node number for evaporator water outlet node
         int CondInletNode;               // Node number for condenser water inlet node
@@ -840,15 +837,6 @@ namespace ChillerReformulatedEIR {
         bool HeatRecRunFlag;
         Real64 HeatRecHighInletLimit;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumElecReformEIRChillers);
-            MyFlag.allocate(NumElecReformEIRChillers);
-            MyEnvrnFlag = true;
-            MyFlag = true;
-            MyOneTimeFlag = false;
-        }
-
         // Initialize condenser nodes
         EvapInletNode = ElecReformEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElecReformEIRChiller(EIRChillNum).EvapOutletNodeNum;
@@ -861,7 +849,7 @@ namespace ChillerReformulatedEIR {
         }
 
         // Init more variables
-        if (MyFlag(EIRChillNum)) {
+        if (ElecReformEIRChiller(EIRChillNum).MyInitFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(ElecReformEIRChiller(EIRChillNum).Name,
@@ -982,10 +970,10 @@ namespace ChillerReformulatedEIR {
                         DataLoopNode::Node(DataPlant::PlantLoop(ElecReformEIRChiller(EIRChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            MyFlag(EIRChillNum) = false;
+            ElecReformEIRChiller(EIRChillNum).MyInitFlag = false;
         }
 
-        if (MyEnvrnFlag(EIRChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (ElecReformEIRChiller(EIRChillNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElecReformEIRChiller(EIRChillNum).CWLoopNum).FluidName,
                                    DataGlobals::CWInitConvTemp,
@@ -1054,10 +1042,10 @@ namespace ChillerReformulatedEIR {
                     (ElecReformEIRChiller(EIRChillNum).RefCap + ElecReformEIRChiller(EIRChillNum).RefCap / ElecReformEIRChiller(EIRChillNum).RefCOP);
             }
 
-            MyEnvrnFlag(EIRChillNum) = false;
+            ElecReformEIRChiller(EIRChillNum).MyEnvrnFlag = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(EIRChillNum) = true;
+            ElecReformEIRChiller(EIRChillNum).MyEnvrnFlag = true;
         }
 
         if ((ElecReformEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated) && ElecReformEIRChiller(EIRChillNum).ModulatedFlowSetToLoop) {
@@ -1153,8 +1141,6 @@ namespace ChillerReformulatedEIR {
         std::string equipName;             // Name of chiller
         Real64 CurveVal(0.0);                   // Used to verify EIR-FT/CAP-FT curves = 1 at reference conditions
         Real64 CondTemp;                   // Used to verify EIRFPLR curve is > than 0 at reference conditions
-        static bool FoundNegValue(false);  // Used to evaluate EIRFPLR curve objects
-        static int CurveCheck(0);          // Used to evaluate EIRFPLR curve objects
         Array1D<Real64> CurveValArray(11); // Used to evaluate EIRFPLR curve objects
         Array1D<Real64> CondTempArray(11); // Used to evaluate EIRFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate EIRFPLR curve objects
@@ -1171,8 +1157,6 @@ namespace ChillerReformulatedEIR {
         Real64 tmpEvapVolFlowRate;    // local evaporator design volume flow rate
         Real64 tmpCondVolFlowRate;    // local condenser design volume flow rate
         Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyFlag;               // TRUE in order to calculate IPLV
         Real64 EvapVolFlowRateUser(0.0);          // Hardsized evaporator flow for reporting
         Real64 RefCapUser(0.0);                   // Hardsized reference capacity for reporting
         Real64 CondVolFlowRateUser(0.0);          // Hardsized condenser flow for reporting
@@ -1181,11 +1165,6 @@ namespace ChillerReformulatedEIR {
         // Formats
         static ObjexxFCL::gio::Fmt Format_530("('Cond Temp (C) = ',11(F7.2))");
         static ObjexxFCL::gio::Fmt Format_531("('Curve Output  = ',11(F7.2))");
-
-        if (MyOneTimeFlag) {
-            MyFlag.dimension(NumElecReformEIRChillers, true);
-            MyOneTimeFlag = false;
-        }
 
         tmpNomCap = ElecReformEIRChiller(EIRChillNum).RefCap;
         tmpEvapVolFlowRate = ElecReformEIRChiller(EIRChillNum).EvapVolFlowRate;
@@ -1472,7 +1451,7 @@ namespace ChillerReformulatedEIR {
         }
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
-            if (MyFlag(EIRChillNum)) {
+            if (ElecReformEIRChiller(EIRChillNum).MySizeFlag) {
                 Real64 IPLV;
                 StandardRatings::CalcChillerIPLV(ElecReformEIRChiller(EIRChillNum).Name,
                                 DataPlant::TypeOf_Chiller_ElectricReformEIR,
@@ -1487,7 +1466,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillNum).EvapVolFlowRate,
                                 ElecReformEIRChiller(EIRChillNum).CDLoopNum,
                                 ElecReformEIRChiller(EIRChillNum).CompPowerToCondenserFrac);
-                MyFlag(EIRChillNum) = false;
+                ElecReformEIRChiller(EIRChillNum).MySizeFlag = false;
             }
             // create predefined report
             equipName = ElecReformEIRChiller(EIRChillNum).Name;
@@ -1599,11 +1578,11 @@ namespace ChillerReformulatedEIR {
                 //     Check EIRFPLR curve output. Calculate condenser inlet temp based on reference condenser outlet temp,
                 //     chiller capacity, and mass flow rate. Starting with the calculated condenser inlet temp and PLR = 0,
                 //     calculate the condenser outlet temp proportional to PLR and test the EIRFPLR curve output for negative numbers.
-                FoundNegValue = false;
+                bool FoundNegValue = false;
                 if (ElecReformEIRChiller(EIRChillNum).ChillerEIRFPLR > 0) {
                     CurveValArray = 0.0;
                     CondTempArray = 0.0;
-                    for (CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                    for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                         PLRTemp = CurveCheck / 10.0;
                         CondTemp = ElecReformEIRChiller(EIRChillNum).TempRefCondIn + (DeltaTCond * PLRTemp);
                         CondTemp = min(CondTemp, ElecReformEIRChiller(EIRChillNum).ChillerEIRFPLRTempMax);

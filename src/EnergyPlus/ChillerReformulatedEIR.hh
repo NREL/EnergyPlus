@@ -210,6 +210,9 @@ namespace ChillerReformulatedEIR {
         int FaultyChillerFoulingIndex;     // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerFoulingFactor; // Chiller fouling factor
         std::string EndUseSubcategory;     // identifier use for the end use subcategory
+        bool MyEnvrnFlag;
+        bool MyInitFlag;
+        bool MySizeFlag;
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
@@ -232,7 +235,8 @@ namespace ChillerReformulatedEIR {
               IterLimitExceededNum(0), IterLimitErrIndex(0), IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondMassFlowIndex(0), PossibleSubcooling(false),
-              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0)
+              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true),
+              MyInitFlag(true), MySizeFlag(true)
         {
         }
     };
