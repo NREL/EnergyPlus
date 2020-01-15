@@ -320,3 +320,72 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
 }
+
+TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest2)
+{
+    // checks DOAS Control Strategy default setpoint values test
+    std::string const idf_objects = delimited_string({
+
+        " Zone,",
+        "	SPACE1-1,      !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	3.0,           !- Ceiling Height {m}",
+        "	240.0;         !- Volume {m3}",
+
+        " Sizing:Zone,",
+        "	SPACE1-1,             !- Zone or ZoneList Name",
+        "	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+        "	14.,                  !- Zone Cooling Design Supply Air Temperature { C }",
+        "	,                     !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+        "	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+        "	50.,                  !- Zone Heating Design Supply Air Temperature { C }",
+        "	,                     !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+        "	0.009,                !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	0.004,                !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	SZ DSOA SPACE1-1,     !- Design Specification Outdoor Air Object Name",
+        "	0.0,                  !- Zone Heating Sizing Factor",
+        "	0.0,                  !- Zone Cooling Sizing Factor",
+        "	DesignDayWithLimit,   !- Cooling Design Air Flow Method",
+        "	,                     !- Cooling Design Air Flow Rate { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Cooling Minimum Air Flow { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow Fraction",
+        "	DesignDay,            !- Heating Design Air Flow Method",
+        "	,                     !- Heating Design Air Flow Rate { m3/s }",
+        "	,                     !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Heating Maximum Air Flow { m3/s }",
+        "	,                     !- Heating Maximum Air Flow Fraction",
+        "	,                     !- Design Specification Zone Air Distribution Object Name",
+        "   Yes,                  !- Account for Dedicated Outside Air System",
+        "   NeutralSupplyAir;     !- Dedicated Outside Air System Control Strategy",
+
+        " DesignSpecification:OutdoorAir,",
+        "	SZ DSOA SPACE1-1,     !- Name",
+        "	sum,                  !- Outdoor Air Method",
+        "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
+        "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    SizingManager::GetOARequirements();
+    SizingManager::GetZoneSizingInput();
+    ASSERT_EQ(1, NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    // set default DOAS control strategy setpoint values
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy();
+    // check default low and high set point values
+    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+}

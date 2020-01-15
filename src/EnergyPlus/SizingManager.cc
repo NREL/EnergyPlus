@@ -3183,16 +3183,14 @@ namespace SizingManager {
                             }
                         }
                         // blank fields are set to autosize
-                        if ( lNumericFieldBlanks( 17 ) ) {
+                        if (lNumericFieldBlanks(17)) {
                             ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = DataSizing::AutoSize;
-                        } else
-                        {
+                        } else {
                             ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = rNumericArgs(17);
                         }
-                        if ( lNumericFieldBlanks( 18 ) ) {
+                        if (lNumericFieldBlanks(18)) {
                             ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = DataSizing::AutoSize;
-                        } else
-                        {
+                        } else {
                             ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = rNumericArgs(18);
                         }
                         if (rNumericArgs(17) > 0.0 && rNumericArgs(18) > 0.0 && rNumericArgs(17) >= rNumericArgs(18)) {
