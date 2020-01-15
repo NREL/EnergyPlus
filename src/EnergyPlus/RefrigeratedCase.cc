@@ -7074,7 +7074,7 @@ namespace RefrigeratedCase {
                                         DataHeatBalance::Zone(zoneID).Name);
                     SetupOutputVariable("Refrigeration Zone Air Chiller Water Removed Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        CoilSysCredit(zoneID).ReportH20RemovedKgPerS_FromZoneRate,
+                                        CoilSysCredit(zoneID).ReportH2ORemovedKgPerS_FromZoneRate,
                                         "HVAC",
                                         "Average",
                                         DataHeatBalance::Zone(zoneID).Name);
@@ -14063,7 +14063,7 @@ namespace RefrigeratedCase {
 
         if (UseSysTimeStep) { // air chillers
             for (int ZoneNum = 1; ZoneNum <= DataGlobals::NumOfZones; ++ZoneNum) {
-                CoilSysCredit(ZoneNum).ReportH20RemovedKgPerS_FromZoneRate = -CoilSysCredit(ZoneNum).LatKgPerS_ToZoneRate;
+                CoilSysCredit(ZoneNum).ReportH2ORemovedKgPerS_FromZoneRate = -CoilSysCredit(ZoneNum).LatKgPerS_ToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneRate = -CoilSysCredit(ZoneNum).LatCreditToZoneRate;
                 CoilSysCredit(ZoneNum).ReportLatCreditToZoneEnergy = -CoilSysCredit(ZoneNum).LatCreditToZoneEnergy;
                 // Sensible rate can be positive or negative, split into separate output variables and

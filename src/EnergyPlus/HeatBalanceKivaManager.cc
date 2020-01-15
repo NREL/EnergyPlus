@@ -71,6 +71,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
@@ -652,7 +653,7 @@ namespace HeatBalanceKivaManager {
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 
