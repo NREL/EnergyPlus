@@ -3848,6 +3848,18 @@ namespace ZoneEquipmentManager {
                                          ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == HPWaterHeater_Num) { // 'WaterHeater:HeatPump:PumpedCondenser'
+//                        auto HPWH = WaterThermalTanks::HeatPumpWaterHeaterData::factory(PrioritySimOrder(EquipTypeNum).EquipName);
+//                        PlantLocation A(0, 0, 0, 0);
+//                        Real64 curLoad = 0.0;
+//                        if (dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->StandAlone) {
+//                            dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->simulate(A, FirstHVACIteration, curLoad, true);
+//                            SysOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterSensibleCapacity;
+//                            LatOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterLatentCapacity;
+//                        } else {
+//                            SysOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterSensibleCapacity;
+//                            LatOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterLatentCapacity;
+//                        }
+
                         SimHeatPumpWaterHeater(PrioritySimOrder(EquipTypeNum).EquipName,
                                                FirstHVACIteration,
                                                SysOutputProvided,
