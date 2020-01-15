@@ -1974,15 +1974,24 @@ End If
 End Sub
 
 
+'-----------------------------------------------------------------------------
+' Make sure the IDD \min-fields is less than or equal to the number of
+' fields in each object
+'-----------------------------------------------------------------------------
 Sub checkMinFields()
 Dim numfields As Integer
+Dim errMessage As String
 Dim i As Integer
+errMessage = ""
 For i = 1 To maxUsedIDDClass
     numfields = 1 + IDDClassDat(i).fieldEnd - IDDClassDat(i).fieldStart
     If IDDClassDat(i).minFields > numfields Then
-        Call MsgBox("\min-field is greater than the number of fiels in: " & IDDClassDat(i).name, vbInformation, "Warning")
+        errMessage = errMessage & vbCrLf & IDDClassDat(i).name
     End If
 Next i
+If errMessage <> "" Then
+    Call MsgBox("\min-fields is greater than the number of fields in: " & vbCrLf & errMessage, vbInformation, "Warning")
+End If
 End Sub
 
 
