@@ -1325,36 +1325,18 @@ namespace ChillerElectricEIR {
 
         static std::string const RoutineName("SizeElectricEIRChiller");
 
-        int PltSizNum;     // Plant Sizing index corresponding to CurLoopNum
-        int PltSizCondNum; // Plant Sizing index for condenser loop
-        bool ErrorsFound;  // If errors detected in input
-        std::string equipName;
-        Real64 rho;
-        Real64 Cp;
-
-        std::string CompName;     // component name
-        std::string CompType;     // component type
-        std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-        bool bPRINT = true;       // TRUE if sizing is reported to output (eio)
-        Real64 TempSize;          // autosized value of coil input field
-        int SizingMethod;         // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
-
-        PltSizCondNum = 0;
-        ErrorsFound = false;
+        int PltSizCondNum = 0;
+        bool ErrorsFound = false;
         Real64 tmpNomCap = ElectricEIRChiller(EIRChillNum).RefCap;
         Real64 tmpEvapVolFlowRate = ElectricEIRChiller(EIRChillNum).EvapVolFlowRate;
         Real64 tmpCondVolFlowRate = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
-        Real64 tempHeatRecVolFlowRate;
-        Real64 EvapVolFlowRateUser(0.0);
-        Real64 RefCapUser(0.0);
-        Real64 CondVolFlowRateUser(0.0);
 
         if (ElectricEIRChiller(EIRChillNum).CondenserType == WaterCooled) {
             PltSizCondNum = DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).PlantSizNum;
         }
 
         // find the appropriate Plant Sizing object
-        PltSizNum = DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).PlantSizNum;
+        int PltSizNum = DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
@@ -1379,7 +1361,7 @@ namespace ChillerElectricEIR {
                     }
                 } else { // Hard-size with sizing data
                     if (ElectricEIRChiller(EIRChillNum).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
-                        EvapVolFlowRateUser = ElectricEIRChiller(EIRChillNum).EvapVolFlowRate;
+                        Real64 EvapVolFlowRateUser = ElectricEIRChiller(EIRChillNum).EvapVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:Electric:EIR",
                                                ElectricEIRChiller(EIRChillNum).Name,
@@ -1423,12 +1405,12 @@ namespace ChillerElectricEIR {
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
                                            DataGlobals::CWInitConvTemp,
                                            DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidIndex,
                                            RoutineName);
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
                                        DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidIndex,
                                        RoutineName);
@@ -1449,7 +1431,7 @@ namespace ChillerElectricEIR {
                     }
                 } else { // Hard-sized with sizing data
                     if (ElectricEIRChiller(EIRChillNum).RefCap > 0.0 && tmpNomCap > 0.0) {
-                        RefCapUser = ElectricEIRChiller(EIRChillNum).RefCap;
+                        Real64 RefCapUser = ElectricEIRChiller(EIRChillNum).RefCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:Electric:EIR",
                                                ElectricEIRChiller(EIRChillNum).Name,
@@ -1490,11 +1472,11 @@ namespace ChillerElectricEIR {
         if (PltSizCondNum > 0 && PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
 
-                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
                                        DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidIndex,
                                        RoutineName);
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
                                            ElectricEIRChiller(EIRChillNum).TempRefCondIn,
                                            DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidIndex,
                                            RoutineName);
@@ -1522,7 +1504,7 @@ namespace ChillerElectricEIR {
                     }
                 } else {
                     if (ElectricEIRChiller(EIRChillNum).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
-                        CondVolFlowRateUser = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
+                        Real64 CondVolFlowRateUser = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Chiller:Electric:EIR",
                                                ElectricEIRChiller(EIRChillNum).Name,
@@ -1568,14 +1550,14 @@ namespace ChillerElectricEIR {
 
                 // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    SizingMethod = DataHVACGlobals::AutoCalculateSizing;
-                    CompType = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
-                    CompName = ElectricEIRChiller(EIRChillNum).Name;
-                    SizingString = "Reference Condenser Fluid Flow Rate  [m3/s]";
+                    int SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                    std::string CompType = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
+                    std::string SizingString = "Reference Condenser Fluid Flow Rate  [m3/s]";
                     DataSizing::DataConstantUsedForSizing = ElectricEIRChiller(EIRChillNum).RefCap;
                     DataSizing::DataFractionUsedForSizing = 0.000114;
-                    TempSize = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
-                    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    Real64 TempSize = ElectricEIRChiller(EIRChillNum).CondVolFlowRate;
+                    bool bPRINT = true;       // TRUE if sizing is reported to output (eio)
+                    ReportSizingManager::RequestSizing(CompType, ElectricEIRChiller(EIRChillNum).Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     ElectricEIRChiller(EIRChillNum).CondVolFlowRate = TempSize;
                     DataSizing::DataConstantUsedForSizing = 0.0;
                     DataSizing::DataFractionUsedForSizing = 0.0;
@@ -1588,7 +1570,7 @@ namespace ChillerElectricEIR {
 
         // now do heat recovery flow rate sizing if active
         if (ElectricEIRChiller(EIRChillNum).HeatRecActive) {
-            tempHeatRecVolFlowRate = tmpCondVolFlowRate * ElectricEIRChiller(EIRChillNum).HeatRecCapacityFraction;
+            Real64 tempHeatRecVolFlowRate = tmpCondVolFlowRate * ElectricEIRChiller(EIRChillNum).HeatRecCapacityFraction;
             if (ElectricEIRChiller(EIRChillNum).DesignHeatRecVolFlowRateWasAutoSized) {
 
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -1662,10 +1644,9 @@ namespace ChillerElectricEIR {
                 ElectricEIRChiller(EIRChillNum).IPLVFlag = false;
             }
             // create predefined report
-            equipName = ElectricEIRChiller(EIRChillNum).Name;
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, equipName, "Chiller:Electric:EIR");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, equipName, ElectricEIRChiller(EIRChillNum).RefCOP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, ElectricEIRChiller(EIRChillNum).RefCap);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, ElectricEIRChiller(EIRChillNum).Name, "Chiller:Electric:EIR");
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, ElectricEIRChiller(EIRChillNum).Name, ElectricEIRChiller(EIRChillNum).RefCOP);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, ElectricEIRChiller(EIRChillNum).Name, ElectricEIRChiller(EIRChillNum).RefCap);
         }
 
         if (ErrorsFound) {
