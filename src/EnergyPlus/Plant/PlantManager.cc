@@ -113,6 +113,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
@@ -949,6 +950,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterStratified;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -957,6 +959,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:Directfired")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
@@ -974,6 +977,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankStratified;
@@ -983,6 +987,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
@@ -1163,11 +1168,13 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "WaterHeater:HeatPump:WrappedCondenser")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
