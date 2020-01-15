@@ -226,8 +226,8 @@ namespace ChillerElectricEIR {
 
         if (LoopNum == ElectricEIRChiller(EIRChillNum).CWLoopNum) {
             ElectricEIRChiller(EIRChillNum).initialize(RunFlag, MyLoad);
-            ElectricEIRChiller(EIRChillNum).calculate(EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
-            UpdateElectricEIRChillerRecords(MyLoad, RunFlag, EIRChillNum);
+            ElectricEIRChiller(EIRChillNum).calculate(MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
+            ElectricEIRChiller(EIRChillNum).update(MyLoad, RunFlag);
 
         } else if (LoopNum == ElectricEIRChiller(EIRChillNum).CDLoopNum) {
             PlantUtilities::UpdateChillerComponentCondenserSide(LoopNum,
@@ -1653,8 +1653,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::calculate(int &EIRChillNum,                     // Chiller number
-                                     Real64 &MyLoad,                       // Operating load
+    void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad,                       // Operating load
                                      bool const RunFlag,                   // TRUE when chiller operating
                                      bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
                                      int const EquipFlowCtrl               // Flow control mode for the equipment
@@ -2245,7 +2244,7 @@ namespace ChillerElectricEIR {
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
                 if (this->HeatRecActive)
-                    EIRChillerHeatRecovery(EIRChillNum, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
+                    this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
                 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
                                                             condInletTemp,
                                                             DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
@@ -2270,7 +2269,7 @@ namespace ChillerElectricEIR {
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive)
-                EIRChillerHeatRecovery(EIRChillNum, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
+                this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
 
             if (this->CondMassFlowRate > 0.0) {
                 Cp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->CondInletNodeNum).HumRat, condInletTemp);
@@ -2294,10 +2293,9 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void EIRChillerHeatRecovery(int const EIRChillNum,      // Number of the current electric EIR chiller being simulated
-                                Real64 &QCond,              // Current condenser load [W]
+    void ElectricEIRChillerSpecs::calcHeatRecovery(Real64 &QCond,              // Current condenser load [W]
                                 Real64 const CondMassFlow,  // Current condenser mass flow [kg/s]
-                                Real64 const CondInletTemp, // Current condenser inlet temp [C]
+                                Real64 const condInletTemp, // Current condenser inlet temp [C]
                                 Real64 &QHeatRec            // Amount of heat recovered [W]
     )
     {
@@ -2312,57 +2310,57 @@ namespace ChillerElectricEIR {
         static std::string const RoutineName("EIRChillerHeatRecovery");
 
         // Inlet node to the heat recovery heat exchanger
-        Real64 HeatRecInletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).HeatRecInletNodeNum).Temp;
-        Real64 HeatRecMassFlowRate = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).HeatRecInletNodeNum).MassFlowRate;
+        Real64 heatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
+        Real64 HeatRecMassFlowRate = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
 
-        Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).HRLoopNum).FluidName,
-                                          HeatRecInletTemp,
-                                          DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).HRLoopNum).FluidIndex,
-                                          RoutineName);
-        Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
-                                       CondInletTemp,
-                                       DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidIndex,
-                                       RoutineName);
+        Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
+                                                                  heatRecInletTemp,
+                                                                  DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
+                                                                  RoutineName);
+        Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                               condInletTemp,
+                                                               DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                               RoutineName);
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot
         Real64 QTotal = QCond;
 
-        if (ElectricEIRChiller(EIRChillNum).HeatRecSetPointNodeNum == 0) { // use original algorithm that blends temps
-            Real64 TAvgIn = (HeatRecMassFlowRate * CpHeatRec * HeatRecInletTemp + CondMassFlow * CpCond * CondInletTemp) /
-                     (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond);
+        if (this->HeatRecSetPointNodeNum == 0) { // use original algorithm that blends temps
+            Real64 TAvgIn = (HeatRecMassFlowRate * CpHeatRec * heatRecInletTemp + CondMassFlow * CpCond * condInletTemp) /
+                            (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond);
 
             Real64 TAvgOut = QTotal / (HeatRecMassFlowRate * CpHeatRec + CondMassFlow * CpCond) + TAvgIn;
 
-            QHeatRec = HeatRecMassFlowRate * CpHeatRec * (TAvgOut - HeatRecInletTemp);
+            QHeatRec = HeatRecMassFlowRate * CpHeatRec * (TAvgOut - heatRecInletTemp);
             QHeatRec = max(QHeatRec, 0.0); // ensure non negative
             // check if heat flow too large for physical size of bundle
-            QHeatRec = min(QHeatRec, ElectricEIRChiller(EIRChillNum).HeatRecMaxCapacityLimit);
+            QHeatRec = min(QHeatRec, this->HeatRecMaxCapacityLimit);
         } else { // use new algorithm to meet setpoint
             Real64 THeatRecSetPoint(0.0); // local value for heat recovery leaving setpoint [C]
             {
-                auto const SELECT_CASE_var(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).HRLoopNum).LoopDemandCalcScheme);
+                auto const SELECT_CASE_var(DataPlant::PlantLoop(this->HRLoopNum).LoopDemandCalcScheme);
 
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                    THeatRecSetPoint = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).HeatRecSetPointNodeNum).TempSetPoint;
+                    THeatRecSetPoint = DataLoopNode::Node(this->HeatRecSetPointNodeNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    THeatRecSetPoint = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).HeatRecSetPointNodeNum).TempSetPointHi;
+                    THeatRecSetPoint = DataLoopNode::Node(this->HeatRecSetPointNodeNum).TempSetPointHi;
                 } else {
                     assert(false);
                 }
             }
 
             // load to heat recovery setpoint
-            Real64 QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * (THeatRecSetPoint - HeatRecInletTemp);
+            Real64 QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * (THeatRecSetPoint - heatRecInletTemp);
             QHeatRecToSetPoint = max(QHeatRecToSetPoint, 0.0);
             QHeatRec = min(QTotal, QHeatRecToSetPoint);
             // check if heat flow too large for physical size of bundle
-            QHeatRec = min(QHeatRec, ElectricEIRChiller(EIRChillNum).HeatRecMaxCapacityLimit);
+            QHeatRec = min(QHeatRec, this->HeatRecMaxCapacityLimit);
         }
 
         // check if limit on inlet is present and exceeded.
-        if (ElectricEIRChiller(EIRChillNum).HeatRecInletLimitSchedNum > 0) {
-            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(ElectricEIRChiller(EIRChillNum).HeatRecInletLimitSchedNum);
-            if (HeatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
+        if (this->HeatRecInletLimitSchedNum > 0) {
+            Real64 HeatRecHighInletLimit = ScheduleManager::GetCurrentScheduleValue(this->HeatRecInletLimitSchedNum);
+            if (heatRecInletTemp > HeatRecHighInletLimit) { // shut down heat recovery
                 QHeatRec = 0.0;
             }
         }
@@ -2371,16 +2369,13 @@ namespace ChillerElectricEIR {
 
         // Calculate a new Heat Recovery Coil Outlet Temp
         if (HeatRecMassFlowRate > 0.0) {
-            ElectricEIRChiller(EIRChillNum).HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
+            this->HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + heatRecInletTemp;
         } else {
-            ElectricEIRChiller(EIRChillNum).HeatRecOutletTemp = HeatRecInletTemp;
+            this->HeatRecOutletTemp = heatRecInletTemp;
         }
     }
 
-    void UpdateElectricEIRChillerRecords(Real64 const MyLoad, // Current load [W]
-                                         bool const RunFlag,  // TRUE if chiller operating
-                                         int const Num        // Chiller number
-    )
+    void ElectricEIRChillerSpecs::update(Real64 const MyLoad, bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2395,98 +2390,98 @@ namespace ChillerElectricEIR {
 
         if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // Set node conditions
-            DataLoopNode::Node(ElectricEIRChiller(Num).EvapOutletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapInletNodeNum).Temp;
-            DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Temp;
-            if (ElectricEIRChiller(Num).CondenserType != WaterCooled) {
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).HumRat = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).HumRat;
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Enthalpy = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Enthalpy;
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).MassFlowRate = 0.0;
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).MassFlowRate = 0.0;
+            DataLoopNode::Node(this->EvapOutletNodeNum).Temp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            DataLoopNode::Node(this->CondOutletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            if (this->CondenserType != WaterCooled) {
+                DataLoopNode::Node(this->CondOutletNodeNum).HumRat = DataLoopNode::Node(this->CondInletNodeNum).HumRat;
+                DataLoopNode::Node(this->CondOutletNodeNum).Enthalpy = DataLoopNode::Node(this->CondInletNodeNum).Enthalpy;
+                DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = 0.0;
+                DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = 0.0;
             }
 
-            ElectricEIRChiller(Num).ChillerPartLoadRatio = 0.0;
-            ElectricEIRChiller(Num).ChillerCyclingRatio = 0.0;
-            ElectricEIRChiller(Num).ChillerFalseLoadRate = 0.0;
-            ElectricEIRChiller(Num).ChillerFalseLoad = 0.0;
-            ElectricEIRChiller(Num).Power = 0.0;
-            ElectricEIRChiller(Num).QEvaporator = 0.0;
-            ElectricEIRChiller(Num).QCondenser = 0.0;
-            ElectricEIRChiller(Num).Energy = 0.0;
-            ElectricEIRChiller(Num).EvapEnergy = 0.0;
-            ElectricEIRChiller(Num).CondEnergy = 0.0;
-            ElectricEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapInletNodeNum).Temp;
-            ElectricEIRChiller(Num).CondInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Temp;
-            ElectricEIRChiller(Num).CondOutletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Temp;
-            ElectricEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapOutletNodeNum).Temp;
-            ElectricEIRChiller(Num).ActualCOP = 0.0;
-            ElectricEIRChiller(Num).CondenserFanPower = 0.0;
-            ElectricEIRChiller(Num).CondenserFanEnergyConsumption = 0.0;
-            if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
-                ElectricEIRChiller(Num).BasinHeaterConsumption = ElectricEIRChiller(Num).BasinHeaterPower * ReportingConstant;
-                ElectricEIRChiller(Num).EvapWaterConsump = 0.0;
+            this->ChillerPartLoadRatio = 0.0;
+            this->ChillerCyclingRatio = 0.0;
+            this->ChillerFalseLoadRate = 0.0;
+            this->ChillerFalseLoad = 0.0;
+            this->Power = 0.0;
+            this->QEvaporator = 0.0;
+            this->QCondenser = 0.0;
+            this->Energy = 0.0;
+            this->EvapEnergy = 0.0;
+            this->CondEnergy = 0.0;
+            this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->ActualCOP = 0.0;
+            this->CondenserFanPower = 0.0;
+            this->CondenserFanEnergyConsumption = 0.0;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
+                this->EvapWaterConsump = 0.0;
             }
 
-            if (ElectricEIRChiller(Num).HeatRecActive) {
+            if (this->HeatRecActive) {
 
-                PlantUtilities::SafeCopyPlantNode(ElectricEIRChiller(Num).HeatRecInletNodeNum, ElectricEIRChiller(Num).HeatRecOutletNodeNum);
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
 
-                ElectricEIRChiller(Num).QHeatRecovered = 0.0;
-                ElectricEIRChiller(Num).EnergyHeatRecovery = 0.0;
-                ElectricEIRChiller(Num).HeatRecInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecInletNodeNum).Temp;
-                ElectricEIRChiller(Num).HeatRecOutletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecOutletNodeNum).Temp;
-                ElectricEIRChiller(Num).HeatRecMassFlow = DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecInletNodeNum).MassFlowRate;
+                this->QHeatRecovered = 0.0;
+                this->EnergyHeatRecovery = 0.0;
+                this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
+                this->HeatRecOutletTemp = DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp;
+                this->HeatRecMassFlow = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
             }
 
         } else { // Chiller is running, so pass calculated values
             // Set node temperatures
-            if (ElectricEIRChiller(Num).CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance && ElectricEIRChiller(Num).EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-                DataLoopNode::Node(ElectricEIRChiller(Num).EvapOutletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapInletNodeNum).Temp;
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Temp;
-                if (ElectricEIRChiller(Num).CondenserType != WaterCooled) {
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).HumRat = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).HumRat;
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Enthalpy = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Enthalpy;
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).MassFlowRate = 0.0;
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).MassFlowRate = 0.0;
+            if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance && this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+                DataLoopNode::Node(this->EvapOutletNodeNum).Temp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                DataLoopNode::Node(this->CondOutletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+                if (this->CondenserType != WaterCooled) {
+                    DataLoopNode::Node(this->CondOutletNodeNum).HumRat = DataLoopNode::Node(this->CondInletNodeNum).HumRat;
+                    DataLoopNode::Node(this->CondOutletNodeNum).Enthalpy = DataLoopNode::Node(this->CondInletNodeNum).Enthalpy;
+                    DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = 0.0;
+                    DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = 0.0;
                 }
             } else {
-                DataLoopNode::Node(ElectricEIRChiller(Num).EvapOutletNodeNum).Temp = ElectricEIRChiller(Num).EvapOutletTemp;
-                DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Temp = ElectricEIRChiller(Num).CondOutletTemp;
-                if (ElectricEIRChiller(Num).CondenserType != WaterCooled) {
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).HumRat = ElectricEIRChiller(Num).CondOutletHumRat;
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(ElectricEIRChiller(Num).CondOutletTemp, ElectricEIRChiller(Num).CondOutletHumRat);
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).MassFlowRate = ElectricEIRChiller(Num).CondMassFlowRate;
-                    DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).MassFlowRate = ElectricEIRChiller(Num).CondMassFlowRate;
+                DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
+                DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
+                if (this->CondenserType != WaterCooled) {
+                    DataLoopNode::Node(this->CondOutletNodeNum).HumRat = this->CondOutletHumRat;
+                    DataLoopNode::Node(this->CondOutletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->CondOutletTemp, this->CondOutletHumRat);
+                    DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRate;
+                    DataLoopNode::Node(this->CondOutletNodeNum).MassFlowRate = this->CondMassFlowRate;
                 }
             }
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            ElectricEIRChiller(Num).ChillerFalseLoad = ElectricEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChiller(Num).Energy = ElectricEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChiller(Num).EvapEnergy = ElectricEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChiller(Num).CondEnergy = ElectricEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapInletNodeNum).Temp;
-            ElectricEIRChiller(Num).CondInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).CondInletNodeNum).Temp;
-            ElectricEIRChiller(Num).CondOutletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).CondOutletNodeNum).Temp;
-            ElectricEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).EvapOutletNodeNum).Temp;
-            ElectricEIRChiller(Num).CondenserFanEnergyConsumption = ElectricEIRChiller(Num).CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            if (ElectricEIRChiller(Num).Power != 0.0) {
-                ElectricEIRChiller(Num).ActualCOP = (ElectricEIRChiller(Num).QEvaporator + ElectricEIRChiller(Num).ChillerFalseLoadRate) / ElectricEIRChiller(Num).Power;
+            this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->EvapEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+            this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
+            this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+            this->CondenserFanEnergyConsumption = this->CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            if (this->Power != 0.0) {
+                this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
             } else {
-                ElectricEIRChiller(Num).ActualCOP = 0.0;
+                this->ActualCOP = 0.0;
             }
-            if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
-                ElectricEIRChiller(Num).BasinHeaterConsumption = ElectricEIRChiller(Num).BasinHeaterPower * ReportingConstant;
-                ElectricEIRChiller(Num).EvapWaterConsump = ElectricEIRChiller(Num).EvapWaterConsumpRate * ReportingConstant;
+            if (this->CondenserType == EvapCooled) {
+                this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
+                this->EvapWaterConsump = this->EvapWaterConsumpRate * ReportingConstant;
             }
 
-            if (ElectricEIRChiller(Num).HeatRecActive) {
+            if (this->HeatRecActive) {
 
-                PlantUtilities::SafeCopyPlantNode(ElectricEIRChiller(Num).HeatRecInletNodeNum, ElectricEIRChiller(Num).HeatRecOutletNodeNum);
-                ElectricEIRChiller(Num).EnergyHeatRecovery = ElectricEIRChiller(Num).QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecOutletNodeNum).Temp = ElectricEIRChiller(Num).HeatRecOutletTemp;
-                ElectricEIRChiller(Num).HeatRecInletTemp = DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecInletNodeNum).Temp;
-                ElectricEIRChiller(Num).HeatRecMassFlow = DataLoopNode::Node(ElectricEIRChiller(Num).HeatRecInletNodeNum).MassFlowRate;
+                PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
+                this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
+                this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
+                this->HeatRecMassFlow = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
             }
         }
     }

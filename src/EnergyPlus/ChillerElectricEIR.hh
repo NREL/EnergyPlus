@@ -235,12 +235,19 @@ namespace ChillerElectricEIR {
 
         void size();
 
-        void calculate(int &EIRChillNum,          // Chiller number
-                                         Real64 &MyLoad,            // Operating load
+        void calculate(Real64 &MyLoad,            // Operating load
                                          bool RunFlag,        // TRUE when chiller operating
                                          bool FirstIteration, // TRUE when first iteration of timestep
                                          int EquipFlowCtrl    // Flow control mode for the equipment
         );
+
+        void calcHeatRecovery(Real64 &QCond,              // Current condenser load [W]
+                                    Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
+                                    Real64 condInletTemp, // Current condenser inlet temp [C]
+                                    Real64 &QHeatRec            // Amount of heat recovered [W]
+        );
+
+        void update(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
@@ -267,18 +274,6 @@ namespace ChillerElectricEIR {
                                Real64 &TempEvapOutDesign);
 
     void GetElectricEIRChillerInput();
-
-    void EIRChillerHeatRecovery(int EIRChillNum,      // Number of the current electric EIR chiller being simulated
-                                Real64 &QCond,              // Current condenser load [W]
-                                Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
-                                Real64 CondInletTemp, // Current condenser inlet temp [C]
-                                Real64 &QHeatRec            // Amount of heat recovered [W]
-    );
-
-    void UpdateElectricEIRChillerRecords(Real64 MyLoad, // Current load [W]
-                                         bool RunFlag,  // TRUE if chiller operating
-                                         int Num        // Chiller number
-    );
 
 } // namespace ChillerElectricEIR
 
