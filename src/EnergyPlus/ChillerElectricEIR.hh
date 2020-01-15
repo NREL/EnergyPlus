@@ -195,6 +195,12 @@ namespace ChillerElectricEIR {
         Real64 CondInletTemp;                 // reporting: Condenser inlet temperature [C]
         Real64 EvapInletTemp;                 // reporting: Evaporator inlet temperature [C]
         Real64 ActualCOP;                     // reporting: Coefficient of performance
+        Real64 EnergyHeatRecovery;            // reporting: Energy recovered from water-cooled condenser [J]
+        Real64 HeatRecInletTemp;              // reporting: Heat reclaim inlet temperature [C]
+        Real64 HeatRecMassFlow;               // reporting: Heat reclaim mass flow rate [kg/s]
+        Real64 ChillerCondAvgTemp;            // reporting: average condenser temp for curves with Heat recovery [C]
+        Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
+        Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -218,34 +224,14 @@ namespace ChillerElectricEIR {
               EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0),
               HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
               ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
-              Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), ActualCOP(0.0)
-        {
-        }
-    };
-
-    struct ReportEIRVars
-    {
-        // Members
-        Real64 EnergyHeatRecovery;            // reporting: Energy recovered from water-cooled condenser [J]
-        Real64 HeatRecInletTemp;              // reporting: Heat reclaim inlet temperature [C]
-        Real64 HeatRecMassFlow;               // reporting: Heat reclaim mass flow rate [kg/s]
-        Real64 ChillerCondAvgTemp;            // reporting: average condenser temp for curves with Heat recovery [C]
-        Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
-        Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
-
-        // Default Constructor
-        ReportEIRVars()
-            :
-              EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0),
-              CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0)
+              Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0)
         {
         }
     };
 
     // Object Data
     extern Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-    extern Array1D<ReportEIRVars> ElectricEIRChillerReport;
 
     // Functions
     void clear_state();

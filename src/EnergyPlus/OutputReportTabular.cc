@@ -4790,7 +4790,6 @@ namespace OutputReportTabular {
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::ElectricEIRChillerReport;
         using ChillerElectricEIR::NumElectricEIRChillers;
         using ChillerReformulatedEIR::ElecReformEIRChiller;
         using ChillerReformulatedEIR::ElecReformEIRChillerReport;

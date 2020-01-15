@@ -72,7 +72,6 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
     int Num = 1;
 
     ElectricEIRChiller.allocate(Num);
-    ElectricEIRChillerReport.allocate(Num);
 
     ElectricEIRChiller(Num).EvapInletNodeNum = 1;
     ElectricEIRChiller(Num).EvapOutletNodeNum = 2;
@@ -92,7 +91,6 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
 
     Node.deallocate();
     ElectricEIRChiller.deallocate();
-    ElectricEIRChillerReport.deallocate();
 }
 
 TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
