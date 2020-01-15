@@ -223,6 +223,12 @@ namespace ChillerElectricEIR {
         }
     }
 
+    void ElectricEIRChillerSpecs::getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut)
+    {
+        TempDesCondIn = this->TempRefCondIn;
+        TempDesEvapOut = this->TempRefEvapOut;
+    }
+
     void ElectricEIRChillerSpecs::getSizingFactor(Real64 &sizFac)
     {
         sizFac = this->SizFac;
