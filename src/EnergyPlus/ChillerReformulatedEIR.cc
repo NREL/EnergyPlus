@@ -1151,7 +1151,7 @@ namespace ChillerReformulatedEIR {
         Real64 SizingCondOutletTemp;       // Plant Sizing outlet temperature for condenser loop [C]
         Real64 RefCapFT;                   // Capacity as a function of temperature curve output used for sizing
         std::string equipName;             // Name of chiller
-        Real64 CurveVal;                   // Used to verify EIR-FT/CAP-FT curves = 1 at reference conditions
+        Real64 CurveVal(0.0);                   // Used to verify EIR-FT/CAP-FT curves = 1 at reference conditions
         Real64 CondTemp;                   // Used to verify EIRFPLR curve is > than 0 at reference conditions
         static bool FoundNegValue(false);  // Used to evaluate EIRFPLR curve objects
         static int CurveCheck(0);          // Used to evaluate EIRFPLR curve objects
@@ -2432,7 +2432,6 @@ namespace ChillerReformulatedEIR {
                 PartLoadRat = (AvailChillerCap > 0.0) ? (QEvaporator / AvailChillerCap) : 0.0;
                 PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
                 ChillerPartLoadRatio = PartLoadRat;
-                EvapDeltaTemp = DataLoopNode::Node(EvapInletNode).Temp - EvapOutletTemp;
             }
 
         } else { // If FlowLock is True
@@ -2507,7 +2506,6 @@ namespace ChillerReformulatedEIR {
                                         EvapMassFlowRate,
                                         QEvaporator);
                 // update corresponding variables at faulty case
-                EvapDeltaTemp = DataLoopNode::Node(EvapInletNode).Temp - EvapOutletTemp;
             }
 
             // Checks QEvaporator on the basis of the machine limits.
@@ -2612,8 +2610,8 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFTXTmax;                  // Maximum evaporator leaving temperature allowed by EIRFT curve [C]
         Real64 EIRFTYTmin;                  // Minimum condenser  leaving temperature allowed by EIRFT curve [C]
         Real64 EIRFTYTmax;                  // Maximum condenser  leaving temperature allowed by EIRFT curve [C]
-        Real64 EIRFPLRTmin;                 // Minimum condenser  leaving temperature allowed by EIRFPLR curve [C]
-        Real64 EIRFPLRTmax;                 // Maximum condenser  leaving temperature allowed by EIRFPLR curve [C]
+        Real64 EIRFPLRTmin(0.0);                 // Minimum condenser  leaving temperature allowed by EIRFPLR curve [C]
+        Real64 EIRFPLRTmax(0.0);                 // Maximum condenser  leaving temperature allowed by EIRFPLR curve [C]
         Real64 EIRFPLRPLRmin;               // Minimum PLR allowed by EIRFPLR curve
         Real64 EIRFPLRPLRmax;               // Maximum PLR allowed by EIRFPLR curve
         Real64 ChillerLift;                 // Chiller lift  [C]
