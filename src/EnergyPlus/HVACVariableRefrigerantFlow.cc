@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -173,7 +173,7 @@ namespace HVACVariableRefrigerantFlow {
     int const NumValidFuelTypes(9);
     Array1D_string const
         cValidFuelTypes(NumValidFuelTypes,
-                        {"Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
+                        {"Electric", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -1255,8 +1255,8 @@ namespace HVACVariableRefrigerantFlow {
             if (CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
                 //******************
                 // WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-                // H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-                //                    /RhoWater [kg H2O/m3 H2O]
+                // H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+                //                    /RhoWater [kgWater/m3]
                 //******************
                 RhoWater = RhoH2O(OutdoorDryBulb);
                 VRF(VRFCond).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoWater * VRF(VRFCond).VRFCondPLR;
@@ -2276,19 +2276,17 @@ namespace HVACVariableRefrigerantFlow {
                 // A39; \field Fuel type
                 if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRICITY")) {
                     VRF(VRFNum).FuelType = FuelTypeElectric;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRIC")) {
-                    VRF(VRFNum).FuelType = FuelTypeElectric;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "NATURALGAS")) {
                     VRF(VRFNum).FuelType = FuelTypeNaturalGas;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANEGAS")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANE")) {
                     VRF(VRFNum).FuelType = FuelTypePropaneGas;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "DIESEL")) {
                     VRF(VRFNum).FuelType = FuelTypeDiesel;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "GASOLINE")) {
                     VRF(VRFNum).FuelType = FuelTypeGasoline;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#1")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO1")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil1;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOIL#2")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "FUELOILNO2")) {
                     VRF(VRFNum).FuelType = FuelTypeFuelOil2;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "OtherFuel1")) {
                     VRF(VRFNum).FuelType = FuelTypeOtherFuel1;
@@ -2298,7 +2296,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
-                        "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }
@@ -8045,7 +8043,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        Real64 LatentLoadMet = 0.0; // latent load deleivered [kgH2O/s]
+        Real64 LatentLoadMet = 0.0; // latent load deleivered [kgWater/s]
         Real64 TempOut = 0.0;
         Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
@@ -8072,7 +8070,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
@@ -11101,7 +11099,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;

@@ -134,7 +134,7 @@
 !    semiheated_skylight_frame = Skylight_Frame_Semiheated
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -7445,11 +7445,9 @@
   Output:Table:SummaryReports,
     EnvelopeSummary,         !- Report 1 Name
     InputVerificationandResultsSummary,  !- Report 2 Name
-    BEPS,                    !- Report 3 Name
+    AnnualBuildingUtilityPerformanceSummary, !- Report 3 Name
     EquipmentSummary,        !- Report 4 Name
-    ABUPS,                   !- Report 5 Name
-    IVRS,                    !- Report 6 Name
-    AllMonthly;              !- Report 7 Name
+    AllMonthly;              !- Report 5 Name
 
  !-   ===========  ALL OBJECTS IN CLASS: REPORT:TABLE:MONTHLY ===========
 

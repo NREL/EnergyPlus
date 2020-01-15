@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -173,6 +173,7 @@ namespace DataGlobals {
 
     bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
     bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ
+    bool beginEnvrnWarmStartFlag(false); // Sizing Speed Up
     bool BeginHourFlag(false);          // True at the start of each hour, False after first time step in hour
     bool BeginSimFlag(false);           // True until any actual simulation (full or sizing) has begun, False after first time step
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
