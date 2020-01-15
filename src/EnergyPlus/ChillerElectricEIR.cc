@@ -248,7 +248,7 @@ namespace ChillerElectricEIR {
                                                 ElectricEIRChiller(EIRChillNum).CondInletNodeNum,
                                                 ElectricEIRChiller(EIRChillNum).CondOutletNodeNum,
                                                 ElectricEIRChiller(EIRChillNum).QCondenser,
-                                                ElectricEIRChillerReport(EIRChillNum).CondInletTemp,
+                                                ElectricEIRChiller(EIRChillNum).CondInletTemp,
                                                 ElectricEIRChiller(EIRChillNum).CondOutletTemp,
                                                 ElectricEIRChiller(EIRChillNum).CondMassFlowRate,
                                                 FirstIteration);
@@ -755,7 +755,7 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricEIRChillerReport(EIRChillerNum).Energy,
+                                ElectricEIRChiller(EIRChillerNum).Energy,
                                 "System",
                                 "Sum",
                                 ElectricEIRChiller(EIRChillerNum).Name,
@@ -773,7 +773,7 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricEIRChillerReport(EIRChillerNum).EvapEnergy,
+                                ElectricEIRChiller(EIRChillerNum).EvapEnergy,
                                 "System",
                                 "Sum",
                                 ElectricEIRChiller(EIRChillerNum).Name,
@@ -790,13 +790,13 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller False Load Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricEIRChillerReport(EIRChillerNum).ChillerFalseLoad,
+                                ElectricEIRChiller(EIRChillerNum).ChillerFalseLoad,
                                 "System",
                                 "Sum",
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElectricEIRChillerReport(EIRChillerNum).EvapInletTemp,
+                                ElectricEIRChiller(EIRChillerNum).EvapInletTemp,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
@@ -821,7 +821,7 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElectricEIRChillerReport(EIRChillerNum).CondEnergy,
+                                ElectricEIRChiller(EIRChillerNum).CondEnergy,
                                 "System",
                                 "Sum",
                                 ElectricEIRChiller(EIRChillerNum).Name,
@@ -832,7 +832,7 @@ namespace ChillerElectricEIR {
                                 "Plant");
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                ElectricEIRChillerReport(EIRChillerNum).ActualCOP,
+                                ElectricEIRChiller(EIRChillerNum).ActualCOP,
                                 "System",
                                 "Average",
                                 ElectricEIRChiller(EIRChillerNum).Name);
@@ -860,7 +860,7 @@ namespace ChillerElectricEIR {
             if (ElectricEIRChiller(EIRChillerNum).CondenserType == WaterCooled) {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricEIRChillerReport(EIRChillerNum).CondInletTemp,
+                                    ElectricEIRChiller(EIRChillerNum).CondInletTemp,
                                     "System",
                                     "Average",
                                     ElectricEIRChiller(EIRChillerNum).Name);
@@ -925,7 +925,7 @@ namespace ChillerElectricEIR {
             } else {
                 SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElectricEIRChillerReport(EIRChillerNum).CondInletTemp,
+                                    ElectricEIRChiller(EIRChillerNum).CondInletTemp,
                                     "System",
                                     "Average",
                                     ElectricEIRChiller(EIRChillerNum).Name);
@@ -2006,7 +2006,7 @@ namespace ChillerElectricEIR {
         if (ElectricEIRChiller(EIRChillNum).HeatRecActive) {
             if ((ElectricEIRChiller(EIRChillNum).QHeatRecovered + ElectricEIRChiller(EIRChillNum).QCondenser) > 0.0) { // protect div by zero
                 AvgCondSinkTemp = (ElectricEIRChiller(EIRChillNum).QHeatRecovered * ElectricEIRChillerReport(EIRChillNum).HeatRecInletTemp +
-                        ElectricEIRChiller(EIRChillNum).QCondenser * ElectricEIRChillerReport(EIRChillNum).CondInletTemp) /
+                        ElectricEIRChiller(EIRChillNum).QCondenser * ElectricEIRChiller(EIRChillNum).CondInletTemp) /
                                   (ElectricEIRChiller(EIRChillNum).QHeatRecovered + ElectricEIRChiller(EIRChillNum).QCondenser);
             } else {
                 AvgCondSinkTemp = CondInletTemp;
@@ -2540,18 +2540,18 @@ namespace ChillerElectricEIR {
             ElectricEIRChiller(Num).ChillerPartLoadRatio = 0.0;
             ElectricEIRChiller(Num).ChillerCyclingRatio = 0.0;
             ElectricEIRChiller(Num).ChillerFalseLoadRate = 0.0;
-            ElectricEIRChillerReport(Num).ChillerFalseLoad = 0.0;
+            ElectricEIRChiller(Num).ChillerFalseLoad = 0.0;
             ElectricEIRChiller(Num).Power = 0.0;
             ElectricEIRChiller(Num).QEvaporator = 0.0;
             ElectricEIRChiller(Num).QCondenser = 0.0;
-            ElectricEIRChillerReport(Num).Energy = 0.0;
-            ElectricEIRChillerReport(Num).EvapEnergy = 0.0;
-            ElectricEIRChillerReport(Num).CondEnergy = 0.0;
-            ElectricEIRChillerReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            ElectricEIRChillerReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            ElectricEIRChiller(Num).Energy = 0.0;
+            ElectricEIRChiller(Num).EvapEnergy = 0.0;
+            ElectricEIRChiller(Num).CondEnergy = 0.0;
+            ElectricEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            ElectricEIRChiller(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
             ElectricEIRChiller(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
             ElectricEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
-            ElectricEIRChillerReport(Num).ActualCOP = 0.0;
+            ElectricEIRChiller(Num).ActualCOP = 0.0;
             ElectricEIRChiller(Num).CondenserFanPower = 0.0;
             ElectricEIRChillerReport(Num).CondenserFanEnergyConsumption = 0.0;
             if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
@@ -2594,19 +2594,19 @@ namespace ChillerElectricEIR {
 
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            ElectricEIRChillerReport(Num).ChillerFalseLoad = ElectricEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChillerReport(Num).Energy = ElectricEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChillerReport(Num).EvapEnergy = ElectricEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChillerReport(Num).CondEnergy = ElectricEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElectricEIRChillerReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            ElectricEIRChillerReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            ElectricEIRChiller(Num).ChillerFalseLoad = ElectricEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElectricEIRChiller(Num).Energy = ElectricEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElectricEIRChiller(Num).EvapEnergy = ElectricEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElectricEIRChiller(Num).CondEnergy = ElectricEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElectricEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            ElectricEIRChiller(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
             ElectricEIRChiller(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
             ElectricEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
             ElectricEIRChillerReport(Num).CondenserFanEnergyConsumption = ElectricEIRChiller(Num).CondenserFanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             if (ElectricEIRChiller(Num).Power != 0.0) {
-                ElectricEIRChillerReport(Num).ActualCOP = (ElectricEIRChiller(Num).QEvaporator + ElectricEIRChiller(Num).ChillerFalseLoadRate) / ElectricEIRChiller(Num).Power;
+                ElectricEIRChiller(Num).ActualCOP = (ElectricEIRChiller(Num).QEvaporator + ElectricEIRChiller(Num).ChillerFalseLoadRate) / ElectricEIRChiller(Num).Power;
             } else {
-                ElectricEIRChillerReport(Num).ActualCOP = 0.0;
+                ElectricEIRChiller(Num).ActualCOP = 0.0;
             }
             if (ElectricEIRChiller(Num).CondenserType == EvapCooled) {
                 ElectricEIRChillerReport(Num).BasinHeaterConsumption = ElectricEIRChiller(Num).BasinHeaterPower * ReportingConstant;

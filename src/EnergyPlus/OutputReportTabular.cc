@@ -4912,7 +4912,7 @@ namespace OutputReportTabular {
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
