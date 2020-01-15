@@ -226,7 +226,7 @@ namespace ChillerElectricEIR {
 
         if (LoopNum == ElectricEIRChiller(EIRChillNum).CWLoopNum) {
             ElectricEIRChiller(EIRChillNum).initialize(RunFlag, MyLoad);
-            CalcElectricEIRChillerModel(EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
+            ElectricEIRChiller(EIRChillNum).calculate(EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
             UpdateElectricEIRChillerRecords(MyLoad, RunFlag, EIRChillNum);
 
         } else if (LoopNum == ElectricEIRChiller(EIRChillNum).CDLoopNum) {
@@ -1653,7 +1653,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void CalcElectricEIRChillerModel(int &EIRChillNum,                     // Chiller number
+    void ElectricEIRChillerSpecs::calculate(int &EIRChillNum,                     // Chiller number
                                      Real64 &MyLoad,                       // Operating load
                                      bool const RunFlag,                   // TRUE when chiller operating
                                      bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
@@ -1690,13 +1690,13 @@ namespace ChillerElectricEIR {
         static std::string OutputChar;         // character string for warning messages
 
         // Set module level inlet and outlet nodes and initialize other local variables
-        ElectricEIRChiller(EIRChillNum).CondMassFlowRate = 0.0;
+        this->CondMassFlowRate = 0.0;
         Real64 FRAC = 1.0;                        // Chiller cycling ratio
 
         // Set performance curve outputs to 0.0 when chiller is off
-        ElectricEIRChiller(EIRChillNum).ChillerCapFT = 0.0;
-        ElectricEIRChiller(EIRChillNum).ChillerEIRFT = 0.0;
-        ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = 0.0;
+        this->ChillerCapFT = 0.0;
+        this->ChillerEIRFT = 0.0;
+        this->ChillerEIRFPLR = 0.0;
 
         // calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -1705,18 +1705,18 @@ namespace ChillerElectricEIR {
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > ElectricEIRChiller(EIRChillNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= ElectricEIRChiller(EIRChillNum).TimeStepSysLast) {
-            if (ElectricEIRChiller(EIRChillNum).PrintMessage) {
-                ++ElectricEIRChiller(EIRChillNum).MsgErrorCount;
+        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+            if (this->PrintMessage) {
+                ++this->MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
-                if (ElectricEIRChiller(EIRChillNum).MsgErrorCount < 2) {
-                    ShowWarningError(ElectricEIRChiller(EIRChillNum).MsgBuffer1 + '.');
-                    ShowContinueError(ElectricEIRChiller(EIRChillNum).MsgBuffer2);
+                if (this->MsgErrorCount < 2) {
+                    ShowWarningError(this->MsgBuffer1 + '.');
+                    ShowContinueError(this->MsgBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(ElectricEIRChiller(EIRChillNum).MsgBuffer1 + " error continues.",
-                                                   ElectricEIRChiller(EIRChillNum).ErrCount1,
-                                                   ElectricEIRChiller(EIRChillNum).MsgDataLast,
-                                                   ElectricEIRChiller(EIRChillNum).MsgDataLast,
+                    ShowRecurringWarningErrorAtEnd(this->MsgBuffer1 + " error continues.",
+                                                   this->ErrCount1,
+                                                   this->MsgDataLast,
+                                                   this->MsgDataLast,
                                                    _,
                                                    "[C]",
                                                    "[C]");
@@ -1725,158 +1725,154 @@ namespace ChillerElectricEIR {
         }
 
         // save last system time step and last end time of current time step (used to determine if warning is valid)
-        ElectricEIRChiller(EIRChillNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        ElectricEIRChiller(EIRChillNum).CurrentEndTimeLast = CurrentEndTime;
+        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->CurrentEndTimeLast = CurrentEndTime;
 
         // If no loop demand or chiller OFF, return
         // If Chiller load is 0 or chiller is not running then leave the subroutine.Before leaving
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive || DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock == 1) {
-                ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).MassFlowRate;
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive || DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
+                this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             }
-            if (ElectricEIRChiller(EIRChillNum).CondenserType == WaterCooled) {
-                if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum)
-                        .LoopSide(ElectricEIRChiller(EIRChillNum).CDLoopSideNum)
-                        .Branch(ElectricEIRChiller(EIRChillNum).CDBranchNum)
-                        .Comp(ElectricEIRChiller(EIRChillNum).CDCompNum)
+            if (this->CondenserType == WaterCooled) {
+                if (DataPlant::PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSideNum)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) {
-                    ElectricEIRChiller(EIRChillNum).CondMassFlowRate = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).MassFlowRate;
+                    this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 }
             }
-            if (ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
+            if (this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
-            ElectricEIRChiller(EIRChillNum).PrintMessage = false;
+            this->PrintMessage = false;
             return;
         }
 
         // initialize outlet air humidity ratio of air or evap cooled chillers
-        ElectricEIRChiller(EIRChillNum).CondOutletHumRat = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).HumRat;
+        this->CondOutletHumRat = DataLoopNode::Node(this->CondInletNodeNum).HumRat;
 
-        if (ElectricEIRChiller(EIRChillNum).CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
-            DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).OutAirDryBulb;
+        if (this->CondenserType == AirCooled) { // Condenser inlet temp = outdoor temp
+            DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb;
 
             // Warn user if entering condenser dry-bulb temperature falls below 0 C
-            if (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp < 0.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
-                ElectricEIRChiller(EIRChillNum).PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp;
-                ElectricEIRChiller(EIRChillNum).MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
-                                                             ElectricEIRChiller(EIRChillNum).Name +
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 0.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
+                this->PrintMessage = true;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
+                this->MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
+                                                             this->Name +
                                                              "\" - Air Cooled Condenser Inlet Temperature below 0C";
-                ElectricEIRChiller(EIRChillNum).MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
+                this->MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
                                                              " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                                                              General::CreateSysTimeIntervalString();
-                ElectricEIRChiller(EIRChillNum).MsgDataLast = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp;
+                this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
-                ElectricEIRChiller(EIRChillNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
-        } else if (ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
-            DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).OutAirWetBulb;
+        } else if (this->CondenserType == EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
+            DataLoopNode::Node(this->CondInletNodeNum).Temp = DataLoopNode::Node(this->CondInletNodeNum).OutAirWetBulb;
             //  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-            ElectricEIRChiller(EIRChillNum).CondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp, DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp, DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Press);
+            this->CondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(DataLoopNode::Node(this->CondInletNodeNum).Temp, DataLoopNode::Node(this->CondInletNodeNum).Temp, DataLoopNode::Node(this->CondInletNodeNum).Press);
 
             // Warn user if evap condenser wet-bulb temperature falls below 10 C
-            if (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp < 10.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
-                ElectricEIRChiller(EIRChillNum).PrintMessage = true;
-                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp;
-                ElectricEIRChiller(EIRChillNum).MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
-                                                             ElectricEIRChiller(EIRChillNum).Name +
+            if (DataLoopNode::Node(this->CondInletNodeNum).Temp < 10.0 && std::abs(MyLoad) > 0 && RunFlag && !DataGlobals::WarmupFlag) {
+                this->PrintMessage = true;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << DataLoopNode::Node(this->CondInletNodeNum).Temp;
+                this->MsgBuffer1 = "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" +
+                                                             this->Name +
                                                              "\" - Air Cooled Condenser Inlet Temperature below 10C";
-                ElectricEIRChiller(EIRChillNum).MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
+                this->MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
                                                              " C. Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                                                              General::CreateSysTimeIntervalString();
-                ElectricEIRChiller(EIRChillNum).MsgDataLast = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp;
+                this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {
-                ElectricEIRChiller(EIRChillNum).PrintMessage = false;
+                this->PrintMessage = false;
             }
         } // End of the Air Cooled/Evap Cooled Logic block
 
         // If not air or evap cooled then set to the condenser node that is attached to a cooling tower
-        Real64 CondInletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).Temp;
+        Real64 condInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
 
         // LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        Real64 MinPartLoadRat = ElectricEIRChiller(EIRChillNum).MinPartLoadRat;
-        Real64 MaxPartLoadRat = ElectricEIRChiller(EIRChillNum).MaxPartLoadRat;
-        Real64 MinUnloadRat = ElectricEIRChiller(EIRChillNum).MinUnloadRat;
-        Real64 ChillerRefCap = ElectricEIRChiller(EIRChillNum).RefCap;
-        Real64 ReferenceCOP = ElectricEIRChiller(EIRChillNum).RefCOP;
-        ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).Temp;
-        Real64 TempLowLimitEout = ElectricEIRChiller(EIRChillNum).TempLowLimitEvapOut;
-        Real64 EvapMassFlowRateMax = ElectricEIRChiller(EIRChillNum).EvapMassFlowRateMax;
+        Real64 ChillerRefCap = this->RefCap;
+        Real64 ReferenceCOP = this->RefCOP;
+        this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
+        Real64 TempLowLimitEout = this->TempLowLimitEvapOut;
 
         // If there is a fault of chiller fouling (zrp_Nov2016)
-        if (ElectricEIRChiller(EIRChillNum).FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = ElectricEIRChiller(EIRChillNum).FaultyChillerFoulingIndex;
+        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerRefCap;
             Real64 ReferenceCOP_ff = ReferenceCOP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            ElectricEIRChiller(EIRChillNum).FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
+            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor();
 
             // update the Chiller nominal capacity and COP at faulty cases
-            ChillerRefCap = NomCap_ff * ElectricEIRChiller(EIRChillNum).FaultyChillerFoulingFactor;
-            ReferenceCOP = ReferenceCOP_ff * ElectricEIRChiller(EIRChillNum).FaultyChillerFoulingFactor;
+            ChillerRefCap = NomCap_ff * this->FaultyChillerFoulingFactor;
+            ReferenceCOP = ReferenceCOP_ff * this->FaultyChillerFoulingFactor;
         }
 
         // Set mass flow rates
-        if (ElectricEIRChiller(EIRChillNum).CondenserType == WaterCooled) {
-            ElectricEIRChiller(EIRChillNum).CondMassFlowRate = ElectricEIRChiller(EIRChillNum).CondMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(ElectricEIRChiller(EIRChillNum).CondMassFlowRate,
-                                 ElectricEIRChiller(EIRChillNum).CondInletNodeNum,
-                                 ElectricEIRChiller(EIRChillNum).CondOutletNodeNum,
-                                 ElectricEIRChiller(EIRChillNum).CDLoopNum,
-                                 ElectricEIRChiller(EIRChillNum).CDLoopSideNum,
-                                 ElectricEIRChiller(EIRChillNum).CDBranchNum,
-                                 ElectricEIRChiller(EIRChillNum).CDCompNum);
-            PlantUtilities::PullCompInterconnectTrigger(ElectricEIRChiller(EIRChillNum).CWLoopNum,
-                                        ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
-                                        ElectricEIRChiller(EIRChillNum).CWBranchNum,
-                                        ElectricEIRChiller(EIRChillNum).CWCompNum,
-                                        ElectricEIRChiller(EIRChillNum).CondMassFlowIndex,
-                                        ElectricEIRChiller(EIRChillNum).CDLoopNum,
-                                        ElectricEIRChiller(EIRChillNum).CDLoopSideNum,
+        if (this->CondenserType == WaterCooled) {
+            this->CondMassFlowRate = this->CondMassFlowRateMax;
+            PlantUtilities::SetComponentFlowRate(this->CondMassFlowRate,
+                                 this->CondInletNodeNum,
+                                 this->CondOutletNodeNum,
+                                 this->CDLoopNum,
+                                 this->CDLoopSideNum,
+                                 this->CDBranchNum,
+                                 this->CDCompNum);
+            PlantUtilities::PullCompInterconnectTrigger(this->CWLoopNum,
+                                        this->CWLoopSideNum,
+                                        this->CWBranchNum,
+                                        this->CWCompNum,
+                                        this->CondMassFlowIndex,
+                                        this->CDLoopNum,
+                                        this->CDLoopSideNum,
                                         DataPlant::CriteriaType_MassFlowRate,
-                                                        ElectricEIRChiller(EIRChillNum).CondMassFlowRate);
+                                                        this->CondMassFlowRate);
 
-            if (ElectricEIRChiller(EIRChillNum).CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-                if (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+            if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+                if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                     // Use PlantUtilities::SetComponentFlowRate to decide actual flow
-                    PlantUtilities::SetComponentFlowRate(ElectricEIRChiller(EIRChillNum).EvapMassFlowRate,
-                                         ElectricEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                         ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum,
-                                         ElectricEIRChiller(EIRChillNum).CWLoopNum,
-                                         ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
-                                         ElectricEIRChiller(EIRChillNum).CWBranchNum,
-                                         ElectricEIRChiller(EIRChillNum).CWCompNum);
+                    PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                         this->EvapInletNodeNum,
+                                         this->EvapOutletNodeNum,
+                                         this->CWLoopNum,
+                                         this->CWLoopSideNum,
+                                         this->CWBranchNum,
+                                         this->CWCompNum);
                 }
                 return;
             }
         }
 
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                if ((ElectricEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated) ||
-                    (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).Branch(ElectricEIRChiller(EIRChillNum).CWBranchNum).Comp(ElectricEIRChiller(EIRChillNum).CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                    (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
+                if ((this->FlowMode == LeavingSetPointModulated) ||
+                    (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                    (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
                     // there will be a valid setpoint on outlet
-                    EvapOutletTempSetPoint = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPoint;
+                    EvapOutletTempSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                 } else { // use plant loop overall setpoint
-                    EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                if ((ElectricEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated) ||
-                    (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).Branch(ElectricEIRChiller(EIRChillNum).CWBranchNum).Comp(ElectricEIRChiller(EIRChillNum).CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
-                    (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
+                if ((this->FlowMode == LeavingSetPointModulated) ||
+                    (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) ||
+                    (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
                     // there will be a valid setpoint on outlet
-                    EvapOutletTempSetPoint = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPointHi;
+                    EvapOutletTempSetPoint = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                 } else { // use plant loop overall setpoint
-                    EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                    EvapOutletTempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             } else {
                 assert(false);
@@ -1884,75 +1880,75 @@ namespace ChillerElectricEIR {
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (ElectricEIRChiller(EIRChillNum).FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
-            int FaultIndex = ElectricEIRChiller(EIRChillNum).FaultyChillerSWTIndex;
+        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 
             // calculate the sensor offset using fault information
-            ElectricEIRChiller(EIRChillNum).FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
+            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct();
             // update the EvapOutletTempSetPoint
             EvapOutletTempSetPoint =
-                max(ElectricEIRChiller(EIRChillNum).TempLowLimitEvapOut,
-                    min(DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller(EIRChillNum).FaultyChillerSWTOffset));
-            ElectricEIRChiller(EIRChillNum).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
+                max(this->TempLowLimitEvapOut,
+                    min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTempSetPoint_ff - this->FaultyChillerSWTOffset));
+            this->FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
         }
 
         // correct temperature if using heat recovery
         // use report values for latest valid calculation, lagged somewhat
         Real64 AvgCondSinkTemp;
-        if (ElectricEIRChiller(EIRChillNum).HeatRecActive) {
-            if ((ElectricEIRChiller(EIRChillNum).QHeatRecovered + ElectricEIRChiller(EIRChillNum).QCondenser) > 0.0) { // protect div by zero
-                AvgCondSinkTemp = (ElectricEIRChiller(EIRChillNum).QHeatRecovered * ElectricEIRChiller(EIRChillNum).HeatRecInletTemp +
-                        ElectricEIRChiller(EIRChillNum).QCondenser * ElectricEIRChiller(EIRChillNum).CondInletTemp) /
-                                  (ElectricEIRChiller(EIRChillNum).QHeatRecovered + ElectricEIRChiller(EIRChillNum).QCondenser);
+        if (this->HeatRecActive) {
+            if ((this->QHeatRecovered + this->QCondenser) > 0.0) { // protect div by zero
+                AvgCondSinkTemp = (this->QHeatRecovered * this->HeatRecInletTemp +
+                        this->QCondenser * this->CondInletTemp) /
+                                  (this->QHeatRecovered + this->QCondenser);
             } else {
-                AvgCondSinkTemp = CondInletTemp;
+                AvgCondSinkTemp = condInletTemp;
             }
         } else {
-            AvgCondSinkTemp = CondInletTemp;
+            AvgCondSinkTemp = condInletTemp;
         }
 
         // Get capacity curve info with respect to CW setpoint and entering condenser water temps
-        ElectricEIRChiller(EIRChillNum).ChillerCapFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
+        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
-        if (ElectricEIRChiller(EIRChillNum).ChillerCapFT < 0) {
-            if (ElectricEIRChiller(EIRChillNum).ChillerCapFTError < 1 && DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerCapFTError;
-                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller Capacity as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerCapFT, 3) +
+        if (this->ChillerCapFT < 0) {
+            if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+                ++this->ChillerCapFTError;
+                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
+                ShowContinueError(" Chiller Capacity as a Function of Temperature curve output is negative (" + General::RoundSigDigits(this->ChillerCapFT, 3) +
                                   ").");
                 ShowContinueError(" Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(EvapOutletTempSetPoint, 1) +
-                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(CondInletTemp, 1) + '.');
+                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(condInletTemp, 1) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerCapFTError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
+            } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+                ++this->ChillerCapFTError;
+                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + this->Name +
                                                    "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
-                                               ElectricEIRChiller(EIRChillNum).ChillerCapFTErrorIndex,
-                                               ElectricEIRChiller(EIRChillNum).ChillerCapFT,
-                                               ElectricEIRChiller(EIRChillNum).ChillerCapFT);
+                                               this->ChillerCapFTErrorIndex,
+                                               this->ChillerCapFT,
+                                               this->ChillerCapFT);
             }
-            ElectricEIRChiller(EIRChillNum).ChillerCapFT = 0.0;
+            this->ChillerCapFT = 0.0;
         }
 
         // Available chiller capacity as a function of temperature
-        Real64 AvailChillerCap = ChillerRefCap * ElectricEIRChiller(EIRChillNum).ChillerCapFT;
+        Real64 AvailChillerCap = ChillerRefCap * this->ChillerCapFT;
 
         // Only perform this check for temperature setpoint control
-        if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).Branch(ElectricEIRChiller(EIRChillNum).CWBranchNum).Comp(ElectricEIRChiller(EIRChillNum).CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+        if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
             // Calculate water side load
 
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
-                                       DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp,
-                                       DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidIndex,
+            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                       DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                       DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                        RoutineName);
-            ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).MassFlowRate;
+            this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             {
-                auto const SELECT_CASE_var(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopDemandCalcScheme);
+                auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                    TempLoad = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPoint);
+                    TempLoad = this->EvapMassFlowRate * Cp * (DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint);
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    TempLoad = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * (DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPointHi);
+                    TempLoad = this->EvapMassFlowRate * Cp * (DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi);
                 } else {
                     assert(false);
                 }
@@ -1968,54 +1964,54 @@ namespace ChillerElectricEIR {
         // Part load ratio based on load and available chiller capacity, cap at max part load ratio
         Real64 PartLoadRat;                 // Operating part load ratio
         if (AvailChillerCap > 0) {
-            PartLoadRat = max(0.0, min(std::abs(MyLoad) / AvailChillerCap, MaxPartLoadRat));
+            PartLoadRat = max(0.0, min(std::abs(MyLoad) / AvailChillerCap, this->MaxPartLoadRat));
         } else {
             PartLoadRat = 0.0;
         }
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidName,
-                                   DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp,
-                                   DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).FluidIndex,
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                   DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                   DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                    RoutineName);
 
-        if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).Branch(ElectricEIRChiller(EIRChillNum).CWBranchNum).Comp(ElectricEIRChiller(EIRChillNum).CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-            ElectricEIRChiller(EIRChillNum).PossibleSubcooling = false;
+        if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+            this->PossibleSubcooling = false;
         } else {
-            ElectricEIRChiller(EIRChillNum).PossibleSubcooling = true;
+            this->PossibleSubcooling = true;
         }
         // Set evaporator heat transfer rate
-        ElectricEIRChiller(EIRChillNum).QEvaporator = AvailChillerCap * PartLoadRat;
+        this->QEvaporator = AvailChillerCap * PartLoadRat;
 
         // Either set the flow to the Constant value or calculate the flow for the variable volume
-        if ((ElectricEIRChiller(EIRChillNum).FlowMode == ConstantFlow) || (ElectricEIRChiller(EIRChillNum).FlowMode == NotModulated)) {
+        if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
             // Set the evaporator mass flow rate to design
             // Start by assuming max (design) flow
-            ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = EvapMassFlowRateMax;
+            this->EvapMassFlowRate = this->EvapMassFlowRateMax;
             // Use PlantUtilities::SetComponentFlowRate to decide actual flow
-            PlantUtilities::SetComponentFlowRate(ElectricEIRChiller(EIRChillNum).EvapMassFlowRate,
-                                 ElectricEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                 ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum,
-                                 ElectricEIRChiller(EIRChillNum).CWLoopNum,
-                                 ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
-                                 ElectricEIRChiller(EIRChillNum).CWBranchNum,
-                                 ElectricEIRChiller(EIRChillNum).CWCompNum);
-            if (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate != 0.0) {
-                EvapDeltaTemp = ElectricEIRChiller(EIRChillNum).QEvaporator / ElectricEIRChiller(EIRChillNum).EvapMassFlowRate / Cp;
+            PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                 this->EvapInletNodeNum,
+                                 this->EvapOutletNodeNum,
+                                 this->CWLoopNum,
+                                 this->CWLoopSideNum,
+                                 this->CWBranchNum,
+                                 this->CWCompNum);
+            if (this->EvapMassFlowRate != 0.0) {
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
             } else {
                 EvapDeltaTemp = 0.0;
             }
             // Evaluate outlet temp based on delta
-            ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+            this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
 
-        } else if (ElectricEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated) {
+        } else if (this->FlowMode == LeavingSetPointModulated) {
 
             // Calculate the Delta Temp from the inlet temp to the chiller outlet setpoint
             {
-                auto const SELECT_CASE_var(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopDemandCalcScheme);
+                auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                    EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPoint;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPointHi;
+                    EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                 } else {
                     assert(false);
                 }
@@ -2023,241 +2019,241 @@ namespace ChillerElectricEIR {
 
             if (EvapDeltaTemp != 0) {
                 // Calculate desired flow to request based on load
-                ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = std::abs(ElectricEIRChiller(EIRChillNum).QEvaporator / Cp / EvapDeltaTemp);
-                if ((ElectricEIRChiller(EIRChillNum).EvapMassFlowRate - EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) ElectricEIRChiller(EIRChillNum).PossibleSubcooling = true;
+                this->EvapMassFlowRate = std::abs(this->QEvaporator / Cp / EvapDeltaTemp);
+                if ((this->EvapMassFlowRate - this->EvapMassFlowRateMax) > DataBranchAirLoopPlant::MassFlowTolerance) this->PossibleSubcooling = true;
                 // Check to see if the Maximum is exceeded, if so set to maximum
-                ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = min(EvapMassFlowRateMax, ElectricEIRChiller(EIRChillNum).EvapMassFlowRate);
+                this->EvapMassFlowRate = min(this->EvapMassFlowRateMax, this->EvapMassFlowRate);
                 // Use PlantUtilities::SetComponentFlowRate to decide actual flow
-                PlantUtilities::SetComponentFlowRate(ElectricEIRChiller(EIRChillNum).EvapMassFlowRate,
-                                     ElectricEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                     ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum,
-                                     ElectricEIRChiller(EIRChillNum).CWLoopNum,
-                                     ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
-                                     ElectricEIRChiller(EIRChillNum).CWBranchNum,
-                                     ElectricEIRChiller(EIRChillNum).CWCompNum);
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                     this->EvapInletNodeNum,
+                                     this->EvapOutletNodeNum,
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
                 // Should we recalculate this with the corrected setpoint?
                 {
-                    auto const SELECT_CASE_var(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(DataPlant::PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                        ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPoint;
+                        this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                        ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempSetPointHi;
+                        this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi;
                     }
                 }
-                ElectricEIRChiller(EIRChillNum).QEvaporator = max(0.0, (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp));
+                this->QEvaporator = max(0.0, (this->EvapMassFlowRate * Cp * EvapDeltaTemp));
             } else {
                 // Try to request zero flow
-                ElectricEIRChiller(EIRChillNum).EvapMassFlowRate = 0.0;
+                this->EvapMassFlowRate = 0.0;
                 // Use PlantUtilities::SetComponentFlowRate to decide actual flow
-                PlantUtilities::SetComponentFlowRate(ElectricEIRChiller(EIRChillNum).EvapMassFlowRate,
-                                     ElectricEIRChiller(EIRChillNum).EvapInletNodeNum,
-                                     ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum,
-                                     ElectricEIRChiller(EIRChillNum).CWLoopNum,
-                                     ElectricEIRChiller(EIRChillNum).CWLoopSideNum,
-                                     ElectricEIRChiller(EIRChillNum).CWBranchNum,
-                                     ElectricEIRChiller(EIRChillNum).CWCompNum);
+                PlantUtilities::SetComponentFlowRate(this->EvapMassFlowRate,
+                                     this->EvapInletNodeNum,
+                                     this->EvapOutletNodeNum,
+                                     this->CWLoopNum,
+                                     this->CWLoopSideNum,
+                                     this->CWBranchNum,
+                                     this->CWCompNum);
                 // No deltaT since component is not running
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp;
-                ElectricEIRChiller(EIRChillNum).QEvaporator = 0.0;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                this->QEvaporator = 0.0;
                 PartLoadRat = 0.0;
-                ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
+                this->ChillerPartLoadRatio = PartLoadRat;
 
                 // DSU? so what if the delta T is zero?  On FlowLock==0, the inlet temp could = setpoint, right?
-                if (ElectricEIRChiller(EIRChillNum).DeltaTErrCount < 1 && !DataGlobals::WarmupFlag) {
-                    ++ElectricEIRChiller(EIRChillNum).DeltaTErrCount;
+                if (this->DeltaTErrCount < 1 && !DataGlobals::WarmupFlag) {
+                    ++this->DeltaTErrCount;
                     ShowWarningError("Evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tsetpoint).");
                     ShowContinueErrorTimeStamp("");
                 } else if (!DataGlobals::WarmupFlag) {
-                    ++ElectricEIRChiller(EIRChillNum).ChillerCapFTError;
-                    ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
+                    ++this->ChillerCapFTError;
+                    ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + this->Name +
                                                        "\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...",
-                                                   ElectricEIRChiller(EIRChillNum).DeltaTErrCountIndex,
+                                                   this->DeltaTErrCountIndex,
                                                    EvapDeltaTemp,
                                                    EvapDeltaTemp);
                 }
             }
         } // End of Constant Variable Flow If Block
 
-        if (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate == 0.0) {
+        if (this->EvapMassFlowRate == 0.0) {
             MyLoad = 0.0;
-            if (ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
-                CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                     ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
+            if (this->CondenserType == EvapCooled) {
+                CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                     this->BasinHeaterSchedulePtr,
+                                     this->BasinHeaterSetPointTemp,
+                                     this->BasinHeaterPower);
             }
-            ElectricEIRChiller(EIRChillNum).PrintMessage = false;
+            this->PrintMessage = false;
             return;
         }
-        if (ElectricEIRChiller(EIRChillNum).PossibleSubcooling) {
-            ElectricEIRChiller(EIRChillNum).QEvaporator = std::abs(MyLoad);
-            EvapDeltaTemp = ElectricEIRChiller(EIRChillNum).QEvaporator / ElectricEIRChiller(EIRChillNum).EvapMassFlowRate / Cp;
-            ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+        if (this->PossibleSubcooling) {
+            this->QEvaporator = std::abs(MyLoad);
+            EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+            this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
         } else {
-            EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - EvapOutletTempSetPoint;
-            ElectricEIRChiller(EIRChillNum).QEvaporator = max(0.0, (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp));
-            ElectricEIRChiller(EIRChillNum).EvapOutletTemp = EvapOutletTempSetPoint;
+            EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapOutletTempSetPoint;
+            this->QEvaporator = max(0.0, (this->EvapMassFlowRate * Cp * EvapDeltaTemp));
+            this->EvapOutletTemp = EvapOutletTempSetPoint;
         }
 
         // Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
-        if (ElectricEIRChiller(EIRChillNum).EvapOutletTemp < TempLowLimitEout) {
-            if ((DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = TempLowLimitEout;
-                EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - ElectricEIRChiller(EIRChillNum).EvapOutletTemp;
-                ElectricEIRChiller(EIRChillNum).QEvaporator = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+        if (this->EvapOutletTemp < TempLowLimitEout) {
+            if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - TempLowLimitEout) > DataPlant::DeltaTempTol) {
+                this->EvapOutletTemp = TempLowLimitEout;
+                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
             } else {
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp;
-                EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - ElectricEIRChiller(EIRChillNum).EvapOutletTemp;
-                ElectricEIRChiller(EIRChillNum).QEvaporator = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
             }
         }
-        if (ElectricEIRChiller(EIRChillNum).EvapOutletTemp < DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempMin) {
-            if ((DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempMin) > DataPlant::DeltaTempTol) {
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum).TempMin;
-                EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - ElectricEIRChiller(EIRChillNum).EvapOutletTemp;
-                ElectricEIRChiller(EIRChillNum).QEvaporator = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+        if (this->EvapOutletTemp < DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) {
+            if ((DataLoopNode::Node(this->EvapInletNodeNum).Temp - DataLoopNode::Node(this->EvapOutletNodeNum).TempMin) > DataPlant::DeltaTempTol) {
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).TempMin;
+                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
             } else {
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp;
-                EvapDeltaTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - ElectricEIRChiller(EIRChillNum).EvapOutletTemp;
-                ElectricEIRChiller(EIRChillNum).QEvaporator = ElectricEIRChiller(EIRChillNum).EvapMassFlowRate * Cp * EvapDeltaTemp;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
+                EvapDeltaTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - this->EvapOutletTemp;
+                this->QEvaporator = this->EvapMassFlowRate * Cp * EvapDeltaTemp;
             }
         }
         // If load exceeds the distributed load set to the distributed load
-        if (ElectricEIRChiller(EIRChillNum).QEvaporator > std::abs(MyLoad)) {
-            if (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                ElectricEIRChiller(EIRChillNum).QEvaporator = std::abs(MyLoad);
-                EvapDeltaTemp = ElectricEIRChiller(EIRChillNum).QEvaporator / ElectricEIRChiller(EIRChillNum).EvapMassFlowRate / Cp;
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+        if (this->QEvaporator > std::abs(MyLoad)) {
+            if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                this->QEvaporator = std::abs(MyLoad);
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
-                ElectricEIRChiller(EIRChillNum).QEvaporator = 0.0;
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp;
+                this->QEvaporator = 0.0;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             }
         }
 
         // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
-        if (ElectricEIRChiller(EIRChillNum).FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-            (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate > 0)) {
+        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            (this->EvapMassFlowRate > 0)) {
             // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
-            int FaultIndex = ElectricEIRChiller(EIRChillNum).FaultyChillerSWTIndex;
-            bool VarFlowFlag = (ElectricEIRChiller(EIRChillNum).FlowMode == LeavingSetPointModulated);
+            int FaultIndex = this->FaultyChillerSWTIndex;
+            bool VarFlowFlag = (this->FlowMode == LeavingSetPointModulated);
             FaultsManager::FaultsChillerSWTSensor(FaultIndex)
                 .CalFaultChillerSWT(VarFlowFlag,
-                                    ElectricEIRChiller(EIRChillNum).FaultyChillerSWTOffset,
+                                    this->FaultyChillerSWTOffset,
                                     Cp,
-                                    DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp,
-                                    ElectricEIRChiller(EIRChillNum).EvapOutletTemp,
-                                    ElectricEIRChiller(EIRChillNum).EvapMassFlowRate,
-                                    ElectricEIRChiller(EIRChillNum).QEvaporator);
+                                    DataLoopNode::Node(this->EvapInletNodeNum).Temp,
+                                    this->EvapOutletTemp,
+                                    this->EvapMassFlowRate,
+                                    this->QEvaporator);
             // update corresponding variables at faulty case
-            PartLoadRat = (AvailChillerCap > 0.0) ? (ElectricEIRChiller(EIRChillNum).QEvaporator / AvailChillerCap) : 0.0;
-            PartLoadRat = max(0.0, min(PartLoadRat, MaxPartLoadRat));
-            ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
+            PartLoadRat = (AvailChillerCap > 0.0) ? (this->QEvaporator / AvailChillerCap) : 0.0;
+            PartLoadRat = max(0.0, min(PartLoadRat, this->MaxPartLoadRat));
+            this->ChillerPartLoadRatio = PartLoadRat;
         }
 
         // Checks QEvaporator on the basis of the machine limits.
-        if (ElectricEIRChiller(EIRChillNum).QEvaporator > (AvailChillerCap * MaxPartLoadRat)) {
-            if (ElectricEIRChiller(EIRChillNum).EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                ElectricEIRChiller(EIRChillNum).QEvaporator = AvailChillerCap * MaxPartLoadRat;
-                EvapDeltaTemp = ElectricEIRChiller(EIRChillNum).QEvaporator / ElectricEIRChiller(EIRChillNum).EvapMassFlowRate / Cp;
+        if (this->QEvaporator > (AvailChillerCap * this->MaxPartLoadRat)) {
+            if (this->EvapMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                this->QEvaporator = AvailChillerCap * this->MaxPartLoadRat;
+                EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
                 // evaporator outlet temperature is allowed to float upwards (recalculate AvailChillerCap? iterate?)
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp - EvapDeltaTemp;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
-                ElectricEIRChiller(EIRChillNum).QEvaporator = 0.0;
-                ElectricEIRChiller(EIRChillNum).EvapOutletTemp = DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).EvapInletNodeNum).Temp;
+                this->QEvaporator = 0.0;
+                this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             }
         }
 
         if (AvailChillerCap > 0.0) {
-            PartLoadRat = max(0.0, min((ElectricEIRChiller(EIRChillNum).QEvaporator / AvailChillerCap), MaxPartLoadRat));
+            PartLoadRat = max(0.0, min((this->QEvaporator / AvailChillerCap), this->MaxPartLoadRat));
         } else {
             PartLoadRat = 0.0;
         }
 
         // Chiller cycles below minimum part load ratio, FRAC = amount of time chiller is ON during this time step
-        if (PartLoadRat < MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / MinPartLoadRat));
+        if (PartLoadRat < this->MinPartLoadRat) FRAC = min(1.0, (PartLoadRat / this->MinPartLoadRat));
 
         // set the module level variable used for reporting FRAC
-        ElectricEIRChiller(EIRChillNum).ChillerCyclingRatio = FRAC;
+        this->ChillerCyclingRatio = FRAC;
 
         // Chiller is false loading below PLR = minimum unloading ratio, find PLR used for energy calculation
         if (AvailChillerCap > 0.0) {
-            PartLoadRat = max(PartLoadRat, MinUnloadRat);
+            PartLoadRat = max(PartLoadRat, this->MinUnloadRat);
         } else {
             PartLoadRat = 0.0;
         }
 
         // set the module level variable used for reporting PLR
-        ElectricEIRChiller(EIRChillNum).ChillerPartLoadRatio = PartLoadRat;
+        this->ChillerPartLoadRatio = PartLoadRat;
 
         // calculate the load due to false loading on chiller over and above water side load
-        ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - ElectricEIRChiller(EIRChillNum).QEvaporator;
-        if (ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
-            ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate = 0.0;
+        this->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - this->QEvaporator;
+        if (this->ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
+            this->ChillerFalseLoadRate = 0.0;
         }
-        if (ElectricEIRChiller(EIRChillNum).QEvaporator == 0.0 && ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
-            CalcBasinHeaterPower(ElectricEIRChiller(EIRChillNum).BasinHeaterPowerFTempDiff,
-                                 ElectricEIRChiller(EIRChillNum).BasinHeaterSchedulePtr,
-                                 ElectricEIRChiller(EIRChillNum).BasinHeaterSetPointTemp,
-                                 ElectricEIRChiller(EIRChillNum).BasinHeaterPower);
+        if (this->QEvaporator == 0.0 && this->CondenserType == EvapCooled) {
+            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
+                                 this->BasinHeaterSchedulePtr,
+                                 this->BasinHeaterSetPointTemp,
+                                 this->BasinHeaterPower);
         }
 
-        ElectricEIRChiller(EIRChillNum).ChillerEIRFT = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFTIndex, ElectricEIRChiller(EIRChillNum).EvapOutletTemp, AvgCondSinkTemp);
-        if (ElectricEIRChiller(EIRChillNum).ChillerEIRFT < 0.0) {
-            if (ElectricEIRChiller(EIRChillNum).ChillerEIRFTError < 1 && DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerEIRFTError;
-                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller EIR as a Function of Temperature curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerEIRFT, 3) + ").");
-                ShowContinueError(" Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).EvapOutletTemp, 1) +
-                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(CondInletTemp, 1) + '.');
+        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
+        if (this->ChillerEIRFT < 0.0) {
+            if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+                ++this->ChillerEIRFTError;
+                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
+                ShowContinueError(" Chiller EIR as a Function of Temperature curve output is negative (" + General::RoundSigDigits(this->ChillerEIRFT, 3) + ").");
+                ShowContinueError(" Negative value occurs using an Evaporator Outlet Temp of " + General::RoundSigDigits(this->EvapOutletTemp, 1) +
+                                  " and a Condenser Inlet Temp of " + General::RoundSigDigits(condInletTemp, 1) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerEIRFTError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
+            } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+                ++this->ChillerEIRFTError;
+                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + this->Name +
                                                    "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFTErrorIndex,
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFT,
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFT);
+                                               this->ChillerEIRFTErrorIndex,
+                                               this->ChillerEIRFT,
+                                               this->ChillerEIRFT);
             }
-            ElectricEIRChiller(EIRChillNum).ChillerEIRFT = 0.0;
+            this->ChillerEIRFT = 0.0;
         }
 
-        ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = CurveManager::CurveValue(ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRIndex, PartLoadRat);
-        if (ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR < 0.0) {
-            if (ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 &&
+        this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, PartLoadRat);
+        if (this->ChillerEIRFPLR < 0.0) {
+            if (this->ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRError;
-                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name + "\":");
-                ShowContinueError(" Chiller EIR as a function of PLR curve output is negative (" + General::RoundSigDigits(ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR, 3) + ").");
+                ++this->ChillerEIRFPLRError;
+                ShowWarningError("CHILLER:ELECTRIC:EIR \"" + this->Name + "\":");
+                ShowContinueError(" Chiller EIR as a function of PLR curve output is negative (" + General::RoundSigDigits(this->ChillerEIRFPLR, 3) + ").");
                 ShowContinueError(" Negative value occurs using a part-load ratio of " + General::RoundSigDigits(PartLoadRat, 3) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CWLoopNum).LoopSide(ElectricEIRChiller(EIRChillNum).CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
-                ++ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + ElectricEIRChiller(EIRChillNum).Name +
+            } else if (DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+                ++this->ChillerEIRFPLRError;
+                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:EIR \"" + this->Name +
                                                    "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRErrorIndex,
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR,
-                                               ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR);
+                                               this->ChillerEIRFPLRErrorIndex,
+                                               this->ChillerEIRFPLR,
+                                               this->ChillerEIRFPLR);
             }
-            ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR = 0.0;
+            this->ChillerEIRFPLR = 0.0;
         }
 
-        ElectricEIRChiller(EIRChillNum).Power = (AvailChillerCap / ReferenceCOP) * ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR * ElectricEIRChiller(EIRChillNum).ChillerEIRFT * FRAC;
+        this->Power = (AvailChillerCap / ReferenceCOP) * this->ChillerEIRFPLR * this->ChillerEIRFT * FRAC;
 
-        ElectricEIRChiller(EIRChillNum).QCondenser = ElectricEIRChiller(EIRChillNum).Power * ElectricEIRChiller(EIRChillNum).CompPowerToCondenserFrac + ElectricEIRChiller(EIRChillNum).QEvaporator + ElectricEIRChiller(EIRChillNum).ChillerFalseLoadRate;
+        this->QCondenser = this->Power * this->CompPowerToCondenserFrac + this->QEvaporator + this->ChillerFalseLoadRate;
 
-        if (ElectricEIRChiller(EIRChillNum).CondenserType == WaterCooled) {
-            if (ElectricEIRChiller(EIRChillNum).CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        if (this->CondenserType == WaterCooled) {
+            if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-                if (ElectricEIRChiller(EIRChillNum).HeatRecActive)
-                    EIRChillerHeatRecovery(EIRChillNum, ElectricEIRChiller(EIRChillNum).QCondenser, ElectricEIRChiller(EIRChillNum).CondMassFlowRate, CondInletTemp, ElectricEIRChiller(EIRChillNum).QHeatRecovered);
-                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidName,
-                                           CondInletTemp,
-                                           DataPlant::PlantLoop(ElectricEIRChiller(EIRChillNum).CDLoopNum).FluidIndex,
-                                           RoutineName);
+                if (this->HeatRecActive)
+                    EIRChillerHeatRecovery(EIRChillNum, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
+                Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->CDLoopNum).FluidName,
+                                                            condInletTemp,
+                                                            DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
+                                                            RoutineName);
 
-                ElectricEIRChiller(EIRChillNum).CondOutletTemp = ElectricEIRChiller(EIRChillNum).QCondenser / ElectricEIRChiller(EIRChillNum).CondMassFlowRate / Cp + CondInletTemp;
+                this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
             } else {
-                ShowSevereError("CalcElectricEIRChillerModel: Condenser flow = 0, for ElectricEIRChiller=" + ElectricEIRChiller(EIRChillNum).Name);
+                ShowSevereError("CalcElectricEIRChillerModel: Condenser flow = 0, for ElectricEIRChiller=" + this->Name);
                 ShowContinueErrorTimeStamp("");
                 // DSU? maybe this could be handled earlier, check if this component has a load and an evap flow rate
                 // then if cond flow is zero, just make a request to the condenser,
@@ -2266,35 +2262,35 @@ namespace ChillerElectricEIR {
             }
         } else { // Air Cooled or Evap Cooled
 
-            if (ElectricEIRChiller(EIRChillNum).QCondenser > 0.0) {
-                ElectricEIRChiller(EIRChillNum).CondMassFlowRate = ElectricEIRChiller(EIRChillNum).CondMassFlowRateMax * PartLoadRat;
+            if (this->QCondenser > 0.0) {
+                this->CondMassFlowRate = this->CondMassFlowRateMax * PartLoadRat;
             } else {
-                ElectricEIRChiller(EIRChillNum).CondMassFlowRate = 0.0;
+                this->CondMassFlowRate = 0.0;
             }
 
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
-            if (ElectricEIRChiller(EIRChillNum).HeatRecActive)
-                EIRChillerHeatRecovery(EIRChillNum, ElectricEIRChiller(EIRChillNum).QCondenser, ElectricEIRChiller(EIRChillNum).CondMassFlowRate, CondInletTemp, ElectricEIRChiller(EIRChillNum).QHeatRecovered);
+            if (this->HeatRecActive)
+                EIRChillerHeatRecovery(EIRChillNum, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
 
-            if (ElectricEIRChiller(EIRChillNum).CondMassFlowRate > 0.0) {
-                Cp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).HumRat, CondInletTemp);
-                ElectricEIRChiller(EIRChillNum).CondOutletTemp = CondInletTemp + ElectricEIRChiller(EIRChillNum).QCondenser / ElectricEIRChiller(EIRChillNum).CondMassFlowRate / Cp;
+            if (this->CondMassFlowRate > 0.0) {
+                Cp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->CondInletNodeNum).HumRat, condInletTemp);
+                this->CondOutletTemp = condInletTemp + this->QCondenser / this->CondMassFlowRate / Cp;
             } else {
-                ElectricEIRChiller(EIRChillNum).CondOutletTemp = CondInletTemp;
+                this->CondOutletTemp = condInletTemp;
             }
 
-            if (ElectricEIRChiller(EIRChillNum).CondenserType == EvapCooled) {
-                Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, CondInletTemp, DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).HumRat, RoutineName);
+            if (this->CondenserType == EvapCooled) {
+                Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, condInletTemp, DataLoopNode::Node(this->CondInletNodeNum).HumRat, RoutineName);
                 // CondMassFlowRate is already multiplied by PLR, convert to water use rate
-                ElectricEIRChiller(EIRChillNum).EvapWaterConsumpRate = ((ElectricEIRChiller(EIRChillNum).CondOutletHumRat - DataLoopNode::Node(ElectricEIRChiller(EIRChillNum).CondInletNodeNum).HumRat) * ElectricEIRChiller(EIRChillNum).CondMassFlowRate) / RhoAir;
+                this->EvapWaterConsumpRate = ((this->CondOutletHumRat - DataLoopNode::Node(this->CondInletNodeNum).HumRat) * this->CondMassFlowRate) / RhoAir;
             }
         }
 
         // Calculate condenser fan power
-        if (ElectricEIRChiller(EIRChillNum).ChillerCapFT > 0.0) {
-            ElectricEIRChiller(EIRChillNum).CondenserFanPower = ChillerRefCap * ElectricEIRChiller(EIRChillNum).CondenserFanPowerRatio * FRAC;
+        if (this->ChillerCapFT > 0.0) {
+            this->CondenserFanPower = ChillerRefCap * this->CondenserFanPowerRatio * FRAC;
         } else {
-            ElectricEIRChiller(EIRChillNum).CondenserFanPower = 0.0;
+            this->CondenserFanPower = 0.0;
         }
     }
 
