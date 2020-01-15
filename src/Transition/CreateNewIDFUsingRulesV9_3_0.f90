@@ -754,7 +754,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               CASE("HEATPUMP:WATERTOWATER:EIR:HEATING")
                   ! object rename
-                  ObjectName = "PlantLoop:WaterToWater:EIR:Heating"
+                  ObjectName = "HeatPump:PlantLoop:EIR:Heating"
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
                   ! fields 1-3 same
@@ -768,7 +768,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               CASE("HEATPUMP:WATERTOWATER:EIR:COOLING")
                   ! object rename
-                  ObjectName = "PlantLoop:WaterToWater:EIR:Cooling"
+                  ObjectName = "HeatPump:PlantLoop:EIR:Cooling"
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
                   ! fields 1-3 same
