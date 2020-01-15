@@ -69,7 +69,7 @@ namespace ChillerElectricEIR {
     // MODULE VARIABLE DECLARATIONS:
     extern int NumElectricEIRChillers;  // Number of electric EIR chillers specified in input
 
-    extern bool GetInputEIR; // When TRUE, calls subroutine to read input file.
+    extern bool getInputFlag; // When TRUE, calls subroutine to read input file.
 
     struct ElectricEIRChillerSpecs
     {
@@ -201,6 +201,7 @@ namespace ChillerElectricEIR {
         Real64 ChillerCondAvgTemp;            // reporting: average condenser temp for curves with Heat recovery [C]
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
+        bool IPLVFlag;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -225,7 +226,8 @@ namespace ChillerElectricEIR {
               HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0),
               ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
               Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0)
+              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0),
+              IPLVFlag(true)
         {
         }
     };

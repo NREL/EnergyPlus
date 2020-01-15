@@ -574,9 +574,9 @@ namespace FaultsManager {
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
-                    if (ChillerElectricEIR::GetInputEIR) {
+                    if (ChillerElectricEIR::getInputFlag) {
                         ChillerElectricEIR::GetElectricEIRChillerInput();
-                        ChillerElectricEIR::GetInputEIR = false;
+                        ChillerElectricEIR::getInputFlag = false;
                     }
 
                     // Check whether the chiller name and chiller type match each other
@@ -1305,9 +1305,9 @@ namespace FaultsManager {
 
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
-                    if (ChillerElectricEIR::GetInputEIR) {
+                    if (ChillerElectricEIR::getInputFlag) {
                         ChillerElectricEIR::GetElectricEIRChillerInput();
-                        ChillerElectricEIR::GetInputEIR = false;
+                        ChillerElectricEIR::getInputFlag = false;
                     }
                     // Check whether the chiller name and chiller type match each other
                     ChillerNum = UtilityRoutines::FindItemInList(FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName,

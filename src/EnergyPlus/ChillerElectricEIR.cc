@@ -131,11 +131,7 @@ namespace ChillerElectricEIR {
 
     Array1D_bool CheckEquipName;
 
-    bool GetInputEIR(true); // When TRUE, calls subroutine to read input file.
-    bool ChillerIPLVOneTimeFlag(true);
-    Array1D_bool ChillerIPLVFlagArr;
-    bool getInputAllocatedFlag(false);
-    bool InitMyOneTimeFlag(true);
+    bool getInputFlag(true); // When TRUE, calls subroutine to read input file.
 
     // Object Data
     Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
@@ -145,11 +141,7 @@ namespace ChillerElectricEIR {
     {
         NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
         CheckEquipName.deallocate();
-        GetInputEIR = true;
-        ChillerIPLVOneTimeFlag = true;
-        getInputAllocatedFlag = false;
-        InitMyOneTimeFlag = true;
-        ChillerIPLVFlagArr.deallocate();
+        getInputFlag = true;
         ElectricEIRChiller.deallocate();
     }
 
@@ -184,9 +176,9 @@ namespace ChillerElectricEIR {
         int EIRChillNum; // Chiller number pointer
         int LoopSide;
 
-        if (GetInputEIR) {
+        if (getInputFlag) {
             GetElectricEIRChillerInput();
-            GetInputEIR = false;
+            getInputFlag = false;
         }
 
         // Find the correct Chiller
@@ -292,7 +284,6 @@ namespace ChillerElectricEIR {
         // Formats
         static ObjexxFCL::gio::Fmt Format_530("('Curve Output = ',11(F7.2))");
 
-        if (getInputAllocatedFlag) return;
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
         NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
@@ -304,7 +295,6 @@ namespace ChillerElectricEIR {
         // ALLOCATE ARRAYS
         ElectricEIRChiller.allocate(NumElectricEIRChillers);
         CheckEquipName.dimension(NumElectricEIRChillers, true);
-        getInputAllocatedFlag = true;
 
         // Load arrays with electric EIR chiller data
         for (EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum) {
@@ -1033,11 +1023,6 @@ namespace ChillerElectricEIR {
         bool FatalError;
         bool errFlag;
 
-        // Do the one time initializations
-        if (InitMyOneTimeFlag) {
-            InitMyOneTimeFlag = false;
-        }
-
         EvapInletNode = ElectricEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum;
         CondInletNode = ElectricEIRChiller(EIRChillNum).CondInletNodeNum;
@@ -1385,11 +1370,6 @@ namespace ChillerElectricEIR {
         Real64 TempSize;          // autosized value of coil input field
         int SizingMethod;         // Integer representation of sizing method (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
 
-        if (ChillerIPLVOneTimeFlag) {
-            ChillerIPLVFlagArr.dimension(NumElectricEIRChillers, true);
-            ChillerIPLVOneTimeFlag = false;
-        }
-
         PltSizCondNum = 0;
         ErrorsFound = false;
         Real64 tmpNomCap = ElectricEIRChiller(EIRChillNum).RefCap;
@@ -1698,7 +1678,7 @@ namespace ChillerElectricEIR {
         } // Heat recovery active
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
-            if (ChillerIPLVFlagArr(EIRChillNum)) {
+            if (ElectricEIRChiller(EIRChillNum).IPLVFlag) {
                 Real64 IPLV;
                 StandardRatings::CalcChillerIPLV(ElectricEIRChiller(EIRChillNum).Name,
                                 DataPlant::TypeOf_Chiller_ElectricEIR,
@@ -1710,7 +1690,7 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillNum).ChillerEIRFPLRIndex,
                                 ElectricEIRChiller(EIRChillNum).MinUnloadRat,
                                 IPLV);
-                ChillerIPLVFlagArr(EIRChillNum) = false;
+                ElectricEIRChiller(EIRChillNum).IPLVFlag = false;
             }
             // create predefined report
             equipName = ElectricEIRChiller(EIRChillNum).Name;
