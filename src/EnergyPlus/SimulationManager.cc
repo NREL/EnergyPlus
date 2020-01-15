@@ -109,6 +109,7 @@ extern "C" {
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -520,7 +521,7 @@ namespace SimulationManager {
                     isFinalYear = true;
                 }
             }
-            
+
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
@@ -1170,12 +1171,14 @@ namespace SimulationManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", instance.key());
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
-                        DoCoilDirectSolutions = true;
-                    }
+                    DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
+                }
+                if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
+                    HeatBalanceIntRadExchange::CarrollMethod =
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
                 }
             }
         }
