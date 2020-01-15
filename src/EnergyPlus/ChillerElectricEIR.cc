@@ -77,6 +77,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -128,9 +129,6 @@ namespace ChillerElectricEIR {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumElectricEIRChillers(0);    // Number of electric EIR chillers specified in input
-
-    Array1D_bool CheckEquipName;
-
     bool getInputFlag(true); // When TRUE, calls subroutine to read input file.
 
     // Object Data
@@ -140,27 +138,30 @@ namespace ChillerElectricEIR {
     void clear_state()
     {
         NumElectricEIRChillers = 0; // Number of electric EIR chillers specified in input
-        CheckEquipName.deallocate();
         getInputFlag = true;
         ElectricEIRChiller.deallocate();
     }
 
-    void SimElectricEIRChiller(std::string const &EP_UNUSED(EIRChillerType), // Type of chiller
-                               std::string const &EIRChillerName,            // User specified name of chiller
-                               int const EquipFlowCtrl,                      // Flow control mode for the equipment
-                               int &CompIndex,                               // Chiller number pointer
-                               int const LoopNum,                            // plant loop index pointer
-                               bool const RunFlag,                           // Simulate chiller when TRUE
-                               bool const FirstIteration,                    // Initialize variables when TRUE
-                               bool &InitLoopEquip,                          // If not zero, calculate the max load for operating conditions
-                               Real64 &MyLoad,                               // Loop demand component will meet
-                               Real64 &MaxCap,                               // Maximum operating capacity of chiller [W]
-                               Real64 &MinCap,                               // Minimum operating capacity of chiller [W]
-                               Real64 &OptCap,                               // Optimal operating capacity of chiller [W]
-                               bool const GetSizingFactor,                   // TRUE when just the sizing factor is requested
-                               Real64 &SizingFactor,                         // sizing factor
-                               Real64 &TempCondInDesign,
-                               Real64 &TempEvapOutDesign)
+    PlantComponent *ElectricEIRChillerSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data if it hasn't been done already
+        if (getInputFlag) {
+            GetElectricEIRChillerInput();
+            getInputFlag = false;
+        }
+        // Now look for this particular object in the list
+        for (auto &obj : ElectricEIRChiller) {
+            if (obj.Name == objectName) {
+                return &obj;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalElectEIRChillerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void ElectricEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -173,85 +174,67 @@ namespace ChillerElectricEIR {
         //  model, initializes simulation variables, calls the appropriate model and sets
         //  up reporting variables.
 
-        int EIRChillNum; // Chiller number pointer
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            this->initialize(RunFlag, CurLoad);
+            this->calculate(CurLoad, RunFlag);
+            this->update(CurLoad, RunFlag);
 
-        if (getInputFlag) {
-            GetElectricEIRChillerInput();
-            getInputFlag = false;
+        } else if (calledFromLocation.loopNum == this->CDLoopNum) {
+            PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
+                                                                this->CDLoopSideNum,
+                                                                DataPlant::TypeOf_Chiller_ElectricEIR,
+                                                                this->CondInletNodeNum,
+                                                                this->CondOutletNodeNum,
+                                                                this->QCondenser,
+                                                                this->CondInletTemp,
+                                                                this->CondOutletTemp,
+                                                                this->CondMassFlowRate,
+                                                                FirstHVACIteration);
+
+        } else if (calledFromLocation.loopNum == this->HRLoopNum) {
+            PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+                                                            this->HRLoopSideNum,
+                                                            DataPlant::TypeOf_Chiller_ElectricEIR,
+                                                            this->HeatRecInletNodeNum,
+                                                            this->HeatRecOutletNodeNum,
+                                                            this->QHeatRecovered,
+                                                            this->HeatRecInletTemp,
+                                                            this->HeatRecOutletTemp,
+                                                            this->HeatRecMassFlow,
+                                                            FirstHVACIteration);
         }
+    }
 
-        // Find the correct Chiller
-        if (CompIndex == 0) {
-            EIRChillNum = UtilityRoutines::FindItemInList(EIRChillerName, ElectricEIRChiller);
-            if (EIRChillNum == 0) {
-                ShowFatalError("SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName);
-            }
-            CompIndex = EIRChillNum;
+    void ElectricEIRChillerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            MinLoad = this->RefCap * this->MinPartLoadRat;
+            MaxLoad = this->RefCap * this->MaxPartLoadRat;
+            OptLoad = this->RefCap * this->OptPartLoadRat;
         } else {
-            EIRChillNum = CompIndex;
-            if (EIRChillNum > NumElectricEIRChillers || EIRChillNum < 1) {
-                ShowFatalError("SimElectricEIRChiller:  Invalid CompIndex passed=" + General::TrimSigDigits(EIRChillNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumElectricEIRChillers) + ", Entered Unit name=" + EIRChillerName);
-            }
-            if (CheckEquipName(EIRChillNum)) {
-                if (EIRChillerName != ElectricEIRChiller(EIRChillNum).Name) {
-                    ShowFatalError("SimElectricEIRChiller: Invalid CompIndex passed=" + General::TrimSigDigits(EIRChillNum) + ", Unit name=" + EIRChillerName +
-                                   ", stored Unit Name for that index=" + ElectricEIRChiller(EIRChillNum).Name);
-                }
-                CheckEquipName(EIRChillNum) = false;
-            }
+            MinLoad = 0.0;
+            MaxLoad = 0.0;
+            OptLoad = 0.0;
         }
+    }
 
-        if (InitLoopEquip) {
-            TempEvapOutDesign = ElectricEIRChiller(EIRChillNum).TempRefEvapOut;
-            TempCondInDesign = ElectricEIRChiller(EIRChillNum).TempRefCondIn;
+    void ElectricEIRChillerSpecs::getSizingFactor(Real64 &sizFac)
+    {
+        sizFac = this->SizFac;
+    }
 
-            ElectricEIRChiller(EIRChillNum).initialize(RunFlag, MyLoad);
+    void ElectricEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {
+        // TempEvapOutDesign = this->TempRefEvapOut;
+        // TempCondInDesign = this->TempRefCondIn;
 
-            if (LoopNum == ElectricEIRChiller(EIRChillNum).CWLoopNum) {
-                ElectricEIRChiller(EIRChillNum).size();
-                MinCap = ElectricEIRChiller(EIRChillNum).RefCap * ElectricEIRChiller(EIRChillNum).MinPartLoadRat;
-                MaxCap = ElectricEIRChiller(EIRChillNum).RefCap * ElectricEIRChiller(EIRChillNum).MaxPartLoadRat;
-                OptCap = ElectricEIRChiller(EIRChillNum).RefCap * ElectricEIRChiller(EIRChillNum).OptPartLoadRat;
-            } else {
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            }
-            if (GetSizingFactor) {
-                SizingFactor = ElectricEIRChiller(EIRChillNum).SizFac;
-            }
-            return;
-        }
+        bool runFlag = true;
+        Real64 myLoad = 0.0;
 
-        if (LoopNum == ElectricEIRChiller(EIRChillNum).CWLoopNum) {
-            ElectricEIRChiller(EIRChillNum).initialize(RunFlag, MyLoad);
-            ElectricEIRChiller(EIRChillNum).calculate(MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
-            ElectricEIRChiller(EIRChillNum).update(MyLoad, RunFlag);
+        this->initialize(runFlag, myLoad);
 
-        } else if (LoopNum == ElectricEIRChiller(EIRChillNum).CDLoopNum) {
-            PlantUtilities::UpdateChillerComponentCondenserSide(LoopNum,
-                    ElectricEIRChiller(EIRChillNum).CDLoopSideNum,
-                                                DataPlant::TypeOf_Chiller_ElectricEIR,
-                                                ElectricEIRChiller(EIRChillNum).CondInletNodeNum,
-                                                ElectricEIRChiller(EIRChillNum).CondOutletNodeNum,
-                                                ElectricEIRChiller(EIRChillNum).QCondenser,
-                                                ElectricEIRChiller(EIRChillNum).CondInletTemp,
-                                                ElectricEIRChiller(EIRChillNum).CondOutletTemp,
-                                                ElectricEIRChiller(EIRChillNum).CondMassFlowRate,
-                                                FirstIteration);
-
-        } else if (LoopNum == ElectricEIRChiller(EIRChillNum).HRLoopNum) {
-            PlantUtilities::UpdateComponentHeatRecoverySide(ElectricEIRChiller(EIRChillNum).HRLoopNum,
-                                            ElectricEIRChiller(EIRChillNum).HRLoopSideNum,
-                                            DataPlant::TypeOf_Chiller_ElectricEIR,
-                                            ElectricEIRChiller(EIRChillNum).HeatRecInletNodeNum,
-                                            ElectricEIRChiller(EIRChillNum).HeatRecOutletNodeNum,
-                                            ElectricEIRChiller(EIRChillNum).QHeatRecovered,
-                                            ElectricEIRChiller(EIRChillNum).HeatRecInletTemp,
-                                            ElectricEIRChiller(EIRChillNum).HeatRecOutletTemp,
-                                            ElectricEIRChiller(EIRChillNum).HeatRecMassFlow,
-                                            FirstIteration);
+        if (calledFromLocation.loopNum == this->CWLoopNum) {
+            this->size();
         }
     }
 
@@ -281,7 +264,6 @@ namespace ChillerElectricEIR {
 
         // ALLOCATE ARRAYS
         ElectricEIRChiller.allocate(NumElectricEIRChillers);
-        CheckEquipName.dimension(NumElectricEIRChillers, true);
 
         // Load arrays with electric EIR chiller data
         for (int EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum) {
@@ -979,9 +961,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::initialize(bool const RunFlag,    // TRUE when chiller operating
-                                Real64 const MyLoad    // current load put on chiller
-    )
+    void ElectricEIRChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1653,11 +1633,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad,                       // Operating load
-                                     bool const RunFlag,                   // TRUE when chiller operating
-                                     bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
-                                     int const EquipFlowCtrl               // Flow control mode for the equipment
-    )
+    void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
