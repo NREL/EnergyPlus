@@ -106,7 +106,7 @@ namespace ChillerReformulatedEIR {
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        int FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
