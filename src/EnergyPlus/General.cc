@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3652,15 +3652,15 @@ namespace General {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (has_prefix(cAlphaArgs(1), "CONSTRUCT")) {
+                if (UtilityRoutines::SameString(cAlphaArgs(1), "CONSTRUCTIONS")) {
                     Constructions = true;
-                } else if (has_prefix(cAlphaArgs(1), "MAT")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(1), "MATERIALS")) {
                     Materials = true;
                 }
                 if (NumNames > 1) {
-                    if (has_prefix(cAlphaArgs(2), "CONSTRUCT")) {
+                    if (UtilityRoutines::SameString(cAlphaArgs(2), "CONSTRUCTIONS")) {
                         Constructions = true;
-                    } else if (has_prefix(cAlphaArgs(2), "MAT")) {
+                    } else if (UtilityRoutines::SameString(cAlphaArgs(2), "MATERIALS")) {
                         Materials = true;
                     }
                 }
