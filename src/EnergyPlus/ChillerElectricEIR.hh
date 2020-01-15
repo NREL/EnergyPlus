@@ -204,6 +204,7 @@ namespace ChillerElectricEIR {
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
         bool EquipFlowCtrl;
+        bool oneTimeInit;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -229,11 +230,13 @@ namespace ChillerElectricEIR {
               ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0),
               Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0),
-              IPLVFlag(true), EquipFlowCtrl(true)
+              IPLVFlag(true), EquipFlowCtrl(true), oneTimeInit(true)
         {
         }
 
         static PlantComponent *factory(std::string const &objectName);
+
+        void setupOutputVars();
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
