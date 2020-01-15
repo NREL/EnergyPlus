@@ -2497,7 +2497,7 @@ namespace SystemReports {
 
         VentReportStructureCreated = true;
 
-        AllocateAndSetUpVentReports();
+ //       AllocateAndSetUpVentReports();
 
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {

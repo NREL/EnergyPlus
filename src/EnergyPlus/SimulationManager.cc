@@ -280,6 +280,7 @@ namespace SimulationManager {
         using SizingManager::ManageSizing;
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
+        using SystemReports::AllocateAndSetUpVentReports;
         using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
@@ -409,12 +410,15 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
-            //UpdateMeterReporting();//moved the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
+            AllocateAndSetUpVentReports();
+            UpdateMeterReporting();
+         // AllocateAndSetUpVentReports();
             CheckPollutionMeterReporting();
-           //facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();//moved together with the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
+            facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
+        //   AllocateAndSetUpVentReports();
             InitDemandManagers();
-
+         //   AllocateAndSetUpVentReports();
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
@@ -427,7 +431,7 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             CheckControllerLists(ErrFound);
             if (ErrFound) TerminalError = true;
-
+        
             if (DoDesDaySim || DoWeathSim) {
                 ReportLoopConnections();
                 ReportAirLoopConnections();
@@ -436,10 +440,10 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-
+            //AllocateAndSetUpVentReports();
             CreateEnergyReportStructure();
-            UpdateMeterReporting(); //moved the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
-            facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();//moved together with the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
+            //UpdateMeterReporting(); //moved the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
+            //facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();//moved together with the function UpdateMeterReporting() after the function CreateEnergyReportStructure().
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
 
