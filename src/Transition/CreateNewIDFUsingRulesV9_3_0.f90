@@ -756,7 +756,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ! object rename
                   ObjectName = "PlantLoop:WaterToWater:EIR:Heating"
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.true.
+                  nodiff=.false.
                   ! fields 1-3 same
                   OutArgs(1:3)=InArgs(1:3)
                   ! insert condenser type field
@@ -770,7 +770,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ! object rename
                   ObjectName = "PlantLoop:WaterToWater:EIR:Cooling"
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.true.
+                  nodiff=.false.
                   ! fields 1-3 same
                   OutArgs(1:3)=InArgs(1:3)
                   ! insert condenser type field
