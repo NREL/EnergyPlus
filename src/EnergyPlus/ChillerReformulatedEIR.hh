@@ -59,14 +59,11 @@ namespace EnergyPlus {
 
 namespace ChillerReformulatedEIR {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Chiller type parameters
     extern int const AirCooled;   // Air-cooled condenser currently not allowed
     extern int const WaterCooled; // Only water-cooled condensers are currently allowed
     extern int const EvapCooled;  // Evap-cooled condenser currently not allowed
+
     // Performance curve variable parameters
     extern int const LeavingCondenser;
 
@@ -76,7 +73,6 @@ namespace ChillerReformulatedEIR {
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumElecReformEIRChillers; // Number of electric reformulated EIR chillers specified in input
     extern Real64 CondMassFlowRate;      // Condenser mass flow rate [kg/s]
     extern Real64 EvapMassFlowRate;      // Evaporator mass flow rate [kg/s]
@@ -87,7 +83,6 @@ namespace ChillerReformulatedEIR {
     extern Real64 QCondenser;            // Rate of heat transfer to the condenser coil [W]
     extern Real64 QHeatRecovered;        // Rate of heat transfer to the heat recovery coil [W]
     extern Real64 HeatRecOutletTemp;     // Heat recovery outlet temperature [C]
-    // REAL(r64)      :: CondenserFanPower       =0.0d0 ! Condenser Fan Power (fan cycles with compressor) [W]
     extern Real64 ChillerCapFT;         // Chiller capacity fraction (evaluated as a function of temperature)
     extern Real64 ChillerEIRFT;         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
     extern Real64 ChillerEIRFPLR;       // Chiller EIR as a function of part-load ratio (PLR)
@@ -97,10 +92,6 @@ namespace ChillerReformulatedEIR {
     extern Real64 AvgCondSinkTemp;      // condenser temperature value for use in curves [C]
 
     extern bool GetInputREIR; // When TRUE, calls subroutine to read input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerReformulatedEIR
-
-    // Types
 
     struct ReformulatedEIRChillerSpecs
     {
@@ -157,7 +148,6 @@ namespace ChillerReformulatedEIR {
         // (function of leaving evaporator and condenser water temperatures)
         int ChillerEIRFPLR; // Index for the energy input ratio vs part-load ratio curve
         // (function of leaving condenser water temperature and part-load ratio)
-        //  INTEGER           :: CondFanPowerFCap         = 0   ! Condenser fan capacity as a function of chiller capacity
         int ChillerCapFTError;         // Used for negative capacity as a function of temp warnings
         int ChillerCapFTErrorIndex;    // Used for negative capacity as a function of temp warnings
         int ChillerEIRFTError;         // Used for negative EIR as a function of temp warnings
@@ -214,12 +204,6 @@ namespace ChillerReformulatedEIR {
         int HRBranchNum;               // heat recovery water plant loop branch index
         int HRCompNum;                 // heat recovery water plant loop component index
         int CondMassFlowIndex;
-        //  CHARACTER(len=220):: MsgBuffer1    = ' ' !- buffer to print warning messages on following time step
-        //  CHARACTER(len=300):: MsgBuffer2    = ' ' !- buffer to print warning messages on following time step
-        //  REAL(r64)         :: MsgDataLast   = 0.0d0 ! value of data when warning occurred (passed to Recurring Warn)
-        //  LOGICAL           :: PrintMessage  = .FALSE. ! logical to determine if message is valid
-        //  INTEGER           :: MsgErrorCount = 0   ! number of occurrences of warning
-        //  INTEGER           :: ErrCount1     = 0   ! for recurring error messages
         bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
         // Operational fault parameters
         bool FaultyChillerFoulingFlag;     // True if the chiller has fouling fault
@@ -281,8 +265,6 @@ namespace ChillerReformulatedEIR {
         Real64 ChillerCapFT;         // reporting: Chiller capacity curve output value
         Real64 ChillerEIRFT;         // reporting: Chiller EIRFT curve output value
         Real64 ChillerEIRFPLR;       // reporting: Chiller EIRFPLR curve output value
-        //  REAL(r64)    :: CondenserFanPowerUse  = 0.0d0 ! reporting: Air-cooled condenser fan power [W]
-        //  REAL(r64)    :: CondenserFanEnergyConsumption = 0.0d0 ! reporting: Air-cooled condenser fan energy [J]
         Real64 ChillerCondAvgTemp; // reporting: average condenser temp for curves with Heat recovery [C]
 
         // Default Constructor
@@ -298,8 +280,6 @@ namespace ChillerReformulatedEIR {
     // Object Data
     extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
     extern Array1D<ReportVars> ElecReformEIRChillerReport;
-
-    // Functions
 
     void SimReformulatedEIRChiller(std::string const &EIRChillerType, // Type of chiller !unused1208
                                    std::string const &EIRChillerName, // User specified name of chiller
@@ -317,9 +297,6 @@ namespace ChillerReformulatedEIR {
                                    Real64 &SizingFactor,              // sizing factor
                                    Real64 &TempCondInDesign,
                                    Real64 &TempEvapOutDesign);
-
-    // End Reformulated EIR Chiller Module Driver Subroutine
-    //******************************************************************************
 
     void GetElecReformEIRChillerInput();
 

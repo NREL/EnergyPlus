@@ -115,7 +115,6 @@ namespace ChillerReformulatedEIR {
     // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
     //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-    // Using/Aliasing
     using namespace DataGlobals;
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
@@ -157,7 +156,6 @@ namespace ChillerReformulatedEIR {
     Real64 QCondenser(0.0);          // Rate of heat transfer to the condenser coil [W]
     Real64 QHeatRecovered(0.0);      // Rate of heat transfer to the heat recovery coil [W]
     Real64 HeatRecOutletTemp(0.0);   // Heat recovery outlet temperature [C]
-    // REAL(r64)      :: CondenserFanPower       =0.0d0 ! Condenser Fan Power (fan cycles with compressor) [W]
     Real64 ChillerCapFT(0.0);         // Chiller capacity fraction (evaluated as a function of temperature)
     Real64 ChillerEIRFT(0.0);         // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
     Real64 ChillerEIRFPLR(0.0);       // Chiller EIR as a function of part-load ratio (PLR)
@@ -168,18 +166,9 @@ namespace ChillerReformulatedEIR {
 
     bool GetInputREIR(true); // When TRUE, calls subroutine to read input file
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerReformulatedEIR
-
     // Object Data
     Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
     Array1D<ReportVars> ElecReformEIRChillerReport;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Reformulated EIR Chiller Module Driver Subroutine
-    //*************************************************************************
-
-    // Functions
 
     void SimReformulatedEIRChiller(std::string const &EP_UNUSED(EIRChillerType), // Type of chiller !unused1208
                                    std::string const &EIRChillerName,            // User specified name of chiller
@@ -209,12 +198,10 @@ namespace ChillerReformulatedEIR {
         //  models, initializes simulation variables, calls the appropriate model and sets
         //  up reporting variables.
 
-        // Using/Aliasing
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using PlantUtilities::UpdateChillerComponentCondenserSide;
         using PlantUtilities::UpdateComponentHeatRecoverySide;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EIRChillNum;
         int LoopSide;
 
@@ -293,9 +280,6 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    // End Reformulated EIR Chiller Module Driver Subroutine
-    //******************************************************************************
-
     void GetElecReformEIRChillerInput()
     {
         // SUBROUTINE INFORMATION:
@@ -322,11 +306,8 @@ namespace ChillerReformulatedEIR {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetScheduleIndex;
 
-        // Locals
-        // PARAMETERS
         static std::string const RoutineName("GetElecReformEIRChillerInput: "); // include trailing blank space
 
-        // LOCAL VARIABLES
         int EIRChillerNum;                // Chiller counter
         int NumAlphas;                    // Number of elements in the alpha array
         int NumNums;                      // Number of elements in the numeric array
@@ -334,8 +315,6 @@ namespace ChillerReformulatedEIR {
         static bool ErrorsFound(false);   // True when input errors found
         static bool AllocatedFlag(false); // True when arrays are allocated
         std::string PartLoadCurveType;    // Part load curve type
-
-        // FLOW
 
         if (AllocatedFlag) return;
 
@@ -870,7 +849,6 @@ namespace ChillerReformulatedEIR {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
         using DataEnvironment::StdBaroPress;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::BeginEnvrnFlag;
@@ -886,7 +864,6 @@ namespace ChillerReformulatedEIR {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string const RoutineName("InitElecReformEIRChiller");
         static bool MyOneTimeFlag(true); // One time logic flag for allocating MyEnvrnFlag array
         static Array1D_bool MyFlag;
@@ -1054,10 +1031,6 @@ namespace ChillerReformulatedEIR {
             MyFlag(EIRChillNum) = false;
         }
 
-        // Initialize Demand Side Variables
-        //  IF((MyEnvrnFlag(EIRChillNum) .and. BeginEnvrnFlag) &
-        //     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
-
         if (MyEnvrnFlag(EIRChillNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
 
             rho = GetDensityGlycol(PlantLoop(ElecReformEIRChiller(EIRChillNum).CWLoopNum).FluidName,
@@ -1215,7 +1188,6 @@ namespace ChillerReformulatedEIR {
         //  the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
         //  is calculated from the reference capacity, the COP, and the condenser loop design delta T.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
@@ -1229,10 +1201,8 @@ namespace ChillerReformulatedEIR {
         using namespace OutputReportPredefined;
         using StandardRatings::CalcChillerIPLV;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElecReformEIRChiller");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum(0);                  // Plant Sizing index corresponding to CurLoopNum
         int PltSizCondNum(0);              // Plant Sizing index for condenser loop
         bool ErrorsFound(false);           // If errors detected in input
@@ -1790,25 +1760,12 @@ namespace ChillerReformulatedEIR {
         // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
         //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-        // USE STATEMENTS:
-
-        // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using DataGlobals::WarmupFlag;
         using General::SolveRoot;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         Real64 const Acc(0.0001); // Accuracy control for SolveRoot
         int const MaxIter(500);   // Iteration control for SolveRoot
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        //  na
-
-        // DERIVED TYPE DEFINITIONS:
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 CAPFTYTmin;       // Minimum condenser leaving temperature allowed by CAPFT curve [C]
         Real64 CAPFTYTmax;       // Maximum condenser leaving temperature allowed by CAPFT curve [C]
@@ -1935,34 +1892,18 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from the chiller condenser
 
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
         using DataPlant::SingleSetPoint;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("EIRChillerHeatRecovery");
 
-        // DERIVED TYPE DEFINITIONS:
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CondInletNode;  // Condenser inlet node number
         int CondOutletNode; // Condenser outlet node number
         int HeatRecInNode;  // Node number for heat recovery water inlet node
         int HeatRecOutNode; // Node number for heat recovery water outlet node
         Real64 QTotal;      // Total condenser heat [W]
-        //  REAL(r64)    :: QCondTmp            ! Total condenser heat based on average temperatures [W]
         Real64 HeatRecInletTemp;    // Heat reclaim inlet temp [C]
         Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
         Real64 TAvgIn;              // Average inlet temperature of heat reclaim inlet and condenser inlet [C]
@@ -2055,12 +1996,10 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  Reporting
 
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapInletNode;  // Evaporator inlet node number
         int EvapOutletNode; // Evaporator outlet node number
         int CondInletNode;  // Condenser inlet node number
@@ -2175,30 +2114,8 @@ namespace ChillerReformulatedEIR {
         // METHODOLOGY EMPLOYED:
         //  Regula Falsi solver is used to calculate condenser outlet temperature.
 
-        // REFERENCES:
-        //  na
-
-        // USE STATEMENTS:
-        //  na
-
-        // Return value
         Real64 CondOutTempResidual;
 
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        //  na
-
-        // DERIVED TYPE DEFINITIONS:
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int EIRChillNum;     // Chiller number
         Real64 MyLoad;       // Operating load [W]
         bool FirstIteration; // TRUE when first iteration of timestep
@@ -2213,7 +2130,6 @@ namespace ChillerReformulatedEIR {
         MyLoad = Par(2);
         RunFlag = (int(Par(3)) == 1);
         FirstIteration = (int(Par(4)) == 1);
-        // FlowLock = INT(Par(5))   !DSU
         EquipFlowCtrl = int(Par(6));
 
         CalcReformEIRChillerModel(EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, FalsiCondOutTemp);
@@ -2252,7 +2168,6 @@ namespace ChillerReformulatedEIR {
         // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
         //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -2278,21 +2193,9 @@ namespace ChillerReformulatedEIR {
         using PlantUtilities::PullCompInterconnectTrigger;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElecReformEIRChillerModel");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FRAC;                        // Chiller cycling ratio
         Real64 MinPartLoadRat;              // Minimum allowed operating fraction of full load
         Real64 MinUnloadRat;                // Minimum allowed unloading fraction of full load
@@ -2319,7 +2222,6 @@ namespace ChillerReformulatedEIR {
         int EvapOutletNode; // evaporator outlet node number
         int CondInletNode;  // condenser inlet node number
         int CondOutletNode; // condenser outlet node number
-        //  LOGICAL, SAVE          :: PossibleSubcooling
         Real64 TempLoad; // actual load to be met by chiller. This value is compared to MyLoad
         // and reset when necessary since this chiller can cycle, the load passed
         // should be the actual load.  Instead the minimum PLR * RefCap is
@@ -2330,12 +2232,6 @@ namespace ChillerReformulatedEIR {
         int CompNum;
         Real64 Cp; // Local fluid specific heat
 
-        //  REAL(r64),SAVE         :: TimeStepSysLast=0.0     ! last system time step (used to check for downshifting)
-        //  REAL(r64)              :: CurrentEndTime          ! end time of time step for current simulation time step
-        //  REAL(r64),SAVE         :: CurrentEndTimeLast=0.0  ! end time of time step for last simulation time step
-        //  CHARACTER(len=6)       :: OutputChar = ' '        ! character string for warning messages
-
-        // Set module level inlet and outlet nodes and initialize other local variables
         ChillerPartLoadRatio = 0.0;
         ChillerCyclingRatio = 0.0;
         ChillerFalseLoadRate = 0.0;
@@ -2345,7 +2241,6 @@ namespace ChillerReformulatedEIR {
         QCondenser = 0.0;
         QEvaporator = 0.0;
         QHeatRecovered = 0.0;
-        //  CondenserFanPower          = 0.0
         EvapInletNode = ElecReformEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElecReformEIRChiller(EIRChillNum).EvapOutletNodeNum;
         CondInletNode = ElecReformEIRChiller(EIRChillNum).CondInletNodeNum;
@@ -2363,32 +2258,6 @@ namespace ChillerReformulatedEIR {
         // Set module-level chiller evap and condenser inlet temperature variables
         EvapInletTemp = Node(EvapInletNode).Temp;
         CondInletTemp = Node(CondInletNode).Temp;
-
-        // This chiller is currenlty has only a water-cooled condenser
-        //! calculate end time of current time step
-        //  CurrentEndTime = CurrentTime + SysTimeElapsed
-        //! Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
-        //! Wait for next time step to print warnings. If simulation iterates, print out
-        //! the warning for the last iteration only. Must wait for next time step to accomplish this.
-        //! If a warning occurs and the simulation down shifts, the warning is not valid.
-        //  IF(CurrentEndTime .GT. CurrentEndTimeLast .AND. TimeStepSys .GE. TimeStepSysLast)THEN
-        //    IF(ElecReformEIRChiller(EIRChillNum)%PrintMessage)THEN
-        //          ElecReformEIRChiller(EIRChillNum)%MsgErrorCount = &
-        //                         ElecReformEIRChiller(EIRChillNum)%MsgErrorCount + 1
-        //!     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
-        //      IF (ElecReformEIRChiller(EIRChillNum)%MsgErrorCount < 2) THEN
-        //         CALL ShowWarningError(TRIM(ElecReformEIRChiller(EIRChillNum)%MsgBuffer1)//'.')
-        //         CALL ShowContinueError(TRIM(ElecReformEIRChiller(EIRChillNum)%MsgBuffer2))
-        //      ELSE
-        //        CALL ShowRecurringWarningErrorAtEnd(TRIM(ElecReformEIRChiller(EIRChillNum)%MsgBuffer1)//' error continues.', &
-        //           ElecReformEIRChiller(EIRChillNum)%ErrCount1,ReportMaxOf=ElecReformEIRChiller(EIRChillNum)%MsgDataLast,  &
-        //           ReportMinOf=ElecReformEIRChiller(EIRChillNum)%MsgDataLast,ReportMaxUnits='[C]',ReportMinUnits='[C]')
-        //      END IF
-        //    END IF
-        //  END IF
-        //! save last system time step and last end time of current time step (used to determine if warning is valid)
-        //  TimeStepSysLast    = TimeStepSys
-        //  CurrentEndTimeLast = CurrentEndTime
 
         // If no loop demand or chiller OFF, return
         // If chiller load is 0 or chiller is not running then leave the subroutine. Before leaving
@@ -2521,34 +2390,20 @@ namespace ChillerReformulatedEIR {
         // Available chiller capacity as a function of temperature
         AvailChillerCap = ChillerRefCap * ChillerCapFT;
 
-        //  IF (PlantLoop(PlantLoopNum)%LoopSide(LoopSideNum)%FlowLock .EQ. 0) THEN
-        //    EvapMassFlowRate = MIN(EvapMassFlowRateMax,Node(EvapInletNode)%MassFlowRateMaxAvail)    !CRBranchPump
-        //    EvapMassFlowRate = MAX(EvapMassFlowRate,Node(EvapInletNode)%MassFlowRateMinAvail)       !CRBranchPump
-        //!   Some other component set the flow to 0. No reason to continue with calculations.
-        //    IF(EvapMassFlowRate == 0.0d0)THEN
-        //      MyLoad = 0.0d0
-        //!      ElecReformEIRChiller(EIRChillNum)%PrintMessage = .FALSE.
-        //      RETURN
-        //    END IF
-        //  ELSE
         EvapMassFlowRate = Node(EvapInletNode).MassFlowRate;
         //   Some other component set the flow to 0. No reason to continue with calculations.
         if (EvapMassFlowRate == 0.0) {
             MyLoad = 0.0;
-            //      ElecReformEIRChiller(EIRChillNum)%PrintMessage = .FALSE.
             return;
         }
-        //  END IF
 
-        // This chiller is currenlty has only a water-cooled condenser
+        // This chiller is currently has only a water-cooled condenser
 
         // Calculate water side load
         Cp = GetSpecificHeatGlycol(PlantLoop(ElecReformEIRChiller(EIRChillNum).CWLoopNum).FluidName,
                                    Node(EvapInletNode).Temp,
                                    PlantLoop(ElecReformEIRChiller(EIRChillNum).CWLoopNum).FluidIndex,
                                    RoutineName);
-        // problem here if no setpoint on outlet
-        // CR 9132 changed from actual node flow rate to maximum available to avoid issue of limiting capacity
 
         TempLoad = Node(EvapInletNode).MassFlowRateMaxAvail * Cp * (Node(EvapInletNode).Temp - EvapOutletTempSetPoint);
 
@@ -2697,7 +2552,6 @@ namespace ChillerReformulatedEIR {
             //       Some other component set the flow to 0. No reason to continue with calculations.
             if (EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;
-                //        ElecReformEIRChiller(EIRChillNum)%PrintMessage = .FALSE.
                 return;
             }
             if (ElecReformEIRChiller(EIRChillNum).PossibleSubcooling) {
@@ -2771,7 +2625,6 @@ namespace ChillerReformulatedEIR {
                 } else {
                     QEvaporator = 0.0;
                     EvapOutletTemp = Node(EvapInletNode).Temp;
-                    //           ElecReformEIRChiller(EIRChillNum)%PrintMessage = .FALSE.
                 }
             }
 
@@ -2854,13 +2707,6 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  To compare the evaporator/condenser outlet temperatures to curve object min/max values
 
-        // METHODOLOGY EMPLOYED:
-        //  na
-
-        // REFERENCES:
-        //  na
-
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataGlobals::WarmupFlag;
         using DataPlant::CompSetPtBasedSchemeType;
@@ -2870,16 +2716,6 @@ namespace ChillerReformulatedEIR {
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapOutletNode;                 // Chiller evaporator outlet node number
         Real64 EvapOutletTempSetPoint(0.0); // Evaporator outlet temperature setpoint [C]
         Real64 CAPFTXTmin;                  // Minimum evaporator leaving temperature allowed by CAPFT curve [C]
