@@ -1785,6 +1785,7 @@ namespace ChillerElectricEIR {
         Real64 RhoAir;                         // air density [kg/m3]
 
         // Set module level inlet and outlet nodes and initialize other local variables
+        ElectricEIRChiller(EIRChillNum).CondMassFlowRate = 0.0;
         EvapInletNode = ElectricEIRChiller(EIRChillNum).EvapInletNodeNum;
         EvapOutletNode = ElectricEIRChiller(EIRChillNum).EvapOutletNodeNum;
         CondInletNode = ElectricEIRChiller(EIRChillNum).CondInletNodeNum;
