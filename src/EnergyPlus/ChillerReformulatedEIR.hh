@@ -246,6 +246,25 @@ namespace ChillerReformulatedEIR {
               HeatRecMassFlow(0.0)
         {
         }
+
+        void initialize(bool RunFlag, Real64 MyLoad);
+
+        void size();
+
+        void control(int &EIRChillNum,          // Chiller number
+                                          Real64 &MyLoad,            // Operating load [W]
+                                          bool RunFlag,        // TRUE when chiller operating
+                                          bool FirstIteration, // TRUE when first iteration of timestep
+                                          int EquipFlowCtrl    // Flow control mode for the equipment
+        );
+
+        void calculate(int EIRChillNum,        // Chiller number
+                                       Real64 &MyLoad,               // Operating load [W]
+                                       bool RunFlag,           // TRUE when chiller operating
+                                       bool FirstIteration,    // TRUE when first iteration of timestep !unused1208
+                                       int EquipFlowCtrl,      // Flow control mode for the equipment
+                                       Real64 FalsiCondOutTemp // RegulaFalsi condenser outlet temperature result [C]
+        );
     };
 
     // Object Data
@@ -270,20 +289,6 @@ namespace ChillerReformulatedEIR {
 
     void GetElecReformEIRChillerInput();
 
-    void InitElecReformEIRChiller(int EIRChillNum, // Number of the current electric EIR chiller being simulated
-                                  bool RunFlag,    // TRUE when chiller operating
-                                  Real64 MyLoad    // Current load put on chiller
-    );
-
-    void SizeElecReformEIRChiller(int EIRChillNum);
-
-    void ControlReformEIRChillerModel(int &EIRChillNum,          // Chiller number
-                                      Real64 &MyLoad,            // Operating load [W]
-                                      bool RunFlag,        // TRUE when chiller operating
-                                      bool FirstIteration, // TRUE when first iteration of timestep
-                                      int EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
     void ReformEIRChillerHeatRecovery(int EIRChillNum,      // Number of the current electric EIR chiller being simulated
                                       Real64 &QCond,              // Current condenser load [W]
                                       Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
@@ -298,14 +303,6 @@ namespace ChillerReformulatedEIR {
 
     Real64 CondOutTempResidual(Real64 FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
                                Array1<Real64> const &Par      // Parameter array used to interface with RegulaFalsi solver
-    );
-
-    void CalcReformEIRChillerModel(int EIRChillNum,        // Chiller number
-                                   Real64 &MyLoad,               // Operating load [W]
-                                   bool RunFlag,           // TRUE when chiller operating
-                                   bool FirstIteration,    // TRUE when first iteration of timestep !unused1208
-                                   int EquipFlowCtrl,      // Flow control mode for the equipment
-                                   Real64 FalsiCondOutTemp // RegulaFalsi condenser outlet temperature result [C]
     );
 
     void CheckMinMaxCurveBoundaries(int EIRChillNum,    // Number of the current electric EIR chiller being simulated
