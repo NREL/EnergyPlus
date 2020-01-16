@@ -136,7 +136,6 @@ namespace ChillerReformulatedEIR {
 
     // Object Data
     Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-    Array1D<ReportVars> ElecReformEIRChillerReport;
 
     void SimReformulatedEIRChiller(std::string const &EP_UNUSED(EIRChillerType), // Type of chiller !unused1208
                                    std::string const &EIRChillerName,            // User specified name of chiller
@@ -226,7 +225,7 @@ namespace ChillerReformulatedEIR {
                                                 ElecReformEIRChiller(EIRChillNum).CondInletNodeNum,
                                                 ElecReformEIRChiller(EIRChillNum).CondOutletNodeNum,
                                                 ElecReformEIRChiller(EIRChillNum).QCondenser,
-                                                ElecReformEIRChillerReport(EIRChillNum).CondInletTemp,
+                                                ElecReformEIRChiller(EIRChillNum).CondInletTemp,
                                                 ElecReformEIRChiller(EIRChillNum).CondOutletTemp,
                                                 ElecReformEIRChiller(EIRChillNum).CondMassFlowRate,
                                                 FirstIteration);
@@ -237,9 +236,9 @@ namespace ChillerReformulatedEIR {
                                             ElecReformEIRChiller(EIRChillNum).HeatRecInletNodeNum,
                                             ElecReformEIRChiller(EIRChillNum).HeatRecOutletNodeNum,
                                             ElecReformEIRChiller(EIRChillNum).QHeatRecovery,
-                                            ElecReformEIRChillerReport(EIRChillNum).HeatRecInletTemp,
-                                            ElecReformEIRChillerReport(EIRChillNum).HeatRecOutletTemp,
-                                            ElecReformEIRChillerReport(EIRChillNum).HeatRecMassFlow,
+                                            ElecReformEIRChiller(EIRChillNum).HeatRecInletTemp,
+                                            ElecReformEIRChiller(EIRChillNum).HeatRecOutletTemp,
+                                            ElecReformEIRChiller(EIRChillNum).HeatRecMassFlow,
                                             FirstIteration);
         }
     }
@@ -275,7 +274,6 @@ namespace ChillerReformulatedEIR {
 
         // ALLOCATE ARRAYS
         ElecReformEIRChiller.allocate(NumElecReformEIRChillers);
-        ElecReformEIRChillerReport.allocate(NumElecReformEIRChillers);
 
         // Load arrays with reformulated electric EIR chiller data
         for (EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum) {
@@ -605,7 +603,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ElecReformEIRChillerReport(EIRChillerNum).Energy,
+                                ElecReformEIRChiller(EIRChillerNum).Energy,
                                 "System",
                                 "Sum",
                                 ElecReformEIRChiller(EIRChillerNum).Name,
@@ -623,7 +621,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ElecReformEIRChillerReport(EIRChillerNum).EvapEnergy,
+                                ElecReformEIRChiller(EIRChillerNum).EvapEnergy,
                                 "System",
                                 "Sum",
                                 ElecReformEIRChiller(EIRChillerNum).Name,
@@ -640,13 +638,13 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller False Load Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElecReformEIRChillerReport(EIRChillerNum).ChillerFalseLoad,
+                                ElecReformEIRChiller(EIRChillerNum).ChillerFalseLoad,
                                 "System",
                                 "Sum",
                                 ElecReformEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElecReformEIRChillerReport(EIRChillerNum).EvapInletTemp,
+                                ElecReformEIRChiller(EIRChillerNum).EvapInletTemp,
                                 "System",
                                 "Average",
                                 ElecReformEIRChiller(EIRChillerNum).Name);
@@ -671,7 +669,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillerNum).Name);
             SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ElecReformEIRChillerReport(EIRChillerNum).CondEnergy,
+                                ElecReformEIRChiller(EIRChillerNum).CondEnergy,
                                 "System",
                                 "Sum",
                                 ElecReformEIRChiller(EIRChillerNum).Name,
@@ -682,7 +680,7 @@ namespace ChillerReformulatedEIR {
                                 "Plant");
             SetupOutputVariable("Chiller COP",
                                 OutputProcessor::Unit::W_W,
-                                ElecReformEIRChillerReport(EIRChillerNum).ActualCOP,
+                                ElecReformEIRChiller(EIRChillerNum).ActualCOP,
                                 "System",
                                 "Average",
                                 ElecReformEIRChiller(EIRChillerNum).Name);
@@ -708,7 +706,7 @@ namespace ChillerReformulatedEIR {
 
             SetupOutputVariable("Chiller Condenser Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElecReformEIRChillerReport(EIRChillerNum).CondInletTemp,
+                                ElecReformEIRChiller(EIRChillerNum).CondInletTemp,
                                 "System",
                                 "Average",
                                 ElecReformEIRChiller(EIRChillerNum).Name);
@@ -735,7 +733,7 @@ namespace ChillerReformulatedEIR {
                                     ElecReformEIRChiller(EIRChillerNum).Name);
                 SetupOutputVariable("Chiller Total Recovered Heat Energy",
                                     OutputProcessor::Unit::J,
-                                    ElecReformEIRChillerReport(EIRChillerNum).EnergyHeatRecovery,
+                                    ElecReformEIRChiller(EIRChillerNum).EnergyHeatRecovery,
                                     "System",
                                     "Sum",
                                     ElecReformEIRChiller(EIRChillerNum).Name,
@@ -746,19 +744,19 @@ namespace ChillerReformulatedEIR {
                                     "Plant");
                 SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElecReformEIRChillerReport(EIRChillerNum).HeatRecInletTemp,
+                                    ElecReformEIRChiller(EIRChillerNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
                                     ElecReformEIRChiller(EIRChillerNum).Name);
                 SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ElecReformEIRChillerReport(EIRChillerNum).HeatRecOutletTemp,
+                                    ElecReformEIRChiller(EIRChillerNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
                                     ElecReformEIRChiller(EIRChillerNum).Name);
                 SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ElecReformEIRChillerReport(EIRChillerNum).HeatRecMassFlow,
+                                    ElecReformEIRChiller(EIRChillerNum).HeatRecMassFlow,
                                     "System",
                                     "Average",
                                     ElecReformEIRChiller(EIRChillerNum).Name);
@@ -1900,27 +1898,27 @@ namespace ChillerReformulatedEIR {
             ElecReformEIRChiller(Num).ChillerPartLoadRatio = 0.0;
             ElecReformEIRChiller(Num).ChillerCyclingRatio = 0.0;
             ElecReformEIRChiller(Num).ChillerFalseLoadRate = 0.0;
-            ElecReformEIRChillerReport(Num).ChillerFalseLoad = 0.0;
+            ElecReformEIRChiller(Num).ChillerFalseLoad = 0.0;
             ElecReformEIRChiller(Num).Power = 0.0;
             ElecReformEIRChiller(Num).QEvaporator = 0.0;
             ElecReformEIRChiller(Num).QCondenser = 0.0;
-            ElecReformEIRChillerReport(Num).Energy = 0.0;
-            ElecReformEIRChillerReport(Num).EvapEnergy = 0.0;
-            ElecReformEIRChillerReport(Num).CondEnergy = 0.0;
-            ElecReformEIRChillerReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            ElecReformEIRChillerReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            ElecReformEIRChiller(Num).Energy = 0.0;
+            ElecReformEIRChiller(Num).EvapEnergy = 0.0;
+            ElecReformEIRChiller(Num).CondEnergy = 0.0;
+            ElecReformEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            ElecReformEIRChiller(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
             ElecReformEIRChiller(Num).CondOutletTemp = DataLoopNode::Node(CondOutletNode).Temp;
             ElecReformEIRChiller(Num).EvapOutletTemp = DataLoopNode::Node(EvapOutletNode).Temp;
-            ElecReformEIRChillerReport(Num).ActualCOP = 0.0;
+            ElecReformEIRChiller(Num).ActualCOP = 0.0;
 
             if (ElecReformEIRChiller(Num).HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
                 ElecReformEIRChiller(Num).QHeatRecovery = 0.0;
-                ElecReformEIRChillerReport(Num).EnergyHeatRecovery = 0.0;
-                ElecReformEIRChillerReport(Num).HeatRecInletTemp = DataLoopNode::Node(HeatRecInNode).Temp;
-                ElecReformEIRChillerReport(Num).HeatRecOutletTemp = DataLoopNode::Node(HeatRecOutNode).Temp;
-                ElecReformEIRChillerReport(Num).HeatRecMassFlow = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
+                ElecReformEIRChiller(Num).EnergyHeatRecovery = 0.0;
+                ElecReformEIRChiller(Num).HeatRecInletTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+                ElecReformEIRChiller(Num).HeatRecOutletTemp = DataLoopNode::Node(HeatRecOutNode).Temp;
+                ElecReformEIRChiller(Num).HeatRecMassFlow = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
             }
 
         } else { // Chiller is running, so pass calculated values
@@ -1929,26 +1927,26 @@ namespace ChillerReformulatedEIR {
             DataLoopNode::Node(CondOutletNode).Temp = ElecReformEIRChiller(Num).CondOutletTemp;
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
-            ElecReformEIRChillerReport(Num).ChillerFalseLoad = ElecReformEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElecReformEIRChillerReport(Num).Energy = ElecReformEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElecReformEIRChillerReport(Num).EvapEnergy = ElecReformEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElecReformEIRChillerReport(Num).CondEnergy = ElecReformEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-            ElecReformEIRChillerReport(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
-            ElecReformEIRChillerReport(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
+            ElecReformEIRChiller(Num).ChillerFalseLoad = ElecReformEIRChiller(Num).ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElecReformEIRChiller(Num).Energy = ElecReformEIRChiller(Num).Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElecReformEIRChiller(Num).EvapEnergy = ElecReformEIRChiller(Num).QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElecReformEIRChiller(Num).CondEnergy = ElecReformEIRChiller(Num).QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+            ElecReformEIRChiller(Num).EvapInletTemp = DataLoopNode::Node(EvapInletNode).Temp;
+            ElecReformEIRChiller(Num).CondInletTemp = DataLoopNode::Node(CondInletNode).Temp;
             if (ElecReformEIRChiller(Num).Power != 0.0) {
-                ElecReformEIRChillerReport(Num).ActualCOP = (ElecReformEIRChiller(Num).QEvaporator + ElecReformEIRChiller(Num).ChillerFalseLoadRate) / ElecReformEIRChiller(Num).Power;
+                ElecReformEIRChiller(Num).ActualCOP = (ElecReformEIRChiller(Num).QEvaporator + ElecReformEIRChiller(Num).ChillerFalseLoadRate) / ElecReformEIRChiller(Num).Power;
             } else {
-                ElecReformEIRChillerReport(Num).ActualCOP = 0.0;
+                ElecReformEIRChiller(Num).ActualCOP = 0.0;
             }
 
             if (ElecReformEIRChiller(Num).HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
-                ElecReformEIRChillerReport(Num).EnergyHeatRecovery = ElecReformEIRChiller(Num).QHeatRecovery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+                ElecReformEIRChiller(Num).EnergyHeatRecovery = ElecReformEIRChiller(Num).QHeatRecovery * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
                 DataLoopNode::Node(HeatRecOutNode).Temp = ElecReformEIRChiller(Num).HeatRecOutletTemp;
-                ElecReformEIRChillerReport(Num).HeatRecInletTemp = DataLoopNode::Node(HeatRecInNode).Temp;
-                ElecReformEIRChillerReport(Num).HeatRecOutletTemp = DataLoopNode::Node(HeatRecOutNode).Temp;
-                ElecReformEIRChillerReport(Num).HeatRecMassFlow = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
+                ElecReformEIRChiller(Num).HeatRecInletTemp = DataLoopNode::Node(HeatRecInNode).Temp;
+                ElecReformEIRChiller(Num).HeatRecOutletTemp = DataLoopNode::Node(HeatRecOutNode).Temp;
+                ElecReformEIRChiller(Num).HeatRecMassFlow = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
             }
         }
     }
@@ -2200,7 +2198,7 @@ namespace ChillerReformulatedEIR {
         if (ElecReformEIRChiller(EIRChillNum).HeatRecActive) {
             if ((ElecReformEIRChiller(EIRChillNum).QHeatRecovery + ElecReformEIRChiller(EIRChillNum).QCondenser) >
                 0.0) { // protect div by zero
-                ElecReformEIRChiller(EIRChillNum).ChillerCondAvgTemp = (ElecReformEIRChiller(EIRChillNum).QHeatRecovery * ElecReformEIRChillerReport(EIRChillNum).HeatRecOutletTemp +
+                ElecReformEIRChiller(EIRChillNum).ChillerCondAvgTemp = (ElecReformEIRChiller(EIRChillNum).QHeatRecovery * ElecReformEIRChiller(EIRChillNum).HeatRecOutletTemp +
                         ElecReformEIRChiller(EIRChillNum).QCondenser * ElecReformEIRChiller(EIRChillNum).CondOutletTemp) /
                                   (ElecReformEIRChiller(EIRChillNum).QHeatRecovery + ElecReformEIRChiller(EIRChillNum).QCondenser);
             } else {

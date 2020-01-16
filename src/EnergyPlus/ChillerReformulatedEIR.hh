@@ -205,6 +205,16 @@ namespace ChillerReformulatedEIR {
         Real64 CondOutletTemp;       // reporting: Condenser outlet temperature [C]
         Real64 EvapMassFlowRate;             // reporting: Evaporator mass flow rate [kg/s]
         Real64 CondMassFlowRate;    // Condenser mass flow rate [kg/s]
+        Real64 ChillerFalseLoad;     // reporting: Chiller false load over and above water side load [W]
+        Real64 Energy;               // reporting: Chiller electric consumption [J]
+        Real64 EvapEnergy;           // reporting: Evaporator heat transfer energy [J]
+        Real64 CondEnergy;           // reporting: Condenser heat transfer energy [J]
+        Real64 CondInletTemp;        // reporting: Condenser inlet temperature [C]
+        Real64 EvapInletTemp;        // reporting: Evaporator inlet temperature [C]
+        Real64 ActualCOP;            // reporting: Coefficient of performance
+        Real64 EnergyHeatRecovery;   // reporting: Energy recovered from water-cooled condenser [J]
+        Real64 HeatRecInletTemp;     // reporting: Heat reclaim inlet temperature [C]
+        Real64 HeatRecMassFlow;      // reporting: Heat reclaim mass flow rate [kg/s]
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
@@ -231,39 +241,15 @@ namespace ChillerReformulatedEIR {
               MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0), ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0),
               ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0), ChillerCapFT(0.0), HeatRecOutletTemp(0.0),
               QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0),
-              EvapMassFlowRate(0.0), CondMassFlowRate(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 ChillerFalseLoad;     // reporting: Chiller false load over and above water side load [W]
-        Real64 Energy;               // reporting: Chiller electric consumption [J]
-        Real64 EvapEnergy;           // reporting: Evaporator heat transfer energy [J]
-        Real64 CondEnergy;           // reporting: Condenser heat transfer energy [J]
-        Real64 CondInletTemp;        // reporting: Condenser inlet temperature [C]
-        Real64 EvapInletTemp;        // reporting: Evaporator inlet temperature [C]
-        Real64 ActualCOP;            // reporting: Coefficient of performance
-        Real64 EnergyHeatRecovery;   // reporting: Energy recovered from water-cooled condenser [J]
-        Real64 HeatRecInletTemp;     // reporting: Heat reclaim inlet temperature [C]
-        Real64 HeatRecOutletTemp;    // reporting: Heat reclaim outlet temperature [C]
-        Real64 HeatRecMassFlow;      // reporting: Heat reclaim mass flow rate [kg/s]
-
-        // Default Constructor
-        ReportVars()
-            : ChillerFalseLoad(0.0),
-              Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0),
-              ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0)
+              EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
+              CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+              HeatRecMassFlow(0.0)
         {
         }
     };
 
     // Object Data
     extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-    extern Array1D<ReportVars> ElecReformEIRChillerReport;
 
     void SimReformulatedEIRChiller(std::string const &EIRChillerType, // Type of chiller !unused1208
                                    std::string const &EIRChillerName, // User specified name of chiller
