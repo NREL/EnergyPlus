@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     ScheduleManager::ProcessScheduleInput(); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
