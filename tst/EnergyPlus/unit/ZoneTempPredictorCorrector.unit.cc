@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,10 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
+
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -69,6 +73,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -78,7 +83,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace DataGlobals;
@@ -290,34 +294,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     Zone(1).IsControlled = true;
     CorrectZoneHumRat(1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
-
-    // Deallocate everything
-    ZoneEquipConfig(1).InletNode.deallocate();
-    ZoneEquipConfig(1).ExhaustNode.deallocate();
-    ZoneEquipConfig.deallocate();
-    Node.deallocate();
-    Zone.deallocate();
-    HybridModelZone.deallocate();
-    ZoneLatentGain.deallocate();
-    ZoneEqSizing.deallocate();
-    SumLatentHTRadSys.deallocate();
-    SumLatentPool.deallocate();
-    ZT.deallocate(); // Zone temperature C
-    ZoneAirHumRat.deallocate();
-    Surface.deallocate();
-    OAMFL.deallocate();
-    VAMFL.deallocate();
-    EAMFL.deallocate();
-    EAMFLxHumRat.deallocate();
-    CTMFL.deallocate();
-    SumHmARaW.deallocate();
-    SumHmARa.deallocate();
-    MixingMassFlowXHumRat.deallocate();
-    MixingMassFlowZone.deallocate();
-    MDotOA.deallocate();
-    ZoneAirHumRatTemp.deallocate();
-    ZoneW1.deallocate();
-    AirModel.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
@@ -510,7 +486,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput();  // read schedules
 
-    GetZoneAirSetPoints();
+    GetZoneAirSetPoints(OutputFiles::getSingleton());
 
     DeadBandOrSetback.allocate(NumTempControlledZones);
     CurDeadBandOrSetback.allocate(NumTempControlledZones);
@@ -653,28 +629,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     EXPECT_EQ(25.0, TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(CurDeadBandOrSetback(DualZoneNum));                          // Tstat should show there is load on a dual SP
     EXPECT_EQ(-2500.0, ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired); // should show a cooling load
-
-    NumTempControlledZones = 0;
-    Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    TempControlType.deallocate();
-    TempControlledZone.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    ZoneSetPointLast.deallocate();
-    Setback.deallocate();
-    AdapComfortCoolingSetPoint.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SNLoadPredictedRate.deallocate();
-    LoadCorrectionFactor.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    OccRoomTSetPointHeat.deallocate();
-    OccRoomTSetPointCool.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
@@ -970,10 +924,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     ZoneAirSetPoint = 26.0;
     AdjustOperativeSetPointsforAdapComfort(DualZoneNum, ZoneAirSetPoint);
     ASSERT_EQ(26.0, ZoneAirSetPoint); // Tstat should show set point is not overwritten
-
-    Environment.deallocate();
-    DesDayInput.deallocate();
-    TempControlledZone.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectionTest)
@@ -1111,30 +1061,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     EXPECT_EQ(10.0, SumHA);
     EXPECT_EQ(300.0, SumHATsurf);
     EXPECT_EQ(50.0, SumHATref);
-
-    DataHeatBalance::ZoneIntGain.deallocate();
-    DataHeatBalFanSys::SumConvHTRadSys.deallocate();
-    DataHeatBalFanSys::SumConvPool.deallocate();
-    DataHeatBalFanSys::MCPI.deallocate();
-    DataHeatBalFanSys::MCPV.deallocate();
-    DataHeatBalFanSys::MCPM.deallocate();
-    DataHeatBalFanSys::MCPE.deallocate();
-    DataHeatBalFanSys::MCPC.deallocate();
-    DataHeatBalFanSys::MCPTI.deallocate();
-    DataHeatBalFanSys::MCPTV.deallocate();
-    DataHeatBalFanSys::MCPTM.deallocate();
-    DataHeatBalFanSys::MCPTE.deallocate();
-    DataHeatBalFanSys::MCPTC.deallocate();
-    DataHeatBalFanSys::MDotCPOA.deallocate();
-    ZoneEquipConfig.deallocate();
-    Zone.deallocate();
-    Surface.deallocate();
-    MAT.deallocate();
-    ZoneAirHumRat.deallocate();
-    HConvIn.deallocate();
-    TempEffBulkAir.deallocate();
-    Node.deallocate();
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
@@ -1183,7 +1109,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -1418,36 +1344,6 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     PredictSystemLoads(false, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
-
-    TempControlledZone(1).DeltaTCutSet = 0.0;
-    TempControlledZone(1).HeatModeLast = false;
-    TempControlledZone(1).CoolModeLast = false;
-
-    SNLoadPredictedRate.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    LoadCorrectionFactor.deallocate();
-    DeadBandOrSetback.deallocate();
-    DataZoneEnergyDemands::Setback.deallocate();
-    ZoneSetPointLast.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    AIRRAT.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    ZoneT1.deallocate();
-    MAT.deallocate();
-    Schedule.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    TempControlledZone.deallocate();
-    TempControlType.deallocate();
-    SetPointSingleHeating.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SetPointSingleCooling.deallocate();
-    SetPointSingleHeatCool.deallocate();
-    SetPointDualHeatCool.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
@@ -1577,36 +1473,4 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     PredictSystemLoads(true, false, 0.01);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
-
-    TempControlledZone(1).DeltaTCutSet = 0.0;
-    TempControlledZone(1).HeatModeLast = false;
-    TempControlledZone(1).CoolModeLast = false;
-    TempControlledZone(1).HeatModeLastSave = false;
-    TempControlledZone(1).CoolModeLastSave = false;
-
-    SNLoadPredictedRate.deallocate();
-    SNLoadPredictedHSPRate.deallocate();
-    SNLoadPredictedCSPRate.deallocate();
-    CurDeadBandOrSetback.deallocate();
-    LoadCorrectionFactor.deallocate();
-    DeadBandOrSetback.deallocate();
-    DataZoneEnergyDemands::Setback.deallocate();
-    ZoneSetPointLast.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DeadBandOrSetback.deallocate();
-    AIRRAT.deallocate();
-    TempDepZnLd.deallocate();
-    TempIndZnLd.deallocate();
-    XMPT.deallocate();
-    MAT.deallocate();
-    Schedule.deallocate();
-    TempZoneThermostatSetPoint.deallocate();
-    TempControlledZone.deallocate();
-    TempControlType.deallocate();
-    SetPointSingleHeating.deallocate();
-    ZoneThermostatSetPointLo.deallocate();
-    ZoneThermostatSetPointHi.deallocate();
-    SetPointSingleCooling.deallocate();
-    SetPointSingleHeatCool.deallocate();
-    SetPointDualHeatCool.deallocate();
 }

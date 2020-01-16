@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -977,7 +977,7 @@ namespace RuntimeLanguageProcessor {
                     WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
-                    // evaluate expresssion at while, skip to past endwhile if not true
+                    // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
@@ -3550,9 +3550,9 @@ namespace RuntimeLanguageProcessor {
                             ResourceTypeString = "Diesel";
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
-                        } else if (SELECT_CASE_var == "FUELOIL#1") {
+                        } else if (SELECT_CASE_var == "FUELOILNO1") {
                             ResourceTypeString = "FuelOil#1";
-                        } else if (SELECT_CASE_var == "FUELOIL#2") {
+                        } else if (SELECT_CASE_var == "FUELOILNO2") {
                             ResourceTypeString = "FuelOil#2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
