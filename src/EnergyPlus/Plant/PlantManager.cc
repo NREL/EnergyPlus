@@ -96,10 +96,12 @@
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
+#include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PlantValves.hh>
@@ -115,7 +117,6 @@
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 
@@ -1086,6 +1087,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:EngineDriven")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1094,6 +1096,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1102,6 +1105,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:ConstantCOP")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1110,6 +1114,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
@@ -1220,8 +1225,8 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Heating")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Heating")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
@@ -1231,8 +1236,8 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Cooling")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Cooling")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
