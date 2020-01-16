@@ -181,7 +181,6 @@ namespace PlantLoopEquip {
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
@@ -302,39 +301,19 @@ namespace PlantLoopEquip {
 
             // CHILLERS
         } else if (GeneralEquipType == GenEquipTypes_Chiller) {
-            if ((EquipTypeNum == TypeOf_Chiller_EngineDriven) || (EquipTypeNum == TypeOf_Chiller_Electric) ||
-                (EquipTypeNum == TypeOf_Chiller_ConstCOP) || (EquipTypeNum == TypeOf_Chiller_CombTurbine)) {
-                SimChiller(LoopNum,
-                           LoopSideNum,
-                           EquipTypeNum,
-                           sim_component.Name,
-                           EquipFlowCtrl,
-                           EquipNum,
-                           RunFlag,
-                           FirstHVACIteration,
-                           InitLoopEquip,
-                           CurLoad,
-                           MaxLoad,
-                           MinLoad,
-                           OptLoad,
-                           GetCompSizFac,
-                           SizingFac,
-                           TempCondInDesign,
-                           TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+            if (EquipTypeNum == TypeOf_Chiller_Electric) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_EngineDriven) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_CombTurbine) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_ConstCOP) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {
