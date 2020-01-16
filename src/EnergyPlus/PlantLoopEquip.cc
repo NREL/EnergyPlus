@@ -102,6 +102,13 @@ namespace PlantLoopEquip {
     // This module contains subroutine that calls the required component for simulation. The components are selected
     // using a CASE statement.
 
+    // METHODOLOGY EMPLOYED:
+    // Needs description, as appropriate.
+
+    // REFERENCES: none
+
+    // OTHER NOTES: none
+
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataPlant;
@@ -164,11 +171,9 @@ namespace PlantLoopEquip {
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
-        using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
@@ -285,36 +290,17 @@ namespace PlantLoopEquip {
 
             // CHILLERS
         } else if (GeneralEquipType == GenEquipTypes_Chiller) {
-            if ((EquipTypeNum == TypeOf_Chiller_EngineDriven) || (EquipTypeNum == TypeOf_Chiller_Electric) ||
-                (EquipTypeNum == TypeOf_Chiller_ConstCOP) || (EquipTypeNum == TypeOf_Chiller_CombTurbine)) {
-                SimChiller(LoopNum,
-                           LoopSideNum,
-                           EquipTypeNum,
-                           sim_component.Name,
-                           EquipFlowCtrl,
-                           EquipNum,
-                           RunFlag,
-                           FirstHVACIteration,
-                           InitLoopEquip,
-                           CurLoad,
-                           MaxLoad,
-                           MinLoad,
-                           OptLoad,
-                           GetCompSizFac,
-                           SizingFac,
-                           TempCondInDesign,
-                           TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+            if (EquipTypeNum == TypeOf_Chiller_Electric) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_EngineDriven) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_CombTurbine) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_ConstCOP) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
@@ -471,24 +457,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HeatPumpVRF) {
-
-                SimVRFCondenserPlant(sim_component.TypeOf,
-                                     EquipTypeNum,
-                                     sim_component.Name,
-                                     EquipNum,
-                                     FirstHVACIteration,
-                                     InitLoopEquip,
-                                     CurLoad,
-                                     MaxLoad,
-                                     MinLoad,
-                                     OptLoad,
-                                     LoopNum); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Heat Pump Type=" + sim_component.TypeOf);
