@@ -212,6 +212,11 @@ namespace ChillerReformulatedEIR {
             return;
         }
 
+        if (ElecReformEIRChiller(EIRChillNum).oneTimeFlag) {
+            ElecReformEIRChiller(EIRChillNum).setupOutputVars();
+            ElecReformEIRChiller(EIRChillNum).oneTimeFlag = false;
+        }
+
         if (LoopNum == ElecReformEIRChiller(EIRChillNum).CWLoopNum) {
             ElecReformEIRChiller(EIRChillNum).initialize(RunFlag, MyLoad);
             ElecReformEIRChiller(EIRChillNum).control(MyLoad, RunFlag, FirstIteration, EquipFlowCtrl);
@@ -579,197 +584,218 @@ namespace ChillerReformulatedEIR {
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
+    }
 
-        for (int EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum) {
-            SetupOutputVariable("Chiller Part Load Ratio",
-                                OutputProcessor::Unit::None,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerPartLoadRatio,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Cycling Ratio",
-                                OutputProcessor::Unit::None,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerCyclingRatio,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Electric Power",
+    void ReformulatedEIRChillerSpecs::setupOutputVars()
+    {
+        SetupOutputVariable("Chiller Part Load Ratio",
+                            OutputProcessor::Unit::None,
+                            this->ChillerPartLoadRatio,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Cycling Ratio",
+                            OutputProcessor::Unit::None,
+                            this->ChillerCyclingRatio,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->Power,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->Energy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ELECTRICITY",
+                            "Cooling",
+                            this->EndUseSubcategory,
+                            "Plant");
+
+        SetupOutputVariable("Chiller Evaporator Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->QEvaporator,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Evaporator Cooling Energy",
+                            OutputProcessor::Unit::J,
+                            this->EvapEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "CHILLERS",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Chiller False Load Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->ChillerFalseLoadRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller False Load Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->ChillerFalseLoad,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Evaporator Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Evaporator Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->EvapOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->EvapMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QCondenser,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->CondEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "HEATREJECTION",
+                            _,
+                            "Plant");
+
+        SetupOutputVariable("Chiller COP",
+                            OutputProcessor::Unit::W_W,
+                            this->ActualCOP,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Capacity Temperature Modifier Multiplier",
+                            OutputProcessor::Unit::None,
+                            this->ChillerCapFT,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller EIR Temperature Modifier Multiplier",
+                            OutputProcessor::Unit::None,
+                            this->ChillerEIRFT,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller EIR Part Load Modifier Multiplier",
+                            OutputProcessor::Unit::None,
+                            this->ChillerEIRFPLR,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Chiller Condenser Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->CondMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        // If heat recovery is active then setup report variables
+        if (this->HeatRecActive) {
+            SetupOutputVariable("Chiller Total Recovered Heat Rate",
                                 OutputProcessor::Unit::W,
-                                ElecReformEIRChiller(EIRChillerNum).Power,
+                                this->QHeatRecovery,
                                 "System",
                                 "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Electric Energy",
+                                this->Name);
+
+            SetupOutputVariable("Chiller Total Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
-                                ElecReformEIRChiller(EIRChillerNum).Energy,
+                                this->EnergyHeatRecovery,
                                 "System",
                                 "Sum",
-                                ElecReformEIRChiller(EIRChillerNum).Name,
-                                _,
-                                "ELECTRICITY",
-                                "Cooling",
-                                ElecReformEIRChiller(EIRChillerNum).EndUseSubcategory,
-                                "Plant");
-
-            SetupOutputVariable("Chiller Evaporator Cooling Rate",
-                                OutputProcessor::Unit::W,
-                                ElecReformEIRChiller(EIRChillerNum).QEvaporator,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Evaporator Cooling Energy",
-                                OutputProcessor::Unit::J,
-                                ElecReformEIRChiller(EIRChillerNum).EvapEnergy,
-                                "System",
-                                "Sum",
-                                ElecReformEIRChiller(EIRChillerNum).Name,
+                                this->Name,
                                 _,
                                 "ENERGYTRANSFER",
-                                "CHILLERS",
+                                "HEATRECOVERY",
                                 _,
                                 "Plant");
-            SetupOutputVariable("Chiller False Load Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerFalseLoadRate,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller False Load Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerFalseLoad,
-                                "System",
-                                "Sum",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Evaporator Inlet Temperature",
+
+            SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElecReformEIRChiller(EIRChillerNum).EvapInletTemp,
+                                this->HeatRecInletTemp,
                                 "System",
                                 "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Evaporator Outlet Temperature",
+                                this->Name);
+
+            SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ElecReformEIRChiller(EIRChillerNum).EvapOutletTemp,
+                                this->HeatRecOutletTemp,
                                 "System",
                                 "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Evaporator Mass Flow Rate",
+                                this->Name);
+
+            SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ElecReformEIRChiller(EIRChillerNum).EvapMassFlowRate,
+                                this->HeatRecMassFlow,
                                 "System",
                                 "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
+                                this->Name);
 
-            SetupOutputVariable("Chiller Condenser Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                ElecReformEIRChiller(EIRChillerNum).QCondenser,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Condenser Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
-                                ElecReformEIRChiller(EIRChillerNum).CondEnergy,
-                                "System",
-                                "Sum",
-                                ElecReformEIRChiller(EIRChillerNum).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HEATREJECTION",
-                                _,
-                                "Plant");
-            SetupOutputVariable("Chiller COP",
-                                OutputProcessor::Unit::W_W,
-                                ElecReformEIRChiller(EIRChillerNum).ActualCOP,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-
-            SetupOutputVariable("Chiller Capacity Temperature Modifier Multiplier",
-                                OutputProcessor::Unit::None,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerCapFT,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller EIR Temperature Modifier Multiplier",
-                                OutputProcessor::Unit::None,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerEIRFT,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller EIR Part Load Modifier Multiplier",
-                                OutputProcessor::Unit::None,
-                                ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLR,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-
-            SetupOutputVariable("Chiller Condenser Inlet Temperature",
+            SetupOutputVariable("Chiller Effective Heat Rejection Temperature",
                                 OutputProcessor::Unit::C,
-                                ElecReformEIRChiller(EIRChillerNum).CondInletTemp,
+                                this->ChillerCondAvgTemp,
                                 "System",
                                 "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                ElecReformEIRChiller(EIRChillerNum).CondOutletTemp,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
-            SetupOutputVariable("Chiller Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                ElecReformEIRChiller(EIRChillerNum).CondMassFlowRate,
-                                "System",
-                                "Average",
-                                ElecReformEIRChiller(EIRChillerNum).Name);
+                                this->Name);
+        }
 
-            // If heat recovery is active then setup report variables
-            if (ElecReformEIRChiller(EIRChillerNum).HeatRecActive) {
-                SetupOutputVariable("Chiller Total Recovered Heat Rate",
-                                    OutputProcessor::Unit::W,
-                                    ElecReformEIRChiller(EIRChillerNum).QHeatRecovery,
-                                    "System",
-                                    "Average",
-                                    ElecReformEIRChiller(EIRChillerNum).Name);
-                SetupOutputVariable("Chiller Total Recovered Heat Energy",
-                                    OutputProcessor::Unit::J,
-                                    ElecReformEIRChiller(EIRChillerNum).EnergyHeatRecovery,
-                                    "System",
-                                    "Sum",
-                                    ElecReformEIRChiller(EIRChillerNum).Name,
-                                    _,
-                                    "ENERGYTRANSFER",
-                                    "HEATRECOVERY",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Chiller Heat Recovery Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    ElecReformEIRChiller(EIRChillerNum).HeatRecInletTemp,
-                                    "System",
-                                    "Average",
-                                    ElecReformEIRChiller(EIRChillerNum).Name);
-                SetupOutputVariable("Chiller Heat Recovery Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    ElecReformEIRChiller(EIRChillerNum).HeatRecOutletTemp,
-                                    "System",
-                                    "Average",
-                                    ElecReformEIRChiller(EIRChillerNum).Name);
-                SetupOutputVariable("Chiller Heat Recovery Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    ElecReformEIRChiller(EIRChillerNum).HeatRecMassFlow,
-                                    "System",
-                                    "Average",
-                                    ElecReformEIRChiller(EIRChillerNum).Name);
-                SetupOutputVariable("Chiller Effective Heat Rejection Temperature",
-                                    OutputProcessor::Unit::C,
-                                    ElecReformEIRChiller(EIRChillerNum).ChillerCondAvgTemp,
-                                    "System",
-                                    "Average",
-                                    ElecReformEIRChiller(EIRChillerNum).Name);
-            }
-
-            if (DataGlobals::AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable(
-                    "Chiller Nominal Capacity", ElecReformEIRChiller(EIRChillerNum).Name, "[W]", ElecReformEIRChiller(EIRChillerNum).RefCap);
-            }
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            SetupEMSInternalVariable(
+                    "Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
         }
     }
 

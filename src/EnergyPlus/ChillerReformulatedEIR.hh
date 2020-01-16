@@ -215,6 +215,7 @@ namespace ChillerReformulatedEIR {
         Real64 EnergyHeatRecovery;   // reporting: Energy recovered from water-cooled condenser [J]
         Real64 HeatRecInletTemp;     // reporting: Heat reclaim inlet temperature [C]
         Real64 HeatRecMassFlow;      // reporting: Heat reclaim mass flow rate [kg/s]
+        bool oneTimeFlag;
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
@@ -243,11 +244,13 @@ namespace ChillerReformulatedEIR {
               QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0),
               EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0)
+              HeatRecMassFlow(0.0), oneTimeFlag(true)
         {
         }
 
         void initialize(bool RunFlag, Real64 MyLoad);
+
+        void setupOutputVars();
 
         void size();
 
