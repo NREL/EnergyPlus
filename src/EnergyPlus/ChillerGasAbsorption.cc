@@ -112,13 +112,6 @@ namespace ChillerGasAbsorption {
 
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataGlobals::BigNumber;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SecInHour;
-    using DataHVACGlobals::SmallWaterVolFlow;
-
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
 
     int NumGasAbsorbers(0); // number of Absorption Chillers specified in input
 
@@ -140,10 +133,7 @@ namespace ChillerGasAbsorption {
         Array1D_bool Init_MyEnvrnFlag;
         Array1D_bool Init_MyPlantScanFlag;
         Real64 Calc_oldCondSupplyTemp(0.0); // save the last iteration value of leaving condenser water temperature
-    }                                       // namespace
-
-    // Beginning of Absorption Chiller Module Driver Subroutines
-    //*************************************************************************
+    }
 
     void SimGasAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
                         std::string const &AbsorberName,            // user specified name of Absorber
@@ -169,10 +159,6 @@ namespace ChillerGasAbsorption {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        using CurveManager::CurveValue;
-        using DataPlant::TypeOf_Chiller_DFAbsorption;
-        using PlantUtilities::UpdateChillerComponentCondenserSide;
-
         int ChillNum; // Absorber number counter
 
         // Get Absorber data from input file
@@ -191,12 +177,12 @@ namespace ChillerGasAbsorption {
         } else {
             ChillNum = CompIndex;
             if (ChillNum > NumGasAbsorbers || ChillNum < 1) {
-                ShowFatalError("SimGasAbsorber:  Invalid CompIndex passed=" + TrimSigDigits(ChillNum) +
-                               ", Number of Units=" + TrimSigDigits(NumGasAbsorbers) + ", Entered Unit name=" + AbsorberName);
+                ShowFatalError("SimGasAbsorber:  Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) +
+                               ", Number of Units=" + General::TrimSigDigits(NumGasAbsorbers) + ", Entered Unit name=" + AbsorberName);
             }
             if (CheckEquipName(ChillNum)) {
                 if (AbsorberName != GasAbsorber(ChillNum).Name) {
-                    ShowFatalError("SimGasAbsorber: Invalid CompIndex passed=" + TrimSigDigits(ChillNum) + ", Unit name=" + AbsorberName +
+                    ShowFatalError("SimGasAbsorber: Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) + ", Unit name=" + AbsorberName +
                                    ", stored Unit Name for that index=" + GasAbsorber(ChillNum).Name);
                 }
                 CheckEquipName(ChillNum) = false;
@@ -240,30 +226,22 @@ namespace ChillerGasAbsorption {
         if (BranchInletNodeNum == GasAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            if (RunFlag) {
-                GasAbsorber(ChillNum).InCoolingMode = true;
-            } else {
-                GasAbsorber(ChillNum).InCoolingMode = false;
-            }
+            GasAbsorber(ChillNum).InCoolingMode = RunFlag != 0;
             InitGasAbsorber(ChillNum, RunFlag);
             CalcGasAbsorberChillerModel(ChillNum, MyLoad, RunFlag);
             UpdateGasAbsorberCoolRecords(MyLoad, RunFlag, ChillNum);
         } else if (BranchInletNodeNum == GasAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            if (RunFlag) {
-                GasAbsorber(ChillNum).InHeatingMode = true;
-            } else {
-                GasAbsorber(ChillNum).InHeatingMode = false;
-            }
+            GasAbsorber(ChillNum).InHeatingMode = RunFlag != 0;
             InitGasAbsorber(ChillNum, RunFlag);
             CalcGasAbsorberHeaterModel(ChillNum, MyLoad, RunFlag);
             UpdateGasAbsorberHeatRecords(MyLoad, RunFlag, ChillNum);
         } else if (BranchInletNodeNum == GasAbsorber(ChillNum).CondReturnNodeNum) { // called from condenser loop
             if (GasAbsorber(ChillNum).CDLoopNum > 0) {
-                UpdateChillerComponentCondenserSide(GasAbsorber(ChillNum).CDLoopNum,
+                PlantUtilities::UpdateChillerComponentCondenserSide(GasAbsorber(ChillNum).CDLoopNum,
                                                     GasAbsorber(ChillNum).CDLoopSideNum,
-                                                    TypeOf_Chiller_DFAbsorption,
+                                                    DataPlant::TypeOf_Chiller_DFAbsorption,
                                                     GasAbsorber(ChillNum).CondReturnNodeNum,
                                                     GasAbsorber(ChillNum).CondSupplyNodeNum,
                                                     GasAbsorberReport(ChillNum).TowerLoad,
@@ -279,18 +257,12 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetGasAbsorberInput()
     {
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
         // This routine will get the input
-        // required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
+        // required by the Direct Fired Absorption chiller model in the object ChillerHeater:Absorption:DirectFired
 
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
@@ -781,9 +753,6 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
     void InitGasAbsorber(int const ChillNum,           // number of the current engine driven chiller being simulated
                          bool const EP_UNUSED(RunFlag) // TRUE when chiller operating
     )
@@ -795,20 +764,6 @@ namespace ChillerGasAbsorption {
         // components.
 
         // Uses the status flags to trigger initializations.
-
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::BeginEnvrnFlag;
-        using DataPlant::PlantFirstSizesOkayToFinalize;
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_Chiller_DFAbsorption;
-        using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::InterConnectTwoPlantLoopSides;
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::RhoH2O;
 
         std::string const RoutineName("InitGasAbsorber");
 
@@ -832,8 +787,8 @@ namespace ChillerGasAbsorption {
         if (Init_MyPlantScanFlag(ChillNum)) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
-                                    TypeOf_Chiller_DFAbsorption,
+            PlantUtilities::ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
+                                    DataPlant::TypeOf_Chiller_DFAbsorption,
                                     GasAbsorber(ChillNum).CWLoopNum,
                                     GasAbsorber(ChillNum).CWLoopSideNum,
                                     GasAbsorber(ChillNum).CWBranchNum,
@@ -848,8 +803,8 @@ namespace ChillerGasAbsorption {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
 
-            ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
-                                    TypeOf_Chiller_DFAbsorption,
+            PlantUtilities::ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
+                                    DataPlant::TypeOf_Chiller_DFAbsorption,
                                     GasAbsorber(ChillNum).HWLoopNum,
                                     GasAbsorber(ChillNum).HWLoopSideNum,
                                     GasAbsorber(ChillNum).HWBranchNum,
@@ -865,8 +820,8 @@ namespace ChillerGasAbsorption {
             }
 
             if (GasAbsorber(ChillNum).isWaterCooled) {
-                ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
-                                        TypeOf_Chiller_DFAbsorption,
+                PlantUtilities::ScanPlantLoopsForObject(GasAbsorber(ChillNum).Name,
+                                        DataPlant::TypeOf_Chiller_DFAbsorption,
                                         GasAbsorber(ChillNum).CDLoopNum,
                                         GasAbsorber(ChillNum).CDLoopSideNum,
                                         GasAbsorber(ChillNum).CDBranchNum,
@@ -880,31 +835,31 @@ namespace ChillerGasAbsorption {
                 if (errFlag) {
                     ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
                 }
-                InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).CWLoopNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).CWLoopNum,
                                               GasAbsorber(ChillNum).CWLoopSideNum,
                                               GasAbsorber(ChillNum).CDLoopNum,
                                               GasAbsorber(ChillNum).CDLoopSideNum,
-                                              TypeOf_Chiller_DFAbsorption,
+                                              DataPlant::TypeOf_Chiller_DFAbsorption,
                                               true);
-                InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).HWLoopNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).HWLoopNum,
                                               GasAbsorber(ChillNum).HWLoopSideNum,
                                               GasAbsorber(ChillNum).CDLoopNum,
                                               GasAbsorber(ChillNum).CDLoopSideNum,
-                                              TypeOf_Chiller_DFAbsorption,
+                                              DataPlant::TypeOf_Chiller_DFAbsorption,
                                               true);
             }
 
-            InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).CWLoopNum,
+            PlantUtilities::InterConnectTwoPlantLoopSides(GasAbsorber(ChillNum).CWLoopNum,
                                           GasAbsorber(ChillNum).CWLoopSideNum,
                                           GasAbsorber(ChillNum).HWLoopNum,
                                           GasAbsorber(ChillNum).HWLoopSideNum,
-                                          TypeOf_Chiller_DFAbsorption,
+                                          DataPlant::TypeOf_Chiller_DFAbsorption,
                                           true);
 
             // check if outlet node of chilled water side has a setpoint.
             if ((Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPoint == SensedNodeFlagValue) &&
                 (Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                     if (!GasAbsorber(ChillNum).ChillSetPointErrDone) {
                         ShowWarningError("Missing temperature setpoint on cool side for chiller heater named " + GasAbsorber(ChillNum).Name);
                         ShowContinueError("  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
@@ -914,7 +869,7 @@ namespace ChillerGasAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    CheckIfNodeSetPointManagedByEMS(GasAbsorber(ChillNum).ChillSupplyNodeNum, iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(GasAbsorber(ChillNum).ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     if (errFlag) {
                         if (!GasAbsorber(ChillNum).ChillSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on cool side for chiller heater named " + GasAbsorber(ChillNum).Name);
@@ -928,14 +883,14 @@ namespace ChillerGasAbsorption {
                 }
                 GasAbsorber(ChillNum).ChillSetPointSetToLoop = true;
                 Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPoint =
-                    Node(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPointHi =
-                    Node(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                    Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
             }
             // check if outlet node of hot water side has a setpoint.
             if ((Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPoint == SensedNodeFlagValue) &&
                 (Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPointLo == SensedNodeFlagValue)) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                     if (!GasAbsorber(ChillNum).HeatSetPointErrDone) {
                         ShowWarningError("Missing temperature setpoint on heat side for chiller heater named " + GasAbsorber(ChillNum).Name);
                         ShowContinueError("  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
@@ -945,7 +900,7 @@ namespace ChillerGasAbsorption {
                 } else {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
-                    CheckIfNodeSetPointManagedByEMS(GasAbsorber(ChillNum).HeatSupplyNodeNum, iTemperatureSetPoint, errFlag);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(GasAbsorber(ChillNum).HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
                     if (errFlag) {
                         if (!GasAbsorber(ChillNum).HeatSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on heat side for chiller heater named " + GasAbsorber(ChillNum).Name);
@@ -959,9 +914,9 @@ namespace ChillerGasAbsorption {
                 }
                 GasAbsorber(ChillNum).HeatSetPointSetToLoop = true;
                 Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPoint =
-                    Node(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                    Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPointLo =
-                    Node(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
+                    Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
             }
             Init_MyPlantScanFlag(ChillNum) = false;
         }
@@ -971,21 +926,21 @@ namespace ChillerGasAbsorption {
         HeatInletNode = GasAbsorber(ChillNum).HeatReturnNodeNum;
         HeatOutletNode = GasAbsorber(ChillNum).HeatSupplyNodeNum;
 
-        if (Init_MyEnvrnFlag(ChillNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
+        if (Init_MyEnvrnFlag(ChillNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             if (GasAbsorber(ChillNum).isWaterCooled) {
                 // init max available condenser water flow rate
                 if (GasAbsorber(ChillNum).CDLoopNum > 0) {
-                    rho = GetDensityGlycol(PlantLoop(GasAbsorber(ChillNum).CDLoopNum).FluidName,
+                    rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GasAbsorber(ChillNum).CDLoopNum).FluidName,
                                            DataGlobals::CWInitConvTemp,
-                                           PlantLoop(GasAbsorber(ChillNum).CDLoopNum).FluidIndex,
+                                           DataPlant::PlantLoop(GasAbsorber(ChillNum).CDLoopNum).FluidIndex,
                                            RoutineName);
                 } else {
-                    rho = RhoH2O(DataGlobals::InitConvTemp);
+                    rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
                 }
 
                 GasAbsorber(ChillNum).DesCondMassFlowRate = rho * GasAbsorber(ChillNum).CondVolFlowRate;
-                InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(0.0,
                                    GasAbsorber(ChillNum).DesCondMassFlowRate,
                                    CondInletNode,
                                    CondOutletNode,
@@ -996,16 +951,16 @@ namespace ChillerGasAbsorption {
             }
 
             if (GasAbsorber(ChillNum).HWLoopNum > 0) {
-                rho = GetDensityGlycol(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidName,
                                        DataGlobals::HWInitConvTemp,
-                                       PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
-                rho = RhoH2O(DataGlobals::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             }
             GasAbsorber(ChillNum).DesHeatMassFlowRate = rho * GasAbsorber(ChillNum).HeatVolFlowRate;
             // init available hot water flow rate
-            InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(0.0,
                                GasAbsorber(ChillNum).DesHeatMassFlowRate,
                                HeatInletNode,
                                HeatOutletNode,
@@ -1015,16 +970,16 @@ namespace ChillerGasAbsorption {
                                GasAbsorber(ChillNum).HWCompNum);
 
             if (GasAbsorber(ChillNum).CWLoopNum > 0) {
-                rho = GetDensityGlycol(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidName,
+                rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidName,
                                        DataGlobals::CWInitConvTemp,
-                                       PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidIndex,
+                                       DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
-                rho = RhoH2O(DataGlobals::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             }
             GasAbsorber(ChillNum).DesEvapMassFlowRate = rho * GasAbsorber(ChillNum).EvapVolFlowRate;
             // init available hot water flow rate
-            InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(0.0,
                                GasAbsorber(ChillNum).DesEvapMassFlowRate,
                                GasAbsorber(ChillNum).ChillReturnNodeNum,
                                GasAbsorber(ChillNum).ChillSupplyNodeNum,
@@ -1036,7 +991,7 @@ namespace ChillerGasAbsorption {
             Init_MyEnvrnFlag(ChillNum) = false;
         }
 
-        if (!BeginEnvrnFlag) {
+        if (!DataGlobals::BeginEnvrnFlag) {
             Init_MyEnvrnFlag(ChillNum) = true;
         }
 
@@ -1044,16 +999,16 @@ namespace ChillerGasAbsorption {
         // fill from plant if needed
         if (GasAbsorber(ChillNum).ChillSetPointSetToLoop) {
             Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPoint =
-                Node(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPoint;
             Node(GasAbsorber(ChillNum).ChillSupplyNodeNum).TempSetPointHi =
-                Node(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
+                Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
 
         if (GasAbsorber(ChillNum).HeatSetPointSetToLoop) {
             Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPoint =
-                Node(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+                Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPoint;
             Node(GasAbsorber(ChillNum).HeatSupplyNodeNum).TempSetPointLo =
-                Node(PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
+                Node(DataPlant::PlantLoop(GasAbsorber(ChillNum).HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
         }
 
         if ((GasAbsorber(ChillNum).isWaterCooled) && ((GasAbsorber(ChillNum).InHeatingMode) || (GasAbsorber(ChillNum).InCoolingMode)) &&
@@ -1061,7 +1016,7 @@ namespace ChillerGasAbsorption {
             mdot = GasAbsorber(ChillNum).DesCondMassFlowRate;
             // DSU removed, this has to have been wrong (?)  Node(CondInletNode)%Temp  = GasAbsorber(ChillNum)%TempDesCondReturn
 
-            SetComponentFlowRate(mdot,
+            PlantUtilities::SetComponentFlowRate(mdot,
                                  GasAbsorber(ChillNum).CondReturnNodeNum,
                                  GasAbsorber(ChillNum).CondSupplyNodeNum,
                                  GasAbsorber(ChillNum).CDLoopNum,
@@ -1072,7 +1027,7 @@ namespace ChillerGasAbsorption {
         } else {
             mdot = 0.0;
             if (GasAbsorber(ChillNum).CDLoopNum > 0 && GasAbsorber(ChillNum).isWaterCooled) {
-                SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(mdot,
                                      GasAbsorber(ChillNum).CondReturnNodeNum,
                                      GasAbsorber(ChillNum).CondSupplyNodeNum,
                                      GasAbsorber(ChillNum).CDLoopNum,
@@ -1145,7 +1100,7 @@ namespace ChillerGasAbsorption {
         PltSizCoolNum = PlantLoop(GasAbsorber(ChillNum).CWLoopNum).PlantSizNum;
 
         if (PltSizCoolNum > 0) {
-            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= SmallWaterVolFlow) {
+            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Cp = GetSpecificHeatGlycol(PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidName,
                                            DataGlobals::CWInitConvTemp,
                                            PlantLoop(GasAbsorber(ChillNum).CWLoopNum).FluidIndex,
@@ -1184,12 +1139,12 @@ namespace ChillerGasAbsorption {
                                                tmpNomCap,
                                                "User-Specified Nominal Cooling Capacity [W]",
                                                NomCapUser);
-                            if (DisplayExtraWarnings) {
+                            if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " +
                                                 GasAbsorber(ChillNum).Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNomCap, 2) + " [W]");
+                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
+                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) + " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1220,7 +1175,7 @@ namespace ChillerGasAbsorption {
         }
 
         if (PltSizCoolNum > 0) {
-            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= SmallWaterVolFlow) {
+            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 tmpEvapVolFlowRate = PlantSizData(PltSizCoolNum).DesVolFlowRate * GasAbsorber(ChillNum).SizFac;
                 if (!GasAbsorber(ChillNum).EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = GasAbsorber(ChillNum).EvapVolFlowRate;
             } else {
@@ -1251,14 +1206,14 @@ namespace ChillerGasAbsorption {
                                                tmpEvapVolFlowRate,
                                                "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                EvapVolFlowRateUser);
-                            if (DisplayExtraWarnings) {
+                            if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " +
                                                 GasAbsorber(ChillNum).Name);
-                                    ShowContinueError("User-Specified Design Chilled Water Flow Rate of " + RoundSigDigits(EvapVolFlowRateUser, 5) +
+                                    ShowContinueError("User-Specified Design Chilled Water Flow Rate of " + General::RoundSigDigits(EvapVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Chilled Water Flow Rate of " +
-                                                      RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
+                                                              General::RoundSigDigits(tmpEvapVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1291,7 +1246,7 @@ namespace ChillerGasAbsorption {
         RegisterPlantCompDesignFlow(GasAbsorber(ChillNum).ChillReturnNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizHeatNum > 0) {
-            if (PlantSizData(PltSizHeatNum).DesVolFlowRate >= SmallWaterVolFlow) {
+            if (PlantSizData(PltSizHeatNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 tmpHeatRecVolFlowRate = PlantSizData(PltSizHeatNum).DesVolFlowRate * GasAbsorber(ChillNum).SizFac;
                 if (!GasAbsorber(ChillNum).HeatVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = GasAbsorber(ChillNum).HeatVolFlowRate;
 
@@ -1323,14 +1278,14 @@ namespace ChillerGasAbsorption {
                                                tmpHeatRecVolFlowRate,
                                                "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                HeatRecVolFlowRateUser);
-                            if (DisplayExtraWarnings) {
+                            if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser) / HeatRecVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerHeaterAbsorptionDirectFired: Potential issue with equipment sizing for " +
                                                 GasAbsorber(ChillNum).Name);
-                                    ShowContinueError("User-Specified Design Hot Water Flow Rate of " + RoundSigDigits(HeatRecVolFlowRateUser, 5) +
+                                    ShowContinueError("User-Specified Design Hot Water Flow Rate of " + General::RoundSigDigits(HeatRecVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Hot Water Flow Rate of " +
-                                                      RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
+                                                              General::RoundSigDigits(tmpHeatRecVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1363,7 +1318,7 @@ namespace ChillerGasAbsorption {
         RegisterPlantCompDesignFlow(GasAbsorber(ChillNum).HeatReturnNodeNum, tmpHeatRecVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizCoolNum > 0) {
-            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
 
                 Cp = GetSpecificHeatGlycol(PlantLoop(GasAbsorber(ChillNum).CDLoopNum).FluidName,
                                            GasAbsorber(ChillNum).TempDesCondReturn,
@@ -1405,14 +1360,14 @@ namespace ChillerGasAbsorption {
                                                tmpCondVolFlowRate,
                                                "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                CondVolFlowRateUser);
-                            if (DisplayExtraWarnings) {
+                            if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeChillerAbsorptionDirectFired: Potential issue with equipment sizing for " +
                                                 GasAbsorber(ChillNum).Name);
-                                    ShowContinueError("User-Specified Design Condenser Water Flow Rate of " + RoundSigDigits(CondVolFlowRateUser, 5) +
+                                    ShowContinueError("User-Specified Design Condenser Water Flow Rate of " + General::RoundSigDigits(CondVolFlowRateUser, 5) +
                                                       " [m3/s]");
                                     ShowContinueError("differs from Design Size Design Condenser Water Flow Rate of " +
-                                                      RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
+                                                              General::RoundSigDigits(tmpCondVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1457,9 +1412,6 @@ namespace ChillerGasAbsorption {
             PreDefTableEntry(pdchMechNomCap, equipName, GasAbsorber(ChillNum).NomCoolingCap);
         }
     }
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
 
     void CalcGasAbsorberChillerModel(int &ChillNum,                // Absorber number
                                      Real64 &MyLoad,               // operating load
@@ -2128,12 +2080,6 @@ namespace ChillerGasAbsorption {
         GasAbsorberReport(ChillNum).ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateGasAbsorberCoolRecords(Real64 const MyLoad, // current load
                                       bool const RunFlag,  // TRUE if Absorber operating
                                       int const ChillNum   // Absorber number
@@ -2142,62 +2088,35 @@ namespace ChillerGasAbsorption {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
 
-        using DataHVACGlobals::TimeStepSys;
-
-        int lChillReturnNodeNum; // Node number on the inlet side of the plant
-        int lChillSupplyNodeNum; // Node number on the outlet side of the plant
-        int lCondReturnNodeNum;  // Node number on the inlet side of the condenser
-        int lCondSupplyNodeNum;  // Node number on the outlet side of the condenser
-
-        lChillReturnNodeNum = GasAbsorber(ChillNum).ChillReturnNodeNum;
-        lChillSupplyNodeNum = GasAbsorber(ChillNum).ChillSupplyNodeNum;
-        lCondReturnNodeNum = GasAbsorber(ChillNum).CondReturnNodeNum;
-        lCondSupplyNodeNum = GasAbsorber(ChillNum).CondSupplyNodeNum;
+        int lChillReturnNodeNum = GasAbsorber(ChillNum).ChillReturnNodeNum;
+        int lChillSupplyNodeNum = GasAbsorber(ChillNum).ChillSupplyNodeNum;
+        int lCondReturnNodeNum = GasAbsorber(ChillNum).CondReturnNodeNum;
+        int lCondSupplyNodeNum = GasAbsorber(ChillNum).CondSupplyNodeNum;
 
         if (MyLoad == 0 || !RunFlag) {
-            // set node temperatures
-
             Node(lChillSupplyNodeNum).Temp = Node(lChillReturnNodeNum).Temp;
             if (GasAbsorber(ChillNum).isWaterCooled) {
                 Node(lCondSupplyNodeNum).Temp = Node(lCondReturnNodeNum).Temp;
             }
-            // set node flow rates
-            // Update Outlet Conditions so that same as Inlet, so component
-            // can be bypassed if necessary
-            // FlowResolver/EnforceSplitterContinuity will determine flow
-            // received, whether component is running or not.
-            //    Node(lChillReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lChillSupplyNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lCondReturnNodeNum)%MassFlowRate           = GasAbsorberReport(ChillNum)%CondWaterFlowRate
-            //    Node(lCondSupplyNodeNum)%MassFlowRate           = GasAbsorberReport(ChillNum)%CondWaterFlowRate
         } else {
-            // set node temperatures
             Node(lChillSupplyNodeNum).Temp = GasAbsorberReport(ChillNum).ChillSupplyTemp;
             if (GasAbsorber(ChillNum).isWaterCooled) {
                 Node(lCondSupplyNodeNum).Temp = GasAbsorberReport(ChillNum).CondSupplyTemp;
             }
-            // set node flow rates;  for these load based models
-            // assume that the sufficient evaporator flow rate available
-            //    Node(lChillReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lChillSupplyNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lCondReturnNodeNum)%MassFlowRate           = GasAbsorberReport(ChillNum)%CondWaterFlowRate
-            //    Node(lCondSupplyNodeNum)%MassFlowRate           = GasAbsorberReport(ChillNum)%CondWaterFlowRate
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        GasAbsorberReport(ChillNum).CoolingEnergy = GasAbsorberReport(ChillNum).CoolingLoad * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).TowerEnergy = GasAbsorberReport(ChillNum).TowerLoad * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).FuelEnergy = GasAbsorberReport(ChillNum).FuelUseRate * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).CoolFuelEnergy = GasAbsorberReport(ChillNum).CoolFuelUseRate * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).ElectricEnergy = GasAbsorberReport(ChillNum).ElectricPower * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).CoolElectricEnergy = GasAbsorberReport(ChillNum).CoolElectricPower * TimeStepSys * SecInHour;
+        GasAbsorberReport(ChillNum).CoolingEnergy = GasAbsorberReport(ChillNum).CoolingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).TowerEnergy = GasAbsorberReport(ChillNum).TowerLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).FuelEnergy = GasAbsorberReport(ChillNum).FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).CoolFuelEnergy = GasAbsorberReport(ChillNum).CoolFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).ElectricEnergy = GasAbsorberReport(ChillNum).ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).CoolElectricEnergy = GasAbsorberReport(ChillNum).CoolElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         if (GasAbsorberReport(ChillNum).CoolFuelUseRate != 0.0) {
             GasAbsorberReport(ChillNum).FuelCOP = GasAbsorberReport(ChillNum).CoolingLoad / GasAbsorberReport(ChillNum).CoolFuelUseRate;
         } else {
             GasAbsorberReport(ChillNum).FuelCOP = 0.0;
         }
-        //  Node(lChillSupplyNodeNum)%MassFlowRateMaxAvail = Node(lChillReturnNodeNum)%MassFlowRateMaxAvail
-        //  Node(lChillSupplyNodeNum)%MassFlowRateMinAvail = Node(lChillReturnNodeNum)%MassFlowRateMinAvail
     }
 
     void UpdateGasAbsorberHeatRecords(Real64 const MyLoad, // current load
@@ -2208,46 +2127,22 @@ namespace ChillerGasAbsorption {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
 
-        using DataHVACGlobals::TimeStepSys;
-
-        int lHeatReturnNodeNum; // absorber steam inlet node number, water side
-        int lHeatSupplyNodeNum; // absorber steam outlet node number, water side
-
-        lHeatReturnNodeNum = GasAbsorber(ChillNum).HeatReturnNodeNum;
-        lHeatSupplyNodeNum = GasAbsorber(ChillNum).HeatSupplyNodeNum;
+        int lHeatReturnNodeNum = GasAbsorber(ChillNum).HeatReturnNodeNum;
+        int lHeatSupplyNodeNum = GasAbsorber(ChillNum).HeatSupplyNodeNum;
 
         if (MyLoad == 0 || !RunFlag) {
-            // set node temperatures
             Node(lHeatSupplyNodeNum).Temp = Node(lHeatReturnNodeNum).Temp;
-
-            // set node flow rates
-            // Update Outlet Conditions so that same as Inlet, so component
-            // can be bypassed if necessary
-            // FlowResolver/EnforceSplitterContinuity will determine flow
-            // received, whether component is running or not.
-            //    Node(lHeatReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%HotWaterFlowRate
-            //    Node(lHeatSupplyNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%HotWaterFlowRate
         } else {
-            // set node temperatures
             Node(lHeatSupplyNodeNum).Temp = GasAbsorberReport(ChillNum).HotWaterSupplyTemp;
-            //          !set node flow rates;  for these load based models
-            //          !assume that the sufficient evaporator flow rate available
-            //    Node(lHeatReturnNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%HotWaterFlowRate
-            //    Node(lHeatSupplyNodeNum)%MassFlowRate          = GasAbsorberReport(ChillNum)%HotWaterFlowRate
         }
 
         // convert power to energy and instantaneous use to use over the time step
-        GasAbsorberReport(ChillNum).HeatingEnergy = GasAbsorberReport(ChillNum).HeatingLoad * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).FuelEnergy = GasAbsorberReport(ChillNum).FuelUseRate * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).HeatFuelEnergy = GasAbsorberReport(ChillNum).HeatFuelUseRate * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).ElectricEnergy = GasAbsorberReport(ChillNum).ElectricPower * TimeStepSys * SecInHour;
-        GasAbsorberReport(ChillNum).HeatElectricEnergy = GasAbsorberReport(ChillNum).HeatElectricPower * TimeStepSys * SecInHour;
-        //  Node(lHeatSupplyNodeNum)%MassFlowRateMaxAvail = Node(lHeatReturnNodeNum)%MassFlowRateMaxAvail
-        //  Node(lHeatSupplyNodeNum)%MassFlowRateMinAvail = Node(lHeatReturnNodeNum)%MassFlowRateMinAvail
+        GasAbsorberReport(ChillNum).HeatingEnergy = GasAbsorberReport(ChillNum).HeatingLoad * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).FuelEnergy = GasAbsorberReport(ChillNum).FuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).HeatFuelEnergy = GasAbsorberReport(ChillNum).HeatFuelUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).ElectricEnergy = GasAbsorberReport(ChillNum).ElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        GasAbsorberReport(ChillNum).HeatElectricEnergy = GasAbsorberReport(ChillNum).HeatElectricPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
     }
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
     void clear_state()
     {
@@ -2263,25 +2158,6 @@ namespace ChillerGasAbsorption {
         Init_MyPlantScanFlag.deallocate();
         Calc_oldCondSupplyTemp = 0.0;
     }
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
 
 } // namespace ChillerGasAbsorption
 

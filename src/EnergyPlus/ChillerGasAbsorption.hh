@@ -59,22 +59,8 @@ namespace EnergyPlus {
 
 namespace ChillerGasAbsorption {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumGasAbsorbers; // number of Absorption Chillers specified in input
-
-    // This type holds the output from the algorithm i.e., the Report Variables
-
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
-    // Types
 
     struct GasAbsorberSpecs
     {
@@ -224,94 +210,52 @@ namespace ChillerGasAbsorption {
     extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
     extern Array1D<ReportVars> GasAbsorberReport;
 
-    // Functions
-
     void SimGasAbsorber(std::string const &AbsorberType, // type of Absorber
                         std::string const &AbsorberName, // user specified name of Absorber
-                        int const EquipFlowCtrl,         // Flow control mode for the equipment
+                        int EquipFlowCtrl,         // Flow control mode for the equipment
                         int &CompIndex,                  // Absorber number counter
-                        bool const RunFlag,              // simulate Absorber when TRUE
-                        bool const FirstIteration,       // initialize variables when TRUE
+                        bool RunFlag,              // simulate Absorber when TRUE
+                        bool FirstIteration,       // initialize variables when TRUE
                         bool &InitLoopEquip,             // If not false, calculate the max load for operating conditions
                         Real64 &MyLoad,                  // loop demand component will meet
-                        int const BranchInletNodeNum,    // node number of inlet to calling branch,
+                        int BranchInletNodeNum,    // node number of inlet to calling branch,
                         Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
                         Real64 &MinCap,                  // W - minimum operating capacity of Absorber
                         Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                        bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
+                        bool GetSizingFactor,      // TRUE when just the sizing factor is requested
                         Real64 &SizingFactor,            // sizing factor
                         Real64 &TempCondInDesign,
                         Real64 &TempEvapOutDesign);
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetGasAbsorberInput();
 
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
-    void InitGasAbsorber(int const ChillNum, // number of the current engine driven chiller being simulated
-                         bool const RunFlag  // TRUE when chiller operating
+    void InitGasAbsorber(int ChillNum, // number of the current engine driven chiller being simulated
+                         bool RunFlag  // TRUE when chiller operating
     );
 
-    void SizeGasAbsorber(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
+    void SizeGasAbsorber(int ChillNum);
 
     void CalcGasAbsorberChillerModel(int &ChillNum,     // Absorber number
                                      Real64 &MyLoad,    // operating load
-                                     bool const RunFlag // TRUE when Absorber operating
+                                     bool RunFlag // TRUE when Absorber operating
     );
 
     void CalcGasAbsorberHeaterModel(int &ChillNum,     // Absorber number
                                     Real64 &MyLoad,    // operating load
-                                    bool const RunFlag // TRUE when Absorber operating
+                                    bool RunFlag // TRUE when Absorber operating
     );
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    void UpdateGasAbsorberCoolRecords(Real64 const MyLoad, // current load
-                                      bool const RunFlag,  // TRUE if Absorber operating
-                                      int const ChillNum   // Absorber number
+    void UpdateGasAbsorberCoolRecords(Real64 MyLoad, // current load
+                                      bool RunFlag,  // TRUE if Absorber operating
+                                      int ChillNum   // Absorber number
     );
 
-    void UpdateGasAbsorberHeatRecords(Real64 const MyLoad, // current load
-                                      bool const RunFlag,  // TRUE if Absorber operating
-                                      int const ChillNum   // Absorber number
+    void UpdateGasAbsorberHeatRecords(Real64 MyLoad, // current load
+                                      bool RunFlag,  // TRUE if Absorber operating
+                                      int ChillNum   // Absorber number
     );
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
 
     void clear_state();
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
 
 } // namespace ChillerGasAbsorption
 
