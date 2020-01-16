@@ -60,6 +60,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -1078,6 +1079,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;

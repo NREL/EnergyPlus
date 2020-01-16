@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +70,7 @@ namespace ChillerReformulatedEIR {
 
     extern bool GetInputREIR; // When TRUE, calls subroutine to read input file
 
-    struct ReformulatedEIRChillerSpecs
+    struct ReformulatedEIRChillerSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // User identifier
@@ -215,7 +216,7 @@ namespace ChillerReformulatedEIR {
         Real64 EnergyHeatRecovery;   // reporting: Energy recovered from water-cooled condenser [J]
         Real64 HeatRecInletTemp;     // reporting: Heat reclaim inlet temperature [C]
         Real64 HeatRecMassFlow;      // reporting: Heat reclaim mass flow rate [kg/s]
-        bool oneTimeFlag;
+        int EquipFlowCtrl;
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
@@ -244,9 +245,21 @@ namespace ChillerReformulatedEIR {
               QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0),
               EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0), oneTimeFlag(true)
+              HeatRecMassFlow(0.0), EquipFlowCtrl(0)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void getSizingFactor(Real64 &sizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
@@ -254,9 +267,9 @@ namespace ChillerReformulatedEIR {
 
         void size();
 
-        void control(Real64 &MyLoad, bool RunFlag, bool FirstIteration, int EquipFlowCtrl);
+        void control(Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
-        void calculate(Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl, Real64 FalsiCondOutTemp);
+        void calculate(Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
 
         void calcHeatRecovery(Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
@@ -269,23 +282,6 @@ namespace ChillerReformulatedEIR {
 
     // Object Data
     extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-
-    void SimReformulatedEIRChiller(std::string const &EIRChillerType, // Type of chiller !unused1208
-                                   std::string const &EIRChillerName, // User specified name of chiller
-                                   int EquipFlowCtrl,           // Flow control mode for the equipment
-                                   int &CompIndex,                    // Chiller number pointer
-                                   int LoopNum,                 // plant loop index pointer
-                                   bool RunFlag,                // Simulate chiller when TRUE
-                                   bool FirstIteration,         // Initialize variables when TRUE
-                                   bool &InitLoopEquip,               // If not zero, calculate the max load for operating conditions
-                                   Real64 &MyLoad,                    // Loop demand component will meet [W]
-                                   Real64 &MaxCap,                    // Maximum operating capacity of chiller [W]
-                                   Real64 &MinCap,                    // Minimum operating capacity of chiller [W]
-                                   Real64 &OptCap,                    // Optimal operating capacity of chiller [W]
-                                   bool GetSizingFactor,        // TRUE when just the sizing factor is requested
-                                   Real64 &SizingFactor,              // sizing factor
-                                   Real64 &TempCondInDesign,
-                                   Real64 &TempEvapOutDesign);
 
     void GetElecReformEIRChillerInput();
 
