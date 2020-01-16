@@ -320,9 +320,6 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {
-                // TODO: Need to get this inside the component, not out here
-                // TODO: Probably best to get this value as soon as the component finds itself with ScanPlantLoopsForObject
-                dynamic_cast<ChillerIndirectAbsorption::IndirectAbsorberSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricEIR) {
@@ -668,13 +665,9 @@ namespace PlantLoopEquip {
             // for heat recovery plant interactions.
 
             if (EquipTypeNum == TypeOf_Generator_FCExhaust) {
-                // TODO: Need to set this during GetInput, not here
-                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_FCStackCooler) {
-                // TODO: Need to set this during GetInput, not here
-                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_MicroCHP) {
