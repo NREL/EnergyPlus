@@ -64,7 +64,9 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::DataLoopNode;
 
-class ChillerElecEIRFixture : public EnergyPlusFixture {};
+class ChillerElecEIRFixture : public EnergyPlusFixture
+{
+};
 
 TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_TestOutletNodeConditions)
 {
