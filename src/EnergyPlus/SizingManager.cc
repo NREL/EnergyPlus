@@ -3182,17 +3182,8 @@ namespace SizingManager {
                                 ErrorsFound = true;
                             }
                         }
-                        // blank fields are set to autosize
-                        if (lNumericFieldBlanks(17)) {
-                            ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = DataSizing::AutoSize;
-                        } else {
-                            ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = rNumericArgs(17);
-                        }
-                        if (lNumericFieldBlanks(18)) {
-                            ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = DataSizing::AutoSize;
-                        } else {
-                            ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = rNumericArgs(18);
-                        }
+                        ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = rNumericArgs(17);
+                        ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = rNumericArgs(18);
                         if (rNumericArgs(17) > 0.0 && rNumericArgs(18) > 0.0 && rNumericArgs(17) >= rNumericArgs(18)) {
                             ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                             ShowContinueError("... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
