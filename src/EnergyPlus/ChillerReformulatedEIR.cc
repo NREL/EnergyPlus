@@ -119,7 +119,7 @@ namespace ChillerReformulatedEIR {
     int const AirCooled(1);   // Air-cooled condenser currently not allowed
     int const WaterCooled(2); // Only water-cooled condensers are currently allowed
     int const EvapCooled(3);  // Evap-cooled condenser currently not allowed
-    
+
     // chiller flow modes
     int const FlowModeNotSet(200);
     int const ConstantFlow(201);
@@ -137,6 +137,13 @@ namespace ChillerReformulatedEIR {
 
     // Object Data
     Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
+
+    void clear_state()
+    {
+      NumElecReformEIRChillers = 0;
+      GetInputREIR = true;
+      ElecReformEIRChiller.deallocate();
+    }
 
     PlantComponent *ReformulatedEIRChillerSpecs::factory(std::string const &objectName)
     {
@@ -1749,7 +1756,7 @@ namespace ChillerReformulatedEIR {
 
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from the chiller condenser
-        
+
         static std::string const RoutineName("EIRChillerHeatRecovery");
 
         // inlet node to the heat recovery heat exchanger

@@ -283,6 +283,8 @@ namespace ChillerReformulatedEIR {
     // Object Data
     extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
 
+    void clear_state();
+
     void GetElecReformEIRChillerInput();
 
 } // namespace ChillerReformulatedEIR
