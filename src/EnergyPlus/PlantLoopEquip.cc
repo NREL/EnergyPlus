@@ -319,7 +319,6 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricEIR) {
-                dynamic_cast<ChillerElectricEIR::ElectricEIRChillerSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricReformEIR) {

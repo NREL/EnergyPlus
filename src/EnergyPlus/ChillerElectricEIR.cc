@@ -174,11 +174,6 @@ namespace ChillerElectricEIR {
         //  model, initializes simulation variables, calls the appropriate model and sets
         //  up reporting variables.
 
-        if (this->oneTimeInit) {
-            this->setupOutputVars();
-            this->oneTimeInit = false;
-        }
-
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(RunFlag, CurLoad);
             this->calculate(CurLoad, RunFlag);
@@ -970,7 +965,10 @@ namespace ChillerElectricEIR {
         static std::string const RoutineName("InitElectricEIRChiller");
 
         // Init more variables
-        if (this->MyFlag) {
+        if (this->oneTimeFlag) {
+
+            this->setupOutputVars();
+
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
@@ -1071,8 +1069,10 @@ namespace ChillerElectricEIR {
                         DataLoopNode::Node(DataPlant::PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            this->MyFlag = false;
+            this->oneTimeFlag = false;
         }
+
+        this->EquipFlowCtrl = DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
 
         if (this->MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
@@ -1629,7 +1629,7 @@ namespace ChillerElectricEIR {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             }
