@@ -198,6 +198,10 @@ namespace ChillerReformulatedEIR {
         Real64 ChillerCapFT;         // reporting: Chiller capacity curve output value
         Real64 HeatRecOutletTemp;
         Real64 QHeatRecovery;        // reporting: Heat recovered from water-cooled condenser [W]
+        Real64 QCondenser;
+        Real64 QEvaporator;                // reporting: Evaporator heat transfer rate [W]
+        Real64 Power;                // reporting: Chiller power [W]
+        Real64 EvapOutletTemp;       // reporting: Evaporator outlet temperature [C]
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
@@ -223,7 +227,7 @@ namespace ChillerReformulatedEIR {
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true),
               MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0), ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0),
               ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0), ChillerCapFT(0.0), HeatRecOutletTemp(0.0),
-              QHeatRecovery(0.0)
+              QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0)
         {
         }
     };
@@ -232,16 +236,12 @@ namespace ChillerReformulatedEIR {
     {
         // Members
         Real64 ChillerFalseLoad;     // reporting: Chiller false load over and above water side load [W]
-        Real64 Power;                // reporting: Chiller power [W]
-        Real64 QEvap;                // reporting: Evaporator heat transfer rate [W]
-        Real64 QCond;                // reporting: Condenser heat transfer rate [W]
         Real64 Energy;               // reporting: Chiller electric consumption [J]
         Real64 EvapEnergy;           // reporting: Evaporator heat transfer energy [J]
         Real64 CondEnergy;           // reporting: Condenser heat transfer energy [J]
         Real64 CondInletTemp;        // reporting: Condenser inlet temperature [C]
         Real64 EvapInletTemp;        // reporting: Evaporator inlet temperature [C]
         Real64 CondOutletTemp;       // reporting: Condenser outlet temperature [C]
-        Real64 EvapOutletTemp;       // reporting: Evaporator outlet temperature [C]
         Real64 Evapmdot;             // reporting: Evaporator mass flow rate [kg/s]
         Real64 Condmdot;             // reporting: Condenser mass flow rate [kg/s]
         Real64 ActualCOP;            // reporting: Coefficient of performance
@@ -252,9 +252,9 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReportVars()
-            : ChillerFalseLoad(0.0), Power(0.0), QEvap(0.0),
-              QCond(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0),
-              EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+            : ChillerFalseLoad(0.0),
+              Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0),
+              Evapmdot(0.0), Condmdot(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMassFlow(0.0)
         {
         }
