@@ -56,8 +56,9 @@
 #include <ostream>
 
 namespace EnergyPlus {
-struct OutputFiles
+class OutputFiles
 {
+public:
     std::ostream &eio;
 
     static OutputFiles makeOutputFiles();
@@ -67,19 +68,21 @@ private:
     OutputFiles();
 };
 
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args);
+void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 
-// Defines a custom formatting type `r` which chooses between `e` and `g` depending
+// Uses lib {fmt} (which has been accepted for C++20)
+// Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
+// The syntax is similar to printf, but uses {} to indicate parameters to be formatted
+// you must escape any {} that you want with {}, like `{{}}`
+//
+// Defines a custom formatting type `R` (round_ which chooses between `E` and `G` depending
 // on the value being printed.
+//
+// This is necessary for parity with the old "RoundSigDigits" utility function
 template <typename... Args>
 void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
-    if (sizeof...(Args) == 0) {
-        // assume 0 args is intentional and just print the string
-        os.write(format_str.data(), format_str.size());
-    } else {
-        EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...));
-    }
+    EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus
