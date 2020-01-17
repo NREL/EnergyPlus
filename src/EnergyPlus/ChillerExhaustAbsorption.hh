@@ -54,12 +54,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
 namespace ChillerExhaustAbsorption {
 
-    struct ExhaustAbsorberSpecs
+    struct ExhaustAbsorberSpecs : PlantComponent
     {
         // Members
         // Parts of Type that do not correspond with IDD definition
@@ -208,7 +210,19 @@ namespace ChillerExhaustAbsorption {
         {
         }
 
-        void initialize(bool RunFlag);
+        static PlantComponent *factory(std::string const &objectName);
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void initialize();
 
         void setupOutputVariables();
 
@@ -225,22 +239,6 @@ namespace ChillerExhaustAbsorption {
     };
 
     extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-
-    void SimExhaustAbsorber(std::string const &AbsorberType, // type of Absorber
-                            std::string const &AbsorberName, // user specified name of Absorber
-                            int EquipFlowCtrl,         // Flow control mode for the equipment
-                            int &CompIndex,                  // Absorber number counter
-                            bool RunFlag,              // simulate Absorber when TRUE
-                            bool FirstIteration,       // initialize variables when TRUE
-                            bool &InitLoopEquip,             // If not false, calculate the max load for operating conditions
-                            Real64 &MyLoad,                  // loop demand component will meet
-                            int BranchInletNodeNum,    // node number of inlet to calling branch,
-                            Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
-                            Real64 &MinCap,                  // W - minimum operating capacity of Absorber
-                            Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                            bool GetSizingFactor,      // TRUE when just the sizing factor is requested
-                            Real64 &SizingFactor             // sizing factor
-    );
 
     void GetExhaustAbsorberInput();
 

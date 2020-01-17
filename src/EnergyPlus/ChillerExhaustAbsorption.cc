@@ -117,119 +117,112 @@ namespace ChillerExhaustAbsorption {
     // Object Data
     Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
     bool Sim_GetInput(true); // then TRUE, calls subroutine to read input file.
-
-    void SimExhaustAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
-                            std::string const &AbsorberName,            // user specified name of Absorber
-                            int const EP_UNUSED(EquipFlowCtrl),         // Flow control mode for the equipment
-                            int &CompIndex,                             // Absorber number counter
-                            bool const RunFlag,                         // simulate Absorber when TRUE
-                            bool const FirstIteration,                  // initialize variables when TRUE
-                            bool &InitLoopEquip,                        // If not false, calculate the max load for operating conditions
-                            Real64 &MyLoad,                             // loop demand component will meet
-                            int const BranchInletNodeNum,               // node number of inlet to calling branch,
-                            Real64 &MaxCap,                             // W - maximum operating capacity of Absorber
-                            Real64 &MinCap,                             // W - minimum operating capacity of Absorber
-                            Real64 &OptCap,                             // W - optimal operating capacity of Absorber
-                            bool const GetSizingFactor,                 // TRUE when just the sizing factor is requested
-                            Real64 &SizingFactor                        // sizing factor
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   March 2001
-        //       MODIFIED       Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Double Effect Absorption Chiller
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        int ChillNum; // Absorber number counter
-
-        // Get Absorber data from input file
+    
+    PlantComponent *ExhaustAbsorberSpecs::factory(std::string const &objectName) {
+        // Process the input data if it hasn't been done already
         if (Sim_GetInput) {
             GetExhaustAbsorberInput();
             Sim_GetInput = false;
         }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            ChillNum = UtilityRoutines::FindItemInList(AbsorberName, ExhaustAbsorber);
-            if (ChillNum == 0) {
-                ShowFatalError("SimExhaustAbsorber: Unit not found=" + AbsorberName);
+        // Now look for this particular pipe in the list
+        for (auto &comp : ExhaustAbsorber) {
+            if (comp.Name == objectName) {
+                return &comp;
             }
-            CompIndex = ChillNum;
-        } else {
-            ChillNum = CompIndex;
         }
-
-        auto &thisChiller = ExhaustAbsorber(ChillNum);
-
-        // Check that this is a valid call
-        if (InitLoopEquip) {
-
-            thisChiller.initialize(RunFlag);
-
-            // Match inlet node name of calling branch to determine if this call is for heating or cooling
-            if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
-                thisChiller.size();      // only call from chilled water loop
-                MinCap = ExhaustAbsorber(ChillNum).NomCoolingCap * ExhaustAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = ExhaustAbsorber(ChillNum).NomCoolingCap * ExhaustAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = ExhaustAbsorber(ChillNum).NomCoolingCap * ExhaustAbsorber(ChillNum).OptPartLoadRat;
-            } else if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
-                Real64 Sim_HeatCap = ExhaustAbsorber(ChillNum).NomCoolingCap * ExhaustAbsorber(ChillNum).NomHeatCoolRatio; // W - nominal heating capacity
-                MinCap = Sim_HeatCap * ExhaustAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = Sim_HeatCap * ExhaustAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = Sim_HeatCap * ExhaustAbsorber(ChillNum).OptPartLoadRat;
-            } else if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).CondReturnNodeNum) { // called from condenser loop
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            } else { // Error, nodes do not match
-                ShowSevereError("SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + AbsorberName);
-                ShowContinueError("Node connections in branch are not consistent with object nodes.");
-                ShowFatalError("Preceding conditions cause termination.");
-            } // Operate as Chiller or Heater
-            if (GetSizingFactor) {
-                SizingFactor = ExhaustAbsorber(ChillNum).SizFac;
-            }
-            return;
-        }
-
+        // If we didn't find it, fatal
+        ShowFatalError("LocalExhaustAbsorberFactory: Error getting inputs for comp named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+        
+    void ExhaustAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) {
+        
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum =
+            DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+        
         // Match inlet node name of calling branch to determine if this call is for heating or cooling
-        if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
-            // Calculate Node Values
-            // Calculate Equipment and Update Variables
-            ExhaustAbsorber(ChillNum).InCoolingMode = RunFlag != 0;
-            thisChiller.initialize(RunFlag);
-            thisChiller.calcChiller(MyLoad);
-            thisChiller.updateCoolRecords(MyLoad, RunFlag);
-        } else if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
-            // Calculate Node Values
-            // Calculate Equipment and Update Variables
-            ExhaustAbsorber(ChillNum).InHeatingMode = RunFlag != 0;
-            thisChiller.initialize(RunFlag);
-            thisChiller.calcHeater(MyLoad, RunFlag);
-            thisChiller.updateHeatRecords(MyLoad, RunFlag);
-        } else if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).CondReturnNodeNum) { // called from condenser loop
-            if (ExhaustAbsorber(ChillNum).CDLoopNum > 0) {
-                PlantUtilities::UpdateChillerComponentCondenserSide(ExhaustAbsorber(ChillNum).CDLoopNum,
-                                                    ExhaustAbsorber(ChillNum).CDLoopSideNum,
-                                                    DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                                    ExhaustAbsorber(ChillNum).CondReturnNodeNum,
-                                                    ExhaustAbsorber(ChillNum).CondSupplyNodeNum,
-                                                    ExhaustAbsorber(ChillNum).TowerLoad,
-                                                    ExhaustAbsorber(ChillNum).CondReturnTemp,
-                                                    ExhaustAbsorber(ChillNum).CondSupplyTemp,
-                                                    ExhaustAbsorber(ChillNum).CondWaterFlowRate,
-                                                    FirstIteration);
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+            this->InCoolingMode = RunFlag != 0;
+            this->initialize();
+            this->calcChiller(CurLoad);
+            this->updateCoolRecords(CurLoad, RunFlag);
+        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+            this->InHeatingMode = RunFlag != 0;
+            this->initialize();
+            this->calcHeater(CurLoad, RunFlag);
+            this->updateHeatRecords(CurLoad, RunFlag);
+        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+            if (this->CDLoopNum > 0) {
+                PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+                                                                    this->CDLoopSideNum,
+                                                                    DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                                    this->CondReturnNodeNum,
+                                                                    this->CondSupplyNodeNum,
+                                                                    this->TowerLoad,
+                                                                    this->CondReturnTemp,
+                                                                    this->CondSupplyTemp,
+                                                                    this->CondWaterFlowRate,
+                                                                    FirstHVACIteration);
             }
 
         } else { // Error, nodes do not match
-            ShowSevereError("Invalid call to Exhaust Absorber Chiller " + AbsorberName);
+            ShowSevereError("Invalid call to Exhaust Absorber Chiller " + this->Name);
             ShowContinueError("Node connections in branch are not consistent with object nodes.");
             ShowFatalError("Preceding conditions cause termination.");
         }
+    }
+    
+    void ExhaustAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) {
+        
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum =
+            DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+        
+        // Match inlet node name of calling branch to determine if this call is for heating or cooling
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+            MinLoad = this->NomCoolingCap * this->MinPartLoadRat;
+            MaxLoad = this->NomCoolingCap * this->MaxPartLoadRat;
+            OptLoad = this->NomCoolingCap * this->OptPartLoadRat;
+        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+            Real64 Sim_HeatCap = this->NomCoolingCap * this->NomHeatCoolRatio; // W - nominal heating capacity
+            MinLoad = Sim_HeatCap * this->MinPartLoadRat;
+            MaxLoad = Sim_HeatCap * this->MaxPartLoadRat;
+            OptLoad = Sim_HeatCap * this->OptPartLoadRat;
+        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+            MinLoad = 0.0;
+            MaxLoad = 0.0;
+            OptLoad = 0.0;
+        } else { // Error, nodes do not match
+            ShowSevereError("SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + this->Name);
+            ShowContinueError("Node connections in branch are not consistent with object nodes.");
+            ShowFatalError("Preceding conditions cause termination.");
+        } // Operate as Chiller or Heater
+
+    }
+    
+    void ExhaustAbsorberSpecs::getSizingFactor(Real64 &_SizFac) {
+        _SizFac = this->SizFac;
+    }
+    
+    void ExhaustAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation) {
+        this->initialize();
+
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum =
+            DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+            this->size();  // only call from chilled water loop
+        } else {
+            // don't do anything here
+        }
+    }
+    
+    void ExhaustAbsorberSpecs::getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) {
+        TempDesEvapOut = this->TempDesCHWSupply;
+        TempDesCondIn = this->TempDesCondReturn;
     }
 
     void GetExhaustAbsorberInput()
@@ -704,7 +697,7 @@ namespace ChillerExhaustAbsorption {
                             ChillerName);
     }
     
-    void ExhaustAbsorberSpecs::initialize(bool const EP_UNUSED(RunFlag))
+    void ExhaustAbsorberSpecs::initialize()
     {
 
         // SUBROUTINE INFORMATION:
