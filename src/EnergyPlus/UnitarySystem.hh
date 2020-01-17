@@ -709,7 +709,7 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
-        static HVACSystemData* factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static HVACSystemData* UnitarySys::factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void simulateSys(std::string const &Name,
                          bool const firstHVACIteration,

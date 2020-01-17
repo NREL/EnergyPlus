@@ -405,19 +405,19 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     bool zoneEquipment = true;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
-    UnitarySystems::UnitarySys *mySys = UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
-    UnitarySystems::UnitarySys &thisSys(*mySys);
-    thisSys.getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
+    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
     DataGlobals::SysSizingCalc =
         false; // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
 
-    InletNode = thisSys.AirInNode;
-    OutletNode = thisSys.AirOutNode;
-    ControlZoneNum = thisSys.NodeNumOfControlledZone;
+    InletNode = thisSys->AirInNode;
+    OutletNode = thisSys->AirOutNode;
+    ControlZoneNum = thisSys->NodeNumOfControlledZone;
 
     // set up unitary system inlet condtions
     DataLoopNode::Node(InletNode).Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
@@ -460,10 +460,10 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize RhoAir
-    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys.m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
+    DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
     OutputReportPredefined::SetPredefinedTables();
-    mySys->simulate(
+    thisSys->simulate(
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
-    mySys->simulate(
+    thisSys->simulate(
         compName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, zoneEquipment, sensOut, latOut);
 
     ZoneTemp = DataLoopNode::Node(ControlZoneNum).Temp;

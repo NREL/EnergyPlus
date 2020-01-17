@@ -591,7 +591,7 @@ namespace HVACVariableRefrigerantFlow {
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - VRF(VRFCond).EvapCondEffectiveness);
             CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
         } else if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
-            CondInletTemp = OutdoorDryBulb; // DataLoopNode::Node inlet temp from above
+            CondInletTemp = OutdoorDryBulb; // node inlet temp from above
             CondWaterMassFlow = VRF(VRFCond).WaterCondenserDesignMassFlow;
         } else {
             assert(false);
@@ -1253,7 +1253,7 @@ namespace HVACVariableRefrigerantFlow {
                                  VRF(VRFCond).SourceCompNum);
 
             // should be the same as above just entering this function
-            //			VRF( VRFCond ).CondenserInletTemp = DataLoopNode::Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
+            //			VRF( VRFCond ).CondenserInletTemp = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
             VRF(VRFCond).WaterCondenserMassFlow = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).MassFlowRate;
 
             CpCond = GetSpecificHeatGlycol(PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName,
@@ -1444,13 +1444,13 @@ namespace HVACVariableRefrigerantFlow {
         Real64 FanVolFlowRate;           // Fan Max Flow Rate from Fan object (for comparisons to validity)
         int FanInletNodeNum;             // Used in TU configuration setup
         int FanOutletNodeNum;            // Used in TU configuration setup
-        Array1D_int OANodeNums(4);       // DataLoopNode::Node numbers of OA mixer (OA, EA, RA, MA)
+        Array1D_int OANodeNums(4);       // Node numbers of OA mixer (OA, EA, RA, MA)
         int CCoilInletNodeNum;           // Used in TU configuration setup
         int CCoilOutletNodeNum;          // Used in TU configuration setup
         int HCoilInletNodeNum;           // Used in TU configuration setup
         int HCoilOutletNodeNum;          // Used in TU configuration setup
-        int SuppHeatCoilAirInletNode;    // supplemental heating coil air inlet DataLoopNode::Node
-        int SuppHeatCoilAirOutletNode;   // supplemental heating coil air outlet DataLoopNode::Node
+        int SuppHeatCoilAirInletNode;    // supplemental heating coil air inlet node
+        int SuppHeatCoilAirOutletNode;   // supplemental heating coil air outlet node
         int ZoneTerminalUnitListNum;     // Used to find connection between VRFTU, TUList and VRF condenser
         int NumCond;                     // loop counter
         int NumList;                     // loop counter
@@ -1619,7 +1619,7 @@ namespace HVACVariableRefrigerantFlow {
                     ErrorsFound = true;
                 }
             }
-            //     CALL TestCompSet(TRIM(cCurrentModuleObject),VRF(VRFTUNum)%Name,cAlphaArgs(3),cAlphaArgs(4),'Air DataLoopNode::Nodes')
+            //     CALL TestCompSet(TRIM(cCurrentModuleObject),VRF(VRFTUNum)%Name,cAlphaArgs(3),cAlphaArgs(4),'Air Nodes')
 
             VRF(VRFNum).CoolingCapacity = rNumericArgs(1);
             VRF(VRFNum).CoolingCOP = rNumericArgs(2);
@@ -2134,7 +2134,7 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).CondenserType = DataHVACGlobals::AirCooled;
             }
 
-            // outdoor condenser DataLoopNode::Node
+            // outdoor condenser node
             if (lAlphaFieldBlanks(35)) {
                 VRF(VRFNum).CondenserNodeNum = 0;
             } else {
@@ -2151,7 +2151,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                          ObjectIsNotParent);
                         if (!CheckOutAirNodeNumber(VRF(VRFNum).CondenserNodeNum)) {
                             ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(35) +
-                                            " not a valid Outdoor Air DataLoopNode::Node = " + cAlphaArgs(35));
+                                            " not a valid Outdoor Air Node = " + cAlphaArgs(35));
                             ShowContinueError("...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                             ErrorsFound = true;
                         }
@@ -2178,10 +2178,10 @@ namespace HVACVariableRefrigerantFlow {
                                                                        DataLoopNode::NodeConnectionType_Outlet,
                                                                        2,
                                                                        ObjectIsNotParent);
-                TestCompSet(cCurrentModuleObject, VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water DataLoopNode::Nodes");
+                TestCompSet(cCurrentModuleObject, VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
             } else if (lAlphaFieldBlanks(36) && VRF(VRFNum).CondenserType == DataHVACGlobals::WaterCooled) {
                 ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\" " + cAlphaFieldNames(36) + " is blank.");
-                ShowContinueError("...node name must be entered when Condenser Type = DataHVACGlobals::WaterCooled.");
+                ShowContinueError("...node name must be entered when Condenser Type = WaterCooled.");
                 ErrorsFound = true;
             }
 
@@ -3123,7 +3123,7 @@ namespace HVACVariableRefrigerantFlow {
         for ( VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum ) {
             VRFTUNum = VRFNum;
 
-            //     initialize local DataLoopNode::Node number variables
+            //     initialize local node number variables
             FanInletNodeNum = 0;
             FanOutletNodeNum = 0;
             CCoilInletNodeNum = 0;
@@ -3150,33 +3150,33 @@ namespace HVACVariableRefrigerantFlow {
 
             VRFTU(VRFTUNum).Name = cAlphaArgs(1);
             ZoneTerminalUnitListNum = 0;
-            for ( NumList = 1; NumList <= NumVRFTULists; ++NumList ) {
+            for (NumList = 1; NumList <= NumVRFTULists; ++NumList) {
                 ZoneTerminalUnitListNum = UtilityRoutines::FindItemInList(
                     VRFTU(VRFTUNum).Name, TerminalUnitList(NumList).ZoneTUName, TerminalUnitList(NumList).NumTUInList);
-                if ( ZoneTerminalUnitListNum > 0 ) {
+                if (ZoneTerminalUnitListNum > 0) {
                     VRFTU(VRFTUNum).IndexToTUInTUList = ZoneTerminalUnitListNum;
                     TerminalUnitList(NumList).ZoneTUPtr(ZoneTerminalUnitListNum) = VRFTUNum;
                     VRFTU(VRFTUNum).TUListIndex = NumList;
                     break;
                 }
             }
-            if ( VRFTU(VRFTUNum).TUListIndex == 0 ) {
+            if (VRFTU(VRFTUNum).TUListIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                 ShowContinueError("Terminal unit not found on any ZoneTerminalUnitList.");
                 ErrorsFound = true;
             }
 
-            for ( NumCond = 1; NumCond <= NumVRFCond; ++NumCond ) {
-                if ( VRF(NumCond).ZoneTUListPtr != VRFTU(VRFTUNum).TUListIndex ) continue;
+            for (NumCond = 1; NumCond <= NumVRFCond; ++NumCond) {
+                if (VRF(NumCond).ZoneTUListPtr != VRFTU(VRFTUNum).TUListIndex) continue;
                 VRFTU(VRFTUNum).VRFSysNum = NumCond;
                 break;
             }
             VRFTU(VRFTUNum).VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
-            if ( lAlphaFieldBlanks(2) ) {
+            if (lAlphaFieldBlanks(2)) {
                 VRFTU(VRFTUNum).SchedPtr = ScheduleAlwaysOn;
             } else {
                 VRFTU(VRFTUNum).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
-                if ( VRFTU(VRFTUNum).SchedPtr == 0 ) {
+                if (VRFTU(VRFTUNum).SchedPtr == 0) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + VRFTU(VRFTUNum).Name + "\" invalid data");
                     ShowContinueError("Invalid-not found " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
@@ -3294,7 +3294,7 @@ namespace HVACVariableRefrigerantFlow {
                             ErrorsFound = true;
                         }
 
-                        // Get the Fan Inlet DataLoopNode::Node
+                        // Get the Fan Inlet node
                         errFlag = false;
                         FanInletNodeNum = GetFanInletNode(FanType, FanName, errFlag);
                         if (errFlag) {
@@ -3302,7 +3302,7 @@ namespace HVACVariableRefrigerantFlow {
                             ErrorsFound = true;
                         }
 
-                        // Get the Fan Outlet DataLoopNode::Node
+                        // Get the Fan Outlet node
                         errFlag = false;
                         FanOutletNodeNum = GetFanOutletNode(FanType, FanName, errFlag);
                         if (errFlag) {
@@ -4013,14 +4013,14 @@ namespace HVACVariableRefrigerantFlow {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                                 ErrorsFound = true;
                             }
-                            // Get the supplemental heating Coil air inlet DataLoopNode::Node
+                            // Get the supplemental heating Coil air inlet node
                             errFlag = false;
                             SuppHeatCoilAirInletNode = HeatingCoils::GetCoilInletNode(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                                 ErrorsFound = true;
                             }
-                            // Get the supplemental heating Coil air outlet DataLoopNode::Node
+                            // Get the supplemental heating Coil air outlet node
                             errFlag = false;
                             SuppHeatCoilAirOutletNode = HeatingCoils::GetCoilOutletNode(SuppHeatingCoilType, SuppHeatingCoilName, errFlag);
                             if (errFlag) {
@@ -4041,7 +4041,7 @@ namespace HVACVariableRefrigerantFlow {
                         ErrorsFound = true;
                     } else { // mine data from heating coil object
 
-                        // Get the supplemental heating coil water Inlet or control DataLoopNode::Node number
+                        // Get the supplemental heating coil water Inlet or control node number
                         errFlag = false;
                         VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode =
                             WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
@@ -4057,7 +4057,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
                         }
-                        // Get the supplemental heating Coil air inlet DataLoopNode::Node
+                        // Get the supplemental heating Coil air inlet node
                         errFlag = false;
                         SuppHeatCoilAirInletNode = WaterCoils::GetCoilInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
@@ -4065,7 +4065,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
                         }
-                        // Get the supplemental heating coil air outlet DataLoopNode::Node
+                        // Get the supplemental heating coil air outlet node
                         errFlag = false;
                         SuppHeatCoilAirOutletNode = WaterCoils::GetCoilOutletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
@@ -4088,7 +4088,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowSevereError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
                         }
-                        // Get the supplemental heating Coil steam inlet DataLoopNode::Node number
+                        // Get the supplemental heating Coil steam inlet node number
                         errFlag = false;
                         VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode =
                             SteamCoils::GetCoilSteamInletNode("Coil:Heating:Steam", SuppHeatingCoilName, errFlag);
@@ -4105,7 +4105,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
                                 SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
                         }
-                        // Get the supplemental heating coil air inlet DataLoopNode::Node
+                        // Get the supplemental heating coil air inlet node
                         errFlag = false;
                         SuppHeatCoilAirInletNode = SteamCoils::GetCoilAirInletNode(VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
@@ -4113,7 +4113,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
                         }
-                        // Get the supplemental heating coil air outlet DataLoopNode::Node
+                        // Get the supplemental heating coil air outlet node
                         errFlag = false;
                         SuppHeatCoilAirOutletNode = SteamCoils::GetCoilAirOutletNode(VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
@@ -4257,7 +4257,7 @@ namespace HVACVariableRefrigerantFlow {
                               DataLoopNode::NodeID(SuppHeatCoilAirInletNode),
                               DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
             }
-            // Set up component set for OA mixer - use OA DataLoopNode::Node and Mixed air DataLoopNode::Node
+            // Set up component set for OA mixer - use OA node and Mixed air node
             if (VRFTU(VRFTUNum).OAMixerUsed)
                 SetUpCompSets(cCurrentModuleObject,
                               VRFTU(VRFTUNum).Name,
@@ -4285,26 +4285,7 @@ namespace HVACVariableRefrigerantFlow {
                 ErrorsFound = true;
             }
 
-            //// move these checks to Init so as to not duplicate code
-            //// check if the TU is connected to an air loop
-            //bool AirLoopFound = false;
-            //for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-            //    for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-            //        for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-            //            if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-            //                                            VRFTU(VRFTUNum).Name) &&
-            //                UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-            //                                            cCurrentModuleObject)) {
-            //                AirLoopFound = true;
-            //                break;
-            //            }
-            //        }
-            //        if (AirLoopFound) break;
-            //    }
-            //    if (AirLoopFound) break;
-            //}
-
-            // for ZoneHVAC check that TU inlet DataLoopNode::Node is a zone exhaust DataLoopNode::Node otherwise ZoneAirNode and ZoneNum = 0
+            // for ZoneHVAC check that TU inlet node is a zone exhaust node otherwise ZoneAirNode and ZoneNum = 0
             if (!VRFTU(VRFTUNum).ATMixerExists || VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -4317,205 +4298,6 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 }
             }
-            //    if (ZoneNodeNotFound && !AirLoopFound) {
-            //        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                        "\" Zone terminal unit air inlet DataLoopNode::Node name must be the same as a zone exhaust DataLoopNode::Node name.");
-            //        ShowContinueError("... Zone exhaust DataLoopNode::Node name is specified in ZoneHVAC:EquipmentConnections object.");
-            //        ShowContinueError("... Zone terminal unit inlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-            //        ErrorsFound = true;
-            //    }
-            //}
-            //// check OA Mixer return DataLoopNode::Node
-            //if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
-            //    if (VRFTU(VRFTUNum).VRFTUInletNodeNum != OANodeNums(3)) {
-            //        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                        "\" Zone terminal unit air inlet DataLoopNode::Node name must be the same as the OutdoorAir:Mixer return air DataLoopNode::Node name.");
-            //        ShowContinueError("... Zone terminal unit air inlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-            //        ShowContinueError("... OutdoorAir:Mixer return air DataLoopNode::Node name = " + DataLoopNode::NodeID(OANodeNums(3)));
-            //        ErrorsFound = true;
-            //    }
-            //}
-            //// check that TU outlet DataLoopNode::Node is a zone inlet DataLoopNode::Node.
-            //if (!VRFTU(VRFTUNum).ATMixerExists || VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
-            //    ZoneNodeNotFound = true;
-            //    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
-            //        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-            //        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-            //            if (VRFTU(VRFTUNum).VRFTUOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-            //                VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
-            //                ZoneNodeNotFound = false;
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    if (ZoneNodeNotFound && !AirLoopFound) {
-            //        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                        "\" Zone terminal unit air outlet DataLoopNode::Node name must be the same as a zone inlet DataLoopNode::Node name.");
-            //        ShowContinueError("... Zone inlet DataLoopNode::Node name is specified in ZoneHVAC:EquipmentConnections object.");
-            //        ShowContinueError("... Zone terminal unit outlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //        ErrorsFound = true;
-            //    }
-            //}
-            //// check fan inlet and outlet DataLoopNode::Nodes
-            //if (VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::BlowThru) {
-            //    if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
-            //        if (FanInletNodeNum != OANodeNums(4)) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError(
-            //                "as the outside air mixers mixed air DataLoopNode::Node name when blow through fan is specified and an outside air mixer is present.");
-            //            ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-            //            ShowContinueError("... OA mixers mixed air DataLoopNode::Node = " + DataLoopNode::NodeID(OANodeNums(4)));
-            //            ErrorsFound = true;
-            //        }
-            //    } else if (!VRFTU(VRFTUNum).OAMixerUsed && (VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide)) {
-            //        if (FanInletNodeNum != VRFTU(VRFTUNum).VRFTUInletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError(
-            //                "as the terminal unit air inlet DataLoopNode::Node name when blow through fan is specified and an outside air mixer is not present.");
-            //            ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-            //            ShowContinueError("... Terminal unit air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //    }
-            //    if (VRFTU(VRFTUNum).CoolingCoilPresent) {
-            //        if (FanOutletNodeNum != CCoilInletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError("as the DX cooling coil air inlet DataLoopNode::Node name when blow through fan is specified.");
-            //            ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanOutletNodeNum));
-            //            ShowContinueError("... DX cooling coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //        if (VRFTU(VRFTUNum).HeatingCoilPresent) {
-            //            if (HCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-            //                ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                                "\" Heating coil outlet DataLoopNode::Node name must be the same");
-            //                ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified.");
-            //                ShowContinueError("... Heating coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-            //                ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //                ErrorsFound = true;
-            //            }
-            //        } else {
-            //            if (CCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-            //                ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                                "\" Cooling coil outlet DataLoopNode::Node name must be the same");
-            //                ShowContinueError(
-            //                    "as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified and no DX heating coil is present.");
-            //                ShowContinueError("... Cooling coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-            //                ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //                ErrorsFound = true;
-            //            }
-            //        }
-            //    } else if (VRFTU(VRFTUNum).HeatingCoilPresent) {
-            //        if (FanOutletNodeNum != HCoilInletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError(
-            //                "as the DX heating coil air inlet DataLoopNode::Node name when blow through fan is specified and a DX cooling coil is not present.");
-            //            ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanOutletNodeNum));
-            //            ShowContinueError("... DX heating coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilInletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //        if (HCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Heating coil outlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified.");
-            //            ShowContinueError("... Heating coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-            //            ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //    }
-            //} else if (VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::DrawThru) {
-            //    if (VRFTU(VRFTUNum).CoolingCoilPresent) {
-            //        if (!VRFTU(VRFTUNum).OAMixerUsed) {
-            //            if (VRFTU(VRFTUNum).VRFTUInletNodeNum != CCoilInletNodeNum) {
-            //                ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Cooling coil inlet DataLoopNode::Node name must be the same");
-            //                ShowContinueError("as the terminal unit air inlet DataLoopNode::Node name when draw through fan is specified.");
-            //                ShowContinueError("... Terminal unit air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-            //                ShowContinueError("... DX cooling coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
-            //                ErrorsFound = true;
-            //            }
-            //        }
-            //        if (VRFTU(VRFTUNum).HeatingCoilPresent) {
-            //            if (FanInletNodeNum != HCoilOutletNodeNum) {
-            //                ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-            //                ShowContinueError("as the DX heating coil air outlet DataLoopNode::Node name when draw through fan is specified.");
-            //                ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-            //                ShowContinueError("... DX heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-            //                ErrorsFound = true;
-            //            }
-            //        } else {
-            //            if (FanInletNodeNum != CCoilOutletNodeNum) {
-            //                ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-            //                ShowContinueError("as the DX cooling coil air outlet DataLoopNode::Node name when draw through fan is specified and a DX heating coil "
-            //                                  "is not present.");
-            //                ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-            //                ShowContinueError("... DX cooling coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-            //                ErrorsFound = true;
-            //            }
-            //        }
-            //    } else if (VRFTU(VRFTUNum).HeatingCoilPresent) {
-            //        if (FanInletNodeNum != HCoilOutletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError("as the DX heating coil air outlet DataLoopNode::Node name when draw through fan is specified.");
-            //            ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-            //            ShowContinueError("... DX heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //    }
-            //    if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
-            //        if (SuppHeatCoilAirOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-            //                            "\" Supplemental heating coil air outlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when draw through fan is specified.");
-            //            ShowContinueError("... Supplemental heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
-            //            ShowContinueError("... Terminal unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //    } else {
-            //        if (FanOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-            //            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-            //            ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when draw through fan is specified.");
-            //            ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanOutletNodeNum));
-            //            ShowContinueError("... Terminal unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-            //            ErrorsFound = true;
-            //        }
-            //    }
-            //}
-            //if (VRFTU(VRFTUNum).CoolingCoilPresent && VRFTU(VRFTUNum).HeatingCoilPresent) {
-            //    if (CCoilOutletNodeNum != HCoilInletNodeNum) {
-            //        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" DX cooling coil air outlet DataLoopNode::Node name must be the same");
-            //        ShowContinueError(" as the DX heating coil air inlet DataLoopNode::Node name.");
-            //        ShowContinueError("... DX cooling coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-            //        ShowContinueError("... DX heating coil air inlet DataLoopNode::Node  = " + DataLoopNode::NodeID(HCoilInletNodeNum));
-            //        ErrorsFound = true;
-            //    }
-            //}
-
-            //if (VRFTU(VRFTUNum).ATMixerExists) {
-            //    //   check that OA flow in cooling must be set to zero when connected to DOAS
-            //    if (VRFTU(VRFTUNum).CoolOutAirVolFlow != 0) {
-            //        ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
-            //        ShowContinueError(".. " + cNumericFieldNames(5) + " must be zero when " + cCurrentModuleObject);
-            //        ShowContinueError("..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer");
-            //        ShowContinueError(".. " + cNumericFieldNames(5) + " is set to 0 and simulation continues.");
-            //        VRFTU(VRFTUNum).CoolOutAirVolFlow = 0;
-            //    }
-            //    //   check that OA flow in heating must be set to zero when connected to DOAS
-            //    if (VRFTU(VRFTUNum).HeatOutAirVolFlow != 0) {
-            //        ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
-            //        ShowContinueError(".. " + cNumericFieldNames(6) + " must be zero when " + cCurrentModuleObject);
-            //        ShowContinueError("..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer");
-            //        ShowContinueError(".. " + cNumericFieldNames(6) + " is set to 0 and simulation continues.");
-            //        VRFTU(VRFTUNum).HeatOutAirVolFlow = 0;
-            //    }
-            //    //   check that OA flow in no cooling and no heating must be set to zero when connected to DOAS
-            //    if (VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow != 0) {
-            //        ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
-            //        ShowContinueError(".. " + cNumericFieldNames(7) + " must be zero when " + cCurrentModuleObject);
-            //        ShowContinueError("..object is connected to central dedicated outdoor air system via AirTerminal:SingleDuct:Mixer");
-            //        ShowContinueError(".. " + cNumericFieldNames(7) + " is set to 0 and simulation continues.");
-            //        VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = 0;
-            //    }
-            //}
-
         } // end Number of VRF Terminal Unit Loop
 
         //   perform additional error checking
@@ -5104,9 +4886,9 @@ namespace HVACVariableRefrigerantFlow {
 
         static std::string const RoutineName("InitVRF");
 
-        int InNode;                       // TU inlet DataLoopNode::Node
-        int OutNode;                      // TU outlet DataLoopNode::Node
-        int OutsideAirNode;               // TU mixer outside air inlet DataLoopNode::Node
+        int InNode;                       // TU inlet node
+        int OutNode;                      // TU outlet node
+        int OutsideAirNode;               // TU mixer outside air inlet node
         int NumTULoop;                    // loop counter, number of TU's in list
         int ELLoop;                       // loop counter, number of zone equipment lists
         int ListLoop;                     // loop counter, number of equipment is each list
@@ -5125,12 +4907,10 @@ namespace HVACVariableRefrigerantFlow {
         bool EnableSystem;                // use to turn on secondary operating mode if OA temp limits exceeded
         bool ErrorsFound;                 // flag returned from mining call
         Real64 rho;                       // density of water (kg/m3)
-        Real64 OutsideDryBulbTemp;        // Outdoor air temperature at external DataLoopNode::Node height
+        Real64 OutsideDryBulbTemp;        // Outdoor air temperature at external node height
         bool errFlag;                     // local error flag
         Real64 SuppHeatCoilLoad;          // additional heating required by supplemental heater (W)
         Real64 SuppHeatCoilCapacity;      // supplemental heating coil size (W)
-        Array1D_int OANodeNums(4);        // DataLoopNode::Node numbers of OA mixer (OA, EA, RA, MA)
-        // FLOW:
 
         // ALLOCATE and Initialize subroutine variables
         if (MyOneTimeFlag) {
@@ -5241,7 +5021,7 @@ namespace HVACVariableRefrigerantFlow {
                     VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
                 }
 
-                // fill fluid outlet DataLoopNode::Node for hot water coil SuppHeatCoilFluidOutletNode
+                // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
                 VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
@@ -5275,7 +5055,7 @@ namespace HVACVariableRefrigerantFlow {
                     VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * SteamDensity;
                 }
 
-                // fill fluid outlet DataLoopNode::Node for steam coil SuppHeatCoilFluidOutletNode
+                // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
                 VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
@@ -5358,10 +5138,10 @@ namespace HVACVariableRefrigerantFlow {
                                 if (ZoneNodeNotFound) {
                                     ShowSevereError(
                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow \"" + VRFTU(TUIndex).Name +
-                                        "\" Zone terminal unit air inlet DataLoopNode::Node name must be the same as a zone inlet or exhaust DataLoopNode::Node name.");
-                                    ShowContinueError("... Zone inlet and exhaust DataLoopNode::Node name is specified in ZoneHVAC:EquipmentConnections object.");
-                                    ShowContinueError("... Zone terminal unit inlet DataLoopNode::Node name  = " + DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum));
-                                    ShowContinueError("... Zone terminal unit outlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum));
+                                        "\" Zone terminal unit air inlet node name must be the same as a zone inlet or exhaust node name.");
+                                    ShowContinueError("... Zone inlet and exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                                    ShowContinueError("... Zone terminal unit inlet node name  = " + DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum));
+                                    ShowContinueError("... Zone terminal unit outlet node name = " + DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum));
                                 }
                             }
                             goto EquipList_exit;
@@ -5383,7 +5163,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                        thisObjectName,
                                                                        DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
                                                                        DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum),
-                                                                       "Air DataLoopNode::Nodes");
+                                                                       "Air Nodes");
                                     if (VRFTU(TUIndex).ZoneNum > 0) {
                                         VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(VRFTU(TUIndex).ZoneNum).ZoneNode;
                                         for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
@@ -5407,7 +5187,7 @@ namespace HVACVariableRefrigerantFlow {
                                             }
                                             if (!AirNodeFound && VRFTU(TUIndex).ZoneNum > 0) {
                                                 ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                                ShowContinueError("Did not find Air DataLoopNode::Node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                                ShowContinueError("Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
                                                 // ShowContinueError("specified Controlling Zone or Thermostat Location name = " +
                                                 // loc_controlZoneName);
                                                 errorsFound = true;
@@ -5438,7 +5218,7 @@ namespace HVACVariableRefrigerantFlow {
                                     thisObjectName,
                                     DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
                                     DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum),
-                                    "Air DataLoopNode::Nodes");
+                                    "Air Nodes");
                                 goto EquipList_exit;
                             }
                         }
@@ -5484,7 +5264,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
 
-                    // Find the number of zones (zone Inlet DataLoopNode::Nodes) attached to an air loop from the air loop number
+                    // Find the number of zones (zone Inlet nodes) attached to an air loop from the air loop number
                     if (AirLoopFound && !VRFTU(TUIndex).isInOASys) {
                         int NumAirLoopZones = 0;
                         bool initLoadBasedControlFlowFracFlagReady = false;
@@ -5495,17 +5275,17 @@ namespace HVACVariableRefrigerantFlow {
                         if (allocated(DataAirLoop::AirToZoneNodeInfo)) {
                             initLoadBasedControlFlowFracFlagReady = true;
                             for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
-                                // zone inlet DataLoopNode::Nodes for cooling
+                                // zone inlet nodes for cooling
                                 if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).NumZonesCooled > 0) {
                                     if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
-                                        // the data structure for the zones inlet DataLoopNode::Nodes has not been filled
+                                        // the data structure for the zones inlet nodes has not been filled
                                         initLoadBasedControlFlowFracFlagReady = false;
                                     }
                                 }
-                                // zone inlet DataLoopNode::Nodes for heating
+                                // zone inlet nodes for heating
                                 if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).NumZonesHeated > 0) {
                                     if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
-                                        // the data structure for the zones inlet DataLoopNode::Nodes has not been filled
+                                        // the data structure for the zones inlet nodes has not been filled
                                         initLoadBasedControlFlowFracFlagReady = false;
                                     }
                                 }
@@ -5582,7 +5362,7 @@ namespace HVACVariableRefrigerantFlow {
                         if (!DataGlobals::AnyEnergyManagementSystemInModel) {
                             ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for " +
                                             VRFTU(TUIndex).Name);
-                            ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control DataLoopNode::Node.");
+                            ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
                             SetPointErrorFlag = true;
                         } else {
                             bool SPNotFound = false;
@@ -5598,8 +5378,8 @@ namespace HVACVariableRefrigerantFlow {
                             if (SPNotFound) {
                                 ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for unitary system = " +
                                                 VRFTU(TUIndex).Name);
-                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control DataLoopNode::Node.");
-                                ShowContinueError("  or use an EMS actuator to establish a temperature setpoint at the coil control DataLoopNode::Node.");
+                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
+                                ShowContinueError("  or use an EMS actuator to establish a temperature setpoint at the coil control node.");
                             }
                         }
                     }
@@ -5612,26 +5392,8 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
-            //// move these checks to Init so as to not duplicate code
-            //// check if the TU is connected to an air loop
-            // for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-            //    for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-            //        for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-            //            if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-            //                                            VRFTU(VRFTUNum).Name) &&
-            //                UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-            //                                            cCurrentModuleObject)) {
-            //                AirLoopFound = true;
-            //                break;
-            //            }
-            //        }
-            //        if (AirLoopFound) break;
-            //    }
-            //    if (AirLoopFound) break;
-            //}
-
-            // TU inlet DataLoopNode::Node must be the same as a zone exhaust DataLoopNode::Node and the OA Mixer return DataLoopNode::Node
-            // check that TU inlet DataLoopNode::Node is a zone exhaust DataLoopNode::Node.
+            // TU inlet node must be the same as a zone exhaust node and the OA Mixer return node
+            // check that TU inlet node is a zone exhaust node.
             if (VRFTU(VRFTUNum).isInZone && (!VRFTU(VRFTUNum).ATMixerExists || VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide)) {
                 bool ZoneNodeNotFound = true;
                 for (int CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
@@ -5647,24 +5409,24 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 if (ZoneNodeNotFound && !VRFTU(VRFTUNum).isInAirLoop) {
                     ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                                    "\" Zone terminal unit air inlet DataLoopNode::Node name must be the same as a zone exhaust DataLoopNode::Node name.");
-                    ShowContinueError("... Zone exhaust DataLoopNode::Node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError("... Zone terminal unit inlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                                    "\" Zone terminal unit air inlet node name must be the same as a zone exhaust node name.");
+                    ShowContinueError("... Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                    ShowContinueError("... Zone terminal unit inlet node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
                     ErrorsFound = true;
                 }
             }
-            // check OA Mixer return DataLoopNode::Node
+            // check OA Mixer return node
             if (VRFTU(VRFTUNum).isInZone && !VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
-                OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
+                Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
                 if (VRFTU(VRFTUNum).VRFTUInletNodeNum != OANodeNums(3)) {
                     ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                                    "\" Zone terminal unit air inlet DataLoopNode::Node name must be the same as the OutdoorAir:Mixer return air DataLoopNode::Node name.");
-                    ShowContinueError("... Zone terminal unit air inlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-                    ShowContinueError("... OutdoorAir:Mixer return air DataLoopNode::Node name = " + DataLoopNode::NodeID(OANodeNums(3)));
+                                    "\" Zone terminal unit air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
+                    ShowContinueError("... Zone terminal unit air inlet node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                    ShowContinueError("... OutdoorAir:Mixer return air node name = " + DataLoopNode::NodeID(OANodeNums(3)));
                     ErrorsFound = true;
                 }
             }
-            // check that TU outlet DataLoopNode::Node is a zone inlet DataLoopNode::Node.
+            // check that TU outlet node is a zone inlet node.
             if ((VRFTU(VRFTUNum).isInZone && (!VRFTU(VRFTUNum).ATMixerExists || VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide))) {
                 bool ZoneNodeNotFound = true;
                 for (int CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
@@ -5680,13 +5442,13 @@ namespace HVACVariableRefrigerantFlow {
                 }
                 if (ZoneNodeNotFound) {
                     ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                                    "\" Zone terminal unit air outlet DataLoopNode::Node name must be the same as a zone inlet DataLoopNode::Node name.");
-                    ShowContinueError("... Zone inlet DataLoopNode::Node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError("... Zone terminal unit outlet DataLoopNode::Node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                                    "\" Zone terminal unit air outlet node name must be the same as a zone inlet node name.");
+                    ShowContinueError("... Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
+                    ShowContinueError("... Zone terminal unit outlet node name = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                     ErrorsFound = true;
                 }
             }
-            // check fan inlet and outlet DataLoopNode::Nodes
+            // check fan inlet and outlet nodes
             int FanInletNodeNum = 0;
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
@@ -5699,66 +5461,67 @@ namespace HVACVariableRefrigerantFlow {
             int HCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
             if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::BlowThru) {
                 if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
+                    Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
                     if (FanInletNodeNum != OANodeNums(4)) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the outside air mixers mixed air DataLoopNode::Node name when blow through fan is specified and an outside air "
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
+                        ShowContinueError("as the outside air mixers mixed air node name when blow through fan is specified and an outside air "
                                           "mixer is present.");
-                        ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError("... OA mixers mixed air DataLoopNode::Node = " + DataLoopNode::NodeID(OANodeNums(4)));
+                        ShowContinueError("... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
+                        ShowContinueError("... OA mixers mixed air node = " + DataLoopNode::NodeID(OANodeNums(4)));
                         ErrorsFound = true;
                     }
                 } else if (!VRFTU(VRFTUNum).OAMixerUsed && (VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide)) {
                     if (FanInletNodeNum != VRFTU(VRFTUNum).VRFTUInletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the terminal unit air inlet DataLoopNode::Node name when blow through fan is specified and an outside air mixer "
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
+                        ShowContinueError("as the terminal unit air inlet node name when blow through fan is specified and an outside air mixer "
                                           "is not present.");
-                        ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError("... Terminal unit air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                        ShowContinueError("... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
+                        ShowContinueError("... Terminal unit air inlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
                         ErrorsFound = true;
                     }
                 }
                 if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     if (VRFTU(VRFTUNum).fanOutletNode != CCoilInletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the DX cooling coil air inlet DataLoopNode::Node name when blow through fan is specified.");
-                        ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError("... DX cooling coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
+                        ShowContinueError("as the DX cooling coil air inlet node name when blow through fan is specified.");
+                        ShowContinueError("... Fan outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError("... DX cooling coil air inlet node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                     if (VRFTU(VRFTUNum).HeatingCoilPresent) {
                         if (HCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
                             ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                                            "\" Heating coil outlet DataLoopNode::Node name must be the same");
-                            ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified.");
-                            ShowContinueError("... Heating coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-                            ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                                            "\" Heating coil outlet node name must be the same");
+                            ShowContinueError("as the terminal unit air outlet node name when blow through fan is specified.");
+                            ShowContinueError("... Heating coil outlet node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                            ShowContinueError("... Terminal Unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else {
                         if (CCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
                             ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                                            "\" Cooling coil outlet DataLoopNode::Node name must be the same");
-                            ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified and no DX heating "
+                                            "\" Cooling coil outlet node name must be the same");
+                            ShowContinueError("as the terminal unit air outlet node name when blow through fan is specified and no DX heating "
                                               "coil is present.");
-                            ShowContinueError("... Cooling coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-                            ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                            ShowContinueError("... Cooling coil outlet node      = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
+                            ShowContinueError("... Terminal Unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                             ErrorsFound = true;
                         }
                     }
                 } else if (VRFTU(VRFTUNum).HeatingCoilPresent) {
                     if (VRFTU(VRFTUNum).fanOutletNode != HCoilInletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the DX heating coil air inlet DataLoopNode::Node name when blow through fan is specified and a DX cooling coil "
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
+                        ShowContinueError("as the DX heating coil air inlet node name when blow through fan is specified and a DX cooling coil "
                                           "is not present.");
-                        ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError("... DX heating coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilInletNodeNum));
+                        ShowContinueError("... Fan outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError("... DX heating coil air inlet node = " + DataLoopNode::NodeID(HCoilInletNodeNum));
                         ErrorsFound = true;
                     }
                     if (HCoilOutletNodeNum != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Heating coil outlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when blow through fan is specified.");
-                        ShowContinueError("... Heating coil outlet DataLoopNode::Node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
-                        ShowContinueError("... Terminal Unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Heating coil outlet node name must be the same");
+                        ShowContinueError("as the terminal unit air outlet node name when blow through fan is specified.");
+                        ShowContinueError("... Heating coil outlet node      = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                        ShowContinueError("... Terminal Unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                         ErrorsFound = true;
                     }
                 }
@@ -5766,65 +5529,65 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     if (!VRFTU(VRFTUNum).OAMixerUsed) {
                         if (VRFTU(VRFTUNum).VRFTUInletNodeNum != CCoilInletNodeNum) {
-                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Cooling coil inlet DataLoopNode::Node name must be the same");
-                            ShowContinueError("as the terminal unit air inlet DataLoopNode::Node name when draw through fan is specified.");
-                            ShowContinueError("... Terminal unit air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
-                            ShowContinueError("... DX cooling coil air inlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
+                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Cooling coil inlet node name must be the same");
+                            ShowContinueError("as the terminal unit air inlet node name when draw through fan is specified.");
+                            ShowContinueError("... Terminal unit air inlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUInletNodeNum));
+                            ShowContinueError("... DX cooling coil air inlet node = " + DataLoopNode::NodeID(CCoilInletNodeNum));
                             ErrorsFound = true;
                         }
                     }
                     if (VRFTU(VRFTUNum).HeatingCoilPresent) {
                         if (FanInletNodeNum != HCoilOutletNodeNum) {
-                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-                            ShowContinueError("as the DX heating coil air outlet DataLoopNode::Node name when draw through fan is specified.");
-                            ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            ShowContinueError("... DX heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
+                            ShowContinueError("as the DX heating coil air outlet node name when draw through fan is specified.");
+                            ShowContinueError("... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
+                            ShowContinueError("... DX heating coil air outlet node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
                             ErrorsFound = true;
                         }
                     } else {
                         if (FanInletNodeNum != CCoilOutletNodeNum) {
-                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-                            ShowContinueError("as the DX cooling coil air outlet DataLoopNode::Node name when draw through fan is specified and a DX heating coil "
+                            ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
+                            ShowContinueError("as the DX cooling coil air outlet node name when draw through fan is specified and a DX heating coil "
                                               "is not present.");
-                            ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                            ShowContinueError("... DX cooling coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
+                            ShowContinueError("... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
+                            ShowContinueError("... DX cooling coil air outlet node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
                             ErrorsFound = true;
                         }
                     }
                 } else if (VRFTU(VRFTUNum).HeatingCoilPresent) {
                     if (FanInletNodeNum != HCoilOutletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the DX heating coil air outlet DataLoopNode::Node name when draw through fan is specified.");
-                        ShowContinueError("... Fan inlet DataLoopNode::Node = " + DataLoopNode::NodeID(FanInletNodeNum));
-                        ShowContinueError("... DX heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
+                        ShowContinueError("as the DX heating coil air outlet node name when draw through fan is specified.");
+                        ShowContinueError("... Fan inlet node = " + DataLoopNode::NodeID(FanInletNodeNum));
+                        ShowContinueError("... DX heating coil air outlet node = " + DataLoopNode::NodeID(HCoilOutletNodeNum));
                         ErrorsFound = true;
                     }
                 }
                 if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
                     // if (SuppHeatCoilAirOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
                     //    ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                    //                    "\" Supplemental heating coil air outlet DataLoopNode::Node name must be the same");
-                    //    ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when draw through fan is specified.");
-                    //    ShowContinueError("... Supplemental heating coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
-                    //    ShowContinueError("... Terminal unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                    //                    "\" Supplemental heating coil air outlet node name must be the same");
+                    //    ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
+                    //    ShowContinueError("... Supplemental heating coil air outlet node = " + DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
+                    //    ShowContinueError("... Terminal unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                     //    ErrorsFound = true;
                     //}
                 } else {
                     if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).fanOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet DataLoopNode::Node name must be the same");
-                        ShowContinueError("as the terminal unit air outlet DataLoopNode::Node name when draw through fan is specified.");
-                        ShowContinueError("... Fan outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
-                        ShowContinueError("... Terminal unit air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
+                        ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
+                        ShowContinueError("... Fan outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
+                        ShowContinueError("... Terminal unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
                         ErrorsFound = true;
                     }
                 }
             }
             if (VRFTU(VRFTUNum).CoolingCoilPresent && VRFTU(VRFTUNum).HeatingCoilPresent) {
                 if (CCoilOutletNodeNum != HCoilInletNodeNum) {
-                    ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" DX cooling coil air outlet DataLoopNode::Node name must be the same");
-                    ShowContinueError(" as the DX heating coil air inlet DataLoopNode::Node name.");
-                    ShowContinueError("... DX cooling coil air outlet DataLoopNode::Node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
-                    ShowContinueError("... DX heating coil air inlet DataLoopNode::Node  = " + DataLoopNode::NodeID(HCoilInletNodeNum));
+                    ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" DX cooling coil air outlet node name must be the same");
+                    ShowContinueError(" as the DX heating coil air inlet node name.");
+                    ShowContinueError("... DX cooling coil air outlet node = " + DataLoopNode::NodeID(CCoilOutletNodeNum));
+                    ShowContinueError("... DX heating coil air inlet node  = " + DataLoopNode::NodeID(HCoilInletNodeNum));
                     ErrorsFound = true;
                 }
             }
@@ -5881,8 +5644,8 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).MaxNoCoolAirMassFlow = RhoAir * VRFTU(VRFTUNum).MaxNoCoolAirVolFlow;
             VRFTU(VRFTUNum).MaxNoHeatAirMassFlow = RhoAir * VRFTU(VRFTUNum).MaxNoHeatAirVolFlow;
             VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow = RhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
-            // set the DataLoopNode::Node max and min mass flow rates
-            // outside air mixer is optional, check that DataLoopNode::Node num > 0
+            // set the node max and min mass flow rates
+            // outside air mixer is optional, check that node num > 0
             if (OutsideAirNode > 0) {
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMax = max(VRFTU(VRFTUNum).CoolOutAirMassFlow, VRFTU(VRFTUNum).HeatOutAirMassFlow);
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMin = 0.0;
@@ -6379,7 +6142,7 @@ namespace HVACVariableRefrigerantFlow {
                 DataLoopNode::Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate =
                     min(DataLoopNode::Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
-                // been set above (it is the "inlet" DataLoopNode::Node flow rate)
+                // been set above (it is the "inlet" node flow rate)
                 SimATMixer(VRFTU(VRFTUNum).ATMixerName, FirstHVACIteration, VRFTU(VRFTUNum).ATMixerIndex);
             }
         } else {
@@ -8502,17 +8265,17 @@ namespace HVACVariableRefrigerantFlow {
         using SingleDuct::SimATMixer;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int VRFTUOutletNodeNum;     // TU air outlet DataLoopNode::Node
-        int VRFTUInletNodeNum;      // TU air inlet DataLoopNode::Node
+        int VRFTUOutletNodeNum;     // TU air outlet node
+        int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
         int OpMode;                 // fan operating mode, DataHVACGlobals::CycFanCycCoil or DataHVACGlobals::ContFanCycCoil
         int VRFCond;                // index to VRF condenser
-        Real64 SpecHumOut;          // specific humidity ratio at outlet DataLoopNode::Node
-        Real64 SpecHumIn;           // specific humidity ratio at inlet DataLoopNode::Node
+        Real64 SpecHumOut;          // specific humidity ratio at outlet node
+        Real64 SpecHumIn;           // specific humidity ratio at inlet node
         int TUListIndex;            // index to TU list for this VRF system
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
-        static int ATMixOutNode(0); // terminal unit mixer outlet DataLoopNode::Node
-        int ZoneNode;               // Zone DataLoopNode::Node of VRFTU is serving
+        static int ATMixOutNode(0); // terminal unit mixer outlet node
+        int ZoneNode;               // Zone node of VRFTU is serving
 
         VRFCond = this->VRFSysNum;
         TUListIndex = VRF(VRFCond).ZoneTUListPtr;
@@ -8533,7 +8296,7 @@ namespace HVACVariableRefrigerantFlow {
                 // set the primary air inlet mass flow rate
                 DataLoopNode::Node(this->ATMixerPriNode).MassFlowRate = min(DataLoopNode::Node(this->ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
-                // been set above (it is the "inlet" DataLoopNode::Node flow rate)
+                // been set above (it is the "inlet" node flow rate)
                 SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             }
         } else {
@@ -8869,9 +8632,9 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine updates the DataLoopNode::Node data for the VRF Condenser.
+        // This subroutine updates the node data for the VRF Condenser.
 
-        int CondenserOutletNode; // - outlet DataLoopNode::Node for VRF water-cooled condenser
+        int CondenserOutletNode; // - outlet node for VRF water-cooled condenser
 
         CondenserOutletNode = VRF(VRFCond).CondenserOutletNodeNum;
 
@@ -8971,9 +8734,9 @@ namespace HVACVariableRefrigerantFlow {
         using DataZoneEquipment::VRFTerminalUnit_Num;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        int InletNode;                   // inlet DataLoopNode::Node number
-        int OutsideAirNode;              // outside air DataLoopNode::Node number
-        int AirRelNode;                  // relief air DataLoopNode::Node number
+        int InletNode;                   // inlet node number
+        int OutsideAirNode;              // outside air node number
+        int AirRelNode;                  // relief air node number
         Real64 AverageUnitMassFlow(0.0); // average supply air mass flow rate over time step
         Real64 AverageOAMassFlow(0.0);   // average outdoor air mass flow rate over time step
 
@@ -9004,6 +8767,8 @@ namespace HVACVariableRefrigerantFlow {
         if (GetCurrentScheduleValue(VRFTU(VRFTUNum).SchedPtr) > 0.0 &&
             (GetCurrentScheduleValue(VRFTU(VRFTUNum).FanAvailSchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOff) && !DataHVACGlobals::ZoneCompTurnFansOff) {
 
+            // so for sure OA system TUs should use inlet node flow rate, don't overwrite inlet node flow rate
+            // could there be a reason for air loops to use inlet node flow? Possibly when VAV TUs used?
             if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
             if (OutsideAirNode > 0) {
@@ -9109,10 +8874,10 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (VRFTU(TUIndex).isSetPointControlled) {
-                // set point temperature may only reside at the TU outlet DataLoopNode::Node
+                // set point temperature may only reside at the TU outlet node
                 Real64 coolCoilTempSetPoint = DataLoopNode::Node(VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
                 Real64 heatCoilTempSetPoint = coolCoilTempSetPoint;
-                // adjust coil control for fan heat when set point is at outlet DataLoopNode::Node
+                // adjust coil control for fan heat when set point is at outlet node
                 Real64 coolfanDeltaT = 0.0;
                 Real64 heatfanDeltaT = 0.0;
                 if (VRFTU(TUIndex).FanPlace ==DataHVACGlobals::DrawThru) {
@@ -9145,7 +8910,7 @@ namespace HVACVariableRefrigerantFlow {
                             DataLoopNode::Node(VRFTU(TUIndex).ATMixerPriNode).MassFlowRate =
                                 min(DataLoopNode::Node(VRFTU(TUIndex).ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate);
                             // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate
-                            // has already been set above (it is the "inlet" DataLoopNode::Node flow rate)
+                            // has already been set above (it is the "inlet" node flow rate)
                             SingleDuct::SimATMixer(VRFTU(TUIndex).ATMixerName, FirstHVACIteration, VRFTU(TUIndex).ATMixerIndex);
                         }
                     } else {
@@ -9587,7 +9352,7 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // lookup function for VRF terminal unit OA inlet DataLoopNode::Node
+        // lookup function for VRF terminal unit OA inlet node
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9611,7 +9376,7 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // lookup function for VRF terminal unit zone inlet DataLoopNode::Node
+        // lookup function for VRF terminal unit zone inlet node
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9626,7 +9391,7 @@ namespace HVACVariableRefrigerantFlow {
     }
 
     int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool & errorsFound) {
-        int NodeNum; // return value of DataLoopNode::Node number
+        int NodeNum; // return value of node number
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9646,7 +9411,7 @@ namespace HVACVariableRefrigerantFlow {
     }
 
     int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool & errorsFound) {
-        int NodeNum; // return value of DataLoopNode::Node number
+        int NodeNum; // return value of node number
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9675,7 +9440,7 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // lookup function for VRF terminal unit mixed air DataLoopNode::Node
+        // lookup function for VRF terminal unit mixed air node
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9699,7 +9464,7 @@ namespace HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // lookup function for VRF terminal unit return air DataLoopNode::Node
+        // lookup function for VRF terminal unit return air node
 
         if (GetVRFInputFlag) {
             GetVRFInput();
@@ -9797,7 +9562,7 @@ namespace HVACVariableRefrigerantFlow {
         int IndexToTUInTUList;       // index to TU in specific list for the VRF system
         int TUListIndex;             // index to TU list for this VRF system
         int VRFNum;                  // index to VRF that the VRF Terminal Unit serves
-        int VRFInletNode;            // VRF inlet DataLoopNode::Node number
+        int VRFInletNode;            // VRF inlet node number
         int ZoneIndex;               // index to zone where the VRF Terminal Unit resides
         Real64 BFC;                  // Bypass factor at the cooling mode (-)
         Real64 BFH;                  // Bypass factor at the heating mode (-)
@@ -10062,7 +9827,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 SH_IU_merged;   // Piping Loss Algorithm Parameter: average super heating degrees after the indoor units [C]
         Real64 SC_OU;          // subcooling degrees at OU condenser [C]
         Real64 SH_OU;          // super heating degrees at OU evaporator [C]
-        Real64 SH_Comp;        // Temperature difference between compressor inlet DataLoopNode::Node and Tsuction [C]
+        Real64 SH_Comp;        // Temperature difference between compressor inlet node and Tsuction [C]
         Real64 T_comp_in;      // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
         Real64 TU_HeatingLoad; // Heating load from terminal units, excluding heating loss [W]
         Real64 TU_CoolingLoad; // Cooling load from terminal units, excluding heating loss [W]
@@ -11478,19 +11243,19 @@ namespace HVACVariableRefrigerantFlow {
         using DataZoneEquipment::ZoneEquipConfig;
         using SingleDuct::SimATMixer;
 
-        int VRFTUOutletNodeNum;     // TU air outlet DataLoopNode::Node
-        int VRFTUInletNodeNum;      // TU air inlet DataLoopNode::Node
+        int VRFTUOutletNodeNum;     // TU air outlet node
+        int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
         int OpMode;                 // fan operating mode, DataHVACGlobals::CycFanCycCoil or DataHVACGlobals::ContFanCycCoil
         int VRFCond;                // index to VRF condenser
-        Real64 SpecHumOut;          // specific humidity ratio at outlet DataLoopNode::Node
-        Real64 SpecHumIn;           // specific humidity ratio at inlet DataLoopNode::Node
+        Real64 SpecHumOut;          // specific humidity ratio at outlet node
+        Real64 SpecHumIn;           // specific humidity ratio at inlet node
         int TUListIndex;            // index to TU list for this VRF system
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
         Real64 EvapTemp;            // evaporating temperature
         Real64 CondTemp;            // condensing temperature
-        static int ATMixOutNode(0); // outlet DataLoopNode::Node of ATM Mixer
-        int ZoneNode;               // Zone DataLoopNode::Node of VRFTU is serving
+        static int ATMixOutNode(0); // outlet node of ATM Mixer
+        int ZoneNode;               // Zone node of VRFTU is serving
         // FLOW
 
         VRFCond = this->VRFSysNum;
@@ -11522,7 +11287,7 @@ namespace HVACVariableRefrigerantFlow {
                 // set the primary air inlet mass flow rate
                 DataLoopNode::Node(this->ATMixerPriNode).MassFlowRate = min(DataLoopNode::Node(this->ATMixerPriNode).MassFlowRateMaxAvail, DataLoopNode::Node(VRFTUInletNodeNum).MassFlowRate);
                 // now calculate the the mixer outlet air conditions (and the secondary air inlet flow rate). The mixer outlet flow rate has already
-                // been set above (it is the "inlet" DataLoopNode::Node flow rate)
+                // been set above (it is the "inlet" node flow rate)
                 SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             }
         } else {
@@ -11788,10 +11553,10 @@ namespace HVACVariableRefrigerantFlow {
 
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
-        int OAMixNode;           // index to the mix DataLoopNode::Node of OA mixer
+        int OAMixNode;           // index to the mix node of OA mixer
         int VRFCond;             // index to VRF condenser
         int VRFTUNum;            // Unit index in VRF terminal unit array
-        int VRFInletNode;        // VRF inlet DataLoopNode::Node number
+        int VRFInletNode;        // VRF inlet node number
         bool FirstHVACIteration; // flag for 1st HVAC iteration in the time step
         Real64 FanSpdRatioBase;  // baseline FanSpdRatio for VRFTUAirFlowResidual
         Real64 FanSpdRatioAct;   // calculated FanSpdRatio for VRFTUAirFlowResidual
@@ -14147,8 +13912,8 @@ namespace HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
-        Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet DataLoopNode::Node
-        Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet DataLoopNode::Node
+        Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet node
+        Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet node
         Real64 const HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
     )
     {
