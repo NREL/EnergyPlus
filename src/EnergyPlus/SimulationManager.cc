@@ -526,7 +526,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 

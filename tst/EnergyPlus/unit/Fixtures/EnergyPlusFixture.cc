@@ -128,6 +128,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -308,6 +309,9 @@ void EnergyPlusFixture::TearDown()
 void EnergyPlusFixture::clear_all_states()
 {
     // A to Z order
+
+    ep_globals.clear_state();
+
     AirflowNetwork::clear_state();
     AirflowNetworkBalanceManager::clear_state();
     BaseboardElectric::clear_state();

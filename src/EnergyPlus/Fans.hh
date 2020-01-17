@@ -66,41 +66,6 @@ namespace Fans {
     using DataHVACGlobals::MinFrac;
     using DataHVACGlobals::SystemAirflowSizing;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // parameters describing fan types are contained in DataHVACGlobals (see USE statement above)
-
-    extern int const ExhaustFanCoupledToAvailManagers;
-    extern int const ExhaustFanDecoupledFromAvailManagers;
-
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    //!$extern int NumFans;           // The Number of Fans found in the Input
-    extern int NumNightVentPerf;  // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    extern bool GetFanInputFlag;  // Flag set to make sure you get input once
-    extern bool LocalTurnFansOn;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and forces ZoneHVAC comp fans off
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Types
-
     struct FanEquipConditions
     {
         // Members

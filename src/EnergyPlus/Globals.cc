@@ -45,9 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/numeric.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Globals.hh>
 
@@ -62,15 +59,19 @@
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
+    void FansGlobals::clear_state()
+    {
+        NumFans = 0;
+        NumNightVentPerf = 0;
+        GetFanInputFlag = true;
+        LocalTurnFansOn = false;
+        LocalTurnFansOff = false;
+    }
 
-    // REFERENCES:
-    // na
+    void AllGlobals::clear_state()
+    {
+        // all clear states
+        fans.clear_state();
+    }
 
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-	
 	AllGlobals ep_globals;
