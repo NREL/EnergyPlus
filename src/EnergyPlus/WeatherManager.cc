@@ -7112,6 +7112,23 @@ namespace WeatherManager {
             //   N14; \field Sky Clearness
             DesDayInput(EnvrnNum).SkyClear = rNumericArgs(14); // Sky Clearness (0 to 1)
 
+            //   N15, \field Maximum Warmup Days Between Sizing Periods
+            if (lNumericFieldBlanks(15)) {
+                // Default to -1 if not input
+                DesDayInput(EnvrnNum).maxWarmupDays = -1;
+            } else {
+                DesDayInput(EnvrnNum).maxWarmupDays = int(rNumericArgs(15));
+            }
+            //   A13, \field Begin Environment Reset Mode
+            if (lAlphaFieldBlanks(13)) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+            } else {
+                if (UtilityRoutines::SameString(cAlphaArgs(13), "FullResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = true;
+                }
+            }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;

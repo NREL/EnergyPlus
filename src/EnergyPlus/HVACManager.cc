@@ -94,6 +94,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -109,7 +110,6 @@
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -544,7 +544,7 @@ namespace HVACManager {
                     UpdateZoneSizing(DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
-                EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::checkConcurrentOperation();
+                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;
