@@ -167,7 +167,6 @@ namespace PlantLoopEquip {
         // If you add a module or new equipment type, you must set up this structure.
 
         // Using/Aliasing
-        using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
@@ -309,33 +308,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricEIR) {
-                SimElectricEIRChiller(sim_component.TypeOf,
-                                      sim_component.Name,
-                                      EquipFlowCtrl,
-                                      EquipNum,
-                                      LoopNum,
-                                      RunFlag,
-                                      FirstHVACIteration,
-                                      InitLoopEquip,
-                                      CurLoad,
-                                      MaxLoad,
-                                      MinLoad,
-                                      OptLoad,
-                                      GetCompSizFac,
-                                      SizingFac,
-                                      TempCondInDesign,
-                                      TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricReformEIR) {
                 SimReformulatedEIRChiller(sim_component.TypeOf,
