@@ -553,25 +553,11 @@ namespace PlantLoopEquip {
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
-
             } else if (EquipTypeNum == TypeOf_GrndHtExchgSlinky) { // 'GROUND HEAT EXCHANGER:SLINKY'
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             }
             // THERMAL STORAGE
         } else if (GeneralEquipType == GenEquipTypes_ThermalStorage) {
-
-            // TODO: Drop this logic into the component, not out here
-            // If component setpoint based control is active for this equipment
-            // then reset CurLoad to original EquipDemand.
-            // Allow negative CurLoad.  For cold storage this means the storage should
-            // charge, for hot storage, this means the storage should discharge.
-            if (sim_component.CurOpSchemeType == CompSetPtBasedSchemeType) {
-                CurLoad = sim_component.EquipDemand;
-                if (CurLoad != 0) RunFlag = true;
-            }
 
             if (EquipTypeNum == TypeOf_TS_IceSimple) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
