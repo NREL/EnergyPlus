@@ -59,9 +59,6 @@ namespace EnergyPlus {
 
 namespace ChillerExhaustAbsorption {
 
-    extern int NumExhaustAbsorbers; // number of Absorption Chillers specified in input
-    extern Array1D_bool CheckEquipName;
-
     struct ExhaustAbsorberSpecs
     {
         // Members
@@ -142,6 +139,10 @@ namespace ChillerExhaustAbsorption {
         int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potentail less than thermal energy needed during heating
         std::string TypeOf;                      // Generator type
         std::string ExhuastSourceName;           // Generator type Name
+        bool oneTimeInit;
+        bool envrnInit;
+        bool plantScanInit;
+        Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
         // Default Constructor
         ExhaustAbsorberSpecs()
@@ -156,7 +157,8 @@ namespace ChillerExhaustAbsorption {
               isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
               DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
               CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
-              HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0)
+              HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0),
+              oneTimeInit(true), envrnInit(true), plantScanInit(true), oldCondSupplyTemp(0.0)
         {
         }
     };
