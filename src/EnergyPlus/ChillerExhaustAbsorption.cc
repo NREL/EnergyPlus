@@ -116,7 +116,6 @@ namespace ChillerExhaustAbsorption {
 
     // Object Data
     Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-    Array1D<ReportVars> ExhaustAbsorberReport;
     bool Sim_GetInput(true); // then TRUE, calls subroutine to read input file.
 
     void SimExhaustAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
@@ -217,10 +216,10 @@ namespace ChillerExhaustAbsorption {
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     ExhaustAbsorber(ChillNum).CondReturnNodeNum,
                                                     ExhaustAbsorber(ChillNum).CondSupplyNodeNum,
-                                                    ExhaustAbsorberReport(ChillNum).TowerLoad,
-                                                    ExhaustAbsorberReport(ChillNum).CondReturnTemp,
-                                                    ExhaustAbsorberReport(ChillNum).CondSupplyTemp,
-                                                    ExhaustAbsorberReport(ChillNum).CondWaterFlowRate,
+                                                    ExhaustAbsorber(ChillNum).TowerLoad,
+                                                    ExhaustAbsorber(ChillNum).CondReturnTemp,
+                                                    ExhaustAbsorber(ChillNum).CondSupplyTemp,
+                                                    ExhaustAbsorber(ChillNum).CondWaterFlowRate,
                                                     FirstIteration);
             }
 
@@ -277,8 +276,6 @@ namespace ChillerExhaustAbsorption {
 
         // ALLOCATE ARRAYS
         ExhaustAbsorber.allocate(NumExhaustAbsorbers);
-
-        ExhaustAbsorberReport.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -455,13 +452,13 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Evaporator Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).CoolingLoad,
+                                ExhaustAbsorber(AbsorberNum).CoolingLoad,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Evaporator Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).CoolingEnergy,
+                                ExhaustAbsorber(AbsorberNum).CoolingEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName,
@@ -473,13 +470,13 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).HeatingLoad,
+                                ExhaustAbsorber(AbsorberNum).HeatingLoad,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).HeatingEnergy,
+                                ExhaustAbsorber(AbsorberNum).HeatingEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName,
@@ -491,13 +488,13 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Condenser Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).TowerLoad,
+                                ExhaustAbsorber(AbsorberNum).TowerLoad,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Condenser Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).TowerEnergy,
+                                ExhaustAbsorber(AbsorberNum).TowerEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName,
@@ -509,34 +506,34 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Cooling Source Heat COP",
                                 OutputProcessor::Unit::W_W,
-                                ExhaustAbsorberReport(AbsorberNum).ThermalEnergyCOP,
+                                ExhaustAbsorber(AbsorberNum).ThermalEnergyCOP,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Electric Power",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).ElectricPower,
+                                ExhaustAbsorber(AbsorberNum).ElectricPower,
                                 "System",
                                 "Average",
                                 ChillerName);
             // Do not include this on meters, this would duplicate the cool electric and heat electric
             SetupOutputVariable("Chiller Heater Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).ElectricEnergy,
+                                ExhaustAbsorber(AbsorberNum).ElectricEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Cooling Electric Power",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).CoolElectricPower,
+                                ExhaustAbsorber(AbsorberNum).CoolElectricPower,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Cooling Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).CoolElectricEnergy,
+                                ExhaustAbsorber(AbsorberNum).CoolElectricEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName,
@@ -548,13 +545,13 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Heating Electric Power",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).HeatElectricPower,
+                                ExhaustAbsorber(AbsorberNum).HeatElectricPower,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ExhaustAbsorberReport(AbsorberNum).HeatElectricEnergy,
+                                ExhaustAbsorber(AbsorberNum).HeatElectricEnergy,
                                 "System",
                                 "Sum",
                                 ChillerName,
@@ -566,19 +563,19 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Evaporator Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ExhaustAbsorberReport(AbsorberNum).ChillReturnTemp,
+                                ExhaustAbsorber(AbsorberNum).ChillReturnTemp,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Evaporator Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ExhaustAbsorberReport(AbsorberNum).ChillSupplyTemp,
+                                ExhaustAbsorber(AbsorberNum).ChillSupplyTemp,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Evaporator Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ExhaustAbsorberReport(AbsorberNum).ChillWaterFlowRate,
+                                ExhaustAbsorber(AbsorberNum).ChillWaterFlowRate,
                                 "System",
                                 "Average",
                                 ChillerName);
@@ -586,26 +583,26 @@ namespace ChillerExhaustAbsorption {
             if (ExhaustAbsorber(AbsorberNum).isWaterCooled) {
                 SetupOutputVariable("Chiller Heater Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ExhaustAbsorberReport(AbsorberNum).CondReturnTemp,
+                                    ExhaustAbsorber(AbsorberNum).CondReturnTemp,
                                     "System",
                                     "Average",
                                     ChillerName);
                 SetupOutputVariable("Chiller Heater Condenser Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ExhaustAbsorberReport(AbsorberNum).CondSupplyTemp,
+                                    ExhaustAbsorber(AbsorberNum).CondSupplyTemp,
                                     "System",
                                     "Average",
                                     ChillerName);
                 SetupOutputVariable("Chiller Heater Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ExhaustAbsorberReport(AbsorberNum).CondWaterFlowRate,
+                                    ExhaustAbsorber(AbsorberNum).CondWaterFlowRate,
                                     "System",
                                     "Average",
                                     ChillerName);
             } else {
                 SetupOutputVariable("Chiller Heater Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    ExhaustAbsorberReport(AbsorberNum).CondReturnTemp,
+                                    ExhaustAbsorber(AbsorberNum).CondReturnTemp,
                                     "System",
                                     "Average",
                                     ChillerName);
@@ -613,90 +610,90 @@ namespace ChillerExhaustAbsorption {
 
             SetupOutputVariable("Chiller Heater Heating Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ExhaustAbsorberReport(AbsorberNum).HotWaterReturnTemp,
+                                ExhaustAbsorber(AbsorberNum).HotWaterReturnTemp,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ExhaustAbsorberReport(AbsorberNum).HotWaterSupplyTemp,
+                                ExhaustAbsorber(AbsorberNum).HotWaterSupplyTemp,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ExhaustAbsorberReport(AbsorberNum).HotWaterFlowRate,
+                                ExhaustAbsorber(AbsorberNum).HotWaterFlowRate,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Cooling Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                ExhaustAbsorberReport(AbsorberNum).CoolPartLoadRatio,
+                                ExhaustAbsorber(AbsorberNum).CoolPartLoadRatio,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Maximum Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).CoolingCapacity,
+                                ExhaustAbsorber(AbsorberNum).CoolingCapacity,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                ExhaustAbsorberReport(AbsorberNum).HeatPartLoadRatio,
+                                ExhaustAbsorber(AbsorberNum).HeatPartLoadRatio,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Maximum Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).HeatingCapacity,
+                                ExhaustAbsorber(AbsorberNum).HeatingCapacity,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Runtime Fraction",
                                 OutputProcessor::Unit::None,
-                                ExhaustAbsorberReport(AbsorberNum).FractionOfPeriodRunning,
+                                ExhaustAbsorber(AbsorberNum).FractionOfPeriodRunning,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Source Exhaust Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                ExhaustAbsorberReport(AbsorberNum).ExhaustInTemp,
+                                ExhaustAbsorber(AbsorberNum).ExhaustInTemp,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Source Exhaust Inlet Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                ExhaustAbsorberReport(AbsorberNum).ExhaustInFlow,
+                                ExhaustAbsorber(AbsorberNum).ExhaustInFlow,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Heating Heat Recovery Potential Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).ExhHeatRecPotentialHeat,
+                                ExhaustAbsorber(AbsorberNum).ExhHeatRecPotentialHeat,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Cooling Heat Recovery Potential Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).ExhHeatRecPotentialCool,
+                                ExhaustAbsorber(AbsorberNum).ExhHeatRecPotentialCool,
                                 "System",
                                 "Average",
                                 ChillerName);
 
             SetupOutputVariable("Chiller Heater Cooling Source Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).CoolThermalEnergyUseRate,
+                                ExhaustAbsorber(AbsorberNum).CoolThermalEnergyUseRate,
                                 "System",
                                 "Average",
                                 ChillerName);
             SetupOutputVariable("Chiller Heater Heating Source Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ExhaustAbsorberReport(AbsorberNum).HeatThermalEnergyUseRate,
+                                ExhaustAbsorber(AbsorberNum).HeatThermalEnergyUseRate,
                                 "System",
                                 "Average",
                                 ChillerName);
@@ -1474,9 +1471,9 @@ namespace ChillerExhaustAbsorption {
         lIsEnterCondensTemp = ExhaustAbsorber(ChillNum).isEnterCondensTemp;
         lIsWaterCooled = ExhaustAbsorber(ChillNum).isWaterCooled;
         lCHWLowLimitTemp = ExhaustAbsorber(ChillNum).CHWLowLimitTemp;
-        lHeatElectricPower = ExhaustAbsorberReport(ChillNum).HeatElectricPower;
-        lHeatThermalEnergyUseRate = ExhaustAbsorberReport(ChillNum).HeatThermalEnergyUseRate;
-        lHeatPartLoadRatio = ExhaustAbsorberReport(ChillNum).HeatPartLoadRatio;
+        lHeatElectricPower = ExhaustAbsorber(ChillNum).HeatElectricPower;
+        lHeatThermalEnergyUseRate = ExhaustAbsorber(ChillNum).HeatThermalEnergyUseRate;
+        lHeatPartLoadRatio = ExhaustAbsorber(ChillNum).HeatPartLoadRatio;
 
         // initialize entering conditions
         lChillReturnTemp = DataLoopNode::Node(lChillReturnNodeNum).Temp;
@@ -1769,26 +1766,26 @@ namespace ChillerExhaustAbsorption {
             }
         } // IF(MyLoad>=0 .OR. .NOT. RunFlag)
         // Write into the Report Variables except for nodes
-        ExhaustAbsorberReport(ChillNum).CoolingLoad = lCoolingLoad;
-        ExhaustAbsorberReport(ChillNum).TowerLoad = lTowerLoad;
-        ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate = lCoolThermalEnergyUseRate;
-        ExhaustAbsorberReport(ChillNum).CoolElectricPower = lCoolElectricPower;
-        ExhaustAbsorberReport(ChillNum).CondReturnTemp = lCondReturnTemp;
-        ExhaustAbsorberReport(ChillNum).ChillReturnTemp = lChillReturnTemp;
-        ExhaustAbsorberReport(ChillNum).CondSupplyTemp = lCondSupplyTemp;
-        ExhaustAbsorberReport(ChillNum).ChillSupplyTemp = lChillSupplyTemp;
-        ExhaustAbsorberReport(ChillNum).ChillWaterFlowRate = lChillWaterMassFlowRate;
-        ExhaustAbsorberReport(ChillNum).CondWaterFlowRate = lCondWaterMassFlowRate;
-        ExhaustAbsorberReport(ChillNum).CoolPartLoadRatio = lCoolPartLoadRatio;
-        ExhaustAbsorberReport(ChillNum).CoolingCapacity = lAvailableCoolingCapacity;
-        ExhaustAbsorberReport(ChillNum).FractionOfPeriodRunning = lFractionOfPeriodRunning;
-        ExhaustAbsorberReport(ChillNum).ExhaustInTemp = lExhaustInTemp;
-        ExhaustAbsorberReport(ChillNum).ExhaustInFlow = lExhaustInFlow;
-        ExhaustAbsorberReport(ChillNum).ExhHeatRecPotentialCool = lExhHeatRecPotentialCool;
+        ExhaustAbsorber(ChillNum).CoolingLoad = lCoolingLoad;
+        ExhaustAbsorber(ChillNum).TowerLoad = lTowerLoad;
+        ExhaustAbsorber(ChillNum).CoolThermalEnergyUseRate = lCoolThermalEnergyUseRate;
+        ExhaustAbsorber(ChillNum).CoolElectricPower = lCoolElectricPower;
+        ExhaustAbsorber(ChillNum).CondReturnTemp = lCondReturnTemp;
+        ExhaustAbsorber(ChillNum).ChillReturnTemp = lChillReturnTemp;
+        ExhaustAbsorber(ChillNum).CondSupplyTemp = lCondSupplyTemp;
+        ExhaustAbsorber(ChillNum).ChillSupplyTemp = lChillSupplyTemp;
+        ExhaustAbsorber(ChillNum).ChillWaterFlowRate = lChillWaterMassFlowRate;
+        ExhaustAbsorber(ChillNum).CondWaterFlowRate = lCondWaterMassFlowRate;
+        ExhaustAbsorber(ChillNum).CoolPartLoadRatio = lCoolPartLoadRatio;
+        ExhaustAbsorber(ChillNum).CoolingCapacity = lAvailableCoolingCapacity;
+        ExhaustAbsorber(ChillNum).FractionOfPeriodRunning = lFractionOfPeriodRunning;
+        ExhaustAbsorber(ChillNum).ExhaustInTemp = lExhaustInTemp;
+        ExhaustAbsorber(ChillNum).ExhaustInFlow = lExhaustInFlow;
+        ExhaustAbsorber(ChillNum).ExhHeatRecPotentialCool = lExhHeatRecPotentialCool;
 
         // write the combined heating and cooling ThermalEnergy used and electric used
-        ExhaustAbsorberReport(ChillNum).ThermalEnergyUseRate = lCoolThermalEnergyUseRate + lHeatThermalEnergyUseRate;
-        ExhaustAbsorberReport(ChillNum).ElectricPower = lCoolElectricPower + lHeatElectricPower;
+        ExhaustAbsorber(ChillNum).ThermalEnergyUseRate = lCoolThermalEnergyUseRate + lHeatThermalEnergyUseRate;
+        ExhaustAbsorber(ChillNum).ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
     void CalcExhaustAbsorberHeaterModel(int &ChillNum,     // Absorber number
@@ -1888,9 +1885,9 @@ namespace ChillerExhaustAbsorption {
 
         Cp_HW = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
-        lCoolElectricPower = ExhaustAbsorberReport(ChillNum).CoolElectricPower;
-        lCoolThermalEnergyUseRate = ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate;
-        lCoolPartLoadRatio = ExhaustAbsorberReport(ChillNum).CoolPartLoadRatio;
+        lCoolElectricPower = ExhaustAbsorber(ChillNum).CoolElectricPower;
+        lCoolThermalEnergyUseRate = ExhaustAbsorber(ChillNum).CoolThermalEnergyUseRate;
+        lCoolPartLoadRatio = ExhaustAbsorber(ChillNum).CoolPartLoadRatio;
 
         // initialize entering conditions
         lHotWaterReturnTemp = DataLoopNode::Node(lHeatReturnNodeNum).Temp;
@@ -1918,11 +1915,11 @@ namespace ChillerExhaustAbsorption {
             // Determine available heating capacity using the current cooling load
             lAvailableHeatingCapacity =
                 ExhaustAbsorber(ChillNum).NomHeatCoolRatio * ExhaustAbsorber(ChillNum).NomCoolingCap *
-                    CurveManager::CurveValue(lHeatCapFCoolCurve, (ExhaustAbsorberReport(ChillNum).CoolingLoad / ExhaustAbsorber(ChillNum).NomCoolingCap));
+                    CurveManager::CurveValue(lHeatCapFCoolCurve, (ExhaustAbsorber(ChillNum).CoolingLoad / ExhaustAbsorber(ChillNum).NomCoolingCap));
 
             // Calculate current load for heating
-            MyLoad = sign(max(std::abs(MyLoad), ExhaustAbsorberReport(ChillNum).HeatingCapacity * lMinPartLoadRat), MyLoad);
-            MyLoad = sign(min(std::abs(MyLoad), ExhaustAbsorberReport(ChillNum).HeatingCapacity * lMaxPartLoadRat), MyLoad);
+            MyLoad = sign(max(std::abs(MyLoad), ExhaustAbsorber(ChillNum).HeatingCapacity * lMinPartLoadRat), MyLoad);
+            MyLoad = sign(min(std::abs(MyLoad), ExhaustAbsorber(ChillNum).HeatingCapacity * lMaxPartLoadRat), MyLoad);
 
             // Determine the following variables depending on if the flow has been set in
             // the nodes (flowlock=1 to 2) or if the amount of load is still be determined (flowlock=0)
@@ -2032,22 +2029,22 @@ namespace ChillerExhaustAbsorption {
 
         } // IF(MyLoad==0 .OR. .NOT. RunFlag)
         // Write into the Report Variables except for nodes
-        ExhaustAbsorberReport(ChillNum).HeatingLoad = lHeatingLoad;
-        ExhaustAbsorberReport(ChillNum).HeatThermalEnergyUseRate = lHeatThermalEnergyUseRate;
-        ExhaustAbsorberReport(ChillNum).HeatElectricPower = lHeatElectricPower;
-        ExhaustAbsorberReport(ChillNum).HotWaterReturnTemp = lHotWaterReturnTemp;
-        ExhaustAbsorberReport(ChillNum).HotWaterSupplyTemp = lHotWaterSupplyTemp;
-        ExhaustAbsorberReport(ChillNum).HotWaterFlowRate = lHotWaterMassFlowRate;
-        ExhaustAbsorberReport(ChillNum).HeatPartLoadRatio = lHeatPartLoadRatio;
-        ExhaustAbsorberReport(ChillNum).HeatingCapacity = lAvailableHeatingCapacity;
-        ExhaustAbsorberReport(ChillNum).FractionOfPeriodRunning = lFractionOfPeriodRunning;
+        ExhaustAbsorber(ChillNum).HeatingLoad = lHeatingLoad;
+        ExhaustAbsorber(ChillNum).HeatThermalEnergyUseRate = lHeatThermalEnergyUseRate;
+        ExhaustAbsorber(ChillNum).HeatElectricPower = lHeatElectricPower;
+        ExhaustAbsorber(ChillNum).HotWaterReturnTemp = lHotWaterReturnTemp;
+        ExhaustAbsorber(ChillNum).HotWaterSupplyTemp = lHotWaterSupplyTemp;
+        ExhaustAbsorber(ChillNum).HotWaterFlowRate = lHotWaterMassFlowRate;
+        ExhaustAbsorber(ChillNum).HeatPartLoadRatio = lHeatPartLoadRatio;
+        ExhaustAbsorber(ChillNum).HeatingCapacity = lAvailableHeatingCapacity;
+        ExhaustAbsorber(ChillNum).FractionOfPeriodRunning = lFractionOfPeriodRunning;
 
         // write the combined heating and cooling ThermalEnergy used and electric used
-        ExhaustAbsorberReport(ChillNum).ThermalEnergyUseRate = lCoolThermalEnergyUseRate + lHeatThermalEnergyUseRate;
-        ExhaustAbsorberReport(ChillNum).ElectricPower = lCoolElectricPower + lHeatElectricPower;
-        ExhaustAbsorberReport(ChillNum).ExhaustInTemp = lExhaustInTemp;
-        ExhaustAbsorberReport(ChillNum).ExhaustInFlow = lExhaustInFlow;
-        ExhaustAbsorberReport(ChillNum).ExhHeatRecPotentialHeat = lExhHeatRecPotentialHeat;
+        ExhaustAbsorber(ChillNum).ThermalEnergyUseRate = lCoolThermalEnergyUseRate + lHeatThermalEnergyUseRate;
+        ExhaustAbsorber(ChillNum).ElectricPower = lCoolElectricPower + lHeatElectricPower;
+        ExhaustAbsorber(ChillNum).ExhaustInTemp = lExhaustInTemp;
+        ExhaustAbsorber(ChillNum).ExhaustInFlow = lExhaustInFlow;
+        ExhaustAbsorber(ChillNum).ExhHeatRecPotentialHeat = lExhHeatRecPotentialHeat;
     }
 
     void UpdateExhaustAbsorberCoolRecords(Real64 const MyLoad, // current load
@@ -2082,29 +2079,29 @@ namespace ChillerExhaustAbsorption {
                 DataLoopNode::Node(lCondSupplyNodeNum).Temp = DataLoopNode::Node(lCondReturnNodeNum).Temp;
             }
             DataLoopNode::Node(lExhaustAirInletNodeNum).Temp = DataLoopNode::Node(lExhaustAirInletNodeNum).Temp;
-            DataLoopNode::Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorberReport(ChillNum).ExhaustInFlow;
+            DataLoopNode::Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorber(ChillNum).ExhaustInFlow;
         } else {
-            DataLoopNode::Node(lChillSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).ChillSupplyTemp;
+            DataLoopNode::Node(lChillSupplyNodeNum).Temp = ExhaustAbsorber(ChillNum).ChillSupplyTemp;
             if (ExhaustAbsorber(ChillNum).isWaterCooled) {
-                DataLoopNode::Node(lCondSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).CondSupplyTemp;
+                DataLoopNode::Node(lCondSupplyNodeNum).Temp = ExhaustAbsorber(ChillNum).CondSupplyTemp;
             }
-            DataLoopNode::Node(lExhaustAirInletNodeNum).Temp = ExhaustAbsorberReport(ChillNum).ExhaustInTemp;
-            DataLoopNode::Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorberReport(ChillNum).ExhaustInFlow;
+            DataLoopNode::Node(lExhaustAirInletNodeNum).Temp = ExhaustAbsorber(ChillNum).ExhaustInTemp;
+            DataLoopNode::Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorber(ChillNum).ExhaustInFlow;
         }
 
         // convert power to energy and instantaneous use to use over the time step
         RptConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ExhaustAbsorberReport(ChillNum).CoolingEnergy = ExhaustAbsorberReport(ChillNum).CoolingLoad * RptConstant;
-        ExhaustAbsorberReport(ChillNum).TowerEnergy = ExhaustAbsorberReport(ChillNum).TowerLoad * RptConstant;
-        ExhaustAbsorberReport(ChillNum).ThermalEnergy = ExhaustAbsorberReport(ChillNum).ThermalEnergyUseRate * RptConstant;
-        ExhaustAbsorberReport(ChillNum).CoolThermalEnergy = ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate * RptConstant;
-        ExhaustAbsorberReport(ChillNum).ElectricEnergy = ExhaustAbsorberReport(ChillNum).ElectricPower * RptConstant;
-        ExhaustAbsorberReport(ChillNum).CoolElectricEnergy = ExhaustAbsorberReport(ChillNum).CoolElectricPower * RptConstant;
-        if (ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate != 0.0) {
-            ExhaustAbsorberReport(ChillNum).ThermalEnergyCOP =
-                ExhaustAbsorberReport(ChillNum).CoolingLoad / ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate;
+        ExhaustAbsorber(ChillNum).CoolingEnergy = ExhaustAbsorber(ChillNum).CoolingLoad * RptConstant;
+        ExhaustAbsorber(ChillNum).TowerEnergy = ExhaustAbsorber(ChillNum).TowerLoad * RptConstant;
+        ExhaustAbsorber(ChillNum).ThermalEnergy = ExhaustAbsorber(ChillNum).ThermalEnergyUseRate * RptConstant;
+        ExhaustAbsorber(ChillNum).CoolThermalEnergy = ExhaustAbsorber(ChillNum).CoolThermalEnergyUseRate * RptConstant;
+        ExhaustAbsorber(ChillNum).ElectricEnergy = ExhaustAbsorber(ChillNum).ElectricPower * RptConstant;
+        ExhaustAbsorber(ChillNum).CoolElectricEnergy = ExhaustAbsorber(ChillNum).CoolElectricPower * RptConstant;
+        if (ExhaustAbsorber(ChillNum).CoolThermalEnergyUseRate != 0.0) {
+            ExhaustAbsorber(ChillNum).ThermalEnergyCOP =
+                ExhaustAbsorber(ChillNum).CoolingLoad / ExhaustAbsorber(ChillNum).CoolThermalEnergyUseRate;
         } else {
-            ExhaustAbsorberReport(ChillNum).ThermalEnergyCOP = 0.0;
+            ExhaustAbsorber(ChillNum).ThermalEnergyCOP = 0.0;
         }
     }
 
@@ -2131,24 +2128,22 @@ namespace ChillerExhaustAbsorption {
         if (MyLoad == 0 || !RunFlag) {
             DataLoopNode::Node(lHeatSupplyNodeNum).Temp = DataLoopNode::Node(lHeatReturnNodeNum).Temp;
         } else {
-            DataLoopNode::Node(lHeatSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).HotWaterSupplyTemp;
+            DataLoopNode::Node(lHeatSupplyNodeNum).Temp = ExhaustAbsorber(ChillNum).HotWaterSupplyTemp;
         }
 
         // convert power to energy and instantaneous use to use over the time step
         RptConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        ExhaustAbsorberReport(ChillNum).HeatingEnergy = ExhaustAbsorberReport(ChillNum).HeatingLoad * RptConstant;
-        ExhaustAbsorberReport(ChillNum).ThermalEnergy = ExhaustAbsorberReport(ChillNum).ThermalEnergyUseRate * RptConstant;
-        ExhaustAbsorberReport(ChillNum).HeatThermalEnergy = ExhaustAbsorberReport(ChillNum).HeatThermalEnergyUseRate * RptConstant;
-        ExhaustAbsorberReport(ChillNum).ElectricEnergy = ExhaustAbsorberReport(ChillNum).ElectricPower * RptConstant;
-        ExhaustAbsorberReport(ChillNum).HeatElectricEnergy = ExhaustAbsorberReport(ChillNum).HeatElectricPower * RptConstant;
+        ExhaustAbsorber(ChillNum).HeatingEnergy = ExhaustAbsorber(ChillNum).HeatingLoad * RptConstant;
+        ExhaustAbsorber(ChillNum).ThermalEnergy = ExhaustAbsorber(ChillNum).ThermalEnergyUseRate * RptConstant;
+        ExhaustAbsorber(ChillNum).HeatThermalEnergy = ExhaustAbsorber(ChillNum).HeatThermalEnergyUseRate * RptConstant;
+        ExhaustAbsorber(ChillNum).ElectricEnergy = ExhaustAbsorber(ChillNum).ElectricPower * RptConstant;
+        ExhaustAbsorber(ChillNum).HeatElectricEnergy = ExhaustAbsorber(ChillNum).HeatElectricPower * RptConstant;
     }
 
     void clear_state()
     {
         ExhaustAbsorber.deallocate();
         Sim_GetInput = true;
-
-        ExhaustAbsorberReport.deallocate();
     }
 
 } // namespace ChillerExhaustAbsorption
