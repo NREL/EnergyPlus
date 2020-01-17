@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -195,11 +195,11 @@ namespace ChillerExhaustAbsorption {
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), HeatVolFlowRate(0.0),
               HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), ThermalEnergyCoolFTCurve(0), ThermalEnergyCoolFPLRCurve(0),
               ElecCoolFTCurve(0), ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), ThermalEnergyHeatFHPLRCurve(0), isEnterCondensTemp(false),
-              isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
-              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
-              CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
-              HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0),
-              oneTimeInit(true), envrnInit(true), plantScanInit(true), oldCondSupplyTemp(0.0),
+              isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
+              DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
+              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
+              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0),
+              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeInit(true), envrnInit(true), plantScanInit(true), oldCondSupplyTemp(0.0),
               CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
               ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
               ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),
@@ -235,7 +235,6 @@ namespace ChillerExhaustAbsorption {
         void updateCoolRecords(Real64 MyLoad, bool RunFlag);
 
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
-
     };
 
     extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
