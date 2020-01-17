@@ -79,6 +79,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -334,7 +335,7 @@ namespace WaterThermalTanks {
         // Allow negative CurLoad.  For cold storage this means the storage should
         // charge, for hot storage, this means the storage should discharge.
         auto &thisComp = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum);
-        if (thisComp.TypeOf_Num == TypeOf_ChilledWaterTankMixed || thisComp.TypeOf_Num == TypeOf_ChilledWaterTankStratified) {
+        if (thisComp.TypeOf_Num == DataPlant::TypeOf_ChilledWaterTankMixed || thisComp.TypeOf_Num == DataPlant::TypeOf_ChilledWaterTankStratified) {
             if (thisComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 Real64 localCurLoad = thisComp.EquipDemand;
                 if (localCurLoad != 0) RunFlag = true;

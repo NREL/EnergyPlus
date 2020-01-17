@@ -67,6 +67,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -186,7 +187,7 @@ namespace IceThermalStorage {
         std::string const RoutineName("SimpleIceStorageData::simulate");
 
         // this was happening in PlantLoopEquip before
-        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum);
+        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum));
 
         // If component setpoint based control is active for this equipment
         // then reset CurLoad to original EquipDemand.
@@ -289,11 +290,11 @@ namespace IceThermalStorage {
     void DetailedIceStorageData::simulate(const PlantLocation &calledFromLocation,
                                           bool EP_UNUSED(FirstHVACIteration),
                                           Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+                                          bool RunFlag)
     {
 
         // this was happening in PlantLoopEquip before
-        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum);
+        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum));
 
         // If component setpoint based control is active for this equipment
         // then reset CurLoad to original EquipDemand.
