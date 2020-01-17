@@ -406,14 +406,14 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
     UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
-    DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                           // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-    DataGlobals::SysSizingCalc =
-        false; // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
+    // DISABLE SIZING - don't call UnitarySystems::sizeUnitarySystem, much more work needed to set up sizing arrays
+    DataGlobals::SysSizingCalc = false;
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
