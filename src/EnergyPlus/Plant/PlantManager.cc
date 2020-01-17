@@ -60,6 +60,8 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -82,6 +84,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
@@ -965,6 +968,7 @@ namespace EnergyPlus {
                                                                    "ChillerHeater:Absorption:Directfired")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
@@ -1068,6 +1072,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Chiller:Electric:ReformulatedEIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
@@ -1253,6 +1258,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;

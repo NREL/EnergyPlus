@@ -266,11 +266,11 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -559,11 +559,11 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;

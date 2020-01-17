@@ -221,6 +221,7 @@
 #include <direct.h>
 #include <stdlib.h>
 #else // Mac or Linux
+#include <fmt-6.1.2/include/fmt/format.h>
 #include <unistd.h>
 #endif
 
