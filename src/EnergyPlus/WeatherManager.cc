@@ -166,7 +166,10 @@ namespace WeatherManager {
     int const WP_ScheduleValue(1);  // User entered Schedule value for Weather Property
     int const WP_DryBulbDelta(2);   // User entered DryBulb difference Schedule value for Weather Property
     int const WP_DewPointDelta(3);  // User entered Dewpoint difference Schedule value for Weather Property
-    int const WP_SkyTAlgorithmA(4); // place holder
+    int const WP_BruntModel(4);          // Use Brunt model for sky emissivity calculation
+    int const WP_IdsoModel(5);           // Use Isdo model for sky emissivity calculation
+    int const WP_MartinBerdahlModel(6);  // Use Martin & Berdahl model for sky emissivity calculation
+    int const WP_SkyTAlgorithmA(7);      // place holder
 
     int const GregorianToJulian(1); // JGDate argument for Gregorian to Julian Date conversion
     int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
@@ -2774,8 +2777,6 @@ namespace WeatherManager {
         bool ErrorsFound;
         static Real64 CurTime;
         Real64 HourRep;
-        int OSky;
-        Real64 TDewK;
         Real64 ESky;
         bool ErrorFound;
         std::string ErrOut;
@@ -3458,13 +3459,17 @@ namespace WeatherManager {
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
                     TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
 
-                    if (Environment(Envrn).WP_Type1 == 0) {
+                    bool SkyTempScheduled = false;
+
+                    if (Environment(Envrn).WP_Type1 != 0 && WPSkyTemperature(Environment(Envrn).WP_Type1).IsSchedule) {
+                        SkyTempScheduled = true;
+                    }
+
+                    if (!SkyTempScheduled) {
                         // Calculate sky temperature, use IRHoriz if not missing
                         if (IRHoriz >= 9999.0) {
-                            // Missing, use sky cover
-                            OSky = OpaqueSkyCover;
-                            TDewK = min(DryBulb, DewPoint) + TKelvin;
-                            ESky = (0.787 + 0.764 * std::log(TDewK / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+                            // Missing, using sky cover
+                            ESky = CalcSkyEmissivity(Envrn, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                         } else { // Valid IR from Sky
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
@@ -3703,6 +3708,31 @@ namespace WeatherManager {
         Real64 interpAng = prevAng + (curAng - prevAng) * curHrWeight;
         return (fmod(interpAng, 360.)); // fmod is float modulus function
     }
+
+    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
+        //Calculate Sky Emissivity
+        Real64 ESky;
+        int ESkyCalcType = 0;
+        if (Environment(Envrn).WP_Type1 != 0) {
+            ESkyCalcType = WPSkyTemperature(Environment(Envrn).WP_Type1).CalculationType;
+        }
+        double TDewC = min(DryBulb, DewPoint);
+        double SatPress = PsyPsatFnTemp(DryBulb) * 0.01;
+        double PartialPress = RelHum * SatPress;
+        double TDewK = TDewC + TKelvin;
+        if (ESkyCalcType == WP_BruntModel) {
+            ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
+        } else if (ESkyCalcType == WP_IdsoModel) {
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
+        } else if (ESkyCalcType == WP_MartinBerdahlModel) {
+            ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
+        } else {
+            ESky = 0.787 + 0.764 * std::log(TDewK / TKelvin);
+        }
+        ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+        return ESky;
+    }
+
 
     void SetDayOfWeekInitialValues(int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
                                    int &CurDayOfWeek,          // Current Day of Week
@@ -4578,11 +4608,17 @@ namespace WeatherManager {
                 // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
                 // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
-                if (Environment(EnvrnNum).WP_Type1 == 0) {
-                    TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
-                    ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
-                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(TomorrowOutDryBulbTemp(TS, Hour) + TKelvin);
-                    TomorrowSkyTemp(TS, Hour) = (TomorrowOutDryBulbTemp(TS, Hour) + TKelvin) * root_4(ESky) - TKelvin;
+                bool SkyTempScheduled = false;
+
+                if (Environment(Envrn).WP_Type1 != 0 && WPSkyTemperature(Environment(Envrn).WP_Type1).IsSchedule) {
+                    SkyTempScheduled = true;
+                }
+
+                if (!SkyTempScheduled) {
+                    double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
+                    ESky = CalcSkyEmissivity(Envrn, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), OutHumRat);
+                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
+                    TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                 } else {
                     TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
                     ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
@@ -7976,62 +8012,70 @@ namespace WeatherManager {
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "UseBruntModel")) {
+                WPSkyTemperature(Item).CalculationType = WP_BruntModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "UseIdsoModel")) {
+                WPSkyTemperature(Item).CalculationType = WP_IdsoModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "UseBerdahlMartinModel")) {
+                WPSkyTemperature(Item).CalculationType = WP_MartinBerdahlModel;
+                WPSkyTemperature(Item).IsSchedule = false;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');
                 ShowContinueError("...entered value=\"" + cAlphaArgs(2) +
                                   "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue.");
                 ErrorsFound = true;
             }
-
-            WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-            if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather || Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+            if (WPSkyTemperature(Item).IsSchedule) {
                 WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-                // See if it's a schedule.
-                Found = GetScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError("...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
-                                      "\"Schedule:Constant\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    WPSkyTemperature(Item).IsSchedule = true;
-                    WPSkyTemperature(Item).SchedulePtr = Found;
-                }
-            } else { // See if it's a valid schedule.
-                Found = GetDayScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError(
-                        "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    if (envFound != 0) {
-                        schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
-                        if (schPtr == 0) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        } else if (SPSiteScheduleUnits(schPtr) != units) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        }
+                if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather ||
+                    Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+                    WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
+                    // See if it's a schedule.
+                    Found = GetScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
+                                "\"Schedule:Constant\" objects.");
+                        ErrorsFound = true;
+                    } else {
                         WPSkyTemperature(Item).IsSchedule = true;
                         WPSkyTemperature(Item).SchedulePtr = Found;
+                    }
+                } else { // See if it's a valid schedule.
+                    Found = GetDayScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
+                        ErrorsFound = true;
+                    } else {
+                        if (envFound != 0) {
+                            schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
+                            if (schPtr == 0) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            } else if (SPSiteScheduleUnits(schPtr) != units) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            }
+                            WPSkyTemperature(Item).IsSchedule = true;
+                            WPSkyTemperature(Item).SchedulePtr = Found;
+                        }
                     }
                 }
             }

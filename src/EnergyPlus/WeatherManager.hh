@@ -107,6 +107,9 @@ namespace WeatherManager {
     extern int const WP_ScheduleValue;  // User entered Schedule value for Weather Property
     extern int const WP_DryBulbDelta;   // User entered DryBulb difference Schedule value for Weather Property
     extern int const WP_DewPointDelta;  // User entered Dewpoint difference Schedule value for Weather Property
+    extern int const WP_BruntModel;  // Use Brunt model for sky emissivity calculation
+    extern int const WP_IdsoModel;   // Use Isdo model for sky emissivity calculation
+    extern int const WP_MartinBerdahlModel;  // Use Martin & Berdahl model for sky emissivity calculation
     extern int const WP_SkyTAlgorithmA; // place holder
 
     extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
@@ -787,6 +790,8 @@ namespace WeatherManager {
     Real64 AirMass(Real64 const CosZen); // COS( solar zenith), 0 - 1
 
     //------------------------------------------------------------------------------
+
+    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum); // Calculate sky temperature from weather data
 
     void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
