@@ -84,6 +84,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -207,6 +208,7 @@ namespace MixedAir {
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
+    int const VRFTerminalUnit(24); // new Jan 2020
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -855,6 +857,27 @@ namespace MixedAir {
                     SimEvapCooler(CompName, CompIndex);
                 }
 
+            } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                int ControlledZoneNum = 0;
+                bool HeatingActive = false;
+                bool CoolingActive = false;
+                int const OAUnitNum = 0;
+                Real64 const OAUCoilOutTemp = 0.0;
+                bool const ZoneEquipment = false;
+                Real64 sysOut = 0.0;
+                Real64 latOut = 0.0;
+                HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                    FirstHVACIteration,
+                    ControlledZoneNum,
+                    CompIndex,
+                    HeatingActive,
+                    CoolingActive,
+                    OAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOut,
+                    latOut);
+
             } else {
                 ShowFatalError("Invalid Outside Air Component=" + CompType);
             }
@@ -1278,6 +1301,8 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
                     } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
+                    } else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) {
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = VRFTerminalUnit;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
                                         OutsideAirSys(OASysNum).ComponentType(CompNum) + "\".");

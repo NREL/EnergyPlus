@@ -65,6 +65,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -787,6 +788,16 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) InletNodeErrFlag = true;
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             EvaporativeCoolers::GetOutletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) OutletNodeErrFlag = true;
+                    } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) {
+                            InletNodeErrFlag = true;
+                            errorsFound = false;
+                        }
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +

@@ -727,14 +727,26 @@ namespace HVACVariableRefrigerantFlow {
         int SuppHeatCoilCompNum;         // supplemental heating coil plant component index
         Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
+        int fanInletNode;                // fan inlet node index
         int fanOutletNode;               // fan outlet node index
         bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
         int airLoopNum;                  // index to air loop
+        bool isInOASys;                  // true if TU is configured in outside air system
         bool isInAirLoop;                // true if TU is configured in an air loop
         bool isInZone;                   // true if TU is configured as zone equipment
+        bool isSetPointControlled;       // TU is controlled via setpoint instead of the standard load control
+        bool coolSPActive;               // set point controlled cooling coil active (needs to operate)
+        bool heatSPActive;               // set point controlled heating coil active (needs to operate)
+        Real64 coolLoadToSP;             // load to set point in cooling mode
+        Real64 heatLoadToSP;             // load to set point in heating mode
+        Real64 coilTempSetPoint;         // coil control temperature
         Real64 controlZoneMassFlowFrac;  // ratio of control zone air mass flow rate to total zone air mass flow rate
         int zoneSequenceCoolingNum;      // zone equipment cooling sequence
         int zoneSequenceHeatingNum;      // zone equipment heating sequence
+        int coolCoilAirInNode;           // cooling coil air inlet node number
+        int coolCoilAirOutNode;          // cooling coil air outlet node number
+        int heatCoilAirInNode;           // heating coil air inlet node number
+        int heatCoilAirOutNode;          // heating coil air outlet node number
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
@@ -743,7 +755,7 @@ namespace HVACVariableRefrigerantFlow {
               MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
               CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
               SuppHeatCoilFluidMaxFlow(0.0), DesignSuppHeatingCapacity(0.0), MaxSATFromSuppHeatCoil(0.0), MaxOATSuppHeatingCoil(0.0),
-              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), FanOpModeSchedPtr(0), FanAvailSchedPtr(0), FanIndex(0), FanPower(0.0), OpMode(0),
+              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0), FanPower(0.0), OpMode(0),
               FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0), HeatCoilIndex(0), SuppHeatCoilIndex(0),
               DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0), ParasiticOffElec(0.0),
               HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0), ParasiticHeatElecPower(0.0),
@@ -755,8 +767,10 @@ namespace HVACVariableRefrigerantFlow {
               ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
               ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), firstPass(true),
               SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
-              fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInAirLoop(false), isInZone(false), controlZoneMassFlowFrac(1.0),
-              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0)
+              fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false),
+              isSetPointControlled(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
+              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0),
+              heatCoilAirOutNode(0)
         {
         }
 
@@ -923,6 +937,10 @@ namespace HVACVariableRefrigerantFlow {
     int GetVRFTUOutAirNode(int const VRFTUNum);
 
     int GetVRFTUZoneInletAirNode(int const VRFTUNum);
+
+    int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
+
+    int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
 
     int GetVRFTUMixedAirNode(int const VRFTUNum);
 

@@ -4523,7 +4523,6 @@ namespace SystemReports {
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) {
                         OutAirNode = GetVRFTUOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-
                         ZoneInletAirNode =
                             GetVRFTUZoneInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
