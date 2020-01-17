@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
 
     GetGasAbsorberInput();
 
-    EXPECT_EQ(1, NumGasAbsorbers);
+    EXPECT_EQ(1u, GasAbsorber.size());
     EXPECT_EQ("BIG CHILLER", GasAbsorber(1).Name);
     EXPECT_EQ(100000., GasAbsorber(1).NomCoolingCap);
     EXPECT_EQ(0.8, GasAbsorber(1).NomHeatCoolRatio);

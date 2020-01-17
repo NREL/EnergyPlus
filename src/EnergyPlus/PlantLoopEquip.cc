@@ -178,7 +178,6 @@ namespace PlantLoopEquip {
 
         // Using/Aliasing
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
-        using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -353,36 +352,9 @@ namespace PlantLoopEquip {
                 // Chiller-Heater needs to know whether it is being called for heating or cooling
                 // Since loops are generic, pass the branch inlet nodenum
             } else if (EquipTypeNum == TypeOf_Chiller_DFAbsorption) {
-                SimGasAbsorber(sim_component.TypeOf,
-                               sim_component.Name,
-                               EquipFlowCtrl,
-                               EquipNum,
-                               RunFlag,
-                               FirstHVACIteration,
-                               InitLoopEquip,
-                               CurLoad,
-                               PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn,
-                               MaxLoad,
-                               MinLoad,
-                               OptLoad,
-                               GetCompSizFac,
-                               SizingFac,
-                               TempCondInDesign,
-                               TempEvapOutDesign); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 // Exhaust Fired Absorption Chiller
-
             } else if (EquipTypeNum == TypeOf_Chiller_ExhFiredAbsorption) {
                 SimExhaustAbsorber(sim_component.TypeOf,
                                    sim_component.Name,
