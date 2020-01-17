@@ -210,6 +210,8 @@ namespace ChillerExhaustAbsorption {
 
         void initialize(bool RunFlag);
 
+        void setupOutputVariables();
+
         void size();
 
         void calcChiller(Real64 &MyLoad);
