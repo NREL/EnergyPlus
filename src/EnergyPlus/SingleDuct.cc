@@ -4493,6 +4493,25 @@ namespace SingleDuct {
             FanOp = 0;
             CalcVAVVS(SysNum, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
         }
+
+        //MassFlow = Node(SysInletNode).MassFlowRate;
+        // Move data to the damper outlet node
+        SysOutlet(SysNum).AirTemp = SysInlet(SysNum).AirTemp;
+        SysOutlet(SysNum).AirHumRat = SysInlet(SysNum).AirHumRat;
+        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
+        SysOutlet(SysNum).AirEnthalpy = SysInlet(SysNum).AirEnthalpy;
+
+        // calculate damper Position.
+        if (Sys(SysNum).AirMassFlowRateMax == 0.0) {
+            Sys(SysNum).DamperPosition = 0.0;
+        } else {
+            Sys(SysNum).DamperPosition = MassFlow / Sys(SysNum).AirMassFlowRateMax;
+        }
+        // update the air terminal outlet node data
+        UpdateSys(SysNum);
+
     }
 
     void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
@@ -4882,14 +4901,6 @@ namespace SingleDuct {
             } else {
                 ShowFatalError("Invalid Reheat Component=" + Sys(SysNum).ReheatComp);
             }
-        }
-        // Calculate Damper Position.
-        if (AirMassFlow == 0.0) {
-            Sys(SysNum).DamperPosition = 0.0;
-        } else if ((AirMassFlow > 0.0) && (AirMassFlow < Sys(SysNum).AirMassFlowRateMax)) {
-            Sys(SysNum).DamperPosition = AirMassFlow / Sys(SysNum).AirMassFlowRateMax;
-        } else if (AirMassFlow == Sys(SysNum).AirMassFlowRateMax) {
-            Sys(SysNum).DamperPosition = 1.0;
         }
 
         LoadMet = AirMassFlow * CpAirZn * (Node(HCOutNode).Temp - Node(ZoneNode).Temp);
