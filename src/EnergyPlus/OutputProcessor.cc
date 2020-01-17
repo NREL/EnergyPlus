@@ -2251,7 +2251,7 @@ namespace OutputProcessor {
             }
 
             // End use subcategory
-            if (!EndUseSub.empty()) {
+            if (!EndUseSub.empty() && !UtilityRoutines::SameString(EndUseSub,"General")) {
                 Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters);
                 if (Found != 0) {
                     ++VarMeterArrays(NumVarMeterArrays).NumOnMeters;
