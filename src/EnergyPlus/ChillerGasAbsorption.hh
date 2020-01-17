@@ -137,29 +137,10 @@ namespace ChillerGasAbsorption {
         int HWCompNum;     // hot water plant loop component index
         bool envrnFlag;
         bool plantScanFlag;
+        bool oneTimeFlag;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
-        // Default Constructor
-        GasAbsorberSpecs()
-            : Available(false), ON(false), InCoolingMode(false), InHeatingMode(false), NomCoolingCap(0.0), NomCoolingCapWasAutoSized(false),
-              NomHeatCoolRatio(0.0), FuelCoolRatio(0.0), FuelHeatRatio(0.0), ElecCoolRatio(0.0), ElecHeatRatio(0.0), ChillReturnNodeNum(0),
-              ChillSupplyNodeNum(0), ChillSetPointErrDone(false), ChillSetPointSetToLoop(false), CondReturnNodeNum(0), CondSupplyNodeNum(0),
-              HeatReturnNodeNum(0), HeatSupplyNodeNum(0), HeatSetPointErrDone(false), HeatSetPointSetToLoop(false), MinPartLoadRat(0.0),
-              MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondReturn(0.0), TempDesCHWSupply(0.0), EvapVolFlowRate(0.0),
-              EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), HeatVolFlowRate(0.0),
-              HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), FuelCoolFTCurve(0), FuelCoolFPLRCurve(0), ElecCoolFTCurve(0),
-              ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), FuelHeatFHPLRCurve(0), isEnterCondensTemp(false), isWaterCooled(false),
-              CHWLowLimitTemp(0.0), FuelHeatingValue(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
-              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
-              CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
-              HWBranchNum(0), HWCompNum(0), envrnFlag(true), plantScanFlag(true), oldCondSupplyTemp(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
+        // Originally on report variable structure
         Real64 CoolingLoad;             // cooling load on the chiller (previously called QEvap)
         Real64 CoolingEnergy;           // variable to track total cooling load for period (was EvapEnergy)
         Real64 HeatingLoad;             // heating load on the chiller
@@ -195,8 +176,20 @@ namespace ChillerGasAbsorption {
         Real64 FuelCOP;                 // reporting: cooling output/fuel input = CoolingLoad/CoolFuelUseRate
 
         // Default Constructor
-        ReportVars()
-            : CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0),
+        GasAbsorberSpecs()
+            : Available(false), ON(false), InCoolingMode(false), InHeatingMode(false), NomCoolingCap(0.0), NomCoolingCapWasAutoSized(false),
+              NomHeatCoolRatio(0.0), FuelCoolRatio(0.0), FuelHeatRatio(0.0), ElecCoolRatio(0.0), ElecHeatRatio(0.0), ChillReturnNodeNum(0),
+              ChillSupplyNodeNum(0), ChillSetPointErrDone(false), ChillSetPointSetToLoop(false), CondReturnNodeNum(0), CondSupplyNodeNum(0),
+              HeatReturnNodeNum(0), HeatSupplyNodeNum(0), HeatSetPointErrDone(false), HeatSetPointSetToLoop(false), MinPartLoadRat(0.0),
+              MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondReturn(0.0), TempDesCHWSupply(0.0), EvapVolFlowRate(0.0),
+              EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), HeatVolFlowRate(0.0),
+              HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), FuelCoolFTCurve(0), FuelCoolFPLRCurve(0), ElecCoolFTCurve(0),
+              ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), FuelHeatFHPLRCurve(0), isEnterCondensTemp(false), isWaterCooled(false),
+              CHWLowLimitTemp(0.0), FuelHeatingValue(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
+              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
+              CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
+              HWBranchNum(0), HWCompNum(0), envrnFlag(true), plantScanFlag(true), oneTimeFlag(true), oldCondSupplyTemp(0.0),
+              CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0),
               FuelEnergy(0.0), CoolFuelUseRate(0.0), CoolFuelEnergy(0.0), HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0),
               ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0), HeatElectricEnergy(0.0),
               ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0),
@@ -204,11 +197,28 @@ namespace ChillerGasAbsorption {
               CoolingCapacity(0.0), HeatingCapacity(0.0), FractionOfPeriodRunning(0.0), FuelCOP(0.0)
         {
         }
+
+        void initialize();
+
+        void setupOutputVariables();
+
+        void size();
+
+        void calculateChiller(Real64 &MyLoad);
+
+        void calculateHeater(Real64 &MyLoad, bool RunFlag);
+
+        void updateCoolRecords(Real64 MyLoad, // current load
+                                          bool RunFlag  // TRUE if Absorber operating
+        );
+
+        void updateHeatRecords(Real64 MyLoad, // current load
+                                          bool RunFlag  // TRUE if Absorber operating
+        );
     };
 
     // Object Data
     extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> GasAbsorberReport;
 
     void SimGasAbsorber(std::string const &AbsorberType, // type of Absorber
                         std::string const &AbsorberName, // user specified name of Absorber
@@ -228,32 +238,6 @@ namespace ChillerGasAbsorption {
                         Real64 &TempEvapOutDesign);
 
     void GetGasAbsorberInput();
-
-    void InitGasAbsorber(int ChillNum, // number of the current engine driven chiller being simulated
-                         bool RunFlag  // TRUE when chiller operating
-    );
-
-    void SizeGasAbsorber(int ChillNum);
-
-    void CalcGasAbsorberChillerModel(int &ChillNum,     // Absorber number
-                                     Real64 &MyLoad,    // operating load
-                                     bool RunFlag // TRUE when Absorber operating
-    );
-
-    void CalcGasAbsorberHeaterModel(int &ChillNum,     // Absorber number
-                                    Real64 &MyLoad,    // operating load
-                                    bool RunFlag // TRUE when Absorber operating
-    );
-
-    void UpdateGasAbsorberCoolRecords(Real64 MyLoad, // current load
-                                      bool RunFlag,  // TRUE if Absorber operating
-                                      int ChillNum   // Absorber number
-    );
-
-    void UpdateGasAbsorberHeatRecords(Real64 MyLoad, // current load
-                                      bool RunFlag,  // TRUE if Absorber operating
-                                      int ChillNum   // Absorber number
-    );
 
     void clear_state();
 
