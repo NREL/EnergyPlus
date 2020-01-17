@@ -207,6 +207,19 @@ namespace ChillerExhaustAbsorption {
               ExhaustInTemp(0.0), ExhaustInFlow(0.0), ExhHeatRecPotentialHeat(0.0), ExhHeatRecPotentialCool(0.0)
         {
         }
+
+        void initialize(bool RunFlag);
+
+        void size();
+
+        void calcChiller(Real64 &MyLoad);
+
+        void calcHeater(Real64 &MyLoad, bool RunFlag);
+
+        void updateCoolRecords(Real64 MyLoad, bool RunFlag);
+
+        void updateHeatRecords(Real64 MyLoad, bool RunFlag);
+
     };
 
     extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
@@ -228,32 +241,6 @@ namespace ChillerExhaustAbsorption {
     );
 
     void GetExhaustAbsorberInput();
-
-    void InitExhaustAbsorber(int ChillNum, // number of the current engine driven chiller being simulated
-                             bool RunFlag  // TRUE when chiller operating
-    );
-
-    void SizeExhaustAbsorber(int ChillNum);
-
-    void CalcExhaustAbsorberChillerModel(int &ChillNum,     // Absorber number
-                                         Real64 &MyLoad,    // operating load
-                                         bool RunFlag // TRUE when Absorber operating
-    );
-
-    void CalcExhaustAbsorberHeaterModel(int &ChillNum,     // Absorber number
-                                        Real64 &MyLoad,    // operating load
-                                        bool RunFlag // TRUE when Absorber operating
-    );
-
-    void UpdateExhaustAbsorberCoolRecords(Real64 MyLoad, // current load
-                                          bool RunFlag,  // TRUE if Absorber operating
-                                          int ChillNum   // Absorber number
-    );
-
-    void UpdateExhaustAbsorberHeatRecords(Real64 MyLoad, // current load
-                                          bool RunFlag,  // TRUE if Absorber operating
-                                          int ChillNum   // Absorber number
-    );
 
     void clear_state();
 
