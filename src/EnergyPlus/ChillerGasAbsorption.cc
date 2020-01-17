@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -483,7 +483,7 @@ namespace ChillerGasAbsorption {
             // Fuel Type Case Statement
             {
                 auto const SELECT_CASE_var(cAlphaArgs(17));
-                if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     GasAbsorber(AbsorberNum).FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -492,15 +492,13 @@ namespace ChillerGasAbsorption {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     GasAbsorber(AbsorberNum).FuelType = "Gasoline";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     GasAbsorber(AbsorberNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -513,7 +511,7 @@ namespace ChillerGasAbsorption {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid value");
                     ShowContinueError("Invalid " + cAlphaFieldNames(17) + '=' + cAlphaArgs(17));
                     ShowContinueError(
-                        "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                     Get_ErrorsFound = true;
                 }
             }

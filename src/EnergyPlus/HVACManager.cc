@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,6 +95,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -110,7 +111,6 @@
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -545,7 +545,7 @@ namespace HVACManager {
                     UpdateZoneSizing(DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
-                EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::checkConcurrentOperation();
+                EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                     PrintEnvrnStampWarmup = true;

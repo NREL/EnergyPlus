@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,7 +207,7 @@ namespace DataHeatBalance {
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(6);  // Default minimum number of warmup days allowed
+    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
@@ -500,7 +500,7 @@ namespace DataHeatBalance {
     bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
 
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
+    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
 
@@ -872,7 +872,7 @@ namespace DataHeatBalance {
         AnyAirBoundary = false;
         AnyAirBoundaryGroupedSolar = false;
         MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 6;
+        MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,6 +110,7 @@ extern "C" {
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -498,6 +499,14 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
+            if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                // easily converge fewer warmup days are allowed
+                DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
+                DataGlobals::beginEnvrnWarmStartFlag = true;
+            } else {
+                DataGlobals::beginEnvrnWarmStartFlag = false;
+            }
             EndEnvrnFlag = false;
             EndMonthFlag = false;
             WarmupFlag = true;
@@ -513,7 +522,7 @@ namespace SimulationManager {
                     isFinalYear = true;
                 }
             }
-            
+
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
@@ -1163,12 +1172,14 @@ namespace SimulationManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", instance.key());
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
-                        DoCoilDirectSolutions = true;
-                    }
+                    DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
+                }
+                if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
+                    HeatBalanceIntRadExchange::CarrollMethod =
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
                 }
             }
         }
