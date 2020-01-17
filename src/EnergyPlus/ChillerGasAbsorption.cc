@@ -110,131 +110,124 @@ namespace ChillerGasAbsorption {
     //    Development of this module was funded by the Gas Research Institute.
     //    (Please see copyright and disclaimer information at end of module)
 
-    Array1D_bool CheckEquipName;
-
     Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
 
     bool getGasAbsorberInputs(true); // then TRUE, calls subroutine to read input file.
 
-    void SimGasAbsorber(std::string const &EP_UNUSED(AbsorberType), // type of Absorber
-                        std::string const &AbsorberName,            // user specified name of Absorber
-                        int const EP_UNUSED(EquipFlowCtrl),         // Flow control mode for the equipment
-                        int &CompIndex,                             // Absorber number counter
-                        bool const RunFlag,                         // simulate Absorber when TRUE
-                        bool const FirstIteration,                  // initialize variables when TRUE
-                        bool &InitLoopEquip,                        // If not false, calculate the max load for operating conditions
-                        Real64 &MyLoad,                             // loop demand component will meet
-                        int const BranchInletNodeNum,               // node number of inlet to calling branch,
-                        Real64 &MaxCap,                             // W - maximum operating capacity of Absorber
-                        Real64 &MinCap,                             // W - minimum operating capacity of Absorber
-                        Real64 &OptCap,                             // W - optimal operating capacity of Absorber
-                        bool const GetSizingFactor,                 // TRUE when just the sizing factor is requested
-                        Real64 &SizingFactor,                       // sizing factor
-                        Real64 &TempCondInDesign,
-                        Real64 &TempEvapOutDesign)
+    PlantComponent *GasAbsorberSpecs::factory(std::string const &objectName)
     {
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   March 2001
-
-        // PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
-        // gets the input for the models, initializes simulation variables, call
-        // the appropriate model and sets up reporting variables.
-
-        int ChillNum; // Absorber number counter
-
-        // Get Absorber data from input file
+        // Process the input data if it hasn't been done already
         if (getGasAbsorberInputs) {
             GetGasAbsorberInput();
             getGasAbsorberInputs = false;
         }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            ChillNum = UtilityRoutines::FindItemInList(AbsorberName, GasAbsorber);
-            if (ChillNum == 0) {
-                ShowFatalError("SimGasAbsorber: Unit not found=" + AbsorberName);
-            }
-            CompIndex = ChillNum;
-        } else {
-            ChillNum = CompIndex;
-            if (CheckEquipName(ChillNum)) {
-                if (AbsorberName != GasAbsorber(ChillNum).Name) {
-                    ShowFatalError("SimGasAbsorber: Invalid CompIndex passed=" + General::TrimSigDigits(ChillNum) + ", Unit name=" + AbsorberName +
-                                   ", stored Unit Name for that index=" + GasAbsorber(ChillNum).Name);
-                }
-                CheckEquipName(ChillNum) = false;
+        // Now look for this particular pipe in the list
+        for (auto &comp : GasAbsorber) {
+            if (comp.Name == objectName) {
+                return &comp;
             }
         }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalGasAbsorberFactory: Error getting inputs for comp named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+    
+    void GasAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+                                    bool RunFlag) {
 
-        auto &thisChiller = GasAbsorber(ChillNum);
-        
-        // Check that this is a valid call
-        if (InitLoopEquip) {
-            Real64 Sim_HeatCap(0.0); // W - nominal heating capacity
-            TempEvapOutDesign = GasAbsorber(ChillNum).TempDesCHWSupply;
-            TempCondInDesign = GasAbsorber(ChillNum).TempDesCondReturn;
-            thisChiller.initialize();
-
-            // Match inlet node name of calling branch to determine if this call is for heating or cooling
-            if (BranchInletNodeNum == GasAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
-                thisChiller.size();                                      // only call from chilled water loop
-                MinCap = GasAbsorber(ChillNum).NomCoolingCap * GasAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = GasAbsorber(ChillNum).NomCoolingCap * GasAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = GasAbsorber(ChillNum).NomCoolingCap * GasAbsorber(ChillNum).OptPartLoadRat;
-            } else if (BranchInletNodeNum == GasAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
-                Sim_HeatCap = GasAbsorber(ChillNum).NomCoolingCap * GasAbsorber(ChillNum).NomHeatCoolRatio;
-                MinCap = Sim_HeatCap * GasAbsorber(ChillNum).MinPartLoadRat;
-                MaxCap = Sim_HeatCap * GasAbsorber(ChillNum).MaxPartLoadRat;
-                OptCap = Sim_HeatCap * GasAbsorber(ChillNum).OptPartLoadRat;
-            } else if (BranchInletNodeNum == GasAbsorber(ChillNum).CondReturnNodeNum) { // called from condenser loop
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            } else { // Error, nodes do not match
-                ShowSevereError("SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + AbsorberName);
-                ShowContinueError("Node connections in branch are not consistent with object nodes.");
-                ShowFatalError("Preceding conditions cause termination.");
-            } // Operate as Chiller or Heater
-            if (GetSizingFactor) {
-                SizingFactor = GasAbsorber(ChillNum).SizFac;
-            }
-            return;
-        }
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
 
         // Match inlet node name of calling branch to determine if this call is for heating or cooling
-        if (BranchInletNodeNum == GasAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            GasAbsorber(ChillNum).InCoolingMode = RunFlag != 0;
-            thisChiller.initialize();
-            thisChiller.calculateChiller(MyLoad);
-            thisChiller.updateCoolRecords(MyLoad, RunFlag);
-        } else if (BranchInletNodeNum == GasAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
+            this->InCoolingMode = RunFlag != 0;
+            this->initialize();
+            this->calculateChiller(CurLoad);
+            this->updateCoolRecords(CurLoad, RunFlag);
+        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            GasAbsorber(ChillNum).InHeatingMode = RunFlag != 0;
-            thisChiller.initialize();
-            thisChiller.calculateHeater(MyLoad, RunFlag);
-            thisChiller.updateHeatRecords(MyLoad, RunFlag);
-        } else if (BranchInletNodeNum == GasAbsorber(ChillNum).CondReturnNodeNum) { // called from condenser loop
-            if (GasAbsorber(ChillNum).CDLoopNum > 0) {
-                PlantUtilities::UpdateChillerComponentCondenserSide(GasAbsorber(ChillNum).CDLoopNum,
-                                                    GasAbsorber(ChillNum).CDLoopSideNum,
-                                                    DataPlant::TypeOf_Chiller_DFAbsorption,
-                                                    GasAbsorber(ChillNum).CondReturnNodeNum,
-                                                    GasAbsorber(ChillNum).CondSupplyNodeNum,
-                                                                    GasAbsorber(ChillNum).TowerLoad,
-                                                                    GasAbsorber(ChillNum).CondReturnTemp,
-                                                                    GasAbsorber(ChillNum).CondSupplyTemp,
-                                                                    GasAbsorber(ChillNum).CondWaterFlowRate,
-                                                    FirstIteration);
+            this->InHeatingMode = RunFlag != 0;
+            this->initialize();
+            this->calculateHeater(CurLoad, RunFlag);
+            this->updateHeatRecords(CurLoad, RunFlag);
+        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+            if (this->CDLoopNum > 0) {
+                PlantUtilities::UpdateChillerComponentCondenserSide(this->CDLoopNum,
+                                                                    this->CDLoopSideNum,
+                                                                    DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                                    this->CondReturnNodeNum,
+                                                                    this->CondSupplyNodeNum,
+                                                                    this->TowerLoad,
+                                                                    this->CondReturnTemp,
+                                                                    this->CondSupplyTemp,
+                                                                    this->CondWaterFlowRate,
+                                                                    FirstHVACIteration);
             }
         } else { // Error, nodes do not match
-            ShowSevereError("Invalid call to Gas Absorber Chiller " + AbsorberName);
+            ShowSevereError("Invalid call to Gas Absorber Chiller " + this->Name);
             ShowContinueError("Node connections in branch are not consistent with object nodes.");
             ShowFatalError("Preceding conditions cause termination.");
         }
     }
+
+
+    void GasAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) {
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+            this->size();                                      // only call from chilled water loop
+            MinLoad = this->NomCoolingCap * this->MinPartLoadRat;
+            MaxLoad = this->NomCoolingCap * this->MaxPartLoadRat;
+            OptLoad = this->NomCoolingCap * this->OptPartLoadRat;
+        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+            Real64 Sim_HeatCap = this->NomCoolingCap * this->NomHeatCoolRatio;
+            MinLoad = Sim_HeatCap * this->MinPartLoadRat;
+            MaxLoad = Sim_HeatCap * this->MaxPartLoadRat;
+            OptLoad = Sim_HeatCap * this->OptPartLoadRat;
+        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+            MinLoad = 0.0;
+            MaxLoad = 0.0;
+            OptLoad = 0.0;
+        } else { // Error, nodes do not match
+            ShowSevereError("SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
+            ShowContinueError("Node connections in branch are not consistent with object nodes.");
+            ShowFatalError("Preceding conditions cause termination.");
+        } // Operate as Chiller or Heater
+    }
+
+    void GasAbsorberSpecs::getSizingFactor(Real64 &_SizFac) {
+        _SizFac = this->SizFac;
+    }
+
+    void GasAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation) {
+        this->initialize();
+
+        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        int BranchInletNodeNum = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+
+        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+            this->size();                                      // only call from chilled water loop
+        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+            // don't do anything here
+        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+           // don't do anything here
+        } else { // Error, nodes do not match
+            ShowSevereError("SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
+            ShowContinueError("Node connections in branch are not consistent with object nodes.");
+            ShowFatalError("Preceding conditions cause termination.");
+        } // Operate as Chiller or Heater
+    }
+
+    void GasAbsorberSpecs::getDesignTemperatures(Real64 &TempCondInDesign, Real64 &TempEvapOutDesign) {
+        TempEvapOutDesign = this->TempDesCHWSupply;
+        TempCondInDesign = this->TempDesCondReturn;
+    }
+
 
     void GetGasAbsorberInput()
     {
@@ -273,7 +266,6 @@ namespace ChillerGasAbsorption {
 
         // ALLOCATE ARRAYS
         GasAbsorber.allocate(NumGasAbsorbers);
-        CheckEquipName.dimension(NumGasAbsorbers, true);
 
         // LOAD ARRAYS
 
@@ -2034,7 +2026,6 @@ namespace ChillerGasAbsorption {
 
     void clear_state()
     {
-        CheckEquipName.deallocate();
         GasAbsorber.deallocate();
         getGasAbsorberInputs = true;
     }
