@@ -182,7 +182,6 @@ namespace ChillerGasAbsorption {
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
 
         if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-            this->size();                                     // only call from chilled water loop
             MinLoad = this->NomCoolingCap * this->MinPartLoadRat;
             MaxLoad = this->NomCoolingCap * this->MaxPartLoadRat;
             OptLoad = this->NomCoolingCap * this->OptPartLoadRat;
