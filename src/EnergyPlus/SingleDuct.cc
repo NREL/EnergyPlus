@@ -4883,6 +4883,14 @@ namespace SingleDuct {
                 ShowFatalError("Invalid Reheat Component=" + Sys(SysNum).ReheatComp);
             }
         }
+        // Calculate Damper Position.
+        if (AirMassFlow == 0.0) {
+            Sys(SysNum).DamperPosition = 0.0;
+        } else if ((AirMassFlow > 0.0) && (AirMassFlow < Sys(SysNum).AirMassFlowRateMax)) {
+            Sys(SysNum).DamperPosition = AirMassFlow / Sys(SysNum).AirMassFlowRateMax;
+        } else if (AirMassFlow == Sys(SysNum).AirMassFlowRateMax) {
+            Sys(SysNum).DamperPosition = 1.0;
+        }
 
         LoadMet = AirMassFlow * CpAirZn * (Node(HCOutNode).Temp - Node(ZoneNode).Temp);
     }
