@@ -301,12 +301,6 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
     void GetExhaustAbsorberInput()
     {
         // SUBROUTINE INFORMATION:
@@ -778,9 +772,6 @@ namespace ChillerExhaustAbsorption {
                                 ChillerName);
         }
     }
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
 
     void InitExhaustAbsorber(int const ChillNum,           // number of the current engine driven chiller being simulated
                              bool const EP_UNUSED(RunFlag) // TRUE when chiller operating
@@ -1477,9 +1468,6 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
     void CalcExhaustAbsorberChillerModel(int &ChillNum,                // Absorber number
                                          Real64 &MyLoad,               // operating load
                                          bool const EP_UNUSED(RunFlag) // TRUE when Absorber operating
@@ -1523,12 +1511,6 @@ namespace ChillerExhaustAbsorption {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
         std::string const RoutineName("CalcExhaustAbsorberChillerModel");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Local copies of ExhaustAbsorberSpecs Type
@@ -2012,12 +1994,6 @@ namespace ChillerExhaustAbsorption {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
         static std::string const RoutineName("CalcExhaustAbsorberHeaterModel");
-        // INTEGER    :: ExhTempLTAbsLeavingTempCount      = 0        ! Counter for exhaust temp < absorber leaving air temp warning messages
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Local copies of ExhaustAbsorberSpecs Type
@@ -2257,12 +2233,6 @@ namespace ChillerExhaustAbsorption {
         ExhaustAbsorberReport(ChillNum).ExhHeatRecPotentialHeat = lExhHeatRecPotentialHeat;
     }
 
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
     void UpdateExhaustAbsorberCoolRecords(Real64 const MyLoad, // current load
                                           bool const RunFlag,  // TRUE if Absorber operating
                                           int const ChillNum   // Absorber number
@@ -2283,12 +2253,8 @@ namespace ChillerExhaustAbsorption {
         int lChillSupplyNodeNum; // Node number on the outlet side of the plant
         int lCondReturnNodeNum;  // Node number on the inlet side of the condenser
         int lCondSupplyNodeNum;  // Node number on the outlet side of the condenser
-        // MBadded
         int lExhaustAirInletNodeNum; // Node number on the inlet side of the plant
-        //  INTEGER           :: lExhaustAirOutletNodeNum ! Node number on the outlet side of the plant
         Real64 RptConstant;
-
-        // BEGIN ROUTINE
 
         lChillReturnNodeNum = ExhaustAbsorber(ChillNum).ChillReturnNodeNum;
         lChillSupplyNodeNum = ExhaustAbsorber(ChillNum).ChillSupplyNodeNum;
@@ -2297,36 +2263,17 @@ namespace ChillerExhaustAbsorption {
 
         lExhaustAirInletNodeNum = ExhaustAbsorber(ChillNum).ExhaustAirInletNodeNum;
         if (MyLoad == 0 || !RunFlag) {
-            // set node temperatures
-
             Node(lChillSupplyNodeNum).Temp = Node(lChillReturnNodeNum).Temp;
             if (ExhaustAbsorber(ChillNum).isWaterCooled) {
                 Node(lCondSupplyNodeNum).Temp = Node(lCondReturnNodeNum).Temp;
             }
-
             Node(lExhaustAirInletNodeNum).Temp = Node(lExhaustAirInletNodeNum).Temp;
-            // set node flow rates
-            // Update Outlet Conditions so that same as Inlet, so component
-            // can be bypassed if necessary
-            // FlowResolver/EnforceSplitterContinuity will determine flow
-            // received, whether component is running or not.
-            //    Node(lChillReturnNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lChillSupplyNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lCondReturnNodeNum)%MassFlowRate           = ExhaustAbsorberReport(ChillNum)%CondWaterFlowRate
-            //    Node(lCondSupplyNodeNum)%MassFlowRate           = ExhaustAbsorberReport(ChillNum)%CondWaterFlowRate
             Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorberReport(ChillNum).ExhaustInFlow;
         } else {
-            // set node temperatures
             Node(lChillSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).ChillSupplyTemp;
             if (ExhaustAbsorber(ChillNum).isWaterCooled) {
                 Node(lCondSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).CondSupplyTemp;
             }
-            // set node flow rates;  for these load based models
-            // assume that the sufficient evaporator flow rate available
-            //    Node(lChillReturnNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lChillSupplyNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%ChillWaterFlowRate
-            //    Node(lCondReturnNodeNum)%MassFlowRate           = ExhaustAbsorberReport(ChillNum)%CondWaterFlowRate
-            //    Node(lCondSupplyNodeNum)%MassFlowRate           = ExhaustAbsorberReport(ChillNum)%CondWaterFlowRate
             Node(lExhaustAirInletNodeNum).Temp = ExhaustAbsorberReport(ChillNum).ExhaustInTemp;
             Node(lExhaustAirInletNodeNum).MassFlowRate = ExhaustAbsorberReport(ChillNum).ExhaustInFlow;
         }
@@ -2369,29 +2316,13 @@ namespace ChillerExhaustAbsorption {
         int lHeatSupplyNodeNum; // absorber steam outlet node number, water side
         Real64 RptConstant;
 
-        // BEGIN ROUTINE
-
         lHeatReturnNodeNum = ExhaustAbsorber(ChillNum).HeatReturnNodeNum;
         lHeatSupplyNodeNum = ExhaustAbsorber(ChillNum).HeatSupplyNodeNum;
 
         if (MyLoad == 0 || !RunFlag) {
-            // set node temperatures
             Node(lHeatSupplyNodeNum).Temp = Node(lHeatReturnNodeNum).Temp;
-
-            // set node flow rates
-            // Update Outlet Conditions so that same as Inlet, so component
-            // can be bypassed if necessary
-            // FlowResolver/EnforceSplitterContinuity will determine flow
-            // received, whether component is running or not.
-            //    Node(lHeatReturnNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%HotWaterFlowRate
-            //    Node(lHeatSupplyNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%HotWaterFlowRate
         } else {
-            // set node temperatures
             Node(lHeatSupplyNodeNum).Temp = ExhaustAbsorberReport(ChillNum).HotWaterSupplyTemp;
-            //          !set node flow rates;  for these load based models
-            //          !assume that the sufficient evaporator flow rate available
-            //    Node(lHeatReturnNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%HotWaterFlowRate
-            //    Node(lHeatSupplyNodeNum)%MassFlowRate          = ExhaustAbsorberReport(ChillNum)%HotWaterFlowRate
         }
 
         // convert power to energy and instantaneous use to use over the time step
@@ -2402,9 +2333,6 @@ namespace ChillerExhaustAbsorption {
         ExhaustAbsorberReport(ChillNum).ElectricEnergy = ExhaustAbsorberReport(ChillNum).ElectricPower * RptConstant;
         ExhaustAbsorberReport(ChillNum).HeatElectricEnergy = ExhaustAbsorberReport(ChillNum).HeatElectricPower * RptConstant;
     }
-
-    // End of Record Keeping subroutines for the Exhasut Fired Absorption Chiller Module
-    // *****************************************************************************
 
     void clear_state()
     {
@@ -2421,25 +2349,6 @@ namespace ChillerExhaustAbsorption {
         Calc_oldCondSupplyTemp = 0.0; // save the last iteration value of leaving condenser water temperature
         Get_ErrorsFound = false;
     }
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
 
 } // namespace ChillerExhaustAbsorption
 
