@@ -70,9 +70,19 @@ namespace ChillerReformulatedEIR {
 
     extern bool GetInputREIR; // When TRUE, calls subroutine to read input file
 
+    struct RefEIRReportSpecs
+    {
+        Real64 CondOutletTemp;
+
+        RefEIRReportSpecs() : CondOutletTemp(0.0)
+        {
+        };
+    };
+
     struct ReformulatedEIRChillerSpecs : PlantComponent
     {
         // Members
+        int myIdx;
         std::string Name;                 // User identifier
         int TypeNum;                      // plant loop type identifier
         std::string CAPFTName;            // CAPFT curve name
@@ -203,7 +213,7 @@ namespace ChillerReformulatedEIR {
         Real64 QEvaporator;                // reporting: Evaporator heat transfer rate [W]
         Real64 Power;                // reporting: Chiller power [W]
         Real64 EvapOutletTemp;       // reporting: Evaporator outlet temperature [C]
-        Real64 CondOutletTemp;       // reporting: Condenser outlet temperature [C]
+//        Real64 CondOutletTemp;       // reporting: Condenser outlet temperature [C]
         Real64 EvapMassFlowRate;             // reporting: Evaporator mass flow rate [kg/s]
         Real64 CondMassFlowRate;    // Condenser mass flow rate [kg/s]
         Real64 ChillerFalseLoad;     // reporting: Chiller false load over and above water side load [W]
@@ -220,7 +230,7 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(0), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
+            : myIdx(0), TypeNum(0), CondenserType(0), PartLoadCurveType(0), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(FlowModeNotSet),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
@@ -242,7 +252,7 @@ namespace ChillerReformulatedEIR {
               FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true),
               MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0), ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0),
               ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0), ChillerCapFT(0.0), HeatRecOutletTemp(0.0),
-              QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0),
+              QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0),
               EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecMassFlow(0.0), EquipFlowCtrl(0)

@@ -133,16 +133,20 @@ namespace ChillerReformulatedEIR {
     // MODULE VARIABLE DECLARATIONS:
     int NumElecReformEIRChillers(0); // Number of electric reformulated EIR chillers specified in input
 
+    Real64 condOutletTempMod(0.0);
+
     bool GetInputREIR(true); // When TRUE, calls subroutine to read input file
 
     // Object Data
     Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
+    Array1D<RefEIRReportSpecs> RefEIRReport; // dimension to number of machines
 
     void clear_state()
     {
       NumElecReformEIRChillers = 0;
       GetInputREIR = true;
       ElecReformEIRChiller.deallocate();
+      RefEIRReport.deallocate();
     }
 
     PlantComponent *ReformulatedEIRChillerSpecs::factory(std::string const &objectName)
@@ -225,7 +229,7 @@ namespace ChillerReformulatedEIR {
                                                 this->CondOutletNodeNum,
                                                 this->QCondenser,
                                                 this->CondInletTemp,
-                                                this->CondOutletTemp,
+                                                RefEIRReport(this->myIdx).CondOutletTemp,
                                                 this->CondMassFlowRate,
                                                 FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRLoopNum) {
@@ -268,6 +272,7 @@ namespace ChillerReformulatedEIR {
 
         // ALLOCATE ARRAYS
         ElecReformEIRChiller.allocate(NumElecReformEIRChillers);
+        RefEIRReport.allocate(NumElecReformEIRChillers);
 
         // Load arrays with reformulated electric EIR chiller data
         for (int EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum) {
@@ -290,6 +295,7 @@ namespace ChillerReformulatedEIR {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
+            ElecReformEIRChiller(EIRChillerNum).myIdx = EIRChillerNum;
             ElecReformEIRChiller(EIRChillerNum).Name = DataIPShortCuts::cAlphaArgs(1);
             // Performance curves
             ElecReformEIRChiller(EIRChillerNum).ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
@@ -726,7 +732,7 @@ namespace ChillerReformulatedEIR {
 
         SetupOutputVariable("Chiller Condenser Outlet Temperature",
                             OutputProcessor::Unit::C,
-                            this->CondOutletTemp,
+                            RefEIRReport(this->myIdx).CondOutletTemp,
                             "System",
                             "Average",
                             this->Name);
@@ -1670,11 +1676,11 @@ namespace ChillerReformulatedEIR {
             this->calculate(MyLoad, RunFlag, Tmin);
 
             // Condenser outlet temperature when using Tmin as input to calculate [C]
-            Real64 CondTempMin = this->CondOutletTemp;
+            Real64 CondTempMin = condOutletTempMod;
             this->calculate(MyLoad, RunFlag, Tmax);
 
             // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
-            Real64 CondTempMax = this->CondOutletTemp;
+            Real64 CondTempMax = condOutletTempMod;
 
             if (CondTempMin > Tmin && CondTempMax < Tmax) {
 
@@ -1709,8 +1715,8 @@ namespace ChillerReformulatedEIR {
                             ShowRecurringWarningErrorAtEnd(this->Name +
                                                                ": Iteration limit exceeded calculating condenser outlet temperature.",
                                                            this->IterLimitErrIndex,
-                                                           this->CondOutletTemp,
-                                                           this->CondOutletTemp);
+                                                           condOutletTempMod,
+                                                           condOutletTempMod);
                         }
                     }
                 } else if (SolFla == -2) {
@@ -1726,8 +1732,8 @@ namespace ChillerReformulatedEIR {
                             ShowRecurringWarningErrorAtEnd(this->Name +
                                                                ": Solution is not found in calculating condenser outlet temperature.",
                                                            this->IterFailedIndex,
-                                                           this->CondOutletTemp,
-                                                           this->CondOutletTemp);
+                                                           condOutletTempMod,
+                                                           condOutletTempMod);
                         }
                     }
                     this->calculate(MyLoad, RunFlag, DataLoopNode::Node(this->CondInletNodeNum).Temp);
@@ -1735,7 +1741,7 @@ namespace ChillerReformulatedEIR {
             } else {
                 //    If iteration is not possible, average the min/max condenser outlet temperature and manually determine solution
                 this->calculate(MyLoad, RunFlag, (CondTempMin + CondTempMax) / 2.0);
-                this->calculate(MyLoad, RunFlag, this->CondOutletTemp);
+                this->calculate(MyLoad, RunFlag, condOutletTempMod);
             }
 
             //  Call subroutine to evaluate all performance curve min/max values against evaporator/condenser outlet temps and PLR
@@ -1850,7 +1856,7 @@ namespace ChillerReformulatedEIR {
             this->CondEnergy = 0.0;
             this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
-            this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
+            RefEIRReport(this->myIdx).CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
             this->ActualCOP = 0.0;
 
@@ -1867,7 +1873,7 @@ namespace ChillerReformulatedEIR {
         } else { // Chiller is running, so pass calculated values
             // Set node temperatures
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
-            DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
+            DataLoopNode::Node(this->CondOutletNodeNum).Temp = condOutletTempMod;
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
             this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -1876,6 +1882,7 @@ namespace ChillerReformulatedEIR {
             this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            RefEIRReport(this->myIdx).CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp; // missed here
             if (this->Power != 0.0) {
                 this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
             } else {
@@ -1914,7 +1921,7 @@ namespace ChillerReformulatedEIR {
         bool RunFlag = (int(Par(3)) == 1);
 
         this->calculate(MyLoad, RunFlag, FalsiCondOutTemp);
-        Real64 CondOutTempResidual = FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
+        Real64 CondOutTempResidual = FalsiCondOutTemp - condOutletTempMod; // CondOutletTemp is module level variable, final value used for reporting
 
         return CondOutTempResidual;
     }
@@ -2083,7 +2090,7 @@ namespace ChillerReformulatedEIR {
             if ((this->QHeatRecovery + this->QCondenser) >
                 0.0) { // protect div by zero
                 this->ChillerCondAvgTemp = (this->QHeatRecovery * this->HeatRecOutletTemp +
-                        this->QCondenser * this->CondOutletTemp) /
+                        this->QCondenser * RefEIRReport(this->myIdx).CondOutletTemp) / // Maybe here too
                                   (this->QHeatRecovery + this->QCondenser);
             } else {
                 this->ChillerCondAvgTemp = FalsiCondOutTemp;
@@ -2417,7 +2424,7 @@ namespace ChillerReformulatedEIR {
                                                         condInletTemp,
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
-            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
+            condOutletTempMod = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
         } else {
             ShowSevereError("ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller=" + this->Name);
             ShowContinueErrorTimeStamp("");
@@ -2533,11 +2540,11 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFPLRPLRmax = this->ChillerEIRFPLRPLRMax;
 
         // Check bounds for curves, lump min/max into same check since min/max values are reported in recurring warning messages
-        if (this->CondOutletTemp < CAPFTYTmin || this->CondOutletTemp > CAPFTYTmax) {
+        if (condOutletTempMod < CAPFTYTmin || condOutletTempMod > CAPFTYTmax) {
             ++this->CAPFTYIter;
             if (this->CAPFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
-                                 "\": The condenser outlet temperature (" + General::TrimSigDigits(this->CondOutletTemp, 2) +
+                                 "\": The condenser outlet temperature (" + General::TrimSigDigits(condOutletTempMod, 2) +
                                  " C) is outside the range of condenser outlet temperatures (Y var) given in Cooling Capacity Function of "
                                  "Temperature biquadratic curve = " +
                                  this->CAPFTName);
@@ -2545,22 +2552,22 @@ namespace ChillerReformulatedEIR {
                 ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The cond outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTYIterIndex,
-                                               this->CondOutletTemp,
-                                               this->CondOutletTemp);
+                                               condOutletTempMod,
+                                               condOutletTempMod);
             } else {
                 ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The cond outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTYIterIndex,
-                                               this->CondOutletTemp,
-                                               this->CondOutletTemp);
+                                               condOutletTempMod,
+                                               condOutletTempMod);
             }
         }
 
-        if (this->CondOutletTemp < EIRFTYTmin || this->CondOutletTemp > EIRFTYTmax) {
+        if (condOutletTempMod < EIRFTYTmin || condOutletTempMod > EIRFTYTmax) {
             ++this->EIRFTYIter;
             if (this->EIRFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
-                                 "\": The condenser outlet temperature (" + General::TrimSigDigits(this->CondOutletTemp, 2) +
+                                 "\": The condenser outlet temperature (" + General::TrimSigDigits(condOutletTempMod, 2) +
                                  " C) is outside the range of condenser outlet temperatures (Y var) given in Electric Input to Cooling Output Ratio "
                                  "Function of Temperature biquadratic curve = " +
                                  this->EIRFTName);
@@ -2569,24 +2576,24 @@ namespace ChillerReformulatedEIR {
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The cond outlet temp range in Electric Input to Cooling Output Ratio as a Function of Temp curve error continues.",
                     this->EIRFTYIterIndex,
-                    this->CondOutletTemp,
-                    this->CondOutletTemp);
+                    condOutletTempMod,
+                    condOutletTempMod);
             } else {
                 ShowRecurringWarningErrorAtEnd(
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The cond outlet temp range in Electric Input to Cooling Output Ratio as a Function of Temp curve error continues.",
                     this->EIRFTYIterIndex,
-                    this->CondOutletTemp,
-                    this->CondOutletTemp);
+                    condOutletTempMod,
+                    condOutletTempMod);
             }
         }
 
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
-            if (this->CondOutletTemp < EIRFPLRTmin || this->CondOutletTemp > EIRFPLRTmax) {
+            if (condOutletTempMod < EIRFPLRTmin || condOutletTempMod > EIRFPLRTmax) {
                 ++this->EIRFPLRTIter;
                 if (this->EIRFPLRTIter == 1) {
                     ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
-                                     "\": The condenser outlet temperature (" + General::TrimSigDigits(this->CondOutletTemp, 2) +
+                                     "\": The condenser outlet temperature (" + General::TrimSigDigits(condOutletTempMod, 2) +
                                      " C) is outside the range of condenser outlet temperatures (X var) given in Electric Input to Cooling Output "
                                      "Ratio Function of Part-load Ratio bicubic curve = " +
                                      this->EIRFPLRName);
@@ -2596,15 +2603,15 @@ namespace ChillerReformulatedEIR {
                         "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                             "\": The cond outlet temp range in Electric Input to Cooling Output Ratio Function of PLR curve error continues.",
                         this->EIRFPLRTIterIndex,
-                        this->CondOutletTemp,
-                        this->CondOutletTemp);
+                        condOutletTempMod,
+                        condOutletTempMod);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                             "\": The cond outlet temp range in Electric Input to Cooling Output Ratio Function of PLR curve error continues.",
                         this->EIRFPLRTIterIndex,
-                        this->CondOutletTemp,
-                        this->CondOutletTemp);
+                        condOutletTempMod,
+                        condOutletTempMod);
                 }
             }
         }
@@ -2662,7 +2669,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, this->CondOutletTemp);
+        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, condOutletTempMod);
 
         if (this->ChillerCapFT < 0) {
             if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 &&
@@ -2672,7 +2679,7 @@ namespace ChillerReformulatedEIR {
                 ShowContinueError(" Chiller Capacity as a Function of Temperature curve output is negative (" + General::RoundSigDigits(this->ChillerCapFT, 3) +
                                   ").");
                 ShowContinueError(" Negative value occurs using an Evaporator Leaving Temp of " + General::RoundSigDigits(EvapOutletTempSetPoint, 1) +
-                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(this->CondOutletTemp, 1) + '.');
+                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(condOutletTempMod, 1) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerCapFTError;
@@ -2684,7 +2691,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, this->CondOutletTemp);
+        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, condOutletTempMod);
 
         if (this->ChillerEIRFT < 0.0) {
             if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 &&
@@ -2694,7 +2701,7 @@ namespace ChillerReformulatedEIR {
                 ShowContinueError(" Reformulated Chiller EIR as a Function of Temperature curve output is negative (" +
                                   General::RoundSigDigits(this->ChillerEIRFT, 3) + ").");
                 ShowContinueError(" Negative value occurs using an Evaporator Leaving Temp of " + General::RoundSigDigits(this->EvapOutletTemp, 1) +
-                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(this->CondOutletTemp, 1) + '.');
+                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(condOutletTempMod, 1) + '.');
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFTError;
@@ -2707,11 +2714,11 @@ namespace ChillerReformulatedEIR {
         }
 
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
-            this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->CondOutletTemp, this->ChillerPartLoadRatio);
+            this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, condOutletTempMod, this->ChillerPartLoadRatio);
         } else if (this->PartLoadCurveType == PLR_Lift) {
 
             // Chiller lift  [C]
-            Real64 ChillerLift = this->CondOutletTemp - this->EvapOutletTemp;
+            Real64 ChillerLift = condOutletTempMod - this->EvapOutletTemp;
 
             // Deviation of leaving chilled water temperature from the reference condition
             Real64 ChillerTdev = std::abs(this->EvapOutletTemp - this->TempRefEvapOut);
@@ -2738,7 +2745,7 @@ namespace ChillerReformulatedEIR {
                 ShowContinueError(" Chiller EIR as a function of PLR and condenser water temperature curve output is negative (" +
                                   General::RoundSigDigits(this->ChillerEIRFPLR, 3) + ").");
                 ShowContinueError(" Negative value occurs using a part-load ratio of " + General::RoundSigDigits(this->ChillerPartLoadRatio, 3) +
-                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(this->CondOutletTemp, 1) + " C.");
+                                  " and a Condenser Leaving Temp of " + General::RoundSigDigits(condOutletTempMod, 1) + " C.");
                 ShowContinueErrorTimeStamp(" Resetting curve output to zero and continuing simulation.");
             } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
                 ++this->ChillerEIRFPLRError;
