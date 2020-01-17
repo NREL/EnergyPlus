@@ -58,13 +58,13 @@
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataEnvironment.hh>
+//#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+//#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -233,22 +233,14 @@ namespace ChillerExhaustAbsorption {
         if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).ChillReturnNodeNum) { // Operate as chiller
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            if (RunFlag) {
-                ExhaustAbsorber(ChillNum).InCoolingMode = true;
-            } else {
-                ExhaustAbsorber(ChillNum).InCoolingMode = false;
-            }
+            ExhaustAbsorber(ChillNum).InCoolingMode = RunFlag != 0;
             InitExhaustAbsorber(ChillNum, RunFlag);
             CalcExhaustAbsorberChillerModel(ChillNum, MyLoad, RunFlag);
             UpdateExhaustAbsorberCoolRecords(MyLoad, RunFlag, ChillNum);
         } else if (BranchInletNodeNum == ExhaustAbsorber(ChillNum).HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
-            if (RunFlag) {
-                ExhaustAbsorber(ChillNum).InHeatingMode = true;
-            } else {
-                ExhaustAbsorber(ChillNum).InHeatingMode = false;
-            }
+            ExhaustAbsorber(ChillNum).InHeatingMode = RunFlag != 0;
             InitExhaustAbsorber(ChillNum, RunFlag);
             CalcExhaustAbsorberHeaterModel(ChillNum, MyLoad, RunFlag);
             UpdateExhaustAbsorberHeatRecords(MyLoad, RunFlag, ChillNum);
@@ -1058,9 +1050,6 @@ namespace ChillerExhaustAbsorption {
         // SUBROUTINE PARAMETER DEFINITIONS:
         std::string const RoutineName("SizeExhaustAbsorber");
 
-        int PltSizCoolNum; // Plant Sizing index for cooling loop
-        int PltSizHeatNum; // Plant Sizing index for heating loop
-        int PltSizCondNum; // Plant Sizing index for condenser loop
 
         bool ErrorsFound; // If errors detected in input
         std::string equipName;
@@ -1075,23 +1064,17 @@ namespace ChillerExhaustAbsorption {
         Real64 CondVolFlowRateUser;    // Hardsized condenser flow rate for reporting
         Real64 HeatRecVolFlowRateUser; // Hardsized generator flow rate for reporting
 
-        PltSizCoolNum = 0;
-        PltSizCondNum = 0;
-        PltSizHeatNum = 0;
         ErrorsFound = false;
         tmpNomCap = ExhaustAbsorber(ChillNum).NomCoolingCap;
         tmpEvapVolFlowRate = ExhaustAbsorber(ChillNum).EvapVolFlowRate;
         tmpCondVolFlowRate = ExhaustAbsorber(ChillNum).CondVolFlowRate;
         tmpHeatRecVolFlowRate = ExhaustAbsorber(ChillNum).HeatVolFlowRate;
-        NomCapUser = 0.0;
-        EvapVolFlowRateUser = 0.0;
-        CondVolFlowRateUser = 0.0;
-        HeatRecVolFlowRateUser = 0.0;
 
+        int PltSizCondNum = 0; // Plant Sizing index for condenser loop
         if (ExhaustAbsorber(ChillNum).isWaterCooled) PltSizCondNum = DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CDLoopNum).PlantSizNum;
 
-        PltSizHeatNum = DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).HWLoopNum).PlantSizNum;
-        PltSizCoolNum = DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).PlantSizNum;
+        int PltSizHeatNum = DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).HWLoopNum).PlantSizNum;
+        int PltSizCoolNum = DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).PlantSizNum;
 
         if (PltSizCoolNum > 0) {
             if (DataSizing::PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
@@ -1533,7 +1516,6 @@ namespace ChillerExhaustAbsorption {
         lElecCoolRatio = ExhaustAbsorber(ChillNum).ElecCoolRatio;
         lMinPartLoadRat = ExhaustAbsorber(ChillNum).MinPartLoadRat;
         lMaxPartLoadRat = ExhaustAbsorber(ChillNum).MaxPartLoadRat;
-        lOptPartLoadRat = ExhaustAbsorber(ChillNum).OptPartLoadRat;
         lTempDesCondReturn = ExhaustAbsorber(ChillNum).TempDesCondReturn;
         lTempDesCHWSupply = ExhaustAbsorber(ChillNum).TempDesCHWSupply;
         lCondVolFlowRate = ExhaustAbsorber(ChillNum).CondVolFlowRate;
@@ -1553,7 +1535,6 @@ namespace ChillerExhaustAbsorption {
         lChillReturnTemp = DataLoopNode::Node(lChillReturnNodeNum).Temp;
         lChillWaterMassFlowRate = DataLoopNode::Node(lChillReturnNodeNum).MassFlowRate;
         lCondReturnTemp = DataLoopNode::Node(lCondReturnNodeNum).Temp;
-        lCondWaterMassFlowRate = DataLoopNode::Node(lCondReturnNodeNum).MassFlowRate;
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -1604,7 +1585,6 @@ namespace ChillerExhaustAbsorption {
                                      ExhaustAbsorber(ChillNum).CDBranchNum,
                                      ExhaustAbsorber(ChillNum).CDCompNum);
             }
-            ChillDeltaTemp = 0.0;
             lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
 
         } else {
@@ -1682,14 +1662,6 @@ namespace ChillerExhaustAbsorption {
                                              ExhaustAbsorber(ChillNum).CWLoopSideNum,
                                              ExhaustAbsorber(ChillNum).CWBranchNum,
                                              ExhaustAbsorber(ChillNum).CWCompNum);
-                        {
-                            auto const SELECT_CASE_var1(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).LoopDemandCalcScheme);
-                            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
-                                lChillSupplyTemp = DataLoopNode::Node(lChillSupplyNodeNum).TempSetPoint;
-                            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
-                                lChillSupplyTemp = DataLoopNode::Node(lChillSupplyNodeNum).TempSetPointHi;
-                            }
-                        }
                     } else {
                         lChillWaterMassFlowRate = 0.0;
                         ShowRecurringWarningErrorAtEnd("ExhaustAbsorberChillerModel:Cooling\"" + ExhaustAbsorber(ChillNum).Name +
@@ -1819,7 +1791,6 @@ namespace ChillerExhaustAbsorption {
                 lCoolElectricPower = 0.0;
                 lChillSupplyTemp = lChillReturnTemp;
                 lCondSupplyTemp = lCondReturnTemp;
-                ChillDeltaTemp = 0.0;
                 lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
             }
             // for water cooled condenser make sure enough flow rate
@@ -1926,7 +1897,6 @@ namespace ChillerExhaustAbsorption {
         int lHeatSupplyNodeNum;           // absorber hot water outlet node number, water side
         Real64 lMinPartLoadRat;           // min allowed operating frac full load
         Real64 lMaxPartLoadRat;           // max allowed operating frac full load
-        Real64 lOptPartLoadRat;           // optimal operating frac full load
         int lHeatCapFCoolCurve;           // Heating Capacity Function of Cooling Capacity Curve
         int lThermalEnergyHeatFHPLRCurve; // ThermalEnergy Input to heat output ratio during heating only function
         // Local copies of ExhaustAbsorberReportVars Type
@@ -1978,7 +1948,6 @@ namespace ChillerExhaustAbsorption {
         lElecHeatRatio = ExhaustAbsorber(ChillNum).ElecHeatRatio;
         lMinPartLoadRat = ExhaustAbsorber(ChillNum).MinPartLoadRat;
         lMaxPartLoadRat = ExhaustAbsorber(ChillNum).MaxPartLoadRat;
-        lOptPartLoadRat = ExhaustAbsorber(ChillNum).OptPartLoadRat;
         lHeatCapFCoolCurve = ExhaustAbsorber(ChillNum).HeatCapFCoolCurve;
         lThermalEnergyHeatFHPLRCurve = ExhaustAbsorber(ChillNum).ThermalEnergyHeatFHPLRCurve;
         lHotWaterMassFlowRateMax = ExhaustAbsorber(ChillNum).DesHeatMassFlowRate;
