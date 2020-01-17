@@ -1436,13 +1436,8 @@ namespace ChillerExhaustAbsorption {
         int lChillReturnNodeNum;         // Node number on the inlet side of the plant
         int lChillSupplyNodeNum;         // Node number on the outlet side of the plant
         int lCondReturnNodeNum;          // Node number on the inlet side of the condenser
-        int lCondSupplyNodeNum;          // Node number on the outlet side of the condenser
         Real64 lMinPartLoadRat;          // min allowed operating frac full load
         Real64 lMaxPartLoadRat;          // max allowed operating frac full load
-        Real64 lOptPartLoadRat;          // optimal operating frac full load
-        Real64 lTempDesCondReturn;       // design secondary loop fluid temperature at the Absorber condenser side inlet
-        Real64 lTempDesCHWSupply;        // design chilled water supply temperature
-        Real64 lCondVolFlowRate;         // m**3/s - design nominal water volumetric flow rate through the condenser
         int lCoolCapFTCurve;             // cooling capacity as a function of temperature curve
         int lThermalEnergyCoolFTCurve;   // ThermalEnergy-Input-to cooling output Ratio Function of Temperature Curve
         int lThermalEnergyCoolFPLRCurve; // ThermalEnergy-Input-to cooling output Ratio Function of Part Load Ratio Curve
@@ -1493,10 +1488,8 @@ namespace ChillerExhaustAbsorption {
         Real64 errorAvailCap; // error fraction on final estimate of AvailableCoolingCapacity
         int LoopNum;
         int LoopSideNum;
-        Real64 rhoCW; // local fluid density for chilled water
         Real64 Cp_CW; // local fluid specific heat for chilled water
-        Real64 rhoCD; // local fluid density for condenser water
-        Real64 Cp_CD; // local fluid specific heat for condenser water
+        Real64 Cp_CD = -1; // local fluid specific heat for condenser water -- initializing to negative to ensure it isn't used uninitialized
         Real64 CpAir; // specific heat of exhaust air
 
         // define constant values
@@ -1506,7 +1499,6 @@ namespace ChillerExhaustAbsorption {
         lChillReturnNodeNum = ExhaustAbsorber(ChillNum).ChillReturnNodeNum;
         lChillSupplyNodeNum = ExhaustAbsorber(ChillNum).ChillSupplyNodeNum;
         lCondReturnNodeNum = ExhaustAbsorber(ChillNum).CondReturnNodeNum;
-        lCondSupplyNodeNum = ExhaustAbsorber(ChillNum).CondSupplyNodeNum;
         lExhaustAirInletNodeNum = ExhaustAbsorber(ChillNum).ExhaustAirInletNodeNum;
 
         // set local copies of data from rest of input structure
@@ -1516,9 +1508,6 @@ namespace ChillerExhaustAbsorption {
         lElecCoolRatio = ExhaustAbsorber(ChillNum).ElecCoolRatio;
         lMinPartLoadRat = ExhaustAbsorber(ChillNum).MinPartLoadRat;
         lMaxPartLoadRat = ExhaustAbsorber(ChillNum).MaxPartLoadRat;
-        lTempDesCondReturn = ExhaustAbsorber(ChillNum).TempDesCondReturn;
-        lTempDesCHWSupply = ExhaustAbsorber(ChillNum).TempDesCHWSupply;
-        lCondVolFlowRate = ExhaustAbsorber(ChillNum).CondVolFlowRate;
         lCoolCapFTCurve = ExhaustAbsorber(ChillNum).CoolCapFTCurve;
         lThermalEnergyCoolFTCurve = ExhaustAbsorber(ChillNum).ThermalEnergyCoolFTCurve;
         lThermalEnergyCoolFPLRCurve = ExhaustAbsorber(ChillNum).ThermalEnergyCoolFPLRCurve;
@@ -1550,19 +1539,11 @@ namespace ChillerExhaustAbsorption {
         lExhaustInFlow = DataLoopNode::Node(lExhaustAirInletNodeNum).MassFlowRate;
         lExhaustAirHumRat = DataLoopNode::Node(lExhaustAirInletNodeNum).HumRat;
 
-        rhoCW = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).FluidName,
-                                 lChillReturnTemp,
-                                 DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).FluidIndex,
-                                 RoutineName);
         Cp_CW = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).FluidName,
                                       lChillReturnTemp,
                                       DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CWLoopNum).FluidIndex,
                                       RoutineName);
         if (ExhaustAbsorber(ChillNum).CDLoopNum > 0) {
-            rhoCD = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CDLoopNum).FluidName,
-                                     lChillReturnTemp,
-                                     DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CDLoopNum).FluidIndex,
-                                     RoutineName);
             Cp_CD = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CDLoopNum).FluidName,
                                           lChillReturnTemp,
                                           DataPlant::PlantLoop(ExhaustAbsorber(ChillNum).CDLoopNum).FluidIndex,
@@ -1906,12 +1887,8 @@ namespace ChillerExhaustAbsorption {
         // Real64 lThermalEnergy( 0.0 ); // variable to track total Thermal Energy used for a period (reference only)
         Real64 lCoolThermalEnergyUseRate(0.0); // instantaneous use of thermal energy for period for cooling
         Real64 lHeatThermalEnergyUseRate(0.0); // instantaneous use of thermal energy for period for heating
-        // Real64 lHeatThermalEnergy( 0.0 ); // variable to track total ThermalEnergy used for a period for heating
-        // Real64 lElectricPower( 0.0 ); // parasitic electric power used (was PumpingPower)
-        // Real64 lElectricEnergy( 0.0 ); // track the total electricity used for a period (was PumpingEnergy)
         Real64 lCoolElectricPower(0.0); // parasitic electric power used  for cooling
         Real64 lHeatElectricPower(0.0); // parasitic electric power used  for heating
-        // Real64 lHeatElectricEnergy( 0.0 ); // track the total electricity used for a period for heating
         Real64 lHotWaterReturnTemp(0.0);       // reporting: hot water return (inlet) temperature
         Real64 lHotWaterSupplyTemp(0.0);       // reporting: hot water supply (outlet) temperature
         Real64 lHotWaterMassFlowRate(0.0);     // reporting: hot water mass flow rate
@@ -1919,7 +1896,6 @@ namespace ChillerExhaustAbsorption {
         Real64 lHeatPartLoadRatio(0.0);        // operating part load ratio (load/capacity for heating)
         Real64 lAvailableHeatingCapacity(0.0); // current heating capacity
         Real64 lFractionOfPeriodRunning(0.0);
-        Real64 lHotWaterMassFlowRateMax(0.0); // Maximum flow rate through the evaporator
         Real64 lExhaustInTemp(0.0);           // Exhaust inlet temperature
         Real64 lExhaustInFlow(0.0);           // Exhaust inlet flow rate
         Real64 lExhHeatRecPotentialHeat(0.0); // Exhaust heat recovery potential
@@ -1931,7 +1907,6 @@ namespace ChillerExhaustAbsorption {
         int LoopSideNum;
         Real64 Cp_HW; // local fluid specific heat for hot water
         Real64 CpAir;
-        Real64 rhoHW;                // local fluid density for hot water
         int lExhaustAirInletNodeNum; // Combustion Air Inlet Node number
 
         // set node values to data structure values for nodes
@@ -1950,12 +1925,10 @@ namespace ChillerExhaustAbsorption {
         lMaxPartLoadRat = ExhaustAbsorber(ChillNum).MaxPartLoadRat;
         lHeatCapFCoolCurve = ExhaustAbsorber(ChillNum).HeatCapFCoolCurve;
         lThermalEnergyHeatFHPLRCurve = ExhaustAbsorber(ChillNum).ThermalEnergyHeatFHPLRCurve;
-        lHotWaterMassFlowRateMax = ExhaustAbsorber(ChillNum).DesHeatMassFlowRate;
         LoopNum = ExhaustAbsorber(ChillNum).HWLoopNum;
         LoopSideNum = ExhaustAbsorber(ChillNum).HWLoopSideNum;
 
         Cp_HW = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
-        rhoHW = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         lCoolElectricPower = ExhaustAbsorberReport(ChillNum).CoolElectricPower;
         lCoolThermalEnergyUseRate = ExhaustAbsorberReport(ChillNum).CoolThermalEnergyUseRate;
@@ -1981,7 +1954,6 @@ namespace ChillerExhaustAbsorption {
         if (MyLoad <= 0 || !RunFlag) {
             // set node temperatures
             lHotWaterSupplyTemp = lHotWaterReturnTemp;
-            HeatDeltaTemp = 0.0;
             lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
         } else {
 
@@ -2091,7 +2063,6 @@ namespace ChillerExhaustAbsorption {
                 lHeatThermalEnergyUseRate = 0.0;
                 lHeatElectricPower = 0.0;
                 lHotWaterSupplyTemp = lHotWaterReturnTemp;
-                HeatDeltaTemp = 0.0;
                 lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
             }
 
