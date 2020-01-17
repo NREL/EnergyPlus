@@ -287,24 +287,11 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(const PlantLocation &calledFromLocation,
+    void DetailedIceStorageData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool EP_UNUSED(FirstHVACIteration),
                                           Real64 &EP_UNUSED(CurLoad),
-                                          bool RunFlag)
+                                          bool EP_UNUSED(RunFlag))
     {
-
-        // this was happening in PlantLoopEquip before
-        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum));
-
-        // If component setpoint based control is active for this equipment
-        // then reset CurLoad to original EquipDemand.
-        // Allow negative CurLoad.  For cold storage this means the storage should
-        // charge, for hot storage, this means the storage should discharge.
-        if (thisComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-            Real64 localCurLoad = thisComp.EquipDemand;
-            if (localCurLoad != 0) RunFlag = true;
-        }
-
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;

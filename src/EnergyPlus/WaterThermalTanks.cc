@@ -318,7 +318,7 @@ namespace WaterThermalTanks {
     void WaterThermalTankData::simulate(const PlantLocation &calledFromLocation,
                                         bool FirstHVACIteration,
                                         Real64 &CurLoad,
-                                        bool RunFlag)
+                                        bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -328,19 +328,6 @@ namespace WaterThermalTanks {
 
         // set the caller loop num to mimic what was happening in plant loop equip
         this->callerLoopNum = calledFromLocation.loopNum;
-
-        // this was also being done in plant loop equip for certain components
-        // If component setpoint based control is active for this equipment
-        // then reset CurLoad to original EquipDemand.
-        // Allow negative CurLoad.  For cold storage this means the storage should
-        // charge, for hot storage, this means the storage should discharge.
-        auto &thisComp = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum);
-        if (thisComp.TypeOf_Num == DataPlant::TypeOf_ChilledWaterTankMixed || thisComp.TypeOf_Num == DataPlant::TypeOf_ChilledWaterTankStratified) {
-            if (thisComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
-                Real64 localCurLoad = thisComp.EquipDemand;
-                if (localCurLoad != 0) RunFlag = true;
-            }
-        }
 
         if (this->myOneTimeInitFlag) {
             this->setupOutputVars();
