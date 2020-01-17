@@ -4790,7 +4790,6 @@ namespace OutputReportTabular {
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::ElectricEIRChillerReport;
         using ChillerElectricEIR::NumElectricEIRChillers;
         using ChillerReformulatedEIR::ElecReformEIRChiller;
         using ChillerReformulatedEIR::ElecReformEIRChillerReport;
@@ -4908,7 +4907,7 @@ namespace OutputReportTabular {
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
