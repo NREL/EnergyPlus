@@ -369,6 +369,8 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
+  OutputFiles.cc
+  OutputFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
   OutputReportPredefined.cc
@@ -588,8 +590,8 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  WaterToWaterHeatPumpEIR.cc
-  WaterToWaterHeatPumpEIR.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -695,7 +697,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib ${PYTHON_LIBRARIES})
+target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib ${PYTHON_LIBRARIES})
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)

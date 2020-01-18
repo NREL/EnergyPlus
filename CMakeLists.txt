@@ -19,6 +19,8 @@ set( CMAKE_VERSION_MAJOR 9 )
 set( CMAKE_VERSION_MINOR 3 )
 set( CMAKE_VERSION_PATCH 0 )
 
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
 set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
@@ -127,9 +129,10 @@ else()
   find_package(PythonInterp 3 REQUIRED)
   # we should now have the ideal python, in the build tree, but we need to be *very* sure
   if ("${PYTHON_EXECUTABLE}" STREQUAL "${IDEALEXELOCATION}")
-    # I am using IDEAL location here because I never want to accidentally "fixup" a system python executable
+    # I am using IDEAL location in the fixup call because I never want to accidentally "fixup" a system python executable
     message("Fixing up Python executable")
     fixup_executable(${IDEALEXELOCATION})
+    # this is currently resulting in an invalid Python executable
   else()
     error("Did not find Python executable in ideal location -- problem!")
   endif()
@@ -251,6 +254,7 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
@@ -309,9 +313,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V9-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-2-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
