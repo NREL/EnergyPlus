@@ -666,14 +666,6 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
                    DEPENDS generate_embeddedable_epJSON_schema )
 
 add_subdirectory(AirflowNetwork)
-#message( $<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES> )
-#include_directories($<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES>)
-
-# We are going to need to link up to Python.  We already require Python in the root CMakeLists, but we need to find
-# the library files here
-find_package(PythonLibs 3 REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-message("Python Library Details: \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")
 
 add_custom_target(
         pythonapi

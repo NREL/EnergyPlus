@@ -73,10 +73,80 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here, could we change this to only find it
-# if("${PYTHON_EXECUTABLE}" STREQUAL "")
+include(cmake/ProjectMacros.cmake)
+
+# We need to connect up to python for a couple reasons.
+# 1. We use Python in our testing scripts
+# 2. We link EnergyPlus up against the Python lib for Python Plugin work
+# 3. We use Python for our Python API runs
+# We are going to create a local virtual environment that is portable so we can package it and install it
+# Users will not need to have Python installed, and it will come with a Python.exe and a Pip.exe for installing libraries
+
+# When configured properly, the python executable we want to use will be in the build directory
+# However, it was previously just found on the system
+# We should carefully proceed to decide what actions to take
+if("${PYTHON_EXECUTABLE}" STREQUAL "")
+  # no python executable has been found, this is probably the initial configure so we need to find the system python
   find_package(PythonInterp 3 REQUIRED)
-# endif()
+endif()
+
+message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
+
+# At this point, we should have *a* Python executable, so we can make sure we also have a virtual environment in the build tree
+if(EXISTS ${CMAKE_BINARY_DIR}/Products/pythonenv)
+  message("Found Python Virtual Environment at ${CMAKE_BINARY_DIR}/Products/pythonenv")
+else()
+  message("Creating virtual environment")
+  execute_process(
+          COMMAND "${PYTHON_EXECUTABLE}" "-m" "venv" "${CMAKE_BINARY_DIR}/Products/pythonenv"
+          TIMEOUT 30
+          RESULT_VARIABLE ENV_EXIT_CODE
+          OUTPUT_VARIABLE CREATION_OUTPUT
+  )
+  message("${CREATION_OUTPUT}")
+endif()
+
+message("Python configuration (2): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
+
+# Now we need to try to make sure the Python executable is the right one, it should point to the one in the build env
+get_filename_component(ACTUALEXELOCATION "${PYTHON_EXECUTABLE}" ABSOLUTE)
+if(WIN32)
+  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/PRODUCTS/PYTHONENV/BIN/PYTHON3.EXE" ABSOLUTE)
+  string(TOUPPER ACTUALEXELOCATION "${ACTUALEXELOCATION}")  # TODO: Will this work?
+else()
+  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/Products/pythonenv/bin/Python3" ABSOLUTE)
+endif()
+
+message("Python configuration (3): \n  Actual Python EXE: ${ACTUALEXELOCATION}\n  Ideal Python EXE: ${IDEALEXELOCATION}")
+
+if("${ACTUALEXELOCATION}" STREQUAL "${IDEALEXELOCATION}")
+  # great, we have one in the build env, carry on
+else()
+  # we have an external Python executable -- need to point to the one in the build env
+  set(PYTHON_EXECUTABLE "${IDEALEXELOCATION}")
+  find_package(PythonInterp 3 REQUIRED)
+  # we should now have the ideal python, in the build tree, but we need to be *very* sure
+  if ("${PYTHON_EXECUTABLE}" STREQUAL "${IDEALEXELOCATION}")
+    # I am using IDEAL location here because I never want to accidentally "fixup" a system python executable
+    message("Fixing up Python executable")
+    fixup_executable(${IDEALEXELOCATION})
+  else()
+    error("Did not find Python executable in ideal location -- problem!")
+  endif()
+
+  # TODO: then hint the library finder to the build env
+  execute_process(
+          COMMAND "${PYTHON_EXECUTABLE}" "-c" "\"import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))\""
+          OUTPUT_VARIABLE THIS_OUTPUT
+  )
+  set(PYTHON_LIBRARY ${THIS_OUTPUT})
+  find_package(PythonLibs 3 REQUIRED)
+  include_directories(${PYTHON_INCLUDE_DIRS})
+endif()
+
+# Now we should have a PYTHON_EXECUTABLE that points to the desired locale in the build tree, fixed up, and with libs as well
+message("Python configuration (4): \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")
+
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -131,7 +201,6 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
-include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
