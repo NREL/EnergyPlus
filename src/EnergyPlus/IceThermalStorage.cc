@@ -67,6 +67,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -178,12 +179,24 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SimpleIceStorageData::simulate(const PlantLocation &calledFromLocation,
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
     {
         std::string const RoutineName("SimpleIceStorageData::simulate");
+
+        // this was happening in PlantLoopEquip before
+        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum));
+
+        // If component setpoint based control is active for this equipment
+        // then reset CurLoad to original EquipDemand.
+        // Allow negative CurLoad.  For cold storage this means the storage should
+        // charge, for hot storage, this means the storage should discharge.
+        if (thisComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+            Real64 localCurLoad = thisComp.EquipDemand;
+            if (localCurLoad != 0) RunFlag = true;
+        }
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
@@ -279,6 +292,7 @@ namespace IceThermalStorage {
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))
     {
+
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             this->ResetXForITSFlag = true;
             this->MyEnvrnFlag = false;
