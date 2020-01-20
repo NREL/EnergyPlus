@@ -181,6 +181,7 @@
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
@@ -192,6 +193,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -222,7 +224,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -369,7 +371,6 @@ void EnergyPlusFixture::clear_all_states()
     EarthTube::clear_state();
     EconomicLifeCycleCost::clear_state();
     EconomicTariff::clear_state();
-    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
     EMSManager::clear_state();
     EnergyPlus::inputProcessor->clear_state();
     EvaporativeCoolers::clear_state();
@@ -430,6 +431,7 @@ void EnergyPlusFixture::clear_all_states()
     PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
     PlantCondLoopOperation::clear_state();
+    PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
     PlantLoopSolver::clear_state();
     PlantManager::clear_state();
@@ -444,6 +446,7 @@ void EnergyPlusFixture::clear_all_states()
     Pumps::clear_state();
     PurchasedAirManager::clear_state();
     PVWatts::clear_state();
+    RefrigeratedCase::clear_state();
     ResultsFramework::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
@@ -472,6 +475,7 @@ void EnergyPlusFixture::clear_all_states()
     WaterCoils::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
+    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();

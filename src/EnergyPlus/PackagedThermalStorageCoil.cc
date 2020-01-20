@@ -4420,7 +4420,7 @@ namespace PackagedThermalStorageCoil {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet hum rat [kg_h20/kg_dryair]
+        // par(2) = desired air outlet hum rat [kgWater/kgDryAir]
         // par(3) = TES coil operating mode
         // par(4) = outlet node number
         // par(5) = supply air fan operating mode (ContFanCycCoil)
@@ -4436,7 +4436,7 @@ namespace PackagedThermalStorageCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;          // index of this coil
-        Real64 OutletAirHumRat; // outlet air humidity ratio [kg_H20/Kg_dryair]
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kgWater/kgDryAir]
         int FanOpMode;          // Supply air fan operating mode
         int TESOpMode;
         int OutletNodeNum;
@@ -4535,8 +4535,7 @@ namespace PackagedThermalStorageCoil {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using WaterThermalTanks::CalcTankTemp;
-        using WaterThermalTanks::CalcTempIntegral;
+        using WaterThermalTanks::WaterThermalTankData;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4599,7 +4598,7 @@ namespace PackagedThermalStorageCoil {
         LossCoeff = TESCoil(TESCoilNum).StorageUA;
         QdotTES = TESCoil(TESCoilNum).QdotTES;
 
-        NewTankTemp = CalcTankTemp(TankTemp,
+        NewTankTemp = WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp,
                                    AmbientTemp,
                                    UseInletTemp,
                                    SourceInletTemp,
@@ -4632,7 +4631,7 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).TESPlantOutletNodeNum).Temp = NewOutletTemp;
         }
 
-        deltaTsum = CalcTempIntegral(TankTemp,
+        deltaTsum = WaterThermalTankData::CalcTempIntegral(TankTemp,
                                      NewTankTemp,
                                      AmbientTemp,
                                      UseInletTemp,

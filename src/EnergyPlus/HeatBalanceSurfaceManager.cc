@@ -509,7 +509,6 @@ namespace HeatBalanceSurfaceManager {
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
         if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange();
-
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades

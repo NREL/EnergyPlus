@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2233,13 +2233,13 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -2252,7 +2252,7 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Real64 PressureSet = 0.5;
 
@@ -2465,7 +2465,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -3007,7 +3007,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
@@ -4399,13 +4399,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     bool ErrorsFound = false;
     // Read objects
     SimulationManager::GetProjectData();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4422,7 +4422,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check inputs
@@ -5612,7 +5612,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -5632,7 +5632,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6254,7 +6254,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -6274,7 +6274,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6877,7 +6877,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -6897,7 +6897,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     EXPECT_EQ(CurveManager::NumCurves, 6);
 
@@ -7504,7 +7504,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -7524,7 +7524,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8138,7 +8138,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -8158,7 +8158,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8864,13 +8864,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     bool ErrorsFound = false;
     // Read objects
     SimulationManager::GetProjectData();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -8892,7 +8892,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check the airflow elements
@@ -9339,7 +9339,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -9359,7 +9359,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     CurveManager::GetCurveInput();
     EXPECT_EQ(0, CurveManager::NumCurves);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, CurveManager::NumCurves);
@@ -12872,13 +12872,13 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -12891,7 +12891,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -13386,7 +13386,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -13421,7 +13421,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
     AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(First, iter, resimu);
@@ -15324,13 +15324,13 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -15343,7 +15343,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Schedule(1).CurrentValue = 1.0;
     Schedule(2).CurrentValue = 100.0;
