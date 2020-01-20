@@ -774,6 +774,7 @@ namespace FuelCellElectricGenerator {
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
+                FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
                 FuelCell(thisFuelCell).ExhaustHX.Name = AlphArray(1);
                 FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
@@ -989,6 +990,7 @@ namespace FuelCellElectricGenerator {
                 int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
+                    FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
                     FuelCell(thisFuelCell).StackCooler.Name = AlphArray(1);
                     FuelCell(thisFuelCell).StackCooler.WaterInNodeName = AlphArray(2);
 
