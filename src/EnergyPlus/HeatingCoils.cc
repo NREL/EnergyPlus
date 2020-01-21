@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3112,10 +3112,11 @@ namespace HeatingCoils {
 
         CoilFound = 0;
 
-        // This function only used for dessicant regeneration
-        if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) ||
-            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+        // note should eventually get rid of this string comparison
+        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
+            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
+            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            GetDXCoilIndex(CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTISPEED &&
                     HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
